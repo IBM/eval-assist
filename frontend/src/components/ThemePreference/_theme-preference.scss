@@ -1,0 +1,40 @@
+@use '@carbon/react/scss/theme';
+@use '@carbon/react/scss/themes';
+
+// :root {
+//   @media (prefers-color-scheme: light) {
+//     @include theme.theme(themes.$white);
+//   }
+
+//   @media (prefers-color-scheme: dark) {
+//     @include theme.theme(themes.$g100);
+//   }
+// }
+
+[data-carbon-theme='white'] {
+  @include theme.theme(themes.$white);
+}
+
+[data-carbon-theme='g10'] {
+  @include theme.theme(themes.$g10);
+}
+
+[data-carbon-theme='g90'] {
+  @include theme.theme(themes.$g90);
+}
+
+[data-carbon-theme='g100'] {
+  @include theme.theme(themes.$g100);
+}
+
+html,
+body {
+  background: theme.$background;
+  color: theme.$text-primary;
+}
+
+button {
+  svg {
+    fill: theme.$text-primary;
+  }
+}

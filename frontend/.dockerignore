@@ -1,0 +1,6 @@
+Secrets.yaml
+.env
+.dockerignore
+Dockerfile
+.vscode
+.git

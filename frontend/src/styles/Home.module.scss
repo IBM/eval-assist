@@ -1,0 +1,12 @@
+@use '@carbon/react/scss/theme';
+@use '@carbon/type';
+@use '@carbon/layout';
+
+.header {
+  @include type.type-style('heading-03');
+}
+
+.text {
+  @include type.type-style('body-short-01');
+  padding: layout.$spacing-06 0;
+}
