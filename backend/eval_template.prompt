@@ -1,0 +1,17 @@
+<s>[INST] <<SYS>>
+You are a helpful and honest assistant.
+<</SYS>>
+
+This is an instruction:
+"{prompt}"
+
+There are two outputs to the instruction:
+Output 1: "{output_1}"
+Output 2: "{output_2}"
+
+A quality output adheres to the following evaluation criteria:
+"{eval_criteria}"
+
+Which output is better quality based on the evaluation criteria?
+
+[/INST] Based on the evaluation criteria, the better quality output is output  

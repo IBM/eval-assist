@@ -1,0 +1,9 @@
+fastapi==0.103.1
+ibm_generative_ai==2.1.0
+langchain==0.0.317
+numpy==1.25.2
+pandas==2.1.1
+pydantic==2.6.0
+python-dotenv==1.0.0
+prisma==0.12.0
+uvicorn==0.24.0.post1
