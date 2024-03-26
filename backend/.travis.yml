@@ -4,6 +4,7 @@ branches:
   only:
   - main
   - dev
+  - demo
 
 services: 
   - docker
