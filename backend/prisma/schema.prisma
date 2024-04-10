@@ -12,126 +12,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model Evaluation {
-  id        Int     @id @default(autoincrement())
-  created_at  DateTime   @default(now())
-  name      String   
-  content   String?
-  aimodels Model[]
-  dataset  Dataset? @relation(fields: [datasetId], references: [id])
-  datasetId Int?
-  prompt String?
-  evaluator String?
-  criteria String?
-  run Run?
-  review Review?
-}
+  id   Int    @id @default(autoincrement())
+  name String
 
-model Model {
-  id        Int     @id @default(autoincrement())
-  name  String
-  index Int @default(autoincrement())
-  evaluation  Evaluation? @relation(fields: [evaluationId], references: [id])
-  evaluationId Int
-  outputs Output[]
-}
+  created_at  DateTime      @default(now())
+  deleted     Boolean       @default(false)
+  deleted_at  DateTime?
+  ModelOutput ModelOutput[]
+  Datum Datum[]
 
-model Dataset {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
-  num_examples Int
-  datums Datum[]
-  variables InputVariable[]  
-  evaluations Evaluation[]
+  @@map("evaluation")
 }
 
 model Datum {
-  id        Int     @id @default(autoincrement())
-  data      Json
-  dataset  Dataset @relation(fields: [datasetId], references: [id])
-  datasetId Int
+  id          Int           @id @default(autoincrement())
+  context     Json
+  evaluation_id Int
+  evaluation    Evaluation @relation(fields: [evaluation_id], references: [id])
+  ModelOutput ModelOutput[]
+
+  @@map("datum")
 }
 
-model InputVariable {
-  id        Int     @id @default(autoincrement())
-  name      String
-  dataset  Dataset @relation(fields: [datasetId], references: [id])
-  datasetId Int
-}
+model ModelOutput {
+  id            Int        @id @default(autoincrement())
+  evaluation_id Int
+  evaluation    Evaluation @relation(fields: [evaluation_id], references: [id])
+  datum_id      Int
+  datum         Datum      @relation(fields: [datum_id], references: [id])
+  config        String
+  text          String
 
-model Run {
-  id        Int     @id @default(autoincrement())
-  name      String
-  state     String
-  progress Int @default(0)
-  evaluation  Evaluation @relation(fields: [evaluationId], references: [id])
-  evaluationId Int @unique
-  examples Example[]
-  contests Contest[]
-}
-
-model Review {
-  id          Int     @id @default(autoincrement())
-  evaluation  Evaluation @relation(fields: [evaluationId], references: [id])
-  evaluationId Int  @unique
-  examples ReviewExample[]
-}
-
-model ReviewExample {
-  id          Int     @id @default(autoincrement())
-  review  Review @relation(fields: [reviewId], references: [id])
-  reviewId Int
-  
-  example  Example @relation(fields: [exampleId], references: [id])
-  exampleId Int @unique
-
-  complete Boolean @default(false)
-  index Int @default(autoincrement())
-
-  bestOutput  Output? @relation("bestOutput", fields: [bestOutputId], references: [id])
-  bestOutputId Int? @unique
-
-  bestEvalOutput  Output? @relation("bestEvalOutput", fields: [bestEvalOutputId], references: [id])
-  bestEvalOutputId Int? @unique
-}
-
-model Example {
-  id        Int     @id @default(autoincrement())
-  prompt      String
-  run  Run @relation(fields: [runId], references: [id])
-  runId Int
-  outputs Output[]
-  contests Contest[]
-  reviewExample ReviewExample?
-}
-
-model Output {
-  id        Int     @id @default(autoincrement())
-  text      String
-  model     Model @relation(fields: [modelId], references: [id])
-  modelId   Int
-  example   Example @relation(fields: [exampleId], references: [id])
-  exampleId Int
-
-  output1Contests Contest[]  @relation("output1")
-  output2Contests Contest[]  @relation("output2")
-  winningContests Contest[]  @relation("winningOutput")
-
-  bestOutputInReviewExample ReviewExample? @relation("bestOutput")
-  bestEvalOutputInReviewExample ReviewExample? @relation("bestEvalOutput")
-}
-
-model Contest {
-  id                Int     @id @default(autoincrement())
-  explanation       String
-  output1           Output     @relation(fields: [output1Id], references: [id], name: "output1")
-  output1Id         Int
-  output2           Output     @relation(fields: [output2Id], references: [id], name: "output2")
-  output2Id         Int
-  winningOutput     Output     @relation(fields: [winningOutputId], references: [id], name: "winningOutput")
-  winningOutputId   Int
-  example           Example     @relation(fields: [exampleId], references: [id])
-  exampleId         Int
-  run               Run     @relation(fields: [runId], references: [id])
-  runId             Int
+  @@map("model_output")
 }
