@@ -24,7 +24,8 @@
       "@hooks": ["src/customHooks"],
       "@env": ["src/env"],
       "@theme": ["src/components/ThemePreference"],
-      "@types": ["src/types"]
+      "@types": ["src/types"],
+      "@customHooks/*": ["src/customHooks/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "carbon.d.ts"],

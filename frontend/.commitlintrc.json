@@ -1,12 +1,25 @@
 {
-  "extends": ["@commitlint/config-conventional"],
+  "extends": [
+    "@commitlint/config-conventional"
+  ],
   "rules": {
-    "type-enum": [2, "always", ["feat", "fix", "docs", "style", "refactor", "perf", "test", "chore"]],
-    "signed-off-by": [2, "always", "Signed-off-by:"],
-    "footer-leading-blank": [1, "always"],
-    "subject-empty": [2, "never"],
-    "body-empty": [2, "never"],
-    "body-leading-blank": [2, "always"],
-    "references-empty": [1, "never"]
+    "type-enum": [
+      2,
+      "always",
+      [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "chore"
+      ]
+    ],
+    "subject-empty": [
+      2,
+      "never"
+    ]
   }
 }

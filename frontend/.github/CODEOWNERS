@@ -1,0 +1,11 @@
+# This is a comment.
+# Each line is a file pattern followed by one or more owners.
+# For more details on how to use this file, check out
+# GitHubs's documentation:
+# https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/about-code-owners
+
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# those listed below will be requested for
+# review when someone opens a pull request.
+*       @Zoe-Gathercole @tuliocoppola

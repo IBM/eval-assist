@@ -10,3 +10,7 @@
   @include type.type-style('body-short-01');
   padding: layout.$spacing-06 0;
 }
+
+.new-prompt {
+  margin-top: layout.$spacing-06;
+}

@@ -1,8 +1,0 @@
-.table-wrapper :global(.cds--data-table-content) {
-    overflow: visible;
-}
-
-.table-wrapper :global(.cds--tooltip-content) {
-    border-radius: 5px;
-}
-
