@@ -1,32 +1,26 @@
-const { i18n } = require('./next-i18next.config')
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  i18n,
   reactStrictMode: true,
   swcMinify: true,
   eslint: {
-    ignoreDuringBuilds: true
+    ignoreDuringBuilds: true,
   },
   poweredByHeader: false,
   output: 'standalone',
-  async rewrites() {
+  async headers() {
     return [
       {
-        source: '/api/runs/:slug',
-        destination: `${process.env.BACKEND_API_HOST}/runs/:slug`,
-      },
-      {
-        source: '/api/runs',
-        destination: `${process.env.BACKEND_API_HOST}/runs`,
-      },
-      {
-        source: '/api/health',
-        destination: `${process.env.BACKEND_API_HOST}/health`,
-      },
-      {
-        source: '/api/cancel_evaluation',
-        destination: `${process.env.BACKEND_API_HOST}/cancel_evaluation`,
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: '*' }, // replace this your actual origin
+          { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT' },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value:
+              'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+          },
+        ],
       },
     ]
   },

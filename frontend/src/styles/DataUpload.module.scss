@@ -1,0 +1,13 @@
+.list-item {
+  padding-left: 1.28571429em;
+  text-indent: -1.28571429em;
+  line-height: 20px;
+}
+
+.loading-wrapper :global .cds--inline-loading__text {
+  // taken from button css
+  font-size: 0.95rem;
+  font-weight: var(--cds-body-compact-01-font-weight, 400);
+  line-height: var(--cds-body-compact-01-line-height, 1.28572);
+  letter-spacing: var(--cds-body-compact-01-letter-spacing, 0.16px);
+}

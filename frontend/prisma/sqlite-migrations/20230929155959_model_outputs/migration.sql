@@ -1,9 +1,0 @@
--- CreateTable
-CREATE TABLE "Output" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "text" TEXT NOT NULL,
-    "modelId" INTEGER NOT NULL,
-    "exampleId" INTEGER NOT NULL,
-    CONSTRAINT "Output_modelId_fkey" FOREIGN KEY ("modelId") REFERENCES "Model" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Output_exampleId_fkey" FOREIGN KEY ("exampleId") REFERENCES "Example" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
-);

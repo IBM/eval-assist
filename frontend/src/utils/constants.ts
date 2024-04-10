@@ -1,1 +1,1 @@
-export const PLATFORM_NAME = 'EvaluLLM'
+export const PLATFORM_NAME = 'EvalAssist'
