@@ -3,6 +3,7 @@ from fastapi import FastAPI, status, UploadFile, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import List
 from dotenv import load_dotenv
 
 from .utils import log_runtime
@@ -13,6 +14,9 @@ load_dotenv()
 import pandas as pd 
 from time import sleep
 import json
+from genai import Credentials, Client
+from src.evaluators import RubricEvaluator, Rubric, RubricOption
+
 
 app = FastAPI()
 app.add_middleware(
@@ -23,13 +27,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Gen ai client
+credentials = Credentials.from_env()
+app.client = Client(credentials=credentials)
+
 class HealthCheck(BaseModel):
     status: str = "OK"
 
-
 class PostEvaluationBody(BaseModel):
     name: str
-
 
 class MissingColumnsException(Exception):
     def __init__(self, message):
@@ -158,6 +164,32 @@ async def upload_data(evaluation_id: int, file: UploadFile):
 async def app_shutdown():
     db.disconnect()
 
+
+class RubricOptionModel(BaseModel):
+    option: str
+    description: str
+
+class RubricModel(BaseModel):
+    criteria: str
+    options: List[RubricOptionModel]
+
+class EvalRequestModel(BaseModel):
+    context: str
+    response: str
+    rubric: RubricModel
+
+class EvalResponseModel(BaseModel):
+    option: str
+    explanation: str
+
+@app.post("/evaluate", response_model=EvalResponseModel)
+async def evaluate(evalRequest: EvalRequestModel):
+    evaluator = RubricEvaluator(client=app.client)
+    rubric = Rubric.from_json(evalRequest.rubric.model_dump_json())
+    return evaluator.evaluate("mistralai/mixtral-8x7b-instruct-v0-1", 
+                              evalRequest.context, 
+                              evalRequest.response, 
+                              rubric)
 
 # @app.post("/runs")
 # async def post_run(req: PostRunRequest, background_tasks: BackgroundTasks):
