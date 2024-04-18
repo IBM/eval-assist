@@ -4,6 +4,8 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
+
+from .utils import log_runtime
 from .db_client import db
 from .genai_client import client
 from datetime import datetime
@@ -75,21 +77,14 @@ async def delete_evaluations(id: int):
         },
         data = {
             'deleted': True,
-            'deleted_at': datetime.datetime.now()
+            'deleted_at': datetime.now()
         }
     )
 
-@app.post("/evaluation/{evaluation_id}/upload_data/")
-async def upload_data(evaluation_id: int, file: UploadFile):
+def validate_data(df: pd.DataFrame, context_columns, df_colums_stripped):
     required_columns = ['config', 'model_output']
-    try:
-        csv_data = StringIO(file.file.read().decode("utf-8"))
-        df = pd.read_csv(csv_data)
-    except:
-        raise HTTPException(status_code=400, detail=f'Something went wrong processing the file.')
-    df_colums_stripped = [c.strip() for c in df.columns ]
-    context_columns = [c for c in df_colums_stripped if c.startswith('context_')]
     missing_columns = set(required_columns) - set(df_colums_stripped)
+
     if len(missing_columns) > 0:
         raise HTTPException(status_code=400, detail=f'Missing required columns. Please make sure to include {missing_columns}.' )
     if df.shape[0] == 0:
@@ -97,22 +92,30 @@ async def upload_data(evaluation_id: int, file: UploadFile):
     if len(context_columns) == 0:
         raise HTTPException(status_code=400, detail=f'No context columns were found in the csv file.' )
     
-
-    # Save everything 
-    groups = df.groupby(context_columns)
-
+@log_runtime
+def store_datums(groups, context_columns, evaluation_id):
     datums_to_create = []
     for name, group in groups:
+        # name: a tuple with the grouped by values
+        # group: a df that only includes the rows where grouped by columns == name tuple
         context_json = {context_columns[i]:name[i] for i in range(len(context_columns))}
         # datum = db.datum.create(data={'context': json.dumps(context_json)})
         datums_to_create.append({'context': json.dumps(context_json), 'evaluation_id': evaluation_id})
-       
-    count = db.datum.create_many(datums_to_create)
-    print(f"Created {count} datums")
     
+    created_datums_count = db.datum.create_many(datums_to_create)
+    print(f"Created {created_datums_count} datums")
+    return created_datums_count
+
+@log_runtime
+def store_model_outputs(groups, evaluation_id):
+    # Create and store the model outputs
+    # Get all the datums for the current evaluation in order to get their ids
     created_datums = db.datum.find_many(where={'evaluation_id': evaluation_id})
     model_outputs_to_create = []
     for name, group in groups:
+        # Get the datum from the datum list for the current group
+        # there may be a more efficient way to do this. For each group we are searching for all the datums
+        # The important aspect is not to access the DB again
         datum = next(x for x in created_datums if all(x.context[k] == group[k].tolist()[0] for k in x.context))
         for index, row in group.iterrows():
             model_output = {
@@ -122,9 +125,34 @@ async def upload_data(evaluation_id: int, file: UploadFile):
                 'text': row.loc['model_output'],
             }
             model_outputs_to_create.append(model_output)
-    db.modeloutput.create_many(model_outputs_to_create)
+    
+    created_model_outputs_count = db.modeloutput.create_many(model_outputs_to_create)
+    print(f"Created {created_model_outputs_count} datums")
+    return created_model_outputs_count
 
-    return 'Ok', 200
+@app.post("/evaluation/{evaluation_id}/upload_data/")
+async def upload_data(evaluation_id: int, file: UploadFile):
+    try:
+        csv_data = StringIO(file.file.read().decode("utf-8"))
+        df = pd.read_csv(csv_data)
+    except:
+        raise HTTPException(status_code=400, detail=f'Something went wrong processing the file.')
+    df_colums_stripped = [c.strip() for c in df.columns ]
+    context_columns = [c for c in df_colums_stripped if c.startswith('context_')]
+    validate_data(df, context_columns, df_colums_stripped)
+
+    # Create and store the datums by grouping bt the context columns
+    groups = df.groupby(context_columns)
+
+    created_datums_count = store_datums(groups, context_columns, evaluation_id)
+    created_model_outputs_count = store_model_outputs(groups, evaluation_id)
+    
+    res =  {
+        'created_datums_count': created_datums_count, 
+        'created_model_outputs_count': created_model_outputs_count
+        }
+
+    return res
 
 @app.on_event("shutdown")    
 async def app_shutdown():
