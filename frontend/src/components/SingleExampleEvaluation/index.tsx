@@ -143,7 +143,7 @@ const EvaluationCriteria = ({
                           labelText="Description"
                           // readOnly={evaluationRunning}
                           // placeholder="Enter your prompt..."
-                          style={{ marginBottom: '2rem' }}
+                          style={{ marginBottom: '1rem' }}
                         />
                         {criteria.scales.map((scale, i) => (
                           <div
@@ -151,7 +151,7 @@ const EvaluationCriteria = ({
                               display: 'flex',
                               flexDirection: 'row',
                               alignItems: 'center',
-                              marginBottom: '2rem',
+                              marginBottom: '1rem',
                             }}
                             key={i}
                           >
@@ -354,7 +354,7 @@ export const SingleExampleEvaluation = () => {
 
   return (
     <div>
-      {/* <h3 style={{ marginBottom: '1rem' }}>Set up</h3> */}
+      <h3 style={{ marginBottom: '1rem' }}>Evaluation sandbox</h3>
       <TextArea
         onChange={(e) => setContext(e.target.value)}
         rows={8}
@@ -363,7 +363,7 @@ export const SingleExampleEvaluation = () => {
         labelText="Task context (optional)"
         // readOnly={evaluationRunning}
         // placeholder="Enter your prompt..."
-        style={{ marginBottom: '2rem' }}
+        style={{ marginBottom: '1rem' }}
       />
 
       <TextArea
@@ -371,10 +371,10 @@ export const SingleExampleEvaluation = () => {
         rows={8}
         value={modelOutput}
         id="text-area-model-output"
-        labelText="Output to evaluate"
+        labelText="Response to evaluate"
         // readOnly={evaluationRunning}
         // placeholder="Enter your prompt..."
-        style={{ marginBottom: '2rem' }}
+        style={{ marginBottom: '1rem' }}
       />
 
       <EvaluationCriteria
