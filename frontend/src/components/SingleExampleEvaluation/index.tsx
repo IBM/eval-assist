@@ -6,6 +6,7 @@ import {
   Button,
   IconButton,
   InlineLoading,
+  Layer,
   Tab,
   TabList,
   TabPanel,
@@ -13,6 +14,7 @@ import {
   Tabs,
   TextArea,
   TextInput,
+  Tile,
 } from '@carbon/react'
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
@@ -69,7 +71,7 @@ const EvaluationCriteria = ({
     }
   }
   return (
-    <div style={{ backgroundColor: '#f4f4f4', marginBottom: '2rem' }}>
+    <div style={{ marginBottom: '2rem' }}>
       <Accordion>
         <AccordionItem
           title="Evaluation Criteria"
@@ -77,9 +79,9 @@ const EvaluationCriteria = ({
           onHeadingClick={() => setIsEvaluationCriteriaCollapsed(!isEvaluationCriteriaCollapsed)}
           className={classes['wrapper']}
         >
-          <div style={{ backgroundColor: '#f4f4f4', padding: '1rem' }}>
+          <div style={{}}>
             {/* <h5 style={{ marginBottom: '2rem' }}></h5> */}
-            <div style={{ paddingInline: '2rem' }}>
+            <div style={{}}>
               <Tabs>
                 <TabList aria-label="List of tabs" contained>
                   <Tab>Form</Tab>
@@ -88,14 +90,14 @@ const EvaluationCriteria = ({
                 <TabPanels>
                   <TabPanel>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ backgroundColor: 'white', padding: '1rem', marginBottom: '2rem' }}>
+                      <Layer style={{ padding: '0rem', marginBottom: '0rem' }}>
                         <div
                           style={{
                             display: 'flex',
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            marginBottom: '2rem',
+                            marginBottom: '1rem',
                           }}
                         >
                           <div
@@ -114,7 +116,7 @@ const EvaluationCriteria = ({
                                 readOnly={!isEditingCriteriaTitle}
                                 id="text-input-criteria-title"
                                 placeholder="Criteria title"
-                                style={{ backgroundColor: 'white', width: '80%' }}
+                                style={{ width: '80%' }}
                               />
                             ) : (
                               <h4 style={{ width: '80%' }}>{criteria.title}</h4>
@@ -139,9 +141,9 @@ const EvaluationCriteria = ({
                           value={criteria.description}
                           id="text-area-evaluation-instruction"
                           labelText="Description"
-                          readOnly={evaluationRunning}
+                          // readOnly={evaluationRunning}
                           // placeholder="Enter your prompt..."
-                          style={{ backgroundColor: '#f4f4f4', marginBottom: '2rem' }}
+                          style={{ marginBottom: '2rem' }}
                         />
                         {criteria.scales.map((scale, i) => (
                           <div
@@ -167,7 +169,7 @@ const EvaluationCriteria = ({
                                     ],
                                   })
                                 }
-                                readOnly={evaluationRunning}
+                                // readOnly={evaluationRunning}
                                 id="text-input-value"
                               />
                             </div>
@@ -176,7 +178,7 @@ const EvaluationCriteria = ({
                               <TextInput
                                 labelText="Definition"
                                 value={scale.definition}
-                                readOnly={evaluationRunning}
+                                // readOnly={evaluationRunning}
                                 id="text-input-definition"
                                 onChange={(e) =>
                                   setCriteria({
@@ -196,7 +198,7 @@ const EvaluationCriteria = ({
                                 label={'Remove'}
                                 size="lg"
                                 kind="ghost"
-                                style={{ backgroundColor: 'white', paddingTop: '24px' }}
+                                style={{ paddingTop: '24px' }}
                                 onClick={() =>
                                   setCriteria({ ...criteria, scales: criteria.scales.filter((s, j) => j !== i) })
                                 }
@@ -215,10 +217,10 @@ const EvaluationCriteria = ({
                         >
                           Add scale
                         </Button>
-                      </div>
-                      <Button renderIcon={Add} disabled kind="tertiary">
+                      </Layer>
+                      {/* <Button renderIcon={Add} disabled kind="tertiary">
                         {'Add new criteria'}
-                      </Button>
+                      </Button> */}
                     </div>
                   </TabPanel>
                   <TabPanel>
@@ -226,13 +228,13 @@ const EvaluationCriteria = ({
                       labelText="JSON input"
                       value={rawJSONCriteria}
                       onChange={onJSONCriteriaChange}
-                      readOnly={evaluationRunning}
+                      // readOnly={evaluationRunning}
                       id="text-input-json-raw"
                       placeholder="Input evaluation criteria in json format"
                       rows={10}
                       invalid={rawJSONCriteria !== '' && !isValidRawJSONCriteria()}
                       invalidText={'JSON input is invalid'}
-                      style={{ backgroundColor: 'white' }}
+                      style={{}}
                       type="json"
                     />
                   </TabPanel>
@@ -252,19 +254,18 @@ interface EvaluationResult {
 
 const EvaluationResult = ({ results }: EvaluationResult) => {
   const dataStyle = {
-    backgroundColor: '#f4f4f4',
-    padding: '2rem 1rem 2rem 1rem',
+    padding: '1rem 1rem 1rem 1rem',
   }
   const columnNames = ['Criteria', 'Value', 'Explanation']
   return (
-    <div
+    <Tile
       style={{
         display: 'grid',
         gridTemplateColumns: '10% 10% 80%',
       }}
     >
       {columnNames.map((c, i) => (
-        <div style={{ paddingBottom: '1rem' }} key={i}>
+        <div style={{ padding: '1rem' }} key={i}>
           <h5>{c}</h5>
         </div>
       ))}
@@ -275,50 +276,34 @@ const EvaluationResult = ({ results }: EvaluationResult) => {
           <div style={dataStyle}>{results.explanation}</div>
         </>
       )}
-    </div>
+    </Tile>
   )
 }
 
 export const SingleExampleEvaluation = () => {
   const [isEvaluationCriteriaCollapsed, setIsEvaluationCriteriaCollapsed] = useState(true)
-  const [isEvaluationInstructionCollapsed, setIsEvaluationInstructionCollapsed] = useState(false)
+  // const [isEvaluationInstructionCollapsed, setIsEvaluationInstructionCollapsed] = useState(false)
 
-  const [context, setContext] =
-    useState(`context document: Since the incorrect and correct words sound the same, we tell the model to make a phonetic replacement.
-    This is the philosophy behind training custom words into a language model. We train a custom word for eligibility with a JSON body {â€śsounds_likeâ€ť: [â€ślegibilityâ€ť, â€śknowledgeabilityâ€ť, â€śallergy abilityâ€ť, â€śL E G B D Tâ€ť]}. Custom words give phonetic cues. add as many text files as you want within a single custom model, as long as you do not exceed the maximum number of total words of 10 millions.
-    Add custom words to the custom model
-    You can use custom words to handle specific pronunciations of acronyms within your domain. To fix specific data inputs like IDs, dates, phone numbers, amounts, etc, you can use the designated SSML tags here
-    To fix recurring words and expressions, use TTS custom dictionary
-    For speed adjustment, use SSML prosody rate at the node level
-    For intonation and inflexion adjustment, use Phonetic symbols or Tune-By-Example
-    Re-generate audio files for each Watson Assistant output node with the new TTS custom dictionary, SSML tags and other improvements
-    Iterate as many times as required.
-
-    Context query: What is a custom word?
-  `)
-  const [modelOutput, setModelOutput] =
-    useState(`Since the incorrect and correct words sound the same, we tell the model to make a phonetic replacement.
-    This is the philosophy behind training custom words into a language model. We train a custom word for eligibility with a JSON body {‚Äúsounds_like‚Äù: [‚Äúlegibility‚Äù, ‚Äúknowledgeability‚Äù, ‚Äúallergy ability‚Äù, ‚ÄúL E G B D T‚Äù]}. Custom words give phonetic cues. add as many text files as you want within a single custom model, as long as you do not exceed the maximum number of total words of 10 millions.
-    Add custom words to the custom model
-    You can use custom words to handle specific pronunciations of acronyms within your domain. To fix specific data inputs like IDs, dates, phone numbers, amounts, etc, you can use the designated SSML tags here
-    To fix recurring words and expressions, use TTS custom dictionary
-    For speed adjustment, use SSML prosody rate at the node level
-    For intonation and inflexion adjustment, use Phonetic symbols or Tune-By-Example
-    Re-generate audio files for each Watson Assistant output node with the new TTS custom dictionary, SSML tags and other improvements
-    Iterate as many times as required.
-  `)
+  const [context, setContext] = useState('How is the weather there?')
+  const [modelOutput, setModelOutput] = useState(
+    'On most days, the weather is warm and humid, with temperatures often soaring into the high 80s and low 90s Fahrenheit (around 31-34°C). The dense foliage of the jungle acts as a natural air conditioner, keeping the temperature relatively stable and comfortable for the inhabitants.',
+  )
 
   const [criteria, setCriteria] = useState<Criteria>({
-    title: 'Naturalness',
-    description: 'Is the output sounds natural',
+    title: 'Temperature',
+    description: 'Is temperature described in both Fahrenheit and Celsius?',
     scales: [
       {
         value: 'Yes',
-        definition: 'Uses proper sentences throughout, looks like a skilled writer',
+        definition: 'The temperature is described in both Fahrenheit and Celsius.',
       },
       {
         value: 'No',
-        definition: 'Purely an informal dump, no sentence structure of formatting throughout entire reposes',
+        definition: 'The temperature is described either in Fahrenheit or Celsius but not both.',
+      },
+      {
+        value: 'None',
+        definition: 'A numerical temperature is not mentioned.',
       },
     ],
   })
@@ -355,8 +340,8 @@ export const SingleExampleEvaluation = () => {
 
     const responseBody = await response.json()
 
-    setIsEvaluationCriteriaCollapsed(false)
-    setIsEvaluationInstructionCollapsed(false)
+    // setIsEvaluationCriteriaCollapsed(false)
+    // setIsEvaluationInstructionCollapsed(false)
 
     setResults({
       name: criteria.title,
@@ -369,32 +354,33 @@ export const SingleExampleEvaluation = () => {
 
   return (
     <div>
-      <h3 style={{ marginBottom: '1rem' }}>Set up</h3>
+      {/* <h3 style={{ marginBottom: '1rem' }}>Set up</h3> */}
       <TextArea
         onChange={(e) => setContext(e.target.value)}
-        rows={10}
+        rows={8}
         value={context}
         id="text-area-context"
         labelText="Task context (optional)"
-        readOnly={evaluationRunning}
+        // readOnly={evaluationRunning}
         // placeholder="Enter your prompt..."
-        style={{ marginBottom: '2rem', backgroundColor: '#f4f4f4' }}
+        style={{ marginBottom: '2rem' }}
       />
 
       <TextArea
         onChange={(e) => setModelOutput(e.target.value)}
-        rows={10}
+        rows={8}
         value={modelOutput}
         id="text-area-model-output"
         labelText="Output to evaluate"
-        readOnly={evaluationRunning}
+        // readOnly={evaluationRunning}
         // placeholder="Enter your prompt..."
-        style={{ marginBottom: '2rem', backgroundColor: '#f4f4f4' }}
+        style={{ marginBottom: '2rem' }}
       />
+
       <EvaluationCriteria
         criteria={criteria}
         setCriteria={setCriteria}
-        evaluationRunning={evaluationRunning}
+        evaluationRunning={false}
         isEvaluationCriteriaCollapsed={isEvaluationCriteriaCollapsed}
         setIsEvaluationCriteriaCollapsed={setIsEvaluationCriteriaCollapsed}
       />
