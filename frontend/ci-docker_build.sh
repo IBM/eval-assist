@@ -50,7 +50,8 @@ fi
 
 # build
 echo "starting docker build:"
-docker build --platform linux/amd64 --build-arg DATABASE_URL=$DATABASE_URL --build-arg BACKEND_API_HOST=$BACKEND_API_HOST . -t $IMAGE_TAG
+docker build --platform linux/amd64 --build-arg NEXT_PUBLIC_BACKEND_API_HOST=$NEXT_PUBLIC_BACKEND_API_HOST . -t $IMAGE_TAG
+
 if [ $? -ne 0 ]; then
   colorecho $RED "docker build failed"
   exit 1
