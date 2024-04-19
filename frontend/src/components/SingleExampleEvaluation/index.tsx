@@ -1,9 +1,21 @@
-import { describe } from 'node:test'
-
 import { Dispatch, SetStateAction, useState } from 'react'
 
-import { Button, IconButton, Tab, TabList, TabPanel, TabPanels, Tabs, TextArea, TextInput } from '@carbon/react'
+import {
+  Accordion,
+  AccordionItem,
+  Button,
+  IconButton,
+  InlineLoading,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  TextArea,
+  TextInput,
+} from '@carbon/react'
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
+import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 import { post } from '@utils/fetchUtils'
 
@@ -16,24 +28,32 @@ type Criteria = {
   title: string
   description: string
   scales: Scale[]
-  results: {
-    name: string
-    answer: string
-    explanation: string
-  } | null
+}
+
+type Results = {
+  name: string
+  answer: string
+  explanation: string
 }
 
 interface EvaluationCriteriaProps {
   criteria: Criteria
   setCriteria: Dispatch<SetStateAction<Criteria>>
   evaluationRunning: boolean
+  isEvaluationCriteriaCollapsed: boolean
+  setIsEvaluationCriteriaCollapsed: Dispatch<SetStateAction<boolean>>
 }
 
 const eqSet = (xs: Set<string>, ys: Set<string>) => xs.size === ys.size && [...xs].every((x) => ys.has(x))
 
-const EvaluationCriteria = ({ criteria, setCriteria, evaluationRunning }: EvaluationCriteriaProps) => {
+const EvaluationCriteria = ({
+  criteria,
+  setCriteria,
+  evaluationRunning,
+  isEvaluationCriteriaCollapsed,
+  setIsEvaluationCriteriaCollapsed,
+}: EvaluationCriteriaProps) => {
   const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(criteria.title === '')
-
   const [rawJSONCriteria, setRawJSONCriteria] = useState('')
 
   const onJSONCriteriaChange = (e: { target: { value: string } }) => {
@@ -48,179 +68,194 @@ const EvaluationCriteria = ({ criteria, setCriteria, evaluationRunning }: Evalua
       return false
     }
   }
-
   return (
-    <div style={{ backgroundColor: '#f4f4f4', padding: '1rem', marginBottom: '2rem' }}>
-      <h5 style={{ marginBottom: '2rem' }}>Evaluation Criteria</h5>
-      <div style={{ paddingInline: '2rem' }}>
-        <Tabs>
-          <TabList aria-label="List of tabs" contained>
-            <Tab>Form</Tab>
-            <Tab>JSON</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ backgroundColor: 'white', padding: '1rem', marginBottom: '2rem' }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: '2rem',
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        width: '14rem',
-                      }}
-                    >
-                      {isEditingCriteriaTitle ? (
-                        <TextInput
-                          labelText=""
-                          value={criteria.title}
-                          onChange={(e) => setCriteria({ ...criteria, title: e.target.value })}
-                          readOnly={!isEditingCriteriaTitle}
-                          id="text-input-criteria-title"
-                          placeholder="Criteria title"
-                          style={{ backgroundColor: 'white', width: '80%' }}
-                        />
-                      ) : (
-                        <h4 style={{ width: '80%' }}>{criteria.title}</h4>
-                      )}
-                      {isEditingCriteriaTitle ? (
-                        <IconButton onClick={() => setIsEditingCriteriaTitle(false)} kind="ghost" label={'Save'}>
-                          <Save />
-                        </IconButton>
-                      ) : (
-                        <IconButton onClick={() => setIsEditingCriteriaTitle(true)} kind="ghost" label={'Save'}>
-                          <Edit />
-                        </IconButton>
-                      )}
-                    </div>
-                    <IconButton label={'Remove'} size="lg" kind="ghost" onClick={() => {}}>
-                      <TrashCan />
-                    </IconButton>
-                  </div>
-                  <TextArea
-                    onChange={(e) => setCriteria({ ...criteria, description: e.target.value })}
-                    rows={1}
-                    value={criteria.description}
-                    id="text-area-evaluation-instruction"
-                    labelText="Description"
-                    readOnly={evaluationRunning}
-                    // placeholder="Enter your prompt..."
-                    style={{ backgroundColor: '#f4f4f4', marginBottom: '2rem' }}
-                  />
-                  {criteria.scales.map((scale, i) => (
-                    <div
-                      style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: '2rem' }}
-                      key={i}
-                    >
-                      <div style={{ width: '20%', marginRight: '1rem' }}>
-                        <TextInput
-                          labelText="Value"
-                          value={scale.value}
-                          onChange={(e) =>
-                            setCriteria({
-                              ...criteria,
-                              scales: [
-                                ...criteria.scales.slice(0, i),
-                                { value: e.target.value, definition: criteria.scales[i].definition },
-                                ...criteria.scales.slice(i + 1),
-                              ],
-                            })
-                          }
-                          readOnly={evaluationRunning}
-                          id="text-input-value"
-                        />
-                      </div>
-
-                      <div style={{ width: '75%', marginRight: '1rem' }}>
-                        <TextInput
-                          labelText="Definition"
-                          value={scale.definition}
-                          readOnly={evaluationRunning}
-                          id="text-input-definition"
-                          onChange={(e) =>
-                            setCriteria({
-                              ...criteria,
-                              scales: [
-                                ...criteria.scales.slice(0, i),
-                                { value: criteria.scales[i].value, definition: e.target.value },
-                                ...criteria.scales.slice(i + 1),
-                              ],
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div style={{ width: '5%' }}>
-                        <IconButton
-                          label={'Remove'}
-                          size="lg"
-                          kind="ghost"
-                          style={{ backgroundColor: 'white', paddingTop: '24px' }}
-                          onClick={() =>
-                            setCriteria({ ...criteria, scales: criteria.scales.filter((s, j) => j !== i) })
-                          }
+    <div style={{ backgroundColor: '#f4f4f4', marginBottom: '2rem' }}>
+      <Accordion>
+        <AccordionItem
+          title="Evaluation Criteria"
+          open={isEvaluationCriteriaCollapsed}
+          onHeadingClick={() => setIsEvaluationCriteriaCollapsed(!isEvaluationCriteriaCollapsed)}
+          className={classes['wrapper']}
+        >
+          <div style={{ backgroundColor: '#f4f4f4', padding: '1rem' }}>
+            {/* <h5 style={{ marginBottom: '2rem' }}></h5> */}
+            <div style={{ paddingInline: '2rem' }}>
+              <Tabs>
+                <TabList aria-label="List of tabs" contained>
+                  <Tab>Form</Tab>
+                  <Tab>JSON</Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ backgroundColor: 'white', padding: '1rem', marginBottom: '2rem' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: '2rem',
+                          }}
                         >
-                          <TrashCan />
-                        </IconButton>
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              width: '14rem',
+                            }}
+                          >
+                            {isEditingCriteriaTitle ? (
+                              <TextInput
+                                labelText=""
+                                value={criteria.title}
+                                onChange={(e) => setCriteria({ ...criteria, title: e.target.value })}
+                                readOnly={!isEditingCriteriaTitle}
+                                id="text-input-criteria-title"
+                                placeholder="Criteria title"
+                                style={{ backgroundColor: 'white', width: '80%' }}
+                              />
+                            ) : (
+                              <h4 style={{ width: '80%' }}>{criteria.title}</h4>
+                            )}
+                            {isEditingCriteriaTitle ? (
+                              <IconButton onClick={() => setIsEditingCriteriaTitle(false)} kind="ghost" label={'Save'}>
+                                <Save />
+                              </IconButton>
+                            ) : (
+                              <IconButton onClick={() => setIsEditingCriteriaTitle(true)} kind="ghost" label={'Save'}>
+                                <Edit />
+                              </IconButton>
+                            )}
+                          </div>
+                          <IconButton label={'Remove'} size="lg" kind="ghost" onClick={() => {}}>
+                            <TrashCan />
+                          </IconButton>
+                        </div>
+                        <TextArea
+                          onChange={(e) => setCriteria({ ...criteria, description: e.target.value })}
+                          rows={1}
+                          value={criteria.description}
+                          id="text-area-evaluation-instruction"
+                          labelText="Description"
+                          readOnly={evaluationRunning}
+                          // placeholder="Enter your prompt..."
+                          style={{ backgroundColor: '#f4f4f4', marginBottom: '2rem' }}
+                        />
+                        {criteria.scales.map((scale, i) => (
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              marginBottom: '2rem',
+                            }}
+                            key={i}
+                          >
+                            <div style={{ width: '20%', marginRight: '1rem' }}>
+                              <TextInput
+                                labelText="Value"
+                                value={scale.value}
+                                onChange={(e) =>
+                                  setCriteria({
+                                    ...criteria,
+                                    scales: [
+                                      ...criteria.scales.slice(0, i),
+                                      { value: e.target.value, definition: criteria.scales[i].definition },
+                                      ...criteria.scales.slice(i + 1),
+                                    ],
+                                  })
+                                }
+                                readOnly={evaluationRunning}
+                                id="text-input-value"
+                              />
+                            </div>
+
+                            <div style={{ width: '75%', marginRight: '1rem' }}>
+                              <TextInput
+                                labelText="Definition"
+                                value={scale.definition}
+                                readOnly={evaluationRunning}
+                                id="text-input-definition"
+                                onChange={(e) =>
+                                  setCriteria({
+                                    ...criteria,
+                                    scales: [
+                                      ...criteria.scales.slice(0, i),
+                                      { value: criteria.scales[i].value, definition: e.target.value },
+                                      ...criteria.scales.slice(i + 1),
+                                    ],
+                                  })
+                                }
+                              />
+                            </div>
+
+                            <div style={{ width: '5%' }}>
+                              <IconButton
+                                label={'Remove'}
+                                size="lg"
+                                kind="ghost"
+                                style={{ backgroundColor: 'white', paddingTop: '24px' }}
+                                onClick={() =>
+                                  setCriteria({ ...criteria, scales: criteria.scales.filter((s, j) => j !== i) })
+                                }
+                              >
+                                <TrashCan />
+                              </IconButton>
+                            </div>
+                          </div>
+                        ))}
+                        <Button
+                          onClick={() =>
+                            setCriteria({ ...criteria, scales: [...criteria.scales, { value: '', definition: '' }] })
+                          }
+                          renderIcon={Add}
+                          kind="tertiary"
+                        >
+                          Add scale
+                        </Button>
                       </div>
+                      <Button renderIcon={Add} disabled kind="tertiary">
+                        {'Add new criteria'}
+                      </Button>
                     </div>
-                  ))}
-                  <Button
-                    onClick={() =>
-                      setCriteria({ ...criteria, scales: [...criteria.scales, { value: '', definition: '' }] })
-                    }
-                    renderIcon={Add}
-                    kind="tertiary"
-                  >
-                    Add scale
-                  </Button>
-                </div>
-                <Button renderIcon={Add} disabled kind="tertiary">
-                  {'Add new criteria'}
-                </Button>
-              </div>
-            </TabPanel>
-            <TabPanel>
-              <TextArea
-                labelText="JSON input"
-                value={rawJSONCriteria}
-                onChange={onJSONCriteriaChange}
-                readOnly={evaluationRunning}
-                id="text-input-json-raw"
-                placeholder="Input evaluation criteria in json format"
-                rows={10}
-                invalid={rawJSONCriteria !== '' && !isValidRawJSONCriteria()}
-                invalidText={'JSON input is invalid'}
-                style={{ backgroundColor: 'white' }}
-                type="json"
-              />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </div>
+                  </TabPanel>
+                  <TabPanel>
+                    <TextArea
+                      labelText="JSON input"
+                      value={rawJSONCriteria}
+                      onChange={onJSONCriteriaChange}
+                      readOnly={evaluationRunning}
+                      id="text-input-json-raw"
+                      placeholder="Input evaluation criteria in json format"
+                      rows={10}
+                      invalid={rawJSONCriteria !== '' && !isValidRawJSONCriteria()}
+                      invalidText={'JSON input is invalid'}
+                      style={{ backgroundColor: 'white' }}
+                      type="json"
+                    />
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            </div>
+          </div>
+        </AccordionItem>
+      </Accordion>
     </div>
   )
 }
 
 interface EvaluationResult {
-  criteria: Criteria
+  results: Results
 }
 
-const EvaluationResult = ({ criteria }: EvaluationResult) => {
+const EvaluationResult = ({ results }: EvaluationResult) => {
   const dataStyle = {
     backgroundColor: '#f4f4f4',
     padding: '2rem 1rem 2rem 1rem',
   }
-  const columnNames = ['Name', 'Answer', 'Explanation']
+  const columnNames = ['Criteria', 'Value', 'Explanation']
   return (
     <div
       style={{
@@ -233,11 +268,11 @@ const EvaluationResult = ({ criteria }: EvaluationResult) => {
           <h5>{c}</h5>
         </div>
       ))}
-      {criteria.results !== null && (
+      {results !== null && (
         <>
-          <div style={dataStyle}>{criteria.results.name}</div>
-          <div style={dataStyle}>{criteria.results.answer}</div>
-          <div style={dataStyle}>{criteria.results.explanation}</div>
+          <div style={dataStyle}>{results.name}</div>
+          <div style={dataStyle}>{results.answer}</div>
+          <div style={dataStyle}>{results.explanation}</div>
         </>
       )}
     </div>
@@ -245,6 +280,9 @@ const EvaluationResult = ({ criteria }: EvaluationResult) => {
 }
 
 export const SingleExampleEvaluation = () => {
+  const [isEvaluationCriteriaCollapsed, setIsEvaluationCriteriaCollapsed] = useState(true)
+  const [isEvaluationInstructionCollapsed, setIsEvaluationInstructionCollapsed] = useState(false)
+
   const [context, setContext] =
     useState(`context document: Since the incorrect and correct words sound the same, we tell the model to make a phonetic replacement.
     This is the philosophy behind training custom words into a language model. We train a custom word for eligibility with a JSON body {â€śsounds_likeâ€ť: [â€ślegibilityâ€ť, â€śknowledgeabilityâ€ť, â€śallergy abilityâ€ť, â€śL E G B D Tâ€ť]}. Custom words give phonetic cues. add as many text files as you want within a single custom model, as long as you do not exceed the maximum number of total words of 10 millions.
@@ -283,12 +321,6 @@ export const SingleExampleEvaluation = () => {
         definition: 'Purely an informal dump, no sentence structure of formatting throughout entire reposes',
       },
     ],
-    results: {
-      name: 'Naturalness',
-      answer: 'Yes',
-      explanation:
-        "The output is unnatural simply because it's delivered at an inappropriate time or with the wrong tone. Natural communication involves sensitivity to social cues and an awareness of the appropriate timing and tone for different situations.",
-    },
   })
 
   const [evaluationInstruction, setEvaluationInstruction] =
@@ -302,11 +334,13 @@ export const SingleExampleEvaluation = () => {
     Follow your answer with an explanation. Try to be concise. Limit your answer and explanation to at most 200 words. 
   `)
 
+  const [results, setResults] = useState<Results | null>(null)
+
   const [evaluationRunning, setEvaluationRunning] = useState(false)
 
   const runEvaluation = async () => {
-    setCriteria({ ...criteria, results: null })
     setEvaluationRunning(true)
+    setResults(null)
     const response = await post('evaluate', {
       context: context,
       response: modelOutput,
@@ -318,16 +352,18 @@ export const SingleExampleEvaluation = () => {
         })),
       },
     })
+
     const responseBody = await response.json()
 
-    setCriteria({
-      ...criteria,
-      results: {
-        name: criteria.title,
-        answer: responseBody.option,
-        explanation: responseBody.explanation,
-      },
+    setIsEvaluationCriteriaCollapsed(false)
+    setIsEvaluationInstructionCollapsed(false)
+
+    setResults({
+      name: criteria.title,
+      answer: responseBody.option,
+      explanation: responseBody.explanation,
     })
+
     setEvaluationRunning(false)
   }
 
@@ -342,7 +378,7 @@ export const SingleExampleEvaluation = () => {
         labelText="Task context (optional)"
         readOnly={evaluationRunning}
         // placeholder="Enter your prompt..."
-        style={{ marginBottom: '2rem' }}
+        style={{ marginBottom: '2rem', backgroundColor: '#f4f4f4' }}
       />
 
       <TextArea
@@ -353,24 +389,44 @@ export const SingleExampleEvaluation = () => {
         labelText="Output to evaluate"
         readOnly={evaluationRunning}
         // placeholder="Enter your prompt..."
-        style={{ marginBottom: '2rem' }}
+        style={{ marginBottom: '2rem', backgroundColor: '#f4f4f4' }}
       />
-      <EvaluationCriteria criteria={criteria} setCriteria={setCriteria} evaluationRunning={evaluationRunning} />
-
-      <TextArea
-        onChange={(e) => setEvaluationInstruction(e.target.value)}
-        rows={10}
-        value={evaluationInstruction}
-        id="text-area-evaluation-instruction"
-        labelText="Evaluation Instruction"
-        readOnly={evaluationRunning}
-        // placeholder="Enter your prompt..."
-        style={{ marginBottom: '2rem' }}
+      <EvaluationCriteria
+        criteria={criteria}
+        setCriteria={setCriteria}
+        evaluationRunning={evaluationRunning}
+        isEvaluationCriteriaCollapsed={isEvaluationCriteriaCollapsed}
+        setIsEvaluationCriteriaCollapsed={setIsEvaluationCriteriaCollapsed}
       />
-      <Button style={{ marginBottom: '2rem' }} onClick={runEvaluation} disabled={evaluationRunning}>
-        Evaluate
-      </Button>
-      {criteria.results !== null && <EvaluationResult criteria={criteria} />}
+      {/* <div style={{ backgroundColor: '#f4f4f4', marginBottom: '2rem' }}>
+        <Accordion>
+          <AccordionItem title="Evaluation Instruction" open={isEvaluationInstructionCollapsed} className="wrapper">
+            <TextArea
+              onChange={(e) => setEvaluationInstruction(e.target.value)}
+              rows={10}
+              value={evaluationInstruction}
+              id="text-area-evaluation-instruction"
+              labelText=""
+              readOnly={evaluationRunning}
+              style={{ backgroundColor: 'white', paddingRight: '-500px' }}
+            />
+          </AccordionItem>
+        </Accordion>
+      </div> */}
+      <div style={{ marginBottom: '2rem' }}>
+        {evaluationRunning ? (
+          <InlineLoading
+            description={'Running evaluation...'}
+            status={'active'}
+            className={classes['loading-wrapper']}
+          />
+        ) : (
+          <Button onClick={runEvaluation} disabled={evaluationRunning}>
+            Evaluate
+          </Button>
+        )}
+      </div>
+      {results !== null && <EvaluationResult results={results} />}
     </div>
   )
 }
