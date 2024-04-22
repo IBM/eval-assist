@@ -1,9 +1,10 @@
 from typing import Dict
-from genai import Credentials, Client
+from genai import Client
 from genai.schema import (
     TextGenerationParameters,
     TextGenerationReturnOptions
 )
+import src.evaluators as evaluators
 from statistics import mean
 import json
 
@@ -23,9 +24,9 @@ class Rubric(object):
         return cls(criteria=json_dict["criteria"], 
                    options=[RubricOption(option=opt["option"],
                                          description=opt["description"]) for opt in json_dict["options"]])
-    
 
-EVAL_TEMPLATE = """<s> [INST]
+
+_MIXTRAL_RUBRIC_ASSESS = """<s> [INST]
 You are presented with a [[Response]] generated to satisify an [[Input Context]]. 
 You will assess the quality of the [[Response]] subject to the [[Evaluation Criteria]].
 
@@ -38,18 +39,16 @@ You will assess the quality of the [[Response]] subject to the [[Evaluation Crit
 [[Evaluation Criteria]]:
 {criteria}
 
-Briefly assess the quality of the [[Response]] subject to the [[Evaluation Criteria]].
-Proceed as follows:
-1. Read the [[Input Context]]
-2. Read the [[Response]]
-3. Read the [[Evaluation Criteria]]
-4. Carefully assess the [[Response]] subject to  the [[Evaluation Criteria]].
+Briefly assess the quality of the Response subject to the Evaluation Criteria.
+Focus on the Evaluation Criteria during assessment.
+
 [/INST]
 Assessment:
 
 """
 
-SUMMARIZATION_TEMPLATE = """
+_MIXTRAL_RUBRIC_SUMMARIZE = """
+</s> 
 [INST]
 Summarize the assessment into an single easy to understand statement. 
 [/INST]
@@ -57,13 +56,13 @@ Assessment Summary:
 
 """
 
-RUBRIC_TEMPLATE = """
+_MIXTRAL_RUBRIC_ANSWER = """
+</s> 
 [INST]
 {criteria}
 {options}
 [/INST]
-Answer:
-
+Answer: 
 """
 
 class RubricEvaluator(object):
@@ -72,7 +71,7 @@ class RubricEvaluator(object):
         self.client = client
         self.random_state = 42
         self.gen_parameters = TextGenerationParameters(
-            max_new_tokens = 300, 
+            max_new_tokens = 200, 
             return_options = TextGenerationReturnOptions(), 
             random_seed = self.random_state
         )
@@ -85,9 +84,42 @@ class RubricEvaluator(object):
             random_seed=self.random_state
         )
 
+    def _token_count(self, model_id: str, prompt:str) -> int:
+
+        response = next(self.client.text.tokenization.create(
+                model_id=model_id,
+                input=prompt,
+                execution_options={"ordered": True, 'concurrency_limit': 1}
+            ))
+        
+        return response.results[0].token_count
+
+    def _select_answer(self, model_id: str, rubric:Rubric, prompt: str, token_count: int, reverse_options=False) -> int:
+
+        lps = []
+
+        for option in rubric.options:
+            response = next(self.client.text.generation.create(
+                model_id=model_id,
+                inputs= prompt + option.option,
+                execution_options={"ordered": True, 'concurrency_limit': 1},
+                parameters=self.ff_parameters,
+            ))
+            tokens = response.results[0].input_tokens[token_count:]
+            lps.append(mean([t.logprob for t in tokens if t.logprob != None]))
+        
+        index_max = max(range(len(lps)), key=lps.__getitem__)
+
+        return rubric.options[index_max].option
+
+
     def evaluate(self, model_id: str, context:str, response:str, rubric: Rubric)  -> Dict:
 
-        eval_prompt = EVAL_TEMPLATE.format(
+        ASSESS_TEMPLATE = _MIXTRAL_RUBRIC_ASSESS  
+        SUMMARIZE_TEMPLATE = _MIXTRAL_RUBRIC_SUMMARIZE
+        ANSWER_TEMPLATE = _MIXTRAL_RUBRIC_ANSWER
+
+        eval_prompt = ASSESS_TEMPLATE.format(
             input=context,
             response=response,
             criteria=rubric.criteria
@@ -101,7 +133,7 @@ class RubricEvaluator(object):
         ))
 
         assessment = response.results[0].generated_text
-        summarization_input = eval_prompt + assessment + SUMMARIZATION_TEMPLATE
+        summarization_input = eval_prompt + assessment + SUMMARIZE_TEMPLATE
 
         response = next(self.client.text.generation.create(
                 model_id=model_id,
@@ -112,32 +144,22 @@ class RubricEvaluator(object):
         )
 
         explanation = response.results[0].generated_text
+
+        # Get answer
         options = [f"Answer {o.option} if {o.description}\n" for o in rubric.options]
-        options_input = summarization_input + explanation + RUBRIC_TEMPLATE.format(criteria=rubric.criteria, options="".join(options)) 
+        options_input = summarization_input + explanation + ANSWER_TEMPLATE.format(criteria=rubric.criteria, options="".join(options)) 
+        tc = self._token_count(model_id, options_input)
+        selected = self._select_answer(model_id, rubric, options_input, tc)
 
-        response = next(self.client.text.tokenization.create(
-                model_id=model_id,
-                input=options_input,
-                execution_options={"ordered": True, 'concurrency_limit': 1}
-            ))
-        
-        tc = response.results[0].token_count
-        lps = []
-
-        for option in rubric.options:
-            response = next(self.client.text.generation.create(
-                model_id=model_id,
-                inputs= options_input + option.option,
-                execution_options={"ordered": True, 'concurrency_limit': 1},
-                parameters=self.ff_parameters,
-            ))
-            tokens = response.results[0].input_tokens[tc:]
-            lps.append(mean([t.logprob for t in tokens if t.logprob != None]))
-
-        index_max = max(range(len(lps)), key=lps.__getitem__)
-        selected_option = rubric.options[index_max].option
+        # Reverse
+        options = [f"Answer {o.option} if {o.description}\n" for o in reversed(rubric.options)]
+        options_input = summarization_input + explanation + ANSWER_TEMPLATE.format(criteria=rubric.criteria, options="".join(options)) 
+        tc = self._token_count(model_id, options_input)
+        selected_r = self._select_answer(model_id, rubric, options_input, tc)
+        p_bias = (selected != selected_r)
 
         return {
-            "option": selected_option,
-            "explanation": explanation
+            "option": selected,
+            "explanation": explanation,
+            "p_bias": p_bias
         }
