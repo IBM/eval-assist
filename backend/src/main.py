@@ -181,6 +181,7 @@ class EvalRequestModel(BaseModel):
 class EvalResponseModel(BaseModel):
     option: str
     explanation: str
+    p_bias: bool
 
 @app.post("/evaluate/", response_model=EvalResponseModel)
 async def evaluate(evalRequest: EvalRequestModel):
