@@ -32,7 +32,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           <Theme theme="g100">
             <AppHeader />
           </Theme>
-          <Content>
+          <Content style={{ paddingTop: '1rem' }}>
             <Component {...pageProps} />
           </Content>
         </>
