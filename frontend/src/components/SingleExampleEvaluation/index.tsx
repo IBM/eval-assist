@@ -1,9 +1,10 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
 
 import {
   Accordion,
   AccordionItem,
   Button,
+  CopyButton,
   IconButton,
   InlineLoading,
   InlineNotification,
@@ -17,17 +18,18 @@ import {
   TextInput,
   Tile,
 } from '@carbon/react'
-import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
+import { Add, Copy, Edit, Save, TextAlignLeft, TrashCan } from '@carbon/react/icons'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 import { post } from '@utils/fetchUtils'
+import { isInstanceOfRubric } from '@utils/utils'
 
-interface Option {
+export interface Option {
   option: string
   description: string
 }
 
-type Rubric = {
+export type Rubric = {
   title: string
   criteria: string
   options: Option[]
@@ -48,7 +50,55 @@ interface EvaluationCriteriaProps {
   setIsEvaluationCriteriaCollapsed: Dispatch<SetStateAction<boolean>>
 }
 
-const eqSet = (xs: Set<string>, ys: Set<string>) => xs.size === ys.size && [...xs].every((x) => ys.has(x))
+interface JSONTextAreaInterface {
+  rawJSONCriteria: string
+  setRawJSONCriteria: Dispatch<SetStateAction<string>>
+  isValidRawJSONCriteria: (str: string) => boolean
+}
+
+const JSONTextArea = ({ rawJSONCriteria, setRawJSONCriteria, isValidRawJSONCriteria }: JSONTextAreaInterface) => {
+  const onRawJSONCriteriaChange = useCallback(
+    (e: { target: { value: string } }) => {
+      setRawJSONCriteria(e.target.value)
+    },
+    [setRawJSONCriteria],
+  )
+
+  const onFormatClick = () => {
+    setRawJSONCriteria(JSON.stringify(JSON.parse(rawJSONCriteria), null, 4))
+  }
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(rawJSONCriteria)
+  }
+
+  return (
+    <Layer style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <p className="cds--label" style={{ marginBottom: 0 }}>
+          Json Input
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <CopyButton onClick={copyToClipboard} />
+          <IconButton kind="ghost" label={'Format'} align="bottom" onClick={onFormatClick}>
+            <TextAlignLeft />
+          </IconButton>
+        </div>
+      </div>
+      <TextArea
+        labelText={''}
+        value={rawJSONCriteria}
+        onChange={onRawJSONCriteriaChange}
+        id="text-input-json-raw"
+        placeholder="Input evaluation criteria in json format"
+        rows={18}
+        invalid={!isValidRawJSONCriteria(rawJSONCriteria)}
+        invalidText={'JSON input is invalid'}
+        // style={{ backgroundColor: 'white' }}
+      />
+    </Layer>
+  )
+}
 
 const EvaluationCriteria = ({
   criteria,
@@ -58,18 +108,28 @@ const EvaluationCriteria = ({
   setIsEvaluationCriteriaCollapsed,
 }: EvaluationCriteriaProps) => {
   const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(criteria.title === '')
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0)
   const [rawJSONCriteria, setRawJSONCriteria] = useState('')
 
-  const onJSONCriteriaChange = (e: { target: { value: string } }) => {
-    setRawJSONCriteria(e.target.value)
-  }
-
-  const isValidRawJSONCriteria = () => {
+  const isValidRawJSONCriteria = (jsonCriteria: string) => {
     try {
-      const rawJSONCriteriaObj = JSON.parse(rawJSONCriteria)
-      return eqSet(new Set(Object.keys(rawJSONCriteriaObj)), new Set(['title', 'description', 'scales']))
+      const rawJSONCriteriaObj = JSON.parse(jsonCriteria)
+      return isInstanceOfRubric(rawJSONCriteriaObj)
     } catch {
       return false
+    }
+  }
+
+  const onSelectedIndexChange = (e: { selectedIndex: number }) => {
+    setSelectedTabIndex(e.selectedIndex)
+
+    if (e.selectedIndex === 0 && selectedTabIndex === 1) {
+      if (isValidRawJSONCriteria(rawJSONCriteria)) {
+        const newRawJSONCriteriaObj = JSON.parse(rawJSONCriteria)
+        setCriteria(newRawJSONCriteriaObj)
+      }
+    } else if (e.selectedIndex === 1 && selectedTabIndex === 0) {
+      setRawJSONCriteria(JSON.stringify(criteria, null, 4))
     }
   }
 
@@ -83,7 +143,7 @@ const EvaluationCriteria = ({
           className={classes['wrapper']}
         >
           <div>
-            <Tabs>
+            <Tabs selectedIndex={selectedTabIndex} onChange={onSelectedIndexChange}>
               <TabList aria-label="List of tabs" contained>
                 <Tab>Form</Tab>
                 <Tab>JSON</Tab>
@@ -117,10 +177,10 @@ const EvaluationCriteria = ({
                               readOnly={!isEditingCriteriaTitle}
                               id="text-input-criteria-title"
                               placeholder="Criteria title"
-                              style={{ width: '80%' }}
+                              style={{ width: '90%' }}
                             />
                           ) : (
-                            <h4 style={{ width: '80%' }}>{criteria.title}</h4>
+                            <h4 style={{ width: '90%' }}>{criteria.title}</h4>
                           )}
                           {isEditingCriteriaTitle ? (
                             <IconButton onClick={() => setIsEditingCriteriaTitle(false)} kind="ghost" label={'Save'}>
@@ -142,8 +202,6 @@ const EvaluationCriteria = ({
                         value={criteria.criteria}
                         id="text-area-evaluation-instruction"
                         labelText="Description"
-                        // readOnly={evaluationRunning}
-                        // placeholder="Enter your prompt..."
                         style={{ marginBottom: '1rem' }}
                       />
                       {criteria.options.map((scale, i) => (
@@ -225,18 +283,10 @@ const EvaluationCriteria = ({
                   </div>
                 </TabPanel>
                 <TabPanel>
-                  <TextArea
-                    labelText="JSON input"
-                    value={rawJSONCriteria}
-                    onChange={onJSONCriteriaChange}
-                    // readOnly={evaluationRunning}
-                    id="text-input-json-raw"
-                    placeholder="Input evaluation criteria in json format"
-                    rows={10}
-                    invalid={rawJSONCriteria !== '' && !isValidRawJSONCriteria()}
-                    invalidText={'JSON input is invalid'}
-                    style={{}}
-                    type="json"
+                  <JSONTextArea
+                    isValidRawJSONCriteria={isValidRawJSONCriteria}
+                    rawJSONCriteria={rawJSONCriteria}
+                    setRawJSONCriteria={setRawJSONCriteria}
                   />
                 </TabPanel>
               </TabPanels>
@@ -284,7 +334,6 @@ const EvaluationResult = ({ results }: EvaluationResult) => {
 
 export const SingleExampleEvaluation = () => {
   const [isEvaluationCriteriaCollapsed, setIsEvaluationCriteriaCollapsed] = useState(false)
-  // const [isEvaluationInstructionCollapsed, setIsEvaluationInstructionCollapsed] = useState(false)
 
   const [context, setContext] = useState('How is the weather there?')
   const [modelOutput, setModelOutput] = useState(
@@ -309,8 +358,6 @@ export const SingleExampleEvaluation = () => {
       },
     ],
   })
-
-  const [evaluationInstruction, setEvaluationInstruction] = useState(``)
 
   const [results, setResults] = useState<Results | null>(null)
   const [evaluationFailed, setEvaluationFailed] = useState(false)
@@ -355,8 +402,6 @@ export const SingleExampleEvaluation = () => {
         value={context}
         id="text-area-context"
         labelText="Task context (optional)"
-        // readOnly={evaluationRunning}
-        // placeholder="Enter your prompt..."
         style={{ marginBottom: '1rem' }}
       />
 
@@ -366,8 +411,6 @@ export const SingleExampleEvaluation = () => {
         value={modelOutput}
         id="text-area-model-output"
         labelText="Response to evaluate"
-        // readOnly={evaluationRunning}
-        // placeholder="Enter your prompt..."
         style={{ marginBottom: '1rem' }}
       />
 
@@ -378,21 +421,6 @@ export const SingleExampleEvaluation = () => {
         isEvaluationCriteriaCollapsed={isEvaluationCriteriaCollapsed}
         setIsEvaluationCriteriaCollapsed={setIsEvaluationCriteriaCollapsed}
       />
-      {/* <div style={{ backgroundColor: '#f4f4f4', marginBottom: '2rem' }}>
-        <Accordion>
-          <AccordionItem title="Evaluation Instruction" open={isEvaluationInstructionCollapsed} className="wrapper">
-            <TextArea
-              onChange={(e) => setEvaluationInstruction(e.target.value)}
-              rows={10}
-              value={evaluationInstruction}
-              id="text-area-evaluation-instruction"
-              labelText=""
-              readOnly={evaluationRunning}
-              style={{ backgroundColor: 'white', paddingRight: '-500px' }}
-            />
-          </AccordionItem>
-        </Accordion>
-      </div> */}
       <div style={{ marginBottom: '1rem' }}>
         {evaluationRunning ? (
           <InlineLoading
