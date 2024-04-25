@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
+import { CSSProperties, Dispatch, SetStateAction, useCallback, useState } from 'react'
 
 import {
   Accordion,
@@ -35,28 +35,37 @@ export type Rubric = {
   options: Option[]
 }
 
-type Results = {
+type Result = {
   name: string
-  answer: string
+  option: string
   explanation: string
   positionalBias: boolean
 }
 
-interface EvaluationCriteriaProps {
-  criteria: Rubric
-  setCriteria: Dispatch<SetStateAction<Rubric>>
-  evaluationRunning: boolean
-  isEvaluationCriteriaCollapsed: boolean
-  setIsEvaluationCriteriaCollapsed: Dispatch<SetStateAction<boolean>>
+type FetchedResult = {
+  name: string
+  option: string
+  explanation: string
+  p_bias: boolean
+}
+
+type FetchedResults = {
+  results: FetchedResult[]
 }
 
 interface JSONTextAreaInterface {
   rawJSONCriteria: string
   setRawJSONCriteria: Dispatch<SetStateAction<string>>
   isValidRawJSONCriteria: (str: string) => boolean
+  style?: CSSProperties
 }
 
-const JSONTextArea = ({ rawJSONCriteria, setRawJSONCriteria, isValidRawJSONCriteria }: JSONTextAreaInterface) => {
+const JSONTextArea = ({
+  rawJSONCriteria,
+  setRawJSONCriteria,
+  isValidRawJSONCriteria,
+  style,
+}: JSONTextAreaInterface) => {
   const onRawJSONCriteriaChange = useCallback(
     (e: { target: { value: string } }) => {
       setRawJSONCriteria(e.target.value)
@@ -73,41 +82,43 @@ const JSONTextArea = ({ rawJSONCriteria, setRawJSONCriteria, isValidRawJSONCrite
   }
 
   return (
-    <Layer style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <p className="cds--label" style={{ marginBottom: 0 }}>
-          Json Input
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-          <CopyButton onClick={copyToClipboard} />
-          <IconButton kind="ghost" label={'Format'} align="bottom" onClick={onFormatClick}>
-            <TextAlignLeft />
-          </IconButton>
+    <div style={style}>
+      <Layer style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <p className="cds--label" style={{ marginBottom: 0 }}>
+            Json Input
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <CopyButton onClick={copyToClipboard} />
+            <IconButton kind="ghost" label={'Format'} align="bottom" onClick={onFormatClick}>
+              <TextAlignLeft />
+            </IconButton>
+          </div>
         </div>
-      </div>
-      <TextArea
-        labelText={''}
-        value={rawJSONCriteria}
-        onChange={onRawJSONCriteriaChange}
-        id="text-input-json-raw"
-        placeholder="Input evaluation criteria in json format"
-        rows={18}
-        invalid={!isValidRawJSONCriteria(rawJSONCriteria)}
-        invalidText={'JSON input is invalid'}
-        // style={{ backgroundColor: 'white' }}
-      />
-    </Layer>
+        <TextArea
+          labelText={''}
+          value={rawJSONCriteria}
+          onChange={onRawJSONCriteriaChange}
+          id="text-input-json-raw"
+          placeholder="Input evaluation criteria in json format"
+          rows={18}
+          invalid={!isValidRawJSONCriteria(rawJSONCriteria)}
+          invalidText={'JSON input is invalid'}
+          // style={{ backgroundColor: 'white' }}
+        />
+      </Layer>
+    </div>
   )
 }
 
-const EvaluationCriteria = ({
-  criteria,
-  setCriteria,
-  evaluationRunning,
-  isEvaluationCriteriaCollapsed,
-  setIsEvaluationCriteriaCollapsed,
-}: EvaluationCriteriaProps) => {
-  const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(criteria.title === '')
+interface EvaluationCriteriaProps {
+  rubric: Rubric
+  setRubric: Dispatch<SetStateAction<Rubric>>
+  style?: CSSProperties
+}
+
+const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCriteriaProps) => {
+  const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(rubric.title === '')
   const [selectedTabIndex, setSelectedTabIndex] = useState(0)
   const [rawJSONCriteria, setRawJSONCriteria] = useState('')
 
@@ -126,22 +137,17 @@ const EvaluationCriteria = ({
     if (e.selectedIndex === 0 && selectedTabIndex === 1) {
       if (isValidRawJSONCriteria(rawJSONCriteria)) {
         const newRawJSONCriteriaObj = JSON.parse(rawJSONCriteria)
-        setCriteria(newRawJSONCriteriaObj)
+        setRubric(newRawJSONCriteriaObj)
       }
     } else if (e.selectedIndex === 1 && selectedTabIndex === 0) {
-      setRawJSONCriteria(JSON.stringify(criteria, null, 4))
+      setRawJSONCriteria(JSON.stringify(rubric, null, 4))
     }
   }
 
   return (
-    <div style={{ marginBottom: '1rem' }}>
+    <div style={style}>
       <Accordion>
-        <AccordionItem
-          title="Evaluation Criteria"
-          open={!isEvaluationCriteriaCollapsed}
-          onHeadingClick={() => setIsEvaluationCriteriaCollapsed(!isEvaluationCriteriaCollapsed)}
-          className={classes['wrapper']}
-        >
+        <AccordionItem title="Evaluation Criteria" className={classes['wrapper']} open>
           <div>
             <Tabs selectedIndex={selectedTabIndex} onChange={onSelectedIndexChange}>
               <TabList aria-label="List of tabs" contained>
@@ -172,15 +178,15 @@ const EvaluationCriteria = ({
                           {isEditingCriteriaTitle ? (
                             <TextInput
                               labelText=""
-                              value={criteria.title}
-                              onChange={(e) => setCriteria({ ...criteria, title: e.target.value })}
+                              value={rubric.title}
+                              onChange={(e) => setRubric({ ...rubric, title: e.target.value })}
                               readOnly={!isEditingCriteriaTitle}
                               id="text-input-criteria-title"
                               placeholder="Criteria title"
                               style={{ width: '90%' }}
                             />
                           ) : (
-                            <h4 style={{ width: '90%' }}>{criteria.title}</h4>
+                            <h4 style={{ width: '90%' }}>{rubric.title}</h4>
                           )}
                           {isEditingCriteriaTitle ? (
                             <IconButton onClick={() => setIsEditingCriteriaTitle(false)} kind="ghost" label={'Save'}>
@@ -197,14 +203,14 @@ const EvaluationCriteria = ({
                         </IconButton>
                       </div>
                       <TextArea
-                        onChange={(e) => setCriteria({ ...criteria, criteria: e.target.value })}
+                        onChange={(e) => setRubric({ ...rubric, criteria: e.target.value })}
                         rows={1}
-                        value={criteria.criteria}
+                        value={rubric.criteria}
                         id="text-area-evaluation-instruction"
                         labelText="Description"
                         style={{ marginBottom: '1rem' }}
                       />
-                      {criteria.options.map((scale, i) => (
+                      {rubric.options.map((scale, i) => (
                         <div
                           style={{
                             display: 'flex',
@@ -219,12 +225,12 @@ const EvaluationCriteria = ({
                               labelText="Value"
                               value={scale.option}
                               onChange={(e) =>
-                                setCriteria({
-                                  ...criteria,
+                                setRubric({
+                                  ...rubric,
                                   options: [
-                                    ...criteria.options.slice(0, i),
-                                    { option: e.target.value, description: criteria.options[i].description },
-                                    ...criteria.options.slice(i + 1),
+                                    ...rubric.options.slice(0, i),
+                                    { option: e.target.value, description: rubric.options[i].description },
+                                    ...rubric.options.slice(i + 1),
                                   ],
                                 })
                               }
@@ -240,12 +246,12 @@ const EvaluationCriteria = ({
                               // readOnly={evaluationRunning}
                               id="text-input-definition"
                               onChange={(e) =>
-                                setCriteria({
-                                  ...criteria,
+                                setRubric({
+                                  ...rubric,
                                   options: [
-                                    ...criteria.options.slice(0, i),
-                                    { option: criteria.options[i].option, description: e.target.value },
-                                    ...criteria.options.slice(i + 1),
+                                    ...rubric.options.slice(0, i),
+                                    { option: rubric.options[i].option, description: e.target.value },
+                                    ...rubric.options.slice(i + 1),
                                   ],
                                 })
                               }
@@ -259,7 +265,7 @@ const EvaluationCriteria = ({
                               kind="ghost"
                               style={{ paddingTop: '24px' }}
                               onClick={() =>
-                                setCriteria({ ...criteria, options: criteria.options.filter((s, j) => j !== i) })
+                                setRubric({ ...rubric, options: rubric.options.filter((s, j) => j !== i) })
                               }
                             >
                               <TrashCan />
@@ -269,7 +275,7 @@ const EvaluationCriteria = ({
                       ))}
                       <Button
                         onClick={() =>
-                          setCriteria({ ...criteria, options: [...criteria.options, { option: '', description: '' }] })
+                          setRubric({ ...rubric, options: [...rubric.options, { option: '', description: '' }] })
                         }
                         renderIcon={Add}
                         kind="tertiary"
@@ -298,37 +304,113 @@ const EvaluationCriteria = ({
   )
 }
 
-interface EvaluationResult {
-  results: Results
+interface EvaluationResultsProps {
+  results: Result[] | null
+  evaluationFailed: boolean
+  evaluationError: Error | null
+  evaluationRunning: boolean
+  style?: CSSProperties
 }
 
-const EvaluationResult = ({ results }: EvaluationResult) => {
+const EvaluationResults = ({
+  results,
+  evaluationFailed,
+  evaluationError,
+  evaluationRunning,
+  style,
+}: EvaluationResultsProps) => {
   const dataStyle = {
     padding: '1rem 1rem 1rem 1rem',
   }
 
-  const columnNames = ['Criteria', 'Value', 'Positional Bias', 'Explanation']
+  const columnNames = ['Criteria', 'Value', 'Explanation']
   return (
-    <Tile
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '10% 10% 10% 70%',
-      }}
-    >
-      {columnNames.map((c, i) => (
-        <div style={{ padding: '1rem' }} key={i}>
-          <h5>{c}</h5>
-        </div>
-      ))}
-      {results !== null && (
-        <>
-          <div style={dataStyle}>{results.name}</div>
-          <div style={dataStyle}>{results.answer}</div>
-          <div style={dataStyle}>{results.positionalBias ? 'True' : 'False'}</div>
-          <p style={dataStyle}>{results.explanation}</p>
-        </>
+    <div style={style}>
+      {evaluationFailed ? (
+        <InlineNotification
+          aria-label="closes notification"
+          kind="error"
+          onClose={function noRefCheck() {}}
+          onCloseButtonClick={function noRefCheck() {}}
+          statusIconDescription="notification"
+          subtitle={evaluationError?.message}
+          title="Evaluation failed"
+        />
+      ) : results !== null ? (
+        <Tile
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '10% 10% 80%',
+          }}
+        >
+          {columnNames.map((c, i) => (
+            <div style={{ padding: '1rem' }} key={i}>
+              <h5>{c}</h5>
+            </div>
+          ))}
+          {results !== null && (
+            <>
+              {results.map((result) => (
+                <>
+                  <div style={dataStyle}>{result.name}</div>
+                  <div style={dataStyle}>{result.option}</div>
+                  <p style={dataStyle}>{result.explanation}</p>
+                </>
+              ))}
+            </>
+          )}
+        </Tile>
+      ) : !evaluationRunning ? (
+        <p style={{ color: 'gray' }}>{'No results...'}</p>
+      ) : null}
+    </div>
+  )
+}
+
+interface EvaluateButtonProps {
+  evaluationRunning: boolean
+  runEvaluation: () => Promise<void>
+  style?: CSSProperties
+}
+
+const EvaluateButton = ({ evaluationRunning, runEvaluation, style }: EvaluateButtonProps) => {
+  return (
+    <div style={style}>
+      {evaluationRunning ? (
+        <InlineLoading description={'Running evaluation...'} status={'active'} className={classes['loading-wrapper']} />
+      ) : (
+        <Button onClick={runEvaluation} disabled={evaluationRunning}>
+          Evaluate
+        </Button>
       )}
-    </Tile>
+    </div>
+  )
+}
+
+interface ResponsesInterface {
+  responses: string[]
+  setResponses: Dispatch<SetStateAction<string[]>>
+  style?: CSSProperties
+}
+
+const Responses = ({ responses, setResponses, style }: ResponsesInterface) => {
+  return (
+    <div style={style}>
+      {responses?.map((response, i) => (
+        <TextArea
+          onChange={(e) => setResponses([...responses.slice(0, i), e.target.value, ...responses.slice(i + 1)])}
+          rows={4}
+          value={response}
+          id="text-area-model-output"
+          labelText={`Response #${i + 1}`}
+          style={{ marginBottom: '1rem' }}
+          key={i}
+        />
+      ))}
+      <Button kind="tertiary" onClick={(e) => setResponses([...responses, ''])}>
+        {'Add response'}
+      </Button>
+    </div>
   )
 }
 
@@ -336,9 +418,9 @@ export const SingleExampleEvaluation = () => {
   const [isEvaluationCriteriaCollapsed, setIsEvaluationCriteriaCollapsed] = useState(false)
 
   const [context, setContext] = useState('How is the weather there?')
-  const [modelOutput, setModelOutput] = useState(
+  const [responses, setResponses] = useState([
     'On most days, the weather is warm and humid, with temperatures often soaring into the high 80s and low 90s Fahrenheit (around 31-34°C). The dense foliage of the jungle acts as a natural air conditioner, keeping the temperature relatively stable and comfortable for the inhabitants.',
-  )
+  ])
 
   const [rubric, setRubric] = useState<Rubric>({
     title: 'Temperature',
@@ -359,7 +441,7 @@ export const SingleExampleEvaluation = () => {
     ],
   })
 
-  const [results, setResults] = useState<Results | null>(null)
+  const [results, setResults] = useState<Result[] | null>(null)
   const [evaluationFailed, setEvaluationFailed] = useState(false)
   const [evaluationError, setEvaluationError] = useState<Error | null>(null)
 
@@ -370,8 +452,8 @@ export const SingleExampleEvaluation = () => {
     setEvaluationRunning(true)
     setResults(null)
     const response = await post('evaluate', {
-      context: context,
-      response: modelOutput,
+      context,
+      responses,
       rubric,
     })
 
@@ -383,14 +465,16 @@ export const SingleExampleEvaluation = () => {
       return
     }
 
-    const responseBody = await response.json()
+    const responseBody = (await response.json()) as FetchedResults
 
-    setResults({
-      name: rubric.title,
-      answer: responseBody.option,
-      explanation: responseBody.explanation,
-      positionalBias: responseBody.p_bias,
-    })
+    setResults(
+      responseBody.results.map((result) => ({
+        name: rubric.title,
+        option: result.option,
+        explanation: result.explanation,
+        positionalBias: result.p_bias,
+      })),
+    )
   }
 
   return (
@@ -404,49 +488,21 @@ export const SingleExampleEvaluation = () => {
         labelText="Task context (optional)"
         style={{ marginBottom: '1rem' }}
       />
-
-      <TextArea
-        onChange={(e) => setModelOutput(e.target.value)}
-        rows={4}
-        value={modelOutput}
-        id="text-area-model-output"
-        labelText="Response to evaluate"
+      <Responses responses={responses} setResponses={setResponses} style={{ marginBottom: '2rem' }} />
+      <EvaluationCriteria rubric={rubric} setRubric={setRubric} style={{ marginBottom: '2rem' }} />
+      <EvaluateButton
+        evaluationRunning={evaluationRunning}
+        runEvaluation={runEvaluation}
         style={{ marginBottom: '1rem' }}
       />
 
-      <EvaluationCriteria
-        criteria={rubric}
-        setCriteria={setRubric}
-        evaluationRunning={false}
-        isEvaluationCriteriaCollapsed={isEvaluationCriteriaCollapsed}
-        setIsEvaluationCriteriaCollapsed={setIsEvaluationCriteriaCollapsed}
+      <EvaluationResults
+        results={results}
+        evaluationFailed={evaluationFailed}
+        evaluationError={evaluationError}
+        evaluationRunning={evaluationRunning}
+        style={{ marginBottom: '1rem' }}
       />
-      <div style={{ marginBottom: '1rem' }}>
-        {evaluationRunning ? (
-          <InlineLoading
-            description={'Running evaluation...'}
-            status={'active'}
-            className={classes['loading-wrapper']}
-          />
-        ) : (
-          <Button onClick={runEvaluation} disabled={evaluationRunning}>
-            Evaluate
-          </Button>
-        )}
-      </div>
-      {evaluationFailed ? (
-        <InlineNotification
-          aria-label="closes notification"
-          kind="error"
-          onClose={function noRefCheck() {}}
-          onCloseButtonClick={function noRefCheck() {}}
-          statusIconDescription="notification"
-          subtitle={evaluationError?.message}
-          title="Evaluation failed"
-        />
-      ) : results !== null ? (
-        <EvaluationResult results={results} />
-      ) : null}
     </div>
   )
 }
