@@ -1,6 +1,18 @@
 import { CSSProperties } from 'react'
 
-import { InlineNotification, Tile } from '@carbon/react'
+import {
+  InlineNotification,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tile,
+  Tooltip,
+} from '@carbon/react'
+import { Information } from '@carbon/react/icons'
+import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 import { Result } from './types'
 
@@ -22,7 +34,20 @@ export const EvaluationResults = ({
   const dataStyle = {
     padding: '1rem 1rem 1rem 1rem',
   }
-  const columnNames = ['Criteria', 'Value', 'Positional bias', 'Explanation']
+  const headers = [
+    'Response',
+    'Criteria',
+    'Value',
+    <div key={3} style={{ display: 'inline-flex', flexDirection: 'row', alignItems: 'center' }}>
+      Positional bias
+      <Tooltip label={<p style={{ textAlign: 'center' }}>{'Positioanl bias bla bla'}</p>} align="top">
+        <button style={{ backgroundColor: 'transparent', border: 'none' }}>
+          <Information />
+        </button>
+      </Tooltip>
+    </div>,
+    'Explanation',
+  ]
   return (
     <div style={style}>
       {evaluationFailed ? (
@@ -36,30 +61,28 @@ export const EvaluationResults = ({
           title="Evaluation failed"
         />
       ) : results !== null ? (
-        <Tile
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '10% 10% 10% 70%',
-          }}
-        >
-          {columnNames.map((c, i) => (
-            <div style={{ padding: '1rem' }} key={i}>
-              <h5>{c}</h5>
-            </div>
-          ))}
-          {results !== null && (
-            <>
-              {results.map((result) => (
-                <>
-                  <div style={dataStyle}>{result.name}</div>
-                  <div style={dataStyle}>{result.option}</div>
-                  <div style={dataStyle}>{result.positionalBias ? 'True' : 'False'}</div>
-                  <p style={dataStyle}>{result.explanation}</p>
-                </>
+        <div className={classes['table-wrapper']}>
+          <Table size="lg" useZebraStyles={false} aria-label="sample table">
+            <TableHead>
+              <TableRow>
+                {headers.map((header, i) => (
+                  <TableHeader key={i}>{header}</TableHeader>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {results.map((row, i) => (
+                <TableRow key={i} style={{ backgroundColor: row.positionalBias ? '#f9dede' : '' }}>
+                  <TableCell>{`${i}`}</TableCell>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.option}</TableCell>
+                  <TableCell>{row.positionalBias ? 'True' : 'False'}</TableCell>
+                  <TableCell>{row.explanation}</TableCell>
+                </TableRow>
               ))}
-            </>
-          )}
-        </Tile>
+            </TableBody>
+          </Table>
+        </div>
       ) : !evaluationRunning ? (
         <p style={{ color: 'gray' }}>{'No results...'}</p>
       ) : null}

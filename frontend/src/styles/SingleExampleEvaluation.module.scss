@@ -9,3 +9,7 @@
   line-height: var(--cds-body-compact-01-line-height, 1.28572);
   letter-spacing: var(--cds-body-compact-01-letter-spacing, 0.16px);
 }
+
+.table-wrapper :global(.cds--data-table-content) {
+  overflow: visible;
+}
