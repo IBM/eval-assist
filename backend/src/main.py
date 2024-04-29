@@ -2,7 +2,7 @@ from io import StringIO
 from fastapi import FastAPI, status, UploadFile, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import List
 from dotenv import load_dotenv
 
@@ -173,25 +173,41 @@ class RubricModel(BaseModel):
     criteria: str
     options: List[RubricOptionModel]
 
+    @validator('options', pre=True, always=True)
+    def validate_options_length(cls, value):
+        if len(value) < 2:
+            raise ValueError("Rubrics require min. 2 options.")
+        return value
+
 class EvalRequestModel(BaseModel):
     context: str
-    response: str
+    responses: List[str]
     rubric: RubricModel
 
-class EvalResponseModel(BaseModel):
+    @validator('responses', pre=True, always=True)
+    def validate_responses_length(cls, value):
+        if len(value) == 0:
+            raise ValueError("empty response list not allowed")
+        return value
+
+class EvalResultModel(BaseModel):
     option: str
     explanation: str
     p_bias: bool
 
-@app.post("/evaluate/", response_model=EvalResponseModel)
+class EvalResponseModel(BaseModel):
+    results: List[EvalResultModel]
+
+@app.post("/evaluate", response_model=EvalResponseModel)
 async def evaluate(evalRequest: EvalRequestModel):
     evaluator = RubricEvaluator(client=app.client)
     rubric = Rubric.from_json(evalRequest.rubric.model_dump_json())
 
     try:
-        return evaluator.evaluate("mistralai/mixtral-8x7b-instruct-v0-1", 
-                                evalRequest.context, 
-                                evalRequest.response, 
-                                rubric)
+        res = evaluator.evaluate("mistralai/mixtral-8x7b-instruct-v0-1", 
+                                context=evalRequest.context, 
+                                responses=evalRequest.responses, 
+                                rubric=rubric)
+        return EvalResponseModel(results=res)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

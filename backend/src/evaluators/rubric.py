@@ -4,9 +4,11 @@ from genai.schema import (
     TextGenerationParameters,
     TextGenerationReturnOptions
 )
+from typing import List
 import src.evaluators as evaluators
 from statistics import mean
 import json
+from tqdm import tqdm
 
 class RubricOption(object):
     def __init__(self, option: str, description: str):
@@ -84,82 +86,105 @@ class RubricEvaluator(object):
             random_seed=self.random_state
         )
 
-    def _token_count(self, model_id: str, prompt:str) -> int:
+    def _token_count(self, model_id: str, prompts:List[str]) -> int:
 
-        response = next(self.client.text.tokenization.create(
-                model_id=model_id,
-                input=prompt,
-                execution_options={"ordered": True, 'concurrency_limit': 1}
-            ))
-        
-        return response.results[0].token_count
+        token_counts = []
+        response = next(self.client.text.tokenization.create(model_id=model_id,
+            input=prompts,
+            execution_options={"ordered": True, 'concurrency_limit': 2}))
 
-    def _select_answer(self, model_id: str, rubric:Rubric, prompt: str, token_count: int, reverse_options=False) -> int:
+        for r in response.results:
+            token_counts.append(r.token_count)
+
+        return token_counts
+
+    def _select_answer(self, model_id: str, rubric:Rubric, prompt: str, token_count: int) -> int:
 
         lps = []
+        option_prompts = [prompt + o.option for o in rubric.options]
 
-        for option in rubric.options:
-            response = next(self.client.text.generation.create(
+        for response in tqdm(
+            self.client.text.generation.create(
                 model_id=model_id,
-                inputs= prompt + option.option,
-                execution_options={"ordered": True, 'concurrency_limit': 1},
+                inputs = option_prompts,
+                execution_options={"ordered": True, 'concurrency_limit': 5},
                 parameters=self.ff_parameters,
-            ))
+            ),
+            total = len(option_prompts),
+            desc="Selecting options"
+        ):
             tokens = response.results[0].input_tokens[token_count:]
             lps.append(mean([t.logprob for t in tokens if t.logprob != None]))
         
         index_max = max(range(len(lps)), key=lps.__getitem__)
-
         return rubric.options[index_max].option
 
-
-    def evaluate(self, model_id: str, context:str, response:str, rubric: Rubric)  -> Dict:
+    def evaluate(self, model_id: str, context:str, responses:List[str], rubric: Rubric)  -> Dict:
 
         ASSESS_TEMPLATE = _MIXTRAL_RUBRIC_ASSESS  
         SUMMARIZE_TEMPLATE = _MIXTRAL_RUBRIC_SUMMARIZE
         ANSWER_TEMPLATE = _MIXTRAL_RUBRIC_ANSWER
 
-        eval_prompt = ASSESS_TEMPLATE.format(
-            input=context,
-            response=response,
-            criteria=rubric.criteria
-        )
+        assessment_prompts = [ASSESS_TEMPLATE.format(
+                input=context,
+                response=r,
+                criteria=rubric.criteria
+            ) for r in responses]
 
-        response = next(self.client.text.generation.create(
+        # Assessment stage
+        assessments = []
+
+        for response in tqdm(
+            self.client.text.generation.create(
             model_id=model_id,
-            inputs= eval_prompt,
-            execution_options={"ordered": True, 'concurrency_limit': 1},
-            parameters=self.gen_parameters,
-        ))
+            inputs= assessment_prompts,
+            execution_options={"ordered": True, 'concurrency_limit': 5},
+            parameters=self.gen_parameters),
+            total=len(assessment_prompts),
+            desc="Assessment"
+        ):
+            assessments.append(response.results[0].generated_text)
 
-        assessment = response.results[0].generated_text
-        summarization_input = eval_prompt + assessment + SUMMARIZE_TEMPLATE
+        summarization_prompts = [
+            assessment_prompt + assessment + SUMMARIZE_TEMPLATE for assessment_prompt, assessment in zip(assessment_prompts, assessments)
+        ]
 
-        response = next(self.client.text.generation.create(
-                model_id=model_id,
-                inputs=summarization_input,
-                execution_options={"ordered": True, 'concurrency_limit': 1},
-                parameters=self.gen_parameters,
-            )
-        )
+        # Summarization stage
+        summaries = []
 
-        explanation = response.results[0].generated_text
+        for response in tqdm(
+            self.client.text.generation.create(
+            model_id=model_id,
+            inputs= summarization_prompts,
+            execution_options={"ordered": True, 'concurrency_limit': 5},
+            parameters=self.gen_parameters),
+            total=len(summarization_prompts),
+            desc="Summarization"
+        ):
+            summaries.append(response.results[0].generated_text)
 
-        # Get answer
-        options = [f"Answer {o.option} if {o.description}\n" for o in rubric.options]
-        options_input = summarization_input + explanation + ANSWER_TEMPLATE.format(criteria=rubric.criteria, options="".join(options)) 
-        tc = self._token_count(model_id, options_input)
-        selected = self._select_answer(model_id, rubric, options_input, tc)
+        results = []
 
-        # Reverse
-        options = [f"Answer {o.option} if {o.description}\n" for o in reversed(rubric.options)]
-        options_input = summarization_input + explanation + ANSWER_TEMPLATE.format(criteria=rubric.criteria, options="".join(options)) 
-        tc = self._token_count(model_id, options_input)
-        selected_r = self._select_answer(model_id, rubric, options_input, tc)
-        p_bias = (selected != selected_r)
+        for i in range(len(responses)):
 
-        return {
-            "option": selected,
-            "explanation": explanation,
-            "p_bias": p_bias
-        }
+            # Answer stage
+            options = [f"Answer {o.option} if {o.description}\n" for o in rubric.options]
+            r_options = [f"Answer {o.option} if {o.description}\n" for o in reversed(rubric.options)]
+
+            options_input = summarization_prompts[i] + summaries[i] + ANSWER_TEMPLATE.format(criteria=rubric.criteria, options="".join(options)) 
+            r_options_input = summarization_prompts[i] + summaries[i] + ANSWER_TEMPLATE.format(criteria=rubric.criteria, options="".join(r_options)) 
+
+            token_counts = self._token_count(model_id, [options_input, r_options_input])
+
+            selected = self._select_answer(model_id, rubric, options_input, token_counts[0])
+            selected_r = self._select_answer(model_id, rubric, r_options_input, token_counts[1])
+
+            p_bias = (selected != selected_r)
+
+            results.append({
+                "option": selected,
+                "explanation": summaries[i],
+                "p_bias": p_bias
+            })
+
+        return results
