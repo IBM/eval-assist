@@ -29,10 +29,8 @@ const App = ({ Component, pageProps }: AppProps) => {
       <ThemePreference>
         <>
           <RouterLoading />
-          <Theme theme="g100">
-            <AppHeader />
-          </Theme>
-          <Content style={{ paddingTop: '1rem' }}>
+          <AppHeader />
+          <Content style={{ paddingLeft: '1rem' }}>
             <Component {...pageProps} />
           </Content>
         </>
