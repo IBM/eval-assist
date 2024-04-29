@@ -198,7 +198,7 @@ class EvalResultModel(BaseModel):
 class EvalResponseModel(BaseModel):
     results: List[EvalResultModel]
 
-@app.post("/evaluate", response_model=EvalResponseModel)
+@app.post("/evaluate/", response_model=EvalResponseModel)
 async def evaluate(evalRequest: EvalRequestModel):
     evaluator = RubricEvaluator(client=app.client)
     rubric = Rubric.from_json(evalRequest.rubric.model_dump_json())
