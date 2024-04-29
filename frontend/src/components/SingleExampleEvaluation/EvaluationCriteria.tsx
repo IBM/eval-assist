@@ -152,7 +152,7 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
 
                           <div style={{ width: '75%', marginRight: '1rem' }}>
                             <TextInput
-                              labelText="Definition"
+                              labelText="Definition (optional)"
                               value={scale.description}
                               // readOnly={evaluationRunning}
                               id="text-input-definition"

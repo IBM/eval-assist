@@ -11,6 +11,7 @@ interface ResponsesInterface {
 
 export const Responses = ({ responses, setResponses, style }: ResponsesInterface) => {
   const onRemoveResponse = (i: number) => {
+    if (responses.length === 1) return
     setResponses(responses.filter((_, j) => i !== j))
   }
 
@@ -28,7 +29,14 @@ export const Responses = ({ responses, setResponses, style }: ResponsesInterface
             }}
           >
             <label className="cds--label" style={{ marginBottom: 0 }}>{`Response #${i + 1}`}</label>
-            <IconButton kind={'ghost'} size="sm" label="Delete" align="bottom" onClick={() => onRemoveResponse(i)}>
+            <IconButton
+              disabled={responses.length === 1}
+              kind={'ghost'}
+              size="sm"
+              label="Delete"
+              align="bottom"
+              onClick={() => onRemoveResponse(i)}
+            >
               <Close size={14} />
             </IconButton>
           </div>

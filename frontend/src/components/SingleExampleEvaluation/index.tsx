@@ -1,36 +1,30 @@
-import { useState } from 'react'
+import { use, useState } from 'react'
 
-import { TextArea } from '@carbon/react'
+import { Content, TextArea } from '@carbon/react'
 
+import { AppHeader } from '@components/AppHeader/AppHeader'
+import { ConfirmationDialog } from '@components/LandingPage/ConfirmationDialog'
 import { post } from '@utils/fetchUtils'
 
 import { EvaluateButton } from './EvaluateButton'
 import { EvaluationCriteria } from './EvaluationCriteria'
 import { EvaluationResults } from './EvaluationResults'
 import { Responses } from './Responses'
+import { UseCaseConfirmationModal } from './UseCaseConfimationModal'
+import { UseCase } from './UseCases'
 import { FetchedResults, Result, Rubric } from './types'
 
 export const SingleExampleEvaluation = () => {
-  const [context, setContext] = useState('How is the weather there?')
-  const [responses, setResponses] = useState([
-    'On most days, the weather is warm and humid, with temperatures often soaring into the high 80s and low 90s Fahrenheit (around 31-34°C). The dense foliage of the jungle acts as a natural air conditioner, keeping the temperature relatively stable and comfortable for the inhabitants.',
-  ])
+  const [context, setContext] = useState('')
+  const [responses, setResponses] = useState([''])
 
   const [rubric, setRubric] = useState<Rubric>({
-    title: 'Temperature',
-    criteria: 'Is temperature described in both Fahrenheit and Celsius?',
+    title: '',
+    criteria: '',
     options: [
       {
-        option: 'Yes',
-        description: 'The temperature is described in both Fahrenheit and Celsius.',
-      },
-      {
-        option: 'No',
-        description: 'The temperature is described either in Fahrenheit or Celsius but not both.',
-      },
-      {
-        option: 'None',
-        description: 'A numerical temperature is not mentioned.',
+        option: '',
+        description: '.',
       },
     ],
   })
@@ -40,6 +34,9 @@ export const SingleExampleEvaluation = () => {
   const [evaluationError, setEvaluationError] = useState<Error | null>(null)
 
   const [evaluationRunning, setEvaluationRunning] = useState(false)
+
+  const [useCaseSelected, setUseCaseSelected] = useState<UseCase | null>(null)
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
 
   const runEvaluation = async () => {
     setEvaluationFailed(false)
@@ -71,32 +68,49 @@ export const SingleExampleEvaluation = () => {
     )
   }
 
-  return (
-    <div>
-      <h3 style={{ marginBottom: '1rem' }}>Evaluation sandbox</h3>
-      <TextArea
-        onChange={(e) => setContext(e.target.value)}
-        rows={4}
-        value={context}
-        id="text-area-context"
-        labelText="Task context (optional)"
-        style={{ marginBottom: '1rem' }}
-      />
-      <Responses responses={responses} setResponses={setResponses} style={{ marginBottom: '2rem' }} />
-      <EvaluationCriteria rubric={rubric} setRubric={setRubric} style={{ marginBottom: '2rem' }} />
-      <EvaluateButton
-        evaluationRunning={evaluationRunning}
-        runEvaluation={runEvaluation}
-        style={{ marginBottom: '1rem' }}
-      />
+  const setUseCase = (useCase: UseCase) => {
+    setContext(useCase.context)
+    setResponses(useCase.responses)
+    setRubric(useCase.rubric)
+  }
 
-      <EvaluationResults
-        results={results}
-        evaluationFailed={evaluationFailed}
-        evaluationError={evaluationError}
-        evaluationRunning={evaluationRunning}
-        style={{ marginBottom: '1rem' }}
+  return (
+    <>
+      <AppHeader setOpen={setConfirmationModalOpen} setUseCaseSelected={setUseCaseSelected} />
+      <Content style={{ paddingLeft: '1rem' }}>
+        <div>
+          <h3 style={{ marginBottom: '1rem' }}>Evaluation sandbox</h3>
+          <TextArea
+            onChange={(e) => setContext(e.target.value)}
+            rows={4}
+            value={context}
+            id="text-area-context"
+            labelText="Task context (optional)"
+            style={{ marginBottom: '1rem' }}
+          />
+          <Responses responses={responses} setResponses={setResponses} style={{ marginBottom: '2rem' }} />
+          <EvaluationCriteria rubric={rubric} setRubric={setRubric} style={{ marginBottom: '2rem' }} />
+          <EvaluateButton
+            evaluationRunning={evaluationRunning}
+            runEvaluation={runEvaluation}
+            style={{ marginBottom: '1rem' }}
+          />
+
+          <EvaluationResults
+            results={results}
+            evaluationFailed={evaluationFailed}
+            evaluationError={evaluationError}
+            evaluationRunning={evaluationRunning}
+            style={{ marginBottom: '1rem' }}
+          />
+        </div>
+      </Content>
+      <UseCaseConfirmationModal
+        setUseCase={setUseCase}
+        open={confirmationModalOpen}
+        setOpen={setConfirmationModalOpen}
+        useCaseSelected={useCaseSelected}
       />
-    </div>
+    </>
   )
 }

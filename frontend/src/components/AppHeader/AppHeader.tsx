@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
 
 import Link from 'next/link'
@@ -12,14 +12,19 @@ import {
   SideNavItems,
   SideNavLink,
   SideNavMenu,
-  SideNavMenuItem,
   Theme,
 } from '@carbon/react'
 import { Categories, Help } from '@carbon/react/icons'
 
+import { UseCase, useCases } from '@components/SingleExampleEvaluation/UseCases'
 import { PLATFORM_NAME } from '@constants'
 
-export const AppHeader = () => {
+interface AppHeaderProps {
+  setOpen: Dispatch<SetStateAction<boolean>>
+  setUseCaseSelected: Dispatch<SetStateAction<UseCase | null>>
+}
+
+export const AppHeader = ({ setOpen, setUseCaseSelected }: AppHeaderProps) => {
   const sm = useMediaQuery({ query: '(max-width: 671px)' })
   const title = `IBM ${PLATFORM_NAME}`
   const [isSideNavExpanded, setIsSideNavExpanded] = useState(false)
@@ -46,9 +51,19 @@ export const AppHeader = () => {
       >
         <SideNavItems>
           <SideNavMenu renderIcon={Categories} title="Use Case Library" defaultExpanded>
-            <SideNavLink onClick={() => alert('hola')}>Use Case 1</SideNavLink>
-            <SideNavLink>Use Case 2</SideNavLink>
-            <SideNavLink>Use Case 3</SideNavLink>
+            {useCases.map((useCase) => (
+              <SideNavLink
+                isActive={false}
+                key={useCase.name}
+                onClick={() => {
+                  setOpen(true)
+                  setUseCaseSelected(useCase)
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                {useCase.name}
+              </SideNavLink>
+            ))}
           </SideNavMenu>
         </SideNavItems>
       </SideNav>

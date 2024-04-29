@@ -29,10 +29,8 @@ const App = ({ Component, pageProps }: AppProps) => {
       <ThemePreference>
         <>
           <RouterLoading />
-          <AppHeader />
-          <Content style={{ paddingLeft: '1rem' }}>
-            <Component {...pageProps} />
-          </Content>
+          {/* <AppHeader /> */}
+          <Component {...pageProps} />
         </>
       </ThemePreference>
     </>
