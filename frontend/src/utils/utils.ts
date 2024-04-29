@@ -1,4 +1,4 @@
-import { Option, Rubric } from '@components/SingleExampleEvaluation'
+import { Option, Rubric } from '@components/SingleExampleEvaluation/types'
 
 export const isInstanceOfOption = (obj: any): obj is Option => {
   return typeof obj.option === 'string' && typeof obj.description === 'string'
