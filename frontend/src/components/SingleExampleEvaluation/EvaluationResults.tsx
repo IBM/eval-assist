@@ -22,8 +22,7 @@ export const EvaluationResults = ({
   const dataStyle = {
     padding: '1rem 1rem 1rem 1rem',
   }
-
-  const columnNames = ['Criteria', 'Value', 'Explanation']
+  const columnNames = ['Criteria', 'Value', 'Positional bias', 'Explanation']
   return (
     <div style={style}>
       {evaluationFailed ? (
@@ -40,7 +39,7 @@ export const EvaluationResults = ({
         <Tile
           style={{
             display: 'grid',
-            gridTemplateColumns: '10% 10% 80%',
+            gridTemplateColumns: '10% 10% 10% 70%',
           }}
         >
           {columnNames.map((c, i) => (
@@ -54,6 +53,7 @@ export const EvaluationResults = ({
                 <>
                   <div style={dataStyle}>{result.name}</div>
                   <div style={dataStyle}>{result.option}</div>
+                  <div style={dataStyle}>{result.positionalBias ? 'True' : 'False'}</div>
                   <p style={dataStyle}>{result.explanation}</p>
                 </>
               ))}

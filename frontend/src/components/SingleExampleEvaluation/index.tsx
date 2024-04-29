@@ -1,7 +1,6 @@
-import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
+import { useState } from 'react'
 
-import { Button, InlineLoading, TextArea } from '@carbon/react'
-import classes from '@styles/SingleExampleEvaluation.module.scss'
+import { TextArea } from '@carbon/react'
 
 import { post } from '@utils/fetchUtils'
 
@@ -12,8 +11,6 @@ import { Responses } from './Responses'
 import { FetchedResults, Result, Rubric } from './types'
 
 export const SingleExampleEvaluation = () => {
-  const [isEvaluationCriteriaCollapsed, setIsEvaluationCriteriaCollapsed] = useState(false)
-
   const [context, setContext] = useState('How is the weather there?')
   const [responses, setResponses] = useState([
     'On most days, the weather is warm and humid, with temperatures often soaring into the high 80s and low 90s Fahrenheit (around 31-34°C). The dense foliage of the jungle acts as a natural air conditioner, keeping the temperature relatively stable and comfortable for the inhabitants.',
