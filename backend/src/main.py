@@ -204,7 +204,7 @@ async def evaluate(evalRequest: EvalRequestModel):
     rubric = Rubric.from_json(evalRequest.rubric.model_dump_json())
 
     try:
-        res = evaluator.evaluate("mistralai/mixtral-8x7b-instruct-v0-1", 
+        res = evaluator.evaluate("mistralai/mixtral-8x7b-instruct-v01", 
                                 context=evalRequest.context, 
                                 responses=evalRequest.responses, 
                                 rubric=rubric)
