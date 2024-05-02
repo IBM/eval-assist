@@ -146,7 +146,7 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                                 })
                               }
                               // readOnly={evaluationRunning}
-                              id="text-input-value"
+                              id={`criteria-option-value-${i}`}
                             />
                           </div>
 
@@ -154,8 +154,7 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                             <TextInput
                               labelText="Definition (optional)"
                               value={scale.description}
-                              // readOnly={evaluationRunning}
-                              id="text-input-definition"
+                              id={`criteria-option-definition-${i}`}
                               onChange={(e) =>
                                 setRubric({
                                   ...rubric,

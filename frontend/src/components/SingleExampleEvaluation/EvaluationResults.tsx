@@ -19,7 +19,7 @@ import { Result } from './types'
 interface EvaluationResultsProps {
   results: Result[] | null
   evaluationFailed: boolean
-  evaluationError: Error | null
+  evaluationError: string
   evaluationRunning: boolean
   style?: CSSProperties
 }
@@ -31,9 +31,6 @@ export const EvaluationResults = ({
   evaluationRunning,
   style,
 }: EvaluationResultsProps) => {
-  const dataStyle = {
-    padding: '1rem 1rem 1rem 1rem',
-  }
   const headers = [
     'Response',
     'Criteria',
@@ -57,7 +54,7 @@ export const EvaluationResults = ({
           onClose={function noRefCheck() {}}
           onCloseButtonClick={function noRefCheck() {}}
           statusIconDescription="notification"
-          subtitle={evaluationError?.message}
+          subtitle={evaluationError}
           title="Evaluation failed"
         />
       ) : results !== null ? (
@@ -73,7 +70,7 @@ export const EvaluationResults = ({
             <TableBody>
               {results.map((row, i) => (
                 <TableRow key={i} style={{ backgroundColor: row.positionalBias ? '#f9dede' : '' }}>
-                  <TableCell>{`${i}`}</TableCell>
+                  <TableCell>{`${i + 1}`}</TableCell>
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.option}</TableCell>
                   <TableCell>{row.positionalBias ? 'True' : 'False'}</TableCell>

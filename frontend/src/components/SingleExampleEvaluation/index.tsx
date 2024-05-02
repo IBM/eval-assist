@@ -1,11 +1,15 @@
-import { use, useState } from 'react'
+import { match } from 'assert'
+import { useSessionStorage } from 'usehooks-ts'
 
-import { Content, TextArea } from '@carbon/react'
+import { DetailedHTMLProps, HTMLAttributes, LegacyRef, useRef, useState } from 'react'
+
+import { ActionableNotification, Button, Content, InlineNotification, TextArea } from '@carbon/react'
+import { AlignBoxBottomCenter, ArrowUp } from '@carbon/react/icons'
 
 import { AppHeader } from '@components/AppHeader/AppHeader'
-import { ConfirmationDialog } from '@components/LandingPage/ConfirmationDialog'
 import { post } from '@utils/fetchUtils'
 
+import { APIKeyPopover } from './APIKeyPopover'
 import { EvaluateButton } from './EvaluateButton'
 import { EvaluationCriteria } from './EvaluationCriteria'
 import { EvaluationResults } from './EvaluationResults'
@@ -31,12 +35,18 @@ export const SingleExampleEvaluation = () => {
 
   const [results, setResults] = useState<Result[] | null>(null)
   const [evaluationFailed, setEvaluationFailed] = useState(false)
-  const [evaluationError, setEvaluationError] = useState<Error | null>(null)
+  const [evaluationError, setEvaluationError] = useState<string>('')
 
   const [evaluationRunning, setEvaluationRunning] = useState(false)
 
   const [useCaseSelected, setUseCaseSelected] = useState<UseCase | null>(null)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
+
+  const [popoverOpen, setPopoverOpen] = useState(false)
+
+  const [bamAPIKey, setBamAPIKey, removeBamAPIKey] = useSessionStorage<string>('bamAPIKey', '')
+
+  const popoverRef = useRef<HTMLDivElement>()
 
   const runEvaluation = async () => {
     setEvaluationFailed(false)
@@ -46,13 +56,19 @@ export const SingleExampleEvaluation = () => {
       context,
       responses,
       rubric,
+      bam_api_key: bamAPIKey,
     })
 
     setEvaluationRunning(false)
 
-    if (response.status === 500) {
+    if (!response.ok) {
+      const error = (await response.json()) as {
+        detail: string
+      }
+      console.log(error)
       setEvaluationFailed(true)
-      setEvaluationError(new Error('Something went wrong running the evaluation. Please try again.'))
+      // We are catching this error an so we show the message sent from the backend
+      setEvaluationError(error.detail)
       return
     }
 
@@ -79,7 +95,20 @@ export const SingleExampleEvaluation = () => {
       <AppHeader setOpen={setConfirmationModalOpen} setUseCaseSelected={setUseCaseSelected} />
       <Content style={{ paddingLeft: '1rem' }}>
         <div>
-          <h3 style={{ marginBottom: '1rem' }}>Evaluation sandbox</h3>
+          <div
+            style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+            ref={popoverRef as LegacyRef<HTMLDivElement> | undefined}
+          >
+            <h3 style={{ marginBottom: '1rem' }}>Evaluation sandbox</h3>
+
+            <APIKeyPopover
+              popoverOpen={popoverOpen}
+              setPopoverOpen={setPopoverOpen}
+              bamAPIKey={bamAPIKey}
+              setBamAPIKey={setBamAPIKey}
+            />
+          </div>
+
           <TextArea
             onChange={(e) => setContext(e.target.value)}
             rows={4}
