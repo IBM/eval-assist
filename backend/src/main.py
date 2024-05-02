@@ -8,15 +8,15 @@ from dotenv import load_dotenv
 
 from .utils import log_runtime
 from .db_client import db
-from .genai_client import client
 from datetime import datetime
 load_dotenv()
 import pandas as pd 
 from time import sleep
 import json
 from genai import Credentials, Client
+from genai.exceptions import ApiResponseException
 from src.evaluators import RubricEvaluator, Rubric, RubricOption
-
+import os
 
 app = FastAPI()
 app.add_middleware(
@@ -26,10 +26,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Gen ai client
-credentials = Credentials.from_env()
-app.client = Client(credentials=credentials)
 
 class HealthCheck(BaseModel):
     status: str = "OK"
@@ -183,6 +179,7 @@ class EvalRequestModel(BaseModel):
     context: str
     responses: List[str]
     rubric: RubricModel
+    bam_api_key: str
 
     @validator('responses', pre=True, always=True)
     def validate_responses_length(cls, value):
@@ -198,10 +195,22 @@ class EvalResultModel(BaseModel):
 class EvalResponseModel(BaseModel):
     results: List[EvalResultModel]
 
+def throw_authorized_exception():
+    raise HTTPException(status_code=401, detail=f"Couldn't connect to BAM. Please check that the provided API key is correct." )
+
 @app.post("/evaluate/", response_model=EvalResponseModel)
 async def evaluate(evalRequest: EvalRequestModel):
-    evaluator = RubricEvaluator(client=app.client)
+    # Gen ai client
+    BAM_API_URL = os.getenv("GENAI_API", None)  
+    credentials = Credentials(api_key=evalRequest.bam_api_key, api_endpoint=BAM_API_URL)
+    client = Client(credentials=credentials)
+
+    evaluator = RubricEvaluator(client=client)
     rubric = Rubric.from_json(evalRequest.rubric.model_dump_json())
+
+    # for some reason, if the api key is wrong genai doesn't throw an authorized error
+    if evalRequest.bam_api_key == '':
+        throw_authorized_exception()
 
     try:
         res = evaluator.evaluate("mistralai/mixtral-8x7b-instruct-v01", 
@@ -209,5 +218,8 @@ async def evaluate(evalRequest: EvalRequestModel):
                                 responses=evalRequest.responses, 
                                 rubric=rubric)
         return EvalResponseModel(results=res)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except ApiResponseException as e:
+        if e.response.error == "Unauthorized":
+            throw_authorized_exception()
+        print(e.response.error)
+        raise HTTPException(status_code=400, detail="Something went wrong running the evaluation. Please try again.")
