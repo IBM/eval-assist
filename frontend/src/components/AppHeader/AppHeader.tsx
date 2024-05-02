@@ -7,6 +7,7 @@ import {
   Header,
   HeaderGlobalAction,
   HeaderGlobalBar,
+  HeaderMenuButton,
   HeaderName,
   SideNav,
   SideNavItems,
@@ -15,6 +16,7 @@ import {
   Theme,
 } from '@carbon/react'
 import { Categories, Help } from '@carbon/react/icons'
+import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 import { UseCase, useCases } from '@components/SingleExampleEvaluation/UseCases'
 import { PLATFORM_NAME } from '@constants'
@@ -32,9 +34,16 @@ export const AppHeader = ({ setOpen, setUseCaseSelected }: AppHeaderProps) => {
     <>
       <Theme theme="g100">
         <Header aria-label={title}>
+          {/* <HeaderMenuButton
+                aria-label="Open menu"
+                onClick={() => setIsSideNavExpanded(!isSideNavExpanded)}
+                isActive={isSideNavExpanded}
+                style={{display:"inherit"}}
+              /> */}
           <HeaderName href="/" prefix="IBM" as={Link}>
             {PLATFORM_NAME}
           </HeaderName>
+
           <HeaderGlobalBar>
             <HeaderGlobalAction aria-label="Help">
               <Help size={20} />
@@ -45,9 +54,12 @@ export const AppHeader = ({ setOpen, setUseCaseSelected }: AppHeaderProps) => {
 
       <SideNav
         aria-label="Side navigation"
+        isPersistent={true}
         onOverlayClick={() => setIsSideNavExpanded(!isSideNavExpanded)}
         onSideNavBlur={() => setIsSideNavExpanded(!isSideNavExpanded)}
+        expanded={isSideNavExpanded}
         isRail
+        className={classes['custom-sidenav']}
       >
         <SideNavItems>
           <SideNavMenu renderIcon={Categories} title="Use Case Library" defaultExpanded>

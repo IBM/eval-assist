@@ -1,3 +1,9 @@
+@use '@carbon/styles/scss/theme' as *;
+
+.custom-sidenav {
+  border-right: 1px solid $border-subtle-00;
+}
+
 .wrapper :global .cds--accordion__wrapper .cds--accordion__content {
   padding-right: 1rem !important;
 }
@@ -13,3 +19,4 @@
 .table-wrapper :global(.cds--data-table-content) {
   overflow: visible;
 }
+
