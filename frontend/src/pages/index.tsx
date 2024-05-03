@@ -3,12 +3,15 @@
 import { use } from 'react'
 
 import { GetServerSideProps } from 'next'
+import { useSession } from 'next-auth/react'
 
 import { SingleExampleEvaluation } from '@components/SingleExampleEvaluation'
 import { UseCase } from '@components/SingleExampleEvaluation/types'
 import { StoredUseCase } from '@prisma/client'
 import { get } from '@utils/fetchUtils'
 import { parseFetchedUseCase } from '@utils/utils'
+
+import { LoginView } from '../components/Login/Login'
 
 // import { get } from '@utils/fetchUtils'
 
@@ -21,7 +24,17 @@ interface Props {
 // }
 
 const Home = ({ savedUseCases }: Props) => {
-  return <SingleExampleEvaluation _savedUseCases={savedUseCases} />
+  const { data: session } = useSession()
+
+  // const siren = String.fromCodePoint(0x1f6a8);
+  // const flashlight = String.fromCodePoint(0x1f526);
+  // console.log(`${siren} ${flashlight} here's process.env.NEXT_PUBLIC_USE_AUTH:`, process.env.NEXT_PUBLIC_USE_AUTH);
+
+  if (!session && process.env.NEXT_PUBLIC_USE_AUTH == 'true') {
+    return <LoginView></LoginView>
+  } else {
+    return <SingleExampleEvaluation _savedUseCases={savedUseCases} />
+  }
 }
 
 export const getServerSideProps = (async (context) => {

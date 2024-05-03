@@ -1,3 +1,5 @@
+import type { Session } from 'next-auth'
+import { SessionProvider } from 'next-auth/react'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 
@@ -9,7 +11,7 @@ import { AppHeader } from '@components/AppHeader/AppHeader'
 import { RouterLoading } from '@components/RouterLoading/RouterLoading'
 import { PLATFORM_NAME } from '@constants'
 
-const App = ({ Component, pageProps }: AppProps) => {
+const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ session: Session }>) => {
   const title = `IBM ${PLATFORM_NAME}`
 
   return (
@@ -30,7 +32,9 @@ const App = ({ Component, pageProps }: AppProps) => {
         <>
           <RouterLoading />
           {/* <AppHeader /> */}
-          <Component {...pageProps} />
+          <SessionProvider session={session}>
+            <Component {...pageProps} />
+          </SessionProvider>
         </>
       </ThemePreference>
     </>

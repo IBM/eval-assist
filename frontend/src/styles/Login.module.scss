@@ -1,0 +1,23 @@
+@import "@carbon/react/scss/spacing";
+
+.main {
+  height: 100vh;
+}
+
+.page {
+  height: 100%;
+  // max-width: 75%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  // padding-bottom: 256px;
+  margin: 0 2em;
+}
+
+.title {
+  font-size: 42px;
+  line-height: 50px;
+  font-weight: 300;
+  color: black;
+  margin-bottom: $spacing-06;
+}

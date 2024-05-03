@@ -50,7 +50,18 @@ fi
 
 # build
 echo "starting docker build:"
-docker build --platform linux/amd64 --build-arg NEXT_PUBLIC_BACKEND_API_HOST=$NEXT_PUBLIC_BACKEND_API_HOST . -t $IMAGE_TAG
+docker build --platform linux/amd64 \
+-f $DOCKERFILE \
+--build-arg NEXT_PUBLIC_BACKEND_API_HOST=$NEXT_PUBLIC_BACKEND_API_HOST \
+--build-arg NEXTAUTH_SECRET=$NEXTAUTH_SECRET \
+--build-arg NEXTAUTH_URL=$NEXTAUTH_URL \
+--build-arg AUTH_PROVIDER_ID=$AUTH_PROVIDER_ID \
+--build-arg AUTH_PROVIDER_NAME=$AUTH_PROVIDER_NAME \
+--build-arg AUTH_WELL_KNOWN=$AUTH_WELL_KNOWN \
+--build-arg AUTH_CLIENT_ID=$AUTH_CLIENT_ID \
+--build-arg AUTH_CLIENT_SECRET=$AUTH_CLIENT_SECRET \
+--build-arg NEXT_PUBLIC_USE_AUTH=$NEXT_PUBLIC_USE_AUTH \
+. -t $IMAGE_TAG
 
 if [ $? -ne 0 ]; then
   colorecho $RED "docker build failed"

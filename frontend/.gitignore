@@ -38,3 +38,5 @@ next-env.d.ts
 .env
 Secrets.yaml
 .vscode
+
+certificates
