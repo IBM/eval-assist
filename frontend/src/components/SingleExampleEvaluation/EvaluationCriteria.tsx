@@ -13,6 +13,7 @@ import {
   Tabs,
   TextArea,
   TextInput,
+  Tooltip,
 } from '@carbon/react'
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
@@ -109,9 +110,11 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                             </IconButton>
                           )}
                         </div>
-                        <IconButton label={'Remove'} size="lg" kind="ghost" onClick={() => {}}>
-                          <TrashCan />
-                        </IconButton>
+                        <Tooltip label={'This option is not available yet'} align={'left'}>
+                          <span>
+                            <TrashCan />
+                          </span>
+                        </Tooltip>
                       </div>
                       <TextArea
                         onChange={(e) => setRubric({ ...rubric, criteria: e.target.value })}
@@ -169,17 +172,33 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                           </div>
 
                           <div style={{ width: '5%' }}>
-                            <IconButton
-                              label={'Remove'}
-                              size="lg"
-                              kind="ghost"
-                              style={{ paddingTop: '24px' }}
-                              onClick={() =>
-                                setRubric({ ...rubric, options: rubric.options.filter((s, j) => j !== i) })
-                              }
-                            >
-                              <TrashCan />
-                            </IconButton>
+                            {rubric.options.length === 2 ? (
+                              <Tooltip align={'left'} label={'A minimum of two options is required'}>
+                                <span>
+                                  <IconButton
+                                    label={'Remove'}
+                                    size="lg"
+                                    kind="ghost"
+                                    style={{ marginTop: '24px' }}
+                                    disabled
+                                  >
+                                    <TrashCan />
+                                  </IconButton>
+                                </span>
+                              </Tooltip>
+                            ) : (
+                              <IconButton
+                                label={'Remove'}
+                                size="lg"
+                                kind="ghost"
+                                style={{ marginTop: '24px' }}
+                                onClick={() =>
+                                  setRubric({ ...rubric, options: rubric.options.filter((s, j) => j !== i) })
+                                }
+                              >
+                                <TrashCan />
+                              </IconButton>
+                            )}
                           </div>
                         </div>
                       ))}
