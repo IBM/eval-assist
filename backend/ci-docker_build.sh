@@ -49,7 +49,9 @@ fi
 
 # build
 echo "starting docker build:"
-docker build --platform linux/amd64 --build-arg GH_TOKEN=$GH_TOKEN DATABASE_URL=$DATABASE_URL . -t $IMAGE_TAG
+
+docker build --platform linux/amd64 --build-arg GH_TOKEN=$GH_TOKEN --build-arg DATABASE_URL=$DATABASE_URL . -t $IMAGE_TAG
+
 if [ $? -ne 0 ]; then
   colorecho $RED "docker build failed"
   exit 1
