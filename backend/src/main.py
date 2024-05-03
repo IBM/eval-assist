@@ -11,12 +11,13 @@ from .db_client import db
 from datetime import datetime
 load_dotenv()
 import pandas as pd 
-from time import sleep
 import json
 from genai import Credentials, Client
+
+from llmasajudge.evaluators import Rubric, RubricEvaluator
 from genai.exceptions import ApiResponseException
-from src.evaluators import RubricEvaluator, Rubric, RubricOption
 import os
+
 
 app = FastAPI()
 app.add_middleware(
@@ -213,8 +214,7 @@ async def evaluate(evalRequest: EvalRequestModel):
         throw_authorized_exception()
 
     try:
-        res = evaluator.evaluate("mistralai/mixtral-8x7b-instruct-v01", 
-                                context=evalRequest.context, 
+        res = evaluator.evaluate(contexts=[evalRequest.context]*len(evalRequest.responses), 
                                 responses=evalRequest.responses, 
                                 rubric=rubric)
         return EvalResponseModel(results=res)
