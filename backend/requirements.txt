@@ -3,3 +3,4 @@ pydantic==2.6.0
 prisma==0.12.0
 uvicorn==0.29.0
 python-multipart==0.0.9
+llmasajudge @ git+https://${GH_TOKEN}@github.ibm.com/AIExperience/llm-as-a-judge.git

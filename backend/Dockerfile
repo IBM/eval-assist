@@ -3,7 +3,6 @@ WORKDIR /
 
 ARG GH_TOKEN
 ENV GH_TOKEN $GH_TOKEN
-RUN pip install "llmasajudge @ git+https://${GH_TOKEN}@github.ibm.com/AIExperience/llm-as-a-judge.git"
 
 COPY ./requirements.txt /requirements.txt 
 RUN pip install --no-cache-dir --upgrade -r /requirements.txt
