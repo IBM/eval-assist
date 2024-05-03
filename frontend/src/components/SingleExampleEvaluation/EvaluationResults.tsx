@@ -80,8 +80,6 @@ export const EvaluationResults = ({
             </TableBody>
           </Table>
         </div>
-      ) : !evaluationRunning ? (
-        <p style={{ color: 'gray' }}>{'No results...'}</p>
       ) : null}
     </div>
   )

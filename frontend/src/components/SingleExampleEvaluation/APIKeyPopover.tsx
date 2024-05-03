@@ -1,8 +1,9 @@
-import { Dispatch, LegacyRef, SetStateAction } from 'react'
+import { Dispatch, SetStateAction } from 'react'
 
 import Link from 'next/link'
 
 import { Button, Layer, Popover, PopoverContent, TextInput } from '@carbon/react'
+import { WarningFilled } from '@carbon/react/icons'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 interface Props {
@@ -15,7 +16,12 @@ interface Props {
 export const APIKeyPopover = ({ popoverOpen, setPopoverOpen, bamAPIKey, setBamAPIKey }: Props) => {
   return (
     <Popover open={popoverOpen} align="bottom-end" isTabTip onRequestClose={() => setPopoverOpen(false)}>
-      <Button kind="tertiary" onClick={() => setPopoverOpen(!popoverOpen)}>
+      <Button
+        kind="tertiary"
+        onClick={() => setPopoverOpen(!popoverOpen)}
+        iconDescription="Set api key"
+        renderIcon={bamAPIKey === '' ? WarningFilled : undefined}
+      >
         {'API key'}
       </Button>
       <PopoverContent>
@@ -31,6 +37,7 @@ export const APIKeyPopover = ({ popoverOpen, setPopoverOpen, bamAPIKey, setBamAP
               labelText="BAM API key"
               value={bamAPIKey}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBamAPIKey(e.target.value)}
+              autoComplete="off"
             />
           </Layer>
           <p className="cds--form__helper-text">

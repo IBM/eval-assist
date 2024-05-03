@@ -1,12 +1,11 @@
-import { match } from 'assert'
 import { useSessionStorage } from 'usehooks-ts'
 
-import { DetailedHTMLProps, HTMLAttributes, LegacyRef, useRef, useState } from 'react'
+import { LegacyRef, useRef, useState } from 'react'
 
-import { ActionableNotification, Button, Content, InlineNotification, TextArea } from '@carbon/react'
-import { AlignBoxBottomCenter, ArrowUp } from '@carbon/react/icons'
+import { Content, TextArea } from '@carbon/react'
 
 import { AppHeader } from '@components/AppHeader/AppHeader'
+import { useHasMounted } from '@customHooks/useHasMounted'
 import { post } from '@utils/fetchUtils'
 
 import { APIKeyPopover } from './APIKeyPopover'
@@ -19,6 +18,9 @@ import { UseCase } from './UseCases'
 import { FetchedResults, Result, Rubric } from './types'
 
 export const SingleExampleEvaluation = () => {
+  // we are ignoring client side rendering to be able to use useSessionStorage
+  const hasMounted = useHasMounted()
+
   const [context, setContext] = useState('')
   const [responses, setResponses] = useState([''])
 
@@ -94,49 +96,52 @@ export const SingleExampleEvaluation = () => {
     setRubric(useCase.rubric)
   }
 
+  if (!hasMounted) return null
+
   return (
     <>
       <AppHeader setOpen={setConfirmationModalOpen} setUseCaseSelected={setUseCaseSelected} />
       <Content style={{ paddingLeft: '1rem' }}>
-        <div>
-          <div
-            style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
-            ref={popoverRef as LegacyRef<HTMLDivElement> | undefined}
-          >
-            <h3 style={{ marginBottom: '1rem' }}>Evaluation sandbox</h3>
+        <div
+          style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+          ref={popoverRef as LegacyRef<HTMLDivElement> | undefined}
+        >
+          <h3 style={{ marginBottom: '1rem' }}>Evaluation sandbox</h3>
 
-            <APIKeyPopover
-              popoverOpen={popoverOpen}
-              setPopoverOpen={setPopoverOpen}
-              bamAPIKey={bamAPIKey}
-              setBamAPIKey={setBamAPIKey}
-            />
-          </div>
-
-          <TextArea
-            onChange={(e) => setContext(e.target.value)}
-            rows={4}
-            value={context}
-            id="text-area-context"
-            labelText="Task context (optional)"
-            style={{ marginBottom: '1rem' }}
-          />
-          <Responses responses={responses} setResponses={setResponses} style={{ marginBottom: '2rem' }} />
-          <EvaluationCriteria rubric={rubric} setRubric={setRubric} style={{ marginBottom: '2rem' }} />
-          <EvaluateButton
-            evaluationRunning={evaluationRunning}
-            runEvaluation={runEvaluation}
-            style={{ marginBottom: '1rem' }}
-          />
-
-          <EvaluationResults
-            results={results}
-            evaluationFailed={evaluationFailed}
-            evaluationError={evaluationError}
-            evaluationRunning={evaluationRunning}
-            style={{ marginBottom: '1rem' }}
+          <APIKeyPopover
+            popoverOpen={popoverOpen}
+            setPopoverOpen={setPopoverOpen}
+            bamAPIKey={bamAPIKey}
+            setBamAPIKey={setBamAPIKey}
           />
         </div>
+
+        <TextArea
+          onChange={(e) => setContext(e.target.value)}
+          rows={4}
+          value={context}
+          id="text-area-context"
+          labelText="Task context (optional)"
+          style={{ marginBottom: '1rem' }}
+        />
+        <Responses responses={responses} setResponses={setResponses} style={{ marginBottom: '2rem' }} />
+        <EvaluationCriteria rubric={rubric} setRubric={setRubric} style={{ marginBottom: '2rem' }} />
+        <EvaluateButton
+          evaluationRunning={evaluationRunning}
+          runEvaluation={runEvaluation}
+          style={{ marginBottom: '1rem' }}
+        />
+        {bamAPIKey === '' && !evaluationRunning && results === null && !evaluationFailed && (
+          <p>{'You will need to provide your BAM API key to run the evaluation'}</p>
+        )}
+
+        <EvaluationResults
+          results={results}
+          evaluationFailed={evaluationFailed}
+          evaluationError={evaluationError}
+          evaluationRunning={evaluationRunning}
+          style={{ marginBottom: '1rem' }}
+        />
       </Content>
       <UseCaseConfirmationModal
         setUseCase={setUseCase}
