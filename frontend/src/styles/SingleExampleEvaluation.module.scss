@@ -20,6 +20,10 @@
   overflow: visible;
 }
 
-.api-key-content-div{
+.api-key-content-div {
   border: 1px solid $border-strong-01;
+}
+
+.table-row-error :global td {
+  color: $text-error;
 }

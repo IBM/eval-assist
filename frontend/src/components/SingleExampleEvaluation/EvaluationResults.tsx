@@ -78,7 +78,7 @@ export const EvaluationResults = ({
             </TableHead>
             <TableBody>
               {results.map((row, i) => (
-                <TableRow key={i} style={{ backgroundColor: row.positionalBias ? '#f9dede' : '' }}>
+                <TableRow key={i} className={row.positionalBias ? classes['table-row-error'] : ''}>
                   <TableCell>{`${i + 1}`}</TableCell>
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.option}</TableCell>
