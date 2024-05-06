@@ -15,7 +15,7 @@ import json
 from genai import Credentials, Client
 
 from llmasajudge.evaluators import Rubric, RubricEvaluator
-from genai.exceptions import ApiResponseException
+from genai.exceptions import ApiResponseException, ApiNetworkException
 import os
 
 
@@ -221,5 +221,12 @@ async def evaluate(evalRequest: EvalRequestModel):
     except ApiResponseException as e:
         if e.response.error == "Unauthorized":
             throw_authorized_exception()
+        print('raised ApiResponseException')
         print(e.response.error)
-        raise HTTPException(status_code=400, detail="Something went wrong running the evaluation. Please try again.")
+        raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
+    except ApiNetworkException as e:
+        # I think the random errors thrown by BAM are of type ApiNetworkException, lets maintain error
+        # handling this way till we know better how they are thrown
+        print('raised ApiNetworkException')
+        print(e.response.error)
+        raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
