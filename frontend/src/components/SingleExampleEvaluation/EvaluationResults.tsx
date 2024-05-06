@@ -8,7 +8,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tile,
   Tooltip,
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'

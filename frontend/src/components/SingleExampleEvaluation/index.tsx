@@ -1,4 +1,4 @@
-import { useSessionStorage } from 'usehooks-ts'
+import { useLocalStorage } from 'usehooks-ts'
 
 import { LegacyRef, useRef, useState } from 'react'
 
@@ -50,7 +50,7 @@ export const SingleExampleEvaluation = () => {
 
   const [popoverOpen, setPopoverOpen] = useState(false)
 
-  const [bamAPIKey, setBamAPIKey, removeBamAPIKey] = useSessionStorage<string>('bamAPIKey', '')
+  const [bamAPIKey, setBamAPIKey, removeBamAPIKey] = useLocalStorage<string>('bamAPIKey', '')
 
   const popoverRef = useRef<HTMLDivElement>()
 

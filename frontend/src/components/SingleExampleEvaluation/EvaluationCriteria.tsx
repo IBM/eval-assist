@@ -11,9 +11,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  TextArea,
   TextInput,
-  Tooltip,
 } from '@carbon/react'
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
