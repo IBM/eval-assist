@@ -30,11 +30,11 @@ export const SingleExampleEvaluation = () => {
     options: [
       {
         option: '',
-        description: '.',
+        description: '',
       },
       {
         option: '',
-        description: '.',
+        description: '',
       },
     ],
   })
@@ -123,6 +123,7 @@ export const SingleExampleEvaluation = () => {
           id="text-area-context"
           labelText="Task context (optional)"
           style={{ marginBottom: '1rem' }}
+          placeholder="Context information relevant to the evaluation such as prompt, data variables etc."
         />
         <Responses responses={responses} setResponses={setResponses} style={{ marginBottom: '2rem' }} />
         <EvaluationCriteria rubric={rubric} setRubric={setRubric} style={{ marginBottom: '2rem' }} />

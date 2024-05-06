@@ -1,7 +1,7 @@
 import { CSSProperties, Dispatch, SetStateAction } from 'react'
 
 import { Button, IconButton, TextArea } from '@carbon/react'
-import { Close } from '@carbon/react/icons'
+import { Add, Close } from '@carbon/react/icons'
 
 interface ResponsesInterface {
   responses: string[]
@@ -46,10 +46,17 @@ export const Responses = ({ responses, setResponses, style }: ResponsesInterface
             value={response}
             id="text-area-model-output"
             labelText={''}
+            placeholder="The response/text to evaluate."
           />
         </div>
       ))}
-      <Button kind="tertiary" style={{ marginTop: '1rem' }} onClick={(e) => setResponses([...responses, ''])}>
+      <Button
+        kind="tertiary"
+        size="sm"
+        renderIcon={Add}
+        style={{ marginTop: '1rem' }}
+        onClick={(e) => setResponses([...responses, ''])}
+      >
         {'Add response'}
       </Button>
     </div>

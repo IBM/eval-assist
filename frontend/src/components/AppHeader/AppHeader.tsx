@@ -55,14 +55,16 @@ export const AppHeader = ({ setOpen, setUseCaseSelected }: AppHeaderProps) => {
       <SideNav
         aria-label="Side navigation"
         isPersistent={true}
-        onOverlayClick={() => setIsSideNavExpanded(!isSideNavExpanded)}
-        onSideNavBlur={() => setIsSideNavExpanded(!isSideNavExpanded)}
+        // onOverlayClick={() => setIsSideNavExpanded(!isSideNavExpanded)}
+        // onSideNavBlur={() => setIsSideNavExpanded(!isSideNavExpanded)}
+        onMouseEnter={(e) => e.preventDefault()}
+        onMouseLeave={(e) => e.preventDefault()}
         expanded={isSideNavExpanded}
         isRail
         className={classes['custom-sidenav']}
       >
         <SideNavItems>
-          <SideNavMenu renderIcon={Categories} title="Use Case Library" defaultExpanded>
+          <SideNavMenu renderIcon={Categories} title="Use Case Library">
             {useCases.map((useCase) => (
               <SideNavLink
                 isActive={false}

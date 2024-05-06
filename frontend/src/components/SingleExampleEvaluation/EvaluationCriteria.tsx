@@ -110,19 +110,19 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                             </IconButton>
                           )}
                         </div>
-                        <Tooltip label={'This option is not available yet'} align={'left'}>
+                        {/* <Tooltip label={'This option is not available yet'} align={'left'}>
                           <span>
                             <TrashCan />
                           </span>
-                        </Tooltip>
+                        </Tooltip> */}
                       </div>
-                      <TextArea
+                      <TextInput
                         onChange={(e) => setRubric({ ...rubric, criteria: e.target.value })}
-                        rows={1}
                         value={rubric.criteria}
                         id="text-area-evaluation-instruction"
                         labelText="Description"
                         style={{ marginBottom: '1rem' }}
+                        placeholder="Describe your evaluation criteria as a question e.g Is the response gramatically correct?"
                       />
                       {rubric.options.map((scale, i) => (
                         <div
@@ -138,6 +138,7 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                             <TextInput
                               labelText="Value"
                               value={scale.option}
+                              placeholder="Answer"
                               onChange={(e) =>
                                 setRubric({
                                   ...rubric,
@@ -158,6 +159,7 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                               labelText="Definition (optional)"
                               value={scale.description}
                               id={`criteria-option-definition-${i}`}
+                              placeholder="State the condition under which the answer is selected."
                               onChange={(e) =>
                                 setRubric({
                                   ...rubric,
@@ -172,24 +174,10 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                           </div>
 
                           <div style={{ width: '5%' }}>
-                            {rubric.options.length === 2 ? (
-                              <Tooltip align={'left'} label={'A minimum of two options is required'}>
-                                <span>
-                                  <IconButton
-                                    label={'Remove'}
-                                    size="lg"
-                                    kind="ghost"
-                                    style={{ marginTop: '24px' }}
-                                    disabled
-                                  >
-                                    <TrashCan />
-                                  </IconButton>
-                                </span>
-                              </Tooltip>
-                            ) : (
+                            {rubric.options.length > 2 && (
                               <IconButton
                                 label={'Remove'}
-                                size="lg"
+                                size="sm"
                                 kind="ghost"
                                 style={{ marginTop: '24px' }}
                                 onClick={() =>
@@ -203,6 +191,7 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                         </div>
                       ))}
                       <Button
+                        size="sm"
                         onClick={() =>
                           setRubric({ ...rubric, options: [...rubric.options, { option: '', description: '' }] })
                         }

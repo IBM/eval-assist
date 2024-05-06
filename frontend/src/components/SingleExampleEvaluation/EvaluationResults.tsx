@@ -37,7 +37,16 @@ export const EvaluationResults = ({
     'Value',
     <div key={3} style={{ display: 'inline-flex', flexDirection: 'row', alignItems: 'center' }}>
       Positional bias
-      <Tooltip label={<p style={{ textAlign: 'center' }}>{'Positioanl bias bla bla'}</p>} align="top">
+      <Tooltip
+        label={
+          <p style={{ textAlign: 'center' }}>
+            {
+              'Positional bias occurs when the LLM evaluator is unable to consistenly choose a rubric value. Results that exhibit positional bias are uncertain and cannot be trusted.'
+            }
+          </p>
+        }
+        align="top"
+      >
         <button style={{ backgroundColor: 'transparent', border: 'none' }}>
           <Information />
         </button>
