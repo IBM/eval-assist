@@ -4,8 +4,11 @@ WORKDIR /
 ARG GH_TOKEN
 ENV GH_TOKEN $GH_TOKEN
 
-COPY ./requirements.txt /requirements.txt 
-RUN pip install --no-cache-dir --upgrade -r /requirements.txt
+COPY ./requirements/common.txt /common.txt
+COPY ./requirements/prod.txt /prod.txt 
+
+RUN pip install --no-cache-dir --upgrade -r /common.txt
+RUN pip install --no-cache-dir --upgrade -r /prod.txt
 
 COPY ./prisma ./prisma
 ARG DATABASE_URL

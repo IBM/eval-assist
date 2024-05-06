@@ -1,0 +1,2 @@
+# For travis build
+llmasajudge @ git+https://${GH_TOKEN}@github.ibm.com/AIExperience/llm-as-a-judge.git@v0.0.1-alpha
