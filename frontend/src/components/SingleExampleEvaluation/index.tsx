@@ -103,7 +103,13 @@ export const SingleExampleEvaluation = () => {
       <AppHeader setOpen={setConfirmationModalOpen} setUseCaseSelected={setUseCaseSelected} />
       <Content style={{ paddingLeft: '1rem' }}>
         <div
-          style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '10px',
+          }}
           ref={popoverRef as LegacyRef<HTMLDivElement> | undefined}
         >
           <h3 style={{ marginBottom: '1rem' }}>Evaluation sandbox</h3>
@@ -116,6 +122,8 @@ export const SingleExampleEvaluation = () => {
           />
         </div>
 
+        <EvaluationCriteria rubric={rubric} setRubric={setRubric} style={{ marginBottom: '2rem' }} />
+
         <TextArea
           onChange={(e) => setContext(e.target.value)}
           rows={4}
@@ -125,8 +133,9 @@ export const SingleExampleEvaluation = () => {
           style={{ marginBottom: '1rem' }}
           placeholder="Context information relevant to the evaluation such as prompt, data variables etc."
         />
+
         <Responses responses={responses} setResponses={setResponses} style={{ marginBottom: '2rem' }} />
-        <EvaluationCriteria rubric={rubric} setRubric={setRubric} style={{ marginBottom: '2rem' }} />
+
         <EvaluateButton
           evaluationRunning={evaluationRunning}
           runEvaluation={runEvaluation}
