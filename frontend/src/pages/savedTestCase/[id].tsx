@@ -1,11 +1,8 @@
 import { GetServerSideProps } from 'next'
 
-import { Strawberry } from '@carbon/react/icons'
-
 import { SingleExampleEvaluation } from '@components/SingleExampleEvaluation'
-import { Rubric, UseCase } from '@components/SingleExampleEvaluation/types'
-import { TestCase } from '@prisma/client'
-import { JsonObject } from '@prisma/client/runtime/library'
+import { UseCase } from '@components/SingleExampleEvaluation/types'
+import { StoredUseCase } from '@prisma/client'
 import { get } from '@utils/fetchUtils'
 import { parseFetchedUseCase } from '@utils/utils'
 
@@ -19,10 +16,10 @@ const SavedTestCase = ({ useCase, savedUseCases }: Props) => {
 }
 
 export const getServerSideProps = (async (context) => {
-  const fetchedUseCase: TestCase = await (await get(`test_case/${context.query.id}`)).json()
+  const fetchedUseCase: StoredUseCase = await (await get(`test_case/${context.query.id}`)).json()
   const useCase: UseCase = parseFetchedUseCase(fetchedUseCase)
 
-  const fetchedSavedUseCases: TestCase[] = await (await get(`test_case`)).json()
+  const fetchedSavedUseCases: StoredUseCase[] = await (await get(`test_case`)).json()
   const savedUseCases = fetchedSavedUseCases.map((testCase) => parseFetchedUseCase(testCase))
   const result: Props = {
     useCase,

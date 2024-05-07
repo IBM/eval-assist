@@ -1,5 +1,5 @@
 import { Option, Result, Rubric, UseCase } from '@components/SingleExampleEvaluation/types'
-import { TestCase } from '@prisma/client'
+import { StoredUseCase } from '@prisma/client'
 import { JsonObject } from '@prisma/client/runtime/library'
 
 export const isInstanceOfOption = (obj: any): obj is Option => {
@@ -14,7 +14,7 @@ export const isInstanceOfRubric = (obj: any): obj is Rubric => {
   )
 }
 
-export const parseFetchedUseCase = (fetchedUseCase: TestCase): UseCase => {
+export const parseFetchedUseCase = (fetchedUseCase: StoredUseCase): UseCase => {
   return {
     id: fetchedUseCase.id,
     name: fetchedUseCase.name,

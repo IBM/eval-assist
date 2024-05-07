@@ -6,7 +6,7 @@ import { GetServerSideProps } from 'next'
 
 import { SingleExampleEvaluation } from '@components/SingleExampleEvaluation'
 import { UseCase } from '@components/SingleExampleEvaluation/types'
-import { TestCase } from '@prisma/client'
+import { StoredUseCase } from '@prisma/client'
 import { get } from '@utils/fetchUtils'
 import { parseFetchedUseCase } from '@utils/utils'
 
@@ -25,7 +25,7 @@ const Home = ({ savedUseCases }: Props) => {
 }
 
 export const getServerSideProps = (async (context) => {
-  const fetchedSavedUseCases: TestCase[] = await (await get(`test_case`)).json()
+  const fetchedSavedUseCases: StoredUseCase[] = await (await get(`test_case`)).json()
   const savedUseCases = fetchedSavedUseCases.map((testCase) => parseFetchedUseCase(testCase))
   const result: Props = {
     savedUseCases,

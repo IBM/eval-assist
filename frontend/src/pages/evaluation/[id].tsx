@@ -53,4 +53,8 @@
 //   return { props: result }
 // }) satisfies GetServerSideProps<Props>
 
-// export default EvaluationView
+const EvaluationView = () => {
+  return null
+}
+
+export default EvaluationView
