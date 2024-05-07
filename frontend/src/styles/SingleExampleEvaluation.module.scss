@@ -4,8 +4,12 @@
   border-right: 1px solid $border-subtle-00;
 }
 
-.wrapper :global .cds--accordion__wrapper .cds--accordion__content {
+.accordion-wrapper :global .cds--accordion__wrapper .cds--accordion__content {
   padding-right: 1rem !important;
+}
+
+.accordion-wrapper {
+  border-bottom: none !important;
 }
 
 .loading-wrapper :global .cds--inline-loading__text {
@@ -16,12 +20,35 @@
   letter-spacing: var(--cds-body-compact-01-letter-spacing, 0.16px);
 }
 
+// fixes tooltip getting cut
 .table-wrapper :global(.cds--data-table-content) {
   overflow: visible;
 }
 
 .api-key-content-div {
   border: 1px solid $border-strong-01;
+}
+
+.bottom-divider {
+  border-bottom: 1px solid $border-subtle-00;
+}
+
+.left-padding {
+  padding-left: 1rem;
+}
+
+.vertical-divider {
+  width: 1px;
+  background-color: $border-subtle-00;
+}
+
+.subtitle {
+  //styleName: Body/Body strong (ds-body ds-strong);
+  font-family: IBM Plex Sans;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  text-align: left;
 }
 
 .table-row-error :global td {

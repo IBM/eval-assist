@@ -26,3 +26,12 @@ export interface FetchedResult {
 export interface FetchedResults {
   results: FetchedResult[]
 }
+
+export interface UseCase {
+  id: number | null
+  name: string
+  context: string
+  responses: string[]
+  rubric: Rubric
+  results: Result[] | null
+}

@@ -25,6 +25,7 @@ interface EvaluationCriteriaProps {
   rubric: Rubric
   setRubric: Dispatch<SetStateAction<Rubric>>
   style?: CSSProperties
+  className?: string
 }
 
 export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCriteriaProps) => {
@@ -57,7 +58,7 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
   return (
     <div style={style}>
       <Accordion>
-        <AccordionItem title="Evaluation Criteria" className={classes['wrapper']} open>
+        <AccordionItem title="Evaluation Criteria" className={classes['accordion-wrapper']} open>
           <div>
             <Tabs selectedIndex={selectedTabIndex} onChange={onSelectedIndexChange}>
               <TabList aria-label="List of tabs" contained>
@@ -93,17 +94,17 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                               readOnly={!isEditingCriteriaTitle}
                               id="text-input-criteria-title"
                               placeholder="Criteria title"
-                              style={{ width: '90%' }}
+                              style={{ width: '95%' }}
                             />
                           ) : (
-                            <h4 style={{ width: '90%' }}>{rubric.title}</h4>
+                            <h4 style={{ width: '95%' }}>{rubric.title}</h4>
                           )}
                           {isEditingCriteriaTitle ? (
                             <IconButton onClick={() => setIsEditingCriteriaTitle(false)} kind="ghost" label={'Save'}>
                               <Save />
                             </IconButton>
                           ) : (
-                            <IconButton onClick={() => setIsEditingCriteriaTitle(true)} kind="ghost" label={'Save'}>
+                            <IconButton onClick={() => setIsEditingCriteriaTitle(true)} kind="ghost" label={'Edit'}>
                               <Edit />
                             </IconButton>
                           )}

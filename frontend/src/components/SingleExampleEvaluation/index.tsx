@@ -1,54 +1,63 @@
+import { set } from 'date-fns'
 import { useLocalStorage } from 'usehooks-ts'
 
-import { LegacyRef, useRef, useState } from 'react'
+import { LegacyRef, useMemo, useRef, useState } from 'react'
 
 import { Content, TextArea } from '@carbon/react'
+import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 import { AppHeader } from '@components/AppHeader/AppHeader'
+import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useHasMounted } from '@customHooks/useHasMounted'
-import { post } from '@utils/fetchUtils'
+import { StoredUseCase } from '@prisma/client'
+import { post, put } from '@utils/fetchUtils'
+import { getEmptyRubric, parseFetchedUseCase } from '@utils/utils'
 
 import { APIKeyPopover } from './APIKeyPopover'
 import { EvaluateButton } from './EvaluateButton'
 import { EvaluationCriteria } from './EvaluationCriteria'
 import { EvaluationResults } from './EvaluationResults'
+import { NewUseCaseModal } from './Modals/NewUseCaseModal'
+import { SaveTestCaseModal } from './Modals/SaveTestCaseModal'
+import { UseCaseConfirmationModal } from './Modals/UseCaseConfimationModal'
 import { Responses } from './Responses'
-import { UseCaseConfirmationModal } from './UseCaseConfimationModal'
-import { UseCase } from './UseCases'
-import { FetchedResults, Result, Rubric } from './types'
+import { TestCaseOptions } from './TestCaseOptions'
+import { FetchedResults, Result, Rubric, UseCase } from './types'
 
-export const SingleExampleEvaluation = () => {
+interface Props {
+  useCase?: UseCase
+  _savedUseCases: UseCase[]
+}
+
+export const SingleExampleEvaluation = ({ useCase, _savedUseCases }: Props) => {
   // we are ignoring client side rendering to be able to use useSessionStorage
   const hasMounted = useHasMounted()
+  const [libraryUseCaseSelected, setLibraryUseCaseSelected] = useState<UseCase | null>(null)
 
+  // if the usecase doesnt have an id, it means it hasn't been stored
+  const [id, setId] = useState<number | null>(null)
+  const [name, setName] = useState('')
   const [context, setContext] = useState('')
   const [responses, setResponses] = useState([''])
+  const [rubric, setRubric] = useState<Rubric>(getEmptyRubric())
 
-  const [rubric, setRubric] = useState<Rubric>({
-    title: '',
-    criteria: '',
-    options: [
-      {
-        option: '',
-        description: '',
-      },
-      {
-        option: '',
-        description: '',
-      },
-    ],
-  })
+  const [isSideNavExpanded, setIsSideNavExpanded] = useState(false)
+  const [savedUseCases, setSavedUseCases] = useState(_savedUseCases)
 
+  const isTestCaseSaved = useMemo(() => id !== null, [id])
   const [results, setResults] = useState<Result[] | null>(null)
   const [evaluationFailed, setEvaluationFailed] = useState(false)
   const [evaluationError, setEvaluationError] = useState<string>('')
 
   const [evaluationRunning, setEvaluationRunning] = useState(false)
 
-  const [useCaseSelected, setUseCaseSelected] = useState<UseCase | null>(null)
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
+  const [saveTestCaseModalOpen, setSaveTestCaseModalOpen] = useState(false)
+  const [newUseCaseModalOpen, setNewUseCaseModalOpen] = useState(false)
 
   const [popoverOpen, setPopoverOpen] = useState(false)
+
+  // useBeforeOnload()
 
   const [bamAPIKey, setBamAPIKey, removeBamAPIKey] = useLocalStorage<string>('bamAPIKey', '')
 
@@ -94,25 +103,83 @@ export const SingleExampleEvaluation = () => {
     setContext(useCase.context)
     setResponses(useCase.responses)
     setRubric(useCase.rubric)
+    setName(useCase.id !== null ? useCase.name : '')
+    setId(useCase.id)
+    setResults(useCase.results)
+  }
+
+  const onSave = async () => {
+    const savedUseCase: StoredUseCase = await (
+      await put('test_case', {
+        name,
+        content: JSON.stringify({
+          context,
+          responses,
+          rubric,
+          results,
+        }),
+        user_id: -1,
+        id: id,
+      } as StoredUseCase)
+    ).json()
+
+    const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
+    setUseCase(parsedSavedUseCase)
+
+    // update use case in the use cases list
+    const i = savedUseCases.findIndex((useCase) => useCase.id === id)
+    setSavedUseCases([...savedUseCases.slice(0, i), parsedSavedUseCase, ...savedUseCases.slice(i + 1)])
+    // notify the user
+  }
+
+  const onSaveAs = async () => {
+    const savedUseCase: StoredUseCase = await (
+      await put('test_case', {
+        name,
+        content: JSON.stringify({
+          context,
+          responses,
+          rubric,
+          results,
+        }),
+        user_id: -1,
+        id: -1,
+      } as StoredUseCase)
+    ).json()
+
+    const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
+    setUseCase(parsedSavedUseCase)
+    setSavedUseCases([...savedUseCases, parsedSavedUseCase])
+    // notify the user
   }
 
   if (!hasMounted) return null
 
   return (
     <>
-      <AppHeader setOpen={setConfirmationModalOpen} setUseCaseSelected={setUseCaseSelected} />
-      <Content style={{ paddingLeft: '1rem' }}>
+      <AppHeader
+        setConfirmationModalOpen={setConfirmationModalOpen}
+        setLibraryUseCaseSelected={setLibraryUseCaseSelected}
+        savedUseCases={savedUseCases}
+        isSideNavExpanded={isSideNavExpanded}
+        setIsSideNavExpanded={setIsSideNavExpanded}
+        currentUseCaseId={id}
+      />
+      <Content style={{ paddingLeft: 0, paddingTop: 0 }}>
         <div
           style={{
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '10px',
+            paddingBottom: '1rem',
+            paddingTop: '1rem',
+            marginBottom: '1rem',
           }}
           ref={popoverRef as LegacyRef<HTMLDivElement> | undefined}
+          className={`${classes['bottom-divider']} ${classes['left-padding']}`}
         >
-          <h3 style={{ marginBottom: '1rem' }}>Evaluation sandbox</h3>
+          <h3>Evaluation sandbox</h3>
 
           <APIKeyPopover
             popoverOpen={popoverOpen}
@@ -121,9 +188,25 @@ export const SingleExampleEvaluation = () => {
             setBamAPIKey={setBamAPIKey}
           />
         </div>
-
-        <EvaluationCriteria rubric={rubric} setRubric={setRubric} style={{ marginBottom: '2rem' }} />
-
+        <TestCaseOptions
+          style={{ marginBottom: '1rem' }}
+          className={classes['left-padding']}
+          testCaseName={name}
+          setTestCaseName={setName}
+          setSaveTestCaseModalOpen={setSaveTestCaseModalOpen}
+          isTestCaseSaved={isTestCaseSaved}
+          onSave={onSave}
+          setNewUseCaseModalOpen={setNewUseCaseModalOpen}
+        />
+        <EvaluationCriteria
+          className={classes['left-padding']}
+          rubric={rubric}
+          setRubric={setRubric}
+          style={{ marginBottom: '1rem' }}
+        />
+        <div style={{ marginBottom: '1rem' }} className={`${classes['left-padding']} cds--accordion-title`}>
+          Test data
+        </div>
         <TextArea
           onChange={(e) => setContext(e.target.value)}
           rows={4}
@@ -132,20 +215,27 @@ export const SingleExampleEvaluation = () => {
           labelText="Task context (optional)"
           style={{ marginBottom: '1rem' }}
           placeholder="Context information relevant to the evaluation such as prompt, data variables etc."
+          className={classes['left-padding']}
         />
 
-        <Responses responses={responses} setResponses={setResponses} style={{ marginBottom: '2rem' }} />
+        <Responses
+          responses={responses}
+          setResponses={setResponses}
+          style={{ marginBottom: '2rem' }}
+          className={classes['left-padding']}
+        />
 
         <EvaluateButton
           evaluationRunning={evaluationRunning}
           runEvaluation={runEvaluation}
           style={{ marginBottom: '1rem' }}
+          className={classes['left-padding']}
         />
         {bamAPIKey === '' && !evaluationRunning && results === null && !evaluationFailed && (
           <p>{'You will need to provide your BAM API key to run the evaluation'}</p>
         )}
-
         <EvaluationResults
+          className={classes['left-padding']}
           results={results}
           evaluationFailed={evaluationFailed}
           evaluationError={evaluationError}
@@ -157,8 +247,17 @@ export const SingleExampleEvaluation = () => {
         setUseCase={setUseCase}
         open={confirmationModalOpen}
         setOpen={setConfirmationModalOpen}
-        useCaseSelected={useCaseSelected}
+        libraryUseCaseSelected={libraryUseCaseSelected}
+        setIsSideNavExpanded={setIsSideNavExpanded}
       />
+      <SaveTestCaseModal
+        open={saveTestCaseModalOpen}
+        setOpen={setSaveTestCaseModalOpen}
+        onSaveAs={onSaveAs}
+        testCaseName={name}
+        setTestCaseName={setName}
+      />
+      <NewUseCaseModal open={newUseCaseModalOpen} setOpen={setNewUseCaseModalOpen} setUseCase={setUseCase} />
     </>
   )
 }

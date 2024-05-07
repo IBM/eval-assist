@@ -1,20 +1,38 @@
 // import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 // import { LandingPage } from '@components/LandingPage/LandingPage'
+import { use } from 'react'
+
+import { GetServerSideProps } from 'next'
+
 import { SingleExampleEvaluation } from '@components/SingleExampleEvaluation'
+import { UseCase } from '@components/SingleExampleEvaluation/types'
+import { TestCase } from '@prisma/client'
+import { get } from '@utils/fetchUtils'
+import { parseFetchedUseCase } from '@utils/utils'
 
 // import { get } from '@utils/fetchUtils'
 
 interface Props {
-  fetchedEvaluations: any[]
+  savedUseCases: UseCase[]
 }
 
 // const Home = ({ fetchedEvaluations }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 //   return <LandingPage fetchedEvaluations={fetchedEvaluations} />
 // }
 
-const Home = () => {
-  return <SingleExampleEvaluation />
+const Home = ({ savedUseCases }: Props) => {
+  return <SingleExampleEvaluation _savedUseCases={savedUseCases} />
 }
+
+export const getServerSideProps = (async (context) => {
+  const fetchedSavedUseCases: TestCase[] = await (await get(`test_case`)).json()
+  const savedUseCases = fetchedSavedUseCases.map((testCase) => parseFetchedUseCase(testCase))
+  const result: Props = {
+    savedUseCases,
+  }
+
+  return { props: result }
+}) satisfies GetServerSideProps<Props>
 
 // export const getServerSideProps = (async () => {
 //   // TODO: find out how to solve Date being converted to string

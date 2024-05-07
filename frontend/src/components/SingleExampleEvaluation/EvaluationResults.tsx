@@ -21,6 +21,7 @@ interface EvaluationResultsProps {
   evaluationError: string
   evaluationRunning: boolean
   style?: CSSProperties
+  className?: string
 }
 
 export const EvaluationResults = ({
@@ -29,6 +30,7 @@ export const EvaluationResults = ({
   evaluationError,
   evaluationRunning,
   style,
+  className,
 }: EvaluationResultsProps) => {
   const headers = [
     'Response',
@@ -54,7 +56,7 @@ export const EvaluationResults = ({
     'Explanation',
   ]
   return (
-    <div style={style}>
+    <div style={style} className={className}>
       {evaluationFailed ? (
         <InlineNotification
           aria-label="closes notification"

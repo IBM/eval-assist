@@ -1,15 +1,9 @@
-import { Rubric } from './types'
-
-export interface UseCase {
-  name: string
-  context: string
-  responses: string[]
-  rubric: Rubric
-}
+import { Rubric, UseCase } from './types'
 
 export const useCases: UseCase[] = [
   {
     name: 'Temperature',
+    id: null,
     context: 'How is the weather there?',
     responses: [
       'On most days, the weather is warm and humid, with temperatures often soaring into the high 80s and low 90s Fahrenheit (around 31-34°C). The dense foliage of the jungle acts as a natural air conditioner, keeping the temperature relatively stable and comfortable for the inhabitants.',
@@ -29,9 +23,11 @@ export const useCases: UseCase[] = [
         },
       ],
     },
+    results: null,
   },
   {
     name: 'RQA Quality',
+    id: null,
     context: 'What will become of my apprenticeship if I have to self-isolate due to COVID-19?',
     responses: [
       `Guidance for apprentices, employers, training providers, end-point assessment organisations (EPAOs) and external quality assurance providers about changes to apprenticeships due to coronavirus (COVID-19)
@@ -63,5 +59,6 @@ website or contact them to discuss your options.`,
         },
       ],
     },
+    results: null,
   },
 ]

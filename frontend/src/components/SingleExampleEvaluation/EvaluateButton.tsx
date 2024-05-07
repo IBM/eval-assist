@@ -7,11 +7,12 @@ interface EvaluateButtonProps {
   evaluationRunning: boolean
   runEvaluation: () => Promise<void>
   style?: CSSProperties
+  className?: string
 }
 
-export const EvaluateButton = ({ evaluationRunning, runEvaluation, style }: EvaluateButtonProps) => {
+export const EvaluateButton = ({ evaluationRunning, runEvaluation, style, className }: EvaluateButtonProps) => {
   return (
-    <div style={style}>
+    <div style={style} className={className}>
       {evaluationRunning ? (
         <InlineLoading description={'Running evaluation...'} status={'active'} className={classes['loading-wrapper']} />
       ) : (

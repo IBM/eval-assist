@@ -7,16 +7,17 @@ interface ResponsesInterface {
   responses: string[]
   setResponses: Dispatch<SetStateAction<string[]>>
   style?: CSSProperties
+  className?: string
 }
 
-export const Responses = ({ responses, setResponses, style }: ResponsesInterface) => {
+export const Responses = ({ responses, setResponses, style, className }: ResponsesInterface) => {
   const onRemoveResponse = (i: number) => {
     if (responses.length === 1) return
     setResponses(responses.filter((_, j) => i !== j))
   }
 
   return (
-    <div style={style}>
+    <div style={style} className={className}>
       {responses?.map((response, i) => (
         <div key={i} style={{ marginBottom: '0.5rem' }}>
           <div
