@@ -12,38 +12,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model StoredUseCase {
+  id      Int    @id @default(autoincrement())
+  user_id Int
+  content Json
+  name    String @unique
 
-model Evaluation {
-  id   Int    @id @default(autoincrement())
-  name String
-
-  created_at  DateTime      @default(now())
-  deleted     Boolean       @default(false)
-  deleted_at  DateTime?
-  ModelOutput ModelOutput[]
-  Datum Datum[]
-
-  @@map("evaluation")
+  @@map("stored_use_case")
 }
 
-model Datum {
-  id          Int           @id @default(autoincrement())
-  context     Json
-  evaluation_id Int
-  evaluation    Evaluation @relation(fields: [evaluation_id], references: [id])
-  ModelOutput ModelOutput[]
-
-  @@map("datum")
+model AppUser {
+  id    Int    @id @default(autoincrement())
+  email String
 }
+// model Evaluation {
+//   id   Int    @id @default(autoincrement())
+//   name String
 
-model ModelOutput {
-  id            Int        @id @default(autoincrement())
-  evaluation_id Int
-  evaluation    Evaluation @relation(fields: [evaluation_id], references: [id])
-  datum_id      Int
-  datum         Datum      @relation(fields: [datum_id], references: [id])
-  config        String
-  text          String
+//   created_at  DateTime      @default(now())
+//   deleted     Boolean       @default(false)
+//   deleted_at  DateTime?
+//   ModelOutput ModelOutput[]
+//   Datum Datum[]
 
-  @@map("model_output")
-}
+//   @@map("evaluation")
+// }
+
+// model Datum {
+//   id          Int           @id @default(autoincrement())
+//   context     Json
+//   evaluation_id Int
+//   evaluation    Evaluation @relation(fields: [evaluation_id], references: [id])
+//   ModelOutput ModelOutput[]
+
+//   @@map("datum")
+// }
+
+// model ModelOutput {
+//   id            Int        @id @default(autoincrement())
+//   evaluation_id Int
+//   evaluation    Evaluation @relation(fields: [evaluation_id], references: [id])
+//   datum_id      Int
+//   datum         Datum      @relation(fields: [datum_id], references: [id])
+//   config        String
+//   text          String
+
+//   @@map("model_output")
+// }

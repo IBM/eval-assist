@@ -7,7 +7,6 @@ ENV GH_TOKEN $GH_TOKEN
 COPY ./requirements/common.txt /common.txt
 COPY ./requirements/prod.txt /prod.txt 
 
-RUN pip install --no-cache-dir --upgrade -r /common.txt
 RUN pip install --no-cache-dir --upgrade -r /prod.txt
 
 COPY ./prisma ./prisma

@@ -13,11 +13,11 @@ load_dotenv()
 import pandas as pd 
 import json
 from genai import Credentials, Client
-
+from prisma.models import StoredUseCase
 from llmasajudge.evaluators import Rubric, RubricEvaluator
 from genai.exceptions import ApiResponseException, ApiNetworkException
 import os
-
+import json
 
 app = FastAPI()
 app.add_middleware(
@@ -230,3 +230,38 @@ async def evaluate(evalRequest: EvalRequestModel):
         print('raised ApiNetworkException')
         print(e.response.error)
         raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
+
+
+@app.get("/test_case/")
+async def get_test_cases():
+    test_cases = db.storedusecase.find_many()
+    return test_cases
+
+
+@app.get("/test_case/{test_case_id}/")
+async def get_test_case(test_case_id: int):
+    return db.storedusecase.find_unique(where={"id": test_case_id})
+    
+@app.put("/test_case/")
+async def put_test_case(test_case: StoredUseCase):
+    found = db.storedusecase.find_unique(where={"id": test_case.id})
+
+    if found:
+        res = db.storedusecase.update(
+            where={"id": test_case.id}, 
+            data={
+                "name": test_case.name, 
+                "content": json.dumps(test_case.content),
+            }
+        )
+    else:
+        res = db.storedusecase.create(
+            data={
+                "name": test_case.name, 
+                "content": json.dumps(test_case.content),
+                "user_id": test_case.user_id
+            }
+        )
+
+    return res
+    
