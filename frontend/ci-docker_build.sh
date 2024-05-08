@@ -51,7 +51,6 @@ fi
 # build
 echo "starting docker build:"
 docker build --platform linux/amd64 \
--f $DOCKERFILE \
 --build-arg NEXT_PUBLIC_BACKEND_API_HOST=$NEXT_PUBLIC_BACKEND_API_HOST \
 --build-arg NEXTAUTH_SECRET=$NEXTAUTH_SECRET \
 --build-arg NEXTAUTH_URL=$NEXTAUTH_URL \
