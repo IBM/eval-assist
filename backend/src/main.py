@@ -232,36 +232,61 @@ async def evaluate(evalRequest: EvalRequestModel):
         raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
 
 
-@app.get("/test_case/")
-async def get_test_cases():
-    test_cases = db.storedusecase.find_many()
+@app.get("/use_case/")
+async def get_test_cases(user: str):
+    print('user')
+    print(user)
+    test_cases = db.storedusecase.find_many(where={
+        'app_user': {
+            'email': user
+        }
+    })
     return test_cases
 
 
-@app.get("/test_case/{test_case_id}/")
-async def get_test_case(test_case_id: int):
-    return db.storedusecase.find_unique(where={"id": test_case_id})
+@app.get("/use_case/{use_case_id}/")
+async def get_test_case(use_case_id: int, user: str):
+    return db.storedusecase.find_unique(where={"id": use_case_id})
     
-@app.put("/test_case/")
-async def put_test_case(test_case: StoredUseCase):
-    found = db.storedusecase.find_unique(where={"id": test_case.id})
+class PutUseCaseBody(BaseModel):
+    user: str
+    use_case: StoredUseCase
+
+@app.put("/use_case/")
+async def put_test_case(request_body: PutUseCaseBody):
+    user = db.appuser.find_unique(where={'email': request_body.user})
+    
+    found = db.storedusecase.find_unique(where={
+        "id": request_body.use_case.id, 
+        "user_id": user.id
+    })
 
     if found:
         res = db.storedusecase.update(
-            where={"id": test_case.id}, 
+            where={"id": request_body.use_case.id}, 
             data={
-                "name": test_case.name, 
-                "content": json.dumps(test_case.content),
+                "name": request_body.use_case.name, 
+                "content": json.dumps(request_body.use_case.content),
             }
         )
     else:
         res = db.storedusecase.create(
             data={
-                "name": test_case.name, 
-                "content": json.dumps(test_case.content),
-                "user_id": test_case.user_id
+                "name": request_body.use_case.name, 
+                "content": json.dumps(request_body.use_case.content),
+                "user_id": user.id
             }
         )
 
     return res
     
+
+class CreateUserPostBody(BaseModel):
+    user: str
+
+@app.post('/user/')
+def create_user_if_not_exist(requestBody: CreateUserPostBody):
+    user = db.appuser.find_unique(where={'email': requestBody.user})
+    if (user is None):
+        user = db.appuser.create(data={'email': requestBody.user})
+    return user
