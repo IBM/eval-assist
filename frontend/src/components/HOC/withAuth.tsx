@@ -17,7 +17,7 @@ export const withAuth = (Component: NextComponentType) => {
     useEffect(() => {
       const createUserIfNotExist = async () => {
         if (user) {
-          post('user', { user: user.name }).then((res) => {
+          post('user/', { user: user.name }).then((res) => {
             if (res.ok) {
               res.json().then((userInfo) => {
                 setUserIsCreated(true)

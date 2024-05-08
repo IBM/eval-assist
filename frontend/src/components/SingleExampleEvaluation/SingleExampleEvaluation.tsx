@@ -65,7 +65,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
     setEvaluationFailed(false)
     setEvaluationRunning(true)
     setResults(null)
-    const response = await post('evaluate', {
+    const response = await post('evaluate/', {
       context,
       responses,
       rubric,
@@ -108,7 +108,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
 
   const onSave = async () => {
     const savedUseCase: StoredUseCase = await (
-      await put('use_case', {
+      await put('use_case/', {
         use_case: {
           name,
           content: JSON.stringify({
@@ -135,7 +135,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
 
   const onSaveAs = async () => {
     const savedUseCase: StoredUseCase = await (
-      await put('use_case', {
+      await put('use_case/', {
         use_case: {
           name,
           content: JSON.stringify({
