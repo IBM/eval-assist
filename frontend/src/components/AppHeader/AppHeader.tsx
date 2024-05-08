@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 
+import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 
 import {
@@ -14,18 +15,19 @@ import {
   SideNavMenu,
   Theme,
 } from '@carbon/react'
-import { Categories, DocumentSigned, Help, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
+import { Categories, DocumentSigned, Help, Logout, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 import { useCases } from '@components/SingleExampleEvaluation/UseCasesLibrary'
 import { UseCase } from '@components/SingleExampleEvaluation/types'
 import { PLATFORM_NAME } from '@constants'
+import { useAuthentication } from '@customHooks/useAuthentication'
 
 interface AppSidenavProps {
   setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
   setLibraryUseCaseSelected: Dispatch<SetStateAction<UseCase | null>>
   isSideNavExpanded: boolean
-  savedUseCases: UseCase[]
+  userUseCases: UseCase[]
   currentUseCaseId: number | null
 }
 
@@ -33,7 +35,7 @@ export const AppSidenav = ({
   setConfirmationModalOpen,
   setLibraryUseCaseSelected,
   isSideNavExpanded,
-  savedUseCases,
+  userUseCases,
   currentUseCaseId,
 }: AppSidenavProps) => {
   return (
@@ -65,7 +67,7 @@ export const AppSidenav = ({
           ))}
         </SideNavMenu>
         <SideNavMenu renderIcon={WatsonHealthSaveAnnotation} title="My Use Cases">
-          {savedUseCases.map((useCase, i) => (
+          {userUseCases.map((useCase, i) => (
             <SideNavLink
               key={i}
               isActive={currentUseCaseId === useCase.id}
@@ -94,7 +96,7 @@ export const AppSidenav = ({
 interface AppHeaderProps {
   setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
   setLibraryUseCaseSelected: Dispatch<SetStateAction<UseCase | null>>
-  savedUseCases: UseCase[]
+  userUseCases: UseCase[]
   isSideNavExpanded: boolean
   setIsSideNavExpanded: Dispatch<SetStateAction<boolean>>
   currentUseCaseId: number | null
@@ -103,12 +105,13 @@ interface AppHeaderProps {
 export const AppHeader = ({
   setConfirmationModalOpen,
   setLibraryUseCaseSelected,
-  savedUseCases,
+  userUseCases,
   isSideNavExpanded,
   setIsSideNavExpanded,
   currentUseCaseId,
 }: AppHeaderProps) => {
   const title = `IBM ${PLATFORM_NAME}`
+  const { authenticationEnabled } = useAuthentication()
   return (
     <>
       <Theme theme="g100">
@@ -122,19 +125,20 @@ export const AppHeader = ({
           <HeaderName href="/" prefix="IBM" as={Link}>
             {PLATFORM_NAME}
           </HeaderName>
-
-          <HeaderGlobalBar>
-            <HeaderGlobalAction aria-label="Help">
-              <Help size={20} />
-            </HeaderGlobalAction>
-          </HeaderGlobalBar>
+          {authenticationEnabled && (
+            <HeaderGlobalBar>
+              <HeaderGlobalAction aria-label="Logout" onClick={signOut}>
+                <Logout size={20} />
+              </HeaderGlobalAction>
+            </HeaderGlobalBar>
+          )}
         </Header>
       </Theme>
       <AppSidenav
         setConfirmationModalOpen={setConfirmationModalOpen}
         setLibraryUseCaseSelected={setLibraryUseCaseSelected}
         isSideNavExpanded={isSideNavExpanded}
-        savedUseCases={savedUseCases}
+        userUseCases={userUseCases}
         currentUseCaseId={currentUseCaseId}
       />
     </>

@@ -7,6 +7,7 @@ const nextConfig = {
   },
   poweredByHeader: false,
   output: 'standalone',
+  trailingSlash: true,
   async headers() {
     return [
       {

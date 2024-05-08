@@ -16,12 +16,17 @@ model StoredUseCase {
   content Json
   name    String @unique
 
+  app_user AppUser @relation(fields: [user_id], references: [id])
+
   @@map("stored_use_case")
 }
 
 model AppUser {
-  id    Int    @id @default(autoincrement())
-  email String
+  id               Int             @id @default(autoincrement())
+  email            String          @unique
+  stored_use_cases StoredUseCase[]
+
+  @@map("app_user")
 }
 
 // model Evaluation {
