@@ -8,13 +8,14 @@ import classes from '@styles/SingleExampleEvaluation.module.scss'
 import { AppHeader } from '@components/AppHeader/AppHeader'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { StoredUseCase } from '@prisma/client'
-import { post, put } from '@utils/fetchUtils'
-import { getEmptyRubric, parseFetchedUseCase } from '@utils/utils'
+import { deleteCustom, post, put } from '@utils/fetchUtils'
+import { getEmptyRubric, getEmptyUseCase, parseFetchedUseCase } from '@utils/utils'
 
 import { APIKeyPopover } from './APIKeyPopover'
 import { EvaluateButton } from './EvaluateButton'
 import { EvaluationCriteria } from './EvaluationCriteria'
 import { EvaluationResults } from './EvaluationResults'
+import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
 import { NewUseCaseModal } from './Modals/NewUseCaseModal'
 import { SaveTestCaseModal } from './Modals/SaveTestCaseModal'
 import { UseCaseConfirmationModal } from './Modals/UseCaseConfimationModal'
@@ -50,6 +51,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
   const [saveTestCaseModalOpen, setSaveTestCaseModalOpen] = useState(false)
   const [newUseCaseModalOpen, setNewUseCaseModalOpen] = useState(false)
+  const [deleteUseCaseModalOpen, setDeleteUseCaseModalOpen] = useState(false)
 
   const [popoverOpen, setPopoverOpen] = useState(false)
 
@@ -97,7 +99,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
     )
   }
 
-  const setUseCase = (useCase: UseCase) => {
+  const setCurrentUseCase = (useCase: UseCase) => {
     setContext(useCase.context)
     setResponses(useCase.responses)
     setRubric(useCase.rubric)
@@ -125,7 +127,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
     ).json()
 
     const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
-    setUseCase(parsedSavedUseCase)
+    setCurrentUseCase(parsedSavedUseCase)
 
     // update use case in the use cases list
     const i = userUseCases.findIndex((useCase) => useCase.id === id)
@@ -152,9 +154,15 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
     ).json()
 
     const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
-    setUseCase(parsedSavedUseCase)
+    setCurrentUseCase(parsedSavedUseCase)
     setUserUseCases([...userUseCases, parsedSavedUseCase])
     // notify the user
+  }
+
+  const onDeleteUseCase = async () => {
+    await deleteCustom('use_case/', { use_case_id: id })
+    setUserUseCases(userUseCases.filter((u) => u.id !== id))
+    setCurrentUseCase(getEmptyUseCase())
   }
 
   return (
@@ -197,9 +205,10 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
           testCaseName={name}
           setTestCaseName={setName}
           setSaveTestCaseModalOpen={setSaveTestCaseModalOpen}
-          isTestCaseSaved={isUseCaseSaved}
+          isUseCaseSaved={isUseCaseSaved}
           onSave={onSave}
           setNewUseCaseModalOpen={setNewUseCaseModalOpen}
+          setDeleteUseCaseModalOpen={setDeleteUseCaseModalOpen}
         />
         <EvaluationCriteria
           className={classes['left-padding']}
@@ -249,7 +258,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
         />
       </Content>
       <UseCaseConfirmationModal
-        setUseCase={setUseCase}
+        setUseCase={setCurrentUseCase}
         open={confirmationModalOpen}
         setOpen={setConfirmationModalOpen}
         libraryUseCaseSelected={libraryUseCaseSelected}
@@ -262,7 +271,17 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
         testCaseName={name}
         setTestCaseName={setName}
       />
-      <NewUseCaseModal open={newUseCaseModalOpen} setOpen={setNewUseCaseModalOpen} setUseCase={setUseCase} />
+      <NewUseCaseModal
+        open={newUseCaseModalOpen}
+        setOpen={setNewUseCaseModalOpen}
+        setCurrentUseCase={setCurrentUseCase}
+      />
+      <DeleteUseCaseModal
+        open={deleteUseCaseModalOpen}
+        setOpen={setDeleteUseCaseModalOpen}
+        onDeleteUseCase={onDeleteUseCase}
+        useCaseName={name}
+      />
     </>
   )
 }

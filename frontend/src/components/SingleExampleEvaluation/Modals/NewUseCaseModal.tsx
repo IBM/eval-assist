@@ -9,10 +9,10 @@ import { UseCase } from '../types'
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  setUseCase: (useCase: UseCase) => void
+  setCurrentUseCase: (useCase: UseCase) => void
 }
 
-export const NewUseCaseModal = ({ open, setOpen, setUseCase }: Props) => {
+export const NewUseCaseModal = ({ open, setOpen, setCurrentUseCase }: Props) => {
   return (
     <Modal
       open={open}
@@ -21,7 +21,7 @@ export const NewUseCaseModal = ({ open, setOpen, setUseCase }: Props) => {
       primaryButtonText="Confirm"
       secondaryButtonText="Cancel"
       onRequestSubmit={(e) => {
-        setUseCase(getEmptyUseCase())
+        setCurrentUseCase(getEmptyUseCase())
         setOpen(false)
       }}
     >

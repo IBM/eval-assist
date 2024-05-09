@@ -6,8 +6,8 @@ export const post = async (path: string, body: any) => {
   return await makeRequest(path, 'POST', body)
 }
 
-export const deleteCustom = async (path: string) => {
-  return await makeRequest(path, 'DELETE')
+export const deleteCustom = async (path: string, body?: any) => {
+  return await makeRequest(path, 'DELETE', body)
 }
 
 export const put = async (path: string, body: any) => {
