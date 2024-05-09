@@ -2,11 +2,7 @@ import { ClientOnly } from '@components/ClientOnly/ClientOnly'
 import { EvaluationLandingPage } from '@components/SingleExampleEvaluation'
 
 const Home = () => {
-  return (
-    <ClientOnly>
-      <EvaluationLandingPage />
-    </ClientOnly>
-  )
+  return <EvaluationLandingPage />
 }
 
 export default Home
