@@ -166,6 +166,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
         isSideNavExpanded={isSideNavExpanded}
         setIsSideNavExpanded={setIsSideNavExpanded}
         currentUseCaseId={id}
+        displaySidenav
       />
       <Content style={{ paddingLeft: 0, paddingTop: 0 }}>
         <div

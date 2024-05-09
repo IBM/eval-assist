@@ -1,21 +1,24 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction } from 'react'
 
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import {
   Header,
   HeaderGlobalAction,
   HeaderGlobalBar,
   HeaderMenuButton,
+  HeaderMenuItem,
   HeaderName,
+  HeaderNavigation,
   SideNav,
   SideNavItems,
   SideNavLink,
   SideNavMenu,
   Theme,
 } from '@carbon/react'
-import { Categories, DocumentSigned, Help, Logout, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
+import { Categories, Document, DocumentSigned, Help, Logout, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 import { useCases } from '@components/SingleExampleEvaluation/UseCasesLibrary'
@@ -82,24 +85,19 @@ export const AppSidenav = ({
             </SideNavLink>
           ))}
         </SideNavMenu>
-        <SideNavMenu renderIcon={DocumentSigned} title="Documentation">
-          <SideNavLink style={{ cursor: 'pointer' }}>{'Overview'}</SideNavLink>
-          <SideNavLink style={{ cursor: 'pointer' }}>{'Criteria definition'}</SideNavLink>
-          <SideNavLink style={{ cursor: 'pointer' }}>{'Installation'}</SideNavLink>
-          <SideNavLink style={{ cursor: 'pointer' }}>{'Usage'}</SideNavLink>
-        </SideNavMenu>
       </SideNavItems>
     </SideNav>
   )
 }
 
 interface AppHeaderProps {
-  setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
-  setLibraryUseCaseSelected: Dispatch<SetStateAction<UseCase | null>>
-  userUseCases: UseCase[]
-  isSideNavExpanded: boolean
-  setIsSideNavExpanded: Dispatch<SetStateAction<boolean>>
-  currentUseCaseId: number | null
+  setConfirmationModalOpen?: Dispatch<SetStateAction<boolean>>
+  setLibraryUseCaseSelected?: Dispatch<SetStateAction<UseCase | null>>
+  userUseCases?: UseCase[]
+  isSideNavExpanded?: boolean
+  setIsSideNavExpanded?: Dispatch<SetStateAction<boolean>>
+  currentUseCaseId?: number | null
+  displaySidenav: boolean
 }
 
 export const AppHeader = ({
@@ -109,38 +107,60 @@ export const AppHeader = ({
   isSideNavExpanded,
   setIsSideNavExpanded,
   currentUseCaseId,
+  displaySidenav = true,
 }: AppHeaderProps) => {
+  console.log(setIsSideNavExpanded)
   const title = `IBM ${PLATFORM_NAME}`
   const { authenticationEnabled } = useAuthentication()
   return (
     <>
       <Theme theme="g100">
         <Header aria-label={title}>
-          <HeaderMenuButton
-            aria-label="Open menu"
-            onClick={() => setIsSideNavExpanded(!isSideNavExpanded)}
-            isActive={isSideNavExpanded}
-            style={{ display: 'inherit' }}
-          />
+          {displaySidenav && setIsSideNavExpanded && (
+            <HeaderMenuButton
+              aria-label="Open menu"
+              onClick={() => setIsSideNavExpanded(!isSideNavExpanded)}
+              isActive={isSideNavExpanded}
+              style={{ display: 'inherit' }}
+            />
+          )}
           <HeaderName href="/" prefix="IBM" as={Link}>
             {PLATFORM_NAME}
           </HeaderName>
-          {authenticationEnabled && (
-            <HeaderGlobalBar>
+
+          <HeaderGlobalBar>
+            <HeaderNavigation aria-label="IBM [Platform]">
+              <HeaderMenuItem href="/documentation" target="_blank" rel="noopener noreferrer">
+                <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+                  Documentation
+                  <Document style={{ marginLeft: '0.5rem' }} size={18} />
+                </div>
+              </HeaderMenuItem>
+            </HeaderNavigation>
+
+            {authenticationEnabled && (
               <HeaderGlobalAction aria-label="Logout" onClick={signOut}>
                 <Logout size={20} />
               </HeaderGlobalAction>
-            </HeaderGlobalBar>
-          )}
+            )}
+          </HeaderGlobalBar>
         </Header>
       </Theme>
-      <AppSidenav
-        setConfirmationModalOpen={setConfirmationModalOpen}
-        setLibraryUseCaseSelected={setLibraryUseCaseSelected}
-        isSideNavExpanded={isSideNavExpanded}
-        userUseCases={userUseCases}
-        currentUseCaseId={currentUseCaseId}
-      />
+      {displaySidenav &&
+        // this checks are just to make ts happy
+        setConfirmationModalOpen !== undefined &&
+        setLibraryUseCaseSelected !== undefined &&
+        isSideNavExpanded !== undefined &&
+        userUseCases !== undefined &&
+        currentUseCaseId !== undefined && (
+          <AppSidenav
+            setConfirmationModalOpen={setConfirmationModalOpen}
+            setLibraryUseCaseSelected={setLibraryUseCaseSelected}
+            isSideNavExpanded={isSideNavExpanded}
+            userUseCases={userUseCases}
+            currentUseCaseId={currentUseCaseId}
+          />
+        )}
     </>
   )
 }
