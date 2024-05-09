@@ -233,19 +233,17 @@ async def evaluate(evalRequest: EvalRequestModel):
 
 
 @app.get("/use_case/")
-async def get_test_cases(user: str):
-    print('user')
-    print(user)
-    test_cases = db.storedusecase.find_many(where={
+async def get_use_cases(user: str):
+    use_cases = db.storedusecase.find_many(where={
         'app_user': {
             'email': user
         }
     })
-    return test_cases
+    return use_cases
 
 
 @app.get("/use_case/{use_case_id}/")
-async def get_test_case(use_case_id: int, user: str):
+async def get_use_case(use_case_id: int, user: str):
     return db.storedusecase.find_unique(where={"id": use_case_id})
     
 class PutUseCaseBody(BaseModel):
@@ -253,7 +251,7 @@ class PutUseCaseBody(BaseModel):
     use_case: StoredUseCase
 
 @app.put("/use_case/")
-async def put_test_case(request_body: PutUseCaseBody):
+async def put_use_case(request_body: PutUseCaseBody):
     user = db.appuser.find_unique(where={'email': request_body.user})
     
     found = db.storedusecase.find_unique(where={
@@ -280,6 +278,14 @@ async def put_test_case(request_body: PutUseCaseBody):
 
     return res
     
+
+class DeleteUseCaseBody(BaseModel):
+    use_case_id: int
+
+@app.delete("/use_case/")
+async def delete_use_case(request_body: DeleteUseCaseBody):
+    res = db.storedusecase.delete(where={'id': request_body.use_case_id})
+    return res
 
 class CreateUserPostBody(BaseModel):
     user: str
