@@ -1,7 +1,5 @@
 import NextAuth from 'next-auth'
 
-console.log(`The value of NEXTAUTH_SECRET ${process.env['NEXTAUTH_SECRET']}`)
-
 export const authOptions = {
   providers: [
     {

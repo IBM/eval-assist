@@ -109,7 +109,6 @@ export const AppHeader = ({
   currentUseCaseId,
   displaySidenav = true,
 }: AppHeaderProps) => {
-  console.log(setIsSideNavExpanded)
   const title = `IBM ${PLATFORM_NAME}`
   const { authenticationEnabled } = useAuthentication()
   return (
