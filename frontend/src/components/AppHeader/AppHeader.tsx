@@ -111,6 +111,7 @@ export const AppHeader = ({
 }: AppHeaderProps) => {
   const title = `IBM ${PLATFORM_NAME}`
   const { authenticationEnabled } = useAuthentication()
+  const router = useRouter()
   return (
     <>
       <Theme theme="g100">
@@ -128,14 +129,16 @@ export const AppHeader = ({
           </HeaderName>
 
           <HeaderGlobalBar>
-            <HeaderNavigation aria-label="IBM [Platform]">
-              <HeaderMenuItem href="/documentation" target="_blank" rel="noopener noreferrer">
-                <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
-                  Documentation
-                  <Document style={{ marginLeft: '0.5rem' }} size={18} />
-                </div>
-              </HeaderMenuItem>
-            </HeaderNavigation>
+            {router.pathname === '/documentation' ? null : (
+              <HeaderNavigation aria-label="IBM [Platform]">
+                <HeaderMenuItem href="/documentation">
+                  <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+                    Documentation
+                    <Document style={{ marginLeft: '0.5rem' }} size={18} />
+                  </div>
+                </HeaderMenuItem>
+              </HeaderNavigation>
+            )}
 
             {authenticationEnabled && (
               <HeaderGlobalAction aria-label="Logout" onClick={signOut}>
