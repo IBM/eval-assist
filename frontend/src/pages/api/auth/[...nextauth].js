@@ -13,8 +13,7 @@ export const authOptions = {
       profile(profile, tokens) {
         return {
           id: tokens.id_token || profile.id,
-          name: profile.name,
-          username: profile.emailAddress,
+          name: profile.email,
         }
       },
     },
