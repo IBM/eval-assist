@@ -1,42 +1,57 @@
-import { CSSProperties, Dispatch, SetStateAction } from 'react'
+import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 
 import { Button } from '@carbon/react'
 import { Add, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
 
-interface TestCaseOptionsProps {
+interface UseCaseOptionsProps {
   style?: CSSProperties
   className?: string
-  setTestCaseName: Dispatch<SetStateAction<string>>
   testCaseName: string
-  setSaveTestCaseModalOpen: Dispatch<SetStateAction<boolean>>
   isUseCaseSaved: boolean
   onSave: () => Promise<void>
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   setDeleteUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
+  setUseCaseName: Dispatch<SetStateAction<string>>
+  useCaseName: string
+  setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
+  changesDetected: boolean
 }
 
-export const TestCaseOptions = ({
+export const UseCaseOptions = ({
   style,
   className,
-  testCaseName,
+  useCaseName,
   isUseCaseSaved,
-  setSaveTestCaseModalOpen,
+  setSaveUseCaseModalOpen,
   onSave,
   setNewUseCaseModalOpen,
+  changesDetected,
   setDeleteUseCaseModalOpen,
-}: TestCaseOptionsProps) => {
+}: UseCaseOptionsProps) => {
+  const [savingUseCase, setSavingUseCase] = useState(false)
+  const onSaveClick = async () => {
+    setSavingUseCase(true)
+    await onSave()
+    setSavingUseCase(false)
+  }
+
   return (
     <div style={{ ...style, display: 'flex', flexDirection: 'row', alignItems: 'center' }} className={className}>
-      <h4 style={{ paddingRight: '1rem' }}>{isUseCaseSaved ? testCaseName : 'Unsaved Use Case'}</h4>
+      <h4 style={{ paddingRight: '1rem' }}>{isUseCaseSaved ? useCaseName : 'Unsaved Use Case'}</h4>
 
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
 
-      <Button disabled={!isUseCaseSaved} kind="ghost" renderIcon={Save} onClick={() => onSave()}>
+      <Button
+        disabled={savingUseCase || !isUseCaseSaved || !changesDetected}
+        kind="ghost"
+        renderIcon={Save}
+        onClick={onSaveClick}
+      >
         {'Save'}
       </Button>
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
-      <Button kind="ghost" renderIcon={WatsonHealthSaveImage} onClick={() => setSaveTestCaseModalOpen(true)}>
+      <Button kind="ghost" renderIcon={WatsonHealthSaveImage} onClick={() => setSaveUseCaseModalOpen(true)}>
         {'Save as'}
       </Button>
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>

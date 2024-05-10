@@ -7,11 +7,11 @@ interface Props {
   setOpen: Dispatch<SetStateAction<boolean>>
   onSaveAs: () => Promise<void>
   testCaseName: string
-  setTestCaseName: Dispatch<SetStateAction<string>>
+  setUseCaseName: Dispatch<SetStateAction<string>>
 }
 
-export const SaveTestCaseModal = ({ open, setOpen, onSaveAs, setTestCaseName, testCaseName }: Props) => {
-  const [savingTestCase, setSavingTestCase] = useState(false)
+export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, setUseCaseName, testCaseName }: Props) => {
+  const [savingUseCase, setSavingUseCase] = useState(false)
 
   return (
     <Modal
@@ -19,18 +19,18 @@ export const SaveTestCaseModal = ({ open, setOpen, onSaveAs, setTestCaseName, te
       onRequestClose={() => setOpen(false)}
       modalHeading={`Save Use Case`}
       primaryButtonText="Confirm"
-      primaryButtonDisabled={savingTestCase}
+      primaryButtonDisabled={savingUseCase}
       secondaryButtonText="Cancel"
       onRequestSubmit={async (e) => {
-        setSavingTestCase(true)
+        setSavingUseCase(true)
         await onSaveAs()
-        setSavingTestCase(false)
+        setSavingUseCase(false)
         setOpen(false)
       }}
     >
       <TextInput
         value={testCaseName}
-        onChange={(e: any) => setTestCaseName(e.target.value)}
+        onChange={(e: any) => setUseCaseName(e.target.value)}
         id={''}
         labelText={'Name'}
       ></TextInput>
