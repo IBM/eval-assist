@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 
 import Link from 'next/link'
 
@@ -14,6 +14,11 @@ interface Props {
 }
 
 export const APIKeyPopover = ({ popoverOpen, setPopoverOpen, bamAPIKey, setBamAPIKey }: Props) => {
+  const apiKeyInputRef = useRef(null)
+  useEffect(() => {
+    if (popoverOpen && apiKeyInputRef.current !== null) (apiKeyInputRef as any).current.focus()
+  }, [popoverOpen, bamAPIKey])
+
   return (
     <Popover open={popoverOpen} align="bottom-end" isTabTip onRequestClose={() => setPopoverOpen(false)}>
       <Button
@@ -33,6 +38,7 @@ export const APIKeyPopover = ({ popoverOpen, setPopoverOpen, bamAPIKey, setBamAP
           <Layer>
             {/*@ts-ignore*/}
             <TextInput.PasswordInput
+              ref={apiKeyInputRef}
               id={'bam-api-key-input'}
               labelText="BAM API key"
               value={bamAPIKey}
