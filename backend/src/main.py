@@ -1,5 +1,5 @@
 from io import StringIO
-from fastapi import FastAPI, status, UploadFile, HTTPException
+from fastapi import FastAPI, status, UploadFile, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
@@ -14,6 +14,7 @@ import pandas as pd
 import json
 from genai import Credentials, Client
 from prisma.models import StoredUseCase
+from prisma.errors import PrismaError
 from llmasajudge.evaluators import Rubric, RubricEvaluator
 from genai.exceptions import ApiResponseException, ApiNetworkException
 import os
@@ -288,11 +289,16 @@ async def delete_use_case(request_body: DeleteUseCaseBody):
     return res
 
 class CreateUserPostBody(BaseModel):
-    user: str
+    email: str
+    name: str
 
 @app.post('/user/')
-def create_user_if_not_exist(requestBody: CreateUserPostBody):
-    user = db.appuser.find_unique(where={'email': requestBody.user})
-    if (user is None):
-        user = db.appuser.create(data={'email': requestBody.user})
-    return user
+async def create_user_if_not_exist(user:CreateUserPostBody):
+    try:
+        db_user = db.appuser.find_unique(where={'email': user.email})
+        if (db_user is None):
+            db_user = db.appuser.create(data={'email': user.email, 'name': user.name})
+        return db_user
+    except PrismaError as pe:
+        print(f'Prisma error raised: {pe}')
+        return None
