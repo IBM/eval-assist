@@ -1,4 +1,3 @@
-import { ClientOnly } from '@components/ClientOnly/ClientOnly'
 import { EvaluationLandingPage } from '@components/SingleExampleEvaluation'
 
 const Home = () => {

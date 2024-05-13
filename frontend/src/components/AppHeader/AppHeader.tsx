@@ -21,7 +21,7 @@ import {
 import { Categories, Document, DocumentSigned, Help, Logout, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
 
-import { useCases } from '@components/SingleExampleEvaluation/UseCasesLibrary'
+import { useCases } from '@components/SingleExampleEvaluation/UseCaseLibrary'
 import { UseCase } from '@components/SingleExampleEvaluation/types'
 import { PLATFORM_NAME } from '@constants'
 import { useAuthentication } from '@customHooks/useAuthentication'
@@ -41,6 +41,16 @@ export const AppSidenav = ({
   userUseCases,
   currentUseCaseId,
 }: AppSidenavProps) => {
+  const onLibraryUseCaseClick = (useCase: UseCase) => {
+    setConfirmationModalOpen(true)
+    setLibraryUseCaseSelected(useCase)
+  }
+
+  const onUserUseCaseClick = (useCase: UseCase) => {
+    if (currentUseCaseId === useCase.id) return
+    setConfirmationModalOpen(true)
+    setLibraryUseCaseSelected(useCase)
+  }
   return (
     <SideNav
       aria-label="Side navigation"
@@ -59,10 +69,7 @@ export const AppSidenav = ({
             <SideNavLink
               isActive={false}
               key={useCase.name}
-              onClick={() => {
-                setConfirmationModalOpen(true)
-                setLibraryUseCaseSelected(useCase)
-              }}
+              onClick={() => onLibraryUseCaseClick(useCase)}
               style={{ cursor: 'pointer' }}
             >
               {useCase.name}
@@ -74,11 +81,7 @@ export const AppSidenav = ({
             <SideNavLink
               key={i}
               isActive={currentUseCaseId === useCase.id}
-              onClick={() => {
-                if (currentUseCaseId === useCase.id) return
-                setConfirmationModalOpen(true)
-                setLibraryUseCaseSelected(useCase)
-              }}
+              onClick={() => onUserUseCaseClick(useCase)}
               style={{ cursor: currentUseCaseId === useCase.id ? 'default' : 'pointer' }}
             >
               {useCase.name}
@@ -112,6 +115,7 @@ export const AppHeader = ({
   const title = `IBM ${PLATFORM_NAME}`
   const { authenticationEnabled } = useAuthentication()
   const router = useRouter()
+
   return (
     <>
       <Theme theme="g100">

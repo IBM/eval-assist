@@ -1,7 +1,7 @@
 import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 
-import { Button } from '@carbon/react'
-import { Add, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
+import { Button, IconButton } from '@carbon/react'
+import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 interface UseCaseOptionsProps {
@@ -9,13 +9,14 @@ interface UseCaseOptionsProps {
   className?: string
   testCaseName: string
   isUseCaseSaved: boolean
+  useCaseName: string
+  changesDetected: boolean
   onSave: () => Promise<void>
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   setDeleteUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   setUseCaseName: Dispatch<SetStateAction<string>>
-  useCaseName: string
+  setEditNameModalOpen: Dispatch<SetStateAction<boolean>>
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  changesDetected: boolean
 }
 
 export const UseCaseOptions = ({
@@ -28,6 +29,7 @@ export const UseCaseOptions = ({
   setNewUseCaseModalOpen,
   changesDetected,
   setDeleteUseCaseModalOpen,
+  setEditNameModalOpen,
 }: UseCaseOptionsProps) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
   const onSaveClick = async () => {
@@ -35,11 +37,19 @@ export const UseCaseOptions = ({
     await onSave()
     setSavingUseCase(false)
   }
-
   return (
     <div style={{ ...style, display: 'flex', flexDirection: 'row', alignItems: 'center' }} className={className}>
-      <h4 style={{ paddingRight: '1rem' }}>{isUseCaseSaved ? useCaseName : 'Unsaved Use Case'}</h4>
-
+      <h4 style={{ paddingRight: '0.5rem' }}>{isUseCaseSaved ? useCaseName : 'Unsaved Use Case'}</h4>
+      {isUseCaseSaved && (
+        <IconButton
+          style={{ marginRight: '0.5rem' }}
+          kind={'ghost'}
+          label="Edit name"
+          onClick={() => setEditNameModalOpen(true)}
+        >
+          <Edit />
+        </IconButton>
+      )}
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
 
       <Button

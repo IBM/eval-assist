@@ -2,6 +2,8 @@ import { useLocalStorage } from 'usehooks-ts'
 
 import { LegacyRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { useRouter } from 'next/router'
+
 import { Content, TextArea } from '@carbon/react'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
 
@@ -17,33 +19,34 @@ import { EvaluateButton } from './EvaluateButton'
 import { EvaluationCriteria } from './EvaluationCriteria'
 import { EvaluationResults } from './EvaluationResults'
 import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
+import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
 import { NewUseCaseModal } from './Modals/NewUseCaseModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
-import { UseCaseConfirmationModal } from './Modals/UseCaseConfimationModal'
+import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { Responses } from './Responses'
 import { UseCaseOptions } from './UseCaseOptions'
 import { FetchedResults, Result, Rubric, UseCase } from './types'
 
 export interface SingleExampleEvaluationProps {
   _userUseCases: UseCase[]
+  currentUseCase: UseCase | null
 }
 
-export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluationProps) => {
+export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: SingleExampleEvaluationProps) => {
   // we are ignoring client side rendering to be able to use useSessionStorage
-  const [libraryUseCaseSelected, setLibraryUseCaseSelected] = useState<UseCase | null>(null)
-
+  const [libraryUseCaseSelected, setLibraryUseCaseSelected] = useState<UseCase | null>(currentUseCase)
   // if the usecase doesnt have an id, it means it hasn't been stored
-  const [id, setId] = useState<number | null>(null)
-  const [name, setName] = useState('')
-  const [context, setContext] = useState('')
-  const [responses, setResponses] = useState([''])
-  const [rubric, setRubric] = useState<Rubric>(getEmptyRubric())
+  const [id, setId] = useState<number | null>(currentUseCase ? currentUseCase.id : null)
+  const [name, setName] = useState(currentUseCase ? currentUseCase.name : '')
+  const [context, setContext] = useState(currentUseCase ? currentUseCase.context : '')
+  const [responses, setResponses] = useState(currentUseCase ? currentUseCase.responses : [''])
+  const [rubric, setRubric] = useState<Rubric>(currentUseCase ? currentUseCase.rubric : getEmptyRubric())
+  const [results, setResults] = useState<Result[] | null>(currentUseCase ? currentUseCase.results : null)
 
   const [isSideNavExpanded, setIsSideNavExpanded] = useState(false)
   const [userUseCases, setUserUseCases] = useState(_userUseCases)
 
   const isUseCaseSaved = useMemo(() => id !== null, [id])
-  const [results, setResults] = useState<Result[] | null>(null)
   const [evaluationFailed, setEvaluationFailed] = useState(false)
   const [evaluationError, setEvaluationError] = useState<string>('')
 
@@ -53,6 +56,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
   const [saveUseCaseModalOpen, setSaveUseCaseModalOpen] = useState(false)
   const [newUseCaseModalOpen, setNewUseCaseModalOpen] = useState(false)
   const [deleteUseCaseModalOpen, setDeleteUseCaseModalOpen] = useState(false)
+  const [editNameModalOpen, setEditNameModalOpen] = useState(false)
 
   const [popoverOpen, setPopoverOpen] = useState(false)
 
@@ -81,6 +85,8 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
   const [bamAPIKey, setBamAPIKey, removeBamAPIKey] = useLocalStorage<string>('bamAPIKey', '')
 
   const popoverRef = useRef<HTMLDivElement>()
+
+  const router = useRouter()
 
   const { getUserName } = useAuthentication()
 
@@ -126,7 +132,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
     setContext(useCase.context)
     setResponses(useCase.responses)
     setRubric(useCase.rubric)
-    setName(useCase.id !== null ? useCase.name : '')
+    setName(useCase.name)
     setId(useCase.id)
     setResults(useCase.results)
     setLastSavedUseCase(JSON.stringify(useCase))
@@ -162,11 +168,11 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
     // notify the user
   }
 
-  const onSaveAs = async () => {
+  const onSaveAs = async (useCaseName: string) => {
     const savedUseCase: StoredUseCase = await (
       await put('use_case/', {
         use_case: {
-          name,
+          name: useCaseName,
           content: JSON.stringify({
             context,
             responses,
@@ -183,6 +189,9 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
     const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
     setCurrentUseCase(parsedSavedUseCase)
     setUserUseCases([...userUseCases, parsedSavedUseCase])
+    router.push({ pathname: '/', query: { id: parsedSavedUseCase.id } }, `/?id=${parsedSavedUseCase.id}`, {
+      shallow: true,
+    })
     // notify the user
   }
 
@@ -190,6 +199,7 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
     await deleteCustom('use_case/', { use_case_id: id })
     setUserUseCases(userUseCases.filter((u) => u.id !== id))
     setCurrentUseCase(getEmptyUseCase())
+    router.push({ pathname: '/' }, `/`, { shallow: true })
   }
 
   return (
@@ -232,12 +242,13 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
           testCaseName={name}
           isUseCaseSaved={isUseCaseSaved}
           onSave={onSave}
-          setNewUseCaseModalOpen={setNewUseCaseModalOpen}
-          setDeleteUseCaseModalOpen={setDeleteUseCaseModalOpen}
           useCaseName={name}
           setUseCaseName={setName}
-          setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
           changesDetected={changesDetected}
+          setNewUseCaseModalOpen={setNewUseCaseModalOpen}
+          setDeleteUseCaseModalOpen={setDeleteUseCaseModalOpen}
+          setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
+          setEditNameModalOpen={setEditNameModalOpen}
         />
         <EvaluationCriteria
           className={classes['left-padding']}
@@ -286,20 +297,14 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
           style={{ marginBottom: '1rem' }}
         />
       </Content>
-      <UseCaseConfirmationModal
-        setUseCase={setCurrentUseCase}
+      <SwitchUseCaseModal
+        setCurrentUseCase={setCurrentUseCase}
         open={confirmationModalOpen}
         setOpen={setConfirmationModalOpen}
-        libraryUseCaseSelected={libraryUseCaseSelected}
+        selectedUseCase={libraryUseCaseSelected}
         setIsSideNavExpanded={setIsSideNavExpanded}
       />
-      <SaveAsUseCaseModal
-        open={saveUseCaseModalOpen}
-        setOpen={setSaveUseCaseModalOpen}
-        onSaveAs={onSaveAs}
-        testCaseName={name}
-        setUseCaseName={setName}
-      />
+      <SaveAsUseCaseModal open={saveUseCaseModalOpen} setOpen={setSaveUseCaseModalOpen} onSaveAs={onSaveAs} />
       <NewUseCaseModal
         open={newUseCaseModalOpen}
         setOpen={setNewUseCaseModalOpen}
@@ -310,6 +315,14 @@ export const SingleExampleEvaluation = ({ _userUseCases }: SingleExampleEvaluati
         setOpen={setDeleteUseCaseModalOpen}
         onDeleteUseCase={onDeleteUseCase}
         useCaseName={name}
+      />
+      <EditUseCaseNameModal
+        open={editNameModalOpen}
+        setOpen={setEditNameModalOpen}
+        name={name}
+        setName={setName}
+        userUseCases={userUseCases}
+        setUserUseCases={setUserUseCases}
       />
     </>
   )

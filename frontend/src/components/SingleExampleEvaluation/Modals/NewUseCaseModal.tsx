@@ -1,5 +1,7 @@
 import { Dispatch, SetStateAction } from 'react'
 
+import { useRouter } from 'next/router'
+
 import { Modal } from '@carbon/react'
 
 import { getEmptyUseCase } from '@utils/utils'
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export const NewUseCaseModal = ({ open, setOpen, setCurrentUseCase }: Props) => {
+  const router = useRouter()
   return (
     <Modal
       open={open}
@@ -23,7 +26,11 @@ export const NewUseCaseModal = ({ open, setOpen, setCurrentUseCase }: Props) => 
       onRequestSubmit={(e) => {
         setCurrentUseCase(getEmptyUseCase())
         setOpen(false)
+        if (router.query.id !== 'new') {
+          router.push({ pathname: '/' }, '/', { shallow: true })
+        }
       }}
+      shouldSubmitOnEnter
     >
       <p>{`This action will replace your ongoing work with a blank new use case.`}</p>
     </Modal>

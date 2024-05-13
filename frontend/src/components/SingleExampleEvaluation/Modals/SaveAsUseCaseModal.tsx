@@ -1,18 +1,18 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 
+import { useRouter } from 'next/router'
+
 import { Modal, TextInput } from '@carbon/react'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  onSaveAs: () => Promise<void>
-  testCaseName: string
-  setUseCaseName: Dispatch<SetStateAction<string>>
+  onSaveAs: (name: string) => Promise<void>
 }
 
-export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, setUseCaseName, testCaseName }: Props) => {
+export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs }: Props) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
-
+  const [useCaseName, setUseCaseName] = useState('')
   return (
     <Modal
       open={open}
@@ -23,17 +23,20 @@ export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, setUseCaseName, te
       secondaryButtonText="Cancel"
       onRequestSubmit={async (e) => {
         setSavingUseCase(true)
-        await onSaveAs()
+        await onSaveAs(useCaseName)
+        setUseCaseName('')
         setSavingUseCase(false)
         setOpen(false)
       }}
+      shouldSubmitOnEnter
     >
       <TextInput
-        value={testCaseName}
+        value={useCaseName}
         onChange={(e: any) => setUseCaseName(e.target.value)}
-        id={''}
+        id={'save-as-text-input'}
         labelText={'Name'}
-      ></TextInput>
+        autoFocus
+      />
     </Modal>
   )
 }
