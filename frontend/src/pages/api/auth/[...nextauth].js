@@ -10,10 +10,12 @@ export const authOptions = {
       clientSecret: process.env.AUTH_CLIENT_SECRET,
       wellKnown: process.env.AUTH_WELL_KNOWN,
       idToken: true,
-      profile(profile, tokens) {
+      // checks: ['none'], // use this to prevent prepriam from throwing weird errors
+      profile(profile) {
         return {
-          id: tokens.id_token || profile.id,
-          name: profile.email,
+          id: profile.uniqueSecurityName,
+          name: profile.name,
+          email: profile.email,
         }
       },
     },
@@ -21,8 +23,9 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, profile }) {
       if (profile) {
-        token.username = profile.emailAddress
-        token.email = profile.emailAddress
+        // console.log("[nextauth] jwt: profile: ", profile)
+        token.name = profile.name
+        token.email = profile.email
 
         // from workbench-ui
         // hook to add data to token before returning:

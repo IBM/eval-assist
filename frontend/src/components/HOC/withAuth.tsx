@@ -11,19 +11,24 @@ import { post } from '@utils/fetchUtils'
 export const withAuth = (Component: NextComponentType) => {
   const Auth = () => {
     // Login data added to props via redux-store (or use react context for example)
-    const { authenticationEnabled, isLoggedIn, user } = useAuthentication()
+    const { authenticationEnabled, isAuthenticated, isLoggedIn, user } = useAuthentication()
     const [userIsCreated, setUserIsCreated] = useState(!!!authenticationEnabled)
 
     useEffect(() => {
       const createUserIfNotExist = async () => {
         if (user) {
-          post('user/', { user: user.name }).then((res) => {
+          const data = { name: user.name, email: user.email }
+          post('user/', data).then((res) => {
             if (res.ok) {
               res.json().then((userInfo) => {
                 setUserIsCreated(true)
               })
+            } else {
+              console.log('withAuth res is not OK!')
             }
           })
+        } else {
+          console.log('withAuth no user object')
         }
       }
 

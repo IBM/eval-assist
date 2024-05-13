@@ -13,8 +13,8 @@ export const useAuthentication = () => {
   const isLoggedIn = useMemo(() => !authenticationEnabled || isAuthenticated, [authenticationEnabled, isAuthenticated])
 
   const getUserName = useCallback(
-    () => (authenticationEnabled ? (user?.name as string) : 'only_dev_default_user'),
-    [authenticationEnabled, user?.name],
+    () => (authenticationEnabled ? (user?.email as string) : 'only_dev_default_user'),
+    [authenticationEnabled, user?.email],
   )
 
   return {
