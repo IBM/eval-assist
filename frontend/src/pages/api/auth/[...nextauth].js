@@ -12,6 +12,7 @@ export const authOptions = {
       idToken: true,
       // checks: ['none'], // use this to prevent prepriam from throwing weird errors
       profile(profile) {
+        console.log('provider profile: ', profile)
         return {
           id: profile.uniqueSecurityName,
           name: profile.name,
@@ -23,7 +24,7 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, profile }) {
       if (profile) {
-        // console.log("[nextauth] jwt: profile: ", profile)
+        console.log('[nextauth] jwt: profile: ', profile)
         token.name = profile.name
         token.email = profile.email
 
