@@ -24,6 +24,7 @@ model StoredUseCase {
 model AppUser {
   id               Int             @id @default(autoincrement())
   email            String          @unique
+  name             String          @default("")
   stored_use_cases StoredUseCase[]
 
   @@map("app_user")

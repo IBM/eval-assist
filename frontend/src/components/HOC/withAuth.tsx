@@ -31,7 +31,8 @@ export const withAuth = (Component: NextComponentType) => {
       }
 
       createUserIfNotExist()
-    }, [user])
+      // eslint-disable-next-line
+    }, [JSON.stringify(user)])
 
     // If user is not logged in, return login component
     if (!isLoggedIn) return <LoginView />
