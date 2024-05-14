@@ -16,7 +16,7 @@ export const authOptions = {
         return {
           id: profile.uniqueSecurityName,
           name: profile.name,
-          email: profile.emailAddress,
+          email: profile.emailAddress ?? profile.email,
         }
       },
     },
