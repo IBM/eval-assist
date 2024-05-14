@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "app_user" ADD COLUMN     "name" TEXT NOT NULL DEFAULT "";
+ALTER TABLE "app_user" ADD COLUMN     "name" TEXT NOT NULL;
