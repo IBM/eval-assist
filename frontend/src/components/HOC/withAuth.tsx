@@ -27,8 +27,6 @@ export const withAuth = (Component: NextComponentType) => {
               console.log('withAuth res is not OK!')
             }
           })
-        } else {
-          console.log('withAuth no user object')
         }
       }
 
