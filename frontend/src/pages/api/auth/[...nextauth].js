@@ -16,7 +16,7 @@ export const authOptions = {
         return {
           id: profile.uniqueSecurityName,
           name: profile.name,
-          email: profile.email,
+          email: profile.emailAddress,
         }
       },
     },
@@ -26,7 +26,7 @@ export const authOptions = {
       if (profile) {
         console.log('[nextauth] jwt: profile: ', profile)
         token.name = profile.name
-        token.email = profile.email
+        token.email = profile.emailAddress
 
         // from workbench-ui
         // hook to add data to token before returning:
