@@ -50,6 +50,9 @@ ENV AUTH_CLIENT_SECRET $AUTH_CLIENT_SECRET
 ARG NEXT_PUBLIC_USE_AUTH
 ENV NEXT_PUBLIC_USE_AUTH $NEXT_PUBLIC_USE_AUTH
 
+ARG NODE_ENV
+ENV NODE_ENV $NODE_ENV
+
 RUN yarn prisma generate
 RUN yarn build
 # If using npm comment out above and use below instead
@@ -62,8 +65,7 @@ WORKDIR /app
 # Uncomment the following line in case you want to disable telemetry during runtime.
 ENV NEXT_TELEMETRY_DISABLED 1
 # get NODE_ENV from Travis - allow console logging etc. on dev
-ARG NODE_ENV
-ENV NODE_ENV $NODE_ENV
+
 ENV GENAI_KEY $GENAI_KEY
 ENV GENAI_API $GENAI_API
 
