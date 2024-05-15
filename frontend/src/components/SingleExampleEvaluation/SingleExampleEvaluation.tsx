@@ -8,6 +8,7 @@ import { Content, TextArea } from '@carbon/react'
 import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 import { AppHeader } from '@components/AppHeader/AppHeader'
+import { useToastContext } from '@components/ToastProvider/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { StoredUseCase } from '@prisma/client'
@@ -90,6 +91,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
 
   const { getUserName } = useAuthentication()
 
+  const { addToast } = useToastContext()
+
   useBeforeOnload(changesDetected)
 
   const runEvaluation = async () => {
@@ -113,10 +116,22 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
       setEvaluationFailed(true)
       // We are catching this error an so we show the message sent from the backend
       setEvaluationError(error.detail)
+
+      addToast({
+        kind: 'error',
+        title: 'Evaluation failed',
+      })
+
       return
     }
 
     const responseBody = (await response.json()) as FetchedResults
+
+    addToast({
+      kind: 'success',
+      title: 'Evaluation finished',
+      timeout: 5000,
+    })
 
     setResults(
       responseBody.results.map((result) => ({
@@ -157,7 +172,6 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
     ).json()
 
     const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
-    // setCurrentUseCase(parsedSavedUseCase)
 
     // update use case in the use cases list
     const i = userUseCases.findIndex((useCase) => useCase.id === id)
@@ -165,7 +179,13 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
 
     // update lastSavedUseCase
     setLastSavedUseCase(JSON.stringify(getUseCaseFromState()))
+
     // notify the user
+    addToast({
+      kind: 'success',
+      title: `Use case was saved`,
+      timeout: 5000,
+    })
   }
 
   const onSaveAs = async (useCaseName: string) => {
@@ -192,11 +212,25 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
     router.push({ pathname: '/', query: { id: parsedSavedUseCase.id } }, `/?id=${parsedSavedUseCase.id}`, {
       shallow: true,
     })
+
     // notify the user
+    addToast({
+      kind: 'success',
+      title: `Created use case '${parsedSavedUseCase.name}'`,
+      timeout: 5000,
+    })
   }
 
   const onDeleteUseCase = async () => {
     await deleteCustom('use_case/', { use_case_id: id })
+
+    // notify the user
+    addToast({
+      kind: 'success',
+      title: `Deleted use case '${name}'`,
+      timeout: 5000,
+    })
+
     setUserUseCases(userUseCases.filter((u) => u.id !== id))
     setCurrentUseCase(getEmptyUseCase())
     router.push({ pathname: '/' }, `/`, { shallow: true })

@@ -9,6 +9,7 @@ import ThemePreference from '@theme'
 
 import { AppHeader } from '@components/AppHeader/AppHeader'
 import { RouterLoading } from '@components/RouterLoading/RouterLoading'
+import { ToastProvider } from '@components/ToastProvider/ToastProvider'
 import { PLATFORM_NAME } from '@constants'
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ session: Session }>) => {
@@ -33,7 +34,9 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ ses
           <RouterLoading />
           {/* <AppHeader /> */}
           <SessionProvider session={session}>
-            <Component {...pageProps} />
+            <ToastProvider>
+              <Component {...pageProps} />
+            </ToastProvider>
           </SessionProvider>
         </>
       </ThemePreference>
