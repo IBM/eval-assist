@@ -8,7 +8,7 @@
   width: rem(48px);
   z-index: 1;
   transition: width $duration-fast-02 motion(standard, productive);
-
+  height: 100%;
   &.expanded {
     width: rem(272px + 48px);
   }

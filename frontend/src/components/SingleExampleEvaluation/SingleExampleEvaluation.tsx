@@ -14,7 +14,7 @@ import { deleteCustom, post, put } from '@utils/fetchUtils'
 import { getEmptyRubric, getEmptyUseCase, parseFetchedUseCase } from '@utils/utils'
 
 import { APIKeyPopover } from './APIKeyPopover'
-import { AppSidenavNew } from './AppSidenav'
+import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { EvaluateButton } from './EvaluateButton'
 import { EvaluationCriteria } from './EvaluationCriteria'
 import { EvaluationResults } from './EvaluationResults'
@@ -144,14 +144,37 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
   }
 
   const setCurrentUseCase = (useCase: UseCase) => {
-    setContext(useCase.context)
-    setResponses(useCase.responses)
-    setRubric(useCase.rubric)
-    setName(useCase.name)
-    setId(useCase.id)
-    setResults(useCase.results)
-    setLastSavedUseCase(JSON.stringify(useCase))
+    let urlChangePromise: Promise<boolean>
+
+    if (useCase.id !== null) {
+      urlChangePromise = changeUseCaseURL(useCase.id)
+    } else {
+      urlChangePromise = changeUseCaseURL(null)
+    }
+
+    urlChangePromise.then(() => {
+      setContext(useCase.context)
+      setResponses(useCase.responses)
+      setRubric(useCase.rubric)
+      setName(useCase.name)
+      setId(useCase.id)
+      setResults(useCase.results)
+      setLastSavedUseCase(JSON.stringify(useCase))
+    })
   }
+
+  const changeUseCaseURL = useCallback(
+    (useCaseId: number | null) => {
+      if (useCaseId !== null) {
+        return router.push({ pathname: '/', query: { id: useCaseId } }, `/?id=${useCaseId}`, {
+          shallow: true,
+        })
+      } else {
+        return router.push({ pathname: '/' }, `/`, { shallow: true })
+      }
+    },
+    [router],
+  )
 
   const onSave = async () => {
     const savedUseCase: StoredUseCase = await (
@@ -209,9 +232,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
     const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
     setCurrentUseCase(parsedSavedUseCase)
     setUserUseCases([...userUseCases, parsedSavedUseCase])
-    router.push({ pathname: '/', query: { id: parsedSavedUseCase.id } }, `/?id=${parsedSavedUseCase.id}`, {
-      shallow: true,
-    })
+    changeUseCaseURL(parsedSavedUseCase.id)
 
     // notify the user
     addToast({
@@ -233,7 +254,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
 
     setUserUseCases(userUseCases.filter((u) => u.id !== id))
     setCurrentUseCase(getEmptyUseCase())
-    router.push({ pathname: '/' }, `/`, { shallow: true })
+    changeUseCaseURL(null)
   }
 
   return (
@@ -246,6 +267,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
           currentUseCaseId={id}
           selected={sidebarTabSelected}
           setSelected={setSidebarTabSelected}
+          changesDetected={changesDetected}
+          setCurrentUseCase={setCurrentUseCase}
         />
         <div className={classes.body}>
           <div
@@ -282,6 +305,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
             setDeleteUseCaseModalOpen={setDeleteUseCaseModalOpen}
             setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
             setEditNameModalOpen={setEditNameModalOpen}
+            setCurrentUseCase={setCurrentUseCase}
           />
           <EvaluationCriteria
             className={classes['left-padding']}
@@ -336,7 +360,6 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
         open={confirmationModalOpen}
         setOpen={setConfirmationModalOpen}
         selectedUseCase={libraryUseCaseSelected}
-        setSidebarTabSelected={setSidebarTabSelected}
       />
       <SaveAsUseCaseModal open={saveUseCaseModalOpen} setOpen={setSaveUseCaseModalOpen} onSaveAs={onSaveAs} />
       <NewUseCaseModal

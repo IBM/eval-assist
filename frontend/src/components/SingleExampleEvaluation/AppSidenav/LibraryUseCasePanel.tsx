@@ -8,9 +8,9 @@ import { IconButton } from '@carbon/react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, Tree } from '@carbon/react/icons'
 
-import { useCases } from './UseCaseLibrary'
+import { useCases } from '../UseCaseLibrary'
+import { UseCase } from '../types'
 import classes from './UseCasePanel.module.scss'
-import { UseCase } from './types'
 
 interface Props {
   onUseCaseClick: (useCase: UseCase) => void

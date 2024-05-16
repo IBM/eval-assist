@@ -1,5 +1,7 @@
 import cx from 'classnames'
 
+import { useMemo } from 'react'
+
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -9,8 +11,8 @@ import { IconButton } from '@carbon/react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, Launch } from '@carbon/react/icons'
 
+import { UseCase } from '../types'
 import classes from './UseCasePanel.module.scss'
-import { UseCase } from './types'
 
 interface Props {
   onUseCaseClick: (useCase: UseCase) => void
@@ -20,6 +22,10 @@ interface Props {
 }
 
 export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, currentUseCaseId }: Props) => {
+  const selectedNode = useMemo(() => {
+    return currentUseCaseId !== null ? [`${currentUseCaseId}`] : []
+  }, [currentUseCaseId])
+
   return (
     <section className={cx(classes.root)}>
       <header className={classes.header}>
@@ -33,19 +39,21 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
           <section className={classes.section}>
             {/* <h3 className={classes.sectionHeading}>My saved prompts</h3> */}
             <div className={classes['tree-wrapper']}>
-              <TreeView className={classes['tree-root']} label={''}>
+              <TreeView className={classes['tree-root']} label={''} hideLabel selected={selectedNode}>
                 {userUseCases.map((useCase) => (
                   <TreeNode
-                    onClick={() => onUseCaseClick(useCase)}
-                    key={useCase.id}
-                    id={useCase.id}
+                    onSelect={() => {
+                      onUseCaseClick(useCase)
+                    }}
+                    key={`${useCase.id}`}
+                    id={`${useCase.id}`}
+                    selected={selectedNode}
                     label={
                       <div className={classes['tree-node-content']}>
                         {useCase.name}
                         <LinkButton useCase={useCase} />
                       </div>
                     }
-                    selected={[useCase.id]}
                   />
                 ))}
               </TreeView>

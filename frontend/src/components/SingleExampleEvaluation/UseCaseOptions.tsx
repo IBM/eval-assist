@@ -3,7 +3,10 @@ import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 import { Button, IconButton } from '@carbon/react'
 import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
+import { getEmptyUseCase } from '@utils/utils'
+
 import classes from './SingleExampleEvaluation.module.scss'
+import { UseCase } from './types'
 
 interface UseCaseOptionsProps {
   style?: CSSProperties
@@ -18,6 +21,7 @@ interface UseCaseOptionsProps {
   setUseCaseName: Dispatch<SetStateAction<string>>
   setEditNameModalOpen: Dispatch<SetStateAction<boolean>>
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
+  setCurrentUseCase: (useCase: UseCase) => void
 }
 
 export const UseCaseOptions = ({
@@ -31,6 +35,7 @@ export const UseCaseOptions = ({
   changesDetected,
   setDeleteUseCaseModalOpen,
   setEditNameModalOpen,
+  setCurrentUseCase,
 }: UseCaseOptionsProps) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
   const onSaveClick = async () => {
@@ -70,7 +75,11 @@ export const UseCaseOptions = ({
         kind="ghost"
         renderIcon={Add}
         onClick={() => {
-          setNewUseCaseModalOpen(true)
+          if (changesDetected) {
+            setNewUseCaseModalOpen(true)
+          } else {
+            setCurrentUseCase(getEmptyUseCase())
+          }
         }}
       >
         {'New Use Case'}

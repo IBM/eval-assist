@@ -11,16 +11,9 @@ interface Props {
   selectedUseCase: UseCase | null
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  setSidebarTabSelected: Dispatch<SetStateAction<'user_use_cases' | 'library_use_cases' | null>>
 }
 
-export const SwitchUseCaseModal = ({
-  open,
-  setOpen,
-  setCurrentUseCase,
-  selectedUseCase,
-  setSidebarTabSelected,
-}: Props) => {
+export const SwitchUseCaseModal = ({ open, setOpen, setCurrentUseCase, selectedUseCase }: Props) => {
   const router = useRouter()
 
   return (
@@ -34,16 +27,7 @@ export const SwitchUseCaseModal = ({
         shouldSubmitOnEnter
         onRequestSubmit={(e) => {
           setOpen(false)
-          // setSidebarTabSelected(null)
-          const promise =
-            selectedUseCase.id !== null
-              ? router.push({ pathname: '/', query: { id: selectedUseCase.id } }, `/?id=${selectedUseCase.id}`, {
-                  shallow: true,
-                })
-              : router.push({ pathname: '/' }, `/`, { shallow: true })
-          promise.then(() => {
-            setCurrentUseCase(selectedUseCase)
-          })
+          setCurrentUseCase(selectedUseCase)
         }}
       >
         <p>{`This action will replace your ongoing work with the selected use case.`}</p>

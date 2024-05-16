@@ -26,7 +26,15 @@ export const AppHeader = () => {
   return (
     <Theme theme="g100">
       <Header className={classes.root} aria-label={title}>
-        <HeaderName href="/" prefix="IBM" as={Link}>
+        <HeaderName
+          prefix="IBM"
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            router.push({ pathname: '/', query: {} }).then(() => {
+              router.reload()
+            })
+          }}
+        >
           {PLATFORM_NAME}
         </HeaderName>
 

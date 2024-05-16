@@ -26,9 +26,6 @@ export const NewUseCaseModal = ({ open, setOpen, setCurrentUseCase }: Props) => 
       onRequestSubmit={(e) => {
         setCurrentUseCase(getEmptyUseCase())
         setOpen(false)
-        if (router.query.id !== 'new') {
-          router.push({ pathname: '/' }, '/', { shallow: true })
-        }
       }}
       shouldSubmitOnEnter
     >

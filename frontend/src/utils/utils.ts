@@ -41,8 +41,8 @@ export const getEmptyRubric = () => ({
 })
 
 export const getEmptyUseCase = (): UseCase => ({
-  name: '',
   id: null,
+  name: '',
   context: '',
   responses: [''],
   rubric: getEmptyRubric(),

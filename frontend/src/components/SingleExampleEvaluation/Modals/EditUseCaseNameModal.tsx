@@ -1,7 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-import { useRouter } from 'next/router'
-
 import { Modal, TextInput } from '@carbon/react'
 
 import { UseCase } from '../types'

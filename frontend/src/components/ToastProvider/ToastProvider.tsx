@@ -58,32 +58,18 @@ export const ToastProvider = ({ children }: Props) => {
   )
 
   const contextValue = useMemo(() => ({ addToast }), [addToast])
+
   return (
     <ToastContext.Provider value={contextValue}>
       <div className={cx(classes.toasts, classes.container)}>
         {toasts.map(({ key, ...toast }) => (
-          <>
-            {/* <ToastNotification
-              key={key}
-              {...toast}
-              onClose={() => {
-                setToasts((existing) => existing.filter((toast) => toast.key !== key))
-              }}
-            >
-              <div className={`${toastPrefix}__subtitle`}>
-                {subtitle && <div className={classes.subtitle}>{subtitle}</div>}
-                {apiError && <div className={classes.apiError}>{apiError}</div>}
-              </div>
-              <div className={`${toastPrefix}__caption`}>{caption}</div>
-            </ToastNotification> */}
-            <ToastNotification
-              onClose={() => {
-                setToasts((existing) => existing.filter((toast) => toast.key !== key))
-              }}
-              key={key}
-              {...toast}
-            />
-          </>
+          <ToastNotification
+            onClose={() => {
+              setToasts((existing) => existing.filter((toast) => toast.key !== key))
+            }}
+            key={key}
+            {...toast}
+          />
         ))}
       </div>
       {children}

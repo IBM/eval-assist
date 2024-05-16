@@ -2,7 +2,7 @@ import cx from 'classnames'
 
 import { ReactNode } from 'react'
 
-import { useSession } from 'next-auth/react'
+import { unstable_FeatureFlags as FeatureFlags } from '@carbon/react'
 
 import { AppHeader } from '@components/AppHeader/AppHeader'
 import ThemePreference from '@components/ThemePreference'
@@ -17,14 +17,16 @@ interface Props {
 export const AppShell = ({ children }: Props) => {
   return (
     <ThemePreference>
-      <>
-        <AppHeader />
-        <ToastProvider>
-          <main id="main-content" className={classes.content}>
-            {children}
-          </main>
-        </ToastProvider>
-      </>
+      <FeatureFlags flags={{ 'enable-treeview-controllable': true }}>
+        <>
+          <AppHeader />
+          <ToastProvider>
+            <main id="main-content" className={classes.content}>
+              {children}
+            </main>
+          </ToastProvider>
+        </>
+      </FeatureFlags>
     </ThemePreference>
   )
 }

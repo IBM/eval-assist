@@ -18,6 +18,8 @@ interface AppSidenavProps {
   currentUseCaseId: number | null
   selected: 'user_use_cases' | 'library_use_cases' | null
   setSelected: Dispatch<SetStateAction<'user_use_cases' | 'library_use_cases' | null>>
+  changesDetected: boolean
+  setCurrentUseCase: (useCase: UseCase) => void
 }
 
 export const AppSidenavNew = ({
@@ -27,16 +29,24 @@ export const AppSidenavNew = ({
   currentUseCaseId,
   selected,
   setSelected,
+  changesDetected,
+  setCurrentUseCase,
 }: AppSidenavProps) => {
   const id = useId()
 
   const onUseCaseClick = (useCase: UseCase) => {
     // if the usecase is already selected don't do nothing
     if (currentUseCaseId !== null && currentUseCaseId === useCase.id) return
-    setConfirmationModalOpen(true)
-    setLibraryUseCaseSelected(useCase)
-  }
 
+    // if there are unsaved changes, let the user know that they may lose work
+    if (changesDetected) {
+      setConfirmationModalOpen(true)
+      setLibraryUseCaseSelected(useCase)
+    } else {
+      // no unsaved changes, update the current use case without modals
+      setCurrentUseCase(useCase)
+    }
+  }
   return (
     <aside
       className={cx(classes.root, {
