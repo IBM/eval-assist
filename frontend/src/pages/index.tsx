@@ -1,7 +1,8 @@
-import { EvaluationLandingPage } from '@components/SingleExampleEvaluation'
+import { withAuth } from '@components/HOC/withAuth'
+import Landing from '@components/SingleExampleEvaluation/'
 
 const Home = () => {
-  return <EvaluationLandingPage />
+  return <Landing />
 }
 
-export default Home
+export default withAuth(Home)

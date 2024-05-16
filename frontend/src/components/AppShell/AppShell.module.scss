@@ -1,0 +1,11 @@
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/utilities/convert' as *;
+@use '@carbon/styles/scss/spacing' as *;
+
+.content {
+  position: relative;
+  height: 100%;
+  background-color: $background;
+  color: $text-primary;
+  padding-top: $spacing-09;
+}

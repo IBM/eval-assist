@@ -1,7 +1,8 @@
 import { CSSProperties } from 'react'
 
 import { Button, InlineLoading } from '@carbon/react'
-import classes from '@styles/SingleExampleEvaluation.module.scss'
+
+import classes from './SingleExampleEvaluation.module.scss'
 
 interface EvaluateButtonProps {
   evaluationRunning: boolean

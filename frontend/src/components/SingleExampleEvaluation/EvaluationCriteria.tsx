@@ -14,11 +14,11 @@ import {
   TextInput,
 } from '@carbon/react'
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
-import classes from '@styles/SingleExampleEvaluation.module.scss'
 
 import { isInstanceOfRubric } from '@utils/utils'
 
 import { JSONTextArea } from './JSONTextArea'
+import classes from './SingleExampleEvaluation.module.scss'
 import { Rubric } from './types'
 
 interface EvaluationCriteriaProps {

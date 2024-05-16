@@ -11,7 +11,7 @@ interface Props {
   selectedUseCase: UseCase | null
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  setIsSideNavExpanded: Dispatch<SetStateAction<boolean>>
+  setSidebarTabSelected: Dispatch<SetStateAction<'user_use_cases' | 'library_use_cases' | null>>
 }
 
 export const SwitchUseCaseModal = ({
@@ -19,7 +19,7 @@ export const SwitchUseCaseModal = ({
   setOpen,
   setCurrentUseCase,
   selectedUseCase,
-  setIsSideNavExpanded,
+  setSidebarTabSelected,
 }: Props) => {
   const router = useRouter()
 
@@ -34,8 +34,7 @@ export const SwitchUseCaseModal = ({
         shouldSubmitOnEnter
         onRequestSubmit={(e) => {
           setOpen(false)
-          setIsSideNavExpanded(false)
-
+          // setSidebarTabSelected(null)
           const promise =
             selectedUseCase.id !== null
               ? router.push({ pathname: '/', query: { id: selectedUseCase.id } }, `/?id=${selectedUseCase.id}`, {

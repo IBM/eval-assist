@@ -4,7 +4,8 @@ import Link from 'next/link'
 
 import { Button, Layer, Popover, PopoverContent, TextInput } from '@carbon/react'
 import { WarningFilled } from '@carbon/react/icons'
-import classes from '@styles/SingleExampleEvaluation.module.scss'
+
+import classes from './SingleExampleEvaluation.module.scss'
 
 interface Props {
   popoverOpen: boolean

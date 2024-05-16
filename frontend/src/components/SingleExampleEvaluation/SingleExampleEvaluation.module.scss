@@ -1,4 +1,20 @@
-@use '@carbon/styles/scss/theme' as *;
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/spacing';
+
+.content {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  grid-template-rows: minmax(0, auto);
+  overflow: hidden;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  padding: $spacing-06;
+  height: 100%;
+}
 
 .custom-sidenav {
   border-right: 1px solid $border-subtle-00;
@@ -64,22 +80,4 @@
   border: 0;
   border-bottom: 1px solid $border-subtle-00;
   margin-bottom: 2rem;
-}
-
-.documentation p {
-  font-size: var(--cds-body-01-font-size, 0.875rem);
-  font-weight: var(--cds-body-01-font-weight, 400);
-  line-height: var(--cds-body-01-line-height, 1.42857);
-  letter-spacing: var(--cds-body-01-letter-spacing, 0.16px);
-  color: var(--cds-text-secondary, #4d5358);
-  margin-bottom: 2rem;
-  padding-right: 50%;
-}
-
-.documentation h2 {
-  letter-spacing: var(--cds-heading-03-letter-spacing, 0);
-  font-weight: 400;
-  font-size: 1.25rem;
-  line-height: 1.375;
-  margin-bottom: 1rem;
 }

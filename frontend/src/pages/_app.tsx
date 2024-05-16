@@ -3,18 +3,14 @@ import { SessionProvider } from 'next-auth/react'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 
-import { Content, Theme } from '@carbon/react'
 import '@styles/globals.scss'
-import ThemePreference from '@theme'
 
-import { AppHeader } from '@components/AppHeader/AppHeader'
+import { AppShell } from '@components/AppShell/AppShell'
 import { RouterLoading } from '@components/RouterLoading/RouterLoading'
-import { ToastProvider } from '@components/ToastProvider/ToastProvider'
 import { PLATFORM_NAME } from '@constants'
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ session: Session }>) => {
   const title = `IBM ${PLATFORM_NAME}`
-
   return (
     <>
       <Head>
@@ -29,17 +25,12 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ ses
         <meta name="msapplication-TileColor" content="#052fad" />
         <meta name="theme-color" content="#161616" />
       </Head>
-      <ThemePreference>
-        <>
-          <RouterLoading />
-          {/* <AppHeader /> */}
-          <SessionProvider session={session}>
-            <ToastProvider>
-              <Component {...pageProps} />
-            </ToastProvider>
-          </SessionProvider>
-        </>
-      </ThemePreference>
+      <RouterLoading />
+      <SessionProvider session={session}>
+        <AppShell>
+          <Component {...pageProps} />
+        </AppShell>
+      </SessionProvider>
     </>
   )
 }

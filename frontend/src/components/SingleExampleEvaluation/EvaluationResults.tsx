@@ -11,8 +11,8 @@ import {
   Tooltip,
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
-import classes from '@styles/SingleExampleEvaluation.module.scss'
 
+import classes from './SingleExampleEvaluation.module.scss'
 import { Result } from './types'
 
 interface EvaluationResultsProps {

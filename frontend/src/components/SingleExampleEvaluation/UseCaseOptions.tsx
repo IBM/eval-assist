@@ -2,7 +2,8 @@ import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 
 import { Button, IconButton } from '@carbon/react'
 import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
-import classes from '@styles/SingleExampleEvaluation.module.scss'
+
+import classes from './SingleExampleEvaluation.module.scss'
 
 interface UseCaseOptionsProps {
   style?: CSSProperties

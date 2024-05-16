@@ -5,6 +5,3 @@
 );
 @use '@carbon/layout';
 @use '/src/components/ThemePreference/theme-preference';
-main {
-  margin-top: layout.$spacing-09;
-}
