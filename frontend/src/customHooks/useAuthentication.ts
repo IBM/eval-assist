@@ -8,9 +8,11 @@ export const useAuthentication = () => {
 
   const authenticationEnabled = useMemo(() => process.env.NEXT_PUBLIC_USE_AUTH === 'true', [])
 
-  const isAuthenticated = useMemo(() => status === 'authenticated', [status])
+  const isAuthenticated = status === 'authenticated'
 
-  const isLoggedIn = useMemo(() => !authenticationEnabled || isAuthenticated, [authenticationEnabled, isAuthenticated])
+  const authenticationLoading = status === 'loading'
+
+  const isUnauthenticated = status === 'unauthenticated'
 
   const getUserName = useCallback(
     () => (authenticationEnabled ? (user?.email as string) : 'only_dev_default_user'),
@@ -20,8 +22,9 @@ export const useAuthentication = () => {
   return {
     authenticationEnabled,
     isAuthenticated,
-    isLoggedIn,
     user,
     getUserName,
+    authenticationLoading,
+    isUnauthenticated,
   }
 }
