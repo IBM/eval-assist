@@ -1,24 +1,29 @@
 from io import StringIO
-from fastapi import FastAPI, status, UploadFile, HTTPException, Request
+from fastapi import FastAPI, status, UploadFile, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, validator
-from typing import List
+from pydantic import BaseModel
 from dotenv import load_dotenv
 
 from .utils import log_runtime
 from .db_client import db
 from datetime import datetime
-load_dotenv()
 import pandas as pd 
 import json
 from genai import Credentials, Client
 from prisma.models import StoredUseCase
 from prisma.errors import PrismaError
-from llmasajudge.evaluators import Rubric, RubricEvaluator
+from llmasajudge.evaluators import Rubric, MixtralRubricEvaluator, PairwiseCriteria, MixtralPairwiseEvaluator
 from genai.exceptions import ApiResponseException, ApiNetworkException
 import os
 import json
+
+# API type definitions
+from  .api.pipelines import PipelinesResponseModel, PipelineModel, PAIRWISE_TYPE, RUBRIC_TYPE
+from  .api.pairwise import PairwiseEvalRequestModel, PairwiseEvalResponseModel
+from  .api.rubric import RubricEvalRequestModel, RubricEvalResponseModel
+
+load_dotenv()
 
 app = FastAPI()
 app.add_middleware(
@@ -162,52 +167,79 @@ async def upload_data(evaluation_id: int, file: UploadFile):
 async def app_shutdown():
     db.disconnect()
 
-
-class RubricOptionModel(BaseModel):
-    option: str
-    description: str
-
-class RubricModel(BaseModel):
-    criteria: str
-    options: List[RubricOptionModel]
-
-    @validator('options', pre=True, always=True)
-    def validate_options_length(cls, value):
-        if len(value) < 2:
-            raise ValueError("Rubrics require min. 2 options.")
-        return value
-
-class EvalRequestModel(BaseModel):
-    context: str
-    responses: List[str]
-    rubric: RubricModel
-    bam_api_key: str
-
-    @validator('responses', pre=True, always=True)
-    def validate_responses_length(cls, value):
-        if len(value) == 0:
-            raise ValueError("empty response list not allowed")
-        return value
-
-class EvalResultModel(BaseModel):
-    option: str
-    explanation: str
-    p_bias: bool
-
-class EvalResponseModel(BaseModel):
-    results: List[EvalResultModel]
-
 def throw_authorized_exception():
     raise HTTPException(status_code=401, detail=f"Couldn't connect to BAM. Please check that the provided API key is correct." )
 
-@app.post("/evaluate/", response_model=EvalResponseModel)
-async def evaluate(evalRequest: EvalRequestModel):
+def throw_unknown_pipeline_exception():
+    raise HTTPException(status_code=401, detail=f"Unknown evaluation pipeline." )
+
+# Map API pipeline names to library instantiations
+name_to_pipeline = {
+    RUBRIC_TYPE: {
+        "mistralai/mixtral-8x7b-instruct-v01": MixtralRubricEvaluator,
+    },
+    PAIRWISE_TYPE: {
+        "mistralai/mixtral-8x7b-instruct-v01": MixtralPairwiseEvaluator,
+    }
+}
+
+'''
+Get the list of available pipelines, as supported by llm-as-a-judge library
+'''
+@app.get("/pipelines/", response_model=PipelinesResponseModel)
+async def get_pipelines():
+    return PipelinesResponseModel(pipelines=[
+        PipelineModel(name="mistralai/mixtral-8x7b-instruct-v01", type=RUBRIC_TYPE),
+        PipelineModel(name="mistralai/mixtral-8x7b-instruct-v01", type=PAIRWISE_TYPE),
+    ])
+
+'''
+Single pairwise evaluation endpoint
+'''
+@app.post("/evaluate/pairwise/", response_model=PairwiseEvalResponseModel)
+async def evaluate(req: PairwiseEvalRequestModel):
+
+    BAM_API_URL = os.getenv("GENAI_API", None)  
+    credentials = Credentials(api_key=req.bam_api_key, api_endpoint=BAM_API_URL)
+    client = Client(credentials=credentials)
+
+    if req.pipeline not in name_to_pipeline[PAIRWISE_TYPE]:
+        throw_unknown_pipeline_exception()
+    
+    eval_pipeline = name_to_pipeline[PAIRWISE_TYPE][req.pipeline]
+    evaluator = eval_pipeline(client=client)
+    criteria = PairwiseCriteria.from_json(req.criteria.model_dump_json())
+
+    try:
+        res = evaluator.evaluate(instructions=[req.instruction], 
+                                responses=[req.responses], 
+                                criteria=criteria)
+        return PairwiseEvalResponseModel(results=res)
+    except ApiResponseException as e:
+        if e.response.error == "Unauthorized":
+            throw_authorized_exception()
+        print('raised ApiResponseException')
+        print(e.response.error)
+        raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
+    except ApiNetworkException as e:
+        # I think the random errors thrown by BAM are of type ApiNetworkException, lets maintain error
+        # handling this way till we know better how they are thrown
+        print('raised ApiNetworkException')
+        print(e.response.error)
+        raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
+
+'''
+Single rubric evaluation endpoint
+TODO: Update endpoint path 
+'''
+@app.post("/evaluate/", response_model=RubricEvalResponseModel)
+async def evaluate(evalRequest: RubricEvalRequestModel):
     # Gen ai client
     BAM_API_URL = os.getenv("GENAI_API", None)  
     credentials = Credentials(api_key=evalRequest.bam_api_key, api_endpoint=BAM_API_URL)
     client = Client(credentials=credentials)
 
-    evaluator = RubricEvaluator(client=client)
+    evaluator = MixtralRubricEvaluator(client=client)
     rubric = Rubric.from_json(evalRequest.rubric.model_dump_json())
 
     # for some reason, if the api key is wrong genai doesn't throw an authorized error
@@ -218,7 +250,7 @@ async def evaluate(evalRequest: EvalRequestModel):
         res = evaluator.evaluate(contexts=[evalRequest.context]*len(evalRequest.responses), 
                                 responses=evalRequest.responses, 
                                 rubric=rubric)
-        return EvalResponseModel(results=res)
+        return RubricEvalResponseModel(results=res)
     except ApiResponseException as e:
         if e.response.error == "Unauthorized":
             throw_authorized_exception()
