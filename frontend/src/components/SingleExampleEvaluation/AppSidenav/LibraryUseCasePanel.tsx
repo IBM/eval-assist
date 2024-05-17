@@ -46,7 +46,6 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
       <div className={classes.content}>
         <div className={classes.prompts}>
           <section className={classes.section}>
-            {/* <h3 className={classes.sectionHeading}>My saved prompts</h3> */}
             <TreeView className={classes['tree-root']} label="">
               <TreeNode
                 id={'rubric'}

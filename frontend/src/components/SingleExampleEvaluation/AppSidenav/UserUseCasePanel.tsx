@@ -37,7 +37,6 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
       <div className={classes.content}>
         <div className={classes.prompts}>
           <section className={classes.section}>
-            {/* <h3 className={classes.sectionHeading}>My saved prompts</h3> */}
             {userUseCases.length == 0 ? (
               <p className={classes.emptyMessage}>No saved test cases</p>
             ) : (
@@ -53,7 +52,7 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
                       selected={selectedNode}
                       label={
                         <div className={classes['tree-node-content']}>
-                          {useCase.name}
+                          <span className={classes['tree-node-label']}>{useCase.name}</span>
                           <LinkButton useCase={useCase} />
                         </div>
                       }

@@ -24,7 +24,7 @@ export const withAuth = (Component: NextComponentType) => {
           post('user/', data).then((res) => {
             if (res.ok) {
               res.json().then((userInfo) => {
-                setBackendUserId(backendUserId)
+                setBackendUserId(userInfo.id)
               })
             } else {
               console.log('withAuth res is not OK!')
