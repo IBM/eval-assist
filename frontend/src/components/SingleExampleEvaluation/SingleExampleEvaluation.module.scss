@@ -2,11 +2,8 @@
 @import '@carbon/styles/scss/utilities/convert';
 @import '@carbon/styles/scss/spacing';
 
-.content {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  grid-template-rows: minmax(0, auto);
-  overflow: hidden;
+.cds--side-nav ~ .content {
+  margin-inline-start: rem(272px + 48px);
 }
 
 .body {

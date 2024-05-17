@@ -7,6 +7,7 @@ import { Categories, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 
 import { UseCase } from '@components/SingleExampleEvaluation/types'
 
+import layoutClasses from '../Layout.module.scss'
 import classes from './AppSidenav.module.scss'
 import { LibraryPanel } from './LibraryUseCasePanel'
 import { UserUseCasePanel } from './UserUseCasePanel'
@@ -49,8 +50,8 @@ export const AppSidenavNew = ({
   }
   return (
     <aside
-      className={cx(classes.root, {
-        [classes.expanded]: selected != null,
+      className={cx(classes.root, layoutClasses.sidebar, {
+        [layoutClasses.expanded]: selected != null,
       })}
     >
       <ul className={classes.items} role="tablist" aria-orientation="vertical">

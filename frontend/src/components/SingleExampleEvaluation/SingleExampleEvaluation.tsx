@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { LegacyRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -18,6 +19,7 @@ import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { EvaluateButton } from './EvaluateButton'
 import { EvaluationCriteria } from './EvaluationCriteria'
 import { EvaluationResults } from './EvaluationResults'
+import layoutClasses from './Layout.module.scss'
 import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
 import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
 import { NewUseCaseModal } from './Modals/NewUseCaseModal'
@@ -259,101 +261,99 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
 
   return (
     <>
-      <div className={classes.content}>
-        <AppSidenavNew
-          setConfirmationModalOpen={setConfirmationModalOpen}
-          setLibraryUseCaseSelected={setLibraryUseCaseSelected}
-          userUseCases={userUseCases}
-          currentUseCaseId={id}
-          selected={sidebarTabSelected}
-          setSelected={setSidebarTabSelected}
-          changesDetected={changesDetected}
-          setCurrentUseCase={setCurrentUseCase}
-        />
-        <div className={classes.body}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingBottom: '1rem',
-              marginBottom: '1rem',
-            }}
-            ref={popoverRef as LegacyRef<HTMLDivElement> | undefined}
-            className={`${classes['bottom-divider']} ${classes['left-padding']}`}
-          >
-            <h3>Evaluation sandbox</h3>
+      <AppSidenavNew
+        setConfirmationModalOpen={setConfirmationModalOpen}
+        setLibraryUseCaseSelected={setLibraryUseCaseSelected}
+        userUseCases={userUseCases}
+        currentUseCaseId={id}
+        selected={sidebarTabSelected}
+        setSelected={setSidebarTabSelected}
+        changesDetected={changesDetected}
+        setCurrentUseCase={setCurrentUseCase}
+      />
+      <div className={cx(layoutClasses['main-content'], classes.body)}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingBottom: '1rem',
+            marginBottom: '1rem',
+          }}
+          ref={popoverRef as LegacyRef<HTMLDivElement> | undefined}
+          className={`${classes['bottom-divider']} ${classes['left-padding']}`}
+        >
+          <h3>Evaluation sandbox</h3>
 
-            <APIKeyPopover
-              popoverOpen={popoverOpen}
-              setPopoverOpen={setPopoverOpen}
-              bamAPIKey={bamAPIKey}
-              setBamAPIKey={setBamAPIKey}
-            />
-          </div>
-          <UseCaseOptions
-            style={{ marginBottom: '1rem' }}
-            className={classes['left-padding']}
-            testCaseName={name}
-            isUseCaseSaved={isUseCaseSaved}
-            onSave={onSave}
-            useCaseName={name}
-            setUseCaseName={setName}
-            changesDetected={changesDetected}
-            setNewUseCaseModalOpen={setNewUseCaseModalOpen}
-            setDeleteUseCaseModalOpen={setDeleteUseCaseModalOpen}
-            setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
-            setEditNameModalOpen={setEditNameModalOpen}
-            setCurrentUseCase={setCurrentUseCase}
-          />
-          <EvaluationCriteria
-            className={classes['left-padding']}
-            rubric={rubric}
-            setRubric={setRubric}
-            style={{ marginBottom: '1rem' }}
-          />
-          <div style={{ marginBottom: '1rem' }} className={`${classes['left-padding']} cds--accordion-title`}>
-            Test data
-          </div>
-          <TextArea
-            onChange={(e) => setContext(e.target.value)}
-            rows={4}
-            value={context}
-            id="text-area-context"
-            labelText="Task context (optional)"
-            style={{ marginBottom: '1rem' }}
-            placeholder="Context information relevant to the evaluation such as prompt, data variables etc."
-            className={classes['left-padding']}
-          />
-
-          <Responses
-            responses={responses}
-            setResponses={setResponses}
-            style={{ marginBottom: '2rem' }}
-            className={classes['left-padding']}
-          />
-
-          <EvaluateButton
-            evaluationRunning={evaluationRunning}
-            runEvaluation={runEvaluation}
-            style={{ marginBottom: '1rem' }}
-            className={classes['left-padding']}
-          />
-          {bamAPIKey === '' && !evaluationRunning && results === null && !evaluationFailed && (
-            <p className={`${classes['left-padding']} ${classes['api-key-reminder-text']}`}>
-              {'You will need to provide your BAM API key to run the evaluation'}
-            </p>
-          )}
-          <EvaluationResults
-            className={classes['left-padding']}
-            results={results}
-            evaluationFailed={evaluationFailed}
-            evaluationError={evaluationError}
-            evaluationRunning={evaluationRunning}
-            style={{ marginBottom: '1rem' }}
+          <APIKeyPopover
+            popoverOpen={popoverOpen}
+            setPopoverOpen={setPopoverOpen}
+            bamAPIKey={bamAPIKey}
+            setBamAPIKey={setBamAPIKey}
           />
         </div>
+        <UseCaseOptions
+          style={{ marginBottom: '1rem' }}
+          className={classes['left-padding']}
+          testCaseName={name}
+          isUseCaseSaved={isUseCaseSaved}
+          onSave={onSave}
+          useCaseName={name}
+          setUseCaseName={setName}
+          changesDetected={changesDetected}
+          setNewUseCaseModalOpen={setNewUseCaseModalOpen}
+          setDeleteUseCaseModalOpen={setDeleteUseCaseModalOpen}
+          setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
+          setEditNameModalOpen={setEditNameModalOpen}
+          setCurrentUseCase={setCurrentUseCase}
+        />
+        <EvaluationCriteria
+          className={classes['left-padding']}
+          rubric={rubric}
+          setRubric={setRubric}
+          style={{ marginBottom: '1rem' }}
+        />
+        <div style={{ marginBottom: '1rem' }} className={`${classes['left-padding']} cds--accordion-title`}>
+          Test data
+        </div>
+        <TextArea
+          onChange={(e) => setContext(e.target.value)}
+          rows={4}
+          value={context}
+          id="text-area-context"
+          labelText="Task context (optional)"
+          style={{ marginBottom: '1rem' }}
+          placeholder="Context information relevant to the evaluation such as prompt, data variables etc."
+          className={classes['left-padding']}
+        />
+
+        <Responses
+          responses={responses}
+          setResponses={setResponses}
+          style={{ marginBottom: '2rem' }}
+          className={classes['left-padding']}
+        />
+
+        <EvaluateButton
+          evaluationRunning={evaluationRunning}
+          runEvaluation={runEvaluation}
+          style={{ marginBottom: '1rem' }}
+          className={classes['left-padding']}
+        />
+        {bamAPIKey === '' && !evaluationRunning && results === null && !evaluationFailed && (
+          <p className={`${classes['left-padding']} ${classes['api-key-reminder-text']}`}>
+            {'You will need to provide your BAM API key to run the evaluation'}
+          </p>
+        )}
+        <EvaluationResults
+          className={classes['left-padding']}
+          results={results}
+          evaluationFailed={evaluationFailed}
+          evaluationError={evaluationError}
+          evaluationRunning={evaluationRunning}
+          style={{ marginBottom: '1rem' }}
+        />
       </div>
       <SwitchUseCaseModal
         setCurrentUseCase={setCurrentUseCase}

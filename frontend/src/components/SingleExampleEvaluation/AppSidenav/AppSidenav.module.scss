@@ -1,17 +1,12 @@
 @use '@carbon/styles/scss/theme' as *;
 @use '@carbon/styles/scss/utilities/convert' as *;
-@use '@carbon/styles/scss/motion' as *;
 
 .root {
+  position: fixed;
   color: $text-primary;
   display: flex;
-  width: rem(48px);
   z-index: 1;
-  transition: width $duration-fast-02 motion(standard, productive);
-  height: 100%;
-  &.expanded {
-    width: rem(272px + 48px);
-  }
+  background-color: $background;
 }
 
 .items {
