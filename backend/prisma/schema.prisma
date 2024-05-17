@@ -16,19 +16,20 @@ model StoredUseCase {
   id      Int    @id @default(autoincrement())
   user_id Int
   content Json
-  name    String @unique
+  name    String
 
   app_user AppUser @relation(fields: [user_id], references: [id])
 
+  @@unique([user_id, name])
   @@map("stored_use_case")
 }
 
 model AppUser {
   id               Int             @id @default(autoincrement())
   email            String          @unique
-  name             String          
+  name             String
   stored_use_cases StoredUseCase[]
-  
+
   @@map("app_user")
 }
 
