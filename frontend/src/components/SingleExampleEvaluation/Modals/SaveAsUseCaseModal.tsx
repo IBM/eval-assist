@@ -17,7 +17,7 @@ export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs }: Props) => {
     <Modal
       open={open}
       onRequestClose={() => setOpen(false)}
-      modalHeading={`Save Use Case`}
+      modalHeading={`Save Test Case`}
       primaryButtonText="Confirm"
       primaryButtonDisabled={savingUseCase}
       secondaryButtonText="Cancel"

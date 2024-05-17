@@ -29,7 +29,7 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
   return (
     <section className={cx(classes.root)}>
       <header className={classes.header}>
-        <h2 className={classes.heading}>My Use Cases</h2>
+        <h2 className={classes.heading}>My Test Cases</h2>
         <IconButton label="Close" align="right" kind="ghost" onClick={onClose}>
           <ChevronLeft />
         </IconButton>

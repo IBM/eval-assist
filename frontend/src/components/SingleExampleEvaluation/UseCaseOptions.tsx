@@ -45,7 +45,7 @@ export const UseCaseOptions = ({
   }
   return (
     <div style={{ ...style, display: 'flex', flexDirection: 'row', alignItems: 'center' }} className={className}>
-      <h4 style={{ paddingRight: '0.5rem' }}>{isUseCaseSaved ? useCaseName : 'Unsaved Use Case'}</h4>
+      <h4 style={{ paddingRight: '0.5rem' }}>{isUseCaseSaved ? useCaseName : 'Unsaved Test Case'}</h4>
       {isUseCaseSaved && (
         <IconButton
           style={{ marginRight: '0.5rem' }}
@@ -82,7 +82,7 @@ export const UseCaseOptions = ({
           }
         }}
       >
-        {'New Use Case'}
+        {'New Test Case'}
       </Button>
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
       <Button
@@ -93,7 +93,7 @@ export const UseCaseOptions = ({
           setDeleteUseCaseModalOpen(true)
         }}
       >
-        {'Delete Use Case'}
+        {'Delete Test Case'}
       </Button>
     </div>
   )

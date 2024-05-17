@@ -206,7 +206,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
     // notify the user
     addToast({
       kind: 'success',
-      title: `Use case was saved`,
+      title: `Test case saved`,
       timeout: 5000,
     })
   }

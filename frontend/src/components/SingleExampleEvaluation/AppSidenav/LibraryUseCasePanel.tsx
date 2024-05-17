@@ -38,7 +38,7 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
   return (
     <section className={cx(classes.root)}>
       <header className={classes.header}>
-        <h2 className={classes.heading}>Use Case library</h2>
+        <h2 className={classes.heading}>Test Case library</h2>
         <IconButton label="Close" align="right" kind="ghost" onClick={onClose}>
           <ChevronLeft />
         </IconButton>
@@ -75,8 +75,8 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
                 onToggle={() => handleToggle('pairwise')}
                 isExpanded={expanded['pairwise']}
               >
-                <TreeNode label={'Use Case 1'} key={1} />
-                <TreeNode label={'Use Case 2'} key={2} />
+                <TreeNode label={'Test Case 1'} key={1} />
+                <TreeNode label={'Test Case 2'} key={2} />
               </TreeNode>
             </TreeView>
           </section>
