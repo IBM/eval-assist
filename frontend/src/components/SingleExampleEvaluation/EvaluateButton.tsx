@@ -9,15 +9,22 @@ interface EvaluateButtonProps {
   runEvaluation: () => Promise<void>
   style?: CSSProperties
   className?: string
+  bamAPIKey: string
 }
 
-export const EvaluateButton = ({ evaluationRunning, runEvaluation, style, className }: EvaluateButtonProps) => {
+export const EvaluateButton = ({
+  evaluationRunning,
+  bamAPIKey,
+  runEvaluation,
+  style,
+  className,
+}: EvaluateButtonProps) => {
   return (
     <div style={style} className={className}>
       {evaluationRunning ? (
         <InlineLoading description={'Running evaluation...'} status={'active'} className={classes['loading-wrapper']} />
       ) : (
-        <Button onClick={runEvaluation} disabled={evaluationRunning}>
+        <Button onClick={runEvaluation} disabled={evaluationRunning || bamAPIKey === ''}>
           Evaluate
         </Button>
       )}

@@ -338,6 +338,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
         <EvaluateButton
           evaluationRunning={evaluationRunning}
           runEvaluation={runEvaluation}
+          bamAPIKey={bamAPIKey}
           style={{ marginBottom: '1rem' }}
           className={classes['left-padding']}
         />
