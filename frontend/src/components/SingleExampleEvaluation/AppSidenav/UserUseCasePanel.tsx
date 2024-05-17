@@ -38,26 +38,30 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
         <div className={classes.prompts}>
           <section className={classes.section}>
             {/* <h3 className={classes.sectionHeading}>My saved prompts</h3> */}
-            <div className={classes['tree-wrapper']}>
-              <TreeView className={classes['tree-root']} label={''} hideLabel selected={selectedNode}>
-                {userUseCases.map((useCase) => (
-                  <TreeNode
-                    onSelect={() => {
-                      onUseCaseClick(useCase)
-                    }}
-                    key={`${useCase.id}`}
-                    id={`${useCase.id}`}
-                    selected={selectedNode}
-                    label={
-                      <div className={classes['tree-node-content']}>
-                        {useCase.name}
-                        <LinkButton useCase={useCase} />
-                      </div>
-                    }
-                  />
-                ))}
-              </TreeView>
-            </div>
+            {userUseCases.length == 0 ? (
+              <p className={classes.emptyMessage}>No saved test cases</p>
+            ) : (
+              <div className={classes['tree-wrapper']}>
+                <TreeView className={classes['tree-root']} label={''} hideLabel selected={selectedNode}>
+                  {userUseCases.map((useCase) => (
+                    <TreeNode
+                      onSelect={() => {
+                        onUseCaseClick(useCase)
+                      }}
+                      key={`${useCase.id}`}
+                      id={`${useCase.id}`}
+                      selected={selectedNode}
+                      label={
+                        <div className={classes['tree-node-content']}>
+                          {useCase.name}
+                          <LinkButton useCase={useCase} />
+                        </div>
+                      }
+                    />
+                  ))}
+                </TreeView>
+              </div>
+            )}
           </section>
         </div>
       </div>
