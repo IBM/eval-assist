@@ -58,7 +58,7 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
   return (
     <div style={style}>
       <Accordion>
-        <AccordionItem title="Evaluation Criteria" className={classes['accordion-wrapper']} open>
+        <AccordionItem title={<h5>Evaluation Criteria</h5>} className={classes['accordion-wrapper']} open>
           <div>
             <Tabs selectedIndex={selectedTabIndex} onChange={onSelectedIndexChange}>
               <TabList aria-label="List of tabs" contained>

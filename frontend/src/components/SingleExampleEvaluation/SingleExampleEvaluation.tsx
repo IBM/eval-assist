@@ -25,6 +25,7 @@ import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
 import { NewUseCaseModal } from './Modals/NewUseCaseModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
+import { PipelineSelect } from './PipelineSelect'
 import { Responses } from './Responses'
 import classes from './SingleExampleEvaluation.module.scss'
 import { UseCaseOptions } from './UseCaseOptions'
@@ -308,15 +309,20 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
           setEditNameModalOpen={setEditNameModalOpen}
           setCurrentUseCase={setCurrentUseCase}
         />
+
         <EvaluationCriteria
           className={classes['left-padding']}
           rubric={rubric}
           setRubric={setRubric}
-          style={{ marginBottom: '1rem' }}
+          style={{ marginBottom: '0rem' }}
         />
-        <div style={{ marginBottom: '1rem' }} className={`${classes['left-padding']} cds--accordion-title`}>
-          Test data
+
+        <PipelineSelect type={'rubric'} style={{ marginBottom: '.75rem' }}></PipelineSelect>
+
+        <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>
+          <strong>Test data</strong>
         </div>
+
         <TextArea
           onChange={(e) => setContext(e.target.value)}
           rows={4}
@@ -342,6 +348,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
           style={{ marginBottom: '1rem' }}
           className={classes['left-padding']}
         />
+
         {bamAPIKey === '' && !evaluationRunning && results === null && !evaluationFailed && (
           <p className={`${classes['left-padding']} ${classes['api-key-reminder-text']}`}>
             {'You will need to provide your BAM API key to run the evaluation'}
