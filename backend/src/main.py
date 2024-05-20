@@ -13,7 +13,9 @@ import json
 from genai import Credentials, Client
 from prisma.models import StoredUseCase
 from prisma.errors import PrismaError
-from llmasajudge.evaluators import Rubric, MixtralRubricEvaluator, PairwiseCriteria, MixtralPairwiseEvaluator
+from llmasajudge.evaluators import Rubric, PairwiseCriteria
+from llmasajudge.evaluators import MixtralRubricEvaluator, Llama3InstructRubricEvaluator
+from llmasajudge.evaluators import MixtralPairwiseEvaluator, Llama3InstructPairwiseEvaluator
 from genai.exceptions import ApiResponseException, ApiNetworkException
 import os
 import json
@@ -176,22 +178,34 @@ def throw_unknown_pipeline_exception():
 # Map API pipeline names to library instantiations
 name_to_pipeline = {
     RUBRIC_TYPE: {
-        "mistralai/mixtral-8x7b-instruct-v01": MixtralRubricEvaluator,
+        "mistralai/mixtral-8x7b-instruct-v01": lambda client : MixtralRubricEvaluator(client=client),
+        "meta-llama/llama-3-8b-instruct": lambda client : Llama3InstructRubricEvaluator(client=client, model_id="meta-llama/llama-3-8b-instruct"),
+        "meta-llama/llama-3-70b-instruct": lambda client : Llama3InstructRubricEvaluator(client=client, model_id="meta-llama/llama-3-70b-instruct"),
     },
     PAIRWISE_TYPE: {
-        "mistralai/mixtral-8x7b-instruct-v01": MixtralPairwiseEvaluator,
+        "mistralai/mixtral-8x7b-instruct-v01": lambda client : MixtralPairwiseEvaluator(client=client),
+        "meta-llama/llama-3-8b-instruct": lambda client : Llama3InstructPairwiseEvaluator(client=client, model_id="meta-llama/llama-3-8b-instruct"),
+        "meta-llama/llama-3-70b-instruct": lambda client : Llama3InstructPairwiseEvaluator(client=client, model_id="meta-llama/llama-3-70b-instruct"),
     }
 }
+
+def is_pipeline_valid(pipeline: str, type: str):
+    return pipeline in name_to_pipeline[type]
+
+def get_pipeline(type: str, pipeline: str, client: Client):
+    return name_to_pipeline[type][pipeline](client=client)
 
 '''
 Get the list of available pipelines, as supported by llm-as-a-judge library
 '''
 @app.get("/pipelines/", response_model=PipelinesResponseModel)
 async def get_pipelines():
-    return PipelinesResponseModel(pipelines=[
-        PipelineModel(name="mistralai/mixtral-8x7b-instruct-v01", type=RUBRIC_TYPE),
-        PipelineModel(name="mistralai/mixtral-8x7b-instruct-v01", type=PAIRWISE_TYPE),
-    ])
+    available_pipelines = []
+    for type, pipelines in name_to_pipeline.items():
+        for pipeline_name in pipelines.keys():
+            available_pipelines.append(PipelineModel(name=pipeline_name, type=type))
+    return PipelinesResponseModel(pipelines=available_pipelines)
+
 
 '''
 Single pairwise evaluation endpoint
@@ -203,11 +217,10 @@ async def evaluate(req: PairwiseEvalRequestModel):
     credentials = Credentials(api_key=req.bam_api_key, api_endpoint=BAM_API_URL)
     client = Client(credentials=credentials)
 
-    if req.pipeline not in name_to_pipeline[PAIRWISE_TYPE]:
+    if not is_pipeline_valid(pipeline=req.pipeline, type=PAIRWISE_TYPE):
         throw_unknown_pipeline_exception()
     
-    eval_pipeline = name_to_pipeline[PAIRWISE_TYPE][req.pipeline]
-    evaluator = eval_pipeline(client=client)
+    evaluator = get_pipeline(type=PAIRWISE_TYPE, pipeline=req.pipeline, client=client)
     criteria = PairwiseCriteria.from_json(req.criteria.model_dump_json())
 
     try:
