@@ -142,7 +142,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
       response = await post('evaluate/pairwise/', {
         instruction: context,
         responses,
-        criteria: { name: criteria.name, description: criteria.criteria },
+        criteria: { name: criteria.name, criteria: criteria.criteria },
         bam_api_key: bamAPIKey,
         pipeline: selectedPipeline,
       })
