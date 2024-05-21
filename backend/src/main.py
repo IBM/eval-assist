@@ -13,9 +13,10 @@ import json
 from genai import Credentials, Client
 from prisma.models import StoredUseCase
 from prisma.errors import PrismaError
-from llmasajudge.evaluators import Rubric, PairwiseCriteria
+from llmasajudge.evaluators import RubricCriteria, PairwiseCriteria
 from llmasajudge.evaluators import MixtralRubricEvaluator, Llama3InstructRubricEvaluator
 from llmasajudge.evaluators import MixtralPairwiseEvaluator, Llama3InstructPairwiseEvaluator
+from llmasajudge.evaluators import PrometheusPairwiseEvaluator, PrometheusRubricEvaluator
 from genai.exceptions import ApiResponseException, ApiNetworkException
 import os
 import json
@@ -176,16 +177,19 @@ def throw_unknown_pipeline_exception():
     raise HTTPException(status_code=401, detail=f"Unknown evaluation pipeline." )
 
 # Map API pipeline names to library instantiations
+# TODO: This should be moved to library
 name_to_pipeline = {
     RUBRIC_TYPE: {
         "mistralai/mixtral-8x7b-instruct-v01": lambda client : MixtralRubricEvaluator(client=client),
         "meta-llama/llama-3-8b-instruct": lambda client : Llama3InstructRubricEvaluator(client=client, model_id="meta-llama/llama-3-8b-instruct"),
         "meta-llama/llama-3-70b-instruct": lambda client : Llama3InstructRubricEvaluator(client=client, model_id="meta-llama/llama-3-70b-instruct"),
+        "kaist-ai/prometheus-8x7b-v2": lambda client : PrometheusRubricEvaluator(client=client),
     },
     PAIRWISE_TYPE: {
         "mistralai/mixtral-8x7b-instruct-v01": lambda client : MixtralPairwiseEvaluator(client=client),
         "meta-llama/llama-3-8b-instruct": lambda client : Llama3InstructPairwiseEvaluator(client=client, model_id="meta-llama/llama-3-8b-instruct"),
         "meta-llama/llama-3-70b-instruct": lambda client : Llama3InstructPairwiseEvaluator(client=client, model_id="meta-llama/llama-3-70b-instruct"),
+        "kaist-ai/prometheus-8x7b-v2": lambda client : PrometheusPairwiseEvaluator(client=client),
     }
 }
 
@@ -253,7 +257,7 @@ async def evaluate(evalRequest: RubricEvalRequestModel):
     client = Client(credentials=credentials)
 
     evaluator = MixtralRubricEvaluator(client=client)
-    rubric = Rubric.from_json(evalRequest.rubric.model_dump_json())
+    rubric = RubricCriteria.from_json(evalRequest.rubric.model_dump_json())
 
     # for some reason, if the api key is wrong genai doesn't throw an authorized error
     if evalRequest.bam_api_key == '':

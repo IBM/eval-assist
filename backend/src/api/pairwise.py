@@ -1,9 +1,9 @@
 from pydantic import BaseModel, validator
-from typing import List
+from typing import List, Optional
 
 class PairwiseCriteriaModel(BaseModel):
     name: str
-    description: str
+    criteria: str
 
 class PairwiseEvalRequestModel(BaseModel):
     instruction: str
@@ -33,8 +33,8 @@ class PairwiseEvalRequestModel(BaseModel):
 class PairwiseEvalResultModel(BaseModel):
     w_index: int
     explanation: str
-    entropy: float
-    p_bias: bool
+    entropy: Optional[float] = None
+    p_bias: Optional[bool] = None
 
 class PairwiseEvalResponseModel(BaseModel):
     results: List[PairwiseEvalResultModel]

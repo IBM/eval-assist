@@ -1,5 +1,5 @@
 from pydantic import BaseModel, validator
-from typing import List
+from typing import List, Optional
 
 class RubricOptionModel(BaseModel):
     option: str
@@ -30,7 +30,8 @@ class RubricEvalRequestModel(BaseModel):
 class RubricEvalResultModel(BaseModel):
     option: str
     explanation: str
-    p_bias: bool
+    p_bias: Optional[bool] = None
+    entropy: Optional[float] = None
 
 class RubricEvalResponseModel(BaseModel):
     results: List[RubricEvalResultModel]
