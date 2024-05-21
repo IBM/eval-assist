@@ -44,7 +44,7 @@ export const EvaluationResults = ({
         label={
           <p style={{ textAlign: 'center' }}>
             {
-              'Positional bias occurs when the LLM evaluator is unable to consistenly choose a rubric value. Results that exhibit positional bias are uncertain and cannot be trusted.'
+              'Positional bias occurs when the LLM evaluator is unable to consistently choose a preferred response. Results that exhibit positional bias are uncertain and cannot be trusted.'
             }
           </p>
         }
