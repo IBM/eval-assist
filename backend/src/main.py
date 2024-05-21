@@ -245,7 +245,7 @@ async def evaluate(req: PairwiseEvalRequestModel):
 Single rubric evaluation endpoint
 TODO: Update endpoint path 
 '''
-@app.post("/evaluate/", response_model=RubricEvalResponseModel)
+@app.post("/evaluate/rubric/", response_model=RubricEvalResponseModel)
 async def evaluate(evalRequest: RubricEvalRequestModel):
     # Gen ai client
     BAM_API_URL = os.getenv("GENAI_API", None)  
