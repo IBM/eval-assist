@@ -210,7 +210,6 @@ async def get_pipelines():
             available_pipelines.append(PipelineModel(name=pipeline_name, type=type))
     return PipelinesResponseModel(pipelines=available_pipelines)
 
-
 '''
 Single pairwise evaluation endpoint
 '''
@@ -250,23 +249,22 @@ Single rubric evaluation endpoint
 TODO: Update endpoint path 
 '''
 @app.post("/evaluate/rubric/", response_model=RubricEvalResponseModel)
-async def evaluate(evalRequest: RubricEvalRequestModel):
+async def evaluate(req: RubricEvalRequestModel):
     # Gen ai client
     BAM_API_URL = os.getenv("GENAI_API", None)  
-    credentials = Credentials(api_key=evalRequest.bam_api_key, api_endpoint=BAM_API_URL)
+    credentials = Credentials(api_key=req.bam_api_key, api_endpoint=BAM_API_URL)
     client = Client(credentials=credentials)
 
-    evaluator = MixtralRubricEvaluator(client=client)
-    rubric = RubricCriteria.from_json(evalRequest.rubric.model_dump_json())
+    if not is_pipeline_valid(pipeline=req.pipeline, type=PAIRWISE_TYPE):
+        throw_unknown_pipeline_exception()
 
-    # for some reason, if the api key is wrong genai doesn't throw an authorized error
-    if evalRequest.bam_api_key == '':
-        throw_authorized_exception()
+    evaluator = get_pipeline(type=RUBRIC_TYPE, pipeline=req.pipeline, client=client)
+    criteria = RubricCriteria.from_json(req.rubric.model_dump_json())
 
     try:
-        res = evaluator.evaluate(contexts=[evalRequest.context]*len(evalRequest.responses), 
-                                responses=evalRequest.responses, 
-                                rubric=rubric)
+        res = evaluator.evaluate(contexts=[req.context]*len(req.responses), 
+                                responses=req.responses, 
+                                rubric=criteria)
         return RubricEvalResponseModel(results=res)
     except ApiResponseException as e:
         if e.response.error == "Unauthorized":

@@ -20,7 +20,20 @@ class RubricEvalRequestModel(BaseModel):
     responses: List[str]
     rubric: RubricModel
     bam_api_key: str
+    pipeline: str
 
+    @validator('bam_api_key', pre=True, always=True)
+    def validate_api_key(cls, key):
+        if not key:
+            raise ValueError("API Key is required.")
+        return key
+
+    @validator('pipeline', pre=True, always=True)
+    def validate_pipeline(cls, pipeline):
+        if not pipeline:
+            raise ValueError("Pipeline name is required.")
+        return pipeline
+    
     @validator('responses', pre=True, always=True)
     def validate_responses_length(cls, value):
         if len(value) == 0:
