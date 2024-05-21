@@ -14,8 +14,6 @@ interface Props {
 }
 
 export const SwitchUseCaseModal = ({ open, setOpen, setCurrentUseCase, selectedUseCase }: Props) => {
-  const router = useRouter()
-
   return (
     selectedUseCase && (
       <Modal
@@ -30,7 +28,7 @@ export const SwitchUseCaseModal = ({ open, setOpen, setCurrentUseCase, selectedU
           setCurrentUseCase(selectedUseCase)
         }}
       >
-        <p>{`This action will replace your ongoing work with the selected use case.`}</p>
+        <p>{`This action will replace your ongoing work with the selected test case.`}</p>
       </Modal>
     )
   )

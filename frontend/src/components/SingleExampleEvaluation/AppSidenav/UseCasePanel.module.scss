@@ -86,6 +86,7 @@
   border: none;
   padding: $spacing-02;
   height: rem(24px);
+  align-self: start;
   cursor: pointer;
   svg {
     fill: $link-primary;

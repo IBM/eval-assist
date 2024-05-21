@@ -1,0 +1,13 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/spacing';
+@import '@carbon/colors';
+@import '@carbon/styles/scss/type';
+
+.bottom-padding :global .cds--modal-content {
+  padding-bottom: 1rem;
+}
+
+.danger-text {
+  color: $text-error;
+}

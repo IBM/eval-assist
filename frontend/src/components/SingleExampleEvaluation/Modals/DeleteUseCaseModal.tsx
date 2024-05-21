@@ -29,7 +29,7 @@ export const DeleteUseCaseModal = ({ open, setOpen, onDeleteUseCase, useCaseName
         setDeletingUseCase(false)
       }}
     >
-      <p>{`This action will permanently delete the current use case.`}</p>
+      <p>{`This action will permanently delete the current test case.`}</p>
     </Modal>
   )
 }

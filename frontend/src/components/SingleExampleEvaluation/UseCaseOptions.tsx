@@ -6,7 +6,8 @@ import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/
 import { getEmptyUseCase } from '@utils/utils'
 
 import classes from './SingleExampleEvaluation.module.scss'
-import { UseCase } from './types'
+import { UseCaseTypeBadge } from './UseCaseTypeBadge'
+import { PipelineType, UseCase } from './types'
 
 interface UseCaseOptionsProps {
   style?: CSSProperties
@@ -14,6 +15,7 @@ interface UseCaseOptionsProps {
   testCaseName: string
   isUseCaseSaved: boolean
   useCaseName: string
+  type: PipelineType
   changesDetected: boolean
   onSave: () => Promise<void>
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
@@ -28,6 +30,7 @@ export const UseCaseOptions = ({
   style,
   className,
   useCaseName,
+  type,
   isUseCaseSaved,
   setSaveUseCaseModalOpen,
   onSave,
@@ -57,6 +60,8 @@ export const UseCaseOptions = ({
         </IconButton>
       )}
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
+      <UseCaseTypeBadge type={type} style={{ paddingInline: '0.5rem' }} />
+      <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
 
       <Button
         disabled={savingUseCase || !isUseCaseSaved || !changesDetected}
@@ -75,11 +80,7 @@ export const UseCaseOptions = ({
         kind="ghost"
         renderIcon={Add}
         onClick={() => {
-          if (changesDetected) {
-            setNewUseCaseModalOpen(true)
-          } else {
-            setCurrentUseCase(getEmptyUseCase())
-          }
+          setNewUseCaseModalOpen(true)
         }}
       >
         {'New Test Case'}

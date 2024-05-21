@@ -15,28 +15,28 @@ import {
 } from '@carbon/react'
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 
-import { isInstanceOfRubric } from '@utils/utils'
+import { isInstanceOfRubricCriteria } from '@utils/utils'
 
-import { JSONTextArea } from './JSONTextArea'
-import classes from './SingleExampleEvaluation.module.scss'
-import { Rubric } from './types'
+import { JSONTextArea } from '../JSONTextArea'
+import classes from '../SingleExampleEvaluation.module.scss'
+import { RubricCriteria } from '../types'
 
 interface EvaluationCriteriaProps {
-  rubric: Rubric
-  setRubric: Dispatch<SetStateAction<Rubric>>
+  rubricCriteria: RubricCriteria
+  setCriteria: Dispatch<SetStateAction<RubricCriteria>>
   style?: CSSProperties
   className?: string
 }
 
-export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCriteriaProps) => {
-  const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(rubric.title === '')
+export const RubricCriteriaView = ({ rubricCriteria, setCriteria, style }: EvaluationCriteriaProps) => {
+  const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(rubricCriteria.name === '')
   const [selectedTabIndex, setSelectedTabIndex] = useState(0)
   const [rawJSONCriteria, setRawJSONCriteria] = useState('')
 
   const isValidRawJSONCriteria = (jsonCriteria: string) => {
     try {
       const rawJSONCriteriaObj = JSON.parse(jsonCriteria)
-      return isInstanceOfRubric(rawJSONCriteriaObj)
+      return isInstanceOfRubricCriteria(rawJSONCriteriaObj)
     } catch {
       return false
     }
@@ -48,10 +48,10 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
     if (e.selectedIndex === 0 && selectedTabIndex === 1) {
       if (isValidRawJSONCriteria(rawJSONCriteria)) {
         const newRawJSONCriteriaObj = JSON.parse(rawJSONCriteria)
-        setRubric(newRawJSONCriteriaObj)
+        setCriteria(newRawJSONCriteriaObj)
       }
     } else if (e.selectedIndex === 1 && selectedTabIndex === 0) {
-      setRawJSONCriteria(JSON.stringify(rubric, null, 4))
+      setRawJSONCriteria(JSON.stringify(rubricCriteria, null, 4))
     }
   }
 
@@ -89,15 +89,15 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                           {isEditingCriteriaTitle ? (
                             <TextInput
                               labelText=""
-                              value={rubric.title}
-                              onChange={(e) => setRubric({ ...rubric, title: e.target.value })}
+                              value={rubricCriteria.name}
+                              onChange={(e) => setCriteria({ ...rubricCriteria, name: e.target.value })}
                               readOnly={!isEditingCriteriaTitle}
                               id="text-input-criteria-title"
                               placeholder="Criteria title"
                               style={{ width: '95%' }}
                             />
                           ) : (
-                            <h4 style={{ width: '95%' }}>{rubric.title}</h4>
+                            <h4 style={{ width: '95%' }}>{rubricCriteria.name}</h4>
                           )}
                           {isEditingCriteriaTitle ? (
                             <IconButton onClick={() => setIsEditingCriteriaTitle(false)} kind="ghost" label={'Save'}>
@@ -116,14 +116,14 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                         </Tooltip> */}
                       </div>
                       <TextInput
-                        onChange={(e) => setRubric({ ...rubric, criteria: e.target.value })}
-                        value={rubric.criteria}
+                        onChange={(e) => setCriteria({ ...rubricCriteria, criteria: e.target.value })}
+                        value={rubricCriteria.criteria}
                         id="text-area-evaluation-instruction"
                         labelText="Description"
                         style={{ marginBottom: '1rem' }}
                         placeholder="Describe your evaluation criteria as a question e.g Is the response gramatically correct?"
                       />
-                      {rubric.options.map((scale, i) => (
+                      {rubricCriteria.options.map((scale, i) => (
                         <div
                           style={{
                             display: 'flex',
@@ -139,12 +139,12 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                               value={scale.option}
                               placeholder="Answer"
                               onChange={(e) =>
-                                setRubric({
-                                  ...rubric,
+                                setCriteria({
+                                  ...rubricCriteria,
                                   options: [
-                                    ...rubric.options.slice(0, i),
-                                    { option: e.target.value, description: rubric.options[i].description },
-                                    ...rubric.options.slice(i + 1),
+                                    ...rubricCriteria.options.slice(0, i),
+                                    { option: e.target.value, description: rubricCriteria.options[i].description },
+                                    ...rubricCriteria.options.slice(i + 1),
                                   ],
                                 })
                               }
@@ -160,12 +160,12 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                               id={`criteria-option-definition-${i}`}
                               placeholder="State the condition under which the answer is selected."
                               onChange={(e) =>
-                                setRubric({
-                                  ...rubric,
+                                setCriteria({
+                                  ...rubricCriteria,
                                   options: [
-                                    ...rubric.options.slice(0, i),
-                                    { option: rubric.options[i].option, description: e.target.value },
-                                    ...rubric.options.slice(i + 1),
+                                    ...rubricCriteria.options.slice(0, i),
+                                    { option: rubricCriteria.options[i].option, description: e.target.value },
+                                    ...rubricCriteria.options.slice(i + 1),
                                   ],
                                 })
                               }
@@ -173,14 +173,17 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                           </div>
 
                           <div style={{ width: '5%' }}>
-                            {rubric.options.length > 2 && (
+                            {rubricCriteria.options.length > 2 && (
                               <IconButton
                                 label={'Remove'}
                                 size="sm"
                                 kind="ghost"
                                 style={{ marginTop: '24px' }}
                                 onClick={() =>
-                                  setRubric({ ...rubric, options: rubric.options.filter((s, j) => j !== i) })
+                                  setCriteria({
+                                    ...rubricCriteria,
+                                    options: rubricCriteria.options.filter((s, j) => j !== i),
+                                  })
                                 }
                               >
                                 <TrashCan />
@@ -192,7 +195,10 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                       <Button
                         size="sm"
                         onClick={() =>
-                          setRubric({ ...rubric, options: [...rubric.options, { option: '', description: '' }] })
+                          setCriteria({
+                            ...rubricCriteria,
+                            options: [...rubricCriteria.options, { option: '', description: '' }],
+                          })
                         }
                         renderIcon={Add}
                         kind="tertiary"
@@ -210,6 +216,7 @@ export const EvaluationCriteria = ({ rubric, setRubric, style }: EvaluationCrite
                     isValidRawJSONCriteria={isValidRawJSONCriteria}
                     rawJSONCriteria={rawJSONCriteria}
                     setRawJSONCriteria={setRawJSONCriteria}
+                    rowCount={18}
                   />
                 </TabPanel>
               </TabPanels>

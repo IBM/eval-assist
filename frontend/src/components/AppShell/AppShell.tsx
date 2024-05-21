@@ -1,5 +1,3 @@
-import cx from 'classnames'
-
 import { ReactNode } from 'react'
 
 import { unstable_FeatureFlags as FeatureFlags } from '@carbon/react'

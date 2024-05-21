@@ -1,0 +1,9 @@
+@import '@carbon/styles/scss/theme';
+
+.winner-response :global .cds--text-area__wrapper .cds--text-area {
+  border: solid $support-success !important;
+}
+
+.winner-text {
+  color: $support-success;
+}

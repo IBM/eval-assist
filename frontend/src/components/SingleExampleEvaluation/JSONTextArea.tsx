@@ -8,6 +8,7 @@ interface JSONTextAreaInterface {
   setRawJSONCriteria: Dispatch<SetStateAction<string>>
   isValidRawJSONCriteria: (str: string) => boolean
   style?: CSSProperties
+  rowCount: number
 }
 
 export const JSONTextArea = ({
@@ -15,6 +16,7 @@ export const JSONTextArea = ({
   setRawJSONCriteria,
   isValidRawJSONCriteria,
   style,
+  rowCount,
 }: JSONTextAreaInterface) => {
   const onRawJSONCriteriaChange = useCallback(
     (e: { target: { value: string } }) => {
@@ -51,7 +53,7 @@ export const JSONTextArea = ({
           onChange={onRawJSONCriteriaChange}
           id="text-input-json-raw"
           placeholder="Input evaluation criteria in json format"
-          rows={18}
+          rows={rowCount}
           invalid={!isValidRawJSONCriteria(rawJSONCriteria)}
           invalidText={'JSON input is invalid'}
           // style={{ backgroundColor: 'white' }}

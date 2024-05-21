@@ -9,8 +9,9 @@ import { StoredUseCase } from '@prisma/client'
 import { get } from '@utils/fetchUtils'
 import { getEmptyUseCase, parseFetchedUseCase } from '@utils/utils'
 
+import { PipelineTypesProvider } from './PipelineTypesProvider'
 import { SingleExampleEvaluation } from './SingleExampleEvaluation'
-import { UseCase } from './types'
+import { PipelineType, UseCase } from './types'
 
 export const SingleExampleEvaluationWithProps = () => {
   const [loadingUseCases, setLoadingUseCases] = useState(false)
@@ -23,12 +24,18 @@ export const SingleExampleEvaluationWithProps = () => {
   const currentUseCase = useMemo(
     () =>
       useCaseId === null
-        ? getEmptyUseCase()
+        ? null
         : useCases !== null
         ? (useCases.find((userUseCase) => userUseCase.id === useCaseId) as UseCase)
         : null,
     [useCases, useCaseId],
   )
+
+  // useEffect(() => {
+  //   if (currentUseCase === undefined) {
+  //     router.push({ pathname: '/' }, `/`, { shallow: true })
+  //   }
+  // }, [currentUseCase, router])
 
   useEffect(() => {
     const fetchUseCases = async () => {
@@ -43,7 +50,11 @@ export const SingleExampleEvaluationWithProps = () => {
     fetchUseCases()
   }, [getUserName])
 
-  if (loadingUseCases || useCases === null || currentUseCase === null) return <Loading withOverlay />
+  if (loadingUseCases || useCases === null) return <Loading withOverlay />
 
-  return <SingleExampleEvaluation _userUseCases={useCases} currentUseCase={currentUseCase} />
+  return (
+    <PipelineTypesProvider>
+      <SingleExampleEvaluation _userUseCases={useCases} currentUseCase={currentUseCase} />
+    </PipelineTypesProvider>
+  )
 }

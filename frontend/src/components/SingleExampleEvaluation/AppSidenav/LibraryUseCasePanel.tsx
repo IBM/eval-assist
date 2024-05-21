@@ -6,21 +6,17 @@ import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
 // @ts-ignore
 import { TreeNode, TreeView } from '@carbon/react'
-import { ChevronLeft, Tree } from '@carbon/react/icons'
+import { ChevronLeft } from '@carbon/react/icons'
+
+import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 
 import { useCases } from '../UseCaseLibrary'
-import { UseCase } from '../types'
+import { PipelineType, UseCase } from '../types'
 import classes from './UseCasePanel.module.scss'
 
 interface Props {
   onUseCaseClick: (useCase: UseCase) => void
   onClose: () => void
-}
-
-interface TreeNodeParentControlledProps {
-  label: string
-  children: ReactNode
-  id: string
 }
 
 export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
@@ -49,33 +45,47 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
             <TreeView className={classes['tree-root']} label="">
               <TreeNode
                 id={'rubric'}
-                label="Rubric"
+                label={RUBRIC_NAME}
                 onSelect={() => handleToggle('rubric')}
                 onToggle={() => handleToggle('rubric')}
                 isExpanded={expanded['rubric']}
               >
-                {useCases.map((useCase, i) => (
-                  <TreeNode
-                    id={useCase.name}
-                    label={useCase.name}
-                    key={useCase.name}
-                    onClick={(e: any) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      onUseCaseClick(useCase)
-                    }}
-                  />
-                ))}
+                {useCases
+                  .filter((u) => u.type === PipelineType.RUBRIC)
+                  .map((useCase, i) => (
+                    <TreeNode
+                      id={useCase.name}
+                      label={useCase.name}
+                      key={useCase.name}
+                      onClick={(e: any) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        onUseCaseClick(useCase)
+                      }}
+                    />
+                  ))}
               </TreeNode>
               <TreeNode
                 id={'pairwise'}
-                label="Pairwise"
+                label={PAIRWISE_NAME}
                 onSelect={() => handleToggle('pairwise')}
                 onToggle={() => handleToggle('pairwise')}
                 isExpanded={expanded['pairwise']}
               >
-                <TreeNode label={'Test Case 1'} key={1} />
-                <TreeNode label={'Test Case 2'} key={2} />
+                {useCases
+                  .filter((u) => u.type === PipelineType.PAIRWISE)
+                  .map((useCase, i) => (
+                    <TreeNode
+                      id={useCase.name}
+                      label={useCase.name}
+                      key={useCase.name}
+                      onClick={(e: any) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        onUseCaseClick(useCase)
+                      }}
+                    />
+                  ))}
               </TreeNode>
             </TreeView>
           </section>
