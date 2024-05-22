@@ -1,9 +1,13 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import cx from 'classnames'
 
-import { ContentSwitcher, Layer, Modal, Switch, TextInput } from '@carbon/react'
+import { Dispatch, SetStateAction, useState } from 'react'
+import { useMediaQuery } from 'react-responsive'
+
+import { Column, Grid, Layer, Modal, Row, TextInput } from '@carbon/react'
 
 import { getEmptyUseCase } from '@utils/utils'
 
+import { PipelineOptionCard } from '../PipelineOptionCard'
 import { usePipelineTypesContext } from '../PipelineTypesProvider'
 import { PipelineType, UseCase } from '../types'
 import classes from './NewUseCaseModal.module.scss'
@@ -16,7 +20,7 @@ interface Props {
 }
 
 export const NewUseCaseModal = ({ open, changesDetected, setOpen, onSaveAs }: Props) => {
-  const [selectedType, setSelectedType] = useState<PipelineType>(PipelineType.RUBRIC)
+  const [selectedType, setSelectedType] = useState<PipelineType | null>(null)
   const [name, setName] = useState('')
 
   const [status, setStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>('inactive')
@@ -24,14 +28,16 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, onSaveAs }: Pr
 
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
 
+  const sm = useMediaQuery({ query: '(max-width: 671px)' })
+
   const onSubmit = async () => {
     setStatus('active')
     await onSaveAs(name, {
-      ...getEmptyUseCase(selectedType),
+      ...getEmptyUseCase(selectedType as PipelineType),
       pipeline: selectedType === PipelineType.RUBRIC ? rubricPipelines[0] : pairwisePipelines[0],
     })
     setStatus('finished')
-    setDescription('Saved!')
+    setDescription('Created!')
   }
 
   const onTypeChange = ({ index }: { index?: number }) => {
@@ -41,7 +47,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, onSaveAs }: Pr
 
   const resetStatus = () => {
     setStatus('inactive')
-    setDescription('Deleting...')
+    setDescription('Creating...')
     setOpen(false)
     setName('')
   }
@@ -56,17 +62,17 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, onSaveAs }: Pr
       onRequestSubmit={onSubmit}
       onSecondarySubmit={resetStatus}
       shouldSubmitOnEnter
-      primaryButtonDisabled={name === ''}
+      primaryButtonDisabled={name === '' || selectedType === null}
       loadingDescription={description}
       onLoadingSuccess={resetStatus}
       loadingStatus={status}
-      className={classes['bottom-padding']}
+      className={cx(classes['bottom-padding'], classes.root)}
     >
-      <Layer>
+      <Layer type={'outline'}>
         <TextInput
           data-modal-primary-focus
           id="text-input-1"
-          labelText="Test Case name"
+          labelText="Name"
           placeholder="My test case"
           style={{
             marginBottom: '1.5rem',
@@ -76,16 +82,19 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, onSaveAs }: Pr
           }}
           value={name}
         />
-        <p className={'cds--label'}>Test Case type</p>
-        <ContentSwitcher
-          onChange={onTypeChange}
-          selectedIndex={0}
-          size="sm"
-          style={{ width: '24rem', marginBottom: '2rem' }}
-        >
-          <Switch name={'Direct Assessment'} text={'Direct Assessment'} />
-          <Switch name={'Pairwise Ranking'} text={'Pairwise Ranking'} />
-        </ContentSwitcher>
+        <p className={'cds--label'}>Select an Evaluation Method</p>
+        <div className={classes.cards}>
+          <PipelineOptionCard
+            type={PipelineType.RUBRIC}
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+          />
+          <PipelineOptionCard
+            type={PipelineType.PAIRWISE}
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+          />
+        </div>
         {changesDetected && (
           <span
             className={classes['danger-text']}

@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -11,7 +11,9 @@ import { IconButton } from '@carbon/react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, Launch } from '@carbon/react/icons'
 
-import { UseCase } from '../types'
+import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
+
+import { PipelineType, UseCase } from '../types'
 import classes from './UseCasePanel.module.scss'
 
 interface Props {
@@ -25,6 +27,20 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
   const selectedNode = useMemo(() => {
     return currentUseCaseId !== null ? [`${currentUseCaseId}`] : []
   }, [currentUseCaseId])
+
+  const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean }>({
+    rubric: false,
+    pairwise: false,
+  })
+
+  const rubricTestCases = useMemo(() => userUseCases.filter((u) => u.type === PipelineType.RUBRIC), [userUseCases])
+  const pairwiseTestCases = useMemo(() => userUseCases.filter((u) => u.type === PipelineType.PAIRWISE), [userUseCases])
+
+  const handleToggle = (key: 'rubric' | 'pairwise') =>
+    setExpanded({
+      ...expanded,
+      [key]: !expanded[key],
+    })
 
   return (
     <section className={cx(classes.root)}>
@@ -42,22 +58,54 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
             ) : (
               <div className={classes['tree-wrapper']}>
                 <TreeView className={classes['tree-root']} label={''} hideLabel selected={selectedNode}>
-                  {userUseCases.map((useCase) => (
-                    <TreeNode
-                      onSelect={() => {
-                        onUseCaseClick(useCase)
-                      }}
-                      key={`${useCase.id}`}
-                      id={`${useCase.id}`}
-                      selected={selectedNode}
-                      label={
-                        <div className={classes['tree-node-content']}>
-                          <span className={classes['tree-node-label']}>{useCase.name}</span>
-                          <LinkButton useCase={useCase} />
-                        </div>
-                      }
-                    />
-                  ))}
+                  <TreeNode
+                    id={'rubric'}
+                    label={RUBRIC_NAME}
+                    onSelect={() => handleToggle('rubric')}
+                    onToggle={() => handleToggle('rubric')}
+                    isExpanded={expanded['rubric']}
+                  >
+                    {rubricTestCases.map((useCase) => (
+                      <TreeNode
+                        onSelect={() => {
+                          onUseCaseClick(useCase)
+                        }}
+                        key={`${useCase.id}`}
+                        id={`${useCase.id}`}
+                        selected={selectedNode}
+                        label={
+                          <div className={classes['tree-node-content']}>
+                            <span className={classes['tree-node-label']}>{useCase.name}</span>
+                            <LinkButton useCase={useCase} />
+                          </div>
+                        }
+                      />
+                    ))}
+                  </TreeNode>
+                  <TreeNode
+                    id={'pairwise'}
+                    label={PAIRWISE_NAME}
+                    onSelect={() => handleToggle('pairwise')}
+                    onToggle={() => handleToggle('pairwise')}
+                    isExpanded={expanded['pairwise']}
+                  >
+                    {pairwiseTestCases.map((useCase) => (
+                      <TreeNode
+                        onSelect={() => {
+                          onUseCaseClick(useCase)
+                        }}
+                        key={`${useCase.id}`}
+                        id={`${useCase.id}`}
+                        selected={selectedNode}
+                        label={
+                          <div className={classes['tree-node-content']}>
+                            <span className={classes['tree-node-label']}>{useCase.name}</span>
+                            <LinkButton useCase={useCase} />
+                          </div>
+                        }
+                      />
+                    ))}
+                  </TreeNode>
                 </TreeView>
               </div>
             )}

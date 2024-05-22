@@ -1,8 +1,46 @@
 @import '@carbon/styles/scss/theme';
-@import '@carbon/styles/scss/utilities/convert';
-@import '@carbon/styles/scss/spacing';
-@import '@carbon/colors';
-@import '@carbon/styles/scss/type';
+
+@media (min-width: 50rem) {
+  .cards {
+    display: grid;
+    grid-template-columns: auto;
+    margin-bottom: 1.5rem;
+    grid-gap: 1rem;
+  }
+}
+
+@media (min-width: 66rem) {
+  .cards {
+    display: grid;
+    grid-template-columns: auto auto;
+    margin-bottom: 1.5rem;
+    grid-gap: 1rem;
+  }
+}
+
+// @media (min-width: 75rem) {
+//   .root :global .cds--modal-container {
+//     inline-size: 40%;
+//   }
+// }
+
+@media (min-width: 42rem) {
+  .root :global .cds--modal-container {
+    inline-size: 80%;
+  }
+}
+
+@media (min-width: 82rem) {
+  .root :global .cds--modal-container {
+    inline-size: 65%;
+  }
+}
+
+@media (min-width: 92rem) {
+  .root :global .cds--modal-container {
+    inline-size: 55%;
+  }
+}
 
 .bottom-padding :global .cds--modal-content {
   padding-bottom: 1rem;

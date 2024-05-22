@@ -80,3 +80,6 @@ export const getEmptyUseCase = (type: PipelineType): UseCase => ({
   results: null,
   pipeline: null,
 })
+
+export const returnByPipelineType = (type: PipelineType, returnIfRubric: any, returnIfPairwise: any) =>
+  type === PipelineType.RUBRIC ? returnIfRubric : returnIfPairwise

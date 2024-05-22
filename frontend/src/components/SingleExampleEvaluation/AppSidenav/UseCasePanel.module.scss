@@ -57,7 +57,7 @@
 }
 
 .tree-root :global .cds--tree-node {
-  background-color: var(--cds-background, #fff);
+  background-color: $background;
   padding-inline-start: 1rem;
 }
 
@@ -102,10 +102,6 @@
   > label {
     display: none;
   }
-  // :global(.#{$prefix}--tree) {
-  //   display: flex;
-  //   flex-direction: column;
-  // }
 
   :global(.cds--tree-node) {
     padding-left: 0;
@@ -117,6 +113,7 @@
       padding: 0 $spacing-05;
       display: flex;
       align-items: center;
+      background-color: $background;
       &:hover {
         background-color: $layer-01;
       }
@@ -126,12 +123,12 @@
       align-self: center;
     }
     ul li :global(.cds--tree-node__label) {
-      padding-left: rem(34px);
+      padding-inline-start: 2rem !important;
     }
   }
   :global(.cds--tree-node--selected) {
     > :global(.cds--tree-node__label) {
-      background-color: $blue-10;
+      background-color: $layer-01;
       outline: 1px solid $link-primary;
       outline-offset: -1px;
     }

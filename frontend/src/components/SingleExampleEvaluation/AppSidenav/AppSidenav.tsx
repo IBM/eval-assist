@@ -78,7 +78,7 @@ export const AppSidenavNew = ({
         <li>
           <IconButton
             align="right"
-            label="My use cases"
+            label="My test cases"
             kind="ghost"
             size="lg"
             className={cx(classes.itemBtn, {

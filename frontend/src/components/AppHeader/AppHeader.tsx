@@ -24,49 +24,47 @@ export const AppHeader = () => {
   const router = useRouter()
 
   return (
-    <Theme theme="g100">
-      <Header className={classes.root} aria-label={title}>
-        <HeaderName
-          prefix="IBM"
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            router.push({ pathname: '/', query: {} }).then(() => {
-              router.reload()
-            })
-          }}
-        >
-          {PLATFORM_NAME}
-        </HeaderName>
+    <Header className={classes.root} aria-label={title}>
+      <HeaderName
+        prefix="IBM"
+        style={{ cursor: 'pointer' }}
+        onClick={() => {
+          router.push({ pathname: '/', query: {} }).then(() => {
+            router.reload()
+          })
+        }}
+      >
+        {PLATFORM_NAME}
+      </HeaderName>
 
-        <HeaderGlobalBar>
-          {router.pathname === '/documentation' ? null : (
-            <HeaderNavigation aria-label="IBM [Platform]">
-              <HeaderMenuItem
-                href=" https://airtable.com/appBlXR5AJ5v3dHDN/shrtDukPTBiP7VjJd"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
-                  Feedback
-                  <AddComment style={{ marginLeft: '0.5rem' }} size={18} />
-                </div>
-              </HeaderMenuItem>
-              <HeaderMenuItem href="/documentation">
-                <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
-                  Documentation
-                  <Document style={{ marginLeft: '0.5rem' }} size={18} />
-                </div>
-              </HeaderMenuItem>
-            </HeaderNavigation>
-          )}
+      <HeaderGlobalBar>
+        {router.pathname === '/documentation' ? null : (
+          <HeaderNavigation aria-label="IBM [Platform]">
+            <HeaderMenuItem
+              href=" https://airtable.com/appBlXR5AJ5v3dHDN/shrtDukPTBiP7VjJd"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+                Feedback
+                <AddComment style={{ marginLeft: '0.5rem' }} size={18} />
+              </div>
+            </HeaderMenuItem>
+            <HeaderMenuItem href="/documentation">
+              <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+                Documentation
+                <Document style={{ marginLeft: '0.5rem' }} size={18} />
+              </div>
+            </HeaderMenuItem>
+          </HeaderNavigation>
+        )}
 
-          {authenticationEnabled && (
-            <HeaderGlobalAction aria-label="Logout" onClick={signOut}>
-              <Logout size={20} />
-            </HeaderGlobalAction>
-          )}
-        </HeaderGlobalBar>
-      </Header>
-    </Theme>
+        {authenticationEnabled && (
+          <HeaderGlobalAction aria-label="Logout" onClick={signOut}>
+            <Logout size={20} />
+          </HeaderGlobalAction>
+        )}
+      </HeaderGlobalBar>
+    </Header>
   )
 }
