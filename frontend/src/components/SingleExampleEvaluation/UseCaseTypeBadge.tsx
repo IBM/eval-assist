@@ -19,11 +19,11 @@ export const UseCaseTypeBadge = ({ type: currentType, style, className }: Props)
   return (
     <div style={style} className={cx(className, classes['badge-padding'])}>
       {currentType === PipelineType.RUBRIC ? (
-        <Tag className="some-class" type="blue">
+        <Tag className={classes['usecase-tag']} type="blue" size="lg">
           {RUBRIC_NAME}
         </Tag>
       ) : (
-        <Tag className="some-class" type="blue">
+        <Tag className={classes['usecase-tag']} type="blue" size="lg">
           {PAIRWISE_NAME}
         </Tag>
       )}
