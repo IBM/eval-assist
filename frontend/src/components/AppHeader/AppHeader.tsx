@@ -11,7 +11,7 @@ import {
   HeaderNavigation,
   Theme,
 } from '@carbon/react'
-import { Document, Logout } from '@carbon/react/icons'
+import { AddComment, Document, Logout } from '@carbon/react/icons'
 
 import { PLATFORM_NAME } from '@constants'
 import { useAuthentication } from '@customHooks/useAuthentication'
@@ -41,6 +41,16 @@ export const AppHeader = () => {
         <HeaderGlobalBar>
           {router.pathname === '/documentation' ? null : (
             <HeaderNavigation aria-label="IBM [Platform]">
+              <HeaderMenuItem
+                href=" https://airtable.com/appBlXR5AJ5v3dHDN/shrtDukPTBiP7VjJd"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+                  Feedback
+                  <AddComment style={{ marginLeft: '0.5rem' }} size={18} />
+                </div>
+              </HeaderMenuItem>
               <HeaderMenuItem href="/documentation">
                 <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
                   Documentation
