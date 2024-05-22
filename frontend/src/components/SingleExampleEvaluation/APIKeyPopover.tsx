@@ -10,7 +10,7 @@ import classes from './SingleExampleEvaluation.module.scss'
 interface Props {
   popoverOpen: boolean
   setPopoverOpen: Dispatch<SetStateAction<boolean>>
-  bamAPIKey: string | null
+  bamAPIKey: string
   setBamAPIKey: Dispatch<SetStateAction<string>>
 }
 
@@ -37,14 +37,15 @@ export const APIKeyPopover = ({ popoverOpen, setPopoverOpen, bamAPIKey, setBamAP
             Your API keys are only stored in your browser and are used solely to communicate directly to services.
           </p>
           <Layer>
-            {/*@ts-ignore*/}
-            <TextInput.PasswordInput
+            <p className="cds--label">BAM API key</p>
+            <TextInput
               ref={apiKeyInputRef}
               id={'bam-api-key-input'}
-              labelText="BAM API key"
+              labelText=""
               value={bamAPIKey}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBamAPIKey(e.target.value)}
               autoComplete="off"
+              className={classes['api-key-password-style']}
             />
           </Layer>
           <p className="cds--form__helper-text">

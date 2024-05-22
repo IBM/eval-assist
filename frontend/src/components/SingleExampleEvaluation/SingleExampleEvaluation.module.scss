@@ -78,3 +78,7 @@
   border-bottom: 1px solid $border-subtle-00;
   margin-bottom: 2rem;
 }
+
+.api-key-password-style {
+  -webkit-text-security: disc;
+}
