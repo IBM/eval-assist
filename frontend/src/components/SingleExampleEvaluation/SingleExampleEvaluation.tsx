@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import { pipeline } from 'stream'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { LegacyRef, useCallback, useMemo, useRef, useState } from 'react'
@@ -137,6 +138,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
         responses,
         rubric: { criteria: criteria.criteria, options: (criteria as RubricCriteria).options },
         bam_api_key: bamAPIKey,
+        pipeline: selectedPipeline,
       })
     } else {
       response = await post('evaluate/pairwise/', {
@@ -154,9 +156,21 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
       const error = (await response.json()) as {
         detail: string
       }
+
+      // Sometimes, error.detail is an array
+      // show a generic message in those cases
+      if (typeof error.detail === 'string') {
+        setEvaluationError(error.detail)
+      } else {
+        setEvaluationError(
+          `Something went wrong with the evaluation (${(error.detail as { type: string; msg: string }[])[0].type}: ${
+            (error.detail as { type: string; msg: string }[])[0].msg
+          })`,
+        )
+      }
+
       setEvaluationFailed(true)
       // We are catching this error an so we show the message sent from the backend
-      setEvaluationError(error.detail)
 
       addToast({
         kind: 'error',
