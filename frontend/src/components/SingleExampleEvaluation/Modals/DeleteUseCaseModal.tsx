@@ -12,17 +12,22 @@ interface Props {
 }
 
 export const DeleteUseCaseModal = ({ open, setOpen, onDeleteUseCase, useCaseName }: Props) => {
-  const [status, setStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>('inactive')
+  const [loadingStatus, setLoadingStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>(
+    'inactive',
+  )
   const [description, setDescription] = useState('Deleting...')
 
   const resetStatus = () => {
-    setStatus('active')
+    setLoadingStatus('inactive')
     setDescription('Deleting...')
     setOpen(false)
   }
 
   const onSubmit = async () => {
+    setLoadingStatus('active')
     await onDeleteUseCase()
+    setLoadingStatus('finished')
+    setDescription('Deleted')
     setOpen(false)
     resetStatus()
   }
@@ -36,7 +41,7 @@ export const DeleteUseCaseModal = ({ open, setOpen, onDeleteUseCase, useCaseName
       danger
       secondaryButtonText="Cancel"
       onRequestSubmit={onSubmit}
-      loadingStatus={status}
+      loadingStatus={loadingStatus}
       shouldSubmitOnEnter
       loadingDescription={description}
       onLoadingSuccess={resetStatus}
