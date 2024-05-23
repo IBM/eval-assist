@@ -33,6 +33,12 @@ model AppUser {
   @@map("app_user")
 }
 
+model LogRecord {
+  id      Int    @id @default(autoincrement())
+  data Json
+  @@map("log_record")
+}
+
 // model Evaluation {
 //   id   Int    @id @default(autoincrement())
 //   name String

@@ -1,9 +1,8 @@
 from io import StringIO
-from fastapi import FastAPI, status, UploadFile, HTTPException
+from fastapi import FastAPI, status, UploadFile, HTTPException, APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from dotenv import load_dotenv
 
 from .utils import log_runtime
 from .db_client import db
@@ -26,7 +25,8 @@ from  .api.pipelines import PipelinesResponseModel, PipelineModel, PAIRWISE_TYPE
 from  .api.pairwise import PairwiseEvalRequestModel, PairwiseEvalResponseModel
 from  .api.rubric import RubricEvalRequestModel, RubricEvalResponseModel
 
-load_dotenv()
+# Logging req/resp
+from .logger import LoggingRoute
 
 app = FastAPI()
 app.add_middleware(
@@ -36,6 +36,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+router = APIRouter(route_class=LoggingRoute)
 
 class HealthCheck(BaseModel):
     status: str = "OK"
@@ -213,7 +214,7 @@ async def get_pipelines():
 '''
 Single pairwise evaluation endpoint
 '''
-@app.post("/evaluate/pairwise/", response_model=PairwiseEvalResponseModel)
+@router.post("/evaluate/pairwise/", response_model=PairwiseEvalResponseModel)
 async def evaluate(req: PairwiseEvalRequestModel):
 
     BAM_API_URL = os.getenv("GENAI_API", None)  
@@ -248,7 +249,7 @@ async def evaluate(req: PairwiseEvalRequestModel):
 Single rubric evaluation endpoint
 TODO: Update endpoint path 
 '''
-@app.post("/evaluate/rubric/", response_model=RubricEvalResponseModel)
+@router.post("/evaluate/rubric/", response_model=RubricEvalResponseModel)
 async def evaluate(req: RubricEvalRequestModel):
     # Gen ai client
     BAM_API_URL = os.getenv("GENAI_API", None)  
@@ -280,7 +281,7 @@ async def evaluate(req: RubricEvalRequestModel):
         raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
 
 
-@app.get("/use_case/")
+@router.get("/use_case/")
 async def get_use_cases(user: str):
     use_cases = db.storedusecase.find_many(where={
         'app_user': {
@@ -290,7 +291,7 @@ async def get_use_cases(user: str):
     return use_cases
 
 
-@app.get("/use_case/{use_case_id}/")
+@router.get("/use_case/{use_case_id}/")
 async def get_use_case(use_case_id: int, user: str):
     return db.storedusecase.find_unique(where={"id": use_case_id})
     
@@ -298,7 +299,7 @@ class PutUseCaseBody(BaseModel):
     user: str
     use_case: StoredUseCase
 
-@app.put("/use_case/")
+@router.put("/use_case/")
 async def put_use_case(request_body: PutUseCaseBody):
     user = db.appuser.find_unique(where={'email': request_body.user})
     
@@ -330,7 +331,7 @@ async def put_use_case(request_body: PutUseCaseBody):
 class DeleteUseCaseBody(BaseModel):
     use_case_id: int
 
-@app.delete("/use_case/")
+@router.delete("/use_case/")
 async def delete_use_case(request_body: DeleteUseCaseBody):
     res = db.storedusecase.delete(where={'id': request_body.use_case_id})
     return res
@@ -349,3 +350,6 @@ async def create_user_if_not_exist(user:CreateUserPostBody):
     except PrismaError as pe:
         print(f'Prisma error raised: {pe}')
         return None
+    
+
+app.include_router(router)
