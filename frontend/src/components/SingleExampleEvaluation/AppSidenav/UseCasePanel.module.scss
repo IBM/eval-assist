@@ -135,11 +135,12 @@
   }
 }
 
-.emptyMessage {
-  padding-top: $spacing-03;
+.empty-message {
   padding-left: $spacing-05;
   padding-right: $spacing-05;
   @include type-style('helper-text-01');
   color: $text-helper;
   font-style: italic;
+  margin-left: $spacing-03;
+  margin-bottom: $spacing-03;
 }

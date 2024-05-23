@@ -1,28 +1,16 @@
 @import '@carbon/styles/scss/theme';
 
-@media (min-width: 50rem) {
-  .cards {
-    display: grid;
-    grid-template-columns: auto;
-    margin-bottom: 1.5rem;
-    grid-gap: 1rem;
-  }
+.cards {
+  display: grid;
+  margin-bottom: 1.5rem;
+  grid-gap: 1rem;
 }
 
 @media (min-width: 66rem) {
   .cards {
-    display: grid;
-    grid-template-columns: auto auto;
-    margin-bottom: 1.5rem;
-    grid-gap: 1rem;
+    grid-template-columns: 1fr 1fr;
   }
 }
-
-// @media (min-width: 75rem) {
-//   .root :global .cds--modal-container {
-//     inline-size: 40%;
-//   }
-// }
 
 @media (min-width: 42rem) {
   .root :global .cds--modal-container {

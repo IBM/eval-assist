@@ -1,0 +1,54 @@
+@import '@carbon/styles/scss/spacing';
+@import '@carbon/styles/scss/theme';
+
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+.heading {
+  //styleName: Productive/heading-01;
+  font-family: IBM Plex Sans;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: 0.1599999964237213px;
+  text-align: left;
+  color: $text-primary;
+  margin-bottom: $spacing-04;
+}
+
+.description {
+  //styleName: Productive/heading-03;
+  font-family: IBM Plex Sans;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 28px;
+  text-align: left;
+  color: $text-secondary;
+  margin-bottom: $spacing-05;
+}
+
+.cards {
+  margin-bottom: $spacing-06;
+  display: grid;
+  grid-gap: 2rem;
+}
+
+@media (min-width: 700px) {
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1300px) {
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+.card-white-mode {
+  background-color: $background;
+}

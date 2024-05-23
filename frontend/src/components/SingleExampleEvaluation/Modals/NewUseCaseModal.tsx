@@ -1,13 +1,12 @@
 import cx from 'classnames'
 
 import { Dispatch, SetStateAction, useState } from 'react'
-import { useMediaQuery } from 'react-responsive'
 
-import { Column, Grid, Layer, Modal, Row, TextInput } from '@carbon/react'
+import { Layer, Modal } from '@carbon/react'
 
 import { getEmptyUseCase } from '@utils/utils'
 
-import { PipelineOptionCard } from '../PipelineOptionCard'
+import { PipelineOptionCard } from '../Card/PipelineOptionCard'
 import { usePipelineTypesContext } from '../PipelineTypesProvider'
 import { PipelineType, UseCase } from '../types'
 import classes from './NewUseCaseModal.module.scss'
@@ -17,39 +16,25 @@ interface Props {
   changesDetected: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   onSaveAs: (name: string, fromUseCase?: UseCase) => Promise<void>
+  setCurrentUseCase: (useCase: UseCase) => void
 }
 
-export const NewUseCaseModal = ({ open, changesDetected, setOpen, onSaveAs }: Props) => {
+export const NewUseCaseModal = ({ open, changesDetected, setOpen, onSaveAs, setCurrentUseCase }: Props) => {
   const [selectedType, setSelectedType] = useState<PipelineType | null>(null)
-  const [name, setName] = useState('')
-
-  const [status, setStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>('inactive')
-  const [description, setDescription] = useState('Deleting...')
 
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
 
-  const sm = useMediaQuery({ query: '(max-width: 671px)' })
-
   const onSubmit = async () => {
-    setStatus('active')
-    await onSaveAs(name, {
+    setCurrentUseCase({
       ...getEmptyUseCase(selectedType as PipelineType),
       pipeline: selectedType === PipelineType.RUBRIC ? rubricPipelines[0] : pairwisePipelines[0],
     })
-    setStatus('finished')
-    setDescription('Created!')
-  }
-
-  const onTypeChange = ({ index }: { index?: number }) => {
-    const newType = index === 0 ? PipelineType.RUBRIC : PipelineType.PAIRWISE
-    setSelectedType(newType)
+    resetStatus()
   }
 
   const resetStatus = () => {
-    setStatus('inactive')
-    setDescription('Creating...')
     setOpen(false)
-    setName('')
+    setSelectedType(null)
   }
 
   return (
@@ -60,28 +45,11 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, onSaveAs }: Pr
       primaryButtonText="Confirm"
       secondaryButtonText="Cancel"
       onRequestSubmit={onSubmit}
-      onSecondarySubmit={resetStatus}
       shouldSubmitOnEnter
-      primaryButtonDisabled={name === '' || selectedType === null}
-      loadingDescription={description}
-      onLoadingSuccess={resetStatus}
-      loadingStatus={status}
+      primaryButtonDisabled={selectedType === null}
       className={cx(classes['bottom-padding'], classes.root)}
     >
       <Layer type={'outline'}>
-        <TextInput
-          data-modal-primary-focus
-          id="text-input-1"
-          labelText="Name"
-          placeholder="My test case"
-          style={{
-            marginBottom: '1.5rem',
-          }}
-          onChange={(e) => {
-            setName(e.target.value)
-          }}
-          value={name}
-        />
         <p className={'cds--label'}>Select an Evaluation Method</p>
         <div className={classes.cards}>
           <PipelineOptionCard

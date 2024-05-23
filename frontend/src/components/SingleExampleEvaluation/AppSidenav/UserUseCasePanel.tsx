@@ -29,8 +29,8 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
   }, [currentUseCaseId])
 
   const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean }>({
-    rubric: false,
-    pairwise: false,
+    rubric: true,
+    pairwise: true,
   })
 
   const rubricTestCases = useMemo(() => userUseCases.filter((u) => u.type === PipelineType.RUBRIC), [userUseCases])
@@ -53,8 +53,8 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
       <div className={classes.content}>
         <div className={classes.prompts}>
           <section className={classes.section}>
-            {userUseCases.length == 0 ? (
-              <p className={classes.emptyMessage}>No saved test cases</p>
+            {userUseCases.length === 0 ? (
+              <p className={classes['empty-message']}>No saved test cases</p>
             ) : (
               <div className={classes['tree-wrapper']}>
                 <TreeView className={classes['tree-root']} label={''} hideLabel selected={selectedNode}>
@@ -65,22 +65,26 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
                     onToggle={() => handleToggle('rubric')}
                     isExpanded={expanded['rubric']}
                   >
-                    {rubricTestCases.map((useCase) => (
-                      <TreeNode
-                        onSelect={() => {
-                          onUseCaseClick(useCase)
-                        }}
-                        key={`${useCase.id}`}
-                        id={`${useCase.id}`}
-                        selected={selectedNode}
-                        label={
-                          <div className={classes['tree-node-content']}>
-                            <span className={classes['tree-node-label']}>{useCase.name}</span>
-                            <LinkButton useCase={useCase} />
-                          </div>
-                        }
-                      />
-                    ))}
+                    {rubricTestCases.length === 0 ? (
+                      <p className={classes['empty-message']}>No saved direct assessment test cases</p>
+                    ) : (
+                      rubricTestCases.map((useCase) => (
+                        <TreeNode
+                          onSelect={() => {
+                            onUseCaseClick(useCase)
+                          }}
+                          key={`${useCase.id}`}
+                          id={`${useCase.id}`}
+                          selected={selectedNode}
+                          label={
+                            <div className={classes['tree-node-content']}>
+                              <span className={classes['tree-node-label']}>{useCase.name}</span>
+                              <LinkButton useCase={useCase} />
+                            </div>
+                          }
+                        />
+                      ))
+                    )}
                   </TreeNode>
                   <TreeNode
                     id={'pairwise'}
@@ -89,22 +93,26 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
                     onToggle={() => handleToggle('pairwise')}
                     isExpanded={expanded['pairwise']}
                   >
-                    {pairwiseTestCases.map((useCase) => (
-                      <TreeNode
-                        onSelect={() => {
-                          onUseCaseClick(useCase)
-                        }}
-                        key={`${useCase.id}`}
-                        id={`${useCase.id}`}
-                        selected={selectedNode}
-                        label={
-                          <div className={classes['tree-node-content']}>
-                            <span className={classes['tree-node-label']}>{useCase.name}</span>
-                            <LinkButton useCase={useCase} />
-                          </div>
-                        }
-                      />
-                    ))}
+                    {pairwiseTestCases.length === 0 ? (
+                      <p className={classes['empty-message']}>No saved pairwise test cases</p>
+                    ) : (
+                      pairwiseTestCases.map((useCase) => (
+                        <TreeNode
+                          onSelect={() => {
+                            onUseCaseClick(useCase)
+                          }}
+                          key={`${useCase.id}`}
+                          id={`${useCase.id}`}
+                          selected={selectedNode}
+                          label={
+                            <div className={classes['tree-node-content']}>
+                              <span className={classes['tree-node-label']}>{useCase.name}</span>
+                              <LinkButton useCase={useCase} />
+                            </div>
+                          }
+                        />
+                      ))
+                    )}
                   </TreeNode>
                 </TreeView>
               </div>

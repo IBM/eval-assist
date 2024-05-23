@@ -15,7 +15,7 @@ interface Props {
 export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, type }: Props) => {
   const [useCaseName, setUseCaseName] = useState('')
   const [status, setStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>('inactive')
-  const [description, setDescription] = useState('Deleting...')
+  const [description, setDescription] = useState('Saving...')
 
   const resetStatus = () => {
     setStatus('inactive')

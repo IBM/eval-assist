@@ -21,8 +21,8 @@ interface Props {
 
 export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
   const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean }>({
-    rubric: false,
-    pairwise: false,
+    rubric: true,
+    pairwise: true,
   })
 
   const handleToggle = (key: 'rubric' | 'pairwise') =>

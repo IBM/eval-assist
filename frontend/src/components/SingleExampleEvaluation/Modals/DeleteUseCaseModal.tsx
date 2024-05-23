@@ -12,7 +12,21 @@ interface Props {
 }
 
 export const DeleteUseCaseModal = ({ open, setOpen, onDeleteUseCase, useCaseName }: Props) => {
-  const [deletingUseCase, setDeletingUseCase] = useState(false)
+  const [status, setStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>('inactive')
+  const [description, setDescription] = useState('Deleting...')
+
+  const resetStatus = () => {
+    setStatus('active')
+    setDescription('Deleting...')
+    setOpen(false)
+  }
+
+  const onSubmit = async () => {
+    await onDeleteUseCase()
+    setOpen(false)
+    resetStatus()
+  }
+
   return (
     <Modal
       open={open}
@@ -20,14 +34,12 @@ export const DeleteUseCaseModal = ({ open, setOpen, onDeleteUseCase, useCaseName
       modalHeading={`Delete workspace '${useCaseName}'`}
       primaryButtonText="Delete"
       danger
-      primaryButtonDisabled={deletingUseCase}
       secondaryButtonText="Cancel"
-      onRequestSubmit={async (e) => {
-        setDeletingUseCase(true)
-        await onDeleteUseCase()
-        setOpen(false)
-        setDeletingUseCase(false)
-      }}
+      onRequestSubmit={onSubmit}
+      loadingStatus={status}
+      shouldSubmitOnEnter
+      loadingDescription={description}
+      onLoadingSuccess={resetStatus}
     >
       <p>{`This action will permanently delete the current test case.`}</p>
     </Modal>

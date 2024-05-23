@@ -1,13 +1,11 @@
 import cx from 'classnames'
-import { pipeline } from 'stream'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { LegacyRef, useCallback, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { Button, TextArea } from '@carbon/react'
-import { Add } from '@carbon/react/icons'
+import { TextArea } from '@carbon/react'
 
 import { useToastContext } from '@components/ToastProvider/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
@@ -20,6 +18,7 @@ import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { CriteriaView } from './CriteriaView'
 import { EvaluateButton } from './EvaluateButton'
+import { Landing } from './Landing'
 import layoutClasses from './Layout.module.scss'
 import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
 import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
@@ -86,9 +85,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
 
   const [popoverOpen, setPopoverOpen] = useState(false)
 
-  const [sidebarTabSelected, setSidebarTabSelected] = useState<'user_use_cases' | 'library_use_cases' | null>(
-    !showingTestCase ? (userUseCases.length > 0 ? 'user_use_cases' : 'library_use_cases') : null,
-  )
+  const [sidebarTabSelected, setSidebarTabSelected] = useState<'user_use_cases' | 'library_use_cases' | null>(null)
 
   const getUseCaseFromState = useCallback(
     (): UseCase => ({
@@ -111,8 +108,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
   }, [getUseCaseFromState])
 
   const changesDetected = useMemo(
-    () => lastSavedUseCaseString !== currentUseCaseString,
-    [lastSavedUseCaseString, currentUseCaseString],
+    () => showingTestCase && lastSavedUseCaseString !== currentUseCaseString,
+    [showingTestCase, lastSavedUseCaseString, currentUseCaseString],
   )
 
   const [bamAPIKey, setBamAPIKey, removeBamAPIKey] = useLocalStorage<string>('bamAPIKey', '')
@@ -251,6 +248,10 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
     [router],
   )
 
+  const updateLastSavedPipeline = useCallback(() => {
+    setLastSavedUseCase(JSON.stringify(getUseCaseFromState()))
+  }, [setLastSavedUseCase, getUseCaseFromState])
+
   const onSave = async () => {
     const savedUseCase: StoredUseCase = await (
       await put('use_case/', {
@@ -288,10 +289,6 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
     })
   }
 
-  const updateLastSavedPipeline = useCallback(() => {
-    setLastSavedUseCase(JSON.stringify(getUseCaseFromState()))
-  }, [setLastSavedUseCase, getUseCaseFromState])
-
   const onSaveAs = async (name: string, fromUseCase?: UseCase) => {
     const toSaveUseCase = fromUseCase ?? getUseCaseFromState()
     const savedUseCase: StoredUseCase = await (
@@ -326,6 +323,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
       title: `Created use case '${parsedSavedUseCase.name}'`,
       timeout: 5000,
     })
+
+    setSidebarTabSelected('user_use_cases')
   }
 
   const onDeleteUseCase = async () => {
@@ -358,14 +357,11 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
       />
       <div className={cx(layoutClasses['main-content'], classes.body)}>
         {!showingTestCase ? (
-          <Button
-            renderIcon={Add}
-            onClick={() => {
-              setNewUseCaseModalOpen(true)
-            }}
-          >
-            {'New Test Case'}
-          </Button>
+          <Landing
+            setNewUseCaseModalOpen={setNewUseCaseModalOpen}
+            setCurrentUseCase={setCurrentUseCase}
+            setSidebarTabSelected={setSidebarTabSelected}
+          />
         ) : (
           <>
             <div
@@ -485,6 +481,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
         setOpen={setNewUseCaseModalOpen}
         changesDetected={changesDetected}
         onSaveAs={onSaveAs}
+        setCurrentUseCase={setCurrentUseCase}
       />
       <DeleteUseCaseModal
         open={deleteUseCaseModalOpen}
