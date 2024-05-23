@@ -6,7 +6,7 @@ import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
 // @ts-ignore
 import { TreeNode, TreeView } from '@carbon/react'
-import { ChevronLeft } from '@carbon/react/icons'
+import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 
@@ -34,7 +34,7 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
   return (
     <section className={cx(classes.root)}>
       <header className={classes.header}>
-        <h2 className={classes.heading}>Test Case library</h2>
+        <h2 className={classes.heading}>Example Catalog</h2>
         <IconButton label="Close" align="right" kind="ghost" onClick={onClose}>
           <ChevronLeft />
         </IconButton>
@@ -57,6 +57,7 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
                       id={useCase.name}
                       label={useCase.name}
                       key={useCase.name}
+                      renderIcon={List}
                       onClick={(e: any) => {
                         e.stopPropagation()
                         e.preventDefault()
@@ -79,6 +80,7 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
                       id={useCase.name}
                       label={useCase.name}
                       key={useCase.name}
+                      renderIcon={Compare}
                       onClick={(e: any) => {
                         e.stopPropagation()
                         e.preventDefault()

@@ -48,6 +48,7 @@ export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase, setSidebarT
           title={RUBRIC_NAME}
           description={'Select an answer based on the criteria for the question'}
           imageSrc="rubric_helper"
+          onClick={createEmptyRubric}
           actionButton={
             <Button renderIcon={ArrowRight} kind="ghost" onClick={createEmptyRubric}>
               {'Try it'}
@@ -69,8 +70,8 @@ export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase, setSidebarT
           badge={{ text: 'Sandbox', color: 'blue' }}
         />
         <Card
-          title={'Test Case Library'}
-          description={'A catalogue of customizable criteria along with sample test data'}
+          title={'Example Catalog'}
+          description={'A catalogu of customizable criteria along with sample test data'}
           imageSrc="test_case_library"
           actionButton={
             <Button renderIcon={View} kind="ghost" onClick={openTestCasesLibrary}>

@@ -120,7 +120,7 @@ export const PairwiseCriteriaView = ({ pairwiseCriteria, setCriteria, style }: E
                         onChange={(e) => setCriteria({ ...pairwiseCriteria, criteria: e.target.value })}
                         value={pairwiseCriteria.criteria}
                         id="text-area-evaluation-instruction"
-                        labelText="Description"
+                        labelText="Criteria"
                         style={{ marginBottom: '1rem' }}
                         placeholder="Describe your evaluation criteria as a question e.g Is the response gramatically correct?"
                       />

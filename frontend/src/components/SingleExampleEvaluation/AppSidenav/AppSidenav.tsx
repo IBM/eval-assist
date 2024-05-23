@@ -58,7 +58,7 @@ export const AppSidenavNew = ({
         <li>
           <IconButton
             align="right"
-            label="Library"
+            label="Example Catalog"
             kind="ghost"
             size="lg"
             className={cx(classes.itemBtn, {
@@ -78,7 +78,7 @@ export const AppSidenavNew = ({
         <li>
           <IconButton
             align="right"
-            label="My test cases"
+            label="My Test Cases"
             kind="ghost"
             size="lg"
             className={cx(classes.itemBtn, {

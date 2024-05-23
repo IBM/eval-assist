@@ -9,7 +9,7 @@ import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
 // @ts-ignore
 import { TreeNode, TreeView } from '@carbon/react'
-import { ChevronLeft, Launch } from '@carbon/react/icons'
+import { ChevronLeft, Compare, Launch, List } from '@carbon/react/icons'
 
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 
@@ -66,7 +66,7 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
                     isExpanded={expanded['rubric']}
                   >
                     {rubricTestCases.length === 0 ? (
-                      <p className={classes['empty-message']}>No saved direct assessment test cases</p>
+                      <p className={classes['empty-message']}>Empty</p>
                     ) : (
                       rubricTestCases.map((useCase) => (
                         <TreeNode
@@ -76,6 +76,7 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
                           key={`${useCase.id}`}
                           id={`${useCase.id}`}
                           selected={selectedNode}
+                          renderIcon={List}
                           label={
                             <div className={classes['tree-node-content']}>
                               <span className={classes['tree-node-label']}>{useCase.name}</span>
@@ -94,7 +95,7 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
                     isExpanded={expanded['pairwise']}
                   >
                     {pairwiseTestCases.length === 0 ? (
-                      <p className={classes['empty-message']}>No saved pairwise test cases</p>
+                      <p className={classes['empty-message']}>Empty</p>
                     ) : (
                       pairwiseTestCases.map((useCase) => (
                         <TreeNode
@@ -104,6 +105,7 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
                           key={`${useCase.id}`}
                           id={`${useCase.id}`}
                           selected={selectedNode}
+                          renderIcon={Compare}
                           label={
                             <div className={classes['tree-node-content']}>
                               <span className={classes['tree-node-label']}>{useCase.name}</span>

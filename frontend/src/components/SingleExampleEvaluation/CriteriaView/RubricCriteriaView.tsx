@@ -119,7 +119,7 @@ export const RubricCriteriaView = ({ rubricCriteria, setCriteria, style }: Evalu
                         onChange={(e) => setCriteria({ ...rubricCriteria, criteria: e.target.value })}
                         value={rubricCriteria.criteria}
                         id="text-area-evaluation-instruction"
-                        labelText="Description"
+                        labelText="Criteria"
                         style={{ marginBottom: '1rem' }}
                         placeholder="Describe your evaluation criteria as a question e.g Is the response gramatically correct?"
                       />
@@ -135,7 +135,7 @@ export const RubricCriteriaView = ({ rubricCriteria, setCriteria, style }: Evalu
                         >
                           <div style={{ width: '20%', marginRight: '1rem' }}>
                             <TextInput
-                              labelText="Value"
+                              labelText="Option"
                               value={scale.option}
                               placeholder="Answer"
                               onChange={(e) =>
@@ -155,7 +155,7 @@ export const RubricCriteriaView = ({ rubricCriteria, setCriteria, style }: Evalu
 
                           <div style={{ width: '75%', marginRight: '1rem' }}>
                             <TextInput
-                              labelText="Definition (optional)"
+                              labelText="Description (optional)"
                               value={scale.description}
                               id={`criteria-option-definition-${i}`}
                               placeholder="State the condition under which the answer is selected."
@@ -203,7 +203,7 @@ export const RubricCriteriaView = ({ rubricCriteria, setCriteria, style }: Evalu
                         renderIcon={Add}
                         kind="tertiary"
                       >
-                        Add scale
+                        Add Option
                       </Button>
                     </Layer>
                     {/* <Button renderIcon={Add} disabled kind="tertiary">
