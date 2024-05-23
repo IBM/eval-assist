@@ -81,4 +81,30 @@ website or contact them to discuss your options.`,
     results: null,
     pipeline: null,
   },
+  {
+    name: 'Conciseness',
+    type: PipelineType.RUBRIC,
+    id: null,
+    context: 'What are the benefits of drinking green tea?',
+    responses: [
+      'Drinking green tea offers several benefits, including improved brain function, fat loss, a lower risk of cancer, and a reduced risk of heart disease. It is rich in antioxidants and nutrients that can positively affect overall health.',
+      "Green tea, with its rich infusion of polyphenolic catechins and theanine, synergistically interacts with the neural pathways to potentially enhance cognitive acuity while simultaneously orchestrating lipid oxidation processes to facilitate adipose reduction. The antioxidative properties inherent in its biochemical composition may contribute to oncological risk mitigation. Moreover, its cardiovascular implications include modulating lipid profiles and vascular endothelial function, ostensibly lowering morbidity associated with cardiovascular anomalies. Thus, green tea's multifaceted impact spans a broad spectrum of physiological and potentially psychological benefits.",
+    ],
+    criteria: {
+      name: 'Conciseness',
+      criteria: 'Is the response concise and to the point?',
+      options: [
+        {
+          option: 'Yes',
+          description: 'The response is short, succinct and directly addresses the point at hand.',
+        },
+        {
+          option: 'No',
+          description: 'The response lacks brevity and clarity, failing to directly address the point at hand.',
+        },
+      ],
+    },
+    results: null,
+    pipeline: null,
+  },
 ]
