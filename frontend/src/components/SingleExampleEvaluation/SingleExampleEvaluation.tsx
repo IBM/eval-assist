@@ -413,7 +413,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
               type={type}
               selectedPipeline={selectedPipeline}
               setSelectedPipeline={setSelectedPipeline}
-              style={{ marginBottom: '.75rem' }}
+              style={{ marginBottom: '1rem' }}
             />
             <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>
               <strong>Test data</strong>
