@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import { useLocalStorage } from 'usehooks-ts'
 
-import { LegacyRef, useCallback, useMemo, useRef, useState } from 'react'
+import { LegacyRef, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -30,6 +30,7 @@ import { Responses } from './Responses'
 import { EvaluationResults } from './Results'
 import classes from './SingleExampleEvaluation.module.scss'
 import { UseCaseOptions } from './UseCaseOptions'
+import { autoUpdateSize, useAutosizeTextArea } from './autosizeTextArea'
 import {
   FetchedPairwiseResult,
   FetchedResults,
@@ -343,6 +344,18 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
     setShowingTestCase(false)
   }
 
+  const instructionRef = useRef<HTMLTextAreaElement>(null)
+  useAutosizeTextArea([instructionRef.current] as HTMLTextAreaElement[])
+
+  useLayoutEffect(() => {
+    function updateSize() {
+      autoUpdateSize(instructionRef.current as HTMLTextAreaElement)
+    }
+    window.addEventListener('resize', updateSize)
+    updateSize()
+    return () => window.removeEventListener('resize', updateSize)
+  }, [])
+
   return (
     <>
       <AppSidenavNew
@@ -420,12 +433,15 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
             </div>
 
             <TextArea
-              onChange={(e) => setContext(e.target.value)}
-              rows={4}
+              onChange={(e) => {
+                setContext(e.target.value), autoUpdateSize(e.target)
+              }}
+              rows={1}
+              ref={instructionRef}
               value={context}
               id="text-area-context"
               labelText="Task context (optional)"
-              style={{ marginBottom: '1rem' }}
+              style={{ marginBottom: '1rem', resize: 'none' }}
               placeholder="Context information relevant to the evaluation such as prompt, data variables etc."
               className={classes['left-padding']}
             />

@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { CSSProperties, Dispatch, SetStateAction, useMemo } from 'react'
+import { CSSProperties, Dispatch, SetStateAction, useLayoutEffect, useMemo, useRef } from 'react'
 
 import { Button, IconButton, TextArea } from '@carbon/react'
 import { Add, Close } from '@carbon/react/icons'
@@ -8,6 +8,7 @@ import { Add, Close } from '@carbon/react/icons'
 import { isInstanceOfPairwiseResult } from '@utils/utils'
 
 import classes from './Responses.module.scss'
+import { autoUpdateSize, useAutosizeTextArea } from './autosizeTextArea'
 import { PairwiseResult, PipelineType, RubricResult } from './types'
 
 interface ResponsesInterface {
@@ -31,6 +32,30 @@ export const Responses = ({ responses, setResponses, style, className, type, res
       return results[0].winnerIndex
     } else return null
   }, [results])
+
+  const refs = useRef<HTMLTextAreaElement[]>([])
+  refs.current = []
+
+  // Dynamically add refs during rendering
+  const addToRefs = (el: HTMLTextAreaElement) => {
+    if (el && !refs.current?.includes(el)) {
+      refs.current.push(el)
+    }
+  }
+
+  useAutosizeTextArea(refs.current)
+
+  // Listen for change to window
+  useLayoutEffect(() => {
+    function updateSize() {
+      refs.current.forEach(function (ref: HTMLTextAreaElement) {
+        autoUpdateSize(ref)
+      })
+    }
+    window.addEventListener('resize', updateSize)
+    updateSize()
+    return () => window.removeEventListener('resize', updateSize)
+  }, [])
 
   return (
     <div style={style} className={className}>
@@ -63,8 +88,12 @@ export const Responses = ({ responses, setResponses, style, className, type, res
             </IconButton>
           </div>
           <TextArea
-            onChange={(e) => setResponses([...responses.slice(0, i), e.target.value, ...responses.slice(i + 1)])}
-            rows={4}
+            onChange={(e) => {
+              setResponses([...responses.slice(0, i), e.target.value, ...responses.slice(i + 1)]),
+                autoUpdateSize(e.target)
+            }}
+            ref={addToRefs}
+            rows={1}
             value={response}
             id="text-area-model-output"
             labelText={''}
@@ -72,6 +101,7 @@ export const Responses = ({ responses, setResponses, style, className, type, res
             className={cx({
               [classes['winner-response']]: i === pairwiseWinnerIndex,
             })}
+            style={{ resize: 'none' }}
             // className={classes['winner-response']}
           />
         </div>
