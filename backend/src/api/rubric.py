@@ -64,7 +64,7 @@ class RubricEvalResultModel(BaseModel):
     option: str
     explanation: str
     p_bias: Optional[bool] = None
-    entropy: Optional[float] = None
+    certainty: Optional[float] = None
 
 class RubricEvalResponseModel(BaseModel):
     results: List[RubricEvalResultModel]

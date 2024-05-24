@@ -45,13 +45,11 @@ class PairwiseEvalRequestModel(BaseModel):
             raise HTTPException(status_code=400, detail="Two responses are required for pairwise evaluaton.")
         
         return responses
-
-        return value
-
+    
 class PairwiseEvalResultModel(BaseModel):
     w_index: int
     explanation: str
-    entropy: Optional[float] = None
+    certainty: Optional[float] = None
     p_bias: Optional[bool] = None
 
 class PairwiseEvalResponseModel(BaseModel):
