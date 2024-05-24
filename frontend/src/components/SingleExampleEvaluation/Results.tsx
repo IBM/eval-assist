@@ -55,12 +55,13 @@ export const EvaluationResults = ({
         </button>
       </Tooltip>
     </div>,
+    'Certainty',
     'Explanation',
   ]
 
   const pairwiseResultsHeaders = [
     'Criteria',
-    'Outcome',
+    'Win',
     <div key={3} style={{ display: 'inline-flex', flexDirection: 'row', alignItems: 'center' }}>
       Positional bias
       <Tooltip
@@ -78,6 +79,7 @@ export const EvaluationResults = ({
         </button>
       </Tooltip>
     </div>,
+    'Certainty',
     'Explanation',
   ]
 
@@ -117,8 +119,9 @@ export const EvaluationResults = ({
                   <TableRow key={i} className={row.positionalBias ? classes['table-row-error'] : ''}>
                     <TableCell>{`${i + 1}`}</TableCell>
                     <TableCell>{row.name}</TableCell>
-                    <TableCell>{(row as RubricResult).option}</TableCell>
+                    <TableCell style={{ fontWeight: 'bold' }}>{(row as RubricResult).option}</TableCell>
                     <TableCell>{row.positionalBias ? 'True' : 'False'}</TableCell>
+                    <TableCell>{(row.certainty * 100).toFixed(0) + '%'}</TableCell>
                     <TableCell>{row.explanation}</TableCell>
                   </TableRow>
                 ))}
@@ -128,8 +131,11 @@ export const EvaluationResults = ({
                 {results.map((row, i) => (
                   <TableRow key={i} className={row.positionalBias ? classes['table-row-error'] : ''}>
                     <TableCell>{row.name}</TableCell>
-                    <TableCell>{`Response #${(row as PairwiseResult).winnerIndex + 1} wins`}</TableCell>
+                    <TableCell style={{ fontWeight: 'bold' }}>{`Response #${
+                      (row as PairwiseResult).winnerIndex + 1
+                    }`}</TableCell>
                     <TableCell>{row.positionalBias ? 'True' : 'False'}</TableCell>
+                    <TableCell>{(row.certainty * 100).toFixed(0) + '%'}</TableCell>
                     <TableCell>{row.explanation}</TableCell>
                   </TableRow>
                 ))}

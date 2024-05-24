@@ -66,7 +66,7 @@ website or contact them to discuss your options.`,
     pipeline: null,
   },
   {
-    name: 'Temperature 2',
+    name: 'Temperature',
     type: PipelineType.PAIRWISE,
     id: null,
     context: 'How is the weather there?',

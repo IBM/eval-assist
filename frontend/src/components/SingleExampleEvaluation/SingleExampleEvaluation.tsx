@@ -195,6 +195,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
             option: result.option,
             explanation: result.explanation,
             positionalBias: result.p_bias,
+            certainty: result.certainty,
           } as RubricResult),
       )
     } else {
@@ -205,7 +206,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
             explanation: result.explanation,
             positionalBias: result.p_bias,
             winnerIndex: result.w_index,
-            entropy: result.entropy,
+            certainty: result.certainty,
           } as PairwiseResult),
       )
     }
@@ -426,8 +427,9 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
               type={type}
               selectedPipeline={selectedPipeline}
               setSelectedPipeline={setSelectedPipeline}
-              style={{ marginBottom: '1rem' }}
+              style={{ marginBottom: '2rem' }}
             />
+
             <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>
               <strong>Test data</strong>
             </div>
