@@ -75,7 +75,7 @@ export const getEmptyUseCase = (type: PipelineType): UseCase => ({
   name: '',
   type: type,
   context: '',
-  responses: [''],
+  responses: type === PipelineType.RUBRIC ? [''] : ['', ''],
   criteria: getEmptyRubricCriteria(),
   results: null,
   pipeline: null,
