@@ -41,7 +41,7 @@ export const PipelineSelect = ({ type, style, className, selectedPipeline, setSe
 
   return (
     <div style={{ marginBottom: '1.5rem' }} className={classes['left-padding']}>
-      <span className={classes['toggle-span']}>Evaluators</span>
+      <span className={classes['toggle-span']}>Evaluator</span>
       <Toggletip align="top">
         <ToggletipButton label="Show information" className={classes['eval-info-button']}>
           <Information />

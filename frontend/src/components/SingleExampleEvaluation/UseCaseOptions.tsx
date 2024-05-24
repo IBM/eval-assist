@@ -48,7 +48,15 @@ export const UseCaseOptions = ({
   }
   return (
     <div style={{ ...style, display: 'flex', flexDirection: 'row', alignItems: 'center' }} className={className}>
-      <h4 style={{ paddingRight: '0.5rem' }}>{isUseCaseSaved ? useCaseName : 'Unsaved Test Case'}</h4>
+      <h4
+        style={{
+          paddingRight: '0.5rem',
+          opacity: isUseCaseSaved ? 'inherit' : '0.5',
+          fontStyle: isUseCaseSaved ? 'inherit' : 'italic',
+        }}
+      >
+        {isUseCaseSaved ? useCaseName : '(Unsaved)'}
+      </h4>
       {isUseCaseSaved && (
         <IconButton
           style={{ marginRight: '0.5rem' }}
