@@ -28,6 +28,8 @@ model AppUser {
   id               Int             @id @default(autoincrement())
   email            String          @unique
   name             String
+  created_at       DateTime        @default(now())
+  
   stored_use_cases StoredUseCase[]
 
   @@map("app_user")
