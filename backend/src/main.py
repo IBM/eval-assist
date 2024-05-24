@@ -302,10 +302,10 @@ class PutUseCaseBody(BaseModel):
 @router.put("/use_case/")
 async def put_use_case(request_body: PutUseCaseBody):
     user = db.appuser.find_unique(where={'email': request_body.user})
-    
+
     found = db.storedusecase.find_unique(where={
         "id": request_body.use_case.id, 
-        "user_id": user.id
+        "user_id": user.id,
     })
 
     if found:
@@ -316,14 +316,25 @@ async def put_use_case(request_body: PutUseCaseBody):
                 "content": json.dumps(request_body.use_case.content),
             }
         )
+
     else:
-        res = db.storedusecase.create(
-            data={
-                "name": request_body.use_case.name, 
-                "content": json.dumps(request_body.use_case.content),
-                "user_id": user.id
-            }
+
+        name_and_user_exists = db.storedusecase.find_many(
+            where={"name":request_body.use_case.name,
+                   "user_id": user.id,}
         )
+
+        if name_and_user_exists:
+            raise HTTPException(status_code=409, detail=f"The name '{request_body.use_case.name}' is already in use")
+
+        else:
+            res = db.storedusecase.create(
+                data={
+                    "name": request_body.use_case.name, 
+                    "content": json.dumps(request_body.use_case.content),
+                    "user_id": user.id
+                }
+            )
 
     return res
     
