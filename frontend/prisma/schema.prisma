@@ -2,7 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider             = "prisma-client-py"
+  interface            = "sync"
+  recursive_type_depth = 5
 }
 
 datasource db {
@@ -14,20 +16,29 @@ model StoredUseCase {
   id      Int    @id @default(autoincrement())
   user_id Int
   content Json
-  name    String @unique
+  name    String
 
   app_user AppUser @relation(fields: [user_id], references: [id])
 
+  @@unique([user_id, name])
   @@map("stored_use_case")
 }
 
 model AppUser {
   id               Int             @id @default(autoincrement())
   email            String          @unique
-  name             String          
+  name             String
+  created_at       DateTime        @default(now())
+  
   stored_use_cases StoredUseCase[]
 
   @@map("app_user")
+}
+
+model LogRecord {
+  id      Int    @id @default(autoincrement())
+  data Json
+  @@map("log_record")
 }
 
 // model Evaluation {
@@ -38,17 +49,17 @@ model AppUser {
 //   deleted     Boolean       @default(false)
 //   deleted_at  DateTime?
 //   ModelOutput ModelOutput[]
-//   Datum       Datum[]
+//   Datum Datum[]
 
 //   @@map("evaluation")
 // }
 
 // model Datum {
-//   id            Int           @id @default(autoincrement())
-//   context       Json
+//   id          Int           @id @default(autoincrement())
+//   context     Json
 //   evaluation_id Int
-//   evaluation    Evaluation    @relation(fields: [evaluation_id], references: [id])
-//   ModelOutput   ModelOutput[]
+//   evaluation    Evaluation @relation(fields: [evaluation_id], references: [id])
+//   ModelOutput ModelOutput[]
 
 //   @@map("datum")
 // }
