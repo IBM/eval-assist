@@ -293,34 +293,34 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
 
   const onSaveAs = async (name: string, fromUseCase?: UseCase) => {
     const toSaveUseCase = fromUseCase ?? getUseCaseFromState()
-    const savedUseCase: StoredUseCase = await (
-      await put('use_case/', {
-        use_case: {
-          name: name,
-          content: JSON.stringify({
-            context: toSaveUseCase.context,
-            responses: toSaveUseCase.responses,
-            criteria: toSaveUseCase.criteria,
-            results: toSaveUseCase.results,
-            type: toSaveUseCase.type,
-            pipeline: toSaveUseCase.pipeline,
-          }),
-          user_id: -1,
-          id: -1,
-        } as StoredUseCase,
-        user: getUserName(),
-      })
-    ).json()
-
-    const checkTheUseCase: any = savedUseCase
-    if (checkTheUseCase.context.error == 'NAME_EXISTS') {
-      console.log('NAME EXISTS - trap the error and make the user choose something different')
+    const res = await put('use_case/', {
+      use_case: {
+        name: name,
+        content: JSON.stringify({
+          context: toSaveUseCase.context,
+          responses: toSaveUseCase.responses,
+          criteria: toSaveUseCase.criteria,
+          results: toSaveUseCase.results,
+          type: toSaveUseCase.type,
+          pipeline: toSaveUseCase.pipeline,
+        }),
+        user_id: -1,
+        id: -1,
+      } as StoredUseCase,
+      user: getUserName(),
+    })
+    if (!res.ok) {
+      const error = (await res.json()) as {
+        detail: string
+      }
       addToast({
         kind: 'error',
-        title: `Name already in use '${savedUseCase.name}'`,
+        title: error.detail,
         timeout: 5000,
       })
+      return false
     } else {
+      const savedUseCase: StoredUseCase = await res.json()
       const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
       setCurrentUseCase(parsedSavedUseCase)
       setUserUseCases([...userUseCases, parsedSavedUseCase])
@@ -337,6 +337,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
 
       setSidebarTabSelected('user_use_cases')
     }
+    return true
   }
 
   const onDeleteUseCase = async () => {
@@ -508,7 +509,6 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
         open={newUseCaseModalOpen}
         setOpen={setNewUseCaseModalOpen}
         changesDetected={changesDetected}
-        onSaveAs={onSaveAs}
         setCurrentUseCase={setCurrentUseCase}
       />
       <DeleteUseCaseModal

@@ -15,11 +15,10 @@ interface Props {
   open: boolean
   changesDetected: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  onSaveAs: (name: string, fromUseCase?: UseCase) => Promise<void>
   setCurrentUseCase: (useCase: UseCase) => void
 }
 
-export const NewUseCaseModal = ({ open, changesDetected, setOpen, onSaveAs, setCurrentUseCase }: Props) => {
+export const NewUseCaseModal = ({ open, changesDetected, setOpen, setCurrentUseCase }: Props) => {
   const [selectedType, setSelectedType] = useState<PipelineType | null>(null)
 
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()

@@ -8,18 +8,19 @@ import { PipelineType, UseCase } from '../types'
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  onSaveAs: (name: string, fromUseCase?: UseCase) => Promise<void>
+  onSaveAs: (name: string, fromUseCase?: UseCase) => Promise<boolean>
   type: PipelineType
 }
 
 export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, type }: Props) => {
   const [useCaseName, setUseCaseName] = useState('')
-  const [status, setStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>('inactive')
-  const [description, setDescription] = useState('Saving...')
+  const [loadingStatus, setLoadingStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>(
+    'inactive',
+  )
+  const [loadingDescription, setLoadingDescription] = useState('Saving...')
 
   const resetStatus = () => {
-    setStatus('inactive')
-    setDescription('Deleting...')
+    setLoadingStatus('inactive')
     setOpen(false)
     setUseCaseName('')
   }
@@ -35,16 +36,17 @@ export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, type }: Props) => 
       }
       primaryButtonText="Confirm"
       onRequestSubmit={async () => {
-        setStatus('active')
-        await onSaveAs(useCaseName)
-        setStatus('finished')
-        setDescription('Saved!')
+        setLoadingStatus('active')
+        const failed = !(await onSaveAs(useCaseName))
+        setLoadingStatus(failed ? 'inactive' : 'finished')
+        setLoadingDescription(failed ? 'Saving...' : 'Saved!')
       }}
-      loadingStatus={status}
+      loadingStatus={loadingStatus}
+      loadingDescription={loadingDescription}
       secondaryButtonText="Cancel"
       shouldSubmitOnEnter
-      loadingDescription={description}
       onLoadingSuccess={resetStatus}
+      primaryButtonDisabled={useCaseName === ''}
     >
       <TextInput
         data-modal-primary-focus
