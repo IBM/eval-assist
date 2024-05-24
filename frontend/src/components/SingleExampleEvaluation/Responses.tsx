@@ -77,16 +77,18 @@ export const Responses = ({ responses, setResponses, style, className, type, res
                 {i === pairwiseWinnerIndex ? '(Winner)' : ''}
               </label>
             </div>
-            <IconButton
-              disabled={responses.length === 1}
-              kind={'ghost'}
-              size="sm"
-              label="Delete"
-              align="bottom"
-              onClick={() => onRemoveResponse(i)}
-            >
-              <Close size={14} />
-            </IconButton>
+            {type === PipelineType.RUBRIC && (
+              <IconButton
+                disabled={responses.length === 1}
+                kind={'ghost'}
+                size="sm"
+                label="Delete"
+                align="bottom"
+                onClick={() => onRemoveResponse(i)}
+              >
+                <Close size={14} />
+              </IconButton>
+            )}
           </div>
           <TextArea
             onChange={(e) => {
