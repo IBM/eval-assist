@@ -312,21 +312,31 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
       })
     ).json()
 
-    const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
-    setCurrentUseCase(parsedSavedUseCase)
-    setUserUseCases([...userUseCases, parsedSavedUseCase])
-    changeUseCaseURL(parsedSavedUseCase.id)
-    // update lastSavedUseCase
-    setLastSavedUseCase(JSON.stringify(parsedSavedUseCase))
+    const checkTheUseCase: any = savedUseCase
+    if (checkTheUseCase.context.error == 'NAME_EXISTS') {
+      console.log('NAME EXISTS - trap the error and make the user choose something different')
+      addToast({
+        kind: 'error',
+        title: `Name already in use '${savedUseCase.name}'`,
+        timeout: 5000,
+      })
+    } else {
+      const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
+      setCurrentUseCase(parsedSavedUseCase)
+      setUserUseCases([...userUseCases, parsedSavedUseCase])
+      changeUseCaseURL(parsedSavedUseCase.id)
+      // update lastSavedUseCase
+      setLastSavedUseCase(JSON.stringify(parsedSavedUseCase))
 
-    // notify the user
-    addToast({
-      kind: 'success',
-      title: `Created use case '${parsedSavedUseCase.name}'`,
-      timeout: 5000,
-    })
+      // notify the user
+      addToast({
+        kind: 'success',
+        title: `Created use case '${parsedSavedUseCase.name}'`,
+        timeout: 5000,
+      })
 
-    setSidebarTabSelected('user_use_cases')
+      setSidebarTabSelected('user_use_cases')
+    }
   }
 
   const onDeleteUseCase = async () => {
