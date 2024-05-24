@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider             = "prisma-client-py"
+  provider             = "prisma-client-js"
   interface            = "sync"
   recursive_type_depth = 5
 }
