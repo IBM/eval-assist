@@ -19,7 +19,7 @@ import { Information } from '@carbon/react/icons'
 import { useToastContext } from '@components/ToastProvider/ToastProvider'
 import { get } from '@utils/fetchUtils'
 
-import { usePipelineTypesContext } from './PipelineTypesProvider'
+import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import classes from './SingleExampleEvaluation.module.scss'
 import { Pipeline, PipelineType } from './types'
 

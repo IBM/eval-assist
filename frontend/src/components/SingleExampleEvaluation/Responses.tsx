@@ -28,7 +28,6 @@ export const Responses = ({ responses, setResponses, style, className, type, res
 
   const pairwiseWinnerIndex = useMemo(() => {
     if (results === null || results.length === 0) return null
-    console.log(isInstanceOfPairwiseResult(results[0]))
     if (results.length === 1 && isInstanceOfPairwiseResult(results[0])) {
       return results[0].winnerIndex
     } else return null

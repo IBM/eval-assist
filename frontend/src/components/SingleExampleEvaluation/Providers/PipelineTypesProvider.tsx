@@ -4,7 +4,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from 'react
 
 import { get } from '@utils/fetchUtils'
 
-import { Pipeline, PipelineType } from './types'
+import { Pipeline, PipelineType } from '../types'
 
 interface PipepelineContextValue {
   rubricPipelines: string[]

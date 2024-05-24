@@ -26,6 +26,7 @@ import { NewUseCaseModal } from './Modals/NewUseCaseModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { PipelineSelect } from './PipelineSelect'
+import { useBackendUserContext } from './Providers/BackendUserProvider'
 import { Responses } from './Responses'
 import { EvaluationResults } from './Results'
 import classes from './SingleExampleEvaluation.module.scss'
@@ -125,27 +126,41 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
 
   useBeforeOnload(changesDetected)
 
+  const { backendUser } = useBackendUserContext()
+
   const runEvaluation = async () => {
     setEvaluationFailed(false)
     setEvaluationRunning(true)
     setResults(null)
     let response
     if (type === PipelineType.RUBRIC) {
-      response = await post('evaluate/rubric/', {
-        context,
-        responses,
-        rubric: { criteria: criteria.criteria, options: (criteria as RubricCriteria).options },
-        bam_api_key: bamAPIKey,
-        pipeline: selectedPipeline,
-      })
+      response = await post(
+        'evaluate/rubric/',
+        {
+          context,
+          responses,
+          rubric: { criteria: criteria.criteria, options: (criteria as RubricCriteria).options },
+          bam_api_key: bamAPIKey,
+          pipeline: selectedPipeline,
+        },
+        {
+          user_id: backendUser?.id,
+        },
+      )
     } else {
-      response = await post('evaluate/pairwise/', {
-        instruction: context,
-        responses,
-        criteria: { name: criteria.name, criteria: criteria.criteria },
-        bam_api_key: bamAPIKey,
-        pipeline: selectedPipeline,
-      })
+      response = await post(
+        'evaluate/pairwise/',
+        {
+          instruction: context,
+          responses,
+          criteria: { name: criteria.name, criteria: criteria.criteria },
+          bam_api_key: bamAPIKey,
+          pipeline: selectedPipeline,
+        },
+        {
+          user_id: backendUser?.id,
+        },
+      )
     }
 
     setEvaluationRunning(false)

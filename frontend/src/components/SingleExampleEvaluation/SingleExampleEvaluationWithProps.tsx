@@ -7,11 +7,12 @@ import { Loading } from '@carbon/react'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { StoredUseCase } from '@prisma/client'
 import { get } from '@utils/fetchUtils'
-import { getEmptyUseCase, parseFetchedUseCase } from '@utils/utils'
+import { parseFetchedUseCase } from '@utils/utils'
 
-import { PipelineTypesProvider } from './PipelineTypesProvider'
+import { BackendUserProvider } from './Providers/BackendUserProvider'
+import { PipelineTypesProvider } from './Providers/PipelineTypesProvider'
 import { SingleExampleEvaluation } from './SingleExampleEvaluation'
-import { PipelineType, UseCase } from './types'
+import { UseCase } from './types'
 
 export const SingleExampleEvaluationWithProps = () => {
   const [loadingUseCases, setLoadingUseCases] = useState(false)
@@ -53,8 +54,10 @@ export const SingleExampleEvaluationWithProps = () => {
   if (loadingUseCases || useCases === null) return <Loading withOverlay />
 
   return (
-    <PipelineTypesProvider>
-      <SingleExampleEvaluation _userUseCases={useCases} currentUseCase={currentUseCase} />
-    </PipelineTypesProvider>
+    <BackendUserProvider>
+      <PipelineTypesProvider>
+        <SingleExampleEvaluation _userUseCases={useCases} currentUseCase={currentUseCase} />
+      </PipelineTypesProvider>
+    </BackendUserProvider>
   )
 }

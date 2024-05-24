@@ -14,8 +14,10 @@ export const useAuthentication = () => {
 
   const isUnauthenticated = status === 'unauthenticated'
 
+  const defaultUserName = 'only_dev_default_user'
+
   const getUserName = useCallback(
-    () => (authenticationEnabled ? (user?.email as string) : 'only_dev_default_user'),
+    () => (authenticationEnabled ? (user?.email as string) : defaultUserName),
     [authenticationEnabled, user?.email],
   )
 
@@ -26,5 +28,6 @@ export const useAuthentication = () => {
     getUserName,
     authenticationLoading,
     isUnauthenticated,
+    defaultUserName,
   }
 }
