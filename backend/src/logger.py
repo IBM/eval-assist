@@ -5,7 +5,7 @@ from typing import Callable
 from .db_client import db
 import json, time
 
-def log_info(method, path, req_body, res_body):
+def log_info(method, path, req_body, res_body, headers):
 
     record = {        
         "path": path,
@@ -22,6 +22,9 @@ def log_info(method, path, req_body, res_body):
     if res_body:
         res = json.loads(res_body.decode())
         record["response"] = res
+
+    if "user_id" in headers:
+        record["user_id"] = headers.get("user_id")
 
     db.logrecord.create(
         data={
@@ -40,7 +43,8 @@ class LoggingRoute(APIRoute):
             response = await original_route_handler(request)
             tasks = response.background
 
-            task = BackgroundTask(log_info, request.method, request.url.path, req_body, response.body)
+            request.headers
+            task = BackgroundTask(log_info, request.method, request.url.path, req_body, response.body, request.headers)
             
             # check if the original response had background tasks already attached to it
             if tasks:

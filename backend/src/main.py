@@ -351,7 +351,7 @@ class CreateUserPostBody(BaseModel):
     email: str
     name: str
 
-@app.post('/user/')
+@router.post('/user/')
 async def create_user_if_not_exist(user:CreateUserPostBody):
     try:
         db_user = db.appuser.find_unique(where={'email': user.email})
