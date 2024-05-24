@@ -71,7 +71,7 @@ export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase, setSidebarT
         />
         <Card
           title={'Example Catalog'}
-          description={'A catalogu of customizable criteria along with sample test data'}
+          description={'A catalog of customizable criteria along with sample test data'}
           imageSrc="test_case_library"
           actionButton={
             <Button renderIcon={View} kind="ghost" onClick={openTestCasesLibrary}>
