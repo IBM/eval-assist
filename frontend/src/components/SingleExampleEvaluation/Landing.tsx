@@ -79,7 +79,7 @@ export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase, setSidebarT
             </Button>
           }
           className={cx({ [classes['card-white-mode']]: theme === 'white' })}
-          badge={{ text: 'Catalogue', color: 'purple' }}
+          badge={{ text: 'Catalog', color: 'purple' }}
         />
         <Card
           title={'LLM-as-a-judge Toolkit'}
