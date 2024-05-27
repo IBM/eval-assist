@@ -13,6 +13,7 @@ class RubricOptionModel(BaseModel):
         return option
 
 class RubricModel(BaseModel):
+    name: str
     criteria: str
     options: List[RubricOptionModel]
 
