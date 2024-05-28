@@ -135,7 +135,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
       response = await post('evaluate/rubric/', {
         context,
         responses,
-        rubric: { criteria: criteria.criteria, options: (criteria as RubricCriteria).options },
+        rubric: { name: criteria.name, criteria: criteria.criteria, options: (criteria as RubricCriteria).options },
         bam_api_key: bamAPIKey,
         pipeline: selectedPipeline,
       })
