@@ -1,4 +1,5 @@
 from io import StringIO
+from typing import Optional
 from fastapi import FastAPI, status, UploadFile, HTTPException, APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
@@ -349,14 +350,18 @@ async def delete_use_case(request_body: DeleteUseCaseBody):
 
 class CreateUserPostBody(BaseModel):
     email: str
-    name: str
+    name: Optional[str] = None
 
 @router.post('/user/')
-async def create_user_if_not_exist(user:CreateUserPostBody):
+async def create_user_if_not_exist(user: CreateUserPostBody):
     try:
         db_user = db.appuser.find_unique(where={'email': user.email})
         if (db_user is None):
-            db_user = db.appuser.create(data={'email': user.email, 'name': user.name})
+            db_user = db.appuser.create(
+                data={
+                    'email': user.email, 
+                    'name': user.name if user.name is not None else ''
+                })
         return db_user
     except PrismaError as pe:
         print(f'Prisma error raised: {pe}')
