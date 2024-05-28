@@ -67,7 +67,7 @@ export const Card = ({
         className={cx(classes['card-image'], { [classes['card-image-margin']]: actionButton })}
         width={250}
         height={125}
-        src={`images/${imageSrc}${theme !== 'white' ? '_dark' : ''}.svg`}
+        src={`images/${theme !== 'white' ? 'dark_mode_' : ''}${imageSrc}.svg`}
         alt={title}
       />
       {actionButton && <div className={classes['action-button']}>{actionButton}</div>}
