@@ -24,7 +24,7 @@ def log_info(method, path, req_body, res_body, headers):
         record["response"] = res
 
     if "user_id" in headers:
-        record["user_id"] = headers.get("user_id")
+        record["user_id"] = int(headers.get("user_id"))
 
     db.logrecord.create(
         data={
