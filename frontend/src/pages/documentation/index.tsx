@@ -16,12 +16,14 @@ const Documentation = () => {
         <h2>Overview</h2>
         <p>
           <strong>EvalAssist</strong> is a development environment for LLM-as-a-judge evaluation criteria. We currently
-          support rubric style criteria where the evaluation is described in terms of a question and a set of predefined
-          answers.
+          support <strong>direct assessment</strong> where evaluation is described in terms of a question (or statement)
+          and a set of predefined answers, and <strong>pairwise comparison</strong> where the evaluation involves
+          selecting the best response from a pair of possible responses. The tool also provides a catalog of example
+          test cases, exhibiting the use of LLM-as-a-judge across a variety of scenarios.
         </p>
         <h2>Get API Key</h2>
         <p>
-          You can obtain and copy your API key from{' '}
+          You need a BAM api key to use the tool, you can obtain and copy your API key from{' '}
           <Link href="https://bam.res.ibm.com/">https://bam.res.ibm.com/</Link> under the documentation section (see
           highlighted portion below)
           <br />
