@@ -48,11 +48,10 @@ export const UseCaseOptions = ({
       <h4
         style={{
           paddingRight: '0.5rem',
-          opacity: isUseCaseSaved ? 'inherit' : '0.5',
-          fontStyle: isUseCaseSaved ? 'inherit' : 'italic',
+          opacity: useCaseName ? 'inherit' : '0.5',
         }}
       >
-        {isUseCaseSaved ? useCaseName : 'Unsaved'}
+        {useCaseName || 'Unsaved test case'}
       </h4>
       {isUseCaseSaved && (
         <IconButton
