@@ -8,6 +8,7 @@ import { getEmptyUseCase } from '@utils/utils'
 
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'
 import { usePipelineTypesContext } from '../Providers/PipelineTypesProvider'
+import { useToastContext } from '../Providers/ToastProvider'
 import { PipelineType, UseCase } from '../types'
 import classes from './NewUseCaseModal.module.scss'
 
@@ -23,11 +24,23 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, setCurrentUseC
 
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
 
+  const { addToast } = useToastContext()
+
   const onSubmit = async () => {
-    setCurrentUseCase({
-      ...getEmptyUseCase(selectedType as PipelineType),
-      pipeline: selectedType === PipelineType.RUBRIC ? rubricPipelines[0] : pairwisePipelines[0],
-    })
+    if (rubricPipelines !== null && pairwisePipelines !== null) {
+      setCurrentUseCase({
+        ...getEmptyUseCase(selectedType as PipelineType),
+        pipeline: selectedType === PipelineType.RUBRIC ? rubricPipelines[0] : pairwisePipelines[0],
+      })
+    } else {
+      setCurrentUseCase(getEmptyUseCase(selectedType as PipelineType))
+      addToast({
+        kind: 'info',
+        title: 'Evaluator options are not yet available',
+        subtitle: 'Choose an option once they are ready',
+        timeout: 5000,
+      })
+    }
     resetStatus()
   }
 

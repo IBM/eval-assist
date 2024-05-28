@@ -1,19 +1,19 @@
-import { CSSProperties, Dispatch, SetStateAction, useCallback } from 'react'
-import { useEffect, useState } from 'react'
+import { CSSProperties, Dispatch, SetStateAction, useEffect } from 'react'
 
 import Link from 'next/link'
 
 import {
-  Accordion,
-  AccordionItem,
   Select,
   SelectItem,
+  SelectItemGroup,
   SelectSkeleton,
   Toggletip,
   ToggletipButton,
   ToggletipContent,
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
+
+import { returnByPipelineType } from '@utils/utils'
 
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import classes from './SingleExampleEvaluation.module.scss'
@@ -27,8 +27,14 @@ interface Props {
   setSelectedPipeline: Dispatch<SetStateAction<string | null>>
 }
 
-export const PipelineSelect = ({ type, style, className, selectedPipeline, setSelectedPipeline }: Props) => {
+export const PipelineSelect = ({ style, className, selectedPipeline, setSelectedPipeline, type }: Props) => {
   const { rubricPipelines, pairwisePipelines, loadingPipelines } = usePipelineTypesContext()
+
+  useEffect(() => {
+    if (selectedPipeline === null && rubricPipelines !== null && pairwisePipelines !== null && !loadingPipelines) {
+      setSelectedPipeline(returnByPipelineType(type, rubricPipelines[0], pairwisePipelines[0]))
+    }
+  }, [selectedPipeline, rubricPipelines, pairwisePipelines, setSelectedPipeline, loadingPipelines, type])
 
   return (
     <div style={{ marginBottom: '1.5rem' }} className={classes['left-padding']}>
@@ -48,14 +54,14 @@ export const PipelineSelect = ({ type, style, className, selectedPipeline, setSe
         </ToggletipContent>
       </Toggletip>
 
-      {rubricPipelines === null || pairwisePipelines === null ? (
+      {loadingPipelines || rubricPipelines === null || pairwisePipelines === null ? (
         <SelectSkeleton />
       ) : (
         <Select
           id="pipeline-select"
           labelText=""
-          helperText=""
-          value={selectedPipeline || undefined}
+          helperText={''}
+          value={selectedPipeline || ''}
           onChange={(e) => {
             setSelectedPipeline(e.target.value)
           }}

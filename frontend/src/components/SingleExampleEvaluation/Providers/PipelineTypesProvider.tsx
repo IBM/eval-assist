@@ -23,7 +23,7 @@ export const usePipelineTypesContext = () => {
 }
 
 export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => {
-  const [pipelines, setPipelines] = useState<Pipeline[]>([])
+  const [pipelines, setPipelines] = useState<Pipeline[] | null>(null)
   const [loadingPipelines, setLoadingPipelines] = useState(false)
   useEffect(() => {
     const fetchData = async () => {
@@ -39,8 +39,8 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
   return (
     <PipelineTypesContext.Provider
       value={{
-        rubricPipelines: pipelines.filter((p) => p.type === PipelineType.RUBRIC).map((p) => p.name),
-        pairwisePipelines: pipelines.filter((p) => p.type === PipelineType.PAIRWISE).map((p) => p.name),
+        rubricPipelines: pipelines?.filter((p) => p.type === PipelineType.RUBRIC).map((p) => p.name) ?? null,
+        pairwisePipelines: pipelines?.filter((p) => p.type === PipelineType.PAIRWISE).map((p) => p.name) ?? null,
         loadingPipelines,
       }}
     >

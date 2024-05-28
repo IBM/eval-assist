@@ -47,8 +47,7 @@ export const SwitchUseCaseModal = ({
     setCurrentUseCase(selectedUseCase as UseCase)
     setOpen(false)
   }
-  console.log('currentUseCase.ID')
-  console.log(currentUseCase.id)
+
   return (
     selectedUseCase && (
       <ComposedModal size="sm" open={open} onClose={onClose}>
