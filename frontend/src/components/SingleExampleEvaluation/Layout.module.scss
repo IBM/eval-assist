@@ -1,5 +1,5 @@
-@use '@carbon/styles/scss/utilities/convert' as *;
-@use '@carbon/styles/scss/motion' as *;
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/motion';
 
 .sidebar {
   top: rem(48px);

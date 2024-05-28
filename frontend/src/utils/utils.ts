@@ -83,3 +83,15 @@ export const getEmptyUseCase = (type: PipelineType): UseCase => ({
 
 export const returnByPipelineType = (type: PipelineType, returnIfRubric: any, returnIfPairwise: any) =>
   type === PipelineType.RUBRIC ? returnIfRubric : returnIfPairwise
+
+export const getUseCaseStringWithSortedKeys = (unsortedObj: UseCase) => {
+  const aux = unsortedObj as unknown as { [key: string]: string }
+  return JSON.stringify(
+    Object.keys(aux)
+      .sort()
+      .reduce((obj: { [key: string]: string }, key: string) => {
+        obj[key] = aux[key]
+        return obj
+      }, {}),
+  )
+}

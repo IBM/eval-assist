@@ -12,16 +12,12 @@ import {
   Toggletip,
   ToggletipButton,
   ToggletipContent,
-  ToggletipLabel,
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
-import { useToastContext } from '@components/ToastProvider/ToastProvider'
-import { get } from '@utils/fetchUtils'
-
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import classes from './SingleExampleEvaluation.module.scss'
-import { Pipeline, PipelineType } from './types'
+import { PipelineType } from './types'
 
 interface Props {
   type: PipelineType
@@ -32,12 +28,7 @@ interface Props {
 }
 
 export const PipelineSelect = ({ type, style, className, selectedPipeline, setSelectedPipeline }: Props) => {
-  const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
-
-  useEffect(() => {
-    if (selectedPipeline === null)
-      setSelectedPipeline(type === PipelineType.RUBRIC ? rubricPipelines[0] : pairwisePipelines[0])
-  }, [type, rubricPipelines, pairwisePipelines, selectedPipeline, setSelectedPipeline])
+  const { rubricPipelines, pairwisePipelines, loadingPipelines } = usePipelineTypesContext()
 
   return (
     <div style={{ marginBottom: '1.5rem' }} className={classes['left-padding']}>
@@ -51,13 +42,13 @@ export const PipelineSelect = ({ type, style, className, selectedPipeline, setSe
             Please refer to{' '}
             <Link href="https://bam.res.ibm.com/docs/models#" target="_blank" rel="noopener noreferrer">
               BAM documentation
-            </Link>{' '}
+            </Link>
             for guidance on related model usage
           </p>
         </ToggletipContent>
       </Toggletip>
 
-      {(PipelineType.RUBRIC ? rubricPipelines.length === 0 : pairwisePipelines.length === 0) ? (
+      {rubricPipelines === null || pairwisePipelines === null ? (
         <SelectSkeleton />
       ) : (
         <Select

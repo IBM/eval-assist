@@ -33,18 +33,33 @@
   margin-bottom: $spacing-06;
   display: grid;
   grid-gap: 2rem;
+  grid-template-columns: 1fr;
 }
 
 @media (min-width: 700px) {
   .cards {
-    display: grid;
+    &:not(.sidebar-expanded) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+}
+
+@media (min-width: 970px) {
+  .cards.sidebar-expanded {
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (min-width: 1300px) {
   .cards {
-    display: grid;
+    &:not(.sidebar-expanded) {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+  }
+}
+
+@media (min-width: 1570px) {
+  .cards.sidebar-expanded {
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
 }

@@ -5,8 +5,8 @@ import { useRouter } from 'next/router'
 import { Loading } from '@carbon/react'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
+import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { StoredUseCase } from '@prisma/client'
-import { get } from '@utils/fetchUtils'
 import { parseFetchedUseCase } from '@utils/utils'
 
 import { BackendUserProvider } from './Providers/BackendUserProvider'
@@ -17,12 +17,12 @@ import { UseCase } from './types'
 export const SingleExampleEvaluationWithProps = () => {
   const [loadingUseCases, setLoadingUseCases] = useState(false)
   const [useCases, setUseCases] = useState<UseCase[] | null>(null)
-  const { user, getUserName } = useAuthentication()
+  const { getUserName } = useAuthentication()
   const router = useRouter()
 
   const useCaseId = useMemo(() => (router.query.id ? +router.query.id : null), [router.query.id])
 
-  const currentUseCase = useMemo(
+  const preloadedUseCase = useMemo(
     () =>
       useCaseId === null
         ? null
@@ -32,11 +32,7 @@ export const SingleExampleEvaluationWithProps = () => {
     [useCases, useCaseId],
   )
 
-  // useEffect(() => {
-  //   if (currentUseCase === undefined) {
-  //     router.push({ pathname: '/' }, `/`, { shallow: true })
-  //   }
-  // }, [currentUseCase, router])
+  const { get } = useFetchUtils()
 
   useEffect(() => {
     const fetchUseCases = async () => {
@@ -49,15 +45,13 @@ export const SingleExampleEvaluationWithProps = () => {
       setLoadingUseCases(false)
     }
     fetchUseCases()
-  }, [getUserName])
+  }, [getUserName, get])
 
   if (loadingUseCases || useCases === null) return <Loading withOverlay />
 
   return (
-    <BackendUserProvider>
-      <PipelineTypesProvider>
-        <SingleExampleEvaluation _userUseCases={useCases} currentUseCase={currentUseCase} />
-      </PipelineTypesProvider>
-    </BackendUserProvider>
+    <PipelineTypesProvider>
+      <SingleExampleEvaluation _userUseCases={useCases} preloadedUseCase={preloadedUseCase} />
+    </PipelineTypesProvider>
   )
 }

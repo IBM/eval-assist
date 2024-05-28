@@ -7,12 +7,12 @@ import { useRouter } from 'next/router'
 
 import { TextArea } from '@carbon/react'
 
-import { useToastContext } from '@components/ToastProvider/ToastProvider'
+import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
+import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { StoredUseCase } from '@prisma/client'
-import { deleteCustom, post, put } from '@utils/fetchUtils'
-import { getEmptyCriteria, parseFetchedUseCase } from '@utils/utils'
+import { getEmptyCriteria, getUseCaseStringWithSortedKeys, parseFetchedUseCase } from '@utils/utils'
 
 import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
@@ -26,7 +26,6 @@ import { NewUseCaseModal } from './Modals/NewUseCaseModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { PipelineSelect } from './PipelineSelect'
-import { useBackendUserContext } from './Providers/BackendUserProvider'
 import { Responses } from './Responses'
 import { EvaluationResults } from './Results'
 import classes from './SingleExampleEvaluation.module.scss'
@@ -46,29 +45,29 @@ import {
 
 export interface SingleExampleEvaluationProps {
   _userUseCases: UseCase[]
-  currentUseCase: UseCase | null
+  preloadedUseCase: UseCase | null
 }
 
-export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: SingleExampleEvaluationProps) => {
+export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: SingleExampleEvaluationProps) => {
   // we are ignoring client side rendering to be able to use useSessionStorage
-  const [showingTestCase, setShowingTestCase] = useState<boolean>(currentUseCase !== null)
-  const [libraryUseCaseSelected, setLibraryUseCaseSelected] = useState<UseCase | null>(currentUseCase)
+  const [showingTestCase, setShowingTestCase] = useState<boolean>(preloadedUseCase !== null)
+  const [libraryUseCaseSelected, setLibraryUseCaseSelected] = useState<UseCase | null>(preloadedUseCase)
   // if the usecase doesnt have an id, it means it hasn't been stored
-  const [id, setId] = useState<number | null>(currentUseCase ? currentUseCase.id : null)
-  const [name, setName] = useState(currentUseCase ? currentUseCase.name : '')
-  const [type, setType] = useState<PipelineType>(currentUseCase ? currentUseCase.type : PipelineType.RUBRIC)
-  const [context, setContext] = useState(currentUseCase ? currentUseCase.context : '')
+  const [id, setId] = useState<number | null>(preloadedUseCase ? preloadedUseCase.id : null)
+  const [name, setName] = useState(preloadedUseCase ? preloadedUseCase.name : '')
+  const [type, setType] = useState<PipelineType>(preloadedUseCase ? preloadedUseCase.type : PipelineType.RUBRIC)
+  const [context, setContext] = useState(preloadedUseCase ? preloadedUseCase.context : '')
   const [responses, setResponses] = useState(
-    currentUseCase ? currentUseCase.responses : type === PipelineType.RUBRIC ? [''] : ['', ''],
+    preloadedUseCase ? preloadedUseCase.responses : type === PipelineType.RUBRIC ? [''] : ['', ''],
   )
   const [criteria, setCriteria] = useState<RubricCriteria | PairwiseCriteria>(
-    currentUseCase ? currentUseCase.criteria : getEmptyCriteria(type),
+    preloadedUseCase ? preloadedUseCase.criteria : getEmptyCriteria(type),
   )
   const [results, setResults] = useState<(RubricResult | PairwiseResult)[] | null>(
-    currentUseCase ? currentUseCase.results : null,
+    preloadedUseCase ? preloadedUseCase.results : null,
   )
   const [selectedPipeline, setSelectedPipeline] = useState<string | null>(
-    currentUseCase ? currentUseCase.pipeline : null,
+    preloadedUseCase ? preloadedUseCase.pipeline : null,
   )
 
   const [userUseCases, setUserUseCases] = useState(_userUseCases)
@@ -89,7 +88,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
 
   const [sidebarTabSelected, setSidebarTabSelected] = useState<'user_use_cases' | 'library_use_cases' | null>(null)
 
-  const getUseCaseFromState = useCallback(
+  const currentUseCase = useMemo(
     (): UseCase => ({
       id,
       name,
@@ -103,11 +102,12 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
     [id, name, type, context, responses, criteria, results, selectedPipeline],
   )
 
-  const [lastSavedUseCaseString, setLastSavedUseCase] = useState<string>(JSON.stringify(getUseCaseFromState()))
+  const currentUseCaseString = useMemo<string>(
+    () => (showingTestCase ? getUseCaseStringWithSortedKeys(currentUseCase) : ''),
+    [showingTestCase, currentUseCase],
+  )
 
-  const currentUseCaseString = useMemo<string>(() => {
-    return JSON.stringify(getUseCaseFromState())
-  }, [getUseCaseFromState])
+  const [lastSavedUseCaseString, setLastSavedUseCaseString] = useState<string>(currentUseCaseString)
 
   const changesDetected = useMemo(
     () => showingTestCase && lastSavedUseCaseString !== currentUseCaseString,
@@ -123,10 +123,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
   const { getUserName } = useAuthentication()
 
   const { addToast } = useToastContext()
-
+  const { deleteCustom, post, put } = useFetchUtils()
   useBeforeOnload(changesDetected)
-
-  const { backendUser } = useBackendUserContext()
 
   const runEvaluation = async () => {
     setEvaluationFailed(false)
@@ -134,33 +132,21 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
     setResults(null)
     let response
     if (type === PipelineType.RUBRIC) {
-      response = await post(
-        'evaluate/rubric/',
-        {
-          context,
-          responses,
-          rubric: { criteria: criteria.criteria, options: (criteria as RubricCriteria).options },
-          bam_api_key: bamAPIKey,
-          pipeline: selectedPipeline,
-        },
-        {
-          user_id: backendUser?.id,
-        },
-      )
+      response = await post('evaluate/rubric/', {
+        context,
+        responses,
+        rubric: { criteria: criteria.criteria, options: (criteria as RubricCriteria).options },
+        bam_api_key: bamAPIKey,
+        pipeline: selectedPipeline,
+      })
     } else {
-      response = await post(
-        'evaluate/pairwise/',
-        {
-          instruction: context,
-          responses,
-          criteria: { name: criteria.name, criteria: criteria.criteria },
-          bam_api_key: bamAPIKey,
-          pipeline: selectedPipeline,
-        },
-        {
-          user_id: backendUser?.id,
-        },
-      )
+      response = await post('evaluate/pairwise/', {
+        instruction: context,
+        responses,
+        criteria: { name: criteria.name, criteria: criteria.criteria },
+        bam_api_key: bamAPIKey,
+        pipeline: selectedPipeline,
+      })
     }
 
     setEvaluationRunning(false)
@@ -247,7 +233,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
       setId(useCase.id)
       setResults(useCase.results)
       setSelectedPipeline(useCase.pipeline)
-      setLastSavedUseCase(JSON.stringify(useCase))
+      setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(useCase))
       setShowingTestCase(true)
     })
   }
@@ -266,8 +252,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
   )
 
   const updateLastSavedPipeline = useCallback(() => {
-    setLastSavedUseCase(JSON.stringify(getUseCaseFromState()))
-  }, [setLastSavedUseCase, getUseCaseFromState])
+    setLastSavedUseCaseString(currentUseCaseString)
+  }, [setLastSavedUseCaseString, currentUseCaseString])
 
   const onSave = async () => {
     const savedUseCase: StoredUseCase = await (
@@ -307,7 +293,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
   }
 
   const onSaveAs = async (name: string, fromUseCase?: UseCase) => {
-    const toSaveUseCase = fromUseCase ?? getUseCaseFromState()
+    const toSaveUseCase = fromUseCase ?? currentUseCase
     const res = await put('use_case/', {
       use_case: {
         name: name,
@@ -341,7 +327,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
       setUserUseCases([...userUseCases, parsedSavedUseCase])
       changeUseCaseURL(parsedSavedUseCase.id)
       // update lastSavedUseCase
-      setLastSavedUseCase(JSON.stringify(parsedSavedUseCase))
+      setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(parsedSavedUseCase))
 
       // notify the user
       addToast({
@@ -401,6 +387,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
             setNewUseCaseModalOpen={setNewUseCaseModalOpen}
             setCurrentUseCase={setCurrentUseCase}
             setSidebarTabSelected={setSidebarTabSelected}
+            sidebarTabSelected={sidebarTabSelected}
           />
         ) : (
           <>
@@ -513,6 +500,9 @@ export const SingleExampleEvaluation = ({ _userUseCases, currentUseCase }: Singl
         open={confirmationModalOpen}
         setOpen={setConfirmationModalOpen}
         selectedUseCase={libraryUseCaseSelected}
+        currentUseCase={currentUseCase}
+        onSave={onSave}
+        setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
       />
       <SaveAsUseCaseModal
         type={type}

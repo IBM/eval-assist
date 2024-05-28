@@ -1,6 +1,6 @@
 import { PipelineType, UseCase } from './types'
 
-export const useCases: UseCase[] = [
+export const libraryUseCases: UseCase[] = [
   {
     name: 'Temperature',
     type: PipelineType.RUBRIC,

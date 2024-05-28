@@ -3,8 +3,6 @@ import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 import { Button, IconButton } from '@carbon/react'
 import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
-import { getEmptyUseCase } from '@utils/utils'
-
 import classes from './SingleExampleEvaluation.module.scss'
 import { UseCaseTypeBadge } from './UseCaseTypeBadge'
 import { PipelineType, UseCase } from './types'
@@ -38,7 +36,6 @@ export const UseCaseOptions = ({
   changesDetected,
   setDeleteUseCaseModalOpen,
   setEditNameModalOpen,
-  setCurrentUseCase,
 }: UseCaseOptionsProps) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
   const onSaveClick = async () => {
@@ -55,7 +52,7 @@ export const UseCaseOptions = ({
           fontStyle: isUseCaseSaved ? 'inherit' : 'italic',
         }}
       >
-        {isUseCaseSaved ? useCaseName : '(Unsaved)'}
+        {isUseCaseSaved ? useCaseName : 'Unsaved'}
       </h4>
       {isUseCaseSaved && (
         <IconButton

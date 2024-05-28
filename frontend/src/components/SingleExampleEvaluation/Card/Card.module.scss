@@ -11,6 +11,9 @@
   &.selected {
     border: 1px solid #0f62fe;
   }
+  &:hover {
+    background-color: $layer-hover-01;
+  }
 }
 
 .title-row {

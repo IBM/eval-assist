@@ -1,5 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react'
 
+import { Loading } from '@carbon/react'
+
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { AppUser } from '@prisma/client'
 import { post } from '@utils/fetchUtils'
@@ -50,6 +52,8 @@ export const BackendUserProvider = ({ children }: { children: ReactNode }) => {
     createUserIfNotExist()
     // eslint-disable-next-line
   }, [JSON.stringify(user)])
+
+  if (fetchingBackendUser || backendUser === null) return <Loading withOverlay />
 
   return (
     <BackendUserContext.Provider

@@ -1,8 +1,8 @@
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { Modal } from '@carbon/react'
+import { Button, ComposedModal, Modal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 
 import { UseCase } from '../types'
 
@@ -11,25 +11,67 @@ interface Props {
   selectedUseCase: UseCase | null
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
+  currentUseCase: UseCase
+  onSave: () => Promise<void>
+  setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
-export const SwitchUseCaseModal = ({ open, setOpen, setCurrentUseCase, selectedUseCase }: Props) => {
+export const SwitchUseCaseModal = ({
+  open,
+  setOpen,
+  setCurrentUseCase,
+  currentUseCase,
+  selectedUseCase,
+  onSave,
+  setSaveUseCaseModalOpen,
+}: Props) => {
+  const [saving, setSaving] = useState(false)
+  const onClose = () => {
+    setOpen(false)
+  }
+
+  const onSaveClick = async () => {
+    setSaving(true)
+    await onSave()
+    setSaving(false)
+    setCurrentUseCase(selectedUseCase as UseCase)
+    onClose()
+  }
+
+  const onSaveAsClick = () => {
+    setSaveUseCaseModalOpen(true)
+    onClose()
+  }
+
+  const onDontSave = async () => {
+    setCurrentUseCase(selectedUseCase as UseCase)
+    setOpen(false)
+  }
+  console.log('currentUseCase.ID')
+  console.log(currentUseCase.id)
   return (
     selectedUseCase && (
-      <Modal
-        open={open}
-        onRequestClose={() => setOpen(false)}
-        modalHeading={`Start working with the '${selectedUseCase.name}' use case`}
-        primaryButtonText="Confirm"
-        secondaryButtonText="Cancel"
-        shouldSubmitOnEnter
-        onRequestSubmit={(e) => {
-          setOpen(false)
-          setCurrentUseCase(selectedUseCase)
-        }}
-      >
-        <p>{`This action will replace your ongoing work with the selected test case.`}</p>
-      </Modal>
+      <ComposedModal size="sm" open={open} onClose={onClose}>
+        <ModalHeader title={'Save before leaving?'} />
+        <ModalBody>
+          <p>{'Your test case has unsaved changes, which will be lost, if you continue without saving.'}</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button kind="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+
+          <Button kind="secondary" disabled={saving} onClick={onDontSave}>{`Don't save`}</Button>
+
+          <Button
+            kind="primary"
+            disabled={saving}
+            onClick={() => (currentUseCase.id === null ? onSaveAsClick() : onSaveClick())}
+          >
+            {!saving ? (currentUseCase.id === null ? 'Save as' : 'Save') : 'Saving...'}
+          </Button>
+        </ModalFooter>
+      </ComposedModal>
     )
   )
 }

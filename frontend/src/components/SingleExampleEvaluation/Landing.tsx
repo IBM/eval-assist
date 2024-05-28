@@ -2,6 +2,8 @@ import cx from 'classnames'
 
 import { Dispatch, SetStateAction } from 'react'
 
+import { useRouter } from 'next/router'
+
 import { Button, useTheme } from '@carbon/react'
 import { Add, ArrowDownRight, ArrowRight, Launch, View } from '@carbon/react/icons'
 
@@ -15,10 +17,16 @@ import { PipelineType, UseCase } from './types'
 interface Props {
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   setCurrentUseCase: (useCase: UseCase) => void
+  sidebarTabSelected: 'user_use_cases' | 'library_use_cases' | null
   setSidebarTabSelected: Dispatch<SetStateAction<'user_use_cases' | 'library_use_cases' | null>>
 }
 
-export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase, setSidebarTabSelected }: Props) => {
+export const Landing = ({
+  setNewUseCaseModalOpen,
+  setCurrentUseCase,
+  sidebarTabSelected,
+  setSidebarTabSelected,
+}: Props) => {
   const { theme } = useTheme()
 
   const createEmptyRubric = () => {
@@ -43,7 +51,7 @@ export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase, setSidebarT
     <div className={classes.root}>
       <h2 className={classes.heading}>Welcome</h2>
       <p className={classes.description}>{'Here are some key features we offer'}</p>
-      <div className={classes.cards}>
+      <div className={cx(classes.cards, { [classes['sidebar-expanded']]: sidebarTabSelected !== null })}>
         <Card
           title={RUBRIC_NAME}
           description={'Select an answer based on the criteria for the question'}
@@ -61,6 +69,7 @@ export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase, setSidebarT
           title={PAIRWISE_NAME}
           description={'Compare to choose the which response is better'}
           imageSrc="pairwise_helper"
+          onClick={createEmptyPairwise}
           actionButton={
             <Button renderIcon={ArrowRight} kind="ghost" onClick={createEmptyPairwise}>
               {'Try it'}
@@ -73,6 +82,7 @@ export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase, setSidebarT
           title={'Example Catalog'}
           description={'A catalog of customizable criteria along with sample test data'}
           imageSrc="test_case_library"
+          onClick={openTestCasesLibrary}
           actionButton={
             <Button renderIcon={View} kind="ghost" onClick={openTestCasesLibrary}>
               {'View it'}
@@ -85,6 +95,14 @@ export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase, setSidebarT
           title={'LLM-as-a-judge Toolkit'}
           description={'Apply criteria from sandbox with larger dataset'}
           imageSrc="python_library"
+          onClick={() => {
+            const newWindow = window.open(
+              'https://github.ibm.com/AIExperience/llm-as-a-judge',
+              '_blank',
+              'noopener,noreferrer',
+            )
+            if (newWindow) newWindow.opener = null
+          }}
           actionButton={
             <Button
               renderIcon={Launch}
@@ -93,7 +111,7 @@ export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase, setSidebarT
               target="_blank"
               rel="noopener noreferrer"
             >
-              {'View it'}
+              {'Go'}
             </Button>
           }
           className={cx({ [classes['card-white-mode']]: theme === 'white' })}

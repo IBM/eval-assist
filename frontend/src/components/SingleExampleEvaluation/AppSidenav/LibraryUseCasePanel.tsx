@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { ReactNode, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
@@ -10,7 +10,8 @@ import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 
-import { useCases } from '../UseCaseLibrary'
+import { usePipelineTypesContext } from '../Providers/PipelineTypesProvider'
+import { libraryUseCases } from '../UseCaseLibrary'
 import { PipelineType, UseCase } from '../types'
 import classes from './UseCasePanel.module.scss'
 
@@ -25,11 +26,49 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
     pairwise: true,
   })
 
+  const { rubricPipelines, pairwisePipelines, loadingPipelines } = usePipelineTypesContext()
+
   const handleToggle = (key: 'rubric' | 'pairwise') =>
     setExpanded({
       ...expanded,
       [key]: !expanded[key],
     })
+
+  const rubricTestCases = useMemo(
+    () =>
+      libraryUseCases
+        .filter((u) => u.type === PipelineType.RUBRIC)
+        .map((u) =>
+          rubricPipelines !== null && rubricPipelines.length > 0
+            ? {
+                ...u,
+                pipeline: rubricPipelines[0],
+              }
+            : u,
+        ),
+    [rubricPipelines],
+  )
+
+  const pairwiseTestCases = useMemo(
+    () =>
+      libraryUseCases
+        .filter((u) => u.type === PipelineType.PAIRWISE)
+        .map((u) =>
+          pairwisePipelines !== null && pairwisePipelines.length > 0
+            ? {
+                ...u,
+                pipeline: pairwisePipelines[0],
+              }
+            : u,
+        ),
+    [pairwisePipelines],
+  )
+
+  const onClick = (e: any, useCase: UseCase) => {
+    e.stopPropagation()
+    e.preventDefault()
+    onUseCaseClick(useCase)
+  }
 
   return (
     <section className={cx(classes.root)}>
@@ -50,21 +89,15 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
                 onToggle={() => handleToggle('rubric')}
                 isExpanded={expanded['rubric']}
               >
-                {useCases
-                  .filter((u) => u.type === PipelineType.RUBRIC)
-                  .map((useCase, i) => (
-                    <TreeNode
-                      id={useCase.name}
-                      label={useCase.name}
-                      key={useCase.name}
-                      renderIcon={List}
-                      onClick={(e: any) => {
-                        e.stopPropagation()
-                        e.preventDefault()
-                        onUseCaseClick(useCase)
-                      }}
-                    />
-                  ))}
+                {rubricTestCases.map((useCase, i) => (
+                  <TreeNode
+                    id={`rubric_${useCase.name}_id`}
+                    label={useCase.name}
+                    key={`rubric_${useCase.name}_id`}
+                    renderIcon={List}
+                    onClick={(e: any) => onClick(e, useCase)}
+                  />
+                ))}
               </TreeNode>
               <TreeNode
                 id={'pairwise'}
@@ -73,21 +106,15 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
                 onToggle={() => handleToggle('pairwise')}
                 isExpanded={expanded['pairwise']}
               >
-                {useCases
-                  .filter((u) => u.type === PipelineType.PAIRWISE)
-                  .map((useCase, i) => (
-                    <TreeNode
-                      id={useCase.name}
-                      label={useCase.name}
-                      key={useCase.name}
-                      renderIcon={Compare}
-                      onClick={(e: any) => {
-                        e.stopPropagation()
-                        e.preventDefault()
-                        onUseCaseClick(useCase)
-                      }}
-                    />
-                  ))}
+                {pairwiseTestCases.map((useCase, i) => (
+                  <TreeNode
+                    id={`pairwise_${useCase.name}_id`}
+                    label={useCase.name}
+                    key={`pairwise_${useCase.name}_id`}
+                    renderIcon={Compare}
+                    onClick={(e: any) => onClick(e, useCase)}
+                  />
+                ))}
               </TreeNode>
             </TreeView>
           </section>
