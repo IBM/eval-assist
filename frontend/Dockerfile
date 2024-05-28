@@ -69,6 +69,10 @@ ENV NEXT_TELEMETRY_DISABLED 1
 ENV GENAI_KEY $GENAI_KEY
 ENV GENAI_API $GENAI_API
 
+# make sure next can find sharp
+# https://github.com/vercel/next.js/discussions/40125
+ENV NEXT_SHARP_PATH /app/node_modules/sharp
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
