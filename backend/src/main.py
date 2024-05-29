@@ -205,7 +205,7 @@ def get_pipeline(type: str, pipeline: str, client: Client):
 Get the list of available pipelines, as supported by llm-as-a-judge library
 '''
 @app.get("/pipelines/", response_model=PipelinesResponseModel)
-async def get_pipelines():
+def get_pipelines():
     available_pipelines = []
     for type, pipelines in name_to_pipeline.items():
         for pipeline_name in pipelines.keys():
@@ -216,8 +216,7 @@ async def get_pipelines():
 Single pairwise evaluation endpoint
 '''
 @router.post("/evaluate/pairwise/", response_model=PairwiseEvalResponseModel)
-async def evaluate(req: PairwiseEvalRequestModel):
-
+def evaluate(req: PairwiseEvalRequestModel):
     BAM_API_URL = os.getenv("GENAI_API", None)  
     credentials = Credentials(api_key=req.bam_api_key, api_endpoint=BAM_API_URL)
     client = Client(credentials=credentials)
@@ -251,7 +250,7 @@ Single rubric evaluation endpoint
 TODO: Update endpoint path 
 '''
 @router.post("/evaluate/rubric/", response_model=RubricEvalResponseModel)
-async def evaluate(req: RubricEvalRequestModel):
+def evaluate(req: RubricEvalRequestModel):
     # Gen ai client
     BAM_API_URL = os.getenv("GENAI_API", None)  
     credentials = Credentials(api_key=req.bam_api_key, api_endpoint=BAM_API_URL)
@@ -283,7 +282,7 @@ async def evaluate(req: RubricEvalRequestModel):
 
 
 @router.get("/use_case/")
-async def get_use_cases(user: str):
+def get_use_cases(user: str):
     use_cases = db.storedusecase.find_many(where={
         'app_user': {
             'email': user
@@ -293,7 +292,7 @@ async def get_use_cases(user: str):
 
 
 @router.get("/use_case/{use_case_id}/")
-async def get_use_case(use_case_id: int, user: str):
+def get_use_case(use_case_id: int, user: str):
     return db.storedusecase.find_unique(where={"id": use_case_id})
     
 class PutUseCaseBody(BaseModel):
@@ -301,7 +300,8 @@ class PutUseCaseBody(BaseModel):
     use_case: StoredUseCase
 
 @router.put("/use_case/")
-async def put_use_case(request_body: PutUseCaseBody):
+def put_use_case(request_body: PutUseCaseBody):
+    print('/use_case/')
     user = db.appuser.find_unique(where={'email': request_body.user})
 
     found = db.storedusecase.find_unique(where={
@@ -344,7 +344,7 @@ class DeleteUseCaseBody(BaseModel):
     use_case_id: int
 
 @router.delete("/use_case/")
-async def delete_use_case(request_body: DeleteUseCaseBody):
+def delete_use_case(request_body: DeleteUseCaseBody):
     res = db.storedusecase.delete(where={'id': request_body.use_case_id})
     return res
 
@@ -353,7 +353,7 @@ class CreateUserPostBody(BaseModel):
     name: Optional[str] = None
 
 @router.post('/user/')
-async def create_user_if_not_exist(user: CreateUserPostBody):
+def create_user_if_not_exist(user: CreateUserPostBody):
     try:
         db_user = db.appuser.find_unique(where={'email': user.email})
         if (db_user is None):
