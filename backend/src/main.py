@@ -176,7 +176,7 @@ def throw_authorized_exception():
     raise HTTPException(status_code=401, detail=f"Couldn't connect to BAM. Please check that the provided API key is correct." )
 
 def throw_unknown_pipeline_exception():
-    raise HTTPException(status_code=401, detail=f"Unknown evaluation pipeline." )
+    raise HTTPException(status_code=400, detail=f"Unknown evaluation pipeline." )
 
 # Map API pipeline names to library instantiations
 # TODO: This should be moved to library
