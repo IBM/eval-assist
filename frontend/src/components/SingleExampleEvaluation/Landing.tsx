@@ -32,14 +32,12 @@ export const Landing = ({
   const createEmptyRubric = () => {
     setCurrentUseCase({
       ...getEmptyUseCase(PipelineType.RUBRIC),
-      pipeline: PipelineType.RUBRIC,
     })
   }
 
   const createEmptyPairwise = () => {
     setCurrentUseCase({
       ...getEmptyUseCase(PipelineType.PAIRWISE),
-      pipeline: PipelineType.PAIRWISE,
     })
   }
 
