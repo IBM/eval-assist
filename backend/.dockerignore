@@ -4,3 +4,4 @@ Secrets.yaml
 Dockerfile
 .vscode
 .git
+deployment_yaml/
