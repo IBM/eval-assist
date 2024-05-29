@@ -49,20 +49,20 @@ const Documentation = () => {
           <p>
             Direct assessment is an evaluation paradigmn wherein the LLM chooses one of a set of predefined values from
             an evaluation rubric. This approach can be used to perform likert scale scoring of responses (e.g 1-5) or
-            assign from a set of semantically conditioned literals (Yes/No, Pass/Fail) etc. Direct assessment criteira
+            assign from a set of semantically conditioned literals (Yes/No, Pass/Fail) etc. Direct assessment criteria
             comprise of a name, a criteria expression (typically a short statement or question) and a set of predefined
             options with descriptions.
           </p>
           <h2>Pairwise Comparison</h2>
           <p>
-            Pairwise Comparison is an evaluation paradigmn wherein the LLM chooses a preferred response from a pair of
+            Pairwise Comparison is an evaluation paradigm wherein the LLM chooses a preferred response from a pair of
             candidate responses. Exactly two responses are required to run a pairwise comparison in the sandbox.
-            Pairwise Comparison criteria are simplier, requiring only a name and a criteria description.
+            Pairwise Comparison criteria are simpler, requiring only a name and a criteria description.
           </p>
 
           <h2 id="evaluators">Evaluators</h2>
           <p>
-            The sandbox supports the set of LLM evlauators implemented in the{' '}
+            The sandbox supports the set of LLM evaluators implemented in the{' '}
             <Link href="https://github.ibm.com/AIExperience/llm-as-a-judge">llm-as-a-judge</Link> toolkit. The current
             set of supported evaluators:
           </p>
@@ -125,7 +125,7 @@ const Documentation = () => {
             contributed to refining and enhancing our tools.
             <br /> <br />
             Top contributors (in alphabetical order): Andrew R. Freed, Andre Lopes, Bill Murdock, Charley Beller, Connie
-            He, Davidson Siga, Huaiyu Zhu, Michael Choie, Shobhi Varshney, Sonali Rajendra, Yannis Katsis
+            He, Davidson Siga, Huaiyu Zhu, Michael Choie, Shobhi Varshney, Sonali Rajendra, Yannis Katsis.
             <br /> <br />
             If you&apos;re interested in becoming part of our sponsored user program and engaging in our user study to
             test our tool and offer feedback,{' '}
