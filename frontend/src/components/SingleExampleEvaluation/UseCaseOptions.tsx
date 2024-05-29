@@ -66,16 +66,15 @@ export const UseCaseOptions = ({
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
       <UseCaseTypeBadge type={type} style={{ paddingInline: '0.5rem' }} />
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
+      {isUseCaseSaved ? (
+        <>
+          <Button disabled={savingUseCase || !changesDetected} kind="ghost" renderIcon={Save} onClick={onSaveClick}>
+            {'Save'}
+          </Button>
+          <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
+        </>
+      ) : null}
 
-      <Button
-        disabled={savingUseCase || !isUseCaseSaved || !changesDetected}
-        kind="ghost"
-        renderIcon={Save}
-        onClick={onSaveClick}
-      >
-        {'Save'}
-      </Button>
-      <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
       <Button kind="ghost" renderIcon={WatsonHealthSaveImage} onClick={() => setSaveUseCaseModalOpen(true)}>
         {'Save as'}
       </Button>

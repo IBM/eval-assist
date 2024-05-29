@@ -14,6 +14,8 @@ interface Props {
   currentUseCase: UseCase
   onSave: () => Promise<void>
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
+  evaluationRunning: boolean
+  setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export const SwitchUseCaseModal = ({
@@ -24,6 +26,8 @@ export const SwitchUseCaseModal = ({
   selectedUseCase,
   onSave,
   setSaveUseCaseModalOpen,
+  evaluationRunning,
+  setEvaluationRunningModalOpen,
 }: Props) => {
   const [saving, setSaving] = useState(false)
   const onClose = () => {
@@ -34,13 +38,20 @@ export const SwitchUseCaseModal = ({
     setSaving(true)
     await onSave()
     setSaving(false)
-    setCurrentUseCase(selectedUseCase as UseCase)
     onClose()
+    if (evaluationRunning) {
+      setEvaluationRunningModalOpen(true)
+    } else {
+      setCurrentUseCase(selectedUseCase as UseCase)
+    }
   }
 
   const onSaveAsClick = () => {
     setSaveUseCaseModalOpen(true)
     onClose()
+    if (evaluationRunning) {
+      setEvaluationRunningModalOpen(true)
+    }
   }
 
   const onDontSave = async () => {

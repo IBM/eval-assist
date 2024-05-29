@@ -21,6 +21,8 @@ interface AppSidenavProps {
   setSelected: Dispatch<SetStateAction<'user_use_cases' | 'library_use_cases' | null>>
   changesDetected: boolean
   setCurrentUseCase: (useCase: UseCase) => void
+  setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
+  evaluationRunning: boolean
 }
 
 export const AppSidenavNew = ({
@@ -32,22 +34,27 @@ export const AppSidenavNew = ({
   setSelected,
   changesDetected,
   setCurrentUseCase,
+  setEvaluationRunningModalOpen,
+  evaluationRunning,
 }: AppSidenavProps) => {
   const id = useId()
 
   const onUseCaseClick = (useCase: UseCase) => {
     // if the usecase is already selected don't do nothing
     if (currentUseCaseId !== null && currentUseCaseId === useCase.id) return
-
     // if there are unsaved changes, let the user know that they may lose work
     if (changesDetected) {
-      setConfirmationModalOpen(true)
       setLibraryUseCaseSelected(useCase)
+      setConfirmationModalOpen(true)
+    } else if (evaluationRunning) {
+      setLibraryUseCaseSelected(useCase)
+      setEvaluationRunningModalOpen(true)
     } else {
-      // no unsaved changes, update the current use case without modals
+      // no unsaved changes and model is not running update the current use case without modals
       setCurrentUseCase(useCase)
     }
   }
+
   return (
     <aside
       className={cx(classes.root, layoutClasses.sidebar, {

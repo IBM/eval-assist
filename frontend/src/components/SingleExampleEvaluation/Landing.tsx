@@ -62,6 +62,7 @@ export const Landing = ({
           }
           className={cx({ [classes['card-white-mode']]: theme === 'white' })}
           badge={{ text: 'Sandbox', color: 'blue' }}
+          isImagePriority={true}
         />
         <Card
           title={PAIRWISE_NAME}

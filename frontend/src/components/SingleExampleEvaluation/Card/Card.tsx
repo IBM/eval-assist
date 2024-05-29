@@ -36,6 +36,7 @@ interface PipelineOptionCardProps {
       | 'outline'
       | undefined
   }
+  isImagePriority?: boolean
 }
 
 export const Card = ({
@@ -48,6 +49,7 @@ export const Card = ({
   isSelected = false,
   badge,
   onClick,
+  isImagePriority = false,
 }: PipelineOptionCardProps) => {
   const { theme } = useTheme()
 
@@ -69,6 +71,7 @@ export const Card = ({
         height={125}
         src={`images/${theme !== 'white' ? 'dark_mode_' : ''}${imageSrc}.svg`}
         alt={title}
+        priority={isImagePriority}
       />
       {actionButton && <div className={classes['action-button']}>{actionButton}</div>}
     </Tile>

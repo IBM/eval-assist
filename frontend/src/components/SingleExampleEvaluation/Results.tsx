@@ -95,7 +95,7 @@ export const EvaluationResults = ({
           subtitle={evaluationError}
           title="Evaluation failed"
         />
-      ) : results !== null ? (
+      ) : !evaluationRunning && results !== null ? (
         <div className={classes['table-wrapper']}>
           <Table size="lg" useZebraStyles={false} aria-label="sample table">
             <TableHead>

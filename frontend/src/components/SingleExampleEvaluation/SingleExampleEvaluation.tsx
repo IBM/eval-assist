@@ -1,5 +1,6 @@
 import cx from 'classnames'
 import { useLocalStorage } from 'usehooks-ts'
+import { v4 as uuid } from 'uuid'
 
 import { LegacyRef, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
@@ -12,7 +13,13 @@ import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { StoredUseCase } from '@prisma/client'
-import { getEmptyCriteria, getUseCaseStringWithSortedKeys, parseFetchedUseCase } from '@utils/utils'
+import {
+  getEmptyCriteria,
+  getUseCaseStringWithSortedKeys,
+  parseFetchedUseCase,
+  scrollToBottom,
+  scrollToTop,
+} from '@utils/utils'
 
 import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
@@ -22,6 +29,7 @@ import { Landing } from './Landing'
 import layoutClasses from './Layout.module.scss'
 import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
 import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
+import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
 import { NewUseCaseModal } from './Modals/NewUseCaseModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
@@ -83,7 +91,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
   const [newUseCaseModalOpen, setNewUseCaseModalOpen] = useState(false)
   const [deleteUseCaseModalOpen, setDeleteUseCaseModalOpen] = useState(false)
   const [editNameModalOpen, setEditNameModalOpen] = useState(false)
-
+  const [evaluationRunningModalOpen, setEvaluationRunningModalOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
 
   const [sidebarTabSelected, setSidebarTabSelected] = useState<'user_use_cases' | 'library_use_cases' | null>(null)
@@ -126,10 +134,16 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
   const { deleteCustom, post, put } = useFetchUtils()
   useBeforeOnload(changesDetected)
 
+  const temporaryId = useRef(uuid())
+
+  const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryId.current === id, [temporaryId])
+
   const runEvaluation = async () => {
     setEvaluationFailed(false)
     setEvaluationRunning(true)
-    setResults(null)
+    // temporaryIdSnapshot is used to discern whether the current test case
+    // was changed during the evaluation request
+    const temporaryIdSnapshot = temporaryId.current
     let response
     if (type === PipelineType.RUBRIC) {
       response = await post('evaluate/rubric/', {
@@ -149,70 +163,72 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
       })
     }
 
-    setEvaluationRunning(false)
+    // only perform after-evaluation-finished actions if the current test case didn't change
+    if (isEqualToCurrentTemporaryId(temporaryIdSnapshot)) {
+      setEvaluationRunning(false)
 
-    if (!response.ok) {
-      const error = (await response.json()) as {
-        detail: string
+      if (!response.ok) {
+        const error = (await response.json()) as {
+          detail: string
+        }
+
+        // Sometimes, error.detail is an array
+        // show a generic message in those cases
+        if (typeof error.detail === 'string') {
+          setEvaluationError(error.detail)
+        } else {
+          setEvaluationError(
+            `Something went wrong with the evaluation (${(error.detail as { type: string; msg: string }[])[0].type}: ${
+              (error.detail as { type: string; msg: string }[])[0].msg
+            })`,
+          )
+        }
+
+        setEvaluationFailed(true)
+        // We are catching this error an so we show the message sent from the backend
+
+        addToast({
+          kind: 'error',
+          title: 'Evaluation failed',
+        })
+
+        return
       }
 
-      // Sometimes, error.detail is an array
-      // show a generic message in those cases
-      if (typeof error.detail === 'string') {
-        setEvaluationError(error.detail)
-      } else {
-        setEvaluationError(
-          `Something went wrong with the evaluation (${(error.detail as { type: string; msg: string }[])[0].type}: ${
-            (error.detail as { type: string; msg: string }[])[0].msg
-          })`,
-        )
-      }
-
-      setEvaluationFailed(true)
-      // We are catching this error an so we show the message sent from the backend
+      const responseBody = (await response.json()) as FetchedResults
 
       addToast({
-        kind: 'error',
-        title: 'Evaluation failed',
+        kind: 'success',
+        title: 'Evaluation finished',
+        timeout: 5000,
       })
 
-      return
+      let results
+      if (type === PipelineType.RUBRIC) {
+        results = (responseBody.results as FetchedRubricResult[]).map(
+          (result) =>
+            ({
+              name: criteria.name,
+              option: result.option,
+              explanation: result.explanation,
+              positionalBias: result.p_bias,
+              certainty: result.certainty,
+            } as RubricResult),
+        )
+      } else {
+        results = (responseBody.results as FetchedPairwiseResult[]).map(
+          (result) =>
+            ({
+              name: criteria.name,
+              explanation: result.explanation,
+              positionalBias: result.p_bias,
+              winnerIndex: result.w_index,
+              certainty: result.certainty,
+            } as PairwiseResult),
+        )
+      }
+      setResults(results)
     }
-
-    const responseBody = (await response.json()) as FetchedResults
-
-    addToast({
-      kind: 'success',
-      title: 'Evaluation finished',
-      timeout: 5000,
-    })
-
-    let results
-    if (type === PipelineType.RUBRIC) {
-      results = (responseBody.results as FetchedRubricResult[]).map(
-        (result) =>
-          ({
-            name: criteria.name,
-            option: result.option,
-            explanation: result.explanation,
-            positionalBias: result.p_bias,
-            certainty: result.certainty,
-          } as RubricResult),
-      )
-    } else {
-      results = (responseBody.results as FetchedPairwiseResult[]).map(
-        (result) =>
-          ({
-            name: criteria.name,
-            explanation: result.explanation,
-            positionalBias: result.p_bias,
-            winnerIndex: result.w_index,
-            certainty: result.certainty,
-          } as PairwiseResult),
-      )
-    }
-
-    setResults(results)
   }
 
   const setCurrentUseCase = (useCase: UseCase) => {
@@ -235,7 +251,14 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
       setSelectedPipeline(useCase.pipeline)
       setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(useCase))
       setShowingTestCase(true)
+      temporaryId.current = uuid()
+      scrollToTop()
     })
+
+    // if evaluation is running, cancel it (superficially)
+    if (evaluationRunning) {
+      setEvaluationRunning(false)
+    }
   }
 
   const changeUseCaseURL = useCallback(
@@ -380,6 +403,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         setSelected={setSidebarTabSelected}
         changesDetected={changesDetected}
         setCurrentUseCase={setCurrentUseCase}
+        setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
+        evaluationRunning={evaluationRunning}
       />
       <div className={cx(layoutClasses['main-content'], classes.body)}>
         {!showingTestCase ? (
@@ -503,6 +528,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         currentUseCase={currentUseCase}
         onSave={onSave}
         setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
+        evaluationRunning={evaluationRunning}
+        setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
       />
       <SaveAsUseCaseModal
         type={type}
@@ -529,6 +556,14 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         setName={setName}
         userUseCases={userUseCases}
         setUserUseCases={setUserUseCases}
+      />
+      <EvaluationRunningModal
+        open={evaluationRunningModalOpen}
+        setOpen={setEvaluationRunningModalOpen}
+        setCurrentUseCase={setCurrentUseCase}
+        selectedUseCase={libraryUseCaseSelected}
+        setConfirmationModalOpen={setConfirmationModalOpen}
+        changesDetected={changesDetected}
       />
     </>
   )

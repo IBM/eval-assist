@@ -95,3 +95,18 @@ export const getUseCaseStringWithSortedKeys = (unsortedObj: UseCase) => {
       }, {}),
   )
 }
+export const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: 'smooth',
+  })
+}
+
+export const scrollToBottom = () => {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    left: 0,
+    behavior: 'smooth',
+  })
+}
