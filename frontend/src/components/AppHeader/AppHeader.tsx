@@ -28,11 +28,12 @@ export const AppHeader = () => {
       <HeaderName
         prefix="IBM"
         style={{ cursor: 'pointer' }}
-        onClick={() => {
-          router.push({ pathname: '/', query: {} }).then(() => {
-            router.reload()
-          })
-        }}
+        href="/"
+        // onClick={() => {
+        //   router.push({ pathname: '/', query: {} }).then(() => {
+        //     router.reload()
+        //   })
+        // }}
       >
         {PLATFORM_NAME}
       </HeaderName>

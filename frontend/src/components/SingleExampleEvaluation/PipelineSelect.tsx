@@ -39,7 +39,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
   return (
     <div style={{ marginBottom: '1.5rem' }} className={classes['left-padding']}>
       <span className={classes['toggle-span']}>Evaluator</span>
-      <Toggletip align="top">
+      {/* <Toggletip align="top">
         <ToggletipButton label="Show information" className={classes['eval-info-button']}>
           <Information />
         </ToggletipButton>
@@ -52,7 +52,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
             for guidance on related model usage
           </p>
         </ToggletipContent>
-      </Toggletip>
+      </Toggletip> */}
 
       {loadingPipelines || rubricPipelines === null || pairwisePipelines === null ? (
         <SelectSkeleton />
@@ -60,7 +60,11 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
         <Select
           id="pipeline-select"
           labelText=""
-          helperText={''}
+          helperText={
+            <Link rel="noopener noreferrer" target="_blank" href="/documentation/#evaluators">
+              How do evaluators work?
+            </Link>
+          }
           value={selectedPipeline || ''}
           onChange={(e) => {
             setSelectedPipeline(e.target.value)
