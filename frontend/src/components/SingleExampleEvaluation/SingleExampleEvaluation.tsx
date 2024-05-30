@@ -380,12 +380,24 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
     setShowingTestCase(false)
   }
 
-  const instructionRef = useRef<HTMLTextAreaElement>(null)
-  useAutosizeTextArea([instructionRef.current] as HTMLTextAreaElement[])
+  const refs = useRef<HTMLTextAreaElement[]>([])
+  refs.current = []
 
+  // Dynamically add refs during rendering
+  const addToRefs = (el: HTMLTextAreaElement) => {
+    if (el && !refs.current?.includes(el)) {
+      refs.current.push(el)
+    }
+  }
+
+  useAutosizeTextArea(refs.current)
+
+  // Listen for change to window
   useLayoutEffect(() => {
     function updateSize() {
-      autoUpdateSize(instructionRef.current as HTMLTextAreaElement)
+      refs.current.forEach(function (ref: HTMLTextAreaElement) {
+        autoUpdateSize(ref)
+      })
     }
     window.addEventListener('resize', updateSize)
     updateSize()
@@ -477,7 +489,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
                 setContext(e.target.value), autoUpdateSize(e.target)
               }}
               rows={1}
-              ref={instructionRef}
+              ref={addToRefs}
               value={context}
               id="text-area-context"
               labelText="Task context (optional)"

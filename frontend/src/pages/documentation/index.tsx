@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import Image from 'next/image'
 
 import { Content, Link, ListItem, UnorderedList } from '@carbon/react'
@@ -7,6 +9,24 @@ import { withAuth } from '@components/HOC/withAuth'
 import classes from './Documentation.module.scss'
 
 const Documentation = () => {
+  useEffect(() => {
+    const scrollToHashElement = () => {
+      const { hash } = window.location
+      const elementToScroll = document.getElementById(hash?.replace('#', ''))
+
+      if (!elementToScroll) return
+
+      window.scrollTo({
+        top: elementToScroll.offsetTop - 50,
+        behavior: 'smooth',
+      })
+    }
+
+    scrollToHashElement()
+    window.addEventListener('hashchange', scrollToHashElement)
+    return window.removeEventListener('hashchange', scrollToHashElement)
+  }, [])
+
   return (
     <>
       <Content>
