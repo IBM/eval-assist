@@ -253,6 +253,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
       setShowingTestCase(true)
       temporaryId.current = uuid()
       scrollToTop()
+      setLibraryUseCaseSelected(null)
     })
 
     // if evaluation is running, cancel it (superficially)
@@ -346,7 +347,14 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
     } else {
       const savedUseCase: StoredUseCase = await res.json()
       const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
-      setCurrentUseCase(parsedSavedUseCase)
+
+      // libraryUseCaseSelected will different from null when
+      // save as is done before switching from an unsaved
+      // test cases that has changes detected
+      if (libraryUseCaseSelected === null) {
+        setCurrentUseCase(parsedSavedUseCase)
+        setSidebarTabSelected('user_use_cases')
+      }
       setUserUseCases([...userUseCases, parsedSavedUseCase])
       changeUseCaseURL(parsedSavedUseCase.id)
       // update lastSavedUseCase
@@ -358,8 +366,6 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         title: `Created use case '${parsedSavedUseCase.name}'`,
         timeout: 5000,
       })
-
-      setSidebarTabSelected('user_use_cases')
     }
     return true
   }
@@ -542,12 +548,15 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
         evaluationRunning={evaluationRunning}
         setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
+        setLibraryUseCaseSelected={setLibraryUseCaseSelected}
       />
       <SaveAsUseCaseModal
         type={type}
         open={saveUseCaseModalOpen}
         setOpen={setSaveUseCaseModalOpen}
         onSaveAs={onSaveAs}
+        libraryUseCaseSelected={libraryUseCaseSelected}
+        setCurrentUseCase={setCurrentUseCase}
       />
       <NewUseCaseModal
         open={newUseCaseModalOpen}

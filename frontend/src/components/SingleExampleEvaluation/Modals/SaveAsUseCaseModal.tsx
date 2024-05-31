@@ -10,9 +10,18 @@ interface Props {
   setOpen: Dispatch<SetStateAction<boolean>>
   onSaveAs: (name: string, fromUseCase?: UseCase) => Promise<boolean>
   type: PipelineType
+  libraryUseCaseSelected: UseCase | null
+  setCurrentUseCase: (useCase: UseCase) => void
 }
 
-export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, type }: Props) => {
+export const SaveAsUseCaseModal = ({
+  open,
+  setOpen,
+  onSaveAs,
+  type,
+  libraryUseCaseSelected,
+  setCurrentUseCase,
+}: Props) => {
   const [useCaseName, setUseCaseName] = useState('')
   const [loadingStatus, setLoadingStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>(
     'inactive',
@@ -23,6 +32,16 @@ export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, type }: Props) => 
     setLoadingStatus('inactive')
     setOpen(false)
     setUseCaseName('')
+    if (libraryUseCaseSelected !== null) {
+      setCurrentUseCase(libraryUseCaseSelected)
+    }
+  }
+
+  const onSubmit = async () => {
+    setLoadingStatus('active')
+    const failed = !(await onSaveAs(useCaseName))
+    setLoadingStatus(failed ? 'inactive' : 'finished')
+    setLoadingDescription(failed ? 'Saving...' : 'Saved!')
   }
 
   return (
@@ -35,12 +54,7 @@ export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, type }: Props) => 
         </div>
       }
       primaryButtonText="Confirm"
-      onRequestSubmit={async () => {
-        setLoadingStatus('active')
-        const failed = !(await onSaveAs(useCaseName))
-        setLoadingStatus(failed ? 'inactive' : 'finished')
-        setLoadingDescription(failed ? 'Saving...' : 'Saved!')
-      }}
+      onRequestSubmit={onSubmit}
       loadingStatus={loadingStatus}
       loadingDescription={loadingDescription}
       secondaryButtonText="Cancel"

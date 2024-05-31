@@ -16,6 +16,7 @@ interface Props {
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
+  setLibraryUseCaseSelected: Dispatch<SetStateAction<UseCase | null>>
 }
 
 export const SwitchUseCaseModal = ({
@@ -28,10 +29,16 @@ export const SwitchUseCaseModal = ({
   setSaveUseCaseModalOpen,
   evaluationRunning,
   setEvaluationRunningModalOpen,
+  setLibraryUseCaseSelected,
 }: Props) => {
   const [saving, setSaving] = useState(false)
   const onClose = () => {
     setOpen(false)
+  }
+
+  const onCancel = () => {
+    setLibraryUseCaseSelected(null)
+    onClose()
   }
 
   const onSaveClick = async () => {
@@ -67,7 +74,7 @@ export const SwitchUseCaseModal = ({
           <p>{'Your test case has unsaved changes, which will be lost, if you continue without saving.'}</p>
         </ModalBody>
         <ModalFooter>
-          <Button kind="ghost" onClick={onClose}>
+          <Button kind="ghost" onClick={onCancel}>
             Cancel
           </Button>
 
