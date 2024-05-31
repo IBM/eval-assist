@@ -14,9 +14,7 @@ from genai import Credentials, Client
 from prisma.models import StoredUseCase
 from prisma.errors import PrismaError
 from llmasajudge.evaluators import RubricCriteria, PairwiseCriteria
-from llmasajudge.evaluators import MixtralRubricEvaluator, Llama3InstructRubricEvaluator
-from llmasajudge.evaluators import MixtralPairwiseEvaluator, Llama3InstructPairwiseEvaluator
-from llmasajudge.evaluators import PrometheusPairwiseEvaluator, PrometheusRubricEvaluator
+from llmasajudge.evaluators import PairwiseEvaluator, RubricEvaluator, list_pairwise, list_rubric, PAIRWISE_TYPE, RUBRIC_TYPE
 from genai.exceptions import ApiResponseException, ApiNetworkException
 import os
 import json
@@ -175,41 +173,16 @@ async def app_shutdown():
 def throw_authorized_exception():
     raise HTTPException(status_code=401, detail=f"Couldn't connect to BAM. Please check that the provided API key is correct." )
 
-def throw_unknown_pipeline_exception():
-    raise HTTPException(status_code=400, detail=f"Unknown evaluation pipeline." )
-
-# Map API pipeline names to library instantiations
-# TODO: This should be moved to library
-name_to_pipeline = {
-    RUBRIC_TYPE: {
-        "mistralai/mixtral-8x7b-instruct-v01": lambda client : MixtralRubricEvaluator(client=client),
-        "meta-llama/llama-3-8b-instruct": lambda client : Llama3InstructRubricEvaluator(client=client, model_id="meta-llama/llama-3-8b-instruct"),
-        "meta-llama/llama-3-70b-instruct": lambda client : Llama3InstructRubricEvaluator(client=client, model_id="meta-llama/llama-3-70b-instruct"),
-        "kaist-ai/prometheus-8x7b-v2": lambda client : PrometheusRubricEvaluator(client=client),
-    },
-    PAIRWISE_TYPE: {
-        "mistralai/mixtral-8x7b-instruct-v01": lambda client : MixtralPairwiseEvaluator(client=client),
-        "meta-llama/llama-3-8b-instruct": lambda client : Llama3InstructPairwiseEvaluator(client=client, model_id="meta-llama/llama-3-8b-instruct"),
-        "meta-llama/llama-3-70b-instruct": lambda client : Llama3InstructPairwiseEvaluator(client=client, model_id="meta-llama/llama-3-70b-instruct"),
-        "kaist-ai/prometheus-8x7b-v2": lambda client : PrometheusPairwiseEvaluator(client=client),
-    }
-}
-
-def is_pipeline_valid(pipeline: str, type: str):
-    return pipeline in name_to_pipeline[type]
-
-def get_pipeline(type: str, pipeline: str, client: Client):
-    return name_to_pipeline[type][pipeline](client=client)
-
 '''
 Get the list of available pipelines, as supported by llm-as-a-judge library
 '''
 @app.get("/pipelines/", response_model=PipelinesResponseModel)
 def get_pipelines():
     available_pipelines = []
-    for type, pipelines in name_to_pipeline.items():
-        for pipeline_name in pipelines.keys():
-            available_pipelines.append(PipelineModel(name=pipeline_name, type=type))
+    for name in list_rubric():
+        available_pipelines.append(PipelineModel(name=name, type=RUBRIC_TYPE))
+    for name in list_pairwise():
+        available_pipelines.append(PipelineModel(name=name, type=PAIRWISE_TYPE))
     return PipelinesResponseModel(pipelines=available_pipelines)
 
 '''
@@ -221,17 +194,15 @@ def evaluate(req: PairwiseEvalRequestModel):
     credentials = Credentials(api_key=req.bam_api_key, api_endpoint=BAM_API_URL)
     client = Client(credentials=credentials)
 
-    if not is_pipeline_valid(pipeline=req.pipeline, type=PAIRWISE_TYPE):
-        throw_unknown_pipeline_exception()
-    
-    evaluator = get_pipeline(type=PAIRWISE_TYPE, pipeline=req.pipeline, client=client)
-    criteria = PairwiseCriteria.from_json(req.criteria.model_dump_json())
-
     try:
+        evaluator = PairwiseEvaluator(id=req.pipeline, client=client)
+        criteria = PairwiseCriteria.from_json(req.criteria.model_dump_json())
         res = evaluator.evaluate(instructions=[req.instruction], 
                                 responses=[req.responses], 
                                 criteria=criteria)
         return PairwiseEvalResponseModel(results=res)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=e)
     except ApiResponseException as e:
         if e.response.error == "Unauthorized":
             throw_authorized_exception()
@@ -256,17 +227,15 @@ def evaluate(req: RubricEvalRequestModel):
     credentials = Credentials(api_key=req.bam_api_key, api_endpoint=BAM_API_URL)
     client = Client(credentials=credentials)
 
-    if not is_pipeline_valid(pipeline=req.pipeline, type=PAIRWISE_TYPE):
-        throw_unknown_pipeline_exception()
-
-    evaluator = get_pipeline(type=RUBRIC_TYPE, pipeline=req.pipeline, client=client)
-    criteria = RubricCriteria.from_json(req.rubric.model_dump_json())
-
     try:
+        evaluator = RubricEvaluator(id=req.pipeline, client=client)
+        criteria = RubricCriteria.from_json(req.rubric.model_dump_json())
         res = evaluator.evaluate(contexts=[req.context]*len(req.responses), 
                                 responses=req.responses, 
                                 rubric=criteria)
         return RubricEvalResponseModel(results=res)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ApiResponseException as e:
         if e.response.error == "Unauthorized":
             throw_authorized_exception()
