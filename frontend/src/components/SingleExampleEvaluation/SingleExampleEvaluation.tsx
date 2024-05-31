@@ -212,7 +212,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
               option: result.option,
               explanation: result.explanation,
               positionalBias: result.p_bias,
-              certainty: result.certainty,
+              entropy: result.entropy,
             } as RubricResult),
         )
       } else {
@@ -223,7 +223,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
               explanation: result.explanation,
               positionalBias: result.p_bias,
               winnerIndex: result.w_index,
-              certainty: result.certainty,
+              entropy: result.entropy,
             } as PairwiseResult),
         )
       }
