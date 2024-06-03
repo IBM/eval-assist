@@ -3,6 +3,8 @@ import { CSSProperties, Dispatch, SetStateAction, useCallback } from 'react'
 import { CopyButton, IconButton, Layer, TextArea } from '@carbon/react'
 import { TextAlignLeft } from '@carbon/react/icons'
 
+import { useAutosizeTextArea } from '@customHooks/useAutosizeTextArea'
+
 interface JSONTextAreaInterface {
   rawJSONCriteria: string
   setRawJSONCriteria: Dispatch<SetStateAction<string>>
@@ -18,11 +20,14 @@ export const JSONTextArea = ({
   style,
   rowCount,
 }: JSONTextAreaInterface) => {
+  const { addToRefs, autoUpdateSize } = useAutosizeTextArea()
+
   const onRawJSONCriteriaChange = useCallback(
-    (e: { target: { value: string } }) => {
+    (e: any) => {
       setRawJSONCriteria(e.target.value)
+      autoUpdateSize(e.target)
     },
-    [setRawJSONCriteria],
+    [setRawJSONCriteria, autoUpdateSize],
   )
 
   const onFormatClick = () => {
@@ -51,6 +56,7 @@ export const JSONTextArea = ({
           labelText={''}
           value={rawJSONCriteria}
           onChange={onRawJSONCriteriaChange}
+          ref={addToRefs}
           id="text-input-json-raw"
           placeholder="Input evaluation criteria in json format"
           rows={rowCount}
