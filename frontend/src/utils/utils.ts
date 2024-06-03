@@ -23,7 +23,7 @@ export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseResult =>
   typeof obj.winnerIndex === 'number' &&
   typeof obj.positionalBias === 'boolean' &&
   typeof obj.explanation === 'string' &&
-  typeof obj.certainty === 'number'
+  typeof obj.entropy === 'number'
 
 export const isInstanceOfPairwiseCriteria = (obj: any): obj is RubricCriteria =>
   typeof obj.name === 'string' && typeof obj.criteria === 'string'
