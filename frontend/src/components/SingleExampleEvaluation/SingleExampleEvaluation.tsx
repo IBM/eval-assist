@@ -2,7 +2,7 @@ import cx from 'classnames'
 import { useLocalStorage } from 'usehooks-ts'
 import { v4 as uuid } from 'uuid'
 
-import { LegacyRef, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { LegacyRef, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -95,6 +95,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
   const [popoverOpen, setPopoverOpen] = useState(false)
 
   const [sidebarTabSelected, setSidebarTabSelected] = useState<'user_use_cases' | 'library_use_cases' | null>(null)
+
+  const [shouldScrollToBottom, setShouldSrollToBottom] = useState(false)
 
   const currentUseCase = useMemo(
     (): UseCase => ({
@@ -228,8 +230,16 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         )
       }
       setResults(results)
+      setShouldSrollToBottom(true)
     }
   }
+
+  useEffect(() => {
+    if (shouldScrollToBottom) {
+      scrollToBottom()
+      setShouldSrollToBottom(false)
+    }
+  }, [shouldScrollToBottom, setShouldSrollToBottom])
 
   const setCurrentUseCase = (useCase: UseCase) => {
     let urlChangePromise: Promise<boolean>
