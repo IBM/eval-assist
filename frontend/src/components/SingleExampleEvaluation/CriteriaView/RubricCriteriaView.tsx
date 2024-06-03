@@ -20,6 +20,7 @@ import { isInstanceOfRubricCriteria } from '@utils/utils'
 import { JSONTextArea } from '../JSONTextArea'
 import classes from '../SingleExampleEvaluation.module.scss'
 import { RubricCriteria } from '../types'
+import customClasses from './RubricCriteriaView.module.scss'
 
 interface EvaluationCriteriaProps {
   rubricCriteria: RubricCriteria
@@ -159,6 +160,7 @@ export const RubricCriteriaView = ({ rubricCriteria, setCriteria, style }: Evalu
                               value={scale.description}
                               id={`criteria-option-definition-${i}`}
                               placeholder="State the condition under which the answer is selected."
+                              className={customClasses['text-overflow']}
                               onChange={(e) =>
                                 setCriteria({
                                   ...rubricCriteria,
