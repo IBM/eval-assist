@@ -463,8 +463,9 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
               criteria={criteria}
               setCriteria={setCriteria}
               type={type}
-              className={classes['left-padding']}
+              temporaryId={temporaryIdRef.current}
               style={{ marginBottom: '1rem' }}
+              className={classes['left-padding']}
             />
 
             <PipelineSelect

@@ -25,13 +25,20 @@ import customClasses from './RubricCriteriaView.module.scss'
 interface EvaluationCriteriaProps {
   rubricCriteria: RubricCriteria
   setCriteria: Dispatch<SetStateAction<RubricCriteria>>
+  selectedTabIndex: number
+  setSelectedTabIndex: Dispatch<SetStateAction<number>>
   style?: CSSProperties
   className?: string
 }
 
-export const RubricCriteriaView = ({ rubricCriteria, setCriteria, style }: EvaluationCriteriaProps) => {
+export const RubricCriteriaView = ({
+  rubricCriteria,
+  setCriteria,
+  selectedTabIndex,
+  setSelectedTabIndex,
+  style,
+}: EvaluationCriteriaProps) => {
   const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(rubricCriteria.name === '')
-  const [selectedTabIndex, setSelectedTabIndex] = useState(0)
   const [rawJSONCriteria, setRawJSONCriteria] = useState('')
 
   const isValidRawJSONCriteria = (jsonCriteria: string) => {

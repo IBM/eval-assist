@@ -25,13 +25,20 @@ import { PairwiseCriteria } from '../types'
 interface EvaluationCriteriaProps {
   pairwiseCriteria: PairwiseCriteria
   setCriteria: Dispatch<SetStateAction<PairwiseCriteria>>
-  style?: CSSProperties
+  selectedTabIndex: number
+  setSelectedTabIndex: Dispatch<SetStateAction<number>>
   className?: string
+  style?: CSSProperties
 }
 
-export const PairwiseCriteriaView = ({ pairwiseCriteria, setCriteria, style }: EvaluationCriteriaProps) => {
+export const PairwiseCriteriaView = ({
+  pairwiseCriteria,
+  setCriteria,
+  selectedTabIndex,
+  setSelectedTabIndex,
+  style,
+}: EvaluationCriteriaProps) => {
   const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(pairwiseCriteria.name === '')
-  const [selectedTabIndex, setSelectedTabIndex] = useState(0)
   const [rawJSONCriteria, setRawJSONCriteria] = useState('')
 
   const isValidRawJSONCriteria = (jsonCriteria: string) => {
