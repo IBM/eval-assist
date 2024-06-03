@@ -7,8 +7,8 @@ import { Add, Close } from '@carbon/react/icons'
 
 import { isInstanceOfPairwiseResult } from '@utils/utils'
 
+import { useAutosizeTextArea } from '../../customHooks/useAutosizeTextArea'
 import classes from './Responses.module.scss'
-import { autoUpdateSize, useAutosizeTextArea } from './autosizeTextArea'
 import { PairwiseResult, PipelineType, RubricResult } from './types'
 
 interface ResponsesInterface {
@@ -36,26 +36,7 @@ export const Responses = ({ responses, setResponses, style, className, type, res
   const refs = useRef<HTMLTextAreaElement[]>([])
   refs.current = []
 
-  // Dynamically add refs during rendering
-  const addToRefs = (el: HTMLTextAreaElement) => {
-    if (el && !refs.current?.includes(el)) {
-      refs.current.push(el)
-    }
-  }
-
-  useAutosizeTextArea(refs.current)
-
-  // Listen for change to window
-  useLayoutEffect(() => {
-    function updateSize() {
-      refs.current.forEach(function (ref: HTMLTextAreaElement) {
-        autoUpdateSize(ref)
-      })
-    }
-    window.addEventListener('resize', updateSize)
-    updateSize()
-    return () => window.removeEventListener('resize', updateSize)
-  }, [])
+  const { addToRefs, autoUpdateSize } = useAutosizeTextArea()
 
   return (
     <div style={style} className={className}>
@@ -91,8 +72,8 @@ export const Responses = ({ responses, setResponses, style, className, type, res
           </div>
           <TextArea
             onChange={(e) => {
-              setResponses([...responses.slice(0, i), e.target.value, ...responses.slice(i + 1)]),
-                autoUpdateSize(e.target)
+              setResponses([...responses.slice(0, i), e.target.value, ...responses.slice(i + 1)])
+              autoUpdateSize(e.target)
             }}
             ref={addToRefs}
             rows={1}

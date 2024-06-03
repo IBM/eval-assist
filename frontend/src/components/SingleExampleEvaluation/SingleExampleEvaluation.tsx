@@ -21,6 +21,7 @@ import {
   scrollToTop,
 } from '@utils/utils'
 
+import { useAutosizeTextArea } from '../../customHooks/useAutosizeTextArea'
 import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { CriteriaView } from './CriteriaView'
@@ -38,7 +39,6 @@ import { Responses } from './Responses'
 import { EvaluationResults } from './Results'
 import classes from './SingleExampleEvaluation.module.scss'
 import { UseCaseOptions } from './UseCaseOptions'
-import { autoUpdateSize, useAutosizeTextArea } from './autosizeTextArea'
 import {
   FetchedPairwiseResult,
   FetchedResults,
@@ -136,16 +136,16 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
   const { deleteCustom, post, put } = useFetchUtils()
   useBeforeOnload(changesDetected)
 
-  const temporaryId = useRef(uuid())
+  const temporaryIdRef = useRef(uuid())
 
-  const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryId.current === id, [temporaryId])
+  const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
 
   const runEvaluation = async () => {
     setEvaluationFailed(false)
     setEvaluationRunning(true)
     // temporaryIdSnapshot is used to discern whether the current test case
     // was changed during the evaluation request
-    const temporaryIdSnapshot = temporaryId.current
+    const temporaryIdSnapshot = temporaryIdRef.current
     let response
     if (type === PipelineType.RUBRIC) {
       response = await post('evaluate/rubric/', {
@@ -261,7 +261,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
       setSelectedPipeline(useCase.pipeline)
       setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(useCase))
       setShowingTestCase(true)
-      temporaryId.current = uuid()
+      temporaryIdRef.current = uuid()
       scrollToTop()
       setLibraryUseCaseSelected(null)
     })
@@ -396,29 +396,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
     setShowingTestCase(false)
   }
 
-  const refs = useRef<HTMLTextAreaElement[]>([])
-  refs.current = []
-
-  // Dynamically add refs during rendering
-  const addToRefs = (el: HTMLTextAreaElement) => {
-    if (el && !refs.current?.includes(el)) {
-      refs.current.push(el)
-    }
-  }
-
-  useAutosizeTextArea(refs.current)
-
-  // Listen for change to window
-  useLayoutEffect(() => {
-    function updateSize() {
-      refs.current.forEach(function (ref: HTMLTextAreaElement) {
-        autoUpdateSize(ref)
-      })
-    }
-    window.addEventListener('resize', updateSize)
-    updateSize()
-    return () => window.removeEventListener('resize', updateSize)
-  }, [])
+  const { addToRefs, autoUpdateSize } = useAutosizeTextArea()
 
   return (
     <>
