@@ -2,7 +2,7 @@ import cx from 'classnames'
 import { useLocalStorage } from 'usehooks-ts'
 import { v4 as uuid } from 'uuid'
 
-import { LegacyRef, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { LegacyRef, useCallback, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -13,13 +13,7 @@ import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { StoredUseCase } from '@prisma/client'
-import {
-  getEmptyCriteria,
-  getUseCaseStringWithSortedKeys,
-  parseFetchedUseCase,
-  scrollToBottom,
-  scrollToTop,
-} from '@utils/utils'
+import { getEmptyCriteria, getUseCaseStringWithSortedKeys, parseFetchedUseCase, scrollToTop } from '@utils/utils'
 
 import { useAutosizeTextArea } from '../../customHooks/useAutosizeTextArea'
 import { APIKeyPopover } from './APIKeyPopover'
@@ -32,6 +26,7 @@ import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
 import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
 import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
 import { NewUseCaseModal } from './Modals/NewUseCaseModal'
+import { ResultDetailsModal } from './Modals/ResultDetailsModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { PipelineSelect } from './PipelineSelect'
@@ -91,12 +86,13 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
   const [newUseCaseModalOpen, setNewUseCaseModalOpen] = useState(false)
   const [deleteUseCaseModalOpen, setDeleteUseCaseModalOpen] = useState(false)
   const [editNameModalOpen, setEditNameModalOpen] = useState(false)
+  const [resultDetailsModalOpen, setResultDetailsModalOpen] = useState(false)
   const [evaluationRunningModalOpen, setEvaluationRunningModalOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
 
-  const [sidebarTabSelected, setSidebarTabSelected] = useState<'user_use_cases' | 'library_use_cases' | null>(null)
+  const [selectedResultDetails, setSelectedResultDetails] = useState<RubricResult | PairwiseResult | null>(null)
 
-  const [shouldScrollToBottom, setShouldSrollToBottom] = useState(false)
+  const [sidebarTabSelected, setSidebarTabSelected] = useState<'user_use_cases' | 'library_use_cases' | null>(null)
 
   const currentUseCase = useMemo(
     (): UseCase => ({
@@ -174,17 +170,12 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
           detail: string
         }
 
-        // Sometimes, error.detail is an array
-        // show a generic message in those cases
-        if (typeof error.detail === 'string') {
-          setEvaluationError(error.detail)
-        } else {
-          setEvaluationError(
-            `Something went wrong with the evaluation (${(error.detail as { type: string; msg: string }[])[0].type}: ${
-              (error.detail as { type: string; msg: string }[])[0].msg
-            })`,
-          )
-        }
+        const errorMessage =
+          typeof error.detail === 'string'
+            ? error.detail
+            : `Something went wrong with the evaluation (${
+                (error.detail as { type: string; msg: string }[])[0].type
+              }: ${(error.detail as { type: string; msg: string }[])[0].msg})`
 
         setEvaluationFailed(true)
         // We are catching this error an so we show the message sent from the backend
@@ -192,6 +183,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         addToast({
           kind: 'error',
           title: 'Evaluation failed',
+          subtitle: errorMessage,
         })
 
         return
@@ -230,16 +222,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         )
       }
       setResults(results)
-      setShouldSrollToBottom(true)
     }
   }
-
-  useEffect(() => {
-    if (shouldScrollToBottom) {
-      scrollToBottom()
-      setShouldSrollToBottom(false)
-    }
-  }, [shouldScrollToBottom, setShouldSrollToBottom])
 
   const setCurrentUseCase = (useCase: UseCase) => {
     let urlChangePromise: Promise<boolean>
@@ -262,8 +246,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
       setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(useCase))
       setShowingTestCase(true)
       temporaryIdRef.current = uuid()
-      scrollToTop()
       setLibraryUseCaseSelected(null)
+      // scrollToTop()
     })
 
     // if evaluation is running, cancel it (superficially)
@@ -396,7 +380,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
     setShowingTestCase(false)
   }
 
-  const { addToRefs, autoUpdateSize } = useAutosizeTextArea()
+  const { addToMainsRef, autoUpdateSize } = useAutosizeTextArea()
 
   return (
     <>
@@ -409,8 +393,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         setSelected={setSidebarTabSelected}
         changesDetected={changesDetected}
         setCurrentUseCase={setCurrentUseCase}
-        setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
         evaluationRunning={evaluationRunning}
+        setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
       />
       <div className={cx(layoutClasses['main-content'], classes.body)}>
         {!showingTestCase ? (
@@ -484,11 +468,11 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
                 setContext(e.target.value), autoUpdateSize(e.target)
               }}
               rows={1}
-              ref={addToRefs}
+              ref={addToMainsRef}
               value={context}
               id="text-area-context"
               labelText="Task context (optional)"
-              style={{ marginBottom: '1rem', resize: 'none' }}
+              style={{ marginBottom: '1.5rem', resize: 'none' }}
               placeholder="Context information relevant to the evaluation such as prompt, data variables etc."
               className={classes['left-padding']}
             />
@@ -496,17 +480,20 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
             <Responses
               responses={responses}
               setResponses={setResponses}
-              style={{ marginBottom: '2rem' }}
+              style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
               type={type}
               results={results}
+              setResults={setResults}
+              evaluationRunning={evaluationRunning}
+              setSelectedResultDetails={setSelectedResultDetails}
+              setResultDetailsModalOpen={setResultDetailsModalOpen}
             />
 
             <EvaluateButton
               evaluationRunning={evaluationRunning}
               runEvaluation={runEvaluation}
               bamAPIKey={bamAPIKey}
-              style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
             />
 
@@ -515,7 +502,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
                 {'You will need to provide your BAM API key to run the evaluation'}
               </p>
             )}
-            <EvaluationResults
+            {/* <EvaluationResults
               className={classes['left-padding']}
               results={results}
               evaluationFailed={evaluationFailed}
@@ -523,7 +510,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
               evaluationRunning={evaluationRunning}
               type={type}
               style={{ marginBottom: '1rem' }}
-            />
+            /> */}
           </>
         )}
       </div>
@@ -574,6 +561,12 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         selectedUseCase={libraryUseCaseSelected}
         setConfirmationModalOpen={setConfirmationModalOpen}
         changesDetected={changesDetected}
+      />
+      <ResultDetailsModal
+        open={resultDetailsModalOpen}
+        setOpen={setResultDetailsModalOpen}
+        selectedResultDetails={selectedResultDetails}
+        setSelectedResultDetails={setSelectedResultDetails}
       />
     </>
   )

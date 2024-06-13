@@ -1,0 +1,198 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/colors';
+@import '@carbon/styles/scss/motion';
+@import '@carbon/styles/scss/spacing';
+
+$block-radius: 4px;
+
+.content {
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+  flex-wrap: wrap;
+  position: relative;
+
+  > * {
+    width: 100%;
+  }
+
+  textarea,
+  input[type='text'] {
+    resize: none;
+    border: none;
+    background: transparent;
+    font-size: rem(14px);
+    line-height: rem(18px);
+    padding-right: 10%;
+  }
+}
+
+.innerContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.blockElement {
+  border: 1px solid $border-subtle-01;
+  border-radius: $block-radius;
+  &:not(:last-child) {
+    &:not(.addResponseBlock) {
+      border-right: none;
+    }
+  }
+}
+
+.tableRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 0fr 0fr;
+  // transition: grid-template-columns $duration-fast-01 ease; /* Add transition */
+  transition: grid-template-columns $duration-fast-02 motion(entrance, productive); /* Add transition */
+  // transition: grid-template-columns  $duration-fast-01 ease-in-out;
+
+  .blockElement {
+    border-radius: 0;
+    margin-bottom: -1px;
+
+    textarea {
+      min-height: max(rem(50px), 100%);
+      height: rem(50px);
+    }
+
+    :global(.cds--text-area__wrapper) {
+      height: 100%;
+    }
+  }
+}
+
+.tableRow.tableRowWithResults {
+  grid-template-columns: 5fr 1fr 0fr;
+}
+
+.tableRow.tableRowWithExplanation {
+  grid-template-columns: 5fr 1fr 2fr;
+}
+
+.addResponseBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: rem(50px);
+  background-color: $field-02;
+  border-radius: 0 0 $block-radius $block-radius !important;
+
+  > button {
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+.headerDarkColor {
+  background-color: $field;
+}
+
+.responsesRow {
+  min-height: rem(100px);
+  background-color: $field-02;
+}
+
+.headerBlock {
+  padding-block: rem(11px);
+  border: 0;
+}
+
+.headerTypography {
+  font-weight: 800;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+}
+
+.resultBlock {
+  position: relative;
+  padding: 11px 16px 11px 16px;
+}
+
+.resultBlockHover {
+  &:hover {
+    background-color: $background-hover;
+  }
+}
+
+.resultBlockPointerCursor {
+  cursor: pointer;
+}
+.resultBlockDefaultCursor {
+  cursor: default !important;
+  textarea {
+    cursor: default !important;
+  }
+}
+
+.resultBlockTypography {
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+}
+
+.resultPlaceholder {
+  color: $text-placeholder;
+}
+
+.resultDetailsAction {
+  visibility: hidden;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-right: -13px;
+  svg {
+    fill: $link-primary;
+  }
+}
+
+.responsesRow:hover {
+  .resultDetailsAction {
+    visibility: visible;
+  }
+  .resultBlockGradient {
+    background-image: linear-gradient(
+      0deg,
+      var(--cds-ai-aura-start-sm, rgba(69, 137, 255, 0.16)) 0%,
+      15%,
+      var(--cds-ai-aura-end, rgba(255, 255, 255, 0)) 50%,
+      transparent 100%
+    );
+  }
+}
+
+.resultDetailsAction {
+  text-decoration: none !important;
+}
+
+.winnerResponseOutline {
+  border: 2px solid $support-success;
+  border-radius: 3px;
+  transition: opacity $duration-fast-02;
+  &:nth-child(2) {
+    border-radius: 0;
+  }
+  &:nth-child(3) {
+    border-radius: 0 0 $block-radius $block-radius;
+  }
+}
+
+.untrastedResult {
+  color: $text-error;
+}
+
+.positionalBiasTag {
+  margin-top: 0.5rem;
+  margin-left: -3px !important;
+}
+
+.toggle :global .cds--toggle__text {
+  color: $text-helper;
+}

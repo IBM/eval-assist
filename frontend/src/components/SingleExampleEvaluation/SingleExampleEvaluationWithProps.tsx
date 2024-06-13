@@ -9,7 +9,6 @@ import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { StoredUseCase } from '@prisma/client'
 import { parseFetchedUseCase } from '@utils/utils'
 
-import { BackendUserProvider } from './Providers/BackendUserProvider'
 import { PipelineTypesProvider } from './Providers/PipelineTypesProvider'
 import { SingleExampleEvaluation } from './SingleExampleEvaluation'
 import { UseCase } from './types'

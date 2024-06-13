@@ -7,6 +7,8 @@ import Image from 'next/image'
 import { Tag, Tile, useTheme } from '@carbon/react'
 import { CheckmarkFilled } from '@carbon/react/icons'
 
+import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
+
 import classes from './Card.module.scss'
 
 interface PipelineOptionCardProps {
@@ -51,8 +53,7 @@ export const Card = ({
   onClick,
   isImagePriority = false,
 }: PipelineOptionCardProps) => {
-  const { theme } = useTheme()
-
+  const { isDarkMode } = useThemeContext()
   return (
     <Tile style={{ ...style }} className={cx(className, classes.root)} onClick={onClick}>
       <div className={classes['title-row']}>
@@ -69,7 +70,7 @@ export const Card = ({
         className={cx(classes['card-image'], { [classes['card-image-margin']]: actionButton })}
         width={250}
         height={125}
-        src={`images/${theme !== 'white' ? 'dark_mode_' : ''}${imageSrc}.svg`}
+        src={`images/${isDarkMode() ? 'dark_mode_' : ''}${imageSrc}.svg`}
         alt={title}
         priority={isImagePriority}
       />

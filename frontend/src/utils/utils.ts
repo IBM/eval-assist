@@ -19,6 +19,7 @@ export const isInstanceOfRubricCriteria = (obj: any): obj is RubricCriteria =>
   obj.options.every((o: Option) => isInstanceOfOption(o))
 
 export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseResult =>
+  obj !== null &&
   typeof obj.name === 'string' &&
   typeof obj.winnerIndex === 'number' &&
   typeof obj.positionalBias === 'boolean' &&

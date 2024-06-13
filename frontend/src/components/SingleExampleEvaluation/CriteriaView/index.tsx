@@ -1,6 +1,5 @@
 import { CSSProperties, Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-import classes from '../SingleExampleEvaluation.module.scss'
 import { PairwiseCriteria, PipelineType, RubricCriteria } from '../types'
 import { PairwiseCriteriaView } from './PairwiseCriteriaView'
 import { RubricCriteriaView } from './RubricCriteriaView'

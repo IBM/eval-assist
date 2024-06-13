@@ -1,6 +1,7 @@
 @import '@carbon/styles/scss/theme';
 @import '@carbon/styles/scss/utilities/convert';
 @import '@carbon/styles/scss/spacing';
+@import '@carbon/styles/scss/colors';
 
 .cds--side-nav ~ .content {
   margin-inline-start: rem(272px + 48px);
@@ -91,7 +92,7 @@
 }
 
 .eval-info-button {
-margin-left: 0.25rem;
-position: relative;
-top: 0.1rem;
+  margin-left: 0.25rem;
+  position: relative;
+  top: 0.1rem;
 }

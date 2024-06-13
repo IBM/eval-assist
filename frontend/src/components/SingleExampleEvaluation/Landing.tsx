@@ -2,11 +2,10 @@ import cx from 'classnames'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { useRouter } from 'next/router'
+import { Button } from '@carbon/react'
+import { Add, ArrowRight, Launch, View } from '@carbon/react/icons'
 
-import { Button, useTheme } from '@carbon/react'
-import { Add, ArrowDownRight, ArrowRight, Launch, View } from '@carbon/react/icons'
-
+import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 import { getEmptyUseCase } from '@utils/utils'
 
@@ -27,7 +26,7 @@ export const Landing = ({
   sidebarTabSelected,
   setSidebarTabSelected,
 }: Props) => {
-  const { theme } = useTheme()
+  const { isDarkMode } = useThemeContext()
 
   const createEmptyRubric = () => {
     setCurrentUseCase({
@@ -60,7 +59,7 @@ export const Landing = ({
               {'Try it'}
             </Button>
           }
-          className={cx({ [classes['card-white-mode']]: theme === 'white' })}
+          className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
           badge={{ text: 'Sandbox', color: 'blue' }}
           isImagePriority={true}
         />
@@ -74,7 +73,7 @@ export const Landing = ({
               {'Try it'}
             </Button>
           }
-          className={cx({ [classes['card-white-mode']]: theme === 'white' })}
+          className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
           badge={{ text: 'Sandbox', color: 'blue' }}
         />
         <Card
@@ -87,7 +86,7 @@ export const Landing = ({
               {'View it'}
             </Button>
           }
-          className={cx({ [classes['card-white-mode']]: theme === 'white' })}
+          className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
           badge={{ text: 'Catalog', color: 'purple' }}
         />
         <Card
@@ -113,7 +112,7 @@ export const Landing = ({
               {'Go'}
             </Button>
           }
-          className={cx({ [classes['card-white-mode']]: theme === 'white' })}
+          className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
           badge={{ text: 'Python Library', color: 'green' }}
         />
       </div>

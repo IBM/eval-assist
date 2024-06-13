@@ -20,7 +20,7 @@ export const JSONTextArea = ({
   style,
   rowCount,
 }: JSONTextAreaInterface) => {
-  const { addToRefs, autoUpdateSize } = useAutosizeTextArea()
+  const { addToMainsRef, autoUpdateSize } = useAutosizeTextArea()
 
   const onRawJSONCriteriaChange = useCallback(
     (e: any) => {
@@ -56,7 +56,7 @@ export const JSONTextArea = ({
           labelText={''}
           value={rawJSONCriteria}
           onChange={onRawJSONCriteriaChange}
-          ref={addToRefs}
+          ref={addToMainsRef}
           id="text-input-json-raw"
           placeholder="Input evaluation criteria in json format"
           rows={rowCount}

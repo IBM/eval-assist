@@ -1,0 +1,15 @@
+@import '@carbon/styles/scss/motion';
+
+.noThemeOverlay {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  position: fixed;
+  z-index: 9999;
+  transition: opacity $duration-moderate-02 ease-out;
+  &.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+}

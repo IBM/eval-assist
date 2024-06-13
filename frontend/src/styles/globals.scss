@@ -3,5 +3,15 @@
   $css--reset: true,
   $use-flexbox-grid: true
 );
-@use '@carbon/layout';
-@use '/src/components/ThemePreference/theme-preference';
+@import '@carbon/styles/scss/colors';
+
+:root {
+  &.cds--g100 {
+    color-scheme: dark;
+    scrollbar-color: $cool-gray-60 $cool-gray-80;
+  }
+}
+
+body {
+  overflow-y: scroll !important;
+}

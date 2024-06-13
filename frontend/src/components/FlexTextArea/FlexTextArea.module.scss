@@ -1,0 +1,64 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/colors';
+@import '@carbon/styles/scss/motion';
+
+.flex {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  overflow: hidden;
+
+  .textAreaWrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+  }
+
+  .textArea {
+    position: relative;
+    width: 100%;
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: rem(12px);
+      background: linear-gradient(0deg, rgba($background, 1) 0%, rgba($background, 0) 100%);
+      pointer-events: none;
+    }
+
+    textarea {
+      transition: height $duration-fast-01 ease-in-out;
+      user-select: text !important;
+      resize: none;
+      &:focus {
+        max-height: none !important;
+      }
+    }
+  }
+
+  &:focus-within {
+    .textArea:after {
+      display: none;
+    }
+  }
+
+  :global(textarea.noanimation) {
+    transition: none !important;
+  }
+}
+
+.sizer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  z-index: -1;
+  textarea {
+    height: 0;
+  }
+}

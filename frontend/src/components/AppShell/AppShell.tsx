@@ -4,7 +4,7 @@ import { unstable_FeatureFlags as FeatureFlags } from '@carbon/react'
 
 import { AppHeader } from '@components/AppHeader/AppHeader'
 import { ToastProvider } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
-import ThemePreference from '@components/ThemePreference'
+import { ThemeProvider } from '@components/ThemeProvider/ThemeProvider'
 
 import classes from './AppShell.module.scss'
 
@@ -14,7 +14,7 @@ interface Props {
 
 export const AppShell = ({ children }: Props) => {
   return (
-    <ThemePreference>
+    <ThemeProvider>
       <FeatureFlags flags={{ 'enable-treeview-controllable': true }}>
         <>
           <AppHeader />
@@ -25,6 +25,6 @@ export const AppShell = ({ children }: Props) => {
           </ToastProvider>
         </>
       </FeatureFlags>
-    </ThemePreference>
+    </ThemeProvider>
   )
 }

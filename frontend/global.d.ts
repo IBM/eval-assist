@@ -1,1 +1,1 @@
-// Custom Promp Assistant type declarations go here
+declare module '@carbon/motion'

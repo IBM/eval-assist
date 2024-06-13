@@ -1,0 +1,56 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/colors';
+@import '@carbon/styles/scss/motion';
+
+.container {
+  position: relative;
+  border-radius: 4px;
+  &:hover {
+    z-index: 2;
+    .outline {
+      opacity: 1;
+    }
+    .removeBtn {
+      opacity: 1;
+    }
+  }
+}
+
+.outline {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: calc(100% - 2px);
+  height: calc(100% - 2px);
+  pointer-events: none;
+  z-index: 2;
+  outline: 1px solid $focus;
+  opacity: 0;
+  border-radius: 3px;
+  transition: opacity $duration-fast-02;
+}
+
+.removeBtn {
+  position: absolute;
+  top: rem(-7px);
+  right: rem(-7px);
+  border: none;
+  border-radius: 50%;
+  width: rem(16px);
+  height: rem(16px);
+  background: $background;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0;
+  z-index: 2;
+  transition: opacity $duration-fast-02;
+
+  &.active {
+    opacity: 1;
+  }
+
+  svg {
+    fill: $link-primary;
+  }
+}
