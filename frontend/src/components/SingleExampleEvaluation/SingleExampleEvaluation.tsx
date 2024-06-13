@@ -6,8 +6,7 @@ import { LegacyRef, useCallback, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { TextArea } from '@carbon/react'
-
+import { ResponsiveTextArea } from '@components/ResponsiveTextArea/ResponsiveTextArea'
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
@@ -15,7 +14,6 @@ import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { StoredUseCase } from '@prisma/client'
 import { getEmptyCriteria, getUseCaseStringWithSortedKeys, parseFetchedUseCase, scrollToTop } from '@utils/utils'
 
-import { useAutosizeTextArea } from '../../customHooks/useAutosizeTextArea'
 import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { CriteriaView } from './CriteriaView'
@@ -380,8 +378,6 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
     setShowingTestCase(false)
   }
 
-  const { addToMainsRef, autoUpdateSize } = useAutosizeTextArea()
-
   return (
     <>
       <AppSidenavNew
@@ -463,12 +459,11 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
               <strong>Test data</strong>
             </div>
 
-            <TextArea
+            <ResponsiveTextArea
               onChange={(e) => {
-                setContext(e.target.value), autoUpdateSize(e.target)
+                setContext(e.target.value)
               }}
               rows={1}
-              ref={addToMainsRef}
               value={context}
               id="text-area-context"
               labelText="Task context (optional)"

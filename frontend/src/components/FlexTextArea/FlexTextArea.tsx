@@ -75,7 +75,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
         el.style.height = newHeight
       }
     }
-  }, [isFocused, maxInactiveHeight])
+  }, [isFocused, maxInactiveHeight, fixMaxHeight])
 
   useEffect(() => {
     updateHeight()

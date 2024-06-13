@@ -35,6 +35,8 @@ $block-radius: 4px;
 }
 
 .blockElement {
+  background-color: $field;
+
   border: 1px solid $border-subtle-01;
   border-radius: $block-radius;
   &:not(:last-child) {
@@ -80,7 +82,6 @@ $block-radius: 4px;
   justify-content: space-between;
   align-items: center;
   height: rem(50px);
-  background-color: $field-02;
   border-radius: 0 0 $block-radius $block-radius !important;
 
   > button {
@@ -99,12 +100,11 @@ $block-radius: 4px;
 
 .responsesRow {
   min-height: rem(100px);
-  background-color: $field-02;
 }
 
 .headerBlock {
-  padding-block: rem(11px);
-  border: 0;
+  padding: rem(11px) 0 rem(11px) rem(11px);
+  background-color: $field-hover-01;
 }
 
 .headerTypography {
@@ -120,13 +120,14 @@ $block-radius: 4px;
 
 .resultBlockHover {
   &:hover {
-    background-color: $background-hover;
+    background-color: $field-hover-01;
   }
 }
 
 .resultBlockPointerCursor {
   cursor: pointer;
 }
+
 .resultBlockDefaultCursor {
   cursor: default !important;
   textarea {
@@ -157,15 +158,6 @@ $block-radius: 4px;
   .resultDetailsAction {
     visibility: visible;
   }
-  .resultBlockGradient {
-    background-image: linear-gradient(
-      0deg,
-      var(--cds-ai-aura-start-sm, rgba(69, 137, 255, 0.16)) 0%,
-      15%,
-      var(--cds-ai-aura-end, rgba(255, 255, 255, 0)) 50%,
-      transparent 100%
-    );
-  }
 }
 
 .resultDetailsAction {
@@ -191,6 +183,10 @@ $block-radius: 4px;
 .positionalBiasTag {
   margin-top: 0.5rem;
   margin-left: -3px !important;
+}
+
+.toggle {
+  margin-bottom: 1rem;
 }
 
 .toggle :global .cds--toggle__text {

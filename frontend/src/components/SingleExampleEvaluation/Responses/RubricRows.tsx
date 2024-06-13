@@ -139,7 +139,9 @@ export const RubricRows = ({
                       }
                       labelText={''}
                       placeholder={
-                        results === null || results[i] === undefined ? 'The evaluator explanation will appear here' : ''
+                        results === null || results[i] === undefined
+                          ? 'The evaluator explanation will appear here.'
+                          : ''
                       }
                       key={`rubric_${i}_3_${uuid()}`}
                       id={`rubric_${i}_3_${uuid()}`}

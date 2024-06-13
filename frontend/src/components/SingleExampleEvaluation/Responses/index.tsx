@@ -72,7 +72,7 @@ export const Responses = ({
             })}
           >
             <strong className={cx(classes.blockElement, classes.headerBlock, classes.headerTypography)}>
-              {'Response'}
+              {type === PipelineType.RUBRIC ? 'Response to evaluate' : 'Responses to compare'}
             </strong>
             {results !== null && (
               <div style={{ display: 'flex' }} className={cx(classes.blockElement, classes.headerBlock)}>

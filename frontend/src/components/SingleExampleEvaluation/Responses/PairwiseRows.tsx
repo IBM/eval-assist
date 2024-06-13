@@ -7,6 +7,7 @@ import { Link, Tag } from '@carbon/react'
 import { ZoomIn } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
+import { ResponsiveTextArea } from '@components/ResponsiveTextArea/ResponsiveTextArea'
 
 import { PairwiseResult, RubricResult } from '../types'
 import classes from './index.module.scss'
@@ -42,8 +43,6 @@ export const PairwiseRows = ({
     }
   }
 
-  console.log(results)
-
   return (
     <>
       {responses?.map((response, i) => (
@@ -55,7 +54,7 @@ export const PairwiseRows = ({
             [classes.winnerResponseOutline]: i === pairwiseWinnerIndex,
           })}
         >
-          <FlexTextArea
+          <ResponsiveTextArea
             onChange={(e) => {
               setResponses([...responses.slice(0, i), e.target.value, ...responses.slice(i + 1)])
             }}
@@ -65,7 +64,6 @@ export const PairwiseRows = ({
             placeholder="The response/text to evaluate."
             key={`${i}_1`}
             className={cx(classes.blockElement)}
-            fixMaxHeight
           />
           {results !== null && (
             <>
@@ -127,7 +125,7 @@ export const PairwiseRows = ({
                 </div>
               </div>
               {explanationOn && (
-                <FlexTextArea
+                <ResponsiveTextArea
                   readOnly
                   value={
                     results !== null && results[0] !== undefined && pairwiseWinnerIndex === i
@@ -139,7 +137,6 @@ export const PairwiseRows = ({
                   key={`pairwise_${i}_3_${uuid()}`}
                   id={`pairwise_${i}_3_${uuid()}`}
                   className={cx(classes.blockElement, classes.resultBlockDefaultCursor, classes.explanationBlock)}
-                  fixMaxHeight
                 />
               )}
             </>

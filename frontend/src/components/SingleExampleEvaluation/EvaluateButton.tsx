@@ -2,7 +2,7 @@ import { CSSProperties } from 'react'
 
 import { Button, InlineLoading } from '@carbon/react'
 
-import classes from './SingleExampleEvaluation.module.scss'
+import classes from './EvaluateButton.module.scss'
 
 interface EvaluateButtonProps {
   evaluationRunning: boolean
@@ -22,7 +22,7 @@ export const EvaluateButton = ({
   return (
     <div style={style} className={className}>
       {evaluationRunning ? (
-        <InlineLoading description={'Running evaluation...'} status={'active'} className={classes['loading-wrapper']} />
+        <InlineLoading description={'Running evaluation...'} status={'active'} className={classes.loadingWrapper} />
       ) : (
         <Button onClick={runEvaluation} disabled={evaluationRunning || bamAPIKey === ''}>
           Evaluate
