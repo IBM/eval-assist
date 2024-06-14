@@ -111,3 +111,22 @@ export const scrollToBottom = () => {
     behavior: 'smooth',
   })
 }
+
+export const getQueryParamsFromUseCase = (useCase: UseCase) =>
+  useCase.id !== null
+    ? [{ key: 'id', value: `${useCase.id}` }]
+    : useCase.name !== ''
+    ? [
+        { key: 'libraryTestCase', value: useCase.name },
+        { key: 'type', value: useCase.type },
+      ]
+    : [{ key: 'type', value: useCase.type }]
+
+export const stringifyQueryParams = (
+  queryParams: {
+    key: string
+    value: string
+  }[],
+) => {
+  return `?${queryParams.map((queryParam) => queryParam.key + '=' + queryParam.value).join('&')}`
+}

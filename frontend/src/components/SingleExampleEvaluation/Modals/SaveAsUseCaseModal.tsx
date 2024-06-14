@@ -10,18 +10,9 @@ interface Props {
   setOpen: Dispatch<SetStateAction<boolean>>
   onSaveAs: (name: string, fromUseCase?: UseCase) => Promise<boolean>
   type: PipelineType
-  libraryUseCaseSelected: UseCase | null
-  setCurrentUseCase: (useCase: UseCase) => void
 }
 
-export const SaveAsUseCaseModal = ({
-  open,
-  setOpen,
-  onSaveAs,
-  type,
-  libraryUseCaseSelected,
-  setCurrentUseCase,
-}: Props) => {
+export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, type }: Props) => {
   const [useCaseName, setUseCaseName] = useState('')
   const [loadingStatus, setLoadingStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>(
     'inactive',
@@ -32,9 +23,6 @@ export const SaveAsUseCaseModal = ({
     setLoadingStatus('inactive')
     setOpen(false)
     setUseCaseName('')
-    if (libraryUseCaseSelected !== null) {
-      setCurrentUseCase(libraryUseCaseSelected)
-    }
   }
 
   const onSubmit = async () => {

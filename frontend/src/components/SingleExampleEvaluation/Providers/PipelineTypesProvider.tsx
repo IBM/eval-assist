@@ -2,17 +2,19 @@ import { type } from 'os'
 
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react'
 
+import { Loading } from '@carbon/react'
+
 import { get } from '@utils/fetchUtils'
 
 import { Pipeline, PipelineType } from '../types'
 
-interface PipepelineContextValue {
+interface PipelineContextValue {
   rubricPipelines: string[] | null
   pairwisePipelines: string[] | null
   loadingPipelines: boolean
 }
 
-const PipelineTypesContext = createContext<PipepelineContextValue>({
+const PipelineTypesContext = createContext<PipelineContextValue>({
   rubricPipelines: null,
   pairwisePipelines: null,
   loadingPipelines: false,
@@ -35,6 +37,8 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
     }
     fetchData()
   }, [])
+
+  if (loadingPipelines || pipelines === null) return <Loading withOverlay />
 
   return (
     <PipelineTypesContext.Provider

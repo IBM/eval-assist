@@ -8,6 +8,8 @@ import { Categories, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 import { UseCase } from '@components/SingleExampleEvaluation/types'
 
 import layoutClasses from '../Layout.module.scss'
+import { useAppSidebarContext } from '../Providers/AppSidebarProvider'
+import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import classes from './AppSidenav.module.scss'
 import { LibraryPanel } from './LibraryUseCasePanel'
 import { UserUseCasePanel } from './UserUseCasePanel'
@@ -16,9 +18,6 @@ interface AppSidenavProps {
   setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
   setLibraryUseCaseSelected: Dispatch<SetStateAction<UseCase | null>>
   userUseCases: UseCase[]
-  currentUseCaseId: number | null
-  selected: 'user_use_cases' | 'library_use_cases' | null
-  setSelected: Dispatch<SetStateAction<'user_use_cases' | 'library_use_cases' | null>>
   changesDetected: boolean
   setCurrentUseCase: (useCase: UseCase) => void
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
@@ -29,19 +28,18 @@ export const AppSidenavNew = ({
   setConfirmationModalOpen,
   setLibraryUseCaseSelected,
   userUseCases,
-  currentUseCaseId,
-  selected,
-  setSelected,
   changesDetected,
   setCurrentUseCase,
   setEvaluationRunningModalOpen,
   evaluationRunning,
 }: AppSidenavProps) => {
   const id = useId()
+  const { sidebarTabSelected: selected, setSidebarTabSelected: setSelected } = useAppSidebarContext()
+  const { useCaseId } = useURLInfoContext()
 
   const onUseCaseClick = (useCase: UseCase) => {
     // if the usecase is already selected don't do nothing
-    if (currentUseCaseId !== null && currentUseCaseId === useCase.id) return
+    if (useCaseId !== null && useCaseId === useCase.id) return
     // if there are unsaved changes, let the user know that they may lose work
     if (changesDetected) {
       setLibraryUseCaseSelected(useCase)
@@ -133,7 +131,6 @@ export const AppSidenavNew = ({
               setSelected(null)
             }}
             userUseCases={userUseCases}
-            currentUseCaseId={currentUseCaseId}
           />
         )}
       </div>

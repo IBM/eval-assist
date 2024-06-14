@@ -11,22 +11,17 @@ import { getEmptyUseCase } from '@utils/utils'
 
 import { Card } from './Card/Card'
 import classes from './Landing.module.scss'
+import { useAppSidebarContext } from './Providers/AppSidebarProvider'
 import { PipelineType, UseCase } from './types'
 
 interface Props {
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   setCurrentUseCase: (useCase: UseCase) => void
-  sidebarTabSelected: 'user_use_cases' | 'library_use_cases' | null
-  setSidebarTabSelected: Dispatch<SetStateAction<'user_use_cases' | 'library_use_cases' | null>>
 }
 
-export const Landing = ({
-  setNewUseCaseModalOpen,
-  setCurrentUseCase,
-  sidebarTabSelected,
-  setSidebarTabSelected,
-}: Props) => {
+export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase }: Props) => {
   const { isDarkMode } = useThemeContext()
+  const { sidebarTabSelected, setSidebarTabSelected } = useAppSidebarContext()
 
   const createEmptyRubric = () => {
     setCurrentUseCase({

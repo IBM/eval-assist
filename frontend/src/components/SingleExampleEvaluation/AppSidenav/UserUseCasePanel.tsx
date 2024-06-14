@@ -2,31 +2,31 @@ import cx from 'classnames'
 
 import { useMemo, useState } from 'react'
 
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-
 import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
 // @ts-ignore
 import { TreeNode, TreeView } from '@carbon/react'
-import { ChevronLeft, Compare, Launch, List } from '@carbon/react/icons'
+import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 
+import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import { PipelineType, UseCase } from '../types'
+import { LinkButton } from './LinkButton'
 import classes from './UseCasePanel.module.scss'
 
 interface Props {
   onUseCaseClick: (useCase: UseCase) => void
   onClose: () => void
   userUseCases: UseCase[]
-  currentUseCaseId: number | null
 }
 
-export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, currentUseCaseId }: Props) => {
+export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases }: Props) => {
+  const { useCaseId } = useURLInfoContext()
+
   const selectedNode = useMemo(() => {
-    return currentUseCaseId !== null ? [`${currentUseCaseId}`] : []
-  }, [currentUseCaseId])
+    return useCaseId !== null ? [`${useCaseId}`] : []
+  }, [useCaseId])
 
   const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean }>({
     rubric: true,
@@ -123,24 +123,5 @@ export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases, curren
         </div>
       </div>
     </section>
-  )
-}
-
-interface LinkButtonProps {
-  useCase: UseCase
-}
-
-const LinkButton = ({ useCase }: LinkButtonProps) => {
-  const router = useRouter()
-  return (
-    <Link
-      onClick={(e) => e.stopPropagation()}
-      className={classes['link-button']}
-      target="_blank"
-      rel="noopener noreferrer"
-      href={`/?id=${useCase.id}`}
-    >
-      <Launch />
-    </Link>
   )
 }

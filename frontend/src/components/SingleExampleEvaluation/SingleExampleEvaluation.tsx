@@ -12,7 +12,14 @@ import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { StoredUseCase } from '@prisma/client'
-import { getEmptyCriteria, getUseCaseStringWithSortedKeys, parseFetchedUseCase, scrollToTop } from '@utils/utils'
+import {
+  getEmptyCriteria,
+  getQueryParamsFromUseCase,
+  getUseCaseStringWithSortedKeys,
+  parseFetchedUseCase,
+  returnByPipelineType,
+  stringifyQueryParams,
+} from '@utils/utils'
 
 import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
@@ -28,8 +35,11 @@ import { ResultDetailsModal } from './Modals/ResultDetailsModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { PipelineSelect } from './PipelineSelect'
+import { useAppSidebarContext } from './Providers/AppSidebarProvider'
+import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
+import { useURLInfoContext } from './Providers/URLInfoProvider'
+import { useUserUseCasesContext } from './Providers/UserUseCasesProvider'
 import { Responses } from './Responses'
-import { EvaluationResults } from './Results'
 import classes from './SingleExampleEvaluation.module.scss'
 import { UseCaseOptions } from './UseCaseOptions'
 import {
@@ -44,15 +54,12 @@ import {
   UseCase,
 } from './types'
 
-export interface SingleExampleEvaluationProps {
-  _userUseCases: UseCase[]
-  preloadedUseCase: UseCase | null
-}
-
-export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: SingleExampleEvaluationProps) => {
+export const SingleExampleEvaluation = () => {
+  const { preloadedUseCase } = useURLInfoContext()
+  const { userUseCases, setUserUseCases } = useUserUseCasesContext()
   // we are ignoring client side rendering to be able to use useSessionStorage
   const [showingTestCase, setShowingTestCase] = useState<boolean>(preloadedUseCase !== null)
-  const [libraryUseCaseSelected, setLibraryUseCaseSelected] = useState<UseCase | null>(preloadedUseCase)
+  const [useCaseSelected, setUseCaseSelected] = useState<UseCase | null>(preloadedUseCase)
   // if the usecase doesnt have an id, it means it hasn't been stored
   const [id, setId] = useState<number | null>(preloadedUseCase ? preloadedUseCase.id : null)
   const [name, setName] = useState(preloadedUseCase ? preloadedUseCase.name : '')
@@ -71,12 +78,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
     preloadedUseCase ? preloadedUseCase.pipeline : null,
   )
 
-  const [userUseCases, setUserUseCases] = useState(_userUseCases)
-
   const isUseCaseSaved = useMemo(() => id !== null, [id])
   const [evaluationFailed, setEvaluationFailed] = useState(false)
-  const [evaluationError, setEvaluationError] = useState<string>('')
-
   const [evaluationRunning, setEvaluationRunning] = useState(false)
 
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
@@ -90,7 +93,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
 
   const [selectedResultDetails, setSelectedResultDetails] = useState<RubricResult | PairwiseResult | null>(null)
 
-  const [sidebarTabSelected, setSidebarTabSelected] = useState<'user_use_cases' | 'library_use_cases' | null>(null)
+  const { setSidebarTabSelected } = useAppSidebarContext()
 
   const currentUseCase = useMemo(
     (): UseCase => ({
@@ -133,6 +136,24 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
   const temporaryIdRef = useRef(uuid())
 
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
+
+  const { rubricPipelines, pairwisePipelines, loadingPipelines } = usePipelineTypesContext()
+
+  useEffect(() => {
+    if (selectedPipeline === null && rubricPipelines !== null && pairwisePipelines !== null && !loadingPipelines) {
+      const defaultPipeline = returnByPipelineType(type, rubricPipelines[0], pairwisePipelines[0]) as string
+      setSelectedPipeline(returnByPipelineType(type, rubricPipelines[0], pairwisePipelines[0]))
+      setLastSavedUseCaseString(getUseCaseStringWithSortedKeys({ ...currentUseCase, pipeline: defaultPipeline }))
+    }
+  }, [
+    selectedPipeline,
+    rubricPipelines,
+    pairwisePipelines,
+    setSelectedPipeline,
+    loadingPipelines,
+    type,
+    currentUseCase,
+  ])
 
   const runEvaluation = async () => {
     setEvaluationFailed(false)
@@ -188,6 +209,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         return
       }
 
+      // response is ok
+
       const responseBody = (await response.json()) as FetchedResults
 
       addToast({
@@ -224,41 +247,11 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
     }
   }
 
-  const setCurrentUseCase = (useCase: UseCase) => {
-    let urlChangePromise: Promise<boolean>
-
-    if (useCase.id !== null) {
-      urlChangePromise = changeUseCaseURL(useCase.id)
-    } else {
-      urlChangePromise = changeUseCaseURL(null)
-    }
-
-    urlChangePromise.then(() => {
-      setContext(useCase.context)
-      setResponses(useCase.responses)
-      setCriteria(useCase.criteria)
-      setName(useCase.name)
-      setType(useCase.type)
-      setId(useCase.id)
-      setResults(useCase.results)
-      setSelectedPipeline(useCase.pipeline)
-      setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(useCase))
-      setShowingTestCase(true)
-      temporaryIdRef.current = uuid()
-      setLibraryUseCaseSelected(null)
-      // scrollToTop()
-    })
-
-    // if evaluation is running, cancel it (superficially)
-    if (evaluationRunning) {
-      setEvaluationRunning(false)
-    }
-  }
-
   const changeUseCaseURL = useCallback(
-    (useCaseId: number | null) => {
-      if (useCaseId !== null) {
-        return router.push({ pathname: '/', query: { id: useCaseId } }, `/?id=${useCaseId}`, {
+    (queryParams: { key: string; value: string }[] | null) => {
+      if (queryParams !== null) {
+        const paramsString = stringifyQueryParams(queryParams)
+        return router.push(`/${paramsString}`, `/${paramsString}`, {
           shallow: true,
         })
       } else {
@@ -266,6 +259,20 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
       }
     },
     [router],
+  )
+
+  const updateURLFromUseCase = useCallback(
+    (useCase: UseCase) => {
+      let urlChangePromise: Promise<boolean>
+      // use case is a saved user test case
+      urlChangePromise = changeUseCaseURL(getQueryParamsFromUseCase(useCase))
+
+      // if evaluation is running, cancel it (superficially)
+      if (evaluationRunning) {
+        setEvaluationRunning(false)
+      }
+    },
+    [changeUseCaseURL, evaluationRunning],
   )
 
   const updateLastSavedPipeline = useCallback(() => {
@@ -341,17 +348,18 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
       const savedUseCase: StoredUseCase = await res.json()
       const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
 
-      // libraryUseCaseSelected will different from null when
+      // useCaseSelected will different from null when
       // save as is done before switching from an unsaved
-      // test cases that has changes detected
-      if (libraryUseCaseSelected === null) {
-        setCurrentUseCase(parsedSavedUseCase)
+      // test case that has changes detected
+      // if useCaseSelected is different from null
+      // a rediction will be done to that selected test casen
+      if (useCaseSelected === null) {
+        updateURLFromUseCase(parsedSavedUseCase)
         setSidebarTabSelected('user_use_cases')
+      } else {
+        updateURLFromUseCase(useCaseSelected)
       }
       setUserUseCases([...userUseCases, parsedSavedUseCase])
-      changeUseCaseURL(parsedSavedUseCase.id)
-      // update lastSavedUseCase
-      setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(parsedSavedUseCase))
 
       // notify the user
       addToast({
@@ -385,28 +393,41 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
     setShowingTestCase(false)
   }
 
+  // update the state if the preloaded test case changes
+  useEffect(() => {
+    if (preloadedUseCase !== null) {
+      setUseCaseSelected(preloadedUseCase)
+      setId(preloadedUseCase.id)
+      setName(preloadedUseCase.name)
+      setType(preloadedUseCase.type)
+      setContext(preloadedUseCase.context)
+      setResponses(preloadedUseCase.responses)
+      setCriteria(preloadedUseCase.criteria)
+      setResults(preloadedUseCase.results)
+      setSelectedPipeline(preloadedUseCase.pipeline)
+      setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(preloadedUseCase))
+      setShowingTestCase(true)
+      setUseCaseSelected(null)
+      temporaryIdRef.current = uuid()
+    } else if (preloadedUseCase === null) {
+      setShowingTestCase(false)
+    }
+  }, [preloadedUseCase])
+
   return (
     <>
       <AppSidenavNew
         setConfirmationModalOpen={setConfirmationModalOpen}
-        setLibraryUseCaseSelected={setLibraryUseCaseSelected}
+        setLibraryUseCaseSelected={setUseCaseSelected}
         userUseCases={userUseCases}
-        currentUseCaseId={id}
-        selected={sidebarTabSelected}
-        setSelected={setSidebarTabSelected}
         changesDetected={changesDetected}
-        setCurrentUseCase={setCurrentUseCase}
+        setCurrentUseCase={updateURLFromUseCase}
         evaluationRunning={evaluationRunning}
         setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
       />
       <div className={cx(layoutClasses['main-content'], classes.body)}>
         {!showingTestCase ? (
-          <Landing
-            setNewUseCaseModalOpen={setNewUseCaseModalOpen}
-            setCurrentUseCase={setCurrentUseCase}
-            setSidebarTabSelected={setSidebarTabSelected}
-            sidebarTabSelected={sidebarTabSelected}
-          />
+          <Landing setNewUseCaseModalOpen={setNewUseCaseModalOpen} setCurrentUseCase={updateURLFromUseCase} />
         ) : (
           <>
             <div
@@ -444,7 +465,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
               setDeleteUseCaseModalOpen={setDeleteUseCaseModalOpen}
               setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
               setEditNameModalOpen={setEditNameModalOpen}
-              setCurrentUseCase={setCurrentUseCase}
+              setCurrentUseCase={updateURLFromUseCase}
             />
             <CriteriaView
               criteria={criteria}
@@ -517,30 +538,28 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
         )}
       </div>
       <SwitchUseCaseModal
-        setCurrentUseCase={setCurrentUseCase}
+        setCurrentUseCase={updateURLFromUseCase}
         open={confirmationModalOpen}
         setOpen={setConfirmationModalOpen}
-        selectedUseCase={libraryUseCaseSelected}
+        selectedUseCase={useCaseSelected}
         currentUseCase={currentUseCase}
         onSave={onSave}
         setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
         evaluationRunning={evaluationRunning}
         setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
-        setLibraryUseCaseSelected={setLibraryUseCaseSelected}
+        setLibraryUseCaseSelected={setUseCaseSelected}
       />
       <SaveAsUseCaseModal
         type={type}
         open={saveUseCaseModalOpen}
         setOpen={setSaveUseCaseModalOpen}
         onSaveAs={onSaveAs}
-        libraryUseCaseSelected={libraryUseCaseSelected}
-        setCurrentUseCase={setCurrentUseCase}
       />
       <NewUseCaseModal
         open={newUseCaseModalOpen}
         setOpen={setNewUseCaseModalOpen}
         changesDetected={changesDetected}
-        setCurrentUseCase={setCurrentUseCase}
+        setCurrentUseCase={updateURLFromUseCase}
       />
       <DeleteUseCaseModal
         open={deleteUseCaseModalOpen}
@@ -559,8 +578,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
       <EvaluationRunningModal
         open={evaluationRunningModalOpen}
         setOpen={setEvaluationRunningModalOpen}
-        setCurrentUseCase={setCurrentUseCase}
-        selectedUseCase={libraryUseCaseSelected}
+        setCurrentUseCase={updateURLFromUseCase}
+        selectedUseCase={useCaseSelected}
         setConfirmationModalOpen={setConfirmationModalOpen}
         changesDetected={changesDetected}
       />

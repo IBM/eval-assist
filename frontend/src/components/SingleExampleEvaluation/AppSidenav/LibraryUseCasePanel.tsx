@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
@@ -8,11 +8,12 @@ import { IconButton } from '@carbon/react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 
+import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 
-import { usePipelineTypesContext } from '../Providers/PipelineTypesProvider'
-import { libraryUseCases } from '../UseCaseLibrary'
-import { PipelineType, UseCase } from '../types'
+import { useURLInfoContext } from '../Providers/URLInfoProvider'
+import { UseCase } from '../types'
+import { LinkButton } from './LinkButton'
 import classes from './UseCasePanel.module.scss'
 
 interface Props {
@@ -26,7 +27,17 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
     pairwise: true,
   })
 
-  const { rubricPipelines, pairwisePipelines, loadingPipelines } = usePipelineTypesContext()
+  const { preloadedUseCase } = useURLInfoContext()
+
+  const selectedNode = useMemo(() => {
+    return preloadedUseCase !== null && preloadedUseCase.id === null
+      ? [`${preloadedUseCase.name}_${preloadedUseCase.type}`]
+      : []
+  }, [preloadedUseCase])
+
+  console.log(selectedNode)
+
+  console.log(selectedNode)
 
   const handleToggle = (key: 'rubric' | 'pairwise') =>
     setExpanded({
@@ -34,35 +45,7 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
       [key]: !expanded[key],
     })
 
-  const rubricTestCases = useMemo(
-    () =>
-      libraryUseCases
-        .filter((u) => u.type === PipelineType.RUBRIC)
-        .map((u) =>
-          rubricPipelines !== null && rubricPipelines.length > 0
-            ? {
-                ...u,
-                pipeline: rubricPipelines[0],
-              }
-            : u,
-        ),
-    [rubricPipelines],
-  )
-
-  const pairwiseTestCases = useMemo(
-    () =>
-      libraryUseCases
-        .filter((u) => u.type === PipelineType.PAIRWISE)
-        .map((u) =>
-          pairwisePipelines !== null && pairwisePipelines.length > 0
-            ? {
-                ...u,
-                pipeline: pairwisePipelines[0],
-              }
-            : u,
-        ),
-    [pairwisePipelines],
-  )
+  const { rubricLibraryTestCases, pairwiseLibraryTestCases } = useLibraryTestCases()
 
   const onClick = (e: any, useCase: UseCase) => {
     e.stopPropagation()
@@ -81,42 +64,56 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
       <div className={classes.content}>
         <div className={classes.prompts}>
           <section className={classes.section}>
-            <TreeView className={classes['tree-root']} label="">
-              <TreeNode
-                id={'rubric'}
-                label={RUBRIC_NAME}
-                onSelect={() => handleToggle('rubric')}
-                onToggle={() => handleToggle('rubric')}
-                isExpanded={expanded['rubric']}
-              >
-                {rubricTestCases.map((useCase, i) => (
-                  <TreeNode
-                    id={`rubric_${useCase.name}_id`}
-                    label={useCase.name}
-                    key={`rubric_${useCase.name}_id`}
-                    renderIcon={List}
-                    onClick={(e: any) => onClick(e, useCase)}
-                  />
-                ))}
-              </TreeNode>
-              <TreeNode
-                id={'pairwise'}
-                label={PAIRWISE_NAME}
-                onSelect={() => handleToggle('pairwise')}
-                onToggle={() => handleToggle('pairwise')}
-                isExpanded={expanded['pairwise']}
-              >
-                {pairwiseTestCases.map((useCase, i) => (
-                  <TreeNode
-                    id={`pairwise_${useCase.name}_id`}
-                    label={useCase.name}
-                    key={`pairwise_${useCase.name}_id`}
-                    renderIcon={Compare}
-                    onClick={(e: any) => onClick(e, useCase)}
-                  />
-                ))}
-              </TreeNode>
-            </TreeView>
+            <div className={classes['tree-wrapper']}>
+              <TreeView className={classes['tree-root']} label="" selected={selectedNode}>
+                <TreeNode
+                  id={'rubric'}
+                  label={RUBRIC_NAME}
+                  onSelect={() => handleToggle('rubric')}
+                  onToggle={() => handleToggle('rubric')}
+                  isExpanded={expanded['rubric']}
+                >
+                  {rubricLibraryTestCases.map((useCase, i) => (
+                    <TreeNode
+                      label={
+                        <div className={classes['tree-node-content']}>
+                          <span className={classes['tree-node-label']}>{useCase.name}</span>
+                          <LinkButton useCase={useCase} />
+                        </div>
+                      }
+                      key={`${useCase.name}_rubric`}
+                      id={`${useCase.name}_rubric`}
+                      renderIcon={List}
+                      onClick={(e: any) => onClick(e, useCase)}
+                      selected={selectedNode}
+                    />
+                  ))}
+                </TreeNode>
+                <TreeNode
+                  id={'pairwise'}
+                  label={PAIRWISE_NAME}
+                  onSelect={() => handleToggle('pairwise')}
+                  onToggle={() => handleToggle('pairwise')}
+                  isExpanded={expanded['pairwise']}
+                >
+                  {pairwiseLibraryTestCases.map((useCase, i) => (
+                    <TreeNode
+                      label={
+                        <div className={classes['tree-node-content']}>
+                          <span className={classes['tree-node-label']}>{useCase.name}</span>
+                          <LinkButton useCase={useCase} />
+                        </div>
+                      }
+                      key={`${useCase.name}_pairwise`}
+                      id={`${useCase.name}_pairwise`}
+                      renderIcon={Compare}
+                      onClick={(e: any) => onClick(e, useCase)}
+                      selected={selectedNode}
+                    />
+                  ))}
+                </TreeNode>
+              </TreeView>
+            </div>
           </section>
         </div>
       </div>

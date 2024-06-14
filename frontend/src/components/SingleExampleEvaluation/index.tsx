@@ -1,9 +1,21 @@
+import { AppSidebarProvider } from './Providers/AppSidebarProvider'
 import { BackendUserProvider } from './Providers/BackendUserProvider'
-import { SingleExampleEvaluationWithProps } from './SingleExampleEvaluationWithProps'
+import { PipelineTypesProvider } from './Providers/PipelineTypesProvider'
+import { URLInfoProvider } from './Providers/URLInfoProvider'
+import { UserUseCasesProvider } from './Providers/UserUseCasesProvider'
+import { SingleExampleEvaluation } from './SingleExampleEvaluation'
 
 const Landing = () => (
   <BackendUserProvider>
-    <SingleExampleEvaluationWithProps />
+    <UserUseCasesProvider>
+      <PipelineTypesProvider>
+        <URLInfoProvider>
+          <AppSidebarProvider>
+            <SingleExampleEvaluation />
+          </AppSidebarProvider>
+        </URLInfoProvider>
+      </PipelineTypesProvider>
+    </UserUseCasesProvider>
   </BackendUserProvider>
 )
 
