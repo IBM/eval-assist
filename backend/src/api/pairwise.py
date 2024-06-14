@@ -49,8 +49,8 @@ class PairwiseEvalRequestModel(BaseModel):
 class PairwiseEvalResultModel(BaseModel):
     w_index: int
     explanation: str
-    entropy: Optional[float] = None
     p_bias: Optional[bool] = None
+    certainty: Optional[float] = None
 
 class PairwiseEvalResponseModel(BaseModel):
     results: List[PairwiseEvalResultModel]
