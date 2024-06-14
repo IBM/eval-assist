@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid'
 import { Dispatch, SetStateAction } from 'react'
 
 import { Button, Link, Tag } from '@carbon/react'
-import { Add, ZoomIn } from '@carbon/react/icons'
+import { Add, WarningAlt, ZoomIn } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
@@ -83,9 +83,15 @@ export const RubricRows = ({
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                       <div
-                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', height: '100%' }}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          height: '100%',
+                          gap: '5px',
+                        }}
                       >
-                        <p
+                        <div
                           className={cx(classes.resultBlockTypography, {
                             [classes.resultPlaceholder]: results === null || results[i] === undefined,
                             [classes.resultBlockDefaultCursor]:
@@ -95,21 +101,53 @@ export const RubricRows = ({
                           onFocus={setActive}
                           onBlur={setInactive}
                         >
-                          {getResultToDisplay(i) ?? 'The results will appear here.'}
-                        </p>
+                          {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
+                          {/* {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong>: 'Result will appear here'} */}
+                        </div>
                         {results !== null && results[i] && results[i].positionalBias && (
-                          <Tag
-                            className={cx(classes.positionalBiasTag, {
-                              [classes.resultBlockPointerCursor]: results !== null && results[i] && !explanationOn,
-                              [classes.resultBlockDefaultCursor]: results === null || results[i] === undefined,
-                            })}
-                            type="red"
-                          >
-                            {'Positional bias: Yes'}
-                          </Tag>
+                          // <Tag
+                          //   className={cx(classes.positionalBiasTag, {
+                          //     [classes.resultBlockPointerCursor]: results !== null && results[i] && !explanationOn,
+                          //     [classes.resultBlockDefaultCursor]: results === null || results[i] === undefined,
+                          //   })}
+                          //   type="red"
+                          // >
+                          //   {'!'}
+                          // </Tag>
+                          <div>
+                            <a
+                              href="/documentation/#positional-bias"
+                              className={cx(classes.positionalBiasLink)}
+                              style={{ fontSize: 'small' }}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Positional bias
+                            </a>
+                          </div>
                         )}
 
-                        {results !== null && results[i] !== undefined && !results[i].positionalBias && (
+                        {results !== null && results[i] && results[i].certainty && (
+                          // <Tag
+                          //   className={cx(classes.positionalBiasTag, {
+                          //     [classes.resultBlockPointerCursor]: results !== null && results[i] && !explanationOn,
+                          //     [classes.resultBlockDefaultCursor]: results === null || results[i] === undefined,
+                          //   })}
+                          //   type="red"
+                          // >
+                          //   {'!'}
+                          // </Tag>
+                          <div className={cx(classes.certainty)}>
+                            {((results[i].certainty as number) * 100).toFixed(0) + '%'}
+                          </div>
+
+                          // <div style={{fontSize: "small"}} >
+
+                          //   {(((results[i].certainty as number)*100).toFixed(0)) + "%"}
+                          // </div>
+                        )}
+
+                        {/* {results !== null && results[i] !== undefined && !results[i].positionalBias && (
                           <Tag
                             className={cx(classes.positionalBiasTag, {
                               [classes.resultBlockPointerCursor]: results !== null && results[i] && !explanationOn,
@@ -119,7 +157,7 @@ export const RubricRows = ({
                           >
                             {'Positional bias: No'}
                           </Tag>
-                        )}
+                        )} */}
                       </div>
                       {results !== null && !explanationOn && results[i] !== undefined && (
                         <Link
@@ -139,11 +177,12 @@ export const RubricRows = ({
                         results !== null ? (results[i] !== undefined ? results[i].explanation : undefined) : undefined
                       }
                       labelText={''}
-                      placeholder={
-                        results === null || results[i] === undefined
-                          ? 'The evaluator explanation will appear here.'
-                          : ''
-                      }
+                      // placeholder={
+                      //   results === null || results[i] === undefined
+                      //     ? 'Explanation will appear here'
+                      //     : ''
+                      // }
+                      placeholder=""
                       key={`rubric_${i}_3_${uuid()}`}
                       id={`rubric_${i}_3_${uuid()}`}
                       onFocus={setActive}

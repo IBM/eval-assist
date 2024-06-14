@@ -2,7 +2,7 @@ import cx from 'classnames'
 import { useLocalStorage } from 'usehooks-ts'
 import { v4 as uuid } from 'uuid'
 
-import { LegacyRef, useCallback, useMemo, useRef, useState } from 'react'
+import { LegacyRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
@@ -137,6 +137,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
   const runEvaluation = async () => {
     setEvaluationFailed(false)
     setEvaluationRunning(true)
+    if (results && results.length > 0) setResults([])
     // temporaryIdSnapshot is used to discern whether the current test case
     // was changed during the evaluation request
     const temporaryIdSnapshot = temporaryIdRef.current
@@ -204,7 +205,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
               option: result.option,
               explanation: result.explanation,
               positionalBias: result.p_bias,
-              entropy: result.entropy,
+              certainty: result.certainty,
             } as RubricResult),
         )
       } else {
@@ -215,7 +216,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
               explanation: result.explanation,
               positionalBias: result.p_bias,
               winnerIndex: result.w_index,
-              entropy: result.entropy,
+              certainty: result.certainty,
             } as PairwiseResult),
         )
       }
@@ -362,6 +363,11 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
     return true
   }
 
+  const onSetSelectedPipeline = async (pipeline: string) => {
+    setSelectedPipeline(pipeline)
+    if (pipeline != selectedPipeline) setResults([])
+  }
+
   const onDeleteUseCase = async () => {
     await deleteCustom('use_case/', { use_case_id: id })
 
@@ -451,7 +457,7 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
             <PipelineSelect
               type={type}
               selectedPipeline={selectedPipeline}
-              setSelectedPipeline={setSelectedPipeline}
+              setSelectedPipeline={onSetSelectedPipeline}
               style={{ marginBottom: '2rem' }}
             />
 

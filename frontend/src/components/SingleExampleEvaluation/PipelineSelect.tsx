@@ -24,7 +24,7 @@ interface Props {
   style?: CSSProperties
   className?: string
   selectedPipeline: string | null
-  setSelectedPipeline: Dispatch<SetStateAction<string | null>>
+  setSelectedPipeline: (pipeline: string) => Promise<void>
 }
 
 export const PipelineSelect = ({ style, className, selectedPipeline, setSelectedPipeline, type }: Props) => {

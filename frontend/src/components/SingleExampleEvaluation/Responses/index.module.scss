@@ -194,6 +194,21 @@ $block-radius: 4px;
   color: $text-error;
 }
 
+.positionalBiasLink {
+  color: $text-error;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: small;
+}
+
+.certainty {
+  color: $text-helper;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: small;
+}
+
+
 .positionalBiasTag {
   margin-top: 0.5rem;
   margin-left: -3px !important;

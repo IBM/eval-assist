@@ -121,6 +121,22 @@ const Documentation = () => {
             for guidance on model usage in your context.
           </p>
 
+          <h2 id="positional-bias">Positional Bias</h2>
+          <p>
+            Our evaluators are capable of detecting positional bias. Positional bias occurs when the LLM evaluator is
+            unable to consistently make an evalutaion decision when presented with a set of possible options. This can
+            be detected by changing the order of options presented to the LLM, re-running the evaluation and looking for
+            consistency in the result. Results that exhibit positional bias are uncertain and cannot be trusted. You may
+            see sandbox evaluation results in red, indicating that positional bias has been detected.
+          </p>
+
+          <h2 id="certainty">Certainty</h2>
+          <p>
+            We also attempt to determine the certainty of evaluator judgements, which can help to determine the quality
+            of an outcome. Certainty is calculated by taking the average probability of the tokens corresponding to a
+            particular judgement. The certainty score is presented in the sandbox UI as a percentage.
+          </p>
+
           <h2>Tips</h2>
           <p>
             Refer to the <strong>response</strong> and any appropriate context variable(s) in your criteria description.

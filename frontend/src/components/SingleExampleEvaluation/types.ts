@@ -3,7 +3,7 @@ export interface RubricResult {
   option: string
   explanation: string
   positionalBias: boolean
-  entropy: number
+  certainty: number
 }
 
 export interface PairwiseResult {
@@ -11,7 +11,7 @@ export interface PairwiseResult {
   winnerIndex: number
   positionalBias: boolean
   explanation: string
-  entropy: number
+  certainty: number
 }
 
 export interface FetchedRubricResult {
@@ -19,13 +19,13 @@ export interface FetchedRubricResult {
   option: string
   explanation: string
   p_bias: boolean
-  entropy: number
+  certainty: number
 }
 
 export interface FetchedPairwiseResult {
   w_index: number
   explanation: string
-  entropy: number
+  certainty: number
   p_bias: boolean
 }
 

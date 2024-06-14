@@ -37,10 +37,18 @@ export const PairwiseRows = ({
       setResultDetailsModalOpen(true)
     }
   }
+
   const getResultToDisplay = (i: number) => {
     if (results !== null) {
       return i === pairwiseWinnerIndex ? 'Winner' : ''
     }
+  }
+
+  const getCertainty = () => {
+    if (results !== null && results[0] !== undefined) {
+      return results[0].certainty
+    }
+    return 100
   }
 
   return (
@@ -85,24 +93,40 @@ export const PairwiseRows = ({
                         [classes.resultPlaceholder]: results === null || results[0] === undefined,
                         [classes.resultBlockDefaultCursor]:
                           !explanationOn && (results === null || results[0] === undefined),
-                        [classes.untrastedResult]: results !== null && results[0].positionalBias,
+                        [classes.untrastedResult]:
+                          results !== null && 'positionalBias' in results && results[0].positionalBias,
                       })}
                     >
-                      {getResultToDisplay(i) ?? 'The results will appear here.'}
+                      {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
                     </p>
                     {results !== null && pairwiseWinnerIndex === i && results[0].positionalBias && (
-                      <Tag
-                        className={cx(classes.positionalBiasTag, {
-                          [classes.resultBlockPointerCursor]: results !== null && results[0] && !explanationOn,
-                          [classes.resultBlockDefaultCursor]: results === null || results[0] === undefined,
-                        })}
-                        type="red"
-                      >
-                        {'Positional bias: Yes'}
-                      </Tag>
+                      // <Tag
+                      //   className={cx(classes.positionalBiasTag, {
+                      //     [classes.resultBlockPointerCursor]: results !== null && results[0] && !explanationOn,
+                      //     [classes.resultBlockDefaultCursor]: results === null || results[0] === undefined,
+                      //   })}
+                      //   type="red"
+                      // >
+                      //   {'Positional bias: Yes'}
+                      // </Tag>
+                      <div>
+                        <a
+                          href="/documentation/#positional-bias"
+                          className={cx(classes.positionalBiasLink)}
+                          style={{ fontSize: 'small' }}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Positional bias
+                        </a>
+                      </div>
                     )}
 
-                    {results !== null && pairwiseWinnerIndex === i && !results[0].positionalBias && (
+                    {results !== null && pairwiseWinnerIndex === i && (
+                      <div className={cx(classes.certainty)}>{((getCertainty() as number) * 100).toFixed(0) + '%'}</div>
+                    )}
+
+                    {/* {results !== null && pairwiseWinnerIndex === i && !results[0].positionalBias && (
                       <Tag
                         className={cx(classes.positionalBiasTag, {
                           [classes.resultBlockPointerCursor]: results !== null && results[0] && !explanationOn,
@@ -112,7 +136,7 @@ export const PairwiseRows = ({
                       >
                         {'Positional bias: No'}
                       </Tag>
-                    )}
+                    )} */}
                   </div>
                   {results !== null && !explanationOn && results[0] !== undefined && pairwiseWinnerIndex === i && (
                     <Link
@@ -126,7 +150,7 @@ export const PairwiseRows = ({
                 </div>
               </div>
               {explanationOn && (
-                <ResponsiveTextArea
+                <FlexTextArea
                   readOnly
                   value={
                     results !== null && results[0] !== undefined && pairwiseWinnerIndex === i
@@ -134,7 +158,8 @@ export const PairwiseRows = ({
                       : undefined
                   }
                   labelText={''}
-                  placeholder={results === null ? 'The evaluator explanation will appear here' : ''}
+                  // placeholder={results === null ? 'The evaluator explanation will appear here' : ''}
+                  placeholder={''}
                   key={`pairwise_${i}_3_${uuid()}`}
                   id={`pairwise_${i}_3_${uuid()}`}
                   className={cx(classes.blockElement, classes.resultBlockDefaultCursor, classes.explanationBlock)}
