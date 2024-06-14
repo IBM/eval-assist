@@ -64,7 +64,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
     }
 
     if (fixMaxHeight) {
-      el.style.height = `${sizerEl.scrollHeight}px`
+      el.style.height = `${sizerEl.scrollHeight + 1}px`
     } else {
       let newHeight = isFocused ? `${sizerEl.scrollHeight}px` : ''
       if (newHeight == '' && maxInactiveHeight) {

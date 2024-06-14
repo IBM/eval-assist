@@ -144,6 +144,10 @@ $block-radius: 4px;
   }
 }
 
+.responsesRow {
+  min-height: rem(85px);
+}
+
 .responsesRow:hover {
   .resultDetailsAction {
     visibility: visible;
