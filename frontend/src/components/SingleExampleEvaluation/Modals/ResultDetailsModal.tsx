@@ -60,7 +60,12 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
             <span className={cx({ [classes['positional-bias-error']]: selectedResultDetails.positionalBias })}>
               {positionalBiasString}
             </span>
-            <Link className={classes['positional-bias-link']} href={'/'}>
+            <Link
+              className={classes['positional-bias-link']}
+              rel="noopener noreferrer"
+              target="_blank"
+              href={'/documentation/#positional-bias'}
+            >
               {'(What is this?)'}
             </Link>
           </p>

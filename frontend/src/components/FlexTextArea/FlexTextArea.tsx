@@ -5,7 +5,6 @@ import { ComponentProps, forwardRef, useCallback, useEffect, useRef, useState } 
 
 import { fast01 } from '@carbon/motion'
 import { TextArea } from '@carbon/react'
-import { usePrefix } from '@carbon/react'
 
 import { useMergeRefs } from '@floating-ui/react'
 
@@ -17,7 +16,7 @@ type Props = {
 } & ComponentProps<typeof TextArea>
 
 export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function FlexTextArea(
-  { helperText, className, maxInactiveHeight, onBlur, fixMaxHeight, ...props },
+  { helperText, className, maxInactiveHeight = 125, onBlur, fixMaxHeight, ...props },
   outsideRef,
 ) {
   const [isFocused, setFocused] = useState(false)
@@ -68,7 +67,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
       el.style.height = `${sizerEl.scrollHeight}px`
     } else {
       let newHeight = isFocused ? `${sizerEl.scrollHeight}px` : ''
-      if (newHeight === '' && maxInactiveHeight) {
+      if (newHeight == '' && maxInactiveHeight) {
         newHeight = `${Math.min(sizerEl.scrollHeight, maxInactiveHeight)}px`
       }
       if (newHeight !== el.style.height) {

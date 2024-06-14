@@ -76,6 +76,7 @@ export const PairwiseRows = ({
                   [classes.resultBlockHover]: !explanationOn && i === pairwiseWinnerIndex,
                 })}
                 onClick={() => onResultBlockClick(i)}
+                tabIndex={-1}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', height: '100%' }}>
@@ -137,6 +138,7 @@ export const PairwiseRows = ({
                   key={`pairwise_${i}_3_${uuid()}`}
                   id={`pairwise_${i}_3_${uuid()}`}
                   className={cx(classes.blockElement, classes.resultBlockDefaultCursor, classes.explanationBlock)}
+                  tabIndex={-1}
                 />
               )}
             </>

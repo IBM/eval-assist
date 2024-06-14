@@ -34,6 +34,7 @@ export default function RemovableSection({ onRemove, readOnly, children }: Props
             [classes.active]: active,
           })}
           onClick={onRemove}
+          tabIndex={-1}
         >
           <CloseFilled />
         </button>

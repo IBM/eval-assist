@@ -79,6 +79,7 @@ export const RubricRows = ({
                       [classes.resultBlockHover]: !explanationOn,
                     })}
                     onClick={() => onResultBlockClick(i)}
+                    tabIndex={-1}
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                       <div
@@ -148,6 +149,7 @@ export const RubricRows = ({
                       onFocus={setActive}
                       onBlur={setInactive}
                       className={cx(classes.blockElement, classes.resultBlockDefaultCursor, classes.explanationBlock)}
+                      tabIndex={-1}
                     />
                   )}
                 </>

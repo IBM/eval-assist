@@ -36,13 +36,10 @@ $block-radius: 4px;
 
 .blockElement {
   background-color: $field;
-
   border: 1px solid $border-subtle-01;
   border-radius: $block-radius;
-  &:not(:last-child) {
-    &:not(.addResponseBlock) {
-      border-right: none;
-    }
+  &:not(:last-child):not(.addResponseBlock) {
+    border-right: none;
   }
 }
 
@@ -50,13 +47,10 @@ $block-radius: 4px;
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 0fr 0fr;
-  // transition: grid-template-columns $duration-fast-01 ease; /* Add transition */
   transition: grid-template-columns $duration-fast-02 motion(entrance, productive); /* Add transition */
-  // transition: grid-template-columns  $duration-fast-01 ease-in-out;
 
   .blockElement {
     border-radius: 0;
-    margin-bottom: -1px;
 
     textarea {
       min-height: max(rem(50px), 100%);
@@ -96,10 +90,6 @@ $block-radius: 4px;
 
 .headerDarkColor {
   background-color: $field;
-}
-
-.responsesRow {
-  min-height: rem(100px);
 }
 
 .headerBlock {
@@ -165,13 +155,33 @@ $block-radius: 4px;
 }
 
 .winnerResponseOutline {
-  border: 2px solid $support-success;
-  border-radius: 3px;
-  transition: opacity $duration-fast-02;
-  &:nth-child(2) {
+  border: 1px solid $support-success;
+  border-radius: 1px;
+
+  .blockElement {
+    border-top: 0;
+    border-bottom: 0;
+    &:first-child {
+      border-left: 0;
+    }
+    &:last-child {
+      border-right: 0;
+    }
+  }
+}
+
+.innerContainer .tableRow {
+  &:not(:last-child) .blockElement {
+    border-bottom: 0;
+  }
+}
+
+.innerContainer .winnerResponseOutline {
+  .responsesRow:first-child {
     border-radius: 0;
   }
-  &:nth-child(3) {
+
+  .responsesRow:last-child {
     border-radius: 0 0 $block-radius $block-radius;
   }
 }
