@@ -16,7 +16,7 @@ type Props = {
 } & ComponentProps<typeof TextArea>
 
 export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function FlexTextArea(
-  { helperText, className, maxInactiveHeight = 125, onBlur, fixMaxHeight, ...props },
+  { helperText, className, maxInactiveHeight = 120, onBlur, fixMaxHeight, ...props },
   outsideRef,
 ) {
   const [isFocused, setFocused] = useState(false)
@@ -68,7 +68,8 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
     } else {
       let newHeight = isFocused ? `${sizerEl.scrollHeight}px` : ''
       if (newHeight == '' && maxInactiveHeight) {
-        newHeight = `${Math.min(sizerEl.scrollHeight, maxInactiveHeight)}px`
+        // newHeight = `${Math.min(sizerEl.scrollHeight, maxInactiveHeight)}px`
+        newHeight = `${maxInactiveHeight}px`
       }
       if (newHeight !== el.style.height) {
         el.style.height = newHeight

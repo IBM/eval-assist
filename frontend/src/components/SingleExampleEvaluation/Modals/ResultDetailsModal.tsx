@@ -53,7 +53,20 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
           ) : null}
 
           <p style={{ marginBottom: '0.5rem' }}>
-            <strong>Evaluation explanation:</strong> {selectedResultDetails.explanation}
+            <strong>Explanation:</strong> {selectedResultDetails.explanation}
+          </p>
+
+          <p style={{ marginBottom: '0.5rem' }}>
+            {' '}
+            <strong>Certainty:</strong> {(selectedResultDetails.certainty * 100).toFixed(0) + '%'}{' '}
+            <Link
+              className={classes['positional-bias-link']}
+              rel="noopener noreferrer"
+              target="_blank"
+              href={'/documentation/#certainty'}
+            >
+              {'(What is this?)'}
+            </Link>
           </p>
           <p>
             <strong>Positional bias:</strong>{' '}

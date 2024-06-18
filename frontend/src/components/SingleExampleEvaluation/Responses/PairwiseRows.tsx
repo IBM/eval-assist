@@ -32,7 +32,7 @@ export const PairwiseRows = ({
   pairwiseWinnerIndex,
 }: Props) => {
   const onResultBlockClick = (i: number) => {
-    if (results !== null && results[0] !== undefined && pairwiseWinnerIndex === i && !explanationOn) {
+    if (results !== null && results[0] !== undefined && pairwiseWinnerIndex === i) {
       setSelectedResultDetails(results[0])
       setResultDetailsModalOpen(true)
     }
@@ -62,7 +62,7 @@ export const PairwiseRows = ({
             [classes.winnerResponseOutline]: i === pairwiseWinnerIndex,
           })}
         >
-          <ResponsiveTextArea
+          <FlexTextArea
             onChange={(e) => {
               setResponses([...responses.slice(0, i), e.target.value, ...responses.slice(i + 1)])
             }}
@@ -78,10 +78,10 @@ export const PairwiseRows = ({
               <div
                 className={cx(classes.blockElement, classes.resultBlock, {
                   [classes.resultBlockPointerCursor]:
-                    results !== null && !explanationOn && results[0] !== undefined && pairwiseWinnerIndex === i,
+                    results !== null && results[0] !== undefined && pairwiseWinnerIndex === i,
                   [classes.resultBlockGradient]:
-                    results !== null && !explanationOn && results[0] !== undefined && pairwiseWinnerIndex === i,
-                  [classes.resultBlockHover]: !explanationOn && i === pairwiseWinnerIndex,
+                    results !== null && results[0] !== undefined && pairwiseWinnerIndex === i,
+                  [classes.resultBlockHover]: i === pairwiseWinnerIndex,
                 })}
                 onClick={() => onResultBlockClick(i)}
                 tabIndex={-1}
@@ -91,8 +91,7 @@ export const PairwiseRows = ({
                     <p
                       className={cx(classes.resultBlockTypography, {
                         [classes.resultPlaceholder]: results === null || results[0] === undefined,
-                        [classes.resultBlockDefaultCursor]:
-                          !explanationOn && (results === null || results[0] === undefined),
+                        [classes.resultBlockDefaultCursor]: results === null || results[0] === undefined,
                         [classes.untrastedResult]:
                           results !== null && 'positionalBias' in results && results[0].positionalBias,
                       })}
@@ -109,16 +108,16 @@ export const PairwiseRows = ({
                       // >
                       //   {'Positional bias: Yes'}
                       // </Tag>
-                      <div>
-                        <a
+                      <div className={cx(classes.positionalBiasLink)}>
+                        {/* <a
                           href="/documentation/#positional-bias"
                           className={cx(classes.positionalBiasLink)}
                           style={{ fontSize: 'small' }}
                           target="_blank"
                           rel="noopener noreferrer"
-                        >
-                          Positional bias
-                        </a>
+                        > */}
+                        Positional bias
+                        {/* </a> */}
                       </div>
                     )}
 
@@ -138,13 +137,13 @@ export const PairwiseRows = ({
                       </Tag>
                     )} */}
                   </div>
-                  {results !== null && !explanationOn && results[0] !== undefined && pairwiseWinnerIndex === i && (
+                  {results !== null && results[0] !== undefined && pairwiseWinnerIndex === i && (
                     <Link
                       style={{ alignSelft: 'flex-end' }}
                       className={classes.resultDetailsAction}
-                      renderIcon={() => <ZoomIn />}
+                      // renderIcon={() => <ZoomIn />}
                     >
-                      View Detail
+                      View Details
                     </Link>
                   )}
                 </div>

@@ -365,7 +365,8 @@ export const SingleExampleEvaluation = ({ _userUseCases, preloadedUseCase }: Sin
 
   const onSetSelectedPipeline = async (pipeline: string) => {
     setSelectedPipeline(pipeline)
-    if (pipeline != selectedPipeline) setResults([])
+    // if (pipeline != selectedPipeline && results && results.length > 0)
+    //   setResults([])
   }
 
   const onDeleteUseCase = async () => {

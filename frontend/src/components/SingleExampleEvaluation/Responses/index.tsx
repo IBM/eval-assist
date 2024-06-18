@@ -53,17 +53,6 @@ export const Responses = ({
   return (
     <div style={style} className={className}>
       <div className={classes.content}>
-        {results !== null && (
-          <Toggle
-            labelText={explanationOn ? 'Explanation On' : 'Explanation Off'}
-            toggled={explanationOn}
-            onToggle={() => setExplanationOn(!explanationOn)}
-            size="sm"
-            hideLabel
-            id="toggle-explanation"
-            className={classes.toggle}
-          />
-        )}
         <div className={cx(classes.innerContainer)}>
           <div
             className={cx(classes.tableRow, {
@@ -108,6 +97,18 @@ export const Responses = ({
           )}
         </div>
       </div>
+      {results !== null && (
+        <Toggle
+          // labelText={explanationOn ? 'Show Explanation' : 'Explanation Hidden'}
+          labelText={'Show Explanation'}
+          toggled={explanationOn}
+          onToggle={() => setExplanationOn(!explanationOn)}
+          size="sm"
+          hideLabel
+          id="toggle-explanation"
+          className={classes.toggle}
+        />
+      )}
     </div>
   )
 }

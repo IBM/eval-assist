@@ -3,8 +3,8 @@ import { v4 as uuid } from 'uuid'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { Button, Link, Tag } from '@carbon/react'
-import { Add, WarningAlt, ZoomIn } from '@carbon/react/icons'
+import { Button, Link, Tag, Tooltip } from '@carbon/react'
+import { Add, Information, WarningAlt, ZoomIn } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
@@ -32,7 +32,8 @@ export const RubricRows = ({
   setResultDetailsModalOpen,
 }: Props) => {
   const onResultBlockClick = (i: number) => {
-    if (results !== null && results[i] !== undefined && !explanationOn) {
+    // if (results !== null && results[i] !== undefined && !explanationOn) {
+    if (results !== null && results[i] !== undefined) {
       setSelectedResultDetails(results[i])
       setResultDetailsModalOpen(true)
     }
@@ -72,11 +73,10 @@ export const RubricRows = ({
                 <>
                   <div
                     className={cx(classes.blockElement, classes.resultBlock, {
-                      [classes.resultBlockPointerCursor]:
-                        results !== null && !explanationOn && results[i] !== undefined,
-                      [classes.resultBlockGradient]: results !== null && !explanationOn && results[i] !== undefined,
+                      [classes.resultBlockPointerCursor]: results !== null && results[i] !== undefined,
+                      [classes.resultBlockGradient]: results !== null && results[i] !== undefined,
 
-                      [classes.resultBlockHover]: !explanationOn,
+                      [classes.resultBlockHover]: true,
                     })}
                     onClick={() => onResultBlockClick(i)}
                     tabIndex={-1}
@@ -114,16 +114,16 @@ export const RubricRows = ({
                           // >
                           //   {'!'}
                           // </Tag>
-                          <div>
-                            <a
+                          <div className={cx(classes.positionalBiasLink)}>
+                            {/* <a
                               href="/documentation/#positional-bias"
                               className={cx(classes.positionalBiasLink)}
                               style={{ fontSize: 'small' }}
                               target="_blank"
                               rel="noopener noreferrer"
-                            >
-                              Positional bias
-                            </a>
+                            > */}
+                            Positional bias detected
+                            {/* </a> */}
                           </div>
                         )}
 
@@ -159,13 +159,13 @@ export const RubricRows = ({
                           </Tag>
                         )} */}
                       </div>
-                      {results !== null && !explanationOn && results[i] !== undefined && (
+                      {results !== null && results[i] !== undefined && (
                         <Link
                           style={{ alignSelf: 'flex-end' }}
                           className={classes.resultDetailsAction}
-                          renderIcon={() => <ZoomIn />}
+                          // renderIcon={() => <ZoomIn />} // Icon prevent click propagation
                         >
-                          View Detail
+                          View Details
                         </Link>
                       )}
                     </div>

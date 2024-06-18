@@ -202,6 +202,8 @@ $block-radius: 4px;
 }
 
 .certainty {
+  display: flex;
+  align-items: center;
   color: $text-helper;
   margin-top: 5px;
   margin-bottom: 5px;
@@ -215,7 +217,7 @@ $block-radius: 4px;
 }
 
 .toggle {
-  margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
 .toggle :global .cds--toggle__text {
