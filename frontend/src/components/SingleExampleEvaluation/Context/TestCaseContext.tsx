@@ -1,6 +1,6 @@
 import { SetStateAction } from 'react'
 
-import { ResponsiveTextArea } from '@components/ResponsiveTextArea/ResponsiveTextArea'
+import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
 import classes from '../SingleExampleEvaluation.module.scss'
 
@@ -11,7 +11,7 @@ interface Props {
 
 export const TestCaseContext = ({ context, setContext }: Props) => {
   return (
-    <ResponsiveTextArea
+    <FlexTextArea
       onChange={(e) => {
         setContext(e.target.value)
       }}
@@ -22,6 +22,7 @@ export const TestCaseContext = ({ context, setContext }: Props) => {
       style={{ marginBottom: '1.5rem', resize: 'none' }}
       placeholder="Context information relevant to the evaluation such as prompt, data variables etc."
       className={classes['left-padding']}
+      fixMaxHeight
     />
   )
 }

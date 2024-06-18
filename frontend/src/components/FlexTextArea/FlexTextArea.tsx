@@ -32,29 +32,27 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
   const ref = useMergeRefs([outsideRef, innerRef])
 
   useEffect(() => {
-    const el = innerRef?.current
-    if (!el) {
-      return
-    }
+    if (!fixMaxHeight) {
+      const el = innerRef?.current
+      if (!el) {
+        return
+      }
 
-    let isMounted = true
-    el.classList.remove('noanimation')
-    el.addEventListener(
-      'transitionend',
-      () => {
-        if (isMounted) {
-          el.classList.add('noanimation')
-        }
-      },
-      {
-        once: true,
-      },
-    )
-
-    return () => {
-      isMounted = false
+      let isMounted = true
+      el.classList.remove('noanimation')
+      el.addEventListener(
+        'transitionend',
+        () => {
+          if (isMounted) {
+            el.classList.add('noanimation')
+          }
+        },
+        {
+          once: true,
+        },
+      )
     }
-  }, [isFocused])
+  }, [isFocused, fixMaxHeight])
 
   const updateHeight = useCallback(() => {
     const el = innerRef?.current
@@ -64,7 +62,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
     }
 
     if (fixMaxHeight) {
-      el.style.height = `${sizerEl.scrollHeight + 1}px`
+      el.style.height = `${sizerEl.scrollHeight + 2}px`
     } else {
       let newHeight = isFocused ? `${sizerEl.scrollHeight}px` : ''
       if (newHeight == '' && maxInactiveHeight) {
@@ -79,7 +77,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
 
   useEffect(() => {
     updateHeight()
-  }, [isFocused, updateHeight, props.value])
+  })
 
   return (
     <div className={cx(className, classes.flex)}>
