@@ -56,19 +56,19 @@ export const Responses = ({
         <div className={cx(classes.innerContainer)}>
           <div
             className={cx(classes.tableRow, {
-              [classes.tableRowWithResults]: results !== null,
-              [classes.tableRowWithExplanation]: results !== null && explanationOn,
+              [classes.tableRowWithResults]: results !== null && !evaluationRunning,
+              [classes.tableRowWithExplanation]: results !== null && !evaluationRunning && explanationOn,
             })}
           >
             <strong className={cx(classes.blockElement, classes.headerBlock, classes.headerTypography)}>
               {type === PipelineType.RUBRIC ? 'Responses to evaluate' : 'Responses to compare'}
             </strong>
-            {results !== null && (
+            {results !== null && !evaluationRunning && (
               <div style={{ display: 'flex' }} className={cx(classes.blockElement, classes.headerBlock)}>
                 <strong className={classes.headerTypography}>{'Result'}</strong>
               </div>
             )}
-            {results !== null && explanationOn && (
+            {results !== null && !evaluationRunning && explanationOn && (
               <strong className={cx(classes.blockElement, classes.headerBlock, classes.headerTypography)}>
                 {'Explanation'}
               </strong>
@@ -84,6 +84,7 @@ export const Responses = ({
               explanationOn={explanationOn}
               setSelectedResultDetails={setSelectedResultDetails}
               setResultDetailsModalOpen={setResultDetailsModalOpen}
+              evaluationRunning={evaluationRunning}
             />,
             <PairwiseRows
               responses={responses}
@@ -93,11 +94,12 @@ export const Responses = ({
               setSelectedResultDetails={setSelectedResultDetails}
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               pairwiseWinnerIndex={pairwiseWinnerIndex}
+              evaluationRunning={evaluationRunning}
             />,
           )}
         </div>
       </div>
-      {results !== null && (
+      {results !== null && !evaluationRunning && (
         <Toggle
           // labelText={explanationOn ? 'Show Explanation' : 'Explanation Hidden'}
           labelText={'Show Explanation'}

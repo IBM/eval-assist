@@ -3,8 +3,8 @@ import { v4 as uuid } from 'uuid'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { Button, Link, Tag, Tooltip } from '@carbon/react'
-import { Add, Information, WarningAlt, ZoomIn } from '@carbon/react/icons'
+import { Button, Link } from '@carbon/react'
+import { Add } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
@@ -20,6 +20,7 @@ interface Props {
   explanationOn: boolean
   setSelectedResultDetails: Dispatch<SetStateAction<RubricResult | PairwiseResult | null>>
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
+  evaluationRunning: boolean
 }
 
 export const RubricRows = ({
@@ -30,6 +31,7 @@ export const RubricRows = ({
   explanationOn,
   setSelectedResultDetails,
   setResultDetailsModalOpen,
+  evaluationRunning,
 }: Props) => {
   const onResultBlockClick = (i: number) => {
     // if (results !== null && results[i] !== undefined && !explanationOn) {
@@ -51,8 +53,8 @@ export const RubricRows = ({
             <div
               key={i}
               className={cx(classes.tableRow, classes.responsesRow, {
-                [classes.tableRowWithResults]: results !== null,
-                [classes.tableRowWithExplanation]: results !== null && explanationOn,
+                [classes.tableRowWithResults]: results !== null && !evaluationRunning,
+                [classes.tableRowWithExplanation]: results !== null && !evaluationRunning && explanationOn,
               })}
             >
               <FlexTextArea
@@ -69,12 +71,12 @@ export const RubricRows = ({
                 onBlur={setInactive}
                 className={cx(classes.blockElement)}
               />
-              {results !== null && (
+              {results !== null && !evaluationRunning && (
                 <>
                   <div
                     className={cx(classes.blockElement, classes.resultBlock, {
-                      [classes.resultBlockPointerCursor]: results !== null && results[i] !== undefined,
-                      [classes.resultBlockGradient]: results !== null && results[i] !== undefined,
+                      [classes.resultBlockPointerCursor]: results[i] !== undefined,
+                      [classes.resultBlockGradient]: results[i] !== undefined,
 
                       [classes.resultBlockHover]: true,
                     })}
@@ -93,10 +95,9 @@ export const RubricRows = ({
                       >
                         <div
                           className={cx(classes.resultBlockTypography, {
-                            [classes.resultPlaceholder]: results === null || results[i] === undefined,
-                            [classes.resultBlockDefaultCursor]:
-                              !explanationOn && (results === null || results[i] === undefined),
-                            [classes.untrastedResult]: results !== null && results[i]?.positionalBias,
+                            [classes.resultPlaceholder]: results[i] === undefined,
+                            [classes.resultBlockDefaultCursor]: !explanationOn && results[i] === undefined,
+                            [classes.untrastedResult]: results[i]?.positionalBias,
                           })}
                           onFocus={setActive}
                           onBlur={setInactive}
@@ -104,7 +105,7 @@ export const RubricRows = ({
                           {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
                           {/* {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong>: 'Result will appear here'} */}
                         </div>
-                        {results !== null && results[i] && results[i].positionalBias && (
+                        {results[i] && results[i].positionalBias && (
                           // <Tag
                           //   className={cx(classes.positionalBiasTag, {
                           //     [classes.resultBlockPointerCursor]: results !== null && results[i] && !explanationOn,
@@ -127,7 +128,7 @@ export const RubricRows = ({
                           </div>
                         )}
 
-                        {results !== null && results[i] && results[i].certainty && (
+                        {results[i] && results[i].certainty && (
                           // <Tag
                           //   className={cx(classes.positionalBiasTag, {
                           //     [classes.resultBlockPointerCursor]: results !== null && results[i] && !explanationOn,
@@ -138,7 +139,7 @@ export const RubricRows = ({
                           //   {'!'}
                           // </Tag>
                           <div className={cx(classes.certainty)}>
-                            {((results[i].certainty as number) * 100).toFixed(0) + '%'}
+                            {'Certainty: ' + ((results[i].certainty as number) * 100).toFixed(0) + '%'}
                           </div>
 
                           // <div style={{fontSize: "small"}} >
@@ -159,7 +160,7 @@ export const RubricRows = ({
                           </Tag>
                         )} */}
                       </div>
-                      {results !== null && results[i] !== undefined && (
+                      {results[i] !== undefined && (
                         <Link
                           style={{ alignSelf: 'flex-end' }}
                           className={classes.resultDetailsAction}
@@ -170,12 +171,10 @@ export const RubricRows = ({
                       )}
                     </div>
                   </div>
-                  {explanationOn && (
+                  {results !== null && !evaluationRunning && explanationOn && (
                     <FlexTextArea
                       readOnly
-                      value={
-                        results !== null ? (results[i] !== undefined ? results[i].explanation : undefined) : undefined
-                      }
+                      value={results[i] !== undefined ? results[i].explanation : undefined}
                       labelText={''}
                       // placeholder={
                       //   results === null || results[i] === undefined

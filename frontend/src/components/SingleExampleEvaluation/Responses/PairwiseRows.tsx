@@ -3,11 +3,9 @@ import { v4 as uuid } from 'uuid'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { Link, Tag } from '@carbon/react'
-import { ZoomIn } from '@carbon/react/icons'
+import { Link } from '@carbon/react'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
-import { ResponsiveTextArea } from '@components/ResponsiveTextArea/ResponsiveTextArea'
 
 import { PairwiseResult, RubricResult } from '../types'
 import classes from './index.module.scss'
@@ -20,6 +18,7 @@ interface Props {
   setSelectedResultDetails: Dispatch<SetStateAction<RubricResult | PairwiseResult | null>>
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   pairwiseWinnerIndex: number | null
+  evaluationRunning: boolean
 }
 
 export const PairwiseRows = ({
@@ -30,6 +29,7 @@ export const PairwiseRows = ({
   setSelectedResultDetails,
   setResultDetailsModalOpen,
   pairwiseWinnerIndex,
+  evaluationRunning,
 }: Props) => {
   const onResultBlockClick = (i: number) => {
     if (results !== null && results[0] !== undefined && pairwiseWinnerIndex === i) {
@@ -44,22 +44,15 @@ export const PairwiseRows = ({
     }
   }
 
-  const getCertainty = () => {
-    if (results !== null && results[0] !== undefined) {
-      return results[0].certainty
-    }
-    return 100
-  }
-
   return (
     <>
       {responses?.map((response, i) => (
         <div
           key={i}
           className={cx(classes.tableRow, classes.responsesRow, {
-            [classes.tableRowWithResults]: results !== null,
-            [classes.tableRowWithExplanation]: results !== null && explanationOn,
-            [classes.winnerResponseOutline]: i === pairwiseWinnerIndex,
+            [classes.tableRowWithResults]: results !== null && !evaluationRunning,
+            [classes.tableRowWithExplanation]: results !== null && !evaluationRunning && explanationOn,
+            [classes.winnerResponseOutline]: !evaluationRunning && i === pairwiseWinnerIndex,
           })}
         >
           <FlexTextArea
@@ -73,14 +66,12 @@ export const PairwiseRows = ({
             key={`${i}_1`}
             className={cx(classes.blockElement)}
           />
-          {results !== null && (
+          {results !== null && !evaluationRunning && (
             <>
               <div
                 className={cx(classes.blockElement, classes.resultBlock, {
-                  [classes.resultBlockPointerCursor]:
-                    results !== null && results[0] !== undefined && pairwiseWinnerIndex === i,
-                  [classes.resultBlockGradient]:
-                    results !== null && results[0] !== undefined && pairwiseWinnerIndex === i,
+                  [classes.resultBlockPointerCursor]: results[0] !== undefined && pairwiseWinnerIndex === i,
+                  [classes.resultBlockGradient]: results[0] !== undefined && pairwiseWinnerIndex === i,
                   [classes.resultBlockHover]: i === pairwiseWinnerIndex,
                 })}
                 onClick={() => onResultBlockClick(i)}
@@ -98,7 +89,7 @@ export const PairwiseRows = ({
                     >
                       {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
                     </p>
-                    {results !== null && pairwiseWinnerIndex === i && results[0].positionalBias && (
+                    {pairwiseWinnerIndex === i && results[0].positionalBias && (
                       // <Tag
                       //   className={cx(classes.positionalBiasTag, {
                       //     [classes.resultBlockPointerCursor]: results !== null && results[0] && !explanationOn,
@@ -121,8 +112,10 @@ export const PairwiseRows = ({
                       </div>
                     )}
 
-                    {results !== null && pairwiseWinnerIndex === i && (
-                      <div className={cx(classes.certainty)}>{((getCertainty() as number) * 100).toFixed(0) + '%'}</div>
+                    {results[0] !== undefined && results[0].certainty && pairwiseWinnerIndex === i && (
+                      <div className={cx(classes.certainty)}>
+                        {'Certainty: ' + ((results[0].certainty as number) * 100).toFixed(0) + '%'}
+                      </div>
                     )}
 
                     {/* {results !== null && pairwiseWinnerIndex === i && !results[0].positionalBias && (
@@ -137,7 +130,7 @@ export const PairwiseRows = ({
                       </Tag>
                     )} */}
                   </div>
-                  {results !== null && results[0] !== undefined && pairwiseWinnerIndex === i && (
+                  {results[0] !== undefined && pairwiseWinnerIndex === i && (
                     <Link
                       style={{ alignSelft: 'flex-end' }}
                       className={classes.resultDetailsAction}
@@ -148,14 +141,10 @@ export const PairwiseRows = ({
                   )}
                 </div>
               </div>
-              {explanationOn && (
+              {explanationOn && !evaluationRunning && (
                 <FlexTextArea
                   readOnly
-                  value={
-                    results !== null && results[0] !== undefined && pairwiseWinnerIndex === i
-                      ? results[0].explanation
-                      : undefined
-                  }
+                  value={results[0] !== undefined && pairwiseWinnerIndex === i ? results[0].explanation : undefined}
                   labelText={''}
                   // placeholder={results === null ? 'The evaluator explanation will appear here' : ''}
                   placeholder={''}

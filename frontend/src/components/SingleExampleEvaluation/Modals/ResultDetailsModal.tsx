@@ -1,10 +1,8 @@
 import cx from 'classnames'
-import { useMediaQuery } from 'usehooks-ts'
 
-import { Dispatch, SetStateAction, useMemo, useState } from 'react'
+import { Dispatch, SetStateAction, useMemo } from 'react'
 
-import { Button, Layer, Link, Modal } from '@carbon/react'
-import { Label } from '@carbon/react/icons'
+import { Layer, Link, Modal } from '@carbon/react'
 
 import { isInstanceOfPairwiseResult } from '@utils/utils'
 
@@ -55,19 +53,21 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
           <p style={{ marginBottom: '0.5rem' }}>
             <strong>Explanation:</strong> {selectedResultDetails.explanation}
           </p>
+          {selectedResultDetails.certainty && (
+            <p style={{ marginBottom: '0.5rem' }}>
+              {' '}
+              <strong>Certainty:</strong> {(selectedResultDetails.certainty * 100).toFixed(0) + '%'}{' '}
+              <Link
+                className={classes['positional-bias-link']}
+                rel="noopener noreferrer"
+                target="_blank"
+                href={'/documentation/#certainty'}
+              >
+                {'(What is this?)'}
+              </Link>
+            </p>
+          )}
 
-          <p style={{ marginBottom: '0.5rem' }}>
-            {' '}
-            <strong>Certainty:</strong> {(selectedResultDetails.certainty * 100).toFixed(0) + '%'}{' '}
-            <Link
-              className={classes['positional-bias-link']}
-              rel="noopener noreferrer"
-              target="_blank"
-              href={'/documentation/#certainty'}
-            >
-              {'(What is this?)'}
-            </Link>
-          </p>
           <p>
             <strong>Positional bias:</strong>{' '}
             <span className={cx({ [classes['positional-bias-error']]: selectedResultDetails.positionalBias })}>

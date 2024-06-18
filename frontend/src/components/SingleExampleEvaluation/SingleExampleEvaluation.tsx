@@ -6,7 +6,6 @@ import { LegacyRef, useCallback, useEffect, useMemo, useRef, useState } from 're
 
 import { useRouter } from 'next/router'
 
-import { ResponsiveTextArea } from '@components/ResponsiveTextArea/ResponsiveTextArea'
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
@@ -23,6 +22,7 @@ import {
 
 import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
+import { TestCaseContext } from './Context/TestCaseContext'
 import { CriteriaView } from './CriteriaView'
 import { EvaluateButton } from './EvaluateButton'
 import { Landing } from './Landing'
@@ -124,12 +124,12 @@ export const SingleExampleEvaluation = () => {
   const [bamAPIKey, setBamAPIKey, removeBamAPIKey] = useLocalStorage<string>('bamAPIKey', '')
 
   const popoverRef = useRef<HTMLDivElement>()
-
+  const [evaluationRunningToastId, setEvaluationRunningToastId] = useState<string | null>(null)
   const router = useRouter()
 
   const { getUserName } = useAuthentication()
 
-  const { addToast } = useToastContext()
+  const { addToast, removeToast } = useToastContext()
   const { deleteCustom, post, put } = useFetchUtils()
   useBeforeOnload(changesDetected)
 
@@ -158,7 +158,11 @@ export const SingleExampleEvaluation = () => {
   const runEvaluation = async () => {
     setEvaluationFailed(false)
     setEvaluationRunning(true)
-    if (results && results.length > 0) setResults([])
+    const toastId = addToast({
+      title: 'Running evaluation...',
+      kind: 'info',
+    })
+    setEvaluationRunningToastId(toastId)
     // temporaryIdSnapshot is used to discern whether the current test case
     // was changed during the evaluation request
     const temporaryIdSnapshot = temporaryIdRef.current
@@ -244,6 +248,7 @@ export const SingleExampleEvaluation = () => {
         )
       }
       setResults(results)
+      removeToast(toastId)
     }
   }
 
@@ -266,13 +271,14 @@ export const SingleExampleEvaluation = () => {
       let urlChangePromise: Promise<boolean>
       // use case is a saved user test case
       urlChangePromise = changeUseCaseURL(getQueryParamsFromUseCase(useCase))
-
+      if (evaluationRunningToastId) removeToast(evaluationRunningToastId)
+      setEvaluationRunningToastId(null)
       // if evaluation is running, cancel it (superficially)
       if (evaluationRunning) {
         setEvaluationRunning(false)
       }
     },
-    [changeUseCaseURL, evaluationRunning],
+    [changeUseCaseURL, evaluationRunning, evaluationRunningToastId, removeToast],
   )
 
   const updateLastSavedPipeline = useCallback(() => {
@@ -475,31 +481,16 @@ export const SingleExampleEvaluation = () => {
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
             />
-
             <PipelineSelect
               type={type}
               selectedPipeline={selectedPipeline}
               setSelectedPipeline={onSetSelectedPipeline}
               style={{ marginBottom: '2rem' }}
             />
-
             <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>
               <strong>Test data</strong>
             </div>
-
-            <ResponsiveTextArea
-              onChange={(e) => {
-                setContext(e.target.value)
-              }}
-              rows={1}
-              value={context}
-              id="text-area-context"
-              labelText="Task context (optional)"
-              style={{ marginBottom: '1.5rem', resize: 'none' }}
-              placeholder="Context information relevant to the evaluation such as prompt, data variables etc."
-              className={classes['left-padding']}
-            />
-
+            <TestCaseContext context={context} setContext={setContext} />
             <Responses
               responses={responses}
               setResponses={setResponses}
@@ -525,15 +516,6 @@ export const SingleExampleEvaluation = () => {
                 {'You will need to provide your BAM API key to run the evaluation'}
               </p>
             )}
-            {/* <EvaluationResults
-              className={classes['left-padding']}
-              results={results}
-              evaluationFailed={evaluationFailed}
-              evaluationError={evaluationError}
-              evaluationRunning={evaluationRunning}
-              type={type}
-              style={{ marginBottom: '1rem' }}
-            /> */}
           </>
         )}
       </div>

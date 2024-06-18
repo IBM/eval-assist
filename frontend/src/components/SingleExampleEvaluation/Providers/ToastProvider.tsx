@@ -7,11 +7,13 @@ import { ToastNotification, ToastNotificationProps } from '@carbon/react'
 import classes from './ToastProvider.module.scss'
 
 interface ToastContextValue {
-  addToast: (toast: Toast) => void
+  addToast: (toast: Toast) => string
+  removeToast: (toastId: string) => void
 }
 
 export const ToastContext = createContext<ToastContextValue>({
-  addToast: () => {},
+  addToast: () => '',
+  removeToast: () => {},
 })
 
 interface Props {
@@ -47,23 +49,25 @@ export const ToastProvider = ({ children }: Props) => {
   const [delayedToasts, setDelayedToasts] = useState<ToastWithKey[]>([])
 
   const addToast = useCallback(
-    (toast: Toast) => {
+    (toast: Toast): string => {
       const key = uuid()
       const newToast: ToastWithKey = { ...toast, key }
       if (document.hasFocus()) {
-        setToasts((existing) => {
-          return [newToast, ...existing]
-        })
+        setToasts((existing) => [newToast, ...existing])
       } else {
         // wait for for triggering the toast when the document has focus
         // add the toast to the delayed toasts
-        setDelayedToasts((existing) => {
-          return [newToast, ...existing]
-        })
+        setDelayedToasts((existing) => [newToast, ...existing])
       }
+      return key
     },
     [setToasts],
   )
+
+  const removeToast = useCallback((toastId: string) => {
+    setToasts((existing) => [...existing.filter((toast) => toast.key !== toastId)])
+    setDelayedToasts((existing) => [...existing.filter((toast) => toast.key !== toastId)])
+  }, [])
 
   const onVisibilityChange = useCallback(() => {
     if (document.visibilityState === 'visible') {
@@ -77,7 +81,7 @@ export const ToastProvider = ({ children }: Props) => {
     return () => document.removeEventListener('visibilitychange', onVisibilityChange)
   }, [onVisibilityChange])
 
-  const contextValue = useMemo(() => ({ addToast }), [addToast])
+  const contextValue = useMemo(() => ({ addToast, removeToast }), [addToast, removeToast])
 
   return (
     <ToastContext.Provider value={contextValue}>

@@ -47,8 +47,7 @@ $block-radius: 4px;
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 0fr 0fr;
-  transition: grid-template-columns $duration-fast-02 motion(entrance, productive); /* Add transition */
-
+  transition: none;
   .blockElement {
     border-radius: 0;
 
@@ -64,10 +63,12 @@ $block-radius: 4px;
 }
 
 .tableRow.tableRowWithResults {
+  transition: grid-template-columns $duration-fast-02 motion(entrance, productive);
   grid-template-columns: 5fr 1fr 0fr;
 }
 
 .tableRow.tableRowWithExplanation {
+  transition: grid-template-columns $duration-fast-02 motion(entrance, productive);
   grid-template-columns: 5fr 1fr 2fr;
 }
 
@@ -209,7 +210,6 @@ $block-radius: 4px;
   margin-bottom: 5px;
   font-size: small;
 }
-
 
 .positionalBiasTag {
   margin-top: 0.5rem;

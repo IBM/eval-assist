@@ -35,10 +35,6 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
       : []
   }, [preloadedUseCase])
 
-  console.log(selectedNode)
-
-  console.log(selectedNode)
-
   const handleToggle = (key: 'rubric' | 'pairwise') =>
     setExpanded({
       ...expanded,

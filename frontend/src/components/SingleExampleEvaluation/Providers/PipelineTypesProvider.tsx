@@ -1,6 +1,6 @@
 import { type } from 'os'
 
-import { ReactNode, createContext, useContext, useEffect, useState } from 'react'
+import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 import { Loading } from '@carbon/react'
 
@@ -27,6 +27,17 @@ export const usePipelineTypesContext = () => {
 export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => {
   const [pipelines, setPipelines] = useState<Pipeline[] | null>(null)
   const [loadingPipelines, setLoadingPipelines] = useState(false)
+
+  const rubricPipelines = useMemo(
+    () => pipelines?.filter((p) => p.type === PipelineType.RUBRIC).map((p) => p.name) ?? null,
+    [pipelines],
+  )
+
+  const pairwisePipelines = useMemo(
+    () => pipelines?.filter((p) => p.type === PipelineType.PAIRWISE).map((p) => p.name) ?? null,
+    [pipelines],
+  )
+
   useEffect(() => {
     const fetchData = async () => {
       setLoadingPipelines(true)
@@ -43,8 +54,8 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
   return (
     <PipelineTypesContext.Provider
       value={{
-        rubricPipelines: pipelines?.filter((p) => p.type === PipelineType.RUBRIC).map((p) => p.name) ?? null,
-        pairwisePipelines: pipelines?.filter((p) => p.type === PipelineType.PAIRWISE).map((p) => p.name) ?? null,
+        rubricPipelines,
+        pairwisePipelines,
         loadingPipelines,
       }}
     >

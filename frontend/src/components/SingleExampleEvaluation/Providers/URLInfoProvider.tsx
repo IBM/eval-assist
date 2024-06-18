@@ -45,6 +45,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const preloadedUseCase = useMemo(() => {
+    console.log('here')
     let pu: UseCase | null
     if (useCaseId !== null && userUseCases !== null) {
       pu = userUseCases.find((userUseCase) => userUseCase.id === useCaseId) || null
