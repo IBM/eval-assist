@@ -61,7 +61,6 @@ export const RubricRows = ({
                 onChange={(e) => {
                   setResponses([...responses.slice(0, i), e.target.value, ...responses.slice(i + 1)])
                 }}
-                rows={4}
                 value={response}
                 id="text-area-model-output"
                 labelText={''}
@@ -76,7 +75,6 @@ export const RubricRows = ({
                   <div
                     className={cx(classes.blockElement, classes.resultBlock, {
                       [classes.resultBlockPointerCursor]: results[i] !== undefined,
-                      [classes.resultBlockGradient]: results[i] !== undefined,
 
                       [classes.resultBlockHover]: true,
                     })}
@@ -96,7 +94,7 @@ export const RubricRows = ({
                         <div
                           className={cx(classes.resultBlockTypography, {
                             [classes.resultPlaceholder]: results[i] === undefined,
-                            [classes.resultBlockDefaultCursor]: !explanationOn && results[i] === undefined,
+                            [classes.resultBlockDefaultCursor]: results[i] === undefined,
                             [classes.untrastedResult]: results[i]?.positionalBias,
                           })}
                           onFocus={setActive}

@@ -71,15 +71,22 @@ export const PairwiseRows = ({
               <div
                 className={cx(classes.blockElement, classes.resultBlock, {
                   [classes.resultBlockPointerCursor]: results[0] !== undefined && pairwiseWinnerIndex === i,
-                  [classes.resultBlockGradient]: results[0] !== undefined && pairwiseWinnerIndex === i,
                   [classes.resultBlockHover]: i === pairwiseWinnerIndex,
                 })}
                 onClick={() => onResultBlockClick(i)}
                 tabIndex={-1}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', height: '100%' }}>
-                    <p
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      height: '100%',
+                      gap: '5px',
+                    }}
+                  >
+                    <div
                       className={cx(classes.resultBlockTypography, {
                         [classes.resultPlaceholder]: results === null || results[0] === undefined,
                         [classes.resultBlockDefaultCursor]: results === null || results[0] === undefined,
@@ -88,54 +95,28 @@ export const PairwiseRows = ({
                       })}
                     >
                       {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
-                    </p>
+                    </div>
                     {pairwiseWinnerIndex === i && results[0].positionalBias && (
-                      // <Tag
-                      //   className={cx(classes.positionalBiasTag, {
-                      //     [classes.resultBlockPointerCursor]: results !== null && results[0] && !explanationOn,
-                      //     [classes.resultBlockDefaultCursor]: results === null || results[0] === undefined,
-                      //   })}
-                      //   type="red"
-                      // >
-                      //   {'Positional bias: Yes'}
-                      // </Tag>
-                      <div className={cx(classes.positionalBiasLink)}>
-                        {/* <a
-                          href="/documentation/#positional-bias"
-                          className={cx(classes.positionalBiasLink)}
-                          style={{ fontSize: 'small' }}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        > */}
-                        Positional bias
-                        {/* </a> */}
+                      <div className={cx(classes.positionalBias)}>Positional bias</div>
+                    )}
+                    {pairwiseWinnerIndex === i && results[0] && (
+                      <div
+                        className={cx({
+                          [classes.positionalBias]: results[0].positionalBias,
+                          [classes.softText]: !results[0].positionalBias,
+                        })}
+                      >
+                        {results[0].positionalBias ? 'Positional bias detected' : 'No positional bias'}
                       </div>
                     )}
-
-                    {results[0] !== undefined && results[0].certainty && pairwiseWinnerIndex === i && (
-                      <div className={cx(classes.certainty)}>
+                    {results[0] && results[0].certainty && pairwiseWinnerIndex === i && (
+                      <div className={cx(classes.softText)}>
                         {'Certainty: ' + ((results[0].certainty as number) * 100).toFixed(0) + '%'}
                       </div>
                     )}
-
-                    {/* {results !== null && pairwiseWinnerIndex === i && !results[0].positionalBias && (
-                      <Tag
-                        className={cx(classes.positionalBiasTag, {
-                          [classes.resultBlockPointerCursor]: results !== null && results[0] && !explanationOn,
-                          [classes.resultBlockDefaultCursor]: results === null || results[0] === undefined,
-                        })}
-                        type="green"
-                      >
-                        {'Positional bias: No'}
-                      </Tag>
-                    )} */}
                   </div>
                   {results[0] !== undefined && pairwiseWinnerIndex === i && (
-                    <Link
-                      style={{ alignSelft: 'flex-end' }}
-                      className={classes.resultDetailsAction}
-                      // renderIcon={() => <ZoomIn />}
-                    >
+                    <Link style={{ alignSelft: 'flex-end' }} className={classes.resultDetailsAction}>
                       View Details
                     </Link>
                   )}
