@@ -103,69 +103,25 @@ export const RubricRows = ({
                           onBlur={setInactive}
                         >
                           {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
-                          {/* {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong>: 'Result will appear here'} */}
                         </div>
-                        {results[i] && results[i].positionalBias && (
-                          // <Tag
-                          //   className={cx(classes.positionalBiasTag, {
-                          //     [classes.resultBlockPointerCursor]: results !== null && results[i] && !explanationOn,
-                          //     [classes.resultBlockDefaultCursor]: results === null || results[i] === undefined,
-                          //   })}
-                          //   type="red"
-                          // >
-                          //   {'!'}
-                          // </Tag>
-                          <div className={cx(classes.positionalBiasLink)}>
-                            {/* <a
-                              href="/documentation/#positional-bias"
-                              className={cx(classes.positionalBiasLink)}
-                              style={{ fontSize: 'small' }}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            > */}
-                            Positional bias detected
-                            {/* </a> */}
+                        {results[i] && (
+                          <div
+                            className={cx({
+                              [classes.positionalBias]: results[i].positionalBias,
+                              [classes.softText]: !results[i].positionalBias,
+                            })}
+                          >
+                            {results[i].positionalBias ? 'Positional bias detected' : 'No positional bias'}
                           </div>
                         )}
-
                         {results[i] && results[i].certainty && (
-                          // <Tag
-                          //   className={cx(classes.positionalBiasTag, {
-                          //     [classes.resultBlockPointerCursor]: results !== null && results[i] && !explanationOn,
-                          //     [classes.resultBlockDefaultCursor]: results === null || results[i] === undefined,
-                          //   })}
-                          //   type="red"
-                          // >
-                          //   {'!'}
-                          // </Tag>
-                          <div className={cx(classes.certainty)}>
+                          <div className={cx(classes.softText)}>
                             {'Certainty: ' + ((results[i].certainty as number) * 100).toFixed(0) + '%'}
                           </div>
-
-                          // <div style={{fontSize: "small"}} >
-
-                          //   {(((results[i].certainty as number)*100).toFixed(0)) + "%"}
-                          // </div>
                         )}
-
-                        {/* {results !== null && results[i] !== undefined && !results[i].positionalBias && (
-                          <Tag
-                            className={cx(classes.positionalBiasTag, {
-                              [classes.resultBlockPointerCursor]: results !== null && results[i] && !explanationOn,
-                              [classes.resultBlockDefaultCursor]: results === null || results[i] === undefined,
-                            })}
-                            type="green"
-                          >
-                            {'Positional bias: No'}
-                          </Tag>
-                        )} */}
                       </div>
                       {results[i] !== undefined && (
-                        <Link
-                          style={{ alignSelf: 'flex-end' }}
-                          className={classes.resultDetailsAction}
-                          // renderIcon={() => <ZoomIn />} // Icon prevent click propagation
-                        >
+                        <Link style={{ alignSelf: 'flex-end' }} className={classes.resultDetailsAction}>
                           View Details
                         </Link>
                       )}
