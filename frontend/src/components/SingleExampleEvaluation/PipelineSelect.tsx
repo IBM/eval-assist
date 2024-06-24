@@ -4,9 +4,9 @@ import Link from 'next/link'
 
 import { Select, SelectItem, SelectSkeleton } from '@carbon/react'
 
+import { PipelineType, UseCase } from '../../utils/types'
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import classes from './SingleExampleEvaluation.module.scss'
-import { PipelineType, UseCase } from './types'
 
 interface Props {
   type: PipelineType

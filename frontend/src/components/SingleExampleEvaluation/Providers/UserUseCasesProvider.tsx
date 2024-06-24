@@ -7,7 +7,7 @@ import { StoredUseCase } from '@prisma/client'
 import { get } from '@utils/fetchUtils'
 import { parseFetchedUseCase } from '@utils/utils'
 
-import { UseCase } from '../types'
+import { UseCase } from '../../../utils/types'
 
 interface UserUseCasesContextValue {
   userUseCases: UseCase[]

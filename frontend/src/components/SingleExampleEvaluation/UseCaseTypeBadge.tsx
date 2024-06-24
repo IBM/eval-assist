@@ -6,8 +6,8 @@ import { Tag } from '@carbon/react'
 
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 
+import { PipelineType } from '../../utils/types'
 import classes from './UseCaseTypeBadge.module.scss'
-import { PipelineType } from './types'
 
 interface Props {
   type: PipelineType

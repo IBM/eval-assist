@@ -11,7 +11,7 @@ import {
   HeaderNavigation,
   Theme,
 } from '@carbon/react'
-import { AddComment, Document, Logout } from '@carbon/react/icons'
+import { AddComment, Document, Logout, QqPlot } from '@carbon/react/icons'
 
 import { PLATFORM_NAME } from '@constants'
 import { useAuthentication } from '@customHooks/useAuthentication'
@@ -55,6 +55,12 @@ export const AppHeader = () => {
               <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
                 Documentation
                 <Document style={{ marginLeft: '0.5rem' }} size={18} />
+              </div>
+            </HeaderMenuItem>
+            <HeaderMenuItem href="/documentation">
+              <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+                Benchmarks
+                <QqPlot style={{ marginLeft: '0.5rem' }} size={18} />
               </div>
             </HeaderMenuItem>
           </HeaderNavigation>

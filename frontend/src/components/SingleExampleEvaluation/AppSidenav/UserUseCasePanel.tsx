@@ -10,8 +10,8 @@ import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 
+import { PipelineType, UseCase } from '../../../utils/types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
-import { PipelineType, UseCase } from '../types'
 import { LinkButton } from './LinkButton'
 import classes from './UseCasePanel.module.scss'
 

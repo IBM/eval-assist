@@ -1,4 +1,4 @@
-import { PipelineType, UseCase } from './types'
+import { PipelineType, UseCase } from '../../../utils/types'
 
 export const libraryUseCases: UseCase[] = [
   {

@@ -7,7 +7,7 @@ import { Link } from '@carbon/react'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
-import { PairwiseResult, RubricResult } from '../types'
+import { PairwiseResult, RubricResult } from '../../../utils/types'
 import classes from './index.module.scss'
 
 interface Props {

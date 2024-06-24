@@ -38,17 +38,6 @@ export interface Option {
   description: string
 }
 
-export type RubricCriteria = {
-  name: string
-  criteria: string
-  options: Option[]
-}
-
-export interface PairwiseCriteria {
-  name: string
-  criteria: string
-}
-
 export interface UseCase {
   id: number | null
   name: string
@@ -68,4 +57,39 @@ export enum PipelineType {
 export interface Pipeline {
   name: string
   type: PipelineType
+}
+
+interface Dataset {
+  name: string
+  description: string
+}
+
+interface EvaluatorBenchmark {
+  evaluator_id: string // should be different from model_id, maybe add library version?
+  laas_version: string
+  results: { [key: string]: number | string } // dict of [metric, result] e.g. {[p_bias, 0.2]}
+}
+
+interface CriteriaBenchmark {
+  name: string // must match one of criteriaLibrary (inherits pipeline type from benchmark object pipeline type) e.g. Temperature
+  evaluatorBenchmarks: EvaluatorBenchmark[]
+}
+
+export interface Benchmark {
+  name: string
+  description: string
+  type: PipelineType // rubric or pairwise
+  dataset: Dataset
+  criteriaBenchmarks: CriteriaBenchmark[]
+}
+
+export type RubricCriteria = {
+  name: string
+  criteria: string
+  options: Option[]
+}
+
+export interface PairwiseCriteria {
+  name: string
+  criteria: string
 }

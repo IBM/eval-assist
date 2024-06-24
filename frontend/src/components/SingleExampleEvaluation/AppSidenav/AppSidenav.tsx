@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useId, useState } from 'react'
 import { IconButton } from '@carbon/react'
 import { Categories, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 
-import { UseCase } from '@components/SingleExampleEvaluation/types'
+import { UseCase } from '@utils/types'
 
 import layoutClasses from '../Layout.module.scss'
 import { useAppSidebarContext } from '../Providers/AppSidebarProvider'

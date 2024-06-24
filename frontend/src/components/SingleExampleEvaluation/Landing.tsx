@@ -9,10 +9,10 @@ import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 import { getEmptyUseCase } from '@utils/utils'
 
+import { PipelineType, UseCase } from '../../utils/types'
 import { Card } from './Card/Card'
 import classes from './Landing.module.scss'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
-import { PipelineType, UseCase } from './types'
 
 interface Props {
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>

@@ -18,9 +18,9 @@ import { Edit, Save } from '@carbon/react/icons'
 
 import { isInstanceOfPairwiseCriteria } from '@utils/utils'
 
+import { PairwiseCriteria } from '../../../utils/types'
 import { JSONTextArea } from '../JSONTextArea'
 import classes from '../SingleExampleEvaluation.module.scss'
-import { PairwiseCriteria } from '../types'
 
 interface EvaluationCriteriaProps {
   pairwiseCriteria: PairwiseCriteria

@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
 import { getEmptyUseCase, returnByPipelineType } from '@utils/utils'
 
-import { PipelineType, UseCase } from '../types'
+import { PipelineType, UseCase } from '../../../utils/types'
 import { usePipelineTypesContext } from './PipelineTypesProvider'
 import { useUserUseCasesContext } from './UserUseCasesProvider'
 

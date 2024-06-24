@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from 'react'
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 import { returnByPipelineType } from '@utils/utils'
 
-import { PipelineType } from '../types'
+import { PipelineType } from '../../../utils/types'
 import { Card } from './Card'
 import classes from './PipelineOptionCard.module.scss'
 

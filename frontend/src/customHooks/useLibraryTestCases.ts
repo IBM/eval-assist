@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 
+import { libraryUseCases } from '@components/SingleExampleEvaluation/Libraries/UseCaseLibrary'
 import { usePipelineTypesContext } from '@components/SingleExampleEvaluation/Providers/PipelineTypesProvider'
-import { libraryUseCases } from '@components/SingleExampleEvaluation/UseCaseLibrary'
-import { PipelineType } from '@components/SingleExampleEvaluation/types'
+import { PipelineType } from '@utils/types'
 
 export const useLibraryTestCases = () => {
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()

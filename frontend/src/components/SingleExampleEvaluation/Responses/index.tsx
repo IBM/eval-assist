@@ -7,7 +7,7 @@ import { Toggle } from '@carbon/react'
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { returnByPipelineType } from '@utils/utils'
 
-import { PairwiseResult, PipelineType, RubricResult } from '../types'
+import { PairwiseResult, PipelineType, RubricResult } from '../../../utils/types'
 import { PairwiseRows } from './PairwiseRows'
 import { RubricRows } from './RubricRows'
 import classes from './index.module.scss'

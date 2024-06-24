@@ -7,7 +7,7 @@ import { Launch } from '@carbon/react/icons'
 
 import { getQueryParamsFromUseCase, stringifyQueryParams } from '@utils/utils'
 
-import { UseCase } from '../types'
+import { UseCase } from '../../../utils/types'
 import classes from './UseCasePanel.module.scss'
 
 interface LinkButtonProps {

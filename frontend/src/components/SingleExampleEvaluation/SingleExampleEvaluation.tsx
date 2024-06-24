@@ -20,6 +20,17 @@ import {
   stringifyQueryParams,
 } from '@utils/utils'
 
+import {
+  FetchedPairwiseResult,
+  FetchedResults,
+  FetchedRubricResult,
+  PairwiseCriteria,
+  PairwiseResult,
+  PipelineType,
+  RubricCriteria,
+  RubricResult,
+  UseCase,
+} from '../../utils/types'
 import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { TestCaseContext } from './Context/TestCaseContext'
@@ -42,17 +53,6 @@ import { useUserUseCasesContext } from './Providers/UserUseCasesProvider'
 import { Responses } from './Responses'
 import classes from './SingleExampleEvaluation.module.scss'
 import { UseCaseOptions } from './UseCaseOptions'
-import {
-  FetchedPairwiseResult,
-  FetchedResults,
-  FetchedRubricResult,
-  PairwiseCriteria,
-  PairwiseResult,
-  PipelineType,
-  RubricCriteria,
-  RubricResult,
-  UseCase,
-} from './types'
 
 export const SingleExampleEvaluation = () => {
   const { preloadedUseCase } = useURLInfoContext()

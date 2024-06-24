@@ -1,3 +1,5 @@
+import { StoredUseCase } from '@prisma/client'
+import { JsonObject } from '@prisma/client/runtime/library'
 import {
   Option,
   PairwiseCriteria,
@@ -6,9 +8,7 @@ import {
   RubricCriteria,
   RubricResult,
   UseCase,
-} from '@components/SingleExampleEvaluation/types'
-import { StoredUseCase } from '@prisma/client'
-import { JsonObject } from '@prisma/client/runtime/library'
+} from '@utils/types'
 
 export const isInstanceOfOption = (obj: any): obj is Option =>
   typeof obj.option === 'string' && typeof obj.description === 'string'

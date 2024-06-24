@@ -1,6 +1,6 @@
 import { CSSProperties, Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-import { PairwiseCriteria, PipelineType, RubricCriteria } from '../types'
+import { PairwiseCriteria, PipelineType, RubricCriteria } from '../../../utils/types'
 import { PairwiseCriteriaView } from './PairwiseCriteriaView'
 import { RubricCriteriaView } from './RubricCriteriaView'
 

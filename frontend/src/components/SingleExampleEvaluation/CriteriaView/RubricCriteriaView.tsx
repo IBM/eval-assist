@@ -17,9 +17,9 @@ import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 
 import { isInstanceOfRubricCriteria } from '@utils/utils'
 
+import { RubricCriteria } from '../../../utils/types'
 import { JSONTextArea } from '../JSONTextArea'
 import classes from '../SingleExampleEvaluation.module.scss'
-import { RubricCriteria } from '../types'
 import customClasses from './RubricCriteriaView.module.scss'
 
 interface EvaluationCriteriaProps {

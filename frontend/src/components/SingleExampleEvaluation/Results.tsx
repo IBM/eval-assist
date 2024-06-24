@@ -12,8 +12,8 @@ import {
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
+import { PairwiseCriteria, PairwiseResult, PipelineType, RubricResult } from '../../utils/types'
 import classes from './SingleExampleEvaluation.module.scss'
-import { PairwiseCriteria, PairwiseResult, PipelineType, RubricResult } from './types'
 
 interface EvaluationResultsProps {
   results: (RubricResult | PairwiseResult)[] | null

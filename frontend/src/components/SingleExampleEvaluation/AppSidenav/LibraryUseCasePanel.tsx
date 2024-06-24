@@ -11,8 +11,8 @@ import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 
+import { UseCase } from '../../../utils/types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
-import { UseCase } from '../types'
 import { LinkButton } from './LinkButton'
 import classes from './UseCasePanel.module.scss'
 

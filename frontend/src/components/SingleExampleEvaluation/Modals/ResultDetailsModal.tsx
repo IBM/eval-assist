@@ -6,7 +6,7 @@ import { Layer, Link, Modal } from '@carbon/react'
 
 import { isInstanceOfPairwiseResult } from '@utils/utils'
 
-import { PairwiseResult, PipelineType, RubricResult } from '../types'
+import { PairwiseResult, PipelineType, RubricResult } from '../../../utils/types'
 import classes from './ResultDetailsModal.module.scss'
 
 interface Props {

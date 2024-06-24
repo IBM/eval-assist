@@ -6,7 +6,7 @@ import { Loading } from '@carbon/react'
 
 import { get } from '@utils/fetchUtils'
 
-import { Pipeline, PipelineType } from '../types'
+import { Pipeline, PipelineType } from '../../../utils/types'
 
 interface PipelineContextValue {
   rubricPipelines: string[] | null

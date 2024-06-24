@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { Modal, TextInput } from '@carbon/react'
 
-import { UseCase } from '../types'
+import { UseCase } from '../../../utils/types'
 
 interface Props {
   open: boolean

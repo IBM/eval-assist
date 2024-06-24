@@ -8,8 +8,8 @@ import { Add } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
+import { PairwiseResult, RubricResult } from '../../../utils/types'
 import RemovableSection from '../../RemovableSection/RemovableSection'
-import { PairwiseResult, RubricResult } from '../types'
 import classes from './index.module.scss'
 
 interface Props {
