@@ -59,18 +59,18 @@ export interface Pipeline {
   type: PipelineType
 }
 
-interface Dataset {
+export interface Dataset {
   name: string
   description: string
 }
 
-interface EvaluatorBenchmark {
+export interface EvaluatorBenchmark {
   evaluator_id: string // should be different from model_id, maybe add library version?
-  laas_version: string
+  laaj_version: string
   results: { [key: string]: number | string } // dict of [metric, result] e.g. {[p_bias, 0.2]}
 }
 
-interface CriteriaBenchmark {
+export interface CriteriaBenchmark {
   name: string // must match one of criteriaLibrary (inherits pipeline type from benchmark object pipeline type) e.g. Temperature
   evaluatorBenchmarks: EvaluatorBenchmark[]
 }
@@ -92,4 +92,21 @@ export type RubricCriteria = {
 export interface PairwiseCriteria {
   name: string
   criteria: string
+}
+
+export class Version {
+  version: string
+
+  constructor(version: string) {
+    this.version = version
+  }
+
+  valueOf() {
+    return this.version
+      .split('.')
+      .map((versionSection) => {
+        return '0'.repeat(2 - versionSection.length) + versionSection
+      })
+      .join('')
+  }
 }

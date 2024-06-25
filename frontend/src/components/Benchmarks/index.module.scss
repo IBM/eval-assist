@@ -1,0 +1,47 @@
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/colors';
+@import '@carbon/styles/scss/theme';
+
+.root {
+  margin-inline-start: rem(272px);
+  padding: 1.5rem;
+}
+
+.title {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.bottomDivider {
+  border-bottom: 1px solid $border-subtle-00;
+}
+
+.leftPadding {
+  padding-left: 1rem;
+}
+
+.vertical-divider {
+  width: 1px;
+  background-color: $border-subtle-00;
+  height: 2rem;
+  margin-inline: 1rem;
+}
+
+.benchmarkInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.benchmarkDescriptionTitle {
+  margin-bottom: 0.5rem;
+}
+
+.criteriaBenchmark {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 2rem;
+}

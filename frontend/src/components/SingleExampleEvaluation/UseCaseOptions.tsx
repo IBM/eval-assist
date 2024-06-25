@@ -4,7 +4,7 @@ import { Button, IconButton } from '@carbon/react'
 import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
 import { PipelineType, UseCase } from '../../utils/types'
-import classes from './SingleExampleEvaluation.module.scss'
+import classes from './UseCaseOptions.module.scss'
 import { UseCaseTypeBadge } from './UseCaseTypeBadge'
 
 interface UseCaseOptionsProps {

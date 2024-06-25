@@ -57,7 +57,7 @@ export const AppHeader = () => {
                 <Document style={{ marginLeft: '0.5rem' }} size={18} />
               </div>
             </HeaderMenuItem>
-            <HeaderMenuItem href="/documentation">
+            <HeaderMenuItem href="/benchmarks">
               <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
                 Benchmarks
                 <QqPlot style={{ marginLeft: '0.5rem' }} size={18} />

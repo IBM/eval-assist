@@ -1,3 +1,7 @@
+import {
+  pairwiseCriteriaLibrary,
+  rubricCriteriaLibrary,
+} from '@components/SingleExampleEvaluation/Libraries/CriteriaLibrary'
 import { StoredUseCase } from '@prisma/client'
 import { JsonObject } from '@prisma/client/runtime/library'
 import {
@@ -128,5 +132,12 @@ export const stringifyQueryParams = (
     value: string
   }[],
 ) => {
-  return `?${queryParams.map((queryParam) => queryParam.key + '=' + queryParam.value).join('&')}`
+  return `?${queryParams
+    .map((queryParam) => encodeURIComponent(queryParam.key) + '=' + encodeURIComponent(queryParam.value))
+    .join('&')}`
 }
+
+export const getCriteria = (name: string, type: PipelineType) =>
+  returnByPipelineType(type, rubricCriteriaLibrary, pairwiseCriteriaLibrary).find(
+    (c: RubricCriteria | PairwiseCriteria) => c.name === name,
+  ) as RubricCriteria | PairwiseCriteria
