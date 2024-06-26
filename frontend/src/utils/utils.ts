@@ -26,7 +26,7 @@ export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseResult =>
 export const isInstanceOfRubricCriteria = (obj: any): obj is RubricCriteria =>
   typeof obj.name === 'string' &&
   typeof obj.criteria === 'string' &&
-  obj.option !== undefined &&
+  obj.options !== undefined &&
   obj.options.every((o: Option) => isInstanceOfOption(o))
 
 export const isInstanceOfPairwiseCriteria = (obj: any): obj is PairwiseCriteria =>
@@ -91,7 +91,7 @@ export const getUseCaseWithCriteria = (criteriaName: string, type: PipelineType)
   type: type,
   context: '',
   responses: type === PipelineType.RUBRIC ? [''] : ['', ''],
-  criteria: getCriteria(criteriaName, type),
+  criteria: getCriteria(criteriaName, type) || getEmptyCriteria(type),
   results: null,
   pipeline: null,
 })
@@ -147,7 +147,9 @@ export const stringifyQueryParams = (
     .join('&')}`
 }
 
-export const getCriteria = (name: string, type: PipelineType) =>
-  returnByPipelineType(type, rubricCriteriaLibrary, pairwiseCriteriaLibrary).find(
+export const getCriteria = (name: string, type: PipelineType): RubricCriteria | PairwiseCriteria | null => {
+  const criteria = returnByPipelineType(type, rubricCriteriaLibrary, pairwiseCriteriaLibrary).find(
     (c: RubricCriteria | PairwiseCriteria) => c.name === name,
-  ) as RubricCriteria | PairwiseCriteria
+  ) as RubricCriteria | PairwiseCriteria | undefined
+  return criteria ?? null
+}

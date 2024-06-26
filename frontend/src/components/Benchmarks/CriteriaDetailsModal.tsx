@@ -3,8 +3,6 @@ import { libraryUseCases } from 'src/Libraries/UseCaseLibrary'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { useRouter } from 'next/router'
-
 import { Button, Layer, Link, ListItem, Modal, UnorderedList } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
@@ -21,8 +19,6 @@ interface Props {
 }
 
 export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) => {
-  const router = useRouter()
-
   const onClose = () => {
     setOpen(false)
   }
@@ -31,7 +27,9 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
     libraryUseCases.find((l) => l.criteria.name === criteriaName)?.name ?? null
 
   const getURLFromCriteriaName = (criteriaName: string) => {
+    console.log(criteriaName)
     const libraryTestCaseName = getLibraryTestCaseNameFromCriteriaName(criteriaName)
+    console.log(libraryTestCaseName)
     if (libraryTestCaseName !== null) {
       return `/?libraryTestCase=${getLibraryTestCaseNameFromCriteriaName(criteriaName)}&type=${type}`
     } else {
@@ -78,7 +76,7 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
 
         <Button
           renderIcon={Launch}
-          kind="ghost"
+          kind="tertiary"
           href={getURLFromCriteriaName(criteria.name)}
           target="_blank"
           rel="noopener noreferrer"
