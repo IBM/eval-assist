@@ -5,6 +5,8 @@ import { useRouter } from 'next/router'
 import { Benchmark, PipelineType } from '@utils/types'
 import { stringifyQueryParams } from '@utils/utils'
 
+import { useBenchmarksContext } from './BenchmarksProvider'
+
 interface URLInfoContextValue {
   benchmark: Benchmark | null
   updateURLFromBenchmark: (benchmark: Benchmark) => void
@@ -19,21 +21,19 @@ export const useURLInfoContext = () => {
   return useContext(URLInfoContext)
 }
 
-interface Props {
-  benchmarkLibrary: Benchmark[]
-}
-
-export const URLInfoProvider = ({ benchmarkLibrary, children }: { children: ReactNode } & Props) => {
+export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
+  const { benchmarks } = useBenchmarksContext()
+
   const benchmark = useMemo(() => {
     const urlBenchmark = router.query.benchmark ? (router.query.benchmark as string) : null
     const urlType: PipelineType | null = router.query.type ? (router.query.type as PipelineType) : null
     if (urlBenchmark !== null && urlType !== null) {
-      return benchmarkLibrary.find((b) => b.name === urlBenchmark && b.type === urlType) as Benchmark
+      return benchmarks.find((b) => b.name === urlBenchmark && b.type === urlType) as Benchmark
     } else {
       return null
     }
-  }, [benchmarkLibrary, router.query.benchmark, router.query.type])
+  }, [benchmarks, router.query.benchmark, router.query.type])
 
   const updateURLFromBenchmark = useCallback(
     (benchmark: Benchmark) => {

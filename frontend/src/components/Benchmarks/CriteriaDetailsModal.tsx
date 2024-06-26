@@ -3,13 +3,14 @@ import { libraryUseCases } from 'src/libraries/UseCaseLibrary'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { Button, Layer, Link, ListItem, Modal, UnorderedList } from '@carbon/react'
+import { Button, Layer, ListItem, Modal, UnorderedList } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
 import { PairwiseCriteria, PipelineType, RubricCriteria } from '@utils/types'
 import { isInstanceOfRubricCriteria } from '@utils/utils'
 
 import classes from './CriteriaDetailsModal.module.scss'
+import { useBenchmarksContext } from './Providers/BenchmarksProvider'
 
 interface Props {
   open: boolean
@@ -19,6 +20,8 @@ interface Props {
 }
 
 export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) => {
+  const { benchmarks } = useBenchmarksContext()
+
   const onClose = () => {
     setOpen(false)
   }

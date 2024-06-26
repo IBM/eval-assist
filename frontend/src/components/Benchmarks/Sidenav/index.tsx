@@ -10,16 +10,15 @@ import { List } from '@carbon/react/icons'
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 import { Benchmark, PipelineType } from '@utils/types'
 
+import { useBenchmarksContext } from '../Providers/BenchmarksProvider'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import classes from './index.module.scss'
 
-interface Props {
-  benchmarkLibrary: Benchmark[]
-}
-export const BenchmarkSidenav = ({ benchmarkLibrary }: Props) => {
+export const BenchmarkSidenav = () => {
+  const { benchmarks } = useBenchmarksContext()
   const { benchmark, updateURLFromBenchmark } = useURLInfoContext()
-  const rubricBenchmarks = useMemo(() => benchmarkLibrary.filter((b) => b.type === PipelineType.RUBRIC), [])
-  const pairwiseBenchmarks = useMemo(() => benchmarkLibrary.filter((b) => b.type === PipelineType.PAIRWISE), [])
+  const rubricBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === PipelineType.RUBRIC), [benchmarks])
+  const pairwiseBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === PipelineType.PAIRWISE), [benchmarks])
   const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean }>({
     rubric: true,
     pairwise: true,

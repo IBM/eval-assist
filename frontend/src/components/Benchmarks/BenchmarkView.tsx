@@ -8,17 +8,13 @@ import { useURLInfoContext } from './Providers/URLInfoProvider'
 import { BenchmarkSidenav } from './Sidenav'
 import classes from './index.module.scss'
 
-interface Props {
-  benchmarkLibrary: Benchmark[]
-}
-
-export const BenchmarkView = ({ benchmarkLibrary }: Props) => {
+export const BenchmarkView = () => {
   const { benchmark } = useURLInfoContext()
 
   return (
     benchmark !== null && (
       <>
-        <BenchmarkSidenav benchmarkLibrary={benchmarkLibrary} />
+        <BenchmarkSidenav />
         <div className={cx(classes.root, classes.leftPadding)}>
           <h3 className={cx(classes.title, classes.bottomDivider)}>Benchmarks</h3>
 
