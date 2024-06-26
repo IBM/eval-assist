@@ -6,6 +6,7 @@ import { Button } from '@carbon/react'
 import { Add, ArrowRight, Launch, View } from '@carbon/react/icons'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
+import { useAuthentication } from '@customHooks/useAuthentication'
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 import { getEmptyUseCase } from '@utils/utils'
 
@@ -39,9 +40,11 @@ export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase }: Props) =>
     setSidebarTabSelected('library_use_cases')
   }
 
+  const { user } = useAuthentication()
+
   return (
     <div className={classes.root}>
-      <h2 className={classes.heading}>Welcome</h2>
+      <h2 className={classes.heading}>{`Welcome${user && user.name ? ', ' + user.name : ''}`}</h2>
       <p className={classes.description}>{'Here are some key features we offer'}</p>
       <div className={cx(classes.cards, { [classes['sidebar-expanded']]: sidebarTabSelected !== null })}>
         <Card
