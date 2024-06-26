@@ -1,6 +1,6 @@
 import { getCriteria } from '@utils/utils'
 
-import { PipelineType, UseCase } from '../../../utils/types'
+import { PipelineType, UseCase } from '../utils/types'
 
 export const libraryUseCases: UseCase[] = [
   {

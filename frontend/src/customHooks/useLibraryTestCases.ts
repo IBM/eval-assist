@@ -1,6 +1,7 @@
+import { libraryUseCases } from 'src/Libraries/UseCaseLibrary'
+
 import { useMemo } from 'react'
 
-import { libraryUseCases } from '@components/SingleExampleEvaluation/Libraries/UseCaseLibrary'
 import { usePipelineTypesContext } from '@components/SingleExampleEvaluation/Providers/PipelineTypesProvider'
 import { PipelineType } from '@utils/types'
 

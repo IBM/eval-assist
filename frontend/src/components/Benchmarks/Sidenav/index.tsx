@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import { benchmarkLibrary } from 'src/Libraries/BenchmarkLibrary'
 
 import { useMemo, useState } from 'react'
 
@@ -7,7 +8,6 @@ import { useMemo, useState } from 'react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { List } from '@carbon/react/icons'
 
-import { benchmarkLibrary } from '@components/SingleExampleEvaluation/Libraries/BenchmarkLibrary'
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 import { Benchmark, PipelineType } from '@utils/types'
 

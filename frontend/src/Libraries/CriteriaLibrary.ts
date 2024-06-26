@@ -1,4 +1,4 @@
-import { PairwiseCriteria, RubricCriteria } from '../../../utils/types'
+import { PairwiseCriteria, RubricCriteria } from '../utils/types'
 
 export const rubricCriteriaLibrary: RubricCriteria[] = [
   {
@@ -134,113 +134,116 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
     options: [
       {
         option: 'Excellent',
-        description: 'The response directly answers the question.'
+        description: 'The response directly answers the question.',
       },
       {
         option: 'Acceptable',
-        description: 'The response is adequate but could be better.'
+        description: 'The response is adequate but could be better.',
       },
       {
         option: 'Could be Improved',
-        description: 'The response relates to the questions but does not directly answer it.'
+        description: 'The response relates to the questions but does not directly answer it.',
       },
       {
         option: 'Bad',
-        description: 'The response does not answer the question at all.'
-      }
-    ]
+        description: 'The response does not answer the question at all.',
+      },
+    ],
   },
   {
     name: 'Consistency',
     options: [
       {
         option: '1',
-        description: 'The response is not consistent or makes up false information.'
+        description: 'The response is not consistent or makes up false information.',
       },
       {
         option: '2',
-        description: 'The response is somewhat consistent or makes up some false information.'
+        description: 'The response is somewhat consistent or makes up some false information.',
       },
       {
         option: '3',
-        description: 'The response is consistent and does not make up false information.'
+        description: 'The response is consistent and does not make up false information.',
       },
       {
         option: '4',
-        description: 'The response is very consistent and does not make up false information.'
+        description: 'The response is very consistent and does not make up false information.',
       },
       {
         option: '5',
-        description: 'The response is exceptionally consistent and does not make up false information.'
-      }
+        description: 'The response is exceptionally consistent and does not make up false information.',
+      },
     ],
-    criteria: 'Is the response consistent with respect to the original text? The response should consistent with the facts in the original article. Consider whether the response does reproduce all facts accurately and does not make up false information.'
+    criteria:
+      'Is the response consistent with respect to the original text? The response should consistent with the facts in the original article. Consider whether the response does reproduce all facts accurately and does not make up false information.',
   },
   {
     name: 'Fluency',
     options: [
       {
         option: '1',
-        description: 'The response is not fluent at all.'
+        description: 'The response is not fluent at all.',
       },
       {
         option: '2',
-        description: 'The response is somewhat fluent.'
+        description: 'The response is somewhat fluent.',
       },
       {
         option: '3',
-        description: 'The response is fluent.'
+        description: 'The response is fluent.',
       },
       {
         option: '4',
-        description: 'The response is very fluent, grammatically correct and well-written.'
+        description: 'The response is very fluent, grammatically correct and well-written.',
       },
       {
         option: '5',
-        description: 'The response is exceptionally fluent, grammatically correct, and well-written.'
-      }
+        description: 'The response is exceptionally fluent, grammatically correct, and well-written.',
+      },
     ],
-    criteria: 'Is the response fluent? The response contains sentences that are well-written and grammatically correct. Consider the quality of the individual sentences and measure the extent to which they are fluent.'
+    criteria:
+      'Is the response fluent? The response contains sentences that are well-written and grammatically correct. Consider the quality of the individual sentences and measure the extent to which they are fluent.',
   },
   {
     name: 'Relevance',
     options: [
       {
         option: '1',
-        description: 'The response is not relevant at all to the article.'
+        description: 'The response is not relevant at all to the article.',
       },
       {
         option: '2',
-        description: 'The response is somewhat relevant to the article.'
+        description: 'The response is somewhat relevant to the article.',
       },
       {
         option: '3',
-        description: 'The response is relevant to the article.'
+        description: 'The response is relevant to the article.',
       },
       {
         option: '4',
-        description: 'The response is very relevant to the article.'
+        description: 'The response is very relevant to the article.',
       },
       {
         option: '5',
-        description: 'The response is exceptionally relevant to the article and contains only the important aspects.'
-      }
+        description: 'The response is exceptionally relevant to the article and contains only the important aspects.',
+      },
     ],
-    criteria: 'Is the response relevant with respect to the original text? The response captures the key points of the article. Consider whether all and only the important aspects are contained in the response. Penalize responses that contain redundancies or excess information.'
+    criteria:
+      'Is the response relevant with respect to the original text? The response captures the key points of the article. Consider whether all and only the important aspects are contained in the response. Penalize responses that contain redundancies or excess information.',
   },
   {
     name: 'Truthfulness',
     criteria: 'Is the response true?',
     options: [
       {
-        option: 'Yes', 
-        description: 'The response is true.'
+        option: 'Yes',
+        description: 'The response is true.',
       },
       {
-        option: 'No', 
-        description: 'The response is false.'
-      }
-    ]
+        option: 'No',
+        description: 'The response is false.',
+      },
+    ],
   },
   {
     name: 'Irrelevant information',
@@ -248,13 +251,13 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
     options: [
       {
         option: 'Yes',
-        description: 'The user response contains irrelevant information.'
+        description: 'The user response contains irrelevant information.',
       },
       {
         option: 'No',
-        description: "The user response doesn't contain irrelevant information."
-      }
-    ]
+        description: "The user response doesn't contain irrelevant information.",
+      },
+    ],
   },
   {
     name: 'Addressing',
@@ -262,13 +265,13 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
     options: [
       {
         option: 'Yes',
-        description: 'The user response addresses the question in the customer-agent interaction.'
+        description: 'The user response addresses the question in the customer-agent interaction.',
       },
       {
         option: 'No',
-        description: "The user response doesn't address the question in the customer-agent interaction."
-      }
-    ]
+        description: "The user response doesn't address the question in the customer-agent interaction.",
+      },
+    ],
   },
   {
     name: 'Conversational',
@@ -276,13 +279,13 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
     options: [
       {
         option: 'Yes',
-        description: 'The user response comes across as conversational.'
+        description: 'The user response comes across as conversational.',
       },
       {
         option: 'No',
-        description: "The user response doesn't come across as conversational."
-      }
-    ]
+        description: "The user response doesn't come across as conversational.",
+      },
+    ],
   },
   {
     name: 'Naturalness',
@@ -290,13 +293,13 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
     options: [
       {
         option: 'Yes',
-        description: 'The user response is natural.'
+        description: 'The user response is natural.',
       },
       {
         option: 'No',
-        description: "The user response isn't natural."
-      }
-    ]
+        description: "The user response isn't natural.",
+      },
+    ],
   },
   {
     name: 'Information from the reference document',
@@ -304,13 +307,13 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
     options: [
       {
         option: 'Yes',
-        description: 'The user response contains information from the reference document.'
+        description: 'The user response contains information from the reference document.',
       },
       {
         option: 'No',
-        description: "The user response doesn't contain information from the reference document."
-      }
-    ]
+        description: "The user response doesn't contain information from the reference document.",
+      },
+    ],
   },
   {
     name: 'Information outside of the reference document',
@@ -318,13 +321,13 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
     options: [
       {
         option: 'Yes',
-        description: 'The user response contains information outside of the reference document.'
+        description: 'The user response contains information outside of the reference document.',
       },
       {
         option: 'No',
-        description: "The user response doesn't contain information outside of the reference document."
-      }
-    ]
+        description: "The user response doesn't contain information outside of the reference document.",
+      },
+    ],
   },
 ]
 

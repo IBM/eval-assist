@@ -1,4 +1,6 @@
 import cx from 'classnames'
+import { criteriaLibrary } from 'src/Libraries/CriteriaLibrary'
+import { libraryUseCases } from 'src/Libraries/UseCaseLibrary'
 
 import { CSSProperties, useMemo } from 'react'
 
@@ -6,8 +8,6 @@ import Link from 'next/link'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tile } from '@carbon/react'
 
-import { criteriaLibrary } from '@components/SingleExampleEvaluation/Libraries/CriteriaLibrary'
-import { libraryUseCases } from '@components/SingleExampleEvaluation/Libraries/UseCaseLibrary'
 import { CriteriaBenchmark, PairwiseCriteria, RubricCriteria, UseCase, Version } from '@utils/types'
 
 import classes from './CriteriaBenchmarkCard.module.scss'

@@ -1,7 +1,5 @@
-import {
-  pairwiseCriteriaLibrary,
-  rubricCriteriaLibrary,
-} from '@components/SingleExampleEvaluation/Libraries/CriteriaLibrary'
+import { pairwiseCriteriaLibrary, rubricCriteriaLibrary } from 'src/Libraries/CriteriaLibrary'
+
 import { StoredUseCase } from '@prisma/client'
 import { JsonObject } from '@prisma/client/runtime/library'
 import {

@@ -1,4 +1,4 @@
-import { Benchmark, PipelineType } from '../../../utils/types'
+import { Benchmark, PipelineType } from '../utils/types'
 
 export const benchmarkLibrary: Benchmark[] = [
   {
@@ -70,7 +70,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '77.6%',
-              p_bias: 0.020,
+              p_bias: 0.02,
               pearson: 0.567,
             },
           },
@@ -79,7 +79,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '70.0%',
-              p_bias: 0.000,
+              p_bias: 0.0,
               pearson: 0.476,
             },
           },
@@ -88,7 +88,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '62.6%',
-              p_bias: 0.090,
+              p_bias: 0.09,
               pearson: 0.335,
             },
           },
@@ -97,7 +97,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '57%',
-              p_bias: 0.140,
+              p_bias: 0.14,
               pearson: 0.244,
             },
           },
@@ -122,7 +122,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '91.8%',
-              p_bias: 0.030,
+              p_bias: 0.03,
               pearson: 0.847,
             },
           },
@@ -131,7 +131,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '87.8%',
-              p_bias: 0.020,
+              p_bias: 0.02,
               pearson: 0.755,
             },
           },
@@ -140,7 +140,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '84.4%',
-              p_bias: 0.230,
+              p_bias: 0.23,
               pearson: 0.687,
             },
           },
@@ -149,8 +149,8 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '80.4%',
-              p_bias: 0.030,
-              pearson: 0.610,
+              p_bias: 0.03,
+              pearson: 0.61,
             },
           },
         ],
@@ -174,7 +174,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '',
-              p_bias: 0.000,
+              p_bias: 0.0,
               pearson: 0.549,
             },
           },
@@ -192,7 +192,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '',
-              p_bias: 0.000,
+              p_bias: 0.0,
               pearson: 0.512,
             },
           },
@@ -215,7 +215,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '',
-              p_bias: 0.010,
+              p_bias: 0.01,
               pearson: 0.549,
             },
           },
@@ -224,8 +224,8 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '',
-              p_bias: 0.000,
-              pearson: 0.490,
+              p_bias: 0.0,
+              pearson: 0.49,
             },
           },
           {
@@ -234,7 +234,7 @@ export const benchmarkLibrary: Benchmark[] = [
             results: {
               agreement: '',
               p_bias: 0.475,
-              pearson: 0.460,
+              pearson: 0.46,
             },
           },
           {
@@ -265,7 +265,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '',
-              p_bias: 0.000,
+              p_bias: 0.0,
               pearson: 0.274,
             },
           },
@@ -283,7 +283,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '',
-              p_bias: 0.000,
+              p_bias: 0.0,
               pearson: 0.124,
             },
           },
@@ -297,7 +297,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '',
-              p_bias: 0.400,
+              p_bias: 0.4,
               pearson: 0.624,
             },
           },
@@ -307,7 +307,7 @@ export const benchmarkLibrary: Benchmark[] = [
             results: {
               agreement: '',
               p_bias: 0.558,
-              pearson: 0.490,
+              pearson: 0.49,
             },
           },
           {
@@ -334,11 +334,13 @@ export const benchmarkLibrary: Benchmark[] = [
   },
   {
     name: 'MIT-IBM Benchmark',
-    description: 'This benchmark is about pairwise comparisons, where an LLM and a human select the best LLM response using the criteria below. The criteria contains multiple criteria and looks like this: Most importantly, the response should be accurate. Fact-check the response using the reference document. The reference document contains the accurate information needed to answer the customer question provided. In addition to being accurate, the response should be natural. The general tone should be natural and appropriate. Overall, the response should be more likely to satisfy the customer who asked the question.',
+    description:
+      'This benchmark is about pairwise comparisons, where an LLM and a human select the best LLM response using the criteria below. The criteria contains multiple criteria and looks like this: Most importantly, the response should be accurate. Fact-check the response using the reference document. The reference document contains the accurate information needed to answer the customer question provided. In addition to being accurate, the response should be natural. The general tone should be natural and appropriate. Overall, the response should be more likely to satisfy the customer who asked the question.',
     type: PipelineType.PAIRWISE,
     dataset: {
       name: 'MIT-IBM',
-      description: 'This dataset accompanies the paper "What Leads to Successful Human-AI Collaboration? Prompt Guidance for Human Agents Using Conversational AI for Customer Support". It explores the dynamics of human-AI interaction within customer support scenarios, focusing on improving collaborative efficiency through various configurations.',
+      description:
+        'This dataset accompanies the paper "What Leads to Successful Human-AI Collaboration? Prompt Guidance for Human Agents Using Conversational AI for Customer Support". It explores the dynamics of human-AI interaction within customer support scenarios, focusing on improving collaborative efficiency through various configurations.',
     },
     criteriaBenchmarks: [
       {
@@ -402,7 +404,7 @@ export const benchmarkLibrary: Benchmark[] = [
             results: {
               agreement: '47.6%',
               p_bias: 0.157,
-              pearson: 0.770,
+              pearson: 0.77,
             },
           },
           {
@@ -410,7 +412,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '42.2%',
-              p_bias: 0.440,
+              p_bias: 0.44,
               pearson: 0.764,
             },
           },
@@ -442,7 +444,8 @@ export const benchmarkLibrary: Benchmark[] = [
     type: PipelineType.RUBRIC,
     dataset: {
       name: 'Reliance Study',
-      description: 'This repository contains datasets and analysis from a study aimed at measuring reliance on Large Language Models (LLMs) output across various tasks. Our study employed a controlled experiment design to investigate how different cognitive forcing functions (CFFs) affect users editing behavior concerning accuracy and naturalness of LLM outputs, including the impact of hallucinations in responses.',
+      description:
+        'This repository contains datasets and analysis from a study aimed at measuring reliance on Large Language Models (LLMs) output across various tasks. Our study employed a controlled experiment design to investigate how different cognitive forcing functions (CFFs) affect users editing behavior concerning accuracy and naturalness of LLM outputs, including the impact of hallucinations in responses.',
     },
     criteriaBenchmarks: [
       {
@@ -471,7 +474,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '56.1%',
-              p_bias: 0.000,
+              p_bias: 0.0,
               pearson: 0.183,
             },
           },
@@ -494,7 +497,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '79.8%',
-              p_bias: 0.000,
+              p_bias: 0.0,
               pearson: 0.183,
             },
           },
@@ -535,7 +538,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '44.4%',
-              p_bias: 0.000,
+              p_bias: 0.0,
               pearson: 0.183,
             },
           },
@@ -562,7 +565,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '13.6%',
-              p_bias: 0.020,
+              p_bias: 0.02,
               pearson: 0.002,
             },
           },
@@ -576,7 +579,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '77.1%',
-              p_bias: 0.000,
+              p_bias: 0.0,
               pearson: 0.183,
             },
           },
@@ -617,7 +620,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '90.7%',
-              p_bias: 0.020,
+              p_bias: 0.02,
               pearson: 0.325,
             },
           },
@@ -635,7 +638,7 @@ export const benchmarkLibrary: Benchmark[] = [
             laaj_version: 'v0.0.7-alpha',
             results: {
               agreement: '82.7%',
-              p_bias: 0.180,
+              p_bias: 0.18,
               pearson: 0.002,
             },
           },

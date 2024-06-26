@@ -1,8 +1,9 @@
+import { benchmarkLibrary } from 'src/Libraries/BenchmarkLibrary'
+
 import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { benchmarkLibrary } from '@components/SingleExampleEvaluation/Libraries/BenchmarkLibrary'
 import { Benchmark, PipelineType } from '@utils/types'
 import { stringifyQueryParams } from '@utils/utils'
 
