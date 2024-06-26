@@ -1,0 +1,257 @@
+{
+    "name": "Reliance Study Benchmark",
+    "description": "loren ipsum",
+    "type": "rubric",
+    "dataset": {
+        "name": "Reliance Study",
+        "description": "This repository contains datasets and analysis from a study aimed at measuring reliance on Large Language Models (LLMs) output across various tasks. Our study employed a controlled experiment design to investigate how different cognitive forcing functions (CFFs) affect users editing behavior concerning accuracy and naturalness of LLM outputs, including the impact of hallucinations in responses."
+    },
+    "criteriaBenchmarks": [
+        {
+            "name": "Irrelevant information",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "73.5%",
+                        "p_bias": 0.032,
+                        "pearson": 0.325
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "62.9%",
+                        "p_bias": 0.031,
+                        "pearson": 0.002
+                    }
+                },
+                {
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "56.1%",
+                        "p_bias": 0,
+                        "pearson": 0.183
+                    }
+                },
+                {
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "37.5%",
+                        "p_bias": 0.188,
+                        "pearson": -0.041
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Addressing",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "79.8%",
+                        "p_bias": 0,
+                        "pearson": 0.183
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "72.2%",
+                        "p_bias": 0.055,
+                        "pearson": 0.325
+                    }
+                },
+                {
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "51.3%",
+                        "p_bias": 0.188,
+                        "pearson": -0.041
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "48.5%",
+                        "p_bias": 0.013,
+                        "pearson": 0.002
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Conversational",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "44.4%",
+                        "p_bias": 0,
+                        "pearson": 0.183
+                    }
+                },
+                {
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "14.8%",
+                        "p_bias": 0.064,
+                        "pearson": -0.041
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "14.0%",
+                        "p_bias": 0.028,
+                        "pearson": 0.325
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "13.6%",
+                        "p_bias": 0.02,
+                        "pearson": 0.002
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Naturalness",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "77.1%",
+                        "p_bias": 0,
+                        "pearson": 0.183
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "25.7%",
+                        "p_bias": 0.095,
+                        "pearson": 0.325
+                    }
+                },
+                {
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "21.3%",
+                        "p_bias": 0.127,
+                        "pearson": -0.041
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "13.3%",
+                        "p_bias": 0.029,
+                        "pearson": 0.002
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Information from the reference document",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "90.7%",
+                        "p_bias": 0.02,
+                        "pearson": 0.325
+                    }
+                },
+                {
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "86.8%",
+                        "p_bias": 0.004,
+                        "pearson": 0.183
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "82.7%",
+                        "p_bias": 0.18,
+                        "pearson": 0.002
+                    }
+                },
+                {
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "53.9%",
+                        "p_bias": 0.145,
+                        "pearson": -0.041
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Information outside of the reference document",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "89.2%",
+                        "p_bias": 0.017,
+                        "pearson": 0.325
+                    }
+                },
+                {
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "79.4%",
+                        "p_bias": 0.181,
+                        "pearson": -0.041
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "60.1%",
+                        "p_bias": 0.126,
+                        "pearson": 0.002
+                    }
+                },
+                {
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "36.8%",
+                        "p_bias": 0.004,
+                        "pearson": 0.183
+                    }
+                }
+            ]
+        }
+    ]
+}

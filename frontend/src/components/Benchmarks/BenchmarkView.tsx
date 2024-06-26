@@ -1,19 +1,24 @@
 import cx from 'classnames'
 
 import { UseCaseTypeBadge } from '@components/SingleExampleEvaluation/UseCaseTypeBadge'
+import { Benchmark } from '@utils/types'
 
 import { CriteriaBenchmarkCard } from './CriteriaBenchmarkCard'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
 import { BenchmarkSidenav } from './Sidenav'
 import classes from './index.module.scss'
 
-export const BenchmarkView = () => {
+interface Props {
+  benchmarkLibrary: Benchmark[]
+}
+
+export const BenchmarkView = ({ benchmarkLibrary }: Props) => {
   const { benchmark } = useURLInfoContext()
 
   return (
     benchmark !== null && (
       <>
-        <BenchmarkSidenav />
+        <BenchmarkSidenav benchmarkLibrary={benchmarkLibrary} />
         <div className={cx(classes.root, classes.leftPadding)}>
           <h3 className={cx(classes.title, classes.bottomDivider)}>Benchmarks</h3>
 
@@ -27,7 +32,11 @@ export const BenchmarkView = () => {
             <h4 className={classes.benchmarkDescriptionTitle}>Description</h4>
             <p>{benchmark.description}</p>
           </div>
-          <div className={classes.criteriaBenchmark}>
+          <div
+            className={cx(classes.criteriaBenchmark, {
+              [classes.multipleRows]: benchmark.criteriaBenchmarks.length > 1,
+            })}
+          >
             {benchmark.criteriaBenchmarks.map((criteriaBenchmark, i) => (
               <CriteriaBenchmarkCard criteriaBenchmark={criteriaBenchmark} key={i} />
             ))}

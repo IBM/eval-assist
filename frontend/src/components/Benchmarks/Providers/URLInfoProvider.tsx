@@ -1,5 +1,3 @@
-import { benchmarkLibrary } from 'src/Libraries/BenchmarkLibrary'
-
 import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
 
 import { useRouter } from 'next/router'
@@ -21,9 +19,12 @@ export const useURLInfoContext = () => {
   return useContext(URLInfoContext)
 }
 
-export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
-  const router = useRouter()
+interface Props {
+  benchmarkLibrary: Benchmark[]
+}
 
+export const URLInfoProvider = ({ benchmarkLibrary, children }: { children: ReactNode } & Props) => {
+  const router = useRouter()
   const benchmark = useMemo(() => {
     const urlBenchmark = router.query.benchmark ? (router.query.benchmark as string) : null
     const urlType: PipelineType | null = router.query.type ? (router.query.type as PipelineType) : null
@@ -32,7 +33,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     } else {
       return null
     }
-  }, [router.query.benchmark, router.query.type])
+  }, [benchmarkLibrary, router.query.benchmark, router.query.type])
 
   const updateURLFromBenchmark = useCallback(
     (benchmark: Benchmark) => {

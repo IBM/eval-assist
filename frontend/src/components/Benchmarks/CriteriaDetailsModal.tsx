@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { libraryUseCases } from 'src/Libraries/UseCaseLibrary'
+import { libraryUseCases } from 'src/libraries/UseCaseLibrary'
 
 import { Dispatch, SetStateAction } from 'react'
 
@@ -27,9 +27,7 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
     libraryUseCases.find((l) => l.criteria.name === criteriaName)?.name ?? null
 
   const getURLFromCriteriaName = (criteriaName: string) => {
-    console.log(criteriaName)
     const libraryTestCaseName = getLibraryTestCaseNameFromCriteriaName(criteriaName)
-    console.log(libraryTestCaseName)
     if (libraryTestCaseName !== null) {
       return `/?libraryTestCase=${getLibraryTestCaseNameFromCriteriaName(criteriaName)}&type=${type}`
     } else {

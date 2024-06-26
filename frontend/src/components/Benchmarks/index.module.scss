@@ -39,9 +39,28 @@
   margin-bottom: 0.5rem;
 }
 
-.criteriaBenchmark {
-  margin-top: 1.5rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 2rem;
+@media (max-width: 1240px) {
+  .criteriaBenchmark {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 2rem;
+  }
+
+  .multipleRows {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1240px) {
+  .criteriaBenchmark {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 2rem;
+  }
+
+  .multipleRows {
+    grid-template-columns: 1fr 1fr;
+  }
 }

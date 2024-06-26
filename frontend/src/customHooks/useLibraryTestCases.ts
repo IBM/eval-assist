@@ -1,4 +1,4 @@
-import { libraryUseCases } from 'src/Libraries/UseCaseLibrary'
+import { libraryUseCases } from 'src/libraries/UseCaseLibrary'
 
 import { useMemo } from 'react'
 

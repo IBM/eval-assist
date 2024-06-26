@@ -1,0 +1,52 @@
+{
+    "name": "MIT-IBM Benchmark",
+    "description": "This benchmark is about pairwise comparisons, where an LLM and a human select the best LLM response using the criteria below. The criteria contains multiple criteria and looks like this: Most importantly, the response should be accurate. Fact-check the response using the reference document. The reference document contains the accurate information needed to answer the customer question provided. In addition to being accurate, the response should be natural. The general tone should be natural and appropriate. Overall, the response should be more likely to satisfy the customer who asked the question.",
+    "type": "pairwise",
+    "dataset": {
+        "name": "MIT-IBM",
+        "description": "This dataset accompanies the paper \"What Leads to Successful Human-AI Collaboration? Prompt Guidance for Human Agents Using Conversational AI for Customer Support\". It explores the dynamics of human-AI interaction within customer support scenarios, focusing on improving collaborative efficiency through various configurations."
+    },
+    "criteriaBenchmarks": [
+        {
+            "name": "Overall",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "72.7%",
+                        "p_bias": 0.008,
+                        "pearson": 0.434
+                    }
+                },
+                {
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "70.8%",
+                        "p_bias": 0.225,
+                        "pearson": 0.396
+                    }
+                },
+                {
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "70.8%",
+                        "p_bias": 0.003,
+                        "pearson": 0.395
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "68.1%",
+                        "p_bias": 0.003,
+                        "pearson": 0.334
+                    }
+                }
+            ]
+        }
+    ]
+}

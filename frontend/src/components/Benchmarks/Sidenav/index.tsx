@@ -1,5 +1,4 @@
 import cx from 'classnames'
-import { benchmarkLibrary } from 'src/Libraries/BenchmarkLibrary'
 
 import { useMemo, useState } from 'react'
 
@@ -14,7 +13,10 @@ import { Benchmark, PipelineType } from '@utils/types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import classes from './index.module.scss'
 
-export const BenchmarkSidenav = ({}) => {
+interface Props {
+  benchmarkLibrary: Benchmark[]
+}
+export const BenchmarkSidenav = ({ benchmarkLibrary }: Props) => {
   const { benchmark, updateURLFromBenchmark } = useURLInfoContext()
   const rubricBenchmarks = useMemo(() => benchmarkLibrary.filter((b) => b.type === PipelineType.RUBRIC), [])
   const pairwiseBenchmarks = useMemo(() => benchmarkLibrary.filter((b) => b.type === PipelineType.PAIRWISE), [])
@@ -50,7 +52,7 @@ export const BenchmarkSidenav = ({}) => {
             <div className={classes.prompts}>
               <section className={classes.section}>
                 <div className={classes['tree-wrapper']}>
-                  <TreeView className={classes['tree-root']} label="" selected={selectedBenchmark}>
+                  <TreeView className={classes['tree-root']} label="" selected={selectedBenchmark} id={'tree-view'}>
                     <TreeNode
                       id={'rubric'}
                       label={RUBRIC_NAME}

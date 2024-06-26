@@ -1,16 +1,26 @@
+import { Benchmark } from '@utils/types'
+
 import { BenchmarkView } from './BenchmarkView'
 import { Landing } from './Landing'
 import { URLInfoProvider, useURLInfoContext } from './Providers/URLInfoProvider'
 
-const LandingOrBenchmarkView = () => {
-  const { benchmark } = useURLInfoContext()
-  return benchmark !== null ? <BenchmarkView /> : <Landing />
+interface Props {
+  benchmarkLibrary: Benchmark[]
 }
 
-export const Benchmarks = () => {
+const LandingOrBenchmarkView = ({ benchmarkLibrary }: Props) => {
+  const { benchmark } = useURLInfoContext()
+  return benchmark !== null ? (
+    <BenchmarkView benchmarkLibrary={benchmarkLibrary} />
+  ) : (
+    <Landing benchmarkLibrary={benchmarkLibrary} />
+  )
+}
+
+export const Benchmarks = ({ benchmarkLibrary }: Props) => {
   return (
-    <URLInfoProvider>
-      <LandingOrBenchmarkView />
+    <URLInfoProvider benchmarkLibrary={benchmarkLibrary}>
+      <LandingOrBenchmarkView benchmarkLibrary={benchmarkLibrary} />
     </URLInfoProvider>
   )
 }
