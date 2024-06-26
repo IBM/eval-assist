@@ -127,7 +127,6 @@ export const PairwiseRows = ({
                   readOnly
                   value={results[0] !== undefined && pairwiseWinnerIndex === i ? results[0].explanation : undefined}
                   labelText={''}
-                  // placeholder={results === null ? 'The evaluator explanation will appear here' : ''}
                   placeholder={''}
                   key={`pairwise_${i}_3_${uuid()}`}
                   id={`pairwise_${i}_3_${uuid()}`}

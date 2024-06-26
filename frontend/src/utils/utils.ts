@@ -15,11 +15,6 @@ import {
 export const isInstanceOfOption = (obj: any): obj is Option =>
   typeof obj.option === 'string' && typeof obj.description === 'string'
 
-export const isInstanceOfRubricCriteria = (obj: any): obj is RubricCriteria =>
-  typeof obj.name === 'string' &&
-  typeof obj.criteria === 'string' &&
-  obj.options.every((o: Option) => isInstanceOfOption(o))
-
 export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseResult =>
   obj !== null &&
   typeof obj.name === 'string' &&
@@ -28,7 +23,13 @@ export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseResult =>
   typeof obj.explanation === 'string' &&
   typeof obj.certainty === 'number'
 
-export const isInstanceOfPairwiseCriteria = (obj: any): obj is RubricCriteria =>
+export const isInstanceOfRubricCriteria = (obj: any): obj is RubricCriteria =>
+  typeof obj.name === 'string' &&
+  typeof obj.criteria === 'string' &&
+  obj.option !== undefined &&
+  obj.options.every((o: Option) => isInstanceOfOption(o))
+
+export const isInstanceOfPairwiseCriteria = (obj: any): obj is PairwiseCriteria =>
   typeof obj.name === 'string' && typeof obj.criteria === 'string'
 
 export const parseFetchedUseCase = (fetchedUseCase: StoredUseCase): UseCase => {
@@ -80,6 +81,17 @@ export const getEmptyUseCase = (type: PipelineType): UseCase => ({
   context: '',
   responses: type === PipelineType.RUBRIC ? [''] : ['', ''],
   criteria: getEmptyRubricCriteria(),
+  results: null,
+  pipeline: null,
+})
+
+export const getUseCaseWithCriteria = (criteriaName: string, type: PipelineType): UseCase => ({
+  id: null,
+  name: '',
+  type: type,
+  context: '',
+  responses: type === PipelineType.RUBRIC ? [''] : ['', ''],
+  criteria: getCriteria(criteriaName, type),
   results: null,
   pipeline: null,
 })

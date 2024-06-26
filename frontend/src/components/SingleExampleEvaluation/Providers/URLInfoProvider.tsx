@@ -3,7 +3,7 @@ import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffe
 import { useRouter } from 'next/router'
 
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
-import { getEmptyUseCase, returnByPipelineType } from '@utils/utils'
+import { getEmptyUseCase, getUseCaseWithCriteria, returnByPipelineType } from '@utils/utils'
 
 import { PipelineType, UseCase } from '../../../utils/types'
 import { usePipelineTypesContext } from './PipelineTypesProvider'
@@ -44,6 +44,11 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     [router.query.libraryTestCase],
   )
 
+  const criteriaName = useMemo(
+    () => (router.query.criteriaName ? (router.query.criteriaName as string) : null),
+    [router.query.criteriaName],
+  )
+
   const preloadedUseCase = useMemo(() => {
     let pu: UseCase | null
     if (useCaseId !== null && userUseCases !== null) {
@@ -54,7 +59,11 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
           (libraryUseCase) => libraryUseCase.name === libraryTestCaseName && libraryUseCase.type === useCaseType,
         ) || null
     } else if (useCaseType !== null && useCaseId === null && libraryTestCaseName === null) {
-      pu = getEmptyUseCase(useCaseType)
+      if (criteriaName !== null) {
+        pu = getUseCaseWithCriteria(criteriaName, useCaseType)
+      } else {
+        pu = getEmptyUseCase(useCaseType)
+      }
     } else {
       pu = null
     }

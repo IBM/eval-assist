@@ -1,0 +1,92 @@
+import cx from 'classnames'
+import { libraryUseCases } from 'src/Libraries/UseCaseLibrary'
+
+import { Dispatch, SetStateAction } from 'react'
+
+import { useRouter } from 'next/router'
+
+import { Button, Layer, Link, ListItem, Modal, UnorderedList } from '@carbon/react'
+import { Launch } from '@carbon/react/icons'
+
+import { PairwiseCriteria, PipelineType, RubricCriteria } from '@utils/types'
+import { isInstanceOfRubricCriteria } from '@utils/utils'
+
+import classes from './CriteriaDetailsModal.module.scss'
+
+interface Props {
+  open: boolean
+  setOpen: Dispatch<SetStateAction<boolean>>
+  criteria: RubricCriteria | PairwiseCriteria
+  type: PipelineType
+}
+
+export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) => {
+  const router = useRouter()
+
+  const onClose = () => {
+    setOpen(false)
+  }
+
+  const getLibraryTestCaseNameFromCriteriaName = (criteriaName: string) =>
+    libraryUseCases.find((l) => l.criteria.name === criteriaName)?.name ?? null
+
+  const getURLFromCriteriaName = (criteriaName: string) => {
+    const libraryTestCaseName = getLibraryTestCaseNameFromCriteriaName(criteriaName)
+    if (libraryTestCaseName !== null) {
+      return `/?libraryTestCase=${getLibraryTestCaseNameFromCriteriaName(criteriaName)}&type=${type}`
+    } else {
+      return `/?&type=${type}&criteriaName=${criteriaName}`
+    }
+  }
+
+  return (
+    <Modal
+      open={open}
+      onRequestClose={onClose}
+      passiveModal
+      size="sm"
+      modalHeading={`Criteria details: ${criteria.name}`}
+      className={classes.root}
+    >
+      <Layer style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <p>
+          <strong>{'Name: '}</strong> {criteria.name}
+        </p>
+
+        <p>
+          <strong>{'Criteria: '}</strong>
+          {criteria.criteria}
+        </p>
+
+        {isInstanceOfRubricCriteria(criteria) && (
+          <div>
+            <p style={{ marginBottom: '0.25rem' }}>
+              <strong>Options:</strong>
+            </p>
+            <UnorderedList className={classes.list}>
+              {criteria.options.map((option, i) => (
+                <ListItem key={i}>
+                  <p>
+                    <span style={{ fontWeight: 500 }}>{option.option + ': '}</span>
+                    {option.description}
+                  </p>
+                </ListItem>
+              ))}
+            </UnorderedList>
+          </div>
+        )}
+
+        <Button
+          renderIcon={Launch}
+          kind="ghost"
+          href={getURLFromCriteriaName(criteria.name)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={classes.button}
+        >
+          {'Try it'}
+        </Button>
+      </Layer>
+    </Modal>
+  )
+}

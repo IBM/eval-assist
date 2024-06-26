@@ -344,6 +344,11 @@ export const pairwiseCriteriaLibrary: PairwiseCriteria[] = [
     name: 'Truthfulness',
     criteria: 'Which response is truthful?',
   },
+  {
+    name: 'Overall',
+    criteria:
+      'Most importantly, you should evaluate each customer support response in terms of accuracy. The response should be accurate. Fact-check the response using the reference document we provide you. The reference document contains the accurate information needed to answer the customer question provided. In addition to being accurate, the response should be natural. Read the response carefully to see if the general tone is natural and appropriate. Overall, you should choose a response that is more likely to satisfy the customer who asked the question. We will bonus you if your ratings align well with the expert ratings.',
+  },
 ]
 
 export const criteriaLibrary: (RubricCriteria | PairwiseCriteria)[] = [

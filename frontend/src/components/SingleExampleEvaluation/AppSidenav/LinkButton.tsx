@@ -1,7 +1,4 @@
-import { stringify } from 'querystring'
-
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 import { Launch } from '@carbon/react/icons'
 

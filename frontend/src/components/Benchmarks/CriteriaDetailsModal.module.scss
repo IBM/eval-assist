@@ -1,0 +1,12 @@
+@import '@carbon/styles/scss/theme';
+
+.root :global .cds--modal-content {
+  -webkit-padding-after: 1rem;
+}
+
+.list :global .cds--list__item {
+  margin-bottom: 0.5rem;
+}
+
+.button {
+}
