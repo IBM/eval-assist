@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { Dispatch, SetStateAction, useId, useState } from 'react'
+import { Dispatch, SetStateAction, useId } from 'react'
 
 import { IconButton } from '@carbon/react'
 import { Categories, WatsonHealthSaveAnnotation } from '@carbon/react/icons'

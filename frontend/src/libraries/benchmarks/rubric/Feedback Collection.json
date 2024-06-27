@@ -1,49 +1,49 @@
 {
-    "name": "FeedbackQA - 500 question sample",
+    "name": "Feedback Collection",
     "description": "loren ipsum",
     "type": "rubric",
     "dataset": {
-        "name": "FeedbackQA",
+        "name": "Feedback Collection",
         "description": "loren ipsum"
     },
     "criteriaBenchmarks": [
         {
-            "name": "Quality",
+            "name": "Overall",
             "evaluatorBenchmarks": [
-                {
-                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": "45.6%",
-                        "p_bias": 0.088,
-                        "pearson": 0.767
-                    }
-                },
                 {
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "64.0%",
-                        "p_bias": 0.094,
-                        "pearson": 0.725
-                    }
-                },
-                {
-                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": "38.5%",
-                        "p_bias": 0.028,
-                        "pearson": 0.579
+                        "agreement": "47.6%",
+                        "p_bias": 0.157,
+                        "pearson": 0.77
                     }
                 },
                 {
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "38.5%",
-                        "p_bias": 0.328,
-                        "pearson": 0.579
+                        "agreement": "42.2%",
+                        "p_bias": 0.44,
+                        "pearson": 0.764
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "36.1%",
+                        "p_bias": 0.014,
+                        "pearson": 0.692
+                    }
+                },
+                {
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": "32.9%",
+                        "p_bias": 0.109,
+                        "pearson": 0.558
                     }
                 }
             ]

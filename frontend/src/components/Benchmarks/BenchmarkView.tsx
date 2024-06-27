@@ -1,7 +1,8 @@
 import cx from 'classnames'
 
+import { useMemo } from 'react'
+
 import { UseCaseTypeBadge } from '@components/SingleExampleEvaluation/UseCaseTypeBadge'
-import { Benchmark } from '@utils/types'
 
 import { CriteriaBenchmarkCard } from './CriteriaBenchmarkCard'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
@@ -9,7 +10,17 @@ import { BenchmarkSidenav } from './Sidenav'
 import classes from './index.module.scss'
 
 export const BenchmarkView = () => {
-  const { benchmark } = useURLInfoContext()
+  const { benchmark, selectedCriteriaName } = useURLInfoContext()
+
+  const benchmarkCriterias = useMemo(
+    () =>
+      (selectedCriteriaName === null
+        ? benchmark?.criteriaBenchmarks
+        : benchmark?.criteriaBenchmarks.filter(
+            (criteriaBenchmark) => criteriaBenchmark.name === selectedCriteriaName,
+          )) || [],
+    [benchmark?.criteriaBenchmarks, selectedCriteriaName],
+  )
 
   return (
     benchmark !== null && (
@@ -30,10 +41,10 @@ export const BenchmarkView = () => {
           </div>
           <div
             className={cx(classes.criteriaBenchmark, {
-              [classes.multipleRows]: benchmark.criteriaBenchmarks.length > 1,
+              [classes.multipleRows]: benchmarkCriterias.length > 1,
             })}
           >
-            {benchmark.criteriaBenchmarks.map((criteriaBenchmark, i) => (
+            {benchmarkCriterias.map((criteriaBenchmark, i) => (
               <CriteriaBenchmarkCard criteriaBenchmark={criteriaBenchmark} key={i} />
             ))}
           </div>

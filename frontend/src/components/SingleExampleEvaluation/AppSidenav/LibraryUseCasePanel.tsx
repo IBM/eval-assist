@@ -81,7 +81,6 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
                       id={`${useCase.name}_rubric`}
                       renderIcon={List}
                       onClick={(e: any) => onClick(e, useCase)}
-                      selected={selectedNode}
                     />
                   ))}
                 </TreeNode>
@@ -104,7 +103,6 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
                       id={`${useCase.name}_pairwise`}
                       renderIcon={Compare}
                       onClick={(e: any) => onClick(e, useCase)}
-                      selected={selectedNode}
                     />
                   ))}
                 </TreeNode>

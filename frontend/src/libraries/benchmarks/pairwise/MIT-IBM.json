@@ -1,5 +1,5 @@
 {
-    "name": "MIT-IBM Benchmark",
+    "name": "MIT-IBM",
     "description": "This benchmark is about pairwise comparisons, where an LLM and a human select the best LLM response using the criteria below. The criteria contains multiple criteria and looks like this: Most importantly, the response should be accurate. Fact-check the response using the reference document. The reference document contains the accurate information needed to answer the customer question provided. In addition to being accurate, the response should be natural. The general tone should be natural and appropriate. Overall, the response should be more likely to satisfy the customer who asked the question.",
     "type": "pairwise",
     "dataset": {

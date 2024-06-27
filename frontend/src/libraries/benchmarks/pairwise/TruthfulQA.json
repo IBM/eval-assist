@@ -1,7 +1,7 @@
 {
-    "name": "TruthfulQA - 100 question sample",
+    "name": "TruthfulQA",
     "description": "loren ipsum",
-    "type": "rubric",
+    "type": "pairwise",
     "dataset": {
         "name": "TruthfulQA",
         "description": "loren ipsum"
@@ -14,36 +14,36 @@
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "77.6%",
-                        "p_bias": 0.02,
-                        "pearson": 0.567
+                        "agreement": "91.8%",
+                        "p_bias": 0.03,
+                        "pearson": 0.847
                     }
                 },
                 {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "70.0%",
-                        "p_bias": 0,
-                        "pearson": 0.476
+                        "agreement": "87.8%",
+                        "p_bias": 0.02,
+                        "pearson": 0.755
                     }
                 },
                 {
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "62.6%",
-                        "p_bias": 0.09,
-                        "pearson": 0.335
+                        "agreement": "84.4%",
+                        "p_bias": 0.23,
+                        "pearson": 0.687
                     }
                 },
                 {
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "57%",
-                        "p_bias": 0.14,
-                        "pearson": 0.244
+                        "agreement": "80.4%",
+                        "p_bias": 0.03,
+                        "pearson": 0.61
                     }
                 }
             ]
