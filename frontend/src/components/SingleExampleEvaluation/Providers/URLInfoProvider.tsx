@@ -76,7 +76,16 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return pu
-  }, [useCaseId, userUseCases, libraryTestCaseName, useCaseType, rubricPipelines, pairwisePipelines, libraryUseCases])
+  }, [
+    useCaseId,
+    userUseCases,
+    libraryTestCaseName,
+    useCaseType,
+    rubricPipelines,
+    pairwisePipelines,
+    libraryUseCases,
+    criteriaName,
+  ])
 
   return (
     <URLInfoContext.Provider
