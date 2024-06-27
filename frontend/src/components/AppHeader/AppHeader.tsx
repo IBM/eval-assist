@@ -25,46 +25,35 @@ export const AppHeader = () => {
 
   return (
     <Header className={classes.root} aria-label={title}>
-      <HeaderName
-        prefix="IBM"
-        style={{ cursor: 'pointer' }}
-        href="/"
-        // onClick={() => {
-        //   router.push({ pathname: '/', query: {} }).then(() => {
-        //     router.reload()
-        //   })
-        // }}
-      >
+      <HeaderName prefix="IBM" style={{ cursor: 'pointer' }} href="/">
         {PLATFORM_NAME}
       </HeaderName>
 
       <HeaderGlobalBar>
-        {router.pathname === '/documentation' ? null : (
-          <HeaderNavigation aria-label="IBM [Platform]">
-            <HeaderMenuItem
-              href=" https://airtable.com/appBlXR5AJ5v3dHDN/shrtDukPTBiP7VjJd"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
-                Feedback
-                <AddComment style={{ marginLeft: '0.5rem' }} size={18} />
-              </div>
-            </HeaderMenuItem>
-            <HeaderMenuItem href="/documentation">
-              <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
-                Documentation
-                <Document style={{ marginLeft: '0.5rem' }} size={18} />
-              </div>
-            </HeaderMenuItem>
-            <HeaderMenuItem href="/benchmarks">
-              <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
-                Benchmarks
-                <QqPlot style={{ marginLeft: '0.5rem' }} size={18} />
-              </div>
-            </HeaderMenuItem>
-          </HeaderNavigation>
-        )}
+        <HeaderNavigation aria-label="IBM [Platform]">
+          <HeaderMenuItem
+            href=" https://airtable.com/appBlXR5AJ5v3dHDN/shrtDukPTBiP7VjJd"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+              Feedback
+              <AddComment style={{ marginLeft: '0.5rem' }} size={18} />
+            </div>
+          </HeaderMenuItem>
+          <HeaderMenuItem href="/documentation" isActive={router.pathname === '/documentation'}>
+            <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+              Documentation
+              <Document style={{ marginLeft: '0.5rem' }} size={18} />
+            </div>
+          </HeaderMenuItem>
+          <HeaderMenuItem href="/benchmarks" isActive={router.pathname.startsWith('/benchmarks')}>
+            <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+              Benchmarks
+              <QqPlot style={{ marginLeft: '0.5rem' }} size={18} />
+            </div>
+          </HeaderMenuItem>
+        </HeaderNavigation>
 
         {authenticationEnabled && (
           <HeaderGlobalAction aria-label="Logout" onClick={signOut}>
