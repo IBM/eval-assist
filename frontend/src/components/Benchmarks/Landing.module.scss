@@ -1,0 +1,14 @@
+@import '@carbon/styles/scss/type';
+
+.cardsGrid {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.emptyFilterResult {
+  @include type-style('helper-text-01');
+
+  margin-top: 1.5rem;
+}

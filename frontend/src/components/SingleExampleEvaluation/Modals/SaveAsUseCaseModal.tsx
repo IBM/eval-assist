@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { Modal, TextInput } from '@carbon/react'
 
 import { PipelineType, UseCase } from '../../../utils/types'
-import { UseCaseTypeBadge } from '../UseCaseTypeBadge'
+import { UseCaseTypeBadge } from '../../UseCaseTypeBadge/UseCaseTypeBadge'
 
 interface Props {
   open: boolean

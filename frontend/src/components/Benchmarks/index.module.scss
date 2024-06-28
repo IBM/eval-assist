@@ -27,7 +27,13 @@
   margin-inline: 1rem;
 }
 
-.benchmarkInfo {
+.benchmarkContent {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.benchmarkHeader {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -37,6 +43,11 @@
 
 .benchmarkDescriptionTitle {
   margin-bottom: 0.5rem;
+}
+
+.benchmarkDescription {
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 @media (max-width: 1240px) {

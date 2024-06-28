@@ -6,6 +6,9 @@
         "name": "MIT-IBM",
         "description": "This dataset accompanies the paper \"What Leads to Successful Human-AI Collaboration? Prompt Guidance for Human Agents Using Conversational AI for Customer Support\". It explores the dynamics of human-AI interaction within customer support scenarios, focusing on improving collaborative efficiency through various configurations."
     },
+    "tags": [
+        "Summarization"
+    ],
     "criteriaBenchmarks": [
         {
             "name": "Overall",

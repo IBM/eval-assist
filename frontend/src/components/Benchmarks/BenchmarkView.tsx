@@ -2,7 +2,7 @@ import cx from 'classnames'
 
 import { useMemo } from 'react'
 
-import { UseCaseTypeBadge } from '@components/SingleExampleEvaluation/UseCaseTypeBadge'
+import { UseCaseTypeBadge } from '@components/UseCaseTypeBadge/UseCaseTypeBadge'
 
 import { CriteriaBenchmarkCard } from './CriteriaBenchmarkCard'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
@@ -29,15 +29,21 @@ export const BenchmarkView = () => {
         <div className={cx(classes.root, classes.leftPadding)}>
           <h3 className={cx(classes.title, classes.bottomDivider)}>Benchmarks</h3>
 
-          <div className={cx(classes.bottomDivider, classes.benchmarkInfo)}>
+          <div className={cx(classes.bottomDivider, classes.benchmarkHeader)}>
             <h4>{benchmark.name}</h4>
 
             <div className={classes['vertical-divider']}></div>
             <UseCaseTypeBadge type={benchmark.type} />
           </div>
-          <div>
-            <h4 className={classes.benchmarkDescriptionTitle}>Description</h4>
-            <p>{benchmark.description}</p>
+          <div className={classes.benchmarkContent}>
+            <div>
+              <h4 className={classes.benchmarkDescriptionTitle}>Description</h4>
+              <p className={classes.benchmarkDescription}>{benchmark.description}</p>
+            </div>
+            <div>
+              <h4 className={classes.benchmarkDescriptionTitle}>{`Dataset: ${benchmark.dataset.name}`}</h4>
+              <p className={classes.benchmarkDescription}>{benchmark.dataset.description}</p>
+            </div>
           </div>
           <div
             className={cx(classes.criteriaBenchmark, {

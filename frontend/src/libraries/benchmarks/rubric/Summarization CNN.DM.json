@@ -6,6 +6,7 @@
         "name": "Summarization",
         "description": "loren ipsum"
     },
+    "tags": [],
     "criteriaBenchmarks": [
         {
             "name": "Coherence",

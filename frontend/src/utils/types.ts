@@ -81,6 +81,7 @@ export interface Benchmark {
   type: PipelineType // rubric or pairwise
   dataset: Dataset
   criteriaBenchmarks: CriteriaBenchmark[]
+  tags: string[]
 }
 
 export type RubricCriteria = {
@@ -110,3 +111,20 @@ export class Version {
       .join('')
   }
 }
+
+export const badgeColorsArray = [
+  'red',
+  'magenta',
+  'purple',
+  'cyan',
+  'teal',
+  'green',
+  'gray',
+  'cool-gray',
+  'warm-gray',
+  'high-contrast',
+  'outline',
+  'blue',
+] as const
+
+export type BadgeColor = (typeof badgeColorsArray)[number]

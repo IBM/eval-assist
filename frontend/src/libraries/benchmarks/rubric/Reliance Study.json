@@ -6,6 +6,7 @@
         "name": "Reliance Study",
         "description": "This repository contains datasets and analysis from a study aimed at measuring reliance on Large Language Models (LLMs) output across various tasks. Our study employed a controlled experiment design to investigate how different cognitive forcing functions (CFFs) affect users editing behavior concerning accuracy and naturalness of LLM outputs, including the impact of hallucinations in responses."
     },
+    "tags": [],
     "criteriaBenchmarks": [
         {
             "name": "Irrelevant information",

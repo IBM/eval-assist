@@ -6,6 +6,10 @@
         "name": "FeedbackQA",
         "description": "loren ipsum"
     },
+    "tags": [
+        "RAG",
+        "QA"
+    ],
     "criteriaBenchmarks": [
         {
             "name": "Quality",

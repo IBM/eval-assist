@@ -6,6 +6,7 @@
         "name": "TruthfulQA",
         "description": "loren ipsum"
     },
+    "tags": [],
     "criteriaBenchmarks": [
         {
             "name": "Truthfulness",

@@ -6,6 +6,9 @@
         "name": "Feedback Collection",
         "description": "loren ipsum"
     },
+    "tags": [
+        "RAG"
+    ],
     "criteriaBenchmarks": [
         {
             "name": "Overall",
