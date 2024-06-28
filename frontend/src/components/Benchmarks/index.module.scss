@@ -30,7 +30,7 @@
 .benchmarkContent {
   display: grid;
   gap: 2rem;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 2fr;
 }
 
 .benchmarkHeader {
@@ -48,6 +48,7 @@
 .benchmarkDescription {
   text-align: justify;
   text-justify: inter-word;
+  // white-space: pre;
 }
 
 @media (max-width: 1240px) {

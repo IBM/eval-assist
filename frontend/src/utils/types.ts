@@ -67,7 +67,7 @@ export interface Dataset {
 export interface EvaluatorBenchmark {
   evaluator_id: string // should be different from model_id, maybe add library version?
   laaj_version: string
-  results: { [key: string]: number | string } // dict of [metric, result] e.g. {[p_bias, 0.2]}
+  results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
 }
 
 export interface CriteriaBenchmark {

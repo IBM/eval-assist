@@ -15,7 +15,7 @@
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "73.5%",
+                        "agreement": 0.735,
                         "p_bias": 0.032,
                         "pearson": 0.325
                     }
@@ -24,7 +24,7 @@
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "62.9%",
+                        "agreement": 0.629,
                         "p_bias": 0.031,
                         "pearson": 0.002
                     }
@@ -33,7 +33,7 @@
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "56.1%",
+                        "agreement": 0.561,
                         "p_bias": 0,
                         "pearson": 0.183
                     }
@@ -42,7 +42,7 @@
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "37.5%",
+                        "agreement": 0.375,
                         "p_bias": 0.188,
                         "pearson": -0.041
                     }
@@ -56,7 +56,7 @@
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "79.8%",
+                        "agreement": 0.798,
                         "p_bias": 0,
                         "pearson": 0.183
                     }
@@ -65,7 +65,7 @@
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "72.2%",
+                        "agreement": 0.722,
                         "p_bias": 0.055,
                         "pearson": 0.325
                     }
@@ -74,7 +74,7 @@
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "51.3%",
+                        "agreement": 0.513,
                         "p_bias": 0.188,
                         "pearson": -0.041
                     }
@@ -83,7 +83,7 @@
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "48.5%",
+                        "agreement": 0.485,
                         "p_bias": 0.013,
                         "pearson": 0.002
                     }
@@ -97,7 +97,7 @@
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "44.4%",
+                        "agreement": 0.444,
                         "p_bias": 0,
                         "pearson": 0.183
                     }
@@ -106,7 +106,7 @@
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "14.8%",
+                        "agreement": 0.148,
                         "p_bias": 0.064,
                         "pearson": -0.041
                     }
@@ -115,7 +115,7 @@
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "14.0%",
+                        "agreement": 0.140,
                         "p_bias": 0.028,
                         "pearson": 0.325
                     }
@@ -124,7 +124,7 @@
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "13.6%",
+                        "agreement": 0.136,
                         "p_bias": 0.02,
                         "pearson": 0.002
                     }
@@ -138,7 +138,7 @@
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "77.1%",
+                        "agreement": 0.771,
                         "p_bias": 0,
                         "pearson": 0.183
                     }
@@ -147,7 +147,7 @@
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "25.7%",
+                        "agreement": 0.257,
                         "p_bias": 0.095,
                         "pearson": 0.325
                     }
@@ -156,7 +156,7 @@
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "21.3%",
+                        "agreement": 0.213,
                         "p_bias": 0.127,
                         "pearson": -0.041
                     }
@@ -165,7 +165,7 @@
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "13.3%",
+                        "agreement": 0.133,
                         "p_bias": 0.029,
                         "pearson": 0.002
                     }
@@ -179,7 +179,7 @@
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "90.7%",
+                        "agreement": 0.907,
                         "p_bias": 0.02,
                         "pearson": 0.325
                     }
@@ -188,7 +188,7 @@
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "86.8%",
+                        "agreement": 0.868,
                         "p_bias": 0.004,
                         "pearson": 0.183
                     }
@@ -197,7 +197,7 @@
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "82.7%",
+                        "agreement": 0.827,
                         "p_bias": 0.18,
                         "pearson": 0.002
                     }
@@ -206,7 +206,7 @@
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "53.9%",
+                        "agreement": 0.539,
                         "p_bias": 0.145,
                         "pearson": -0.041
                     }
@@ -220,7 +220,7 @@
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "89.2%",
+                        "agreement": 0.892,
                         "p_bias": 0.017,
                         "pearson": 0.325
                     }
@@ -229,7 +229,7 @@
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "79.4%",
+                        "agreement": 0.794,
                         "p_bias": 0.181,
                         "pearson": -0.041
                     }
@@ -238,7 +238,7 @@
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "60.1%",
+                        "agreement": 0.601,
                         "p_bias": 0.126,
                         "pearson": 0.002
                     }
@@ -247,7 +247,7 @@
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "36.8%",
+                        "agreement": 0.368,
                         "p_bias": 0.004,
                         "pearson": 0.183
                     }

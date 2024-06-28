@@ -2,7 +2,19 @@ import cx from 'classnames'
 
 import { CSSProperties, useCallback, useMemo, useState } from 'react'
 
-import { Link, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tile } from '@carbon/react'
+import {
+  IconButton,
+  Link,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tile,
+  Tooltip,
+} from '@carbon/react'
+import { Information } from '@carbon/react/icons'
 
 import { CriteriaBenchmark, EvaluatorBenchmark, PipelineType, Version } from '@utils/types'
 import { getCriteria } from '@utils/utils'
@@ -15,6 +27,12 @@ interface Props {
   criteriaBenchmark: CriteriaBenchmark
   className?: string
   style?: CSSProperties
+}
+
+const beatutifyName: { [key: string]: string } = {
+  agreement: 'Agreement',
+  p_bias: 'Positional bias',
+  pearson: 'Pearson correlation',
 }
 
 export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: Props) => {
@@ -30,44 +48,46 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
     return Object.keys(criteriaBenchmark.evaluatorBenchmarks[0].results)
   }, [criteriaBenchmark.evaluatorBenchmarks])
 
-  const metricToNumber = (metricValue: number | string) =>
-    typeof metricValue === 'number' ? metricValue : +metricValue.replace(/%/g, '')
+  const benchmarkMetricsHeader = useMemo(
+    () =>
+      benchmarkMetrics.map((metric, i) =>
+        metric === 'pearson' ? (
+          <div key={i} className={classes.headerWithTooltip}>
+            {beatutifyName[metric]}
+            <Tooltip
+              label={
+                <p style={{ textAlign: 'center' }}>
+                  {
+                    'Calculate the Pearson correlation coefficient between the LLM rating and the human rating.Calculate the Pearson correlation coefficient between the LLM rating and the human rating.'
+                  }
+                </p>
+              }
+              align="top"
+            >
+              <IconButton className={classes.headerIconButton} label={''}>
+                <Information />
+              </IconButton>
+            </Tooltip>
+          </div>
+        ) : (
+          beatutifyName[metric]
+        ),
+      ),
+    [benchmarkMetrics],
+  )
 
-  const metricToPercentageString = (metricValue: number) => metricValue + '%'
+  const metricToPercentageString = (metricValue: number) => Math.round(metricValue * 1000) / 10 + '%'
 
   const smallerIsBetter = (metricName: string) => metricName === 'p_bias'
 
-  const getBetterResult = (results: (number | string)[], metricName: string) => {
+  const getBetterResult = (results: number[], metricName: string) => {
     const aggregationFunction = smallerIsBetter(metricName) ? Math.min : Math.max
-    let betterResult: number | string = aggregationFunction(...results.map((r) => metricToNumber(r)))
-    if (metricName === 'agreement') {
-      betterResult = metricToPercentageString(betterResult)
-    }
+    let betterResult: number | string = aggregationFunction(...results)
     return betterResult
   }
 
-  // parses the results of an evaluation benchmarks
-  // if a result is a percentage strings it converts the number part into a
-  // number and then back to a string (with the percentaje symbol)
-  // this ensures cases like 65.0% are converted into 65%
-  // which allows finding the better result consistently
-  const parseEvaluatorBenchmark = useCallback((evaluatorBenchmark: EvaluatorBenchmark) => {
-    let parsedResults: typeof evaluatorBenchmark.results = {}
-    Object.keys(evaluatorBenchmark.results).forEach((key) => {
-      if (evaluatorBenchmark.results[key] === '') {
-        parsedResults[key] = ''
-      } else {
-        parsedResults[key] = metricToNumber(evaluatorBenchmark.results[key])
-        if (key === 'agreement') {
-          parsedResults[key] = metricToPercentageString(parsedResults[key] as number)
-        }
-      }
-    })
-    return {
-      ...evaluatorBenchmark,
-      results: parsedResults,
-    }
-  }, [])
+  const parseResult = (metric: string, result: number): number | string =>
+    metric === 'agreement' || metric === 'p_bias' ? metricToPercentageString(result) : result
 
   // removes old benchmarks, i.e. evaluator benchmarks of old llm-as-a-judge version
   const newestEvaluators = useMemo(
@@ -88,8 +108,8 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
 
   // sorts the evaluators alphabetically and parses the results
   const parsedNewestEvaluators = useMemo(() => {
-    return newestEvaluators.sort((a, b) => b.evaluator_id.localeCompare(a.evaluator_id)).map(parseEvaluatorBenchmark)
-  }, [newestEvaluators, parseEvaluatorBenchmark])
+    return newestEvaluators.sort((a, b) => b.evaluator_id.localeCompare(a.evaluator_id))
+  }, [newestEvaluators])
 
   return (
     benchmark !== null && (
@@ -108,7 +128,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
               <TableHead>
                 <TableRow>
                   <TableHeader key={0}>Evaluator</TableHeader>
-                  {benchmarkMetrics.map((metric, i) => (
+                  {benchmarkMetricsHeader.map((metric, i) => (
                     <TableHeader key={i}>{metric}</TableHeader>
                   ))}
                 </TableRow>
@@ -129,7 +149,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
                             ),
                         })}
                       >
-                        {evaluatorBenchmark.results[metric] !== '' ? evaluatorBenchmark.results[metric] : '-'}
+                        {parseResult(metric, evaluatorBenchmark.results[metric])}
                       </TableCell>
                     ))}
                   </TableRow>

@@ -1,10 +1,10 @@
 {
     "name": "FeedbackQA",
-    "description": "loren ipsum",
+    "description": "FeedbackQA is a retrieval-based QA dataset that contains interactive feedback from users. Each question-answer pair consists of a rating, selected from excellent, good, could be improved, bad, and a natural language explanation elaborating on the strengths and/or weaknesses of the answer (https://huggingface.co/datasets/McGill-NLP/feedbackQA).",
     "type": "rubric",
     "dataset": {
         "name": "FeedbackQA",
-        "description": "loren ipsum"
+        "description": "loren"
     },
     "tags": [
         "RAG",
@@ -18,7 +18,7 @@
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "45.6%",
+                        "agreement": 0.456,
                         "p_bias": 0.088,
                         "pearson": 0.767
                     }
@@ -27,7 +27,7 @@
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "64.0%",
+                        "agreement": 0.640,
                         "p_bias": 0.094,
                         "pearson": 0.725
                     }
@@ -36,7 +36,7 @@
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "38.5%",
+                        "agreement": 0.385,
                         "p_bias": 0.028,
                         "pearson": 0.579
                     }
@@ -45,7 +45,7 @@
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": "38.5%",
+                        "agreement": 0.385,
                         "p_bias": 0.328,
                         "pearson": 0.579
                     }

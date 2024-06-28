@@ -34,16 +34,18 @@ export const BenchmarkView = () => {
 
             <div className={classes['vertical-divider']}></div>
             <UseCaseTypeBadge type={benchmark.type} />
+            {/* <div className={classes['vertical-divider']}></div>
+            <h4 className={classes.benchmarkDescriptionTitle}>{`Dataset: ${benchmark.dataset.name}`}</h4> */}
           </div>
           <div className={classes.benchmarkContent}>
             <div>
               <h4 className={classes.benchmarkDescriptionTitle}>Description</h4>
               <p className={classes.benchmarkDescription}>{benchmark.description}</p>
             </div>
-            <div>
+            {/* <div>
               <h4 className={classes.benchmarkDescriptionTitle}>{`Dataset: ${benchmark.dataset.name}`}</h4>
               <p className={classes.benchmarkDescription}>{benchmark.dataset.description}</p>
-            </div>
+            </div> */}
           </div>
           <div
             className={cx(classes.criteriaBenchmark, {

@@ -11,6 +11,10 @@
 
 .table {
   align-self: stretch;
+
+  :global(.cds--data-table-content) {
+    overflow: visible;
+  }
 }
 
 .highlightedCellText {
@@ -23,4 +27,20 @@
   flex-direction: row;
   align-items: center;
   gap: 0.75rem;
+}
+
+.headerWithTooltip {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.headerIconButton {
+  color: $border-strong-02;
+  background-color: transparent;
+
+  &:hover {
+    color: $layer-accent-active-01;
+    background-color: transparent;
+  }
 }
