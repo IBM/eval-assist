@@ -45,7 +45,7 @@ export const BenchmarkCard = ({ benchmark, tagToColor }: Props) => {
           name={returnByPipelineType(benchmark.type, RUBRIC_NAME, PAIRWISE_NAME)}
           className={classes.badge}
           size="md"
-          color={'blue'}
+          color={tagToColor[returnByPipelineType(benchmark.type, RUBRIC_NAME, PAIRWISE_NAME)]}
         />
         {benchmark.tags.map((tag, i) => (
           <TagBadge className={classes.badge} key={i} name={tag} color={tagToColor[tag]} size="md" />

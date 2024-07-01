@@ -52,9 +52,9 @@ export const Landing = () => {
   } = useMemo(() => {
     const dict: { [key: string]: BadgeColor } = {}
     dict[RUBRIC_NAME] = 'blue'
-    dict[PAIRWISE_NAME] = 'blue'
+    dict[PAIRWISE_NAME] = 'purple'
     allTags.forEach((tag, i) => {
-      const color = badgeColorsArray[i]
+      const color = badgeColorsArray[i % badgeColorsArray.length]
       dict[tag] = color
     })
     return dict

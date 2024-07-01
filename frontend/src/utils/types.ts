@@ -113,19 +113,6 @@ export class Version {
   }
 }
 
-export const badgeColorsArray = [
-  'red',
-  'magenta',
-  'purple',
-  'cyan',
-  'teal',
-  'green',
-  'gray',
-  'cool-gray',
-  'warm-gray',
-  'high-contrast',
-  'outline',
-  'blue',
-] as const
+export const badgeColorsArray = ['red', 'magenta', 'cyan', 'teal', 'green', 'blue', 'purple'] as const
 
 export type BadgeColor = (typeof badgeColorsArray)[number]
