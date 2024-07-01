@@ -32,7 +32,7 @@ export const Filter = ({ items, selectedItems, setSelectedItems, tagToColor }: P
       >
         <MultiSelect
           titleText="Benchmarks filter"
-          label={selectedItems.join(', ')}
+          label={selectedItems.length > 0 ? selectedItems.join(', ') : 'No filters selected'}
           items={items}
           selectedItems={selectedItems}
           onChange={onSelectionChanged}

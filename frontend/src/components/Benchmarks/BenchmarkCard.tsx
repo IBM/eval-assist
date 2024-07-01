@@ -4,7 +4,9 @@ import { ListItem, Tile, UnorderedList } from '@carbon/react'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { UseCaseTypeBadge } from '@components/UseCaseTypeBadge/UseCaseTypeBadge'
+import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 import { BadgeColor, Benchmark } from '@utils/types'
+import { returnByPipelineType } from '@utils/utils'
 
 import classes from './BenchmarkCard.module.scss'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
@@ -39,7 +41,12 @@ export const BenchmarkCard = ({ benchmark, tagToColor }: Props) => {
         ))}
       </UnorderedList>
       <div className={classes.tagList}>
-        <UseCaseTypeBadge type={benchmark.type} className={classes.badge} size="md" />
+        <TagBadge
+          name={returnByPipelineType(benchmark.type, RUBRIC_NAME, PAIRWISE_NAME)}
+          className={classes.badge}
+          size="md"
+          color={'blue'}
+        />
         {benchmark.tags.map((tag, i) => (
           <TagBadge className={classes.badge} key={i} name={tag} color={tagToColor[tag]} size="md" />
         ))}

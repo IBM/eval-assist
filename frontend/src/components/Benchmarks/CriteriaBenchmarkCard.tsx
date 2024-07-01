@@ -32,7 +32,7 @@ interface Props {
 const beatutifyName: { [key: string]: string } = {
   agreement: 'Agreement',
   p_bias: 'Positional bias',
-  pearson: 'Pearson correlation',
+  pearson: 'Pearson',
 }
 
 export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: Props) => {
@@ -48,7 +48,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
     return Object.keys(criteriaBenchmark.evaluatorBenchmarks[0].results)
   }, [criteriaBenchmark.evaluatorBenchmarks])
 
-  const benchmarkMetricsHeader = useMemo(
+  const benchmarkMetricsHeaders = useMemo(
     () =>
       benchmarkMetrics.map((metric, i) =>
         metric === 'pearson' ? (
@@ -57,16 +57,12 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
             <Tooltip
               label={
                 <p style={{ textAlign: 'center' }}>
-                  {
-                    'Calculate the Pearson correlation coefficient between the LLM rating and the human rating.Calculate the Pearson correlation coefficient between the LLM rating and the human rating.'
-                  }
+                  {'Calculate the Pearson correlation coefficient between the LLM rating and the human rating.'}
                 </p>
               }
               align="top"
             >
-              <IconButton className={classes.headerIconButton} label={''}>
-                <Information />
-              </IconButton>
+              <Information className={classes.headerInfoIcon} />
             </Tooltip>
           </div>
         ) : (
@@ -128,7 +124,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
               <TableHead>
                 <TableRow>
                   <TableHeader key={0}>Evaluator</TableHeader>
-                  {benchmarkMetricsHeader.map((metric, i) => (
+                  {benchmarkMetricsHeaders.map((metric, i) => (
                     <TableHeader key={i}>{metric}</TableHeader>
                   ))}
                 </TableRow>

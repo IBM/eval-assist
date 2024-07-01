@@ -50,6 +50,7 @@ $block-radius: 4px;
   transition: none;
   .blockElement {
     border-radius: 0;
+    border-bottom: 0;
 
     textarea {
       min-height: max(rem(50px), 100%);
@@ -78,7 +79,7 @@ $block-radius: 4px;
   align-items: center;
   height: rem(50px);
   border-radius: 0 0 $block-radius $block-radius !important;
-
+  border-bottom: 1px solid $border-subtle-01 !important;
   > button {
     display: flex;
     align-items: center;
@@ -172,12 +173,6 @@ $block-radius: 4px;
     &:last-child {
       border-right: 0;
     }
-  }
-}
-
-.innerContainer .tableRow {
-  &:not(:last-child) .blockElement {
-    border-bottom: 0;
   }
 }
 

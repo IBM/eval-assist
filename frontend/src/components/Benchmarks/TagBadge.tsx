@@ -17,10 +17,8 @@ interface Props {
 
 export const TagBadge = ({ style, className, size, name, color }: Props) => {
   return (
-    <div style={style} className={cx(className)}>
-      <Tag className={classes['usecase-tag']} type={color} size={size || 'md'}>
-        {name}
-      </Tag>
-    </div>
+    <Tag style={style} className={cx(className, classes['usecase-tag'])} type={color} size={size || 'md'}>
+      {name}
+    </Tag>
   )
 }

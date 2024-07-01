@@ -78,6 +78,7 @@ export interface CriteriaBenchmark {
 export interface Benchmark {
   name: string
   description: string
+  link?: string
   type: PipelineType // rubric or pairwise
   dataset: Dataset
   criteriaBenchmarks: CriteriaBenchmark[]

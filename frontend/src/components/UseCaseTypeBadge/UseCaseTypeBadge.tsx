@@ -5,6 +5,7 @@ import { CSSProperties } from 'react'
 import { Tag } from '@carbon/react'
 
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
+import { returnByPipelineType } from '@utils/utils'
 
 import { PipelineType } from '../../utils/types'
 import classes from './UseCaseTypeBadge.module.scss'
@@ -20,7 +21,7 @@ export const UseCaseTypeBadge = ({ type: currentType, style, className, size }: 
   return (
     <div style={style} className={cx(className)}>
       <Tag className={classes['usecase-tag']} type="blue" size={size || 'md'}>
-        {currentType === PipelineType.RUBRIC ? RUBRIC_NAME : PAIRWISE_NAME}
+        {returnByPipelineType(currentType, RUBRIC_NAME, PAIRWISE_NAME)}
       </Tag>
     </div>
   )

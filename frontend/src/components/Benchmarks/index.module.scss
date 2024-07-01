@@ -41,6 +41,10 @@
   margin-bottom: 1rem;
 }
 
+.breadcrumb {
+  margin-bottom: 1rem;
+}
+
 .benchmarkDescriptionTitle {
   margin-bottom: 0.5rem;
 }
@@ -48,7 +52,11 @@
 .benchmarkDescription {
   text-align: justify;
   text-justify: inter-word;
-  // white-space: pre;
+  white-space: pre-line;
+}
+
+.benchmarkLink {
+  text-decoration: none;
 }
 
 @media (max-width: 1240px) {

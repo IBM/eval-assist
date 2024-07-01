@@ -30,15 +30,16 @@
 }
 
 .headerWithTooltip {
-  display: inline-flex;
+  display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 0.5rem;
 }
 
-.headerIconButton {
+.headerInfoIcon {
   color: $border-strong-02;
   background-color: transparent;
-
+  margin-top: 0.2rem !important;
   &:hover {
     color: $layer-accent-active-01;
     background-color: transparent;
