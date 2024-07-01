@@ -7,10 +7,7 @@
         "name": "FeedbackQA",
         "description": "loren"
     },
-    "tags": [
-        "RAG",
-        "QA"
-    ],
+    "tags": [],
     "criteriaBenchmarks": [
         {
             "name": "Quality",
