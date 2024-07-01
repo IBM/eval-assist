@@ -1,10 +1,10 @@
 {
     "name": "Reliance Study",
-    "description": "loren ipsum",
+    "description": "The dataset comes from a study aimed at measuring reliance on Large Language Models (LLMs) output across various tasks. Our study employed a controlled experiment design to investigate how different cognitive forcing functions affect users editing behavior concerning accuracy and naturalness of LLM outputs, including the impact of hallucinations in responses. The LLM has to decide whether the response meets the criteria.",
     "type": "rubric",
     "dataset": {
         "name": "Reliance Study",
-        "description": "This repository contains datasets and analysis from a study aimed at measuring reliance on Large Language Models (LLMs) output across various tasks. Our study employed a controlled experiment design to investigate how different cognitive forcing functions (CFFs) affect users editing behavior concerning accuracy and naturalness of LLM outputs, including the impact of hallucinations in responses."
+        "description": "This repository contains datasets and analysis from a study aimed at measuring reliance on Large Language Models (LLMs) output across various tasks. The study employed a controlled experiment design to investigate how different cognitive forcing functions (CFFs) affect users editing behavior concerning accuracy and naturalness of LLM outputs, including the impact of hallucinations in responses."
     },
     "tags": [],
     "criteriaBenchmarks": [

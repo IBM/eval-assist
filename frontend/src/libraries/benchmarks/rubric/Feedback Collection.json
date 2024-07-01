@@ -1,10 +1,11 @@
 {
     "name": "Feedback Collection",
-    "description": "loren ipsum",
+    "description": "The Feedback Collection is a dataset designed to induce fine-grained evaluation capabilities into language models.\n\nCorrelation/Agreement for this dataset is calculated on gpt4 ratings.",
+    "link": "https://github.com/prometheus-eval/prometheus-eval/blob/main/eval/benchmark/data/feedback_collection_test.json",
     "type": "rubric",
     "dataset": {
         "name": "Feedback Collection",
-        "description": "The Feedback Collection is a dataset designed to induce fine-grained evaluation capabilities into language models.\n\nhttps://github.com/prometheus-eval/prometheus-eval/blob/main/eval/benchmark/data/feedback_collection_test.json\n\nCorrelation/Agreement for this dataset is calculated on gpt4 ratings."
+        "description": "loren ipsum"
     },
     "tags": [
         "RAG"

@@ -1,6 +1,7 @@
 {
     "name": "FeedbackQA",
-    "description": "FeedbackQA is a retrieval-based QA dataset that contains interactive feedback from users. Each question-answer pair consists of a rating, selected from excellent, good, could be improved, bad, and a natural language explanation elaborating on the strengths and/or weaknesses of the answer (https://huggingface.co/datasets/McGill-NLP/feedbackQA).",
+    "description": "FeedbackQA is a retrieval-based QA dataset that contains interactive feedback from users. Each question-answer pair consists of a rating, selected from excellent, good, could be improved, bad, and a natural language explanation elaborating on the strengths and/or weaknesses of the answer.",
+    "link": "https://huggingface.co/datasets/McGill-NLP/feedbackQA",
     "type": "rubric",
     "dataset": {
         "name": "FeedbackQA",

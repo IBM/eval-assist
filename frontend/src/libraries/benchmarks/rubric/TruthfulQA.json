@@ -1,6 +1,7 @@
 {
     "name": "TruthfulQA",
-    "description": "loren ipsum",
+    "description": "TruthfulQA is a dataset to measure whether a language model is truthful in generating answers to questions. The dataset comprises 38 categories, including health, law, finance and politics. The language model has to decide whether the response is correct or whether it is incorrect.",
+    "link": "https://huggingface.co/datasets/truthfulqa/truthful_qa",
     "type": "rubric",
     "dataset": {
         "name": "TruthfulQA",
