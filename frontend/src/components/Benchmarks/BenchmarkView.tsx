@@ -2,6 +2,10 @@ import cx from 'classnames'
 
 import { useMemo } from 'react'
 
+import Link from 'next/link'
+
+import { Breadcrumb, BreadcrumbItem } from '@carbon/react'
+
 import { UseCaseTypeBadge } from '@components/UseCaseTypeBadge/UseCaseTypeBadge'
 
 import { CriteriaBenchmarkCard } from './CriteriaBenchmarkCard'
@@ -27,6 +31,14 @@ export const BenchmarkView = () => {
       <>
         <BenchmarkSidenav />
         <div className={cx(classes.root, classes.leftPadding)}>
+          <Breadcrumb className={classes.breadcrumb}>
+            <BreadcrumbItem isCurrentPage={false}>
+              <Link href="/benchmarks">All benchmarks </Link>
+            </BreadcrumbItem>
+            <BreadcrumbItem isCurrentPage={true}>
+              <p>{benchmark.name}</p>
+            </BreadcrumbItem>
+          </Breadcrumb>
           <h3 className={cx(classes.title, classes.bottomDivider)}>Benchmarks</h3>
 
           <div className={cx(classes.bottomDivider, classes.benchmarkHeader)}>
@@ -34,18 +46,18 @@ export const BenchmarkView = () => {
 
             <div className={classes['vertical-divider']}></div>
             <UseCaseTypeBadge type={benchmark.type} />
-            {/* <div className={classes['vertical-divider']}></div>
-            <h4 className={classes.benchmarkDescriptionTitle}>{`Dataset: ${benchmark.dataset.name}`}</h4> */}
           </div>
           <div className={classes.benchmarkContent}>
             <div>
               <h4 className={classes.benchmarkDescriptionTitle}>Description</h4>
               <p className={classes.benchmarkDescription}>{benchmark.description}</p>
+              <br></br>
+              {benchmark.link !== undefined && (
+                <a className={classes.benchmarkLink} href={benchmark.link} target="_blank" rel="noopener noreferrer">
+                  {benchmark.link}
+                </a>
+              )}
             </div>
-            {/* <div>
-              <h4 className={classes.benchmarkDescriptionTitle}>{`Dataset: ${benchmark.dataset.name}`}</h4>
-              <p className={classes.benchmarkDescription}>{benchmark.dataset.description}</p>
-            </div> */}
           </div>
           <div
             className={cx(classes.criteriaBenchmark, {
