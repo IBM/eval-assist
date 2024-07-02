@@ -10,12 +10,14 @@ import { useBenchmarksContext } from './BenchmarksProvider'
 interface URLInfoContextValue {
   benchmark: Benchmark | null
   selectedCriteriaName: string | null
+  getURLFromBenchmark: (benchmark: Benchmark, criteriaBenchmark?: CriteriaBenchmark) => string
   updateURLFromBenchmark: (benchmark: Benchmark, criteriaBenchmark?: CriteriaBenchmark) => void
 }
 
 const URLInfoContext = createContext<URLInfoContextValue>({
   benchmark: null,
   selectedCriteriaName: null,
+  getURLFromBenchmark: () => '',
   updateURLFromBenchmark: () => {},
 })
 
@@ -43,31 +45,37 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [benchmarks, router.query.benchmark, router.query.criteriaName, router.query.type])
 
+  const getURLFromBenchmark = useCallback((benchmark: Benchmark, criteriaBenchmark?: CriteriaBenchmark) => {
+    const paramsArray = [
+      { key: 'benchmark', value: benchmark.name },
+      { key: 'type', value: benchmark.type },
+    ]
+    if (criteriaBenchmark !== undefined) {
+      paramsArray.push({
+        key: 'criteriaName',
+        value: criteriaBenchmark.name,
+      })
+    }
+    const paramsString = stringifyQueryParams(paramsArray)
+    return `/benchmarks/${paramsString}`
+  }, [])
+
   const updateURLFromBenchmark = useCallback(
     (benchmark: Benchmark, criteriaBenchmark?: CriteriaBenchmark) => {
-      const paramsArray = [
-        { key: 'benchmark', value: benchmark.name },
-        { key: 'type', value: benchmark.type },
-      ]
-      if (criteriaBenchmark !== undefined) {
-        paramsArray.push({
-          key: 'criteriaName',
-          value: criteriaBenchmark.name,
-        })
-      }
-      const paramsString = stringifyQueryParams(paramsArray)
-      router.push(`/benchmarks/${paramsString}`, `/benchmarks/${paramsString}`, {
+      const newUrl = getURLFromBenchmark(benchmark, criteriaBenchmark)
+      router.push(newUrl, newUrl, {
         shallow: true,
       })
       // use case is a saved user test case
     },
-    [router],
+    [getURLFromBenchmark, router],
   )
 
   return (
     <URLInfoContext.Provider
       value={{
         benchmark,
+        getURLFromBenchmark,
         updateURLFromBenchmark,
         selectedCriteriaName: criteriaName,
       }}

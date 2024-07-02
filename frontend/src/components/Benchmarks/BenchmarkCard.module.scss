@@ -14,6 +14,10 @@
   }
 }
 
+.list * {
+  margin-bottom: 0.25rem;
+}
+
 .title-row {
   display: flex;
   flex-direction: row;
@@ -40,9 +44,14 @@
   margin-bottom: $spacing-05;
 }
 
-.criteriaName {
+.criteriaNameLink {
   @include type-style('body-short-01');
   margin-bottom: 0.35rem;
+  color: $text-primary !important;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .card-white-mode {

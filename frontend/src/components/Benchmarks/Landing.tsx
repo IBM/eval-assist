@@ -102,7 +102,12 @@ export const Landing = () => {
         {filteredBenchmarks.length > 0 ? (
           <div className={cx(landingClasses.cardsGrid)}>
             {filteredBenchmarks.map((benchmark, i) => (
-              <BenchmarkCard key={i} benchmark={benchmark} tagToColor={tagToColor} />
+              <BenchmarkCard
+                selectedCriteriaItems={selectedCriteriaItems}
+                key={i}
+                benchmark={benchmark}
+                tagToColor={tagToColor}
+              />
             ))}
           </div>
         ) : (
