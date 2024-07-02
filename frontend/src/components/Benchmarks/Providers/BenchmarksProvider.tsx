@@ -24,7 +24,12 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const getBenchmarks = async () => {
       setLoadingBenchmarks(true)
-      setBenchmarks(await (await fetch('/api/benchmarks')).json())
+      const benchmarks: Benchmark[] = await (await fetch('/api/benchmarks')).json()
+      benchmarks.sort((b1, b2) => b1.name.localeCompare(b2.name))
+      benchmarks.forEach((benchmark) => {
+        benchmark.criteriaBenchmarks.sort((c1, c2) => c1.name.localeCompare(c2.name))
+      })
+      setBenchmarks(benchmarks)
       setLoadingBenchmarks(false)
     }
     getBenchmarks()
