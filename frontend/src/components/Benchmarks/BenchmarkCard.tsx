@@ -2,7 +2,7 @@ import cx from 'classnames'
 
 import Link from 'next/link'
 
-import { ClickableTile, ListItem, Tile, UnorderedList } from '@carbon/react'
+import { ListItem, Tile, UnorderedList } from '@carbon/react'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
@@ -10,7 +10,6 @@ import { BadgeColor, Benchmark } from '@utils/types'
 import { returnByPipelineType } from '@utils/utils'
 
 import classes from './BenchmarkCard.module.scss'
-import { CriteriaBenchmarkCard } from './CriteriaBenchmarkCard'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
 import { TagBadge } from './TagBadge'
 
@@ -25,13 +24,13 @@ interface Props {
 export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems }: Props) => {
   const { isDarkMode } = useThemeContext()
 
-  const { updateURLFromBenchmark, getURLFromBenchmark } = useURLInfoContext()
+  const { getURLFromBenchmark, updateURLFromBenchmark } = useURLInfoContext()
 
+  const onClick = () => {
+    updateURLFromBenchmark(benchmark)
+  }
   return (
-    <ClickableTile
-      href={getURLFromBenchmark(benchmark)}
-      className={cx(classes.root, { [classes['card-white-mode']]: !!!isDarkMode() })}
-    >
+    <Tile className={cx(classes.root, { [classes['card-white-mode']]: !!!isDarkMode() })} onClick={onClick}>
       <div className={classes['title-row']}>
         <h5 className={classes.title}>{benchmark.name}</h5>
       </div>
@@ -44,7 +43,11 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems }: 
           .map((criteriaBenchmark, i) => (
             <ListItem key={i}>
               <Link href={getURLFromBenchmark(benchmark, criteriaBenchmark)} className={classes.criteriaNameLink}>
-                {criteriaBenchmark.name}
+                {selectedCriteriaItems.includes(criteriaBenchmark.name) ? (
+                  <mark>{criteriaBenchmark.name}</mark>
+                ) : (
+                  criteriaBenchmark.name
+                )}
               </Link>
             </ListItem>
           ))}
@@ -60,6 +63,6 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems }: 
           <TagBadge className={classes.badge} key={i} name={tag} color={tagToColor[tag]} size="md" />
         ))}
       </div>
-    </ClickableTile>
+    </Tile>
   )
 }
