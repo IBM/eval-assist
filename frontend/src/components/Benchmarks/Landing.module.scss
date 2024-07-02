@@ -9,6 +9,12 @@
 
 .emptyFilterResult {
   @include type-style('helper-text-01');
+}
 
-  margin-top: 1.5rem;
+.root {
+  gap: 1rem;
+}
+
+.benchmarkFilter {
+  margin-top: -1rem;
 }

@@ -1,0 +1,5 @@
+@import '@carbon/styles/scss/theme';
+
+.placeholderText :global .cds--list-box__label {
+  color: $text-placeholder;
+}

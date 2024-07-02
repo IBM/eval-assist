@@ -4,6 +4,8 @@
 
 .root {
   margin-inline-start: rem(272px);
+  display: flex;
+  flex-direction: column;
   padding: 1.5rem;
 }
 

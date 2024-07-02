@@ -14,25 +14,32 @@ import classes from './index.module.scss'
 
 export const Landing = () => {
   const { benchmarks } = useBenchmarksContext()
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [selectedTagItems, setSelectedTagItems] = useState<string[]>([])
+  const [selectedCriteriaItems, setSelectedCriteriaItems] = useState<string[]>([])
 
   const filteredBenchmarks = useMemo(() => {
-    if (selectedItems.length === 0) {
+    if (selectedTagItems.length === 0 && selectedCriteriaItems.length === 0) {
       return benchmarks
     } else {
-      return benchmarks.filter((b) => {
-        return selectedItems.every((tag) => {
-          if (tag === RUBRIC_NAME && b.type === PipelineType.RUBRIC) {
+      const filteredByTags = benchmarks.filter((b) => {
+        return selectedTagItems.every((selectedTag) => {
+          if (selectedTag === RUBRIC_NAME && b.type === PipelineType.RUBRIC) {
             return true
           }
-          if (tag === PAIRWISE_NAME && b.type === PipelineType.PAIRWISE) {
+          if (selectedTag === PAIRWISE_NAME && b.type === PipelineType.PAIRWISE) {
             return true
           }
-          return b.tags.includes(tag)
+          return b.tags.includes(selectedTag)
         })
       })
+      const filteredByCriteriasAndTag = filteredByTags.filter((b) => {
+        return selectedCriteriaItems.every((selectedCriteria) => {
+          return b.criteriaBenchmarks.map((criteriaBenchmark) => criteriaBenchmark.name).includes(selectedCriteria)
+        })
+      })
+      return filteredByCriteriasAndTag
     }
-  }, [benchmarks, selectedItems])
+  }, [benchmarks, selectedCriteriaItems, selectedTagItems])
 
   const allTags = useMemo(() => {
     const tags: string[] = []
@@ -45,6 +52,16 @@ export const Landing = () => {
     })
     tags.sort((a, b) => b.localeCompare(a))
     return tags
+  }, [benchmarks])
+
+  const criteriaList = useMemo(() => {
+    const criterias: string[] = []
+    benchmarks.forEach((benchmark) =>
+      benchmark.criteriaBenchmarks.forEach(
+        (criteriaBenchmark) => !criterias.includes(criteriaBenchmark.name) && criterias.push(criteriaBenchmark.name),
+      ),
+    )
+    return criterias
   }, [benchmarks])
 
   const tagToColor: {
@@ -63,15 +80,25 @@ export const Landing = () => {
   return (
     <>
       <BenchmarkSidenav />
-      <div className={cx(classes.root, classes.leftPadding)}>
+      <div className={cx(classes.root, landingClasses.root, classes.leftPadding)}>
         <h3 className={cx(classes.title, classes.bottomDivider)}>Benchmarks</h3>
         <Filter
           items={[RUBRIC_NAME, PAIRWISE_NAME, ...allTags]}
-          selectedItems={selectedItems}
-          setSelectedItems={setSelectedItems}
+          selectedItems={selectedTagItems}
+          setSelectedItems={setSelectedTagItems}
           tagToColor={tagToColor}
+          title={'Benchmarks filter'}
+          label={selectedTagItems.length > 0 ? selectedTagItems.join(', ') : 'No filters selected'}
+          className={landingClasses.benchmarkFilter}
         />
-        {/* <p style={{ fontStyle: 'italic' }}>Click on a benchmark in the sidebar panel to see its content.</p> */}
+        <Filter
+          items={criteriaList}
+          selectedItems={selectedCriteriaItems}
+          setSelectedItems={setSelectedCriteriaItems}
+          tagToColor={tagToColor}
+          title={'Criteria filter'}
+          label={selectedCriteriaItems.length > 0 ? selectedCriteriaItems.join(', ') : 'No criterias selected'}
+        />
         {filteredBenchmarks.length > 0 ? (
           <div className={cx(landingClasses.cardsGrid)}>
             {filteredBenchmarks.map((benchmark, i) => (

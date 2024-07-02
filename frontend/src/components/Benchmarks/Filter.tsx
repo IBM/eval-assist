@@ -1,3 +1,5 @@
+import cx from 'classnames'
+
 import { Dispatch, SetStateAction } from 'react'
 
 // @ts-ignore
@@ -5,6 +7,7 @@ import { MultiSelect } from '@carbon/react'
 
 import { BadgeColor } from '@utils/types'
 
+import classes from './Filter.module.scss'
 import { TagBadge } from './TagBadge'
 
 interface Props {
@@ -14,25 +17,30 @@ interface Props {
   tagToColor: {
     [key: string]: BadgeColor
   }
+  title: string
+  label: string
+  className?: string
 }
 
-export const Filter = ({ items, selectedItems, setSelectedItems, tagToColor }: Props) => {
+export const Filter = ({ items, selectedItems, setSelectedItems, tagToColor, title, label, className }: Props) => {
   const onSelectionChanged = (e: { selectedItems: string[] }) => {
     setSelectedItems(e.selectedItems || [])
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end' }}>
+    <div
+      className={cx(className, { [classes.placeholderText]: selectedItems.length === 0 })}
+      style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end' }}
+    >
       <div
         style={{
           width: 300,
-
           marginRight: '1rem',
         }}
       >
         <MultiSelect
-          titleText="Benchmarks filter"
-          label={selectedItems.length > 0 ? selectedItems.join(', ') : 'No filters selected'}
+          titleText={title}
+          label={label}
           items={items}
           selectedItems={selectedItems}
           onChange={onSelectionChanged}
