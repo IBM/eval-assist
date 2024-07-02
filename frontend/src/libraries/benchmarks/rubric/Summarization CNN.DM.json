@@ -12,35 +12,39 @@
             "name": "Coherence",
             "evaluatorBenchmarks": [
                 {
-                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0,
-                        "pearson": 0.549
-                    }
-                },
-                {
-                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "p_bias": 0.224,
-                        "pearson": 0.523
+                        "agreement": 0.136,
+                        "p_bias": 0.398,
+                        "pearson": 0.532
                     }
                 },
                 {
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0,
-                        "pearson": 0.512
+                        "agreement": 0.340,
+                        "p_bias": 0.010,
+                        "pearson": 0.451
                     }
                 },
                 {
-                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0.418,
-                        "pearson": 0.346
+                        "agreement": 0.198,
+                        "p_bias": 0.020,
+                        "pearson": 0.372
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.351,
+                        "p_bias": 0.245,
+                        "pearson": 0.335
                     }
                 }
             ]
@@ -49,35 +53,39 @@
             "name": "Consistency",
             "evaluatorBenchmarks": [
                 {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.356,
+                        "p_bias": 0.247,
+                        "pearson": 0.437
+                    }
+                },
+                {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0.01,
-                        "pearson": 0.549
+                        "agreement": 0.053,
+                        "p_bias": 0.021,
+                        "pearson": 0.406
                     }
                 },
                 {
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0,
-                        "pearson": 0.49
+                        "agreement": 0.258,
+                        "p_bias": 0.000,
+                        "pearson": 0.371
                     }
                 },
                 {
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0.475,
-                        "pearson": 0.46
-                    }
-                },
-                {
-                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "p_bias": 0.202,
-                        "pearson": 0.458
+                        "agreement": 0.000,
+                        "p_bias": 0.474,
+                        "pearson": 0.205
                     }
                 }
             ]
@@ -89,32 +97,36 @@
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0.165,
-                        "pearson": 0.404
+                        "agreement": 0.108,
+                        "p_bias": 0.041,
+                        "pearson": 0.545
                     }
                 },
                 {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0,
-                        "pearson": 0.274
-                    }
-                },
-                {
-                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "p_bias": 0.515,
-                        "pearson": 0.185
+                        "agreement": 0.036,
+                        "p_bias": 0.134,
+                        "pearson": 0.505
                     }
                 },
                 {
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0,
-                        "pearson": 0.124
+                        "agreement": 0.072,
+                        "p_bias": 0.000,
+                        "pearson": 0.368
+                    }
+                },
+                {
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.065,
+                        "p_bias": 0.526,
+                        "pearson": 0.106
                     }
                 }
             ]
@@ -123,35 +135,39 @@
             "name": "Relevance",
             "evaluatorBenchmarks": [
                 {
-                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0.4,
-                        "pearson": 0.624
+                        "agreement": 0.167,
+                        "p_bias": 0.580,
+                        "pearson": 0.636
                     }
                 },
                 {
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0.558,
-                        "pearson": 0.49
+                        "agreement": 0.446,
+                        "p_bias": 0.080,
+                        "pearson": 0.526
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.385,
+                        "p_bias": 0.220,
+                        "pearson": 0.463
                     }
                 },
                 {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "p_bias": 0.021,
-                        "pearson": 0.448
-                    }
-                },
-                {
-                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "p_bias": 0.463,
-                        "pearson": 0.324
+                        "agreement": 0.293,
+                        "p_bias": 0.080,
+                        "pearson": 0.295
                     }
                 }
             ]
