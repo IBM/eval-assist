@@ -46,8 +46,9 @@ export const parseFetchedUseCase = (fetchedUseCase: StoredUseCase): UseCase => {
         : ((fetchedUseCase.content as JsonObject)['criteria'] as unknown as PairwiseCriteria) ||
           // for backward compatibility
           ((fetchedUseCase.content as JsonObject)['rubric'] as unknown as RubricCriteria),
-    results: (fetchedUseCase.content as JsonObject)['results'] as unknown as (RubricResult | PairwiseResult)[],
+    results: (fetchedUseCase.content as JsonObject)['results'] as unknown as UseCase['results'],
     pipeline: (fetchedUseCase.content as JsonObject)['pipeline'] as string,
+    expectedResults: (fetchedUseCase.content as JsonObject)['expectedResults'] as string[],
   }
 }
 
@@ -77,23 +78,18 @@ export const getEmptyCriteria = (type: PipelineType): RubricCriteria | PairwiseC
 export const getEmptyUseCase = (type: PipelineType): UseCase => ({
   id: null,
   name: '',
-  type: type,
+  type,
   context: '',
   responses: type === PipelineType.RUBRIC ? [''] : ['', ''],
   criteria: getEmptyRubricCriteria(),
   results: null,
   pipeline: null,
+  expectedResults: null,
 })
 
 export const getUseCaseWithCriteria = (criteriaName: string, type: PipelineType): UseCase => ({
-  id: null,
-  name: '',
-  type: type,
-  context: '',
-  responses: type === PipelineType.RUBRIC ? [''] : ['', ''],
+  ...getEmptyUseCase(type),
   criteria: getCriteria(criteriaName, type) || getEmptyCriteria(type),
-  results: null,
-  pipeline: null,
 })
 
 export const returnByPipelineType = (type: PipelineType, returnIfRubric: any, returnIfPairwise: any) =>

@@ -17,23 +17,19 @@ import { useAppSidebarContext } from './Providers/AppSidebarProvider'
 
 interface Props {
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  setCurrentUseCase: (useCase: UseCase) => void
+  updateURLFromUseCase: (useCase: UseCase) => void
 }
 
-export const Landing = ({ setNewUseCaseModalOpen, setCurrentUseCase }: Props) => {
+export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props) => {
   const { isDarkMode } = useThemeContext()
   const { sidebarTabSelected, setSidebarTabSelected } = useAppSidebarContext()
 
   const createEmptyRubric = () => {
-    setCurrentUseCase({
-      ...getEmptyUseCase(PipelineType.RUBRIC),
-    })
+    updateURLFromUseCase(getEmptyUseCase(PipelineType.RUBRIC))
   }
 
   const createEmptyPairwise = () => {
-    setCurrentUseCase({
-      ...getEmptyUseCase(PipelineType.PAIRWISE),
-    })
+    updateURLFromUseCase(getEmptyUseCase(PipelineType.PAIRWISE))
   }
 
   const openTestCasesLibrary = () => {

@@ -19,7 +19,7 @@ interface AppSidenavProps {
   setLibraryUseCaseSelected: Dispatch<SetStateAction<UseCase | null>>
   userUseCases: UseCase[]
   changesDetected: boolean
-  setCurrentUseCase: (useCase: UseCase) => void
+  updateURLFromUseCase: (useCase: UseCase) => void
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
 }
@@ -29,7 +29,7 @@ export const AppSidenavNew = ({
   setLibraryUseCaseSelected,
   userUseCases,
   changesDetected,
-  setCurrentUseCase,
+  updateURLFromUseCase,
   setEvaluationRunningModalOpen,
   evaluationRunning,
 }: AppSidenavProps) => {
@@ -49,7 +49,7 @@ export const AppSidenavNew = ({
       setEvaluationRunningModalOpen(true)
     } else {
       // no unsaved changes and model is not running update the current use case without modals
-      setCurrentUseCase(useCase)
+      updateURLFromUseCase(useCase)
     }
   }
 

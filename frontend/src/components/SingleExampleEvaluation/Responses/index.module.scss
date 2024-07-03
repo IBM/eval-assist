@@ -6,6 +6,12 @@
 
 $block-radius: 4px;
 
+$columns-1: 1fr 0 0 0;
+$columns-2: 5fr 1fr 0 0;
+$columns-3-var1: 5fr 1fr 1fr 0;
+$columns-3-var2: 4fr 1fr 2fr 0;
+$columns-4: 3fr 1fr 1fr 2fr;
+
 .content {
   display: flex;
   justify-content: stretch;
@@ -36,7 +42,8 @@ $block-radius: 4px;
 
 .blockElement {
   background-color: $field;
-  border: 1px solid $border-subtle-01;
+  border-left: 1px solid $border-subtle-01;
+  border-right: 1px solid $border-subtle-01;
   border-radius: $block-radius;
   &:not(:last-child):not(.addResponseBlock) {
     border-right: none;
@@ -46,11 +53,9 @@ $block-radius: 4px;
 .tableRow {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 0fr 0fr;
-  transition: none;
+
   .blockElement {
     border-radius: 0;
-    border-bottom: 0;
 
     textarea {
       min-height: max(rem(50px), 100%);
@@ -63,14 +68,38 @@ $block-radius: 4px;
   }
 }
 
-.tableRow.tableRowWithResults {
-  transition: grid-template-columns $duration-fast-02 motion(entrance, productive);
-  grid-template-columns: 5fr 1fr 0fr;
+.headerRow {
+  border-bottom: 1px solid $border-subtle-01;
+  border-top: 1px solid $border-subtle-01;
 }
 
-.tableRow.tableRowWithExplanation {
-  transition: grid-template-columns $duration-fast-02 motion(entrance, productive);
-  grid-template-columns: 5fr 1fr 2fr;
+.addResponseRow {
+  grid-template-columns: $columns-1;
+  border-bottom: 1px solid $border-subtle-01;
+}
+
+.tableRow.tableRowWithExpectedResult {
+  &:not(.tableRowWithResults.tableRowWithExplanation) {
+    grid-template-columns: $columns-2;
+  }
+  &.tableRowWithResults:not(.tableRowWithExplanation) {
+    grid-template-columns: $columns-3-var1;
+  }
+  &.tableRowWithExplanation.tableRowWithResults {
+    grid-template-columns: $columns-4;
+  }
+}
+
+.tableRow:not(.tableRowWithExpectedResult) {
+  &:not(.tableRowWithResults.tableRowWithExplanation) {
+    grid-template-columns: $columns-1;
+  }
+  &.tableRowWithResults:not(.tableRowWithExplanation) {
+    grid-template-columns: $columns-2;
+  }
+  &.tableRowWithExplanation.tableRowWithResults {
+    grid-template-columns: $columns-3-var2;
+  }
 }
 
 .addResponseBlock {
@@ -79,7 +108,6 @@ $block-radius: 4px;
   align-items: center;
   height: rem(50px);
   border-radius: 0 0 $block-radius $block-radius !important;
-  border-bottom: 1px solid $border-subtle-01 !important;
   > button {
     display: flex;
     align-items: center;
@@ -108,6 +136,20 @@ $block-radius: 4px;
 .resultBlock {
   position: relative;
   padding: 11px 16px 11px 16px;
+}
+
+.resultBlockInner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+.resultBlockOuter {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .resultBlockHover {
@@ -148,6 +190,7 @@ $block-radius: 4px;
 
 .responsesRow {
   min-height: rem(85px);
+  border-bottom: 1px solid $border-subtle-01;
 }
 
 .responsesRow:hover {
@@ -161,8 +204,13 @@ $block-radius: 4px;
 }
 
 .winnerResponseOutline {
-  border: 1px solid $support-success;
+  border: 1px solid $support-success !important;
   border-radius: 1px;
+
+  // &.responsesRow {
+  //   border-bottom: 0;
+  //   border-top: 0;
+  // }
 
   .blockElement {
     border-top: 0;
@@ -186,14 +234,12 @@ $block-radius: 4px;
   }
 }
 
-.untrastedResult {
+.untrastedResultTypography {
   color: $text-error;
 }
 
 .positionalBias {
   color: $text-error;
-  margin-top: 5px;
-  margin-bottom: 5px;
   font-size: small;
 }
 
@@ -201,8 +247,6 @@ $block-radius: 4px;
   display: flex;
   align-items: center;
   color: $text-helper;
-  margin-top: 5px;
-  margin-bottom: 5px;
   font-size: small;
 }
 
@@ -217,4 +261,10 @@ $block-radius: 4px;
 
 .toggle :global .cds--toggle__text {
   color: $text-helper;
+}
+
+.toggles {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }

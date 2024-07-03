@@ -3,48 +3,74 @@ import { v4 as uuid } from 'uuid'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { Button, Link } from '@carbon/react'
+import { Button, Link, Select, SelectItem } from '@carbon/react'
 import { Add } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
-import { PairwiseResult, RubricResult } from '../../../utils/types'
+import { PairwiseResult, RubricCriteria, RubricResult, UseCase } from '../../../utils/types'
 import RemovableSection from '../../RemovableSection/RemovableSection'
 import classes from './index.module.scss'
 
 interface Props {
-  responses: string[]
-  setResponses: Dispatch<SetStateAction<string[]>>
+  responses: UseCase['responses']
+  setResponses: (responses: UseCase['responses']) => void
   results: RubricResult[] | null
-  onRemoveResponse: (i: number) => void
   explanationOn: boolean
-  setSelectedResultDetails: Dispatch<SetStateAction<RubricResult | PairwiseResult | null>>
+  expectedResultOn: boolean
+  setSelectedResultDetails: Dispatch<
+    SetStateAction<{ result: RubricResult | PairwiseResult | null; expectedResult: string }>
+  >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
+  criteria: RubricCriteria
+  setExpectedResults: (expectedResults: UseCase['expectedResults']) => void
+  expectedResults: UseCase['expectedResults']
+  setResults: (results: UseCase['results']) => void
 }
 
 export const RubricRows = ({
   responses,
   setResponses,
   results,
-  onRemoveResponse,
   explanationOn,
   setSelectedResultDetails,
   setResultDetailsModalOpen,
   evaluationRunning,
+  criteria,
+  expectedResultOn,
+  expectedResults,
+  setExpectedResults,
+  setResults,
 }: Props) => {
   const onResultBlockClick = (i: number) => {
-    // if (results !== null && results[i] !== undefined && !explanationOn) {
     if (results !== null && results[i] !== undefined) {
-      setSelectedResultDetails(results[i])
+      setSelectedResultDetails({
+        result: results[i],
+        expectedResult: expectedResults !== null ? expectedResults[i] : '',
+      })
       setResultDetailsModalOpen(true)
     }
   }
   const getResultToDisplay = (i: number) => {
     if (results !== null) {
-      return results[i] ? (results[i] as RubricResult).option : null
+      return results[i] ? (results[i] as RubricResult).option : ''
     }
+    return ''
   }
+
+  const onAddResponse = () => {
+    setResponses([...responses, ''])
+    expectedResults !== null && setExpectedResults([...expectedResults, ''])
+  }
+
+  const onRemoveResponse = (i: number) => {
+    if (responses.length === 1) return
+    setResponses(responses.filter((_, j) => i !== j))
+    results !== null && setResults(results.filter((_, j) => i !== j) as UseCase['results'])
+    expectedResults !== null && setExpectedResults(expectedResults.filter((_, j) => i !== j))
+  }
+
   return (
     <>
       {responses?.map((response, i) => (
@@ -53,10 +79,12 @@ export const RubricRows = ({
             <div
               key={i}
               className={cx(classes.tableRow, classes.responsesRow, {
+                [classes.tableRowWithExpectedResult]: expectedResultOn,
                 [classes.tableRowWithResults]: results !== null && !evaluationRunning,
                 [classes.tableRowWithExplanation]: results !== null && !evaluationRunning && explanationOn,
               })}
             >
+              {/* Response */}
               <FlexTextArea
                 onChange={(e) => {
                   setResponses([...responses.slice(0, i), e.target.value, ...responses.slice(i + 1)])
@@ -70,71 +98,101 @@ export const RubricRows = ({
                 onBlur={setInactive}
                 className={cx(classes.blockElement)}
               />
+
+              {/* Expected result */}
+              {expectedResultOn && (
+                <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1}>
+                  <div className={cx(classes.resultBlockTypography, {})} onFocus={setActive} onBlur={setInactive}>
+                    <Select
+                      id={`select-2`}
+                      noLabel
+                      value={expectedResults !== null && expectedResults[i] !== '' ? expectedResults[i] : ''}
+                      onChange={(e) => {
+                        expectedResults !== null &&
+                          setExpectedResults([
+                            ...expectedResults.slice(0, i),
+                            e.target.value,
+                            ...expectedResults.slice(i + 1),
+                          ])
+                      }}
+                    >
+                      <SelectItem key={i} value={''} text={''} />
+                      {criteria.options
+                        .map((option) => option.option)
+                        .map((option, i) => (
+                          <SelectItem key={i} text={option} value={option} />
+                        ))}
+                    </Select>
+                  </div>
+                </div>
+              )}
+
+              {/* Result */}
               {results !== null && !evaluationRunning && (
                 <>
                   <div
                     className={cx(classes.blockElement, classes.resultBlock, {
                       [classes.resultBlockPointerCursor]: results[i] !== undefined,
 
-                      [classes.resultBlockHover]: true,
+                      [classes.resultBlockHover]: results[i] !== undefined,
                     })}
                     onClick={() => onResultBlockClick(i)}
                     tabIndex={-1}
                   >
-                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'flex-start',
-                          height: '100%',
-                          gap: '5px',
-                        }}
-                      >
-                        <div
-                          className={cx(classes.resultBlockTypography, {
-                            [classes.resultPlaceholder]: results[i] === undefined,
-                            [classes.resultBlockDefaultCursor]: results[i] === undefined,
-                            [classes.untrastedResult]: results[i]?.positionalBias,
-                          })}
-                          onFocus={setActive}
-                          onBlur={setInactive}
-                        >
-                          {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
-                        </div>
-                        {results[i] && (
+                    {results[i] !== undefined ? (
+                      <div className={classes.resultBlockOuter}>
+                        <div className={classes.resultBlockInner}>
                           <div
-                            className={cx({
-                              [classes.positionalBias]: results[i].positionalBias,
-                              [classes.softText]: !results[i].positionalBias,
+                            className={cx(classes.resultBlockTypography, {
+                              [classes.untrastedResultTypography]:
+                                results[i].positionalBias ||
+                                (expectedResults !== null &&
+                                  expectedResults[i] !== '' &&
+                                  results[i].option !== expectedResults[i]),
                             })}
+                            onFocus={setActive}
+                            onBlur={setInactive}
                           >
-                            {results[i].positionalBias ? 'Positional bias detected' : 'No positional bias'}
+                            {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
                           </div>
-                        )}
-                        {results[i] && results[i].certainty && (
-                          <div className={cx(classes.softText)}>
-                            {'Certainty: ' + ((results[i].certainty as number) * 100).toFixed(0) + '%'}
-                          </div>
-                        )}
-                      </div>
-                      {results[i] !== undefined && (
+                          {results[i].positionalBias && (
+                            <div
+                              className={cx({
+                                [classes.positionalBias]: results[i].positionalBias,
+                                [classes.softText]: !results[i].positionalBias,
+                              })}
+                            >
+                              {'Positional bias detected'}
+                            </div>
+                          )}
+
+                          {results[i] && expectedResults !== null && expectedResults[i] !== '' && (
+                            <div
+                              className={cx(classes.resultBlockTypography, {
+                                [classes.untrastedResultTypography]: results[i].option !== expectedResults[i],
+                                [classes.softText]: results[i].option === expectedResults[i],
+                              })}
+                            >{`Agreement: ${results[i].option === expectedResults[i] ? 'Yes' : 'No'}`}</div>
+                          )}
+                          {results[i].certainty && (
+                            <div className={cx(classes.softText)}>
+                              {'Certainty: ' + ((results[i].certainty as number) * 100).toFixed(0) + '%'}
+                            </div>
+                          )}
+                        </div>
                         <Link style={{ alignSelf: 'flex-end' }} className={classes.resultDetailsAction}>
                           View Details
                         </Link>
-                      )}
-                    </div>
+                      </div>
+                    ) : null}
                   </div>
+
+                  {/* Explanation */}
                   {results !== null && !evaluationRunning && explanationOn && (
                     <FlexTextArea
                       readOnly
                       value={results[i] !== undefined ? results[i].explanation : undefined}
                       labelText={''}
-                      // placeholder={
-                      //   results === null || results[i] === undefined
-                      //     ? 'Explanation will appear here'
-                      //     : ''
-                      // }
                       placeholder=""
                       key={`rubric_${i}_3_${uuid()}`}
                       id={`rubric_${i}_3_${uuid()}`}
@@ -150,9 +208,9 @@ export const RubricRows = ({
           )}
         </RemovableSection>
       ))}
-      <div className={classes.tableRow}>
+      <div className={cx(classes.tableRow, classes.addResponseRow)}>
         <div className={cx(classes.blockElement, classes.addResponseBlock)}>
-          <Button kind="ghost" size="sm" renderIcon={Add} onClick={(e) => setResponses([...responses, ''])}>
+          <Button kind="ghost" size="sm" renderIcon={Add} onClick={onAddResponse}>
             {'Add response'}
           </Button>
         </div>

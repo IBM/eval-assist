@@ -8,7 +8,7 @@ interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   name: string
-  setName: Dispatch<SetStateAction<string>>
+  setName: (name: string) => void
   userUseCases: UseCase[]
   setUserUseCases: Dispatch<SetStateAction<UseCase[]>>
 }

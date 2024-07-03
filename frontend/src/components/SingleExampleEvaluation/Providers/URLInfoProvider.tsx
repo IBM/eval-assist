@@ -71,7 +71,14 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     if (pu !== null && rubricPipelines !== null && pairwisePipelines !== null) {
       pu = {
         ...pu,
-        pipeline: returnByPipelineType(pu?.type, rubricPipelines[0], pairwisePipelines[0]),
+        pipeline: returnByPipelineType(pu.type, rubricPipelines[0], pairwisePipelines[0]),
+      }
+    }
+
+    if (pu !== null && !pu.expectedResults) {
+      pu = {
+        ...pu,
+        expectedResults: returnByPipelineType(pu.type, new Array(pu.responses.length).fill(''), ['', '']),
       }
     }
 

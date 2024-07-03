@@ -12,51 +12,68 @@ import classes from './ResultDetailsModal.module.scss'
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  selectedResultDetails: RubricResult | PairwiseResult | null
-  setSelectedResultDetails: Dispatch<SetStateAction<RubricResult | PairwiseResult | null>>
+  selectedResultDetails: { result: RubricResult | PairwiseResult | null; expectedResult: string }
+  setSelectedResultDetails: Dispatch<
+    SetStateAction<{ result: RubricResult | PairwiseResult | null; expectedResult: string }>
+  >
+  type: PipelineType
 }
 
-export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSelectedResultDetails }: Props) => {
+export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSelectedResultDetails, type }: Props) => {
   const onClose = () => {
     setOpen(false)
-    setSelectedResultDetails(null)
+    setSelectedResultDetails({ result: null, expectedResult: '' })
   }
 
   const positionalBiasString = useMemo(() => {
-    const pb = `${selectedResultDetails?.positionalBias}`
+    const pb = `${selectedResultDetails.result?.positionalBias}`
     return pb.charAt(0).toUpperCase() + pb.slice(1) + ' '
-  }, [selectedResultDetails?.positionalBias])
-
-  const pipelineType = useMemo(
-    () => (isInstanceOfPairwiseResult(selectedResultDetails) ? PipelineType.PAIRWISE : PipelineType.RUBRIC),
-    [selectedResultDetails],
-  )
+  }, [selectedResultDetails.result?.positionalBias])
 
   return (
-    selectedResultDetails !== null && (
+    selectedResultDetails.result !== null && (
       <Modal open={open} onRequestClose={onClose} passiveModal size="sm" modalHeading="Result details">
         <Layer style={{ display: 'flex', flexDirection: 'column' }}>
-          {pipelineType === PipelineType.RUBRIC ? (
+          {type === PipelineType.RUBRIC ? (
             <p style={{ marginBottom: '0.5rem' }}>
-              <strong>{(selectedResultDetails as RubricResult).name + ':'}</strong>{' '}
-              {(selectedResultDetails as RubricResult).option}
+              <strong>{'Result: '}</strong> {(selectedResultDetails.result as RubricResult).option}
             </p>
           ) : null}
 
-          {pipelineType === PipelineType.PAIRWISE ? (
+          {type === PipelineType.RUBRIC && selectedResultDetails.expectedResult !== '' ? (
+            <p style={{ marginBottom: '0.5rem' }}>
+              <strong>{'Expected result: '}</strong>
+              {selectedResultDetails.expectedResult}
+            </p>
+          ) : null}
+
+          {type === PipelineType.PAIRWISE ? (
             <p style={{ marginBottom: '0.5rem' }}>
               <strong>{'Winner: '}</strong>
-              {`Response ${+(selectedResultDetails as PairwiseResult).winnerIndex + 1}`}
+              {`Response ${+(selectedResultDetails.result as PairwiseResult).winnerIndex + 1}`}
+            </p>
+          ) : null}
+
+          {type === PipelineType.PAIRWISE ? (
+            <p style={{ marginBottom: '0.5rem' }}>
+              <strong>{'Expected winner: '}</strong>
+              {`Response ${
+                selectedResultDetails.expectedResult === 'Winner'
+                  ? +(selectedResultDetails.result as PairwiseResult).winnerIndex + 1
+                  : +(selectedResultDetails.result as PairwiseResult).winnerIndex === 1
+                  ? 1
+                  : 2
+              }`}
             </p>
           ) : null}
 
           <p style={{ marginBottom: '0.5rem' }}>
-            <strong>Explanation:</strong> {selectedResultDetails.explanation}
+            <strong>Explanation:</strong> {selectedResultDetails.result.explanation}
           </p>
-          {selectedResultDetails.certainty && (
+          {selectedResultDetails.result.certainty && (
             <p style={{ marginBottom: '0.5rem' }}>
               {' '}
-              <strong>Certainty:</strong> {(selectedResultDetails.certainty * 100).toFixed(0) + '%'}{' '}
+              <strong>Certainty:</strong> {(selectedResultDetails.result.certainty * 100).toFixed(0) + '%'}{' '}
               <Link
                 className={classes['positional-bias-link']}
                 rel="noopener noreferrer"
@@ -70,7 +87,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
 
           <p>
             <strong>Positional bias:</strong>{' '}
-            <span className={cx({ [classes['positional-bias-error']]: selectedResultDetails.positionalBias })}>
+            <span className={cx({ [classes['positional-bias-error']]: selectedResultDetails.result.positionalBias })}>
               {positionalBiasString}
             </span>
             <Link

@@ -3,22 +3,27 @@ import { v4 as uuid } from 'uuid'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { Link } from '@carbon/react'
+import { Checkbox, Link, Select, SelectItem } from '@carbon/react'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
-import { PairwiseResult, RubricResult } from '../../../utils/types'
+import { PairwiseResult, RubricResult, UseCase } from '../../../utils/types'
 import classes from './index.module.scss'
 
 interface Props {
-  responses: string[]
-  setResponses: Dispatch<SetStateAction<string[]>>
+  responses: UseCase['responses']
+  setResponses: (responses: UseCase['responses']) => void
   results: PairwiseResult[] | null
   explanationOn: boolean
-  setSelectedResultDetails: Dispatch<SetStateAction<RubricResult | PairwiseResult | null>>
+  expectedResultOn: boolean
+  setSelectedResultDetails: Dispatch<
+    SetStateAction<{ result: RubricResult | PairwiseResult | null; expectedResult: string }>
+  >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   pairwiseWinnerIndex: number | null
   evaluationRunning: boolean
+  expectedResults: UseCase['expectedResults']
+  setExpectedResults: (expectedResults: UseCase['expectedResults']) => void
 }
 
 export const PairwiseRows = ({
@@ -30,10 +35,16 @@ export const PairwiseRows = ({
   setResultDetailsModalOpen,
   pairwiseWinnerIndex,
   evaluationRunning,
+  expectedResultOn,
+  expectedResults,
+  setExpectedResults,
 }: Props) => {
   const onResultBlockClick = (i: number) => {
     if (results !== null && results[0] !== undefined && pairwiseWinnerIndex === i) {
-      setSelectedResultDetails(results[0])
+      setSelectedResultDetails({
+        result: results[0],
+        expectedResult: expectedResults !== null ? expectedResults[i] : '',
+      })
       setResultDetailsModalOpen(true)
     }
   }
@@ -50,6 +61,7 @@ export const PairwiseRows = ({
         <div
           key={i}
           className={cx(classes.tableRow, classes.responsesRow, {
+            [classes.tableRowWithExpectedResult]: expectedResultOn,
             [classes.tableRowWithResults]: results !== null && !evaluationRunning,
             [classes.tableRowWithExplanation]: results !== null && !evaluationRunning && explanationOn,
             [classes.winnerResponseOutline]: !evaluationRunning && i === pairwiseWinnerIndex,
@@ -66,6 +78,35 @@ export const PairwiseRows = ({
             key={`${i}_1`}
             className={cx(classes.blockElement)}
           />
+          {/* Expected result */}
+          {expectedResultOn && (
+            <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1}>
+              <Checkbox
+                id={`checkbox-${i}`}
+                labelText="Winner"
+                checked={expectedResults !== null && expectedResults[i] === 'Winner'}
+                onChange={() => setExpectedResults([i === 0 ? 'Winner' : '', i === 0 ? '' : 'Winner'])}
+              />
+              {/* <Select
+                id={`select-2`}
+                noLabel
+                value={expectedResults !== null && expectedResults[i] !== '' ? expectedResults[i] : ''}
+                onChange={(e) => {
+                  expectedResults !== null &&
+                    setExpectedResults([
+                      ...expectedResults.slice(0, i),
+                      e.target.value,
+                      ...expectedResults.slice(i + 1),
+                    ])
+                }}
+              >
+                <SelectItem key={i} value={''} text={''} />
+                {['Loser', 'Winner'].map((option, i) => (
+                  <SelectItem key={i} text={option} value={option} />
+                ))}
+              </Select> */}
+            </div>
+          )}
           {results !== null && !evaluationRunning && (
             <>
               <div
@@ -76,22 +117,15 @@ export const PairwiseRows = ({
                 onClick={() => onResultBlockClick(i)}
                 tabIndex={-1}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start',
-                      height: '100%',
-                      gap: '5px',
-                    }}
-                  >
+                <div className={classes.resultBlockOuter}>
+                  <div className={classes.resultBlockInner}>
                     <div
                       className={cx(classes.resultBlockTypography, {
                         [classes.resultPlaceholder]: results === null || results[0] === undefined,
                         [classes.resultBlockDefaultCursor]: results === null || results[0] === undefined,
-                        [classes.untrastedResult]:
-                          results !== null && 'positionalBias' in results && results[0].positionalBias,
+                        [classes.untrastedResultTypography]:
+                          (results !== null && 'positionalBias' in results && results[0].positionalBias) ||
+                          (expectedResults !== null && expectedResults[i] !== 'Winner'),
                       })}
                     >
                       {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
@@ -107,6 +141,16 @@ export const PairwiseRows = ({
                         })}
                       >
                         {results[0].positionalBias ? 'Positional bias detected' : 'No positional bias'}
+                      </div>
+                    )}
+                    {expectedResults !== null && i === pairwiseWinnerIndex && (
+                      <div
+                        className={cx(classes.resultBlockTypography, {
+                          [classes.untrastedResultTypography]: getResultToDisplay(i) !== expectedResults[i],
+                          [classes.softText]: getResultToDisplay(i) === expectedResults[i],
+                        })}
+                      >
+                        {`Agreement: ${expectedResults[i] === 'Winner' ? 'Yes' : 'No'}`}
                       </div>
                     )}
                     {results[0] && results[0].certainty && pairwiseWinnerIndex === i && (

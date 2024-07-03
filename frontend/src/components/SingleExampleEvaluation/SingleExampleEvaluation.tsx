@@ -10,13 +10,12 @@ import { useToastContext } from '@components/SingleExampleEvaluation/Providers/T
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { useSaveShortcut } from '@customHooks/useSaveShortcut'
 import { StoredUseCase } from '@prisma/client'
 import {
-  getEmptyCriteria,
   getQueryParamsFromUseCase,
   getUseCaseStringWithSortedKeys,
   parseFetchedUseCase,
-  returnByPipelineType,
   stringifyQueryParams,
 } from '@utils/utils'
 
@@ -24,7 +23,6 @@ import {
   FetchedPairwiseResult,
   FetchedResults,
   FetchedRubricResult,
-  PairwiseCriteria,
   PairwiseResult,
   PipelineType,
   RubricCriteria,
@@ -47,7 +45,6 @@ import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { PipelineSelect } from './PipelineSelect'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
-import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
 import { useUserUseCasesContext } from './Providers/UserUseCasesProvider'
 import { Responses } from './Responses'
@@ -56,29 +53,14 @@ import { UseCaseOptions } from './UseCaseOptions'
 
 export const SingleExampleEvaluation = () => {
   const { preloadedUseCase } = useURLInfoContext()
+  const [currentUseCase, setCurrentUseCase] = useState(preloadedUseCase)
   const { userUseCases, setUserUseCases } = useUserUseCasesContext()
   // we are ignoring client side rendering to be able to use useSessionStorage
-  const [showingTestCase, setShowingTestCase] = useState<boolean>(preloadedUseCase !== null)
+  const showingTestCase = useMemo<boolean>(() => preloadedUseCase !== null, [preloadedUseCase])
   const [useCaseSelected, setUseCaseSelected] = useState<UseCase | null>(preloadedUseCase)
   // if the usecase doesnt have an id, it means it hasn't been stored
-  const [id, setId] = useState<number | null>(preloadedUseCase ? preloadedUseCase.id : null)
-  const [name, setName] = useState(preloadedUseCase ? preloadedUseCase.name : '')
-  const [type, setType] = useState<PipelineType>(preloadedUseCase ? preloadedUseCase.type : PipelineType.RUBRIC)
-  const [context, setContext] = useState(preloadedUseCase ? preloadedUseCase.context : '')
-  const [responses, setResponses] = useState(
-    preloadedUseCase ? preloadedUseCase.responses : type === PipelineType.RUBRIC ? [''] : ['', ''],
-  )
-  const [criteria, setCriteria] = useState<RubricCriteria | PairwiseCriteria>(
-    preloadedUseCase ? preloadedUseCase.criteria : getEmptyCriteria(type),
-  )
-  const [results, setResults] = useState<(RubricResult | PairwiseResult)[] | null>(
-    preloadedUseCase ? preloadedUseCase.results : null,
-  )
-  const [selectedPipeline, setSelectedPipeline] = useState<string | null>(
-    preloadedUseCase ? preloadedUseCase.pipeline : null,
-  )
 
-  const isUseCaseSaved = useMemo(() => id !== null, [id])
+  const isUseCaseSaved = useMemo(() => currentUseCase !== null && currentUseCase.id !== null, [currentUseCase])
   const [evaluationFailed, setEvaluationFailed] = useState(false)
   const [evaluationRunning, setEvaluationRunning] = useState(false)
 
@@ -90,27 +72,15 @@ export const SingleExampleEvaluation = () => {
   const [resultDetailsModalOpen, setResultDetailsModalOpen] = useState(false)
   const [evaluationRunningModalOpen, setEvaluationRunningModalOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
-
-  const [selectedResultDetails, setSelectedResultDetails] = useState<RubricResult | PairwiseResult | null>(null)
+  const [selectedResultDetails, setSelectedResultDetails] = useState<{
+    result: RubricResult | PairwiseResult | null
+    expectedResult: string
+  }>({ result: null, expectedResult: '' })
 
   const { setSidebarTabSelected } = useAppSidebarContext()
 
-  const currentUseCase = useMemo(
-    (): UseCase => ({
-      id,
-      name,
-      type,
-      context,
-      responses,
-      criteria,
-      results,
-      pipeline: selectedPipeline,
-    }),
-    [id, name, type, context, responses, criteria, results, selectedPipeline],
-  )
-
   const currentUseCaseString = useMemo<string>(
-    () => (showingTestCase ? getUseCaseStringWithSortedKeys(currentUseCase) : ''),
+    () => (currentUseCase !== null && showingTestCase ? getUseCaseStringWithSortedKeys(currentUseCase) : ''),
     [showingTestCase, currentUseCase],
   )
 
@@ -137,25 +107,8 @@ export const SingleExampleEvaluation = () => {
 
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
 
-  const { rubricPipelines, pairwisePipelines, loadingPipelines } = usePipelineTypesContext()
-
-  useEffect(() => {
-    if (selectedPipeline === null && rubricPipelines !== null && pairwisePipelines !== null && !loadingPipelines) {
-      const defaultPipeline = returnByPipelineType(type, rubricPipelines[0], pairwisePipelines[0]) as string
-      setSelectedPipeline(returnByPipelineType(type, rubricPipelines[0], pairwisePipelines[0]))
-      setLastSavedUseCaseString(getUseCaseStringWithSortedKeys({ ...currentUseCase, pipeline: defaultPipeline }))
-    }
-  }, [
-    selectedPipeline,
-    rubricPipelines,
-    pairwisePipelines,
-    setSelectedPipeline,
-    loadingPipelines,
-    type,
-    currentUseCase,
-  ])
-
   const runEvaluation = async () => {
+    if (currentUseCase === null) return
     setEvaluationFailed(false)
     setEvaluationRunning(true)
     const toastId = addToast({
@@ -167,21 +120,25 @@ export const SingleExampleEvaluation = () => {
     // was changed during the evaluation request
     const temporaryIdSnapshot = temporaryIdRef.current
     let response
-    if (type === PipelineType.RUBRIC) {
+    if (currentUseCase.type === PipelineType.RUBRIC) {
       response = await post('evaluate/rubric/', {
-        context,
-        responses,
-        rubric: { name: criteria.name, criteria: criteria.criteria, options: (criteria as RubricCriteria).options },
+        context: currentUseCase.context,
+        responses: currentUseCase.responses,
+        rubric: {
+          name: currentUseCase.criteria.name,
+          criteria: currentUseCase.criteria.criteria,
+          options: (currentUseCase.criteria as RubricCriteria).options,
+        },
         bam_api_key: bamAPIKey,
-        pipeline: selectedPipeline,
+        pipeline: currentUseCase.pipeline,
       })
     } else {
       response = await post('evaluate/pairwise/', {
-        instruction: context,
-        responses,
-        criteria: { name: criteria.name, criteria: criteria.criteria },
+        instruction: currentUseCase.context,
+        responses: currentUseCase.responses,
+        criteria: { name: currentUseCase.criteria.name, criteria: currentUseCase.criteria.criteria },
         bam_api_key: bamAPIKey,
-        pipeline: selectedPipeline,
+        pipeline: currentUseCase.pipeline,
       })
     }
 
@@ -224,11 +181,11 @@ export const SingleExampleEvaluation = () => {
       })
 
       let results
-      if (type === PipelineType.RUBRIC) {
+      if (currentUseCase.type === PipelineType.RUBRIC) {
         results = (responseBody.results as FetchedRubricResult[]).map(
           (result) =>
             ({
-              name: criteria.name,
+              name: currentUseCase.criteria.name,
               option: result.option,
               explanation: result.explanation,
               positionalBias: result.p_bias,
@@ -239,7 +196,7 @@ export const SingleExampleEvaluation = () => {
         results = (responseBody.results as FetchedPairwiseResult[]).map(
           (result) =>
             ({
-              name: criteria.name,
+              name: currentUseCase.criteria.name,
               explanation: result.explanation,
               positionalBias: result.p_bias,
               winnerIndex: result.w_index,
@@ -247,7 +204,17 @@ export const SingleExampleEvaluation = () => {
             } as PairwiseResult),
         )
       }
-      setResults(results)
+      setCurrentUseCase((previousCurrentUseCase) => {
+        if (previousCurrentUseCase !== null) {
+          return {
+            ...previousCurrentUseCase,
+            results,
+          }
+        } else {
+          return null
+        }
+      })
+
       removeToast(toastId)
     }
   }
@@ -286,29 +253,31 @@ export const SingleExampleEvaluation = () => {
   }, [setLastSavedUseCaseString, currentUseCaseString])
 
   const onSave = async () => {
+    if (currentUseCase === null) return
     const savedUseCase: StoredUseCase = await (
       await put('use_case/', {
         use_case: {
-          name,
+          name: currentUseCase.name,
           content: JSON.stringify({
-            context,
-            responses,
-            criteria,
-            results,
-            type,
-            pipeline: selectedPipeline,
+            context: currentUseCase.context,
+            responses: currentUseCase.responses,
+            criteria: currentUseCase.criteria,
+            results: currentUseCase.results,
+            type: currentUseCase.type,
+            pipeline: currentUseCase.pipeline,
+            expectedResults: currentUseCase.expectedResults,
           }),
           user_id: -1,
-          id: id,
+          id: currentUseCase.id,
         } as StoredUseCase,
         user: getUserName(),
       })
     ).json()
 
     const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
-
+    setCurrentUseCase(parsedSavedUseCase)
     // update use case in the use cases list
-    const i = userUseCases.findIndex((useCase) => useCase.id === id)
+    const i = userUseCases.findIndex((useCase) => useCase.id === currentUseCase.id)
     setUserUseCases([...userUseCases.slice(0, i), parsedSavedUseCase, ...userUseCases.slice(i + 1)])
 
     // update lastSavedUseCase
@@ -323,6 +292,7 @@ export const SingleExampleEvaluation = () => {
   }
 
   const onSaveAs = async (name: string, fromUseCase?: UseCase) => {
+    if (currentUseCase === null) return false
     const toSaveUseCase = fromUseCase ?? currentUseCase
     const res = await put('use_case/', {
       use_case: {
@@ -334,6 +304,7 @@ export const SingleExampleEvaluation = () => {
           results: toSaveUseCase.results,
           type: toSaveUseCase.type,
           pipeline: toSaveUseCase.pipeline,
+          expectedResults: toSaveUseCase.expectedResults,
         }),
         user_id: -1,
         id: -1,
@@ -353,8 +324,7 @@ export const SingleExampleEvaluation = () => {
     } else {
       const savedUseCase: StoredUseCase = await res.json()
       const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
-
-      // useCaseSelected will different from null when
+      // useCaseSelected will be different from null when
       // save as is done before switching from an unsaved
       // test case that has changes detected
       // if useCaseSelected is different from null
@@ -377,46 +347,38 @@ export const SingleExampleEvaluation = () => {
     return true
   }
 
+  useSaveShortcut({ onSave, isUseCaseSaved, changesDetected, setSaveUseCaseModalOpen })
+
   const onSetSelectedPipeline = async (pipeline: string) => {
-    setSelectedPipeline(pipeline)
-    // if (pipeline != selectedPipeline && results && results.length > 0)
-    //   setResults([])
+    if (currentUseCase === null) return
+    setCurrentUseCase({
+      ...currentUseCase,
+      pipeline,
+    })
   }
 
   const onDeleteUseCase = async () => {
-    await deleteCustom('use_case/', { use_case_id: id })
+    if (currentUseCase === null) return
+    await deleteCustom('use_case/', { use_case_id: currentUseCase.id })
 
     // notify the user
     addToast({
       kind: 'success',
-      title: `Deleted use case '${name}'`,
+      title: `Deleted use case '${currentUseCase.name}'`,
       timeout: 5000,
     })
 
-    setUserUseCases(userUseCases.filter((u) => u.id !== id))
+    setUserUseCases(userUseCases.filter((u) => u.id !== currentUseCase.id))
     changeUseCaseURL(null)
-
-    setShowingTestCase(false)
   }
 
   // update the state if the preloaded test case changes
   useEffect(() => {
     if (preloadedUseCase !== null) {
-      setUseCaseSelected(preloadedUseCase)
-      setId(preloadedUseCase.id)
-      setName(preloadedUseCase.name)
-      setType(preloadedUseCase.type)
-      setContext(preloadedUseCase.context)
-      setResponses(preloadedUseCase.responses)
-      setCriteria(preloadedUseCase.criteria)
-      setResults(preloadedUseCase.results)
-      setSelectedPipeline(preloadedUseCase.pipeline)
-      setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(preloadedUseCase))
-      setShowingTestCase(true)
       setUseCaseSelected(null)
+      setCurrentUseCase({ ...preloadedUseCase })
+      setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(preloadedUseCase))
       temporaryIdRef.current = uuid()
-    } else if (preloadedUseCase === null) {
-      setShowingTestCase(false)
     }
   }, [preloadedUseCase])
 
@@ -427,13 +389,13 @@ export const SingleExampleEvaluation = () => {
         setLibraryUseCaseSelected={setUseCaseSelected}
         userUseCases={userUseCases}
         changesDetected={changesDetected}
-        setCurrentUseCase={updateURLFromUseCase}
+        updateURLFromUseCase={updateURLFromUseCase}
         evaluationRunning={evaluationRunning}
         setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
       />
       <div className={cx(layoutClasses['main-content'], classes.body)}>
-        {!showingTestCase ? (
-          <Landing setNewUseCaseModalOpen={setNewUseCaseModalOpen} setCurrentUseCase={updateURLFromUseCase} />
+        {currentUseCase === null ? (
+          <Landing setNewUseCaseModalOpen={setNewUseCaseModalOpen} updateURLFromUseCase={updateURLFromUseCase} />
         ) : (
           <>
             <div
@@ -460,48 +422,76 @@ export const SingleExampleEvaluation = () => {
             <UseCaseOptions
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
-              testCaseName={name}
               isUseCaseSaved={isUseCaseSaved}
-              useCaseName={name}
+              useCaseName={currentUseCase.name}
               changesDetected={changesDetected}
-              type={type}
+              type={currentUseCase.type}
               onSave={onSave}
-              setUseCaseName={setName}
+              setUseCaseName={(name) =>
+                setCurrentUseCase((previousCurrentUseCase) =>
+                  previousCurrentUseCase !== null ? { ...previousCurrentUseCase, name } : null,
+                )
+              }
               setNewUseCaseModalOpen={setNewUseCaseModalOpen}
               setDeleteUseCaseModalOpen={setDeleteUseCaseModalOpen}
               setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
               setEditNameModalOpen={setEditNameModalOpen}
-              setCurrentUseCase={updateURLFromUseCase}
             />
             <CriteriaView
-              criteria={criteria}
-              setCriteria={setCriteria}
-              type={type}
+              criteria={currentUseCase.criteria}
+              setCriteria={(criteria) =>
+                setCurrentUseCase((previousCurrentUseCase) =>
+                  previousCurrentUseCase !== null ? { ...previousCurrentUseCase, criteria } : null,
+                )
+              }
+              type={currentUseCase.type}
               temporaryId={temporaryIdRef.current}
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
             />
             <PipelineSelect
-              type={type}
-              selectedPipeline={selectedPipeline}
+              type={currentUseCase.type}
+              selectedPipeline={currentUseCase.pipeline}
               setSelectedPipeline={onSetSelectedPipeline}
               style={{ marginBottom: '2rem' }}
             />
             <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>
               <strong>Test data</strong>
             </div>
-            <TestCaseContext context={context} setContext={setContext} />
+            <TestCaseContext
+              context={currentUseCase.context}
+              setContext={(context) =>
+                setCurrentUseCase((previousCurrentUseCase) =>
+                  previousCurrentUseCase !== null ? { ...previousCurrentUseCase, context } : null,
+                )
+              }
+            />
             <Responses
-              responses={responses}
-              setResponses={setResponses}
+              responses={currentUseCase.responses}
+              setResponses={(responses) =>
+                setCurrentUseCase((previousCurrentUseCase) =>
+                  previousCurrentUseCase !== null ? { ...previousCurrentUseCase, responses } : null,
+                )
+              }
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
-              type={type}
-              results={results}
-              setResults={setResults}
+              type={currentUseCase.type}
+              results={currentUseCase.results}
+              setExpectedResults={(expectedResults) =>
+                setCurrentUseCase((previousCurrentUseCase) =>
+                  previousCurrentUseCase !== null ? { ...previousCurrentUseCase, expectedResults } : null,
+                )
+              }
+              setResults={(results) =>
+                setCurrentUseCase((previousCurrentUseCase) =>
+                  previousCurrentUseCase !== null ? { ...previousCurrentUseCase, results } : null,
+                )
+              }
               evaluationRunning={evaluationRunning}
               setSelectedResultDetails={setSelectedResultDetails}
               setResultDetailsModalOpen={setResultDetailsModalOpen}
+              criteria={currentUseCase.criteria}
+              expectedResults={currentUseCase.expectedResults}
             />
 
             <EvaluateButton
@@ -511,7 +501,7 @@ export const SingleExampleEvaluation = () => {
               className={classes['left-padding']}
             />
 
-            {bamAPIKey === '' && !evaluationRunning && results === null && !evaluationFailed && (
+            {bamAPIKey === '' && !evaluationRunning && currentUseCase.results === null && !evaluationFailed && (
               <p className={`${classes['left-padding']} ${classes['api-key-reminder-text']}`}>
                 {'You will need to provide your BAM API key to run the evaluation'}
               </p>
@@ -519,58 +509,67 @@ export const SingleExampleEvaluation = () => {
           </>
         )}
       </div>
-      <SwitchUseCaseModal
-        setCurrentUseCase={updateURLFromUseCase}
-        open={confirmationModalOpen}
-        setOpen={setConfirmationModalOpen}
-        selectedUseCase={useCaseSelected}
-        currentUseCase={currentUseCase}
-        onSave={onSave}
-        setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
-        evaluationRunning={evaluationRunning}
-        setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
-        setLibraryUseCaseSelected={setUseCaseSelected}
-      />
-      <SaveAsUseCaseModal
-        type={type}
-        open={saveUseCaseModalOpen}
-        setOpen={setSaveUseCaseModalOpen}
-        onSaveAs={onSaveAs}
-      />
-      <NewUseCaseModal
-        open={newUseCaseModalOpen}
-        setOpen={setNewUseCaseModalOpen}
-        changesDetected={changesDetected}
-        setCurrentUseCase={updateURLFromUseCase}
-      />
-      <DeleteUseCaseModal
-        open={deleteUseCaseModalOpen}
-        setOpen={setDeleteUseCaseModalOpen}
-        onDeleteUseCase={onDeleteUseCase}
-        useCaseName={name}
-      />
-      <EditUseCaseNameModal
-        open={editNameModalOpen}
-        setOpen={setEditNameModalOpen}
-        name={name}
-        setName={setName}
-        userUseCases={userUseCases}
-        setUserUseCases={setUserUseCases}
-      />
-      <EvaluationRunningModal
-        open={evaluationRunningModalOpen}
-        setOpen={setEvaluationRunningModalOpen}
-        setCurrentUseCase={updateURLFromUseCase}
-        selectedUseCase={useCaseSelected}
-        setConfirmationModalOpen={setConfirmationModalOpen}
-        changesDetected={changesDetected}
-      />
-      <ResultDetailsModal
-        open={resultDetailsModalOpen}
-        setOpen={setResultDetailsModalOpen}
-        selectedResultDetails={selectedResultDetails}
-        setSelectedResultDetails={setSelectedResultDetails}
-      />
+      {currentUseCase !== null && (
+        <>
+          <SwitchUseCaseModal
+            setCurrentUseCase={updateURLFromUseCase}
+            open={confirmationModalOpen}
+            setOpen={setConfirmationModalOpen}
+            selectedUseCase={useCaseSelected}
+            currentUseCase={currentUseCase}
+            onSave={onSave}
+            setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
+            evaluationRunning={evaluationRunning}
+            setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
+            setLibraryUseCaseSelected={setUseCaseSelected}
+          />
+          <SaveAsUseCaseModal
+            type={currentUseCase.type}
+            open={saveUseCaseModalOpen}
+            setOpen={setSaveUseCaseModalOpen}
+            onSaveAs={onSaveAs}
+          />
+          <NewUseCaseModal
+            open={newUseCaseModalOpen}
+            setOpen={setNewUseCaseModalOpen}
+            changesDetected={changesDetected}
+            setCurrentUseCase={updateURLFromUseCase}
+          />
+          <DeleteUseCaseModal
+            open={deleteUseCaseModalOpen}
+            setOpen={setDeleteUseCaseModalOpen}
+            onDeleteUseCase={onDeleteUseCase}
+            useCaseName={currentUseCase.name}
+          />
+          <EditUseCaseNameModal
+            open={editNameModalOpen}
+            setOpen={setEditNameModalOpen}
+            name={currentUseCase.name}
+            setName={(name) =>
+              setCurrentUseCase((previousCurrentUseCase) =>
+                previousCurrentUseCase !== null ? { ...previousCurrentUseCase, name } : null,
+              )
+            }
+            userUseCases={userUseCases}
+            setUserUseCases={setUserUseCases}
+          />
+          <EvaluationRunningModal
+            open={evaluationRunningModalOpen}
+            setOpen={setEvaluationRunningModalOpen}
+            setCurrentUseCase={updateURLFromUseCase}
+            selectedUseCase={useCaseSelected}
+            setConfirmationModalOpen={setConfirmationModalOpen}
+            changesDetected={changesDetected}
+          />
+          <ResultDetailsModal
+            open={resultDetailsModalOpen}
+            setOpen={setResultDetailsModalOpen}
+            selectedResultDetails={selectedResultDetails}
+            setSelectedResultDetails={setSelectedResultDetails}
+            type={currentUseCase.type}
+          />
+        </>
+      )}
     </>
   )
 }

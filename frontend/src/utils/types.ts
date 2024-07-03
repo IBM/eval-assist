@@ -45,7 +45,8 @@ export interface UseCase {
   context: string
   responses: string[]
   criteria: RubricCriteria | PairwiseCriteria
-  results: (RubricResult | PairwiseResult)[] | null
+  results: RubricResult[] | PairwiseResult[] | null
+  expectedResults: null | string[]
   pipeline: string | null
 }
 

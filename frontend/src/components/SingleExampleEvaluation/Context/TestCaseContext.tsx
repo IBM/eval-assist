@@ -6,7 +6,7 @@ import classes from '../SingleExampleEvaluation.module.scss'
 
 interface Props {
   context: string
-  setContext: (value: SetStateAction<string>) => void
+  setContext: (context: string) => void
 }
 
 export const TestCaseContext = ({ context, setContext }: Props) => {

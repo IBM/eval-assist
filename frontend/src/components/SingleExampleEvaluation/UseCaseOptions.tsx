@@ -10,7 +10,6 @@ import classes from './UseCaseOptions.module.scss'
 interface UseCaseOptionsProps {
   style?: CSSProperties
   className?: string
-  testCaseName: string
   isUseCaseSaved: boolean
   useCaseName: string
   type: PipelineType
@@ -18,10 +17,9 @@ interface UseCaseOptionsProps {
   onSave: () => Promise<void>
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   setDeleteUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  setUseCaseName: Dispatch<SetStateAction<string>>
+  setUseCaseName: (name: string) => void
   setEditNameModalOpen: Dispatch<SetStateAction<boolean>>
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  setCurrentUseCase: (useCase: UseCase) => void
 }
 
 export const UseCaseOptions = ({
