@@ -67,6 +67,7 @@ export const Responses = ({
               [classes.tableRowWithExpectedResult]: expectedResultOn,
               [classes.tableRowWithResults]: results !== null && !evaluationRunning,
               [classes.tableRowWithExplanation]: results !== null && !evaluationRunning && explanationOn,
+              [classes.noBorderBottom]: pairwiseWinnerIndex === 0,
             })}
           >
             <strong className={cx(classes.blockElement, classes.headerBlock, classes.headerTypography)}>

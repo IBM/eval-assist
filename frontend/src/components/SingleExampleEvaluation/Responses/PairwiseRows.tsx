@@ -65,6 +65,7 @@ export const PairwiseRows = ({
             [classes.tableRowWithResults]: results !== null && !evaluationRunning,
             [classes.tableRowWithExplanation]: results !== null && !evaluationRunning && explanationOn,
             [classes.winnerResponseOutline]: !evaluationRunning && i === pairwiseWinnerIndex,
+            [classes.noBorderBottom]: pairwiseWinnerIndex === 1,
           })}
         >
           <FlexTextArea
@@ -87,24 +88,6 @@ export const PairwiseRows = ({
                 checked={expectedResults !== null && expectedResults[i] === 'Winner'}
                 onChange={() => setExpectedResults([i === 0 ? 'Winner' : '', i === 0 ? '' : 'Winner'])}
               />
-              {/* <Select
-                id={`select-2`}
-                noLabel
-                value={expectedResults !== null && expectedResults[i] !== '' ? expectedResults[i] : ''}
-                onChange={(e) => {
-                  expectedResults !== null &&
-                    setExpectedResults([
-                      ...expectedResults.slice(0, i),
-                      e.target.value,
-                      ...expectedResults.slice(i + 1),
-                    ])
-                }}
-              >
-                <SelectItem key={i} value={''} text={''} />
-                {['Loser', 'Winner'].map((option, i) => (
-                  <SelectItem key={i} text={option} value={option} />
-                ))}
-              </Select> */}
             </div>
           )}
           {results !== null && !evaluationRunning && (
@@ -130,9 +113,6 @@ export const PairwiseRows = ({
                     >
                       {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
                     </div>
-                    {pairwiseWinnerIndex === i && results[0].positionalBias && (
-                      <div className={cx(classes.positionalBias)}>Positional bias</div>
-                    )}
                     {pairwiseWinnerIndex === i && results[0] && (
                       <div
                         className={cx({

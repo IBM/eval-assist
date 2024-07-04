@@ -66,6 +66,10 @@ $columns-4: 3fr 1fr 1fr 2fr;
       height: 100%;
     }
   }
+
+  &.noBorderBottom {
+    border-bottom: 0;
+  }
 }
 
 .headerRow {
