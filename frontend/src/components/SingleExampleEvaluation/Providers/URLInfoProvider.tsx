@@ -78,7 +78,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     if (pu !== null && !pu.expectedResults) {
       pu = {
         ...pu,
-        expectedResults: returnByPipelineType(pu.type, new Array(pu.responses.length).fill(''), ['', '']),
+        expectedResults: returnByPipelineType(pu.type, new Array(pu.responses.length).fill(''), ['none', 'none']),
       }
     }
 

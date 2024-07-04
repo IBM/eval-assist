@@ -122,10 +122,6 @@ $columns-4: 3fr 1fr 1fr 2fr;
   }
 }
 
-.headerDarkColor {
-  background-color: $field;
-}
-
 .headerBlock {
   padding: rem(11px) 0 rem(11px) rem(11px);
   background-color: $field-hover-01;
@@ -210,11 +206,7 @@ $columns-4: 3fr 1fr 1fr 2fr;
 .winnerResponseOutline {
   border: 1px solid $support-success !important;
   border-radius: 1px;
-
-  // &.responsesRow {
-  //   border-bottom: 0;
-  //   border-top: 0;
-  // }
+  background-color: green !important;
 
   .blockElement {
     border-top: 0;

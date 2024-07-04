@@ -55,6 +55,15 @@ export const PairwiseRows = ({
     }
   }
 
+  const onCheckboxClick = (i: number) => {
+    const isChecked = expectedResults !== null && expectedResults[i] === 'Winner'
+    if (isChecked) {
+      setExpectedResults(['none', 'none'])
+    } else {
+      setExpectedResults([i === 0 ? 'Winner' : '', i === 0 ? '' : 'Winner'])
+    }
+  }
+
   return (
     <>
       {responses?.map((response, i) => (
@@ -86,7 +95,7 @@ export const PairwiseRows = ({
                 id={`checkbox-${i}`}
                 labelText="Winner"
                 checked={expectedResults !== null && expectedResults[i] === 'Winner'}
-                onChange={() => setExpectedResults([i === 0 ? 'Winner' : '', i === 0 ? '' : 'Winner'])}
+                onChange={() => onCheckboxClick(i)}
               />
             </div>
           )}
@@ -108,7 +117,9 @@ export const PairwiseRows = ({
                         [classes.resultBlockDefaultCursor]: results === null || results[0] === undefined,
                         [classes.untrastedResultTypography]:
                           (results !== null && 'positionalBias' in results && results[0].positionalBias) ||
-                          (expectedResults !== null && expectedResults[i] !== 'Winner'),
+                          (expectedResults !== null &&
+                            expectedResults[i] !== 'none' &&
+                            expectedResults[i] !== 'Winner'),
                       })}
                     >
                       {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
@@ -123,7 +134,7 @@ export const PairwiseRows = ({
                         {results[0].positionalBias ? 'Positional bias detected' : 'No positional bias'}
                       </div>
                     )}
-                    {expectedResults !== null && i === pairwiseWinnerIndex && (
+                    {expectedResults !== null && expectedResults[i] !== 'none' && i === pairwiseWinnerIndex && (
                       <div
                         className={cx(classes.resultBlockTypography, {
                           [classes.untrastedResultTypography]: getResultToDisplay(i) !== expectedResults[i],
