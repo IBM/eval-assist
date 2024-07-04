@@ -58,16 +58,31 @@ export const Responses = ({
     return (results[0] as PairwiseResult).winnerIndex
   }, [results, type])
 
+  const gridClasses = useMemo(
+    () => ({
+      [classes.columns1]: !expectedResultOn && (results === null || evaluationRunning),
+      [classes.columns2]:
+        !explanationOn &&
+        ((expectedResultOn && (results === null || evaluationRunning)) ||
+          (!expectedResultOn && results !== null && !evaluationRunning)),
+      [classes.columns3var1]: expectedResultOn && results !== null && !evaluationRunning && !explanationOn,
+      [classes.columns3var2]: !expectedResultOn && results !== null && !evaluationRunning && explanationOn,
+      [classes.columns4]: expectedResultOn && results !== null && !evaluationRunning && explanationOn,
+    }),
+    [evaluationRunning, expectedResultOn, explanationOn, results],
+  )
+
+  console.log('gridClasses')
+  console.log(gridClasses)
+
   return (
     <div style={style} className={className}>
       <div className={classes.content}>
         <div className={cx(classes.innerContainer)}>
           <div
             className={cx(classes.tableRow, classes.headerRow, {
-              [classes.tableRowWithExpectedResult]: expectedResultOn,
-              [classes.tableRowWithResults]: results !== null && !evaluationRunning,
-              [classes.tableRowWithExplanation]: results !== null && !evaluationRunning && explanationOn,
               [classes.noBorderBottom]: pairwiseWinnerIndex === 0,
+              ...gridClasses,
             })}
           >
             <strong className={cx(classes.blockElement, classes.headerBlock, classes.headerTypography)}>
@@ -104,6 +119,7 @@ export const Responses = ({
               criteria={criteria as RubricCriteria}
               expectedResults={expectedResults}
               setExpectedResults={setExpectedResults}
+              gridClasses={gridClasses}
             />,
             <PairwiseRows
               responses={responses}
@@ -117,6 +133,7 @@ export const Responses = ({
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               pairwiseWinnerIndex={pairwiseWinnerIndex}
               evaluationRunning={evaluationRunning}
+              gridClasses={gridClasses}
             />,
           )}
         </div>

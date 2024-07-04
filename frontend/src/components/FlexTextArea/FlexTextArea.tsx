@@ -16,7 +16,7 @@ type Props = {
 } & ComponentProps<typeof TextArea>
 
 export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function FlexTextArea(
-  { helperText, className, maxInactiveHeight = 120, onBlur, fixMaxHeight, ...props },
+  { helperText, className, maxInactiveHeight = 125, onBlur, fixMaxHeight, ...props },
   outsideRef,
 ) {
   const [isFocused, setFocused] = useState(false)

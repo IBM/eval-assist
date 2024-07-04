@@ -51,8 +51,10 @@ $columns-4: 3fr 1fr 1fr 2fr;
 }
 
 .tableRow {
-  width: 100%;
+  overflow-y: hidden;
+  max-width: 100%;
   display: grid;
+  // transition: grid-template-columns $duration-fast-01 motion(standard, productive);
 
   .blockElement {
     border-radius: 0;
@@ -82,29 +84,50 @@ $columns-4: 3fr 1fr 1fr 2fr;
   border-bottom: 1px solid $border-subtle-01;
 }
 
-.tableRow.tableRowWithExpectedResult {
-  &:not(.tableRowWithResults.tableRowWithExplanation) {
-    grid-template-columns: $columns-2;
-  }
-  &.tableRowWithResults:not(.tableRowWithExplanation) {
-    grid-template-columns: $columns-3-var1;
-  }
-  &.tableRowWithExplanation.tableRowWithResults {
-    grid-template-columns: $columns-4;
-  }
+.columns1 {
+  grid-template-columns: $columns-1;
 }
 
-.tableRow:not(.tableRowWithExpectedResult) {
-  &:not(.tableRowWithResults.tableRowWithExplanation) {
-    grid-template-columns: $columns-1;
-  }
-  &.tableRowWithResults:not(.tableRowWithExplanation) {
-    grid-template-columns: $columns-2;
-  }
-  &.tableRowWithExplanation.tableRowWithResults {
-    grid-template-columns: $columns-3-var2;
-  }
+.columns2 {
+  grid-template-columns: $columns-2;
 }
+
+.columns3var1 {
+  grid-template-columns: $columns-3-var1;
+}
+
+.columns3var2 {
+  grid-template-columns: $columns-3-var2;
+}
+
+.columns4 {
+  grid-template-columns: $columns-4;
+}
+
+// .tableRow.tableRowWithExpectedResult {
+//   &:not(.tableRowWithResults.tableRowWithExplanation) {
+//     // transition: grid-template-columns $duration-slow-02 motion(standard, productive);
+//     grid-template-columns: $columns-2;
+//   }
+//   &.tableRowWithResults:not(.tableRowWithExplanation) {
+//     grid-template-columns: $columns-3-var1;
+//   }
+//   &.tableRowWithExplanation.tableRowWithResults {
+//     grid-template-columns: $columns-4;
+//   }
+// }
+
+// .tableRow:not(.tableRowWithExpectedResult) {
+//   &:not(.tableRowWithResults.tableRowWithExplanation) {
+//     grid-template-columns: $columns-1;
+//   }
+//   &.tableRowWithResults:not(.tableRowWithExplanation) {
+//     grid-template-columns: $columns-2;
+//   }
+//   &.tableRowWithExplanation.tableRowWithResults {
+//     grid-template-columns: $columns-3-var2;
+//   }
+// }
 
 .addResponseBlock {
   display: flex;

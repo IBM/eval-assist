@@ -27,6 +27,9 @@ interface Props {
   setExpectedResults: (expectedResults: UseCase['expectedResults']) => void
   expectedResults: UseCase['expectedResults']
   setResults: (results: UseCase['results']) => void
+  gridClasses: {
+    [x: string]: boolean
+  }
 }
 
 export const RubricRows = ({
@@ -42,6 +45,7 @@ export const RubricRows = ({
   expectedResults,
   setExpectedResults,
   setResults,
+  gridClasses,
 }: Props) => {
   const onResultBlockClick = (i: number) => {
     if (results !== null && results[i] !== undefined) {
@@ -79,9 +83,7 @@ export const RubricRows = ({
             <div
               key={i}
               className={cx(classes.tableRow, classes.responsesRow, {
-                [classes.tableRowWithExpectedResult]: expectedResultOn,
-                [classes.tableRowWithResults]: results !== null && !evaluationRunning,
-                [classes.tableRowWithExplanation]: results !== null && !evaluationRunning && explanationOn,
+                ...gridClasses,
               })}
             >
               {/* Response */}
@@ -188,7 +190,7 @@ export const RubricRows = ({
                   </div>
 
                   {/* Explanation */}
-                  {results !== null && !evaluationRunning && explanationOn && (
+                  {explanationOn && (
                     <FlexTextArea
                       readOnly
                       value={results[i] !== undefined ? results[i].explanation : undefined}

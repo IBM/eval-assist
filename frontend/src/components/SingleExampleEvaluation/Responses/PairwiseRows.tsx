@@ -24,6 +24,9 @@ interface Props {
   evaluationRunning: boolean
   expectedResults: UseCase['expectedResults']
   setExpectedResults: (expectedResults: UseCase['expectedResults']) => void
+  gridClasses: {
+    [x: string]: boolean
+  }
 }
 
 export const PairwiseRows = ({
@@ -38,6 +41,7 @@ export const PairwiseRows = ({
   expectedResultOn,
   expectedResults,
   setExpectedResults,
+  gridClasses,
 }: Props) => {
   const onResultBlockClick = (i: number) => {
     if (results !== null && results[0] !== undefined && pairwiseWinnerIndex === i) {
@@ -70,11 +74,9 @@ export const PairwiseRows = ({
         <div
           key={i}
           className={cx(classes.tableRow, classes.responsesRow, {
-            [classes.tableRowWithExpectedResult]: expectedResultOn,
-            [classes.tableRowWithResults]: results !== null && !evaluationRunning,
-            [classes.tableRowWithExplanation]: results !== null && !evaluationRunning && explanationOn,
             [classes.winnerResponseOutline]: !evaluationRunning && i === pairwiseWinnerIndex,
             [classes.noBorderBottom]: pairwiseWinnerIndex === 1,
+            ...gridClasses,
           })}
         >
           <FlexTextArea
@@ -157,7 +159,7 @@ export const PairwiseRows = ({
                   )}
                 </div>
               </div>
-              {explanationOn && !evaluationRunning && (
+              {explanationOn && (
                 <FlexTextArea
                   readOnly
                   value={results[0] !== undefined && pairwiseWinnerIndex === i ? results[0].explanation : undefined}
