@@ -62,18 +62,13 @@ export const Responses = ({
     () => ({
       [classes.columns1]: !expectedResultOn && (results === null || evaluationRunning),
       [classes.columns2]:
-        !explanationOn &&
-        ((expectedResultOn && (results === null || evaluationRunning)) ||
-          (!expectedResultOn && results !== null && !evaluationRunning)),
+        (!explanationOn && results !== null && !expectedResultOn) || (expectedResultOn && results === null),
       [classes.columns3var1]: expectedResultOn && results !== null && !evaluationRunning && !explanationOn,
       [classes.columns3var2]: !expectedResultOn && results !== null && !evaluationRunning && explanationOn,
       [classes.columns4]: expectedResultOn && results !== null && !evaluationRunning && explanationOn,
     }),
     [evaluationRunning, expectedResultOn, explanationOn, results],
   )
-
-  console.log('gridClasses')
-  console.log(gridClasses)
 
   return (
     <div style={style} className={className}>
