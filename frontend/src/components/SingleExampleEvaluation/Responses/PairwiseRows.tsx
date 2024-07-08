@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { Checkbox, Link, Select, SelectItem } from '@carbon/react'
+import { Checkbox, Link, RadioButton, Select, SelectItem } from '@carbon/react'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
@@ -60,6 +60,7 @@ export const PairwiseRows = ({
   }
 
   const onCheckboxClick = (i: number) => {
+    // this onclick event is not triggered by radiobutton if the option is already selected
     const isChecked = expectedResults !== null && expectedResults[i] === 'Winner'
     if (isChecked) {
       setExpectedResults(['none', 'none'])
@@ -67,6 +68,8 @@ export const PairwiseRows = ({
       setExpectedResults([i === 0 ? 'Winner' : '', i === 0 ? '' : 'Winner'])
     }
   }
+
+  console.log(expectedResults)
 
   return (
     <>
@@ -93,7 +96,7 @@ export const PairwiseRows = ({
           {/* Expected result */}
           {expectedResultOn && (
             <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1}>
-              <Checkbox
+              <RadioButton
                 id={`checkbox-${i}`}
                 labelText="Winner"
                 checked={expectedResults !== null && expectedResults[i] === 'Winner'}
