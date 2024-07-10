@@ -5,47 +5,47 @@
     "type": "rubric",
     "dataset": {
         "name": "Feedback Collection",
-        "description": "loren ipsum"
+        "description": ""
     },
     "tags": [],
     "criteriaBenchmarks": [
         {
-            "name": "Overall",
+            "name": "Instruction",
             "evaluatorBenchmarks": [
-                {
-                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.476,
-                        "p_bias": 0.157,
-                        "pearson": 0.77
-                    }
-                },
-                {
-                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.422,
-                        "p_bias": 0.44,
-                        "pearson": 0.764
-                    }
-                },
                 {
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.361,
-                        "p_bias": 0.014,
-                        "pearson": 0.692
+                        "agreement": 0.369,
+                        "p_bias": 0.021,
+                        "pearson": 0.668
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.434,
+                        "p_bias": 0.134,
+                        "pearson": 0.729
                     }
                 },
                 {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.329,
-                        "p_bias": 0.109,
-                        "pearson": 0.558
+                        "agreement": 0.332,
+                        "p_bias": 0.159,
+                        "pearson": 0.537
+                    }
+                },
+                {
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.432,
+                        "p_bias": 0.444,
+                        "pearson": 0.735
                     }
                 }
             ]

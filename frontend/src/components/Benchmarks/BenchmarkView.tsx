@@ -52,7 +52,7 @@ export const BenchmarkView = () => {
               <h4 className={classes.benchmarkDescriptionTitle}>Description</h4>
               <p className={classes.benchmarkDescription}>{benchmark.description}</p>
               <br></br>
-              {benchmark.link !== undefined && (
+              {benchmark.link && (
                 <a className={classes.benchmarkLink} href={benchmark.link} target="_blank" rel="noopener noreferrer">
                   {benchmark.link}
                 </a>

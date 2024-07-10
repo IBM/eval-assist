@@ -5,7 +5,7 @@
     "type": "pairwise",
     "dataset": {
         "name": "TruthfulQA",
-        "description": "loren ipsum"
+        "description": ""
     },
     "tags": [],
     "criteriaBenchmarks": [
@@ -13,39 +13,39 @@
             "name": "Truthfulness",
             "evaluatorBenchmarks": [
                 {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.743,
+                        "p_bias": 0.018,
+                        "pearson": 0.489
+                    }
+                },
+                {
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.918,
-                        "p_bias": 0.03,
-                        "pearson": 0.847
+                        "agreement": 0.853,
+                        "p_bias": 0.013,
+                        "pearson": 0.709
                     }
                 },
                 {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.878,
-                        "p_bias": 0.02,
-                        "pearson": 0.755
+                        "agreement": 0.808,
+                        "p_bias": 0.011,
+                        "pearson": 0.617
                     }
                 },
                 {
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.844,
+                        "agreement": 0.742,
                         "p_bias": 0.23,
-                        "pearson": 0.687
-                    }
-                },
-                {
-                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.804,
-                        "p_bias": 0.03,
-                        "pearson": 0.61
+                        "pearson": 0.49
                     }
                 }
             ]

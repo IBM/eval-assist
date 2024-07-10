@@ -1,73 +1,83 @@
 {
     "name": "Reliance Study",
     "description": "The dataset comes from a study aimed at measuring reliance on Large Language Models (LLMs) output across various tasks. Our study employed a controlled experiment design to investigate how different cognitive forcing functions affect users editing behavior concerning accuracy and naturalness of LLM outputs, including the impact of hallucinations in responses. The LLM has to decide whether the response meets the criteria.",
+    "link": "",
     "type": "rubric",
     "dataset": {
         "name": "Reliance Study",
-        "description": "This repository contains datasets and analysis from a study aimed at measuring reliance on Large Language Models (LLMs) output across various tasks. The study employed a controlled experiment design to investigate how different cognitive forcing functions (CFFs) affect users editing behavior concerning accuracy and naturalness of LLM outputs, including the impact of hallucinations in responses."
+        "description": ""
     },
     "tags": [],
     "criteriaBenchmarks": [
         {
-            "name": "Irrelevant information",
+            "name": "Relevance",
             "evaluatorBenchmarks": [
-                {
-                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.735,
-                        "p_bias": 0.032,
-                        "pearson": 0.325
-                    }
-                },
                 {
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.629,
-                        "p_bias": 0.031,
-                        "pearson": 0.002
+                        "agreement": 0.447,
+                        "p_bias": 0.004,
+                        "pearson": 0.157
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.75,
+                        "p_bias": 0.077,
+                        "pearson": 0.224
                     }
                 },
                 {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.561,
-                        "p_bias": 0,
-                        "pearson": 0.183
+                        "agreement": 0.56,
+                        "p_bias": 0.003,
+                        "pearson": 0.099
                     }
                 },
                 {
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.375,
-                        "p_bias": 0.188,
-                        "pearson": -0.041
+                        "agreement": 0.404,
+                        "p_bias": 0.237,
+                        "pearson": 0.116
                     }
                 }
             ]
         },
         {
-            "name": "Addressing",
+            "name": "Customer-Agent Interaction",
             "evaluatorBenchmarks": [
                 {
-                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.798,
-                        "p_bias": 0,
-                        "pearson": 0.183
+                        "agreement": 0.658,
+                        "p_bias": 0.008,
+                        "pearson": 0.156
                     }
                 },
                 {
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.722,
-                        "p_bias": 0.055,
-                        "pearson": 0.325
+                        "agreement": 0.725,
+                        "p_bias": 0.049,
+                        "pearson": 0.14
+                    }
+                },
+                {
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.789,
+                        "p_bias": 0.004,
+                        "pearson": 0.104
                     }
                 },
                 {
@@ -75,31 +85,40 @@
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
                         "agreement": 0.513,
-                        "p_bias": 0.188,
-                        "pearson": -0.041
-                    }
-                },
-                {
-                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.485,
-                        "p_bias": 0.013,
-                        "pearson": 0.002
+                        "p_bias": 0.184,
+                        "pearson": 0.14
                     }
                 }
             ]
         },
         {
-            "name": "Conversational",
+            "name": "Conversation",
             "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.39,
+                        "p_bias": 0.173,
+                        "pearson": 0.09
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.166,
+                        "p_bias": 0.048,
+                        "pearson": 0.04
+                    }
+                },
                 {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.444,
+                        "agreement": 0.426,
                         "p_bias": 0,
-                        "pearson": 0.183
+                        "pearson": 0.216
                     }
                 },
                 {
@@ -107,26 +126,8 @@
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
                         "agreement": 0.148,
-                        "p_bias": 0.064,
-                        "pearson": -0.041
-                    }
-                },
-                {
-                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.140,
-                        "p_bias": 0.028,
-                        "pearson": 0.325
-                    }
-                },
-                {
-                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.136,
-                        "p_bias": 0.02,
-                        "pearson": 0.002
+                        "p_bias": 0.065,
+                        "pearson": 0.05
                     }
                 }
             ]
@@ -135,39 +136,39 @@
             "name": "Naturalness",
             "evaluatorBenchmarks": [
                 {
-                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.771,
-                        "p_bias": 0,
-                        "pearson": 0.183
+                        "agreement": 0.283,
+                        "p_bias": 0.099,
+                        "pearson": -0.112
                     }
                 },
                 {
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.257,
-                        "p_bias": 0.095,
-                        "pearson": 0.325
+                        "agreement": 0.18,
+                        "p_bias": 0.02,
+                        "pearson": 0.051
+                    }
+                },
+                {
+                    "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.761,
+                        "p_bias": 0,
+                        "pearson": 0.194
                     }
                 },
                 {
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.213,
-                        "p_bias": 0.127,
-                        "pearson": -0.041
-                    }
-                },
-                {
-                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.133,
-                        "p_bias": 0.029,
-                        "pearson": 0.002
+                        "agreement": 0.216,
+                        "p_bias": 0.131,
+                        "pearson": 0.053
                     }
                 }
             ]
@@ -176,39 +177,39 @@
             "name": "Information from the reference document",
             "evaluatorBenchmarks": [
                 {
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.875,
+                        "p_bias": 0.295,
+                        "pearson": 0.145
+                    }
+                },
+                {
                     "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.907,
-                        "p_bias": 0.02,
-                        "pearson": 0.325
+                        "agreement": 0.888,
+                        "p_bias": 0.023,
+                        "pearson": 0.525
                     }
                 },
                 {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.868,
+                        "agreement": 0.875,
                         "p_bias": 0.004,
-                        "pearson": 0.183
-                    }
-                },
-                {
-                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.827,
-                        "p_bias": 0.18,
-                        "pearson": 0.002
+                        "pearson": 0.326
                     }
                 },
                 {
                     "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.539,
-                        "p_bias": 0.145,
-                        "pearson": -0.041
+                        "agreement": 0.54,
+                        "p_bias": 0.144,
+                        "pearson": 0.197
                     }
                 }
             ]
@@ -217,39 +218,39 @@
             "name": "Information outside of the reference document",
             "evaluatorBenchmarks": [
                 {
-                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.892,
-                        "p_bias": 0.017,
-                        "pearson": 0.325
-                    }
-                },
-                {
-                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
-                    "laaj_version": "v0.0.7-alpha",
-                    "results": {
-                        "agreement": 0.794,
-                        "p_bias": 0.181,
-                        "pearson": -0.041
-                    }
-                },
-                {
                     "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.601,
-                        "p_bias": 0.126,
-                        "pearson": 0.002
+                        "agreement": 0.349,
+                        "p_bias": 0.003,
+                        "pearson": 0.164
+                    }
+                },
+                {
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.885,
+                        "p_bias": 0.033,
+                        "pearson": 0.578
                     }
                 },
                 {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.368,
-                        "p_bias": 0.004,
-                        "pearson": 0.183
+                        "agreement": 0.417,
+                        "p_bias": 0.005,
+                        "pearson": 0.13
+                    }
+                },
+                {
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "laaj_version": "v0.0.7-alpha",
+                    "results": {
+                        "agreement": 0.799,
+                        "p_bias": 0.181,
+                        "pearson": 0.168
                     }
                 }
             ]

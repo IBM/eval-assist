@@ -69,8 +69,6 @@ export const PairwiseRows = ({
     }
   }
 
-  console.log(expectedResults)
-
   return (
     <>
       {responses?.map((response, i) => (

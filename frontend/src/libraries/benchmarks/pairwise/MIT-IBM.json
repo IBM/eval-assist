@@ -1,10 +1,11 @@
 {
     "name": "MIT-IBM",
-    "description": "This dataset accompanies the paper \"What Leads to Successful Human-AI Collaboration? Prompt Guidance for Human Agents Using Conversational AI for Customer Support\". It explores the dynamics of human-AI interaction within customer support scenarios, focusing on improving collaborative efficiency through various configurations.\n\nThe dataset contains questions (specific to a set reference documents) and pairs of responses. Participants chose their preferred response based on a natural language criteria. In the benchmark we replace the human participant with an LLM and calculate performance relative to the original human preferences.\". It explores the dynamics of human-AI interaction within customer support scenarios, focusing on improving collaborative efficiency through various configurations. The dataset contains questions (specific to a set reference documents) and pairs of responses. Participants chose their preferred response based on a natural language criteria. In the benchmark we replace the human participant with an LLM and calculate performance relative to the original human preferences.",
+    "description": "This dataset accompanies the paper \"What Leads to Successful Human-AI Collaboration? Prompt Guidance for Human Agents Using Conversational AI for Customer Support\". It explores the dynamics of human-AI interaction within customer support scenarios, focusing on improving collaborative efficiency through various configurations.\n\nThe dataset contains questions (specific to a set reference documents) and pairs of responses. Participants chose their preferred response based on a natural language criteria. In the benchmark we replace the human participant with an LLM and calculate performance relative to the original human preferences. It explores the dynamics of human-AI interaction within customer support scenarios, focusing on improving collaborative efficiency through various configurations.",
+    "link": "",
     "type": "pairwise",
     "dataset": {
         "name": "MIT-IBM",
-        "description": "This dataset accompanies the paper \"What Leads to Successful Human-AI Collaboration? Prompt Guidance for Human Agents Using Conversational AI for Customer Support\". It explores the dynamics of human-AI interaction within customer support scenarios, focusing on improving collaborative efficiency through various configurations."
+        "description": ""
     },
     "tags": [],
     "criteriaBenchmarks": [
@@ -12,39 +13,39 @@
             "name": "Overall",
             "evaluatorBenchmarks": [
                 {
-                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
+                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.727,
-                        "p_bias": 0.008,
-                        "pearson": 0.434
+                        "agreement": 0.703,
+                        "p_bias": 0.007,
+                        "pearson": 0.384
                     }
                 },
                 {
-                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
+                    "evaluator_id": "meta-llama/llama-3-70b-instruct",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.708,
-                        "p_bias": 0.225,
-                        "pearson": 0.396
+                        "agreement": 0.725,
+                        "p_bias": 0.005,
+                        "pearson": 0.431
                     }
                 },
                 {
                     "evaluator_id": "mistralai/mixtral-8x7b-instruct-v01",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.708,
+                        "agreement": 0.711,
                         "p_bias": 0.003,
-                        "pearson": 0.395
+                        "pearson": 0.405
                     }
                 },
                 {
-                    "evaluator_id": "meta-llama/llama-3-8b-instruct",
+                    "evaluator_id": "kaist-ai/prometheus-8x7b-v2",
                     "laaj_version": "v0.0.7-alpha",
                     "results": {
-                        "agreement": 0.681,
-                        "p_bias": 0.003,
-                        "pearson": 0.334
+                        "agreement": 0.716,
+                        "p_bias": 0.231,
+                        "pearson": 0.413
                     }
                 }
             ]
