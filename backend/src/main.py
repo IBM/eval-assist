@@ -1,8 +1,10 @@
+import importlib
 from io import StringIO
 from typing import Optional
 from fastapi import FastAPI, status, UploadFile, HTTPException, APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+import pkg_resources
 from pydantic import BaseModel
 
 from .utils import log_runtime
@@ -15,6 +17,7 @@ from prisma.models import StoredUseCase
 from prisma.errors import PrismaError
 from llmasajudge.evaluators import RubricCriteria, PairwiseCriteria
 from llmasajudge.evaluators import PairwiseEvaluator, RubricEvaluator, list_pairwise, list_rubric, PAIRWISE_TYPE, RUBRIC_TYPE
+from llmasajudge.benchmark.utils import get_all_benchmarks
 from genai.exceptions import ApiResponseException, ApiNetworkException
 import os
 import json
@@ -336,5 +339,13 @@ def create_user_if_not_exist(user: CreateUserPostBody):
         print(f'Prisma error raised: {pe}')
         return None
     
+
+
+@router.get("/benchmarks/")
+def get_benchmarks():
+    # version = pkg_resources.get_distribution("llmasajudge").version
+    # print(version)
+    json_data = get_all_benchmarks()
+    return json_data
 
 app.include_router(router)
