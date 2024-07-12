@@ -105,7 +105,8 @@ export class Version {
   }
 
   valueOf() {
-    return this.version
+    const version = this.version.startsWith('v') ? this.version.substring(1) : this.version
+    return version
       .split('.')
       .map((versionSection) => {
         return '0'.repeat(2 - versionSection.length) + versionSection

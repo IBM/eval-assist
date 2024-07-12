@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react'
 
 import { Loading } from '@carbon/react'
 
@@ -24,7 +24,7 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const getBenchmarks = async () => {
       setLoadingBenchmarks(true)
-      const benchmarks: Benchmark[] = await (await fetch('/api/benchmarks')).json()
+      const benchmarks: Benchmark[] = await (await get('benchmarks/')).json()
       benchmarks.sort((b1, b2) => b1.name.localeCompare(b2.name))
       benchmarks.forEach((benchmark) => {
         benchmark.criteriaBenchmarks.sort((c1, c2) => c1.name.localeCompare(c2.name))

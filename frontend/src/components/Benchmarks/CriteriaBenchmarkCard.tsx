@@ -94,7 +94,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
         )
 
         repeatedEvaluators.sort((a, b) => {
-          return new Version(a.laaj_version) > new Version(b.laaj_version) ? 1 : -1
+          return new Version(b.laaj_version) > new Version(a.laaj_version) ? 1 : -1
         })
 
         return e.laaj_version === repeatedEvaluators[0].laaj_version
@@ -104,7 +104,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
 
   // sorts the evaluators alphabetically and parses the results
   const parsedNewestEvaluators = useMemo(() => {
-    return newestEvaluators.sort((a, b) => b.evaluator_id.localeCompare(a.evaluator_id))
+    return newestEvaluators.sort((a, b) => a.evaluator_id.localeCompare(b.evaluator_id))
   }, [newestEvaluators])
 
   return (
@@ -123,7 +123,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
             <Table size="lg" useZebraStyles={false}>
               <TableHead>
                 <TableRow>
-                  <TableHeader key={0}>Evaluator</TableHeader>
+                  <TableHeader key={0}>{'Evaluator'}</TableHeader>
                   {benchmarkMetricsHeaders.map((metric, i) => (
                     <TableHeader key={i}>{metric}</TableHeader>
                   ))}
@@ -132,7 +132,8 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
               <TableBody>
                 {parsedNewestEvaluators.map((evaluatorBenchmark, i) => (
                   <TableRow key={i}>
-                    <TableCell>{evaluatorBenchmark.evaluator_id}</TableCell>
+                    {/* <TableCell>{`${evaluatorBenchmark.evaluator_id} (v${evaluatorBenchmark.laaj_version})`}</TableCell> */}
+                    <TableCell>{`${evaluatorBenchmark.evaluator_id}`}</TableCell>
                     {benchmarkMetrics.map((metric) => (
                       <TableCell
                         key={metric}
