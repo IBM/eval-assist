@@ -351,7 +351,7 @@ export const pairwiseCriteriaLibrary: PairwiseCriteria[] = [
   },
   {
     name: 'Temperature',
-    criteria: 'The temperature described in both Fahrenheit and Celsius.',
+    criteria: 'The temperature is described in both Fahrenheit and Celsius.',
   },
 ]
 

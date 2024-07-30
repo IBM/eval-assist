@@ -42,7 +42,8 @@ export interface UseCase {
   id: number | null
   name: string
   type: PipelineType
-  context: string
+  contextVariables: { variable: string; value: string }[]
+  responseVariableName: string
   responses: string[]
   criteria: RubricCriteria | PairwiseCriteria
   results: RubricResult[] | PairwiseResult[] | null

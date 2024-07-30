@@ -16,6 +16,7 @@ import {
 } from '@carbon/react'
 import { Edit, Save } from '@carbon/react/icons'
 
+import HighlightTextArea from '@components/HighlightTextArea'
 import { isInstanceOfPairwiseCriteria } from '@utils/utils'
 
 import { PairwiseCriteria } from '../../../utils/types'
@@ -27,6 +28,7 @@ interface EvaluationCriteriaProps {
   setCriteria: Dispatch<SetStateAction<PairwiseCriteria>>
   selectedTabIndex: number
   setSelectedTabIndex: Dispatch<SetStateAction<number>>
+  contextVariableNames: string[]
   className?: string
   style?: CSSProperties
 }
@@ -36,6 +38,7 @@ export const PairwiseCriteriaView = ({
   setCriteria,
   selectedTabIndex,
   setSelectedTabIndex,
+  contextVariableNames,
   style,
 }: EvaluationCriteriaProps) => {
   const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(pairwiseCriteria.name === '')
@@ -117,12 +120,18 @@ export const PairwiseCriteriaView = ({
                             </IconButton>
                           )}
                         </div>
-                        {/* <Tooltip label={'This option is not available yet'} align={'left'}>
-                          <span>
-                            <TrashCan />
-                          </span>
-                        </Tooltip> */}
                       </div>
+                      {/* <HighlightTextArea
+                        onChange={(e) => setCriteria({ ...pairwiseCriteria, criteria: e.target.value })}
+                        value={pairwiseCriteria.criteria}
+                        id="text-area-evaluation-instruction"
+                        labelText="Criteria"
+                        style={{ marginBottom: '1rem' }}
+                        placeholder="Describe your evaluation criteria as a question e.g Is the response gramatically correct?"
+                        wordList={contextVariableNames}
+                        isTextArea
+                        lexicalId={'criteria-description-pairwise'}
+                      /> */}
                       <TextArea
                         onChange={(e) => setCriteria({ ...pairwiseCriteria, criteria: e.target.value })}
                         value={pairwiseCriteria.criteria}

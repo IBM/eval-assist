@@ -31,7 +31,7 @@ import {
 } from '../../utils/types'
 import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
-import { TestCaseContext } from './Context/TestCaseContext'
+import { ContextVariables } from './ContextVariables'
 import { CriteriaView } from './CriteriaView'
 import { EvaluateButton } from './EvaluateButton'
 import { Landing } from './Landing'
@@ -55,11 +55,12 @@ export const SingleExampleEvaluation = () => {
   const { preloadedUseCase } = useURLInfoContext()
   const [currentUseCase, setCurrentUseCase] = useState(preloadedUseCase)
   const { userUseCases, setUserUseCases } = useUserUseCasesContext()
+
   // we are ignoring client side rendering to be able to use useSessionStorage
   const showingTestCase = useMemo<boolean>(() => preloadedUseCase !== null, [preloadedUseCase])
   const [useCaseSelected, setUseCaseSelected] = useState<UseCase | null>(preloadedUseCase)
-  // if the usecase doesnt have an id, it means it hasn't been stored
 
+  // if the usecase doesnt have an id, it means it hasn't been stored
   const isUseCaseSaved = useMemo(() => currentUseCase !== null && currentUseCase.id !== null, [currentUseCase])
   const [evaluationFailed, setEvaluationFailed] = useState(false)
   const [evaluationRunning, setEvaluationRunning] = useState(false)
@@ -108,6 +109,8 @@ export const SingleExampleEvaluation = () => {
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
 
   const runEvaluation = async () => {
+    // const criteriaDescription = getEditorContents(editors['criteria-description'])
+    // console.log(criteriaDescription)
     if (currentUseCase === null) return
     setEvaluationFailed(false)
     setEvaluationRunning(true)
@@ -120,9 +123,13 @@ export const SingleExampleEvaluation = () => {
     // was changed during the evaluation request
     const temporaryIdSnapshot = temporaryIdRef.current
     let response
+    const parsedContextVariables = currentUseCase.contextVariables.reduce(
+      (acc, item, index) => ({ ...acc, [item.variable]: item.value }),
+      {},
+    )
     if (currentUseCase.type === PipelineType.RUBRIC) {
       response = await post('evaluate/rubric/', {
-        context: currentUseCase.context,
+        context_variables: parsedContextVariables,
         responses: currentUseCase.responses,
         rubric: {
           name: currentUseCase.criteria.name,
@@ -134,7 +141,7 @@ export const SingleExampleEvaluation = () => {
       })
     } else {
       response = await post('evaluate/pairwise/', {
-        instruction: currentUseCase.context,
+        context_variables: parsedContextVariables,
         responses: currentUseCase.responses,
         criteria: { name: currentUseCase.criteria.name, criteria: currentUseCase.criteria.criteria },
         bam_api_key: bamAPIKey,
@@ -259,7 +266,7 @@ export const SingleExampleEvaluation = () => {
         use_case: {
           name: currentUseCase.name,
           content: JSON.stringify({
-            context: currentUseCase.context,
+            contextVariables: currentUseCase.contextVariables,
             responses: currentUseCase.responses,
             criteria: currentUseCase.criteria,
             results: currentUseCase.results,
@@ -298,7 +305,7 @@ export const SingleExampleEvaluation = () => {
       use_case: {
         name: name,
         content: JSON.stringify({
-          context: toSaveUseCase.context,
+          contextVariables: toSaveUseCase.contextVariables,
           responses: toSaveUseCase.responses,
           criteria: toSaveUseCase.criteria,
           results: toSaveUseCase.results,
@@ -379,6 +386,8 @@ export const SingleExampleEvaluation = () => {
       setCurrentUseCase({ ...preloadedUseCase })
       setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(preloadedUseCase))
       temporaryIdRef.current = uuid()
+    } else {
+      setCurrentUseCase(null)
     }
   }, [preloadedUseCase])
 
@@ -437,6 +446,15 @@ export const SingleExampleEvaluation = () => {
               setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
               setEditNameModalOpen={setEditNameModalOpen}
             />
+            <ContextVariables
+              contextVariables={currentUseCase.contextVariables}
+              setContextVariables={(contextVariables) =>
+                setCurrentUseCase((previousCurrentUseCase) =>
+                  previousCurrentUseCase !== null ? { ...previousCurrentUseCase, contextVariables } : null,
+                )
+              }
+              style={{ marginBottom: '1rem' }}
+            />
             <CriteriaView
               criteria={currentUseCase.criteria}
               setCriteria={(criteria) =>
@@ -444,6 +462,10 @@ export const SingleExampleEvaluation = () => {
                   previousCurrentUseCase !== null ? { ...previousCurrentUseCase, criteria } : null,
                 )
               }
+              contextVariableNames={[
+                ...currentUseCase.contextVariables.map((contextVariable) => contextVariable.variable),
+                currentUseCase.responseVariableName,
+              ]}
               type={currentUseCase.type}
               temporaryId={temporaryIdRef.current}
               style={{ marginBottom: '1rem' }}
@@ -458,14 +480,6 @@ export const SingleExampleEvaluation = () => {
             <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>
               <strong>Test data</strong>
             </div>
-            <TestCaseContext
-              context={currentUseCase.context}
-              setContext={(context) =>
-                setCurrentUseCase((previousCurrentUseCase) =>
-                  previousCurrentUseCase !== null ? { ...previousCurrentUseCase, context } : null,
-                )
-              }
-            />
             <Responses
               responses={currentUseCase.responses}
               setResponses={(responses) =>
@@ -492,6 +506,12 @@ export const SingleExampleEvaluation = () => {
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               criteria={currentUseCase.criteria}
               expectedResults={currentUseCase.expectedResults}
+              responseVariableName={currentUseCase.responseVariableName}
+              setResponseVariableName={(responseVariableName) =>
+                setCurrentUseCase((previousCurrentUseCase) =>
+                  previousCurrentUseCase !== null ? { ...previousCurrentUseCase, responseVariableName } : null,
+                )
+              }
             />
 
             <EvaluateButton

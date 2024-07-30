@@ -1,4 +1,6 @@
-import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
+import cx from 'classnames'
+
+import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   Accordion,
@@ -15,6 +17,8 @@ import {
 } from '@carbon/react'
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 
+import HighlightTextArea from '@components/HighlightTextArea'
+import { TextInputWithHighlightWords } from '@components/TextInputWithHighlightWords/TextInputWithHighlightWords'
 import { isInstanceOfRubricCriteria } from '@utils/utils'
 
 import { RubricCriteria } from '../../../utils/types'
@@ -27,6 +31,7 @@ interface EvaluationCriteriaProps {
   setCriteria: Dispatch<SetStateAction<RubricCriteria>>
   selectedTabIndex: number
   setSelectedTabIndex: Dispatch<SetStateAction<number>>
+  contextVariableNames: string[]
   style?: CSSProperties
   className?: string
 }
@@ -36,6 +41,7 @@ export const RubricCriteriaView = ({
   setCriteria,
   selectedTabIndex,
   setSelectedTabIndex,
+  contextVariableNames,
   style,
 }: EvaluationCriteriaProps) => {
   const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(rubricCriteria.name === '')
@@ -117,88 +123,100 @@ export const RubricCriteriaView = ({
                             </IconButton>
                           )}
                         </div>
-                        {/* <Tooltip label={'This option is not available yet'} align={'left'}>
-                          <span>
-                            <TrashCan />
-                          </span>
-                        </Tooltip> */}
                       </div>
-                      <TextInput
+                      {/* <TextInputWithHighlightWords
                         onChange={(e) => setCriteria({ ...rubricCriteria, criteria: e.target.value })}
                         value={rubricCriteria.criteria}
                         id="text-area-evaluation-instruction"
                         labelText="Criteria"
+                        placeholder="Describe your evaluation criteria as a question e.g Is the response gramatically correct?"
+                        wordList={contextVariableNames}
+                        className={customClasses.criteriaText}
+                      /> */}
+                      {/* <HighlightTextArea
+                        id="text-area-evaluation-instruction"
+                        labelText="Criteria"
+                        wordList={contextVariableNames}
+                        value={rubricCriteria.criteria}
+                        className={customClasses.criteriaText}
+                        isTextInput
+                        lexicalId={'criteria-description-rubric'}
+                      /> */}
+                      <TextInput
+                        onChange={(e) => setCriteria({ ...rubricCriteria, criteria: e.target.value })}
+                        value={rubricCriteria.criteria}
+                        id="text-area-evaluation-instruction2"
+                        labelText=""
                         style={{ marginBottom: '1rem' }}
                         placeholder="Describe your evaluation criteria as a question e.g Is the response gramatically correct?"
                       />
                       {rubricCriteria.options.map((scale, i) => (
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            marginBottom: '1rem',
-                          }}
-                          key={i}
-                        >
-                          <div style={{ width: '20%', marginRight: '1rem' }}>
-                            <TextInput
-                              labelText="Option"
-                              value={scale.option}
-                              placeholder="Answer"
-                              onChange={(e) =>
+                        <div key={i} className={customClasses.optionsGrid}>
+                          <TextInput
+                            labelText="Option"
+                            value={scale.option}
+                            placeholder="Answer"
+                            onChange={(e) =>
+                              setCriteria({
+                                ...rubricCriteria,
+                                options: [
+                                  ...rubricCriteria.options.slice(0, i),
+                                  { option: e.target.value, description: rubricCriteria.options[i].description },
+                                  ...rubricCriteria.options.slice(i + 1),
+                                ],
+                              })
+                            }
+                            id={`criteria-option-value-${i}`}
+                            key={`criteria-option-value-${i}`}
+                          />
+
+                          {/* <HighlightTextArea
+                            labelText="Description (optional)"
+                            value={scale.description}
+                            placeholder="State the condition under which the answer is selected."
+                            className={customClasses['text-overflow']}
+                            wordList={contextVariableNames}
+                            isTextInput
+                            id={`option-${i}`}
+                            key={`option-${i}`}
+                            lexicalId={`criteria-option-${i}`}
+                          /> */}
+                          <TextInput
+                            labelText="Option"
+                            value={scale.description}
+                            placeholder="Answer"
+                            onChange={(e) =>
+                              setCriteria({
+                                ...rubricCriteria,
+                                options: [
+                                  ...rubricCriteria.options.slice(0, i),
+                                  { option: scale.option, description: e.target.value },
+                                  ...rubricCriteria.options.slice(i + 1),
+                                ],
+                              })
+                            }
+                            // readOnly={evaluationRunning}
+                            id={`criteria-option-value-${i}`}
+                          />
+
+                          {rubricCriteria.options.length > 2 && (
+                            <IconButton
+                              label={'Remove'}
+                              size="sm"
+                              kind="ghost"
+                              style={{ marginTop: '24px' }}
+                              onClick={() =>
                                 setCriteria({
                                   ...rubricCriteria,
-                                  options: [
-                                    ...rubricCriteria.options.slice(0, i),
-                                    { option: e.target.value, description: rubricCriteria.options[i].description },
-                                    ...rubricCriteria.options.slice(i + 1),
-                                  ],
+                                  options: rubricCriteria.options.filter((s, j) => j !== i),
                                 })
                               }
-                              // readOnly={evaluationRunning}
-                              id={`criteria-option-value-${i}`}
-                            />
-                          </div>
-
-                          <div style={{ width: '75%', marginRight: '1rem' }}>
-                            <TextInput
-                              labelText="Description (optional)"
-                              value={scale.description}
-                              id={`criteria-option-definition-${i}`}
-                              placeholder="State the condition under which the answer is selected."
-                              className={customClasses['text-overflow']}
-                              onChange={(e) =>
-                                setCriteria({
-                                  ...rubricCriteria,
-                                  options: [
-                                    ...rubricCriteria.options.slice(0, i),
-                                    { option: rubricCriteria.options[i].option, description: e.target.value },
-                                    ...rubricCriteria.options.slice(i + 1),
-                                  ],
-                                })
-                              }
-                            />
-                          </div>
-
-                          <div style={{ width: '5%' }}>
-                            {rubricCriteria.options.length > 2 && (
-                              <IconButton
-                                label={'Remove'}
-                                size="sm"
-                                kind="ghost"
-                                style={{ marginTop: '24px' }}
-                                onClick={() =>
-                                  setCriteria({
-                                    ...rubricCriteria,
-                                    options: rubricCriteria.options.filter((s, j) => j !== i),
-                                  })
-                                }
-                              >
-                                <TrashCan />
-                              </IconButton>
-                            )}
-                          </div>
+                              id={`criteria-option-delete-${i}`}
+                              key={`criteria-option-delete-${i}`}
+                            >
+                              <TrashCan />
+                            </IconButton>
+                          )}
                         </div>
                       ))}
                       <Button

@@ -10,12 +10,21 @@ interface Props {
   criteria: RubricCriteria | PairwiseCriteria
   setCriteria: (criteria: RubricCriteria | PairwiseCriteria) => void
   type: PipelineType
+  contextVariableNames: string[]
+  temporaryId: string
   className?: string | undefined
   style?: CSSProperties | undefined
-  temporaryId: string
 }
 
-export const CriteriaView = ({ type, criteria, setCriteria, temporaryId, className, style }: Props) => {
+export const CriteriaView = ({
+  type,
+  criteria,
+  setCriteria,
+  temporaryId,
+  contextVariableNames,
+  className,
+  style,
+}: Props) => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0)
 
   useEffect(() => {
@@ -29,6 +38,7 @@ export const CriteriaView = ({ type, criteria, setCriteria, temporaryId, classNa
       setCriteria={setCriteria as Dispatch<SetStateAction<RubricCriteria>>}
       selectedTabIndex={selectedTabIndex}
       setSelectedTabIndex={setSelectedTabIndex}
+      contextVariableNames={contextVariableNames}
       className={className}
       style={style}
     />,
@@ -37,6 +47,7 @@ export const CriteriaView = ({ type, criteria, setCriteria, temporaryId, classNa
       setCriteria={setCriteria as Dispatch<SetStateAction<PairwiseCriteria>>}
       selectedTabIndex={selectedTabIndex}
       setSelectedTabIndex={setSelectedTabIndex}
+      contextVariableNames={contextVariableNames}
       style={style}
       className={className}
     />,

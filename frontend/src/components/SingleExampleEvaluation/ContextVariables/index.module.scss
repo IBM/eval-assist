@@ -1,0 +1,147 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/colors';
+@import '@carbon/styles/scss/motion';
+@import '@carbon/styles/scss/spacing';
+
+$block-radius: 4px;
+
+$columns-1: 1fr 0;
+$columns-2: 1fr 4fr;
+
+.content {
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+  flex-wrap: wrap;
+  position: relative;
+
+  > * {
+    width: 100%;
+  }
+
+  textarea,
+  input[type='text'] {
+    resize: none;
+    border: none;
+    background: transparent;
+    font-size: rem(14px);
+    line-height: rem(18px);
+    padding-right: 10%;
+  }
+}
+
+.innerContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.tableRow {
+  overflow-y: hidden;
+  max-width: 100%;
+  display: grid;
+  .blockElement {
+    border-radius: 0;
+
+    textarea {
+      min-height: max(rem(50px), 100%);
+      height: rem(50px);
+    }
+
+    :global(.cds--text-area__wrapper) {
+      height: 100%;
+    }
+  }
+
+  &.noBorderBottom {
+    border-bottom: 0;
+  }
+}
+
+.headerRow {
+  grid-template-columns: $columns-1;
+  border-bottom: 1px solid $border-subtle-01;
+  border-top: 1px solid $border-subtle-01;
+}
+
+.subHeaderRow {
+  grid-template-columns: $columns-2;
+  border-bottom: 1px solid $border-subtle-01;
+}
+
+.emptyContextRow {
+  grid-template-columns: $columns-1;
+  border-bottom: 1px solid $border-subtle-01;
+}
+
+.addResponseRow {
+  grid-template-columns: $columns-1;
+  border-bottom: 1px solid $border-subtle-01;
+}
+
+.columns1 {
+  grid-template-columns: $columns-1;
+}
+
+.columns2 {
+  grid-template-columns: $columns-2;
+}
+
+.blockElement {
+  background-color: $background;
+  border-left: 1px solid $border-subtle-01;
+  border-right: 1px solid $border-subtle-01;
+  border-radius: $block-radius;
+  &:first-child:not(.addContextVariableBlock):not(.headerBlock):not(.emptyContextBlock) {
+    border-right: none;
+  }
+  &:last-child:not(.addContextVariableBlock):not(.headerBlock):not(.emptyContextBlock) {
+    border-left: none;
+  }
+}
+
+.addContextVariableBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: rem(50px);
+  border-radius: 0 0 $block-radius $block-radius !important;
+  > button {
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+.headerBlock {
+  padding: rem(11px) 0 rem(11px) rem(11px);
+  background-color: $field;
+}
+
+.headerTypography {
+  font-weight: 800;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+}
+
+.subHeaderTypography {
+  font-size: rem(14px);
+  line-height: rem(18px);
+  padding: 0.5rem;
+}
+
+.emptyContextTypography {
+  font-size: rem(14px);
+  line-height: rem(18px);
+  padding: 0.5rem;
+  color: $text-placeholder;
+}
+
+.contextVariableRow {
+  min-height: rem(85px);
+  border-bottom: 1px solid $border-subtle-01;
+}

@@ -38,8 +38,12 @@ export const parseFetchedUseCase = (fetchedUseCase: StoredUseCase): UseCase => {
     id: fetchedUseCase.id,
     name: fetchedUseCase.name,
     type: type,
-    context: (fetchedUseCase.content as JsonObject)['context'] as string,
-    responses: (fetchedUseCase.content as JsonObject)['responses'] as string[],
+    contextVariables: ((fetchedUseCase.content as JsonObject)['contextVariables'] as UseCase['contextVariables']) || [
+      { context: (fetchedUseCase.content as JsonObject)['context'] as string },
+    ],
+    responseVariableName:
+      ((fetchedUseCase.content as JsonObject)['responses'] as UseCase['responseVariableName']) || '',
+    responses: (fetchedUseCase.content as JsonObject)['responses'] as UseCase['responses'],
     criteria:
       type === PipelineType.RUBRIC
         ? ((fetchedUseCase.content as JsonObject)['criteria'] as unknown as RubricCriteria)
@@ -47,8 +51,8 @@ export const parseFetchedUseCase = (fetchedUseCase: StoredUseCase): UseCase => {
           // for backward compatibility
           ((fetchedUseCase.content as JsonObject)['rubric'] as unknown as RubricCriteria),
     results: (fetchedUseCase.content as JsonObject)['results'] as unknown as UseCase['results'],
-    pipeline: (fetchedUseCase.content as JsonObject)['pipeline'] as string,
-    expectedResults: (fetchedUseCase.content as JsonObject)['expectedResults'] as string[],
+    pipeline: (fetchedUseCase.content as JsonObject)['pipeline'] as UseCase['pipeline'],
+    expectedResults: (fetchedUseCase.content as JsonObject)['expectedResults'] as UseCase['expectedResults'],
   }
 }
 
@@ -79,7 +83,8 @@ export const getEmptyUseCase = (type: PipelineType): UseCase => ({
   id: null,
   name: '',
   type,
-  context: '',
+  contextVariables: [{ variable: 'context', value: '' }],
+  responseVariableName: 'response',
   responses: type === PipelineType.RUBRIC ? [''] : ['', ''],
   criteria: getEmptyRubricCriteria(),
   results: null,
@@ -149,3 +154,7 @@ export const getCriteria = (name: string, type: PipelineType): RubricCriteria | 
   ) as RubricCriteria | PairwiseCriteria | undefined
   return criteria ?? null
 }
+
+export const fromLexicalToString = () => {}
+
+export const fromStringToLexicalFormat = () => {}

@@ -41,7 +41,7 @@ $columns-4: 3fr 1fr 1fr 2fr;
 }
 
 .blockElement {
-  background-color: $field;
+  background-color: $background;
   border-left: 1px solid $border-subtle-01;
   border-right: 1px solid $border-subtle-01;
   border-radius: $block-radius;
@@ -54,6 +54,8 @@ $columns-4: 3fr 1fr 1fr 2fr;
   overflow-y: hidden;
   max-width: 100%;
   display: grid;
+  // fixes tooltip getting cut
+  overflow: visible;
   // transition: grid-template-columns $duration-fast-01 motion(standard, productive);
   .blockElement {
     border-radius: 0;
@@ -103,31 +105,6 @@ $columns-4: 3fr 1fr 1fr 2fr;
   grid-template-columns: $columns-4;
 }
 
-// .tableRow.tableRowWithExpectedResult {
-//   &:not(.tableRowWithResults.tableRowWithExplanation) {
-//     // transition: grid-template-columns $duration-slow-02 motion(standard, productive);
-//     grid-template-columns: $columns-2;
-//   }
-//   &.tableRowWithResults:not(.tableRowWithExplanation) {
-//     grid-template-columns: $columns-3-var1;
-//   }
-//   &.tableRowWithExplanation.tableRowWithResults {
-//     grid-template-columns: $columns-4;
-//   }
-// }
-
-// .tableRow:not(.tableRowWithExpectedResult) {
-//   &:not(.tableRowWithResults.tableRowWithExplanation) {
-//     grid-template-columns: $columns-1;
-//   }
-//   &.tableRowWithResults:not(.tableRowWithExplanation) {
-//     grid-template-columns: $columns-2;
-//   }
-//   &.tableRowWithExplanation.tableRowWithResults {
-//     grid-template-columns: $columns-3-var2;
-//   }
-// }
-
 .addResponseBlock {
   display: flex;
   justify-content: space-between;
@@ -146,7 +123,7 @@ $columns-4: 3fr 1fr 1fr 2fr;
 
 .headerBlock {
   padding: rem(11px) 0 rem(11px) rem(11px);
-  background-color: $field-hover-01;
+  background-color: $field;
 }
 
 .headerTypography {
@@ -158,6 +135,9 @@ $columns-4: 3fr 1fr 1fr 2fr;
 .resultBlock {
   position: relative;
   padding: 11px 16px 11px 16px;
+  :global(.cds--select-input) {
+    background-color: $background;
+  }
 }
 
 .resultBlockInner {
@@ -284,5 +264,12 @@ $columns-4: 3fr 1fr 1fr 2fr;
 .toggles {
   display: flex;
   flex-direction: row;
+  gap: 1rem;
+}
+
+.headerResponseBlock {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 1rem;
 }

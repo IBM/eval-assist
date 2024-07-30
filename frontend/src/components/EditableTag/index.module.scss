@@ -1,0 +1,24 @@
+@import '@carbon/styles/scss/theme';
+
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.tag {
+  height: 20px;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.variableNameInput {
+  :global(.cds--text-input) {
+    background-color: $background !important;
+    &:focus {
+      outline: none;
+    }
+    &:active {
+      outline: none;
+    }
+  }
+}

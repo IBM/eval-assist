@@ -1,9 +1,10 @@
 import cx from 'classnames'
 
-import { CSSProperties, Dispatch, SetStateAction, useMemo, useState } from 'react'
+import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useMemo, useState } from 'react'
 
 import { Toggle } from '@carbon/react'
 
+import { EditableTag } from '@components/EditableTag'
 import { returnByPipelineType } from '@utils/utils'
 
 import {
@@ -34,6 +35,8 @@ interface Props {
   criteria: RubricCriteria | PairwiseCriteria
   expectedResults: UseCase['expectedResults']
   setExpectedResults: (expectedResults: UseCase['expectedResults']) => void
+  responseVariableName: string
+  setResponseVariableName: (newValue: string) => void
 }
 
 export const Responses = ({
@@ -50,6 +53,8 @@ export const Responses = ({
   criteria,
   expectedResults,
   setExpectedResults,
+  responseVariableName,
+  setResponseVariableName,
 }: Props) => {
   const [explanationOn, setExplanationOn] = useState(true)
   const [expectedResultOn, setExpectedResultOn] = useState(true)
@@ -62,7 +67,9 @@ export const Responses = ({
     () => ({
       [classes.columns1]: !expectedResultOn && (results === null || evaluationRunning),
       [classes.columns2]:
-        (!explanationOn && results !== null && !expectedResultOn) || (expectedResultOn && results === null),
+        (!explanationOn && results !== null && !expectedResultOn && !evaluationRunning) ||
+        (expectedResultOn && results === null) ||
+        (expectedResultOn && evaluationRunning),
       [classes.columns3var1]: expectedResultOn && results !== null && !evaluationRunning && !explanationOn,
       [classes.columns3var2]: !expectedResultOn && results !== null && !evaluationRunning && explanationOn,
       [classes.columns4]: expectedResultOn && results !== null && !evaluationRunning && explanationOn,
@@ -80,9 +87,16 @@ export const Responses = ({
               ...gridClasses,
             })}
           >
-            <strong className={cx(classes.blockElement, classes.headerBlock, classes.headerTypography)}>
-              {type === PipelineType.RUBRIC ? 'Responses to evaluate' : 'Responses to compare'}
-            </strong>
+            <div className={cx(classes.blockElement, classes.headerBlock, classes.headerResponseBlock)}>
+              <strong className={cx(classes.headerTypography)}>
+                {type === PipelineType.RUBRIC ? 'Responses to evaluate' : 'Responses to compare'}
+              </strong>
+              <EditableTag
+                value={responseVariableName}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setResponseVariableName(e.target.value)}
+                color="purple"
+              />
+            </div>
             {expectedResultOn && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
                 <strong className={cx(classes.headerTypography)}>{'Expected result'}</strong>
