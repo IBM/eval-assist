@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator
 from fastapi import HTTPException
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 class PairwiseCriteriaModel(BaseModel):
     name: str
@@ -13,7 +13,7 @@ class PairwiseCriteriaModel(BaseModel):
         return criteria
 
 class PairwiseEvalRequestModel(BaseModel):
-    instruction: str
+    context_variables: Dict[str, str]
     responses: List[str]
     criteria: PairwiseCriteriaModel
     bam_api_key: str

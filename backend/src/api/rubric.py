@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator
 from fastapi import HTTPException
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 class RubricOptionModel(BaseModel):
     option: str
@@ -30,7 +30,7 @@ class RubricModel(BaseModel):
         return options
 
 class RubricEvalRequestModel(BaseModel):
-    context: str
+    context_variables: Dict[str, str]
     responses: List[str]
     rubric: RubricModel
     bam_api_key: str

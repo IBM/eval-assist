@@ -1,4 +1,3 @@
-import importlib
 from io import StringIO
 from typing import Optional
 from fastapi import FastAPI, status, UploadFile, HTTPException, APIRouter
@@ -200,7 +199,7 @@ def evaluate(req: PairwiseEvalRequestModel):
     try:
         evaluator = PairwiseEvaluator(id=req.pipeline, client=client)
         criteria = PairwiseCriteria.from_json(req.criteria.model_dump_json())
-        res = evaluator.evaluate(instructions=[req.instruction], 
+        res = evaluator.evaluate(contexts=[req.context_variables], 
                                 responses=[req.responses], 
                                 criteria=criteria)
         return PairwiseEvalResponseModel(results=res)
@@ -233,7 +232,7 @@ def evaluate(req: RubricEvalRequestModel):
     try:
         evaluator = RubricEvaluator(id=req.pipeline, client=client)
         criteria = RubricCriteria.from_json(req.rubric.model_dump_json())
-        res = evaluator.evaluate(contexts=[req.context]*len(req.responses), 
+        res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses), 
                                 responses=req.responses, 
                                 rubric=criteria)
         return RubricEvalResponseModel(results=res)
