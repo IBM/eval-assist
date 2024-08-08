@@ -33,24 +33,25 @@ class PairwiseEvalRequestModel(BaseModel):
 
     @validator('responses', pre=True, always=True)
     def validate_responses_length(cls, responses):
-        if len(responses) != 2:
-            raise HTTPException(status_code=400, detail="Two responses are required for pairwise evaluaton.")
-        
         all_valid = True
         for r in responses:
             if len(r.strip()) == 0:
                 all_valid = False
                 break
         if not all_valid:
-            raise HTTPException(status_code=400, detail="Two responses are required for pairwise evaluaton.")
+            raise HTTPException(status_code=400, detail="Responses can't be an empty string.")
         
         return responses
     
 class PairwiseEvalResultModel(BaseModel):
-    w_index: int
-    explanation: str
-    p_bias: Optional[bool] = None
-    certainty: Optional[float] = None
+    contest_results: List[bool]
+    compared_to_indexes: List[int]
+    explanations: Dict[int, str]
+    p_bias: Optional[List[bool]] = None
+    certainty: List[float]
+    winrate: float
+    ranking: int
 
 class PairwiseEvalResponseModel(BaseModel):
-    results: List[PairwiseEvalResultModel]
+    per_response_results: Dict[int, PairwiseEvalResultModel]
+    ranking: List[int]

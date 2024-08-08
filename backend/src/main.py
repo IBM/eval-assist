@@ -199,10 +199,10 @@ def evaluate(req: PairwiseEvalRequestModel):
     try:
         evaluator = PairwiseEvaluator(id=req.pipeline, client=client)
         criteria = PairwiseCriteria.from_json(req.criteria.model_dump_json())
-        res = evaluator.evaluate(contexts=[req.context_variables], 
-                                responses=[req.responses], 
+        [per_response_results, ranking] = evaluator.evaluate(context=req.context_variables, 
+                                responses=req.responses, 
                                 criteria=criteria)
-        return PairwiseEvalResponseModel(results=res)
+        return PairwiseEvalResponseModel(per_response_results=per_response_results, ranking=ranking)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=e)
     except ApiResponseException as e:
@@ -272,7 +272,6 @@ class PutUseCaseBody(BaseModel):
 
 @router.put("/use_case/")
 def put_use_case(request_body: PutUseCaseBody):
-    print('/use_case/')
     user = db.appuser.find_unique(where={'email': request_body.user})
 
     found = db.storedusecase.find_unique(where={
