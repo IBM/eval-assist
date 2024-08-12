@@ -64,7 +64,8 @@ export const PairwiseRows = ({
       }
       const ranking = results.ranking[i] + 1
       return `Ranking: ${ranking}${getOrdinalSuffix(ranking)} (${toPercentage(
-        results.perResponseResults[i].winrate,
+        // perResponseResults is a dict, and the value may have been deleted!
+        Object.values(results.perResponseResults)[i].winrate,
       )} winrate)`
     }
   }
@@ -182,9 +183,9 @@ export const PairwiseRows = ({
                           >
                             {getResultToDisplay(i)}
                           </div>
-                          {results.perResponseResults[i].positionalBias.some((pBias) => pBias === true) && (
-                            <div className={cx(classes.positionalBias)}>{'Positional bias detected'}</div>
-                          )}
+                          {Object.values(results.perResponseResults)[i].positionalBias.some(
+                            (pBias) => pBias === true,
+                          ) && <div className={cx(classes.positionalBias)}>{'Positional bias detected'}</div>}
                           {expectedResults !== null && expectedResults[i] !== '' && (
                             <div
                               className={cx(classes.resultBlockTypography, {
