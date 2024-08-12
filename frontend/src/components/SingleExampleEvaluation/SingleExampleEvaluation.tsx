@@ -77,7 +77,8 @@ export const SingleExampleEvaluation = () => {
   const [selectedResultDetails, setSelectedResultDetails] = useState<{
     result: RubricResult | PerResponsePairwiseResult | null
     expectedResult: string
-  }>({ result: null, expectedResult: '' })
+    responseIndex: number
+  }>({ result: null, expectedResult: '', responseIndex: -1 })
 
   const { setSidebarTabSelected } = useAppSidebarContext()
 

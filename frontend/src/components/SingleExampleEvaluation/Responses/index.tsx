@@ -31,7 +31,11 @@ interface Props {
   setResults: (results: UseCase['results']) => void
   evaluationRunning: boolean
   setSelectedResultDetails: Dispatch<
-    SetStateAction<{ result: RubricResult | PerResponsePairwiseResult | null; expectedResult: string }>
+    SetStateAction<{
+      result: RubricResult | PerResponsePairwiseResult | null
+      expectedResult: string
+      responseIndex: number
+    }>
   >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   criteria: RubricCriteria | PairwiseCriteria
@@ -157,7 +161,7 @@ export const Responses = ({
               expectedResultOn={expectedResultOn}
               setSelectedResultDetails={
                 setSelectedResultDetails as Dispatch<
-                  SetStateAction<{ result: RubricResult | null; expectedResult: string }>
+                  SetStateAction<{ result: RubricResult | null; expectedResult: string; responseIndex: number }>
                 >
               }
               setResultDetailsModalOpen={setResultDetailsModalOpen}
@@ -178,7 +182,11 @@ export const Responses = ({
               setExpectedResults={setExpectedResults}
               setSelectedResultDetails={
                 setSelectedResultDetails as Dispatch<
-                  SetStateAction<{ result: PerResponsePairwiseResult | null; expectedResult: string }>
+                  SetStateAction<{
+                    result: PerResponsePairwiseResult | null
+                    expectedResult: string
+                    responseIndex: number
+                  }>
                 >
               }
               setResultDetailsModalOpen={setResultDetailsModalOpen}

@@ -19,7 +19,9 @@ interface Props {
   setResults: (results: UseCase['results']) => void
   explanationOn: boolean
   expectedResultOn: boolean
-  setSelectedResultDetails: Dispatch<SetStateAction<{ result: RubricResult | null; expectedResult: string }>>
+  setSelectedResultDetails: Dispatch<
+    SetStateAction<{ result: RubricResult | null; expectedResult: string; responseIndex: number }>
+  >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
   criteria: RubricCriteria
@@ -50,6 +52,7 @@ export const RubricRows = ({
       setSelectedResultDetails({
         result: results[i],
         expectedResult: expectedResults !== null ? expectedResults[i] : '',
+        responseIndex: i,
       })
       setResultDetailsModalOpen(true)
     }
@@ -71,7 +74,11 @@ export const RubricRows = ({
   return (
     <>
       {responses?.map((response, i) => (
-        <RemovableSection key={i} onRemove={() => onRemoveResponse(i)} readOnly={responses.length === 1}>
+        <RemovableSection
+          key={i}
+          onRemove={() => onRemoveResponse(i)}
+          readOnly={responses.length === 1 || evaluationRunning}
+        >
           {({ setActive, setInactive }) => (
             <div
               key={i}

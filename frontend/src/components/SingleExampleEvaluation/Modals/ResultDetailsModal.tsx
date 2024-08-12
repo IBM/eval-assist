@@ -12,9 +12,17 @@ import classes from './ResultDetailsModal.module.scss'
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  selectedResultDetails: { result: RubricResult | PerResponsePairwiseResult | null; expectedResult: string }
+  selectedResultDetails: {
+    result: RubricResult | PerResponsePairwiseResult | null
+    expectedResult: string
+    responseIndex: number
+  }
   setSelectedResultDetails: Dispatch<
-    SetStateAction<{ result: RubricResult | PerResponsePairwiseResult | null; expectedResult: string }>
+    SetStateAction<{
+      result: RubricResult | PerResponsePairwiseResult | null
+      expectedResult: string
+      responseIndex: number
+    }>
   >
   type: PipelineType
 }
@@ -22,7 +30,7 @@ interface Props {
 export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSelectedResultDetails, type }: Props) => {
   const onClose = () => {
     setOpen(false)
-    setSelectedResultDetails({ result: null, expectedResult: '' })
+    setSelectedResultDetails({ result: null, expectedResult: '', responseIndex: -1 })
   }
 
   const positionalBiasString = useMemo(() => {
@@ -40,7 +48,13 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
 
   return (
     selectedResultDetails.result !== null && (
-      <Modal open={open} onRequestClose={onClose} passiveModal size="sm" modalHeading="Result details">
+      <Modal
+        open={open}
+        onRequestClose={onClose}
+        passiveModal
+        size="sm"
+        modalHeading={`Result details: Response ${selectedResultDetails.responseIndex + 1}`}
+      >
         <Layer style={{ display: 'flex', flexDirection: 'column' }}>
           {type === PipelineType.RUBRIC && (
             <>
