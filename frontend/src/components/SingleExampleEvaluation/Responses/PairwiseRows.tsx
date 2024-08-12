@@ -71,13 +71,15 @@ export const PairwiseRows = ({
   const onRemoveResponse = (i: number) => {
     if (responses.length === 1) return
     setResponses(responses.filter((_, j) => i !== j))
-    const perResponseResults = { ...results.perResponseResults }
-    delete perResponseResults[i]
-    results !== null &&
+    if (results !== null) {
+      const perResponseResults = { ...results.perResponseResults }
+      delete perResponseResults[i]
       setResults({
         ranking: results.ranking,
         perResponseResults,
       })
+    }
+
     expectedResults !== null &&
       setExpectedResults(
         expectedResults
