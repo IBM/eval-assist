@@ -1,14 +1,10 @@
-from io import StringIO
 from typing import Optional
-from fastapi import FastAPI, status, UploadFile, HTTPException, APIRouter
+from fastapi import FastAPI, status, HTTPException, APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
-import pkg_resources
 from pydantic import BaseModel
 
-from .utils import log_runtime
 from .db_client import db
-from datetime import datetime
 import pandas as pd 
 import json
 from genai import Credentials, Client

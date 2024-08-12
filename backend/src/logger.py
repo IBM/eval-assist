@@ -4,13 +4,15 @@ from fastapi.routing import APIRoute
 from typing import Callable
 from .db_client import db
 import json, time
+import time
 
-def log_info(method, path, req_body, res_body, headers):
+def log_info(method, path, req_body, res_body, headers, runtime):
 
     record = {        
         "path": path,
         "method": method,
-        "timestamp": time.time()
+        "timestamp": time.time(),
+        "runtime": runtime
     }
 
     if req_body:
@@ -40,11 +42,14 @@ class LoggingRoute(APIRoute):
 
         async def custom_route_handler(request: Request) -> Response:
             req_body = await request.body()
+            start_timestamp = time.time()
             response = await original_route_handler(request)
+            end_timestamp = time.time()
+            runtime = round(end_timestamp - start_timestamp, 2)
             tasks = response.background
 
             request.headers
-            task = BackgroundTask(log_info, request.method, request.url.path, req_body, response.body, request.headers)
+            task = BackgroundTask(log_info, request.method, request.url.path, req_body, response.body, request.headers, runtime)
             
             # check if the original response had background tasks already attached to it
             if tasks:
