@@ -2,14 +2,16 @@ import cx from 'classnames'
 
 import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useMemo, useState } from 'react'
 
-import { Toggle } from '@carbon/react'
+import { Button, Toggle } from '@carbon/react'
+import { Add } from '@carbon/react/icons'
 
 import { EditableTag } from '@components/EditableTag'
 import { returnByPipelineType } from '@utils/utils'
 
 import {
   PairwiseCriteria,
-  PairwiseResult,
+  PairwiseResults,
+  PerResponsePairwiseResult,
   PipelineType,
   RubricCriteria,
   RubricResult,
@@ -29,7 +31,7 @@ interface Props {
   setResults: (results: UseCase['results']) => void
   evaluationRunning: boolean
   setSelectedResultDetails: Dispatch<
-    SetStateAction<{ result: RubricResult | PairwiseResult | null; expectedResult: string }>
+    SetStateAction<{ result: RubricResult | PerResponsePairwiseResult | null; expectedResult: string }>
   >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   criteria: RubricCriteria | PairwiseCriteria
@@ -56,14 +58,15 @@ export const Responses = ({
   responseVariableName,
   setResponseVariableName,
 }: Props) => {
-  const [explanationOn, setExplanationOn] = useState(true)
+  const [explanationOn, setExplanationOn] = useState(type === PipelineType.RUBRIC)
   const [expectedResultOn, setExpectedResultOn] = useState(true)
+
   const pairwiseWinnerIndex = useMemo(() => {
-    if (results === null || results.length === 0 || type !== PipelineType.PAIRWISE) return null
-    return (results[0] as PairwiseResult).winnerIndex
+    if (results === null || type !== PipelineType.PAIRWISE) return null
+    return (results as PairwiseResults).ranking.indexOf(0)
   }, [results, type])
 
-  const gridClasses = useMemo(
+  const rubricGridClasses = useMemo(
     () => ({
       [classes.columns1]: !expectedResultOn && (results === null || evaluationRunning),
       [classes.columns2]:
@@ -77,6 +80,34 @@ export const Responses = ({
     [evaluationRunning, expectedResultOn, explanationOn, results],
   )
 
+  const pairwiseGridClasses = useMemo(
+    () => ({
+      [classes.columns1]: !expectedResultOn && (results === null || evaluationRunning),
+      [classes.columns2]:
+        (results !== null && !expectedResultOn && !evaluationRunning) ||
+        (expectedResultOn && results === null) ||
+        (expectedResultOn && evaluationRunning),
+      [classes.columns3var3]: expectedResultOn && results !== null && !evaluationRunning,
+    }),
+    [evaluationRunning, expectedResultOn, results],
+  )
+
+  const noPositionalBias = useMemo(() => {
+    if (results === null) return
+    return type === PipelineType.RUBRIC
+      ? (results as RubricResult[])?.every((result) => result.positionalBias == false)
+      : Object.values((results as PairwiseResults)?.perResponseResults).every((perResponseResults) =>
+          perResponseResults.positionalBias.every((pBias) => pBias === false),
+        )
+  }, [results, type])
+
+  const onAddResponse = () => {
+    setResponses([...responses, ''])
+    expectedResults !== null && setExpectedResults([...expectedResults, ''])
+    if (type === PipelineType.PAIRWISE) {
+    }
+  }
+
   return (
     <div style={style} className={className}>
       <div className={classes.content}>
@@ -84,12 +115,12 @@ export const Responses = ({
           <div
             className={cx(classes.tableRow, classes.headerRow, {
               [classes.noBorderBottom]: pairwiseWinnerIndex === 0,
-              ...gridClasses,
+              ...returnByPipelineType(type, rubricGridClasses, pairwiseGridClasses),
             })}
           >
             <div className={cx(classes.blockElement, classes.headerBlock, classes.headerResponseBlock)}>
               <strong className={cx(classes.headerTypography)}>
-                {type === PipelineType.RUBRIC ? 'Responses to evaluate' : 'Responses to compare'}
+                {returnByPipelineType(type, 'Responses to evaluate', 'Responses to compare')}
               </strong>
               <EditableTag
                 value={responseVariableName}
@@ -99,7 +130,9 @@ export const Responses = ({
             </div>
             {expectedResultOn && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
-                <strong className={cx(classes.headerTypography)}>{'Expected result'}</strong>
+                <strong className={cx(classes.headerTypography)}>
+                  {returnByPipelineType(type, 'Expected result', 'Expected ranking')}
+                </strong>
               </div>
             )}
             {results !== null && !evaluationRunning && (
@@ -107,7 +140,7 @@ export const Responses = ({
                 <strong className={classes.headerTypography}>{'Result'}</strong>
               </div>
             )}
-            {results !== null && !evaluationRunning && explanationOn && (
+            {results !== null && !evaluationRunning && explanationOn && type === PipelineType.RUBRIC && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
                 <strong className={cx(classes.headerTypography)}>{'Explanation'}</strong>
               </div>
@@ -122,38 +155,54 @@ export const Responses = ({
               setResults={setResults}
               explanationOn={explanationOn}
               expectedResultOn={expectedResultOn}
-              setSelectedResultDetails={setSelectedResultDetails}
+              setSelectedResultDetails={
+                setSelectedResultDetails as Dispatch<
+                  SetStateAction<{ result: RubricResult | null; expectedResult: string }>
+                >
+              }
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               evaluationRunning={evaluationRunning}
               criteria={criteria as RubricCriteria}
               expectedResults={expectedResults}
               setExpectedResults={setExpectedResults}
-              gridClasses={gridClasses}
+              gridClasses={rubricGridClasses}
             />,
             <PairwiseRows
               responses={responses}
               setResponses={setResponses}
-              results={results as PairwiseResult[]}
+              results={results as PairwiseResults}
+              setResults={setResults}
               explanationOn={explanationOn}
               expectedResultOn={expectedResultOn}
               expectedResults={expectedResults}
               setExpectedResults={setExpectedResults}
-              setSelectedResultDetails={setSelectedResultDetails}
+              setSelectedResultDetails={
+                setSelectedResultDetails as Dispatch<
+                  SetStateAction<{ result: PerResponsePairwiseResult | null; expectedResult: string }>
+                >
+              }
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               pairwiseWinnerIndex={pairwiseWinnerIndex}
               evaluationRunning={evaluationRunning}
-              gridClasses={gridClasses}
+              gridClasses={pairwiseGridClasses}
             />,
           )}
+          <div className={cx(classes.tableRow, classes.addResponseRow)}>
+            <div className={cx(classes.blockElement, classes.addResponseBlock)}>
+              <Button kind="ghost" size="sm" renderIcon={Add} onClick={onAddResponse}>
+                {'Add response'}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
-      {!evaluationRunning && type === PipelineType.RUBRIC && results?.every((result) => !result.positionalBias) && (
+      {!evaluationRunning && results !== null && noPositionalBias ? (
         <p style={{ marginTop: '0.5rem' }} className={classes.softText}>
           {'No positional bias was detected in any of the responses.'}
         </p>
-      )}
+      ) : null}
       <div className={classes.toggles}>
-        {results !== null && !evaluationRunning && (
+        {results !== null && !evaluationRunning && type === PipelineType.RUBRIC && (
           <Toggle
             labelText={'Show Explanation'}
             toggled={explanationOn}

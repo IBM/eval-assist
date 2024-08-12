@@ -10,6 +10,7 @@ $columns-1: 1fr 0 0 0;
 $columns-2: 5fr 1fr 0 0;
 $columns-3-var1: 5fr 1fr 1fr 0;
 $columns-3-var2: 4fr 1fr 2fr 0;
+$columns-3-var3: 5fr 1fr 2fr 0;
 $columns-4: 3fr 1fr 1fr 2fr;
 
 .content {
@@ -101,6 +102,10 @@ $columns-4: 3fr 1fr 1fr 2fr;
   grid-template-columns: $columns-3-var2;
 }
 
+.columns3var3 {
+  grid-template-columns: $columns-3-var3;
+}
+
 .columns4 {
   grid-template-columns: $columns-4;
 }
@@ -122,7 +127,10 @@ $columns-4: 3fr 1fr 1fr 2fr;
 }
 
 .headerBlock {
-  padding: rem(11px) 0 rem(11px) rem(11px);
+  padding-left: rem(11px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   background-color: $field;
 }
 

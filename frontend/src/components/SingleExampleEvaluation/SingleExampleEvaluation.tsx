@@ -20,10 +20,11 @@ import {
 } from '@utils/utils'
 
 import {
-  FetchedPairwiseResult,
+  FetchedPairwiseResults,
   FetchedResults,
   FetchedRubricResult,
-  PairwiseResult,
+  PairwiseResults,
+  PerResponsePairwiseResult,
   PipelineType,
   RubricCriteria,
   RubricResult,
@@ -74,7 +75,7 @@ export const SingleExampleEvaluation = () => {
   const [evaluationRunningModalOpen, setEvaluationRunningModalOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [selectedResultDetails, setSelectedResultDetails] = useState<{
-    result: RubricResult | PairwiseResult | null
+    result: RubricResult | PerResponsePairwiseResult | null
     expectedResult: string
   }>({ result: null, expectedResult: '' })
 
@@ -114,11 +115,11 @@ export const SingleExampleEvaluation = () => {
     if (currentUseCase === null) return
     setEvaluationFailed(false)
     setEvaluationRunning(true)
-    const toastId = addToast({
+    const inProgressEvalToastId = addToast({
       title: 'Running evaluation...',
       kind: 'info',
     })
-    setEvaluationRunningToastId(toastId)
+    setEvaluationRunningToastId(inProgressEvalToastId)
     // temporaryIdSnapshot is used to discern whether the current test case
     // was changed during the evaluation request
     const temporaryIdSnapshot = temporaryIdRef.current
@@ -167,6 +168,7 @@ export const SingleExampleEvaluation = () => {
 
         setEvaluationFailed(true)
         // We are catching this error an so we show the message sent from the backend
+        removeToast(inProgressEvalToastId)
 
         addToast({
           kind: 'error',
@@ -179,15 +181,15 @@ export const SingleExampleEvaluation = () => {
 
       // response is ok
 
-      const responseBody = (await response.json()) as FetchedResults
-
+      const responseBody = await response.json()
       addToast({
         kind: 'success',
         title: 'Evaluation finished',
         timeout: 5000,
       })
 
-      let results
+      let results: RubricResult[] | PairwiseResults
+
       if (currentUseCase.type === PipelineType.RUBRIC) {
         results = (responseBody.results as FetchedRubricResult[]).map(
           (result) =>
@@ -200,17 +202,26 @@ export const SingleExampleEvaluation = () => {
             } as RubricResult),
         )
       } else {
-        results = (responseBody.results as FetchedPairwiseResult[]).map(
-          (result) =>
-            ({
-              name: currentUseCase.criteria.name,
-              explanation: result.explanation,
-              positionalBias: result.p_bias,
-              winnerIndex: result.w_index,
-              certainty: result.certainty,
-            } as PairwiseResult),
-        )
+        const perResponseResults: PairwiseResults['perResponseResults'] = {}
+        const fetchedResults = responseBody as FetchedPairwiseResults
+        Object.entries(fetchedResults.per_response_results).forEach(([result_idx, fetchedPerResponseResult]) => {
+          perResponseResults[result_idx] = {
+            contestResults: fetchedPerResponseResult.contest_results,
+            comparedToIndexes: fetchedPerResponseResult.compared_to_indexes,
+            explanations: fetchedPerResponseResult.explanations,
+            positionalBias:
+              fetchedPerResponseResult.p_bias || new Array(fetchedPerResponseResult.contest_results.length).fill(false),
+            certainty: fetchedPerResponseResult.certainty,
+            winrate: fetchedPerResponseResult.winrate,
+            ranking: fetchedPerResponseResult.ranking,
+          }
+        })
+        results = {
+          perResponseResults,
+          ranking: fetchedResults.ranking,
+        }
       }
+
       setCurrentUseCase((previousCurrentUseCase) => {
         if (previousCurrentUseCase !== null) {
           return {
@@ -222,7 +233,7 @@ export const SingleExampleEvaluation = () => {
         }
       })
 
-      removeToast(toastId)
+      removeToast(inProgressEvalToastId)
     }
   }
 
@@ -273,6 +284,7 @@ export const SingleExampleEvaluation = () => {
             type: currentUseCase.type,
             pipeline: currentUseCase.pipeline,
             expectedResults: currentUseCase.expectedResults,
+            responseVariableName: currentUseCase.responseVariableName,
           }),
           user_id: -1,
           id: currentUseCase.id,
@@ -312,6 +324,7 @@ export const SingleExampleEvaluation = () => {
           type: toSaveUseCase.type,
           pipeline: toSaveUseCase.pipeline,
           expectedResults: toSaveUseCase.expectedResults,
+          responseVariableName: toSaveUseCase.responseVariableName,
         }),
         user_id: -1,
         id: -1,

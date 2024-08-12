@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react'
+import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 
 import {
   Accordion,
@@ -17,14 +17,12 @@ import {
 } from '@carbon/react'
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 
-import HighlightTextArea from '@components/HighlightTextArea'
-import { TextInputWithHighlightWords } from '@components/TextInputWithHighlightWords/TextInputWithHighlightWords'
 import { isInstanceOfRubricCriteria } from '@utils/utils'
 
 import { RubricCriteria } from '../../../utils/types'
 import { JSONTextArea } from '../JSONTextArea'
 import classes from '../SingleExampleEvaluation.module.scss'
-import customClasses from './RubricCriteriaView.module.scss'
+import customClasses from './index.module.scss'
 
 interface EvaluationCriteriaProps {
   rubricCriteria: RubricCriteria
@@ -233,9 +231,6 @@ export const RubricCriteriaView = ({
                         Add Option
                       </Button>
                     </Layer>
-                    {/* <Button renderIcon={Add} disabled kind="tertiary">
-                          {'Add new criteria'}
-                        </Button> */}
                   </div>
                 </TabPanel>
                 <TabPanel>

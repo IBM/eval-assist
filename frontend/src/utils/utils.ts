@@ -2,20 +2,12 @@ import { pairwiseCriteriaLibrary, rubricCriteriaLibrary } from 'src/libraries/Cr
 
 import { StoredUseCase } from '@prisma/client'
 import { JsonObject } from '@prisma/client/runtime/library'
-import {
-  Option,
-  PairwiseCriteria,
-  PairwiseResult,
-  PipelineType,
-  RubricCriteria,
-  RubricResult,
-  UseCase,
-} from '@utils/types'
+import { Option, PairwiseCriteria, PairwiseResults, PipelineType, RubricCriteria, UseCase } from '@utils/types'
 
 export const isInstanceOfOption = (obj: any): obj is Option =>
   typeof obj.option === 'string' && typeof obj.description === 'string'
 
-export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseResult =>
+export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseResults =>
   obj !== null &&
   typeof obj.name === 'string' &&
   typeof obj.winnerIndex === 'number' &&
@@ -34,23 +26,29 @@ export const isInstanceOfPairwiseCriteria = (obj: any): obj is PairwiseCriteria 
 
 export const parseFetchedUseCase = (fetchedUseCase: StoredUseCase): UseCase => {
   const type = ((fetchedUseCase.content as JsonObject)['type'] as PipelineType) ?? PipelineType.RUBRIC
+  const fetchedResults = (fetchedUseCase.content as JsonObject)['results'] as UseCase['results']
   return {
     id: fetchedUseCase.id,
     name: fetchedUseCase.name,
     type: type,
     contextVariables: ((fetchedUseCase.content as JsonObject)['contextVariables'] as UseCase['contextVariables']) || [
-      { context: (fetchedUseCase.content as JsonObject)['context'] as string },
+      { variable: 'context', value: (fetchedUseCase.content as JsonObject)['context'] as string },
     ],
     responseVariableName:
-      ((fetchedUseCase.content as JsonObject)['responses'] as UseCase['responseVariableName']) || '',
+      ((fetchedUseCase.content as JsonObject)['responseVariableName'] as UseCase['responseVariableName']) || '',
     responses: (fetchedUseCase.content as JsonObject)['responses'] as UseCase['responses'],
-    criteria:
-      type === PipelineType.RUBRIC
-        ? ((fetchedUseCase.content as JsonObject)['criteria'] as unknown as RubricCriteria)
-        : ((fetchedUseCase.content as JsonObject)['criteria'] as unknown as PairwiseCriteria) ||
-          // for backward compatibility
-          ((fetchedUseCase.content as JsonObject)['rubric'] as unknown as RubricCriteria),
-    results: (fetchedUseCase.content as JsonObject)['results'] as unknown as UseCase['results'],
+    criteria: returnByPipelineType(
+      type,
+      (fetchedUseCase.content as JsonObject)['criteria'] as unknown as RubricCriteria,
+      ((fetchedUseCase.content as JsonObject)['criteria'] as unknown as PairwiseCriteria) ||
+        // for backward compatibility
+        ((fetchedUseCase.content as JsonObject)['rubric'] as unknown as RubricCriteria),
+    ),
+    results: returnByPipelineType(
+      type,
+      fetchedResults,
+      fetchedResults === null ? null : 'ranking' in fetchedResults ? fetchedResults : null,
+    ),
     pipeline: (fetchedUseCase.content as JsonObject)['pipeline'] as UseCase['pipeline'],
     expectedResults: (fetchedUseCase.content as JsonObject)['expectedResults'] as UseCase['expectedResults'],
   }
@@ -158,3 +156,30 @@ export const getCriteria = (name: string, type: PipelineType): RubricCriteria | 
 export const fromLexicalToString = () => {}
 
 export const fromStringToLexicalFormat = () => {}
+
+/**
+ * Returns the suffix of a number in its ordinal form
+ **/
+export const getOrdinalSuffix = (x: number): string => {
+  // suffix pattern repeats every 100 numbers
+  x %= 100
+  let prefix = 'th'
+  if (x <= 3 || x >= 21) {
+    switch (x % 10) {
+      case 1:
+        prefix = 'st'
+        break
+      case 2:
+        prefix = 'nd'
+        break
+      case 3:
+        prefix = 'rd'
+        break
+      default: {
+      }
+    }
+  }
+  return prefix
+}
+
+export const toPercentage = (value: number) => (value * 100).toFixed(0) + '%'

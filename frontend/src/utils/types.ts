@@ -6,12 +6,21 @@ export interface RubricResult {
   certainty: number
 }
 
-export interface PairwiseResult {
-  name: string
-  winnerIndex: number
-  positionalBias: boolean
-  explanation: string
-  certainty: number
+export interface PerResponsePairwiseResult {
+  contestResults: boolean[]
+  comparedToIndexes: number[]
+  explanations: { [key: string]: string }
+  positionalBias: boolean[]
+  certainty: number[]
+  winrate: number
+  ranking: number
+}
+
+export interface PairwiseResults {
+  perResponseResults: {
+    [key: string]: PerResponsePairwiseResult
+  }
+  ranking: number[]
 }
 
 export interface FetchedRubricResult {
@@ -22,15 +31,23 @@ export interface FetchedRubricResult {
   certainty: number
 }
 
-export interface FetchedPairwiseResult {
-  w_index: number
-  explanation: string
-  certainty: number
-  p_bias: boolean
+export interface FetchedPairwiseResults {
+  per_response_results: {
+    [key: string]: {
+      contest_results: boolean[]
+      compared_to_indexes: number[]
+      explanations: { [key: string]: string }
+      p_bias?: boolean[]
+      certainty: number[]
+      winrate: number
+      ranking: number
+    }
+  }
+  ranking: number[]
 }
 
 export interface FetchedResults {
-  results: (FetchedRubricResult | FetchedPairwiseResult)[]
+  results: FetchedRubricResult[] | FetchedPairwiseResults
 }
 
 export interface Option {
@@ -46,7 +63,7 @@ export interface UseCase {
   responseVariableName: string
   responses: string[]
   criteria: RubricCriteria | PairwiseCriteria
-  results: RubricResult[] | PairwiseResult[] | null
+  results: RubricResult[] | PairwiseResults | null
   expectedResults: null | string[]
   pipeline: string | null
 }

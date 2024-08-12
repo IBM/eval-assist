@@ -8,7 +8,7 @@ import { Add } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
-import { PairwiseResult, RubricCriteria, RubricResult, UseCase } from '../../../utils/types'
+import { PairwiseResults, RubricCriteria, RubricResult, UseCase } from '../../../utils/types'
 import RemovableSection from '../../RemovableSection/RemovableSection'
 import classes from './index.module.scss'
 
@@ -16,17 +16,15 @@ interface Props {
   responses: UseCase['responses']
   setResponses: (responses: UseCase['responses']) => void
   results: RubricResult[] | null
+  setResults: (results: UseCase['results']) => void
   explanationOn: boolean
   expectedResultOn: boolean
-  setSelectedResultDetails: Dispatch<
-    SetStateAction<{ result: RubricResult | PairwiseResult | null; expectedResult: string }>
-  >
+  setSelectedResultDetails: Dispatch<SetStateAction<{ result: RubricResult | null; expectedResult: string }>>
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
   criteria: RubricCriteria
   setExpectedResults: (expectedResults: UseCase['expectedResults']) => void
   expectedResults: UseCase['expectedResults']
-  setResults: (results: UseCase['results']) => void
   gridClasses: {
     [x: string]: boolean
   }
@@ -61,11 +59,6 @@ export const RubricRows = ({
       return results[i] ? (results[i] as RubricResult).option : ''
     }
     return ''
-  }
-
-  const onAddResponse = () => {
-    setResponses([...responses, ''])
-    expectedResults !== null && setExpectedResults([...expectedResults, ''])
   }
 
   const onRemoveResponse = (i: number) => {
@@ -103,29 +96,27 @@ export const RubricRows = ({
 
               {/* Expected result */}
               {expectedResultOn && (
-                <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1}>
-                  <div className={cx(classes.resultBlockTypography, {})} onFocus={setActive} onBlur={setInactive}>
-                    <Select
-                      id={`select-2`}
-                      noLabel
-                      value={expectedResults !== null && expectedResults[i] !== '' ? expectedResults[i] : ''}
-                      onChange={(e) => {
-                        expectedResults !== null &&
-                          setExpectedResults([
-                            ...expectedResults.slice(0, i),
-                            e.target.value,
-                            ...expectedResults.slice(i + 1),
-                          ])
-                      }}
-                    >
-                      <SelectItem key={i} value={''} text={''} />
-                      {criteria.options
-                        .map((option) => option.option)
-                        .map((option, i) => (
-                          <SelectItem key={i} text={option} value={option} />
-                        ))}
-                    </Select>
-                  </div>
+                <div className={cx(classes.blockElement, classes.resultBlock)}>
+                  <Select
+                    id={`select-2`}
+                    noLabel
+                    value={expectedResults !== null && expectedResults[i] !== '' ? expectedResults[i] : ''}
+                    onChange={(e) => {
+                      expectedResults !== null &&
+                        setExpectedResults([
+                          ...expectedResults.slice(0, i),
+                          e.target.value,
+                          ...expectedResults.slice(i + 1),
+                        ])
+                    }}
+                  >
+                    <SelectItem key={i} value={''} text={''} />
+                    {criteria.options
+                      .map((option) => option.option)
+                      .map((option, i) => (
+                        <SelectItem key={i} text={option} value={option} />
+                      ))}
+                  </Select>
                 </div>
               )}
 
@@ -158,14 +149,7 @@ export const RubricRows = ({
                             {getResultToDisplay(i) ? <strong>{getResultToDisplay(i)}</strong> : ''}
                           </div>
                           {results[i].positionalBias && (
-                            <div
-                              className={cx({
-                                [classes.positionalBias]: results[i].positionalBias,
-                                [classes.softText]: !results[i].positionalBias,
-                              })}
-                            >
-                              {'Positional bias detected'}
-                            </div>
+                            <div className={cx(classes.positionalBias)}>{'Positional bias detected'}</div>
                           )}
 
                           {results[i] && expectedResults !== null && expectedResults[i] !== '' && (
@@ -176,11 +160,11 @@ export const RubricRows = ({
                               })}
                             >{`Agreement: ${results[i].option === expectedResults[i] ? 'Yes' : 'No'}`}</div>
                           )}
-                          {results[i].certainty && (
+                          {/* {results[i].certainty && (
                             <div className={cx(classes.softText)}>
                               {'Certainty: ' + ((results[i].certainty as number) * 100).toFixed(0) + '%'}
                             </div>
-                          )}
+                          )} */}
                         </div>
                         <Link style={{ alignSelf: 'flex-end' }} className={classes.resultDetailsAction}>
                           View Details
@@ -210,13 +194,6 @@ export const RubricRows = ({
           )}
         </RemovableSection>
       ))}
-      <div className={cx(classes.tableRow, classes.addResponseRow)}>
-        <div className={cx(classes.blockElement, classes.addResponseBlock)}>
-          <Button kind="ghost" size="sm" renderIcon={Add} onClick={onAddResponse}>
-            {'Add response'}
-          </Button>
-        </div>
-      </div>
     </>
   )
 }
