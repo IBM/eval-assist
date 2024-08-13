@@ -32,7 +32,7 @@ class RubricModel(BaseModel):
 class RubricEvalRequestModel(BaseModel):
     context_variables: Dict[str, str]
     responses: List[str]
-    rubric: RubricModel
+    criteria: RubricModel
     bam_api_key: str
     pipeline: str
 
@@ -41,6 +41,13 @@ class RubricEvalRequestModel(BaseModel):
         if not key:
             raise HTTPException(status_code=400, detail="A valid API Key is required.")
         return key
+    
+    @validator('context_variables', pre=True, always=True)
+    def validate_api_key(cls, context_variables):
+        for context_variable_name in context_variables.keys():
+            if context_variable_name == "":
+                raise HTTPException(status_code=400, detail="Context variable names can't be empty.")
+        return context_variables
 
     @validator('pipeline', pre=True, always=True)
     def validate_pipeline(cls, pipeline):

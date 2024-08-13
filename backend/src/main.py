@@ -11,7 +11,7 @@ from genai import Credentials, Client
 from prisma.models import StoredUseCase
 from prisma.errors import PrismaError
 from llmasajudge.evaluators import RubricCriteria, PairwiseCriteria
-from llmasajudge.evaluators import PairwiseEvaluator, RubricEvaluator, list_pairwise, list_rubric, PAIRWISE_TYPE, RUBRIC_TYPE
+from llmasajudge.evaluators import AllVsAllPairwiseEvaluator, RubricEvaluator, list_pairwise, list_rubric, PAIRWISE_TYPE, RUBRIC_TYPE
 from llmasajudge.benchmark.utils import get_all_benchmarks
 from genai.exceptions import ApiResponseException, ApiNetworkException
 import os
@@ -85,11 +85,13 @@ def evaluate(req: PairwiseEvalRequestModel):
     client = Client(credentials=credentials)
 
     try:
-        evaluator = PairwiseEvaluator(id=req.pipeline, client=client)
+        evaluator = AllVsAllPairwiseEvaluator(id=req.pipeline, client=client)
         criteria = PairwiseCriteria.from_json(req.criteria.model_dump_json())
-        [per_response_results, ranking] = evaluator.evaluate(context=req.context_variables, 
+        [per_response_results, ranking] = evaluator.evaluate(
+                                context_variables=req.context_variables, 
                                 responses=req.responses, 
-                                criteria=criteria)
+                                criteria=criteria,
+                                check_bias=True)
         return PairwiseEvalResponseModel(per_response_results=per_response_results, ranking=ranking)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=e)
@@ -116,10 +118,9 @@ def evaluate(req: RubricEvalRequestModel):
     BAM_API_URL = os.getenv("GENAI_API", None)  
     credentials = Credentials(api_key=req.bam_api_key, api_endpoint=BAM_API_URL)
     client = Client(credentials=credentials)
-
     try:
         evaluator = RubricEvaluator(id=req.pipeline, client=client)
-        criteria = RubricCriteria.from_json(req.rubric.model_dump_json())
+        criteria = RubricCriteria.from_json(req.criteria.model_dump_json())
         res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses), 
                                 responses=req.responses, 
                                 rubric=criteria)
