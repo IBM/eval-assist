@@ -49,7 +49,7 @@ export const PairwiseRows = ({
 }: Props) => {
   const onResultBlockClick = (i: number) => {
     setSelectedResultDetails({
-      result: results.perResponseResults[i],
+      result: Object.values(results.perResponseResults)[i],
       expectedResult: expectedResults !== null ? expectedResults[i] : '',
       responseIndex: i,
     })
@@ -77,7 +77,7 @@ export const PairwiseRows = ({
       const perResponseResults = { ...results.perResponseResults }
       delete perResponseResults[i]
       setResults({
-        ranking: results.ranking,
+        ranking: [...results.ranking.slice(0, i), ...results.ranking.slice(i + 1)],
         perResponseResults,
       })
     }
@@ -161,10 +161,12 @@ export const PairwiseRows = ({
                               className={cx(classes.resultBlockTypography, {
                                 [classes.untrastedResultTypography]:
                                   (results !== null &&
-                                    results.perResponseResults[i].positionalBias.some((pBias) => pBias === true)) ||
+                                    Object.values(results.perResponseResults)[i].positionalBias.some(
+                                      (pBias) => pBias === true,
+                                    )) ||
                                   (expectedResults !== null &&
                                     expectedResults[i] !== '' &&
-                                    +expectedResults[i] !== results.perResponseResults[i].ranking + 1),
+                                    +expectedResults[i] !== Object.values(results.perResponseResults)[i].ranking + 1),
                               })}
                             >
                               <strong>{'Winner'}</strong>
