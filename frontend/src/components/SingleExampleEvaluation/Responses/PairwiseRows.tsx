@@ -20,7 +20,7 @@ interface Props {
   explanationOn: boolean
   expectedResultOn: boolean
   setSelectedResultDetails: Dispatch<
-    SetStateAction<{ result: PerResponsePairwiseResult | null; expectedResult: string; responseIndex: number }>
+    SetStateAction<{ result: PerResponsePairwiseResult | null; expectedResult: string; responseIndex: string }>
   >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   pairwiseWinnerIndex: number | null
@@ -51,7 +51,7 @@ export const PairwiseRows = ({
     setSelectedResultDetails({
       result: Object.values(results.perResponseResults)[i],
       expectedResult: expectedResults !== null ? expectedResults[i] : '',
-      responseIndex: i,
+      responseIndex: (+Object.keys(results.perResponseResults)[i] + 1).toString(),
     })
     setResultDetailsModalOpen(true)
   }

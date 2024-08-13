@@ -20,7 +20,7 @@ interface Props {
   explanationOn: boolean
   expectedResultOn: boolean
   setSelectedResultDetails: Dispatch<
-    SetStateAction<{ result: RubricResult | null; expectedResult: string; responseIndex: number }>
+    SetStateAction<{ result: RubricResult | null; expectedResult: string; responseIndex: string }>
   >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
@@ -52,7 +52,7 @@ export const RubricRows = ({
       setSelectedResultDetails({
         result: results[i],
         expectedResult: expectedResults !== null ? expectedResults[i] : '',
-        responseIndex: i,
+        responseIndex: `${i + 1}`,
       })
       setResultDetailsModalOpen(true)
     }

@@ -15,13 +15,13 @@ interface Props {
   selectedResultDetails: {
     result: RubricResult | PerResponsePairwiseResult | null
     expectedResult: string
-    responseIndex: number
+    responseIndex: string
   }
   setSelectedResultDetails: Dispatch<
     SetStateAction<{
       result: RubricResult | PerResponsePairwiseResult | null
       expectedResult: string
-      responseIndex: number
+      responseIndex: string
     }>
   >
   type: PipelineType
@@ -30,7 +30,7 @@ interface Props {
 export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSelectedResultDetails, type }: Props) => {
   const onClose = () => {
     setOpen(false)
-    setSelectedResultDetails({ result: null, expectedResult: '', responseIndex: -1 })
+    setSelectedResultDetails({ result: null, expectedResult: '', responseIndex: '' })
   }
 
   const positionalBiasString = useMemo(() => {
@@ -53,7 +53,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
         onRequestClose={onClose}
         passiveModal
         size="sm"
-        modalHeading={`Result details: Response ${selectedResultDetails.responseIndex + 1}`}
+        modalHeading={`Result details: Response ${selectedResultDetails.responseIndex}`}
       >
         <Layer style={{ display: 'flex', flexDirection: 'column' }}>
           {type === PipelineType.RUBRIC && (

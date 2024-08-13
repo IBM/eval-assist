@@ -34,7 +34,7 @@ interface Props {
     SetStateAction<{
       result: RubricResult | PerResponsePairwiseResult | null
       expectedResult: string
-      responseIndex: number
+      responseIndex: string
     }>
   >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
@@ -161,7 +161,7 @@ export const Responses = ({
               expectedResultOn={expectedResultOn}
               setSelectedResultDetails={
                 setSelectedResultDetails as Dispatch<
-                  SetStateAction<{ result: RubricResult | null; expectedResult: string; responseIndex: number }>
+                  SetStateAction<{ result: RubricResult | null; expectedResult: string; responseIndex: string }>
                 >
               }
               setResultDetailsModalOpen={setResultDetailsModalOpen}
@@ -185,7 +185,7 @@ export const Responses = ({
                   SetStateAction<{
                     result: PerResponsePairwiseResult | null
                     expectedResult: string
-                    responseIndex: number
+                    responseIndex: string
                   }>
                 >
               }
