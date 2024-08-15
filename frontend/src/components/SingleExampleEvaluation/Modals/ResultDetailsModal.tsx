@@ -67,7 +67,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
               <p style={{ marginBottom: '0.5rem' }}>
                 <strong>{'Result: '}</strong> {(selectedResultDetails.result as RubricResult).option}
               </p>
-              <p>
+              <p style={{ marginBottom: '0.5rem' }}>
                 <strong>Positional bias:</strong>{' '}
                 <span
                   className={cx({ [classes['positional-bias-error']]: selectedResultDetails.result.positionalBias })}

@@ -13,6 +13,7 @@ import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
 import { StoredUseCase } from '@prisma/client'
 import {
+  CURRENT_FORMAT_VERSION,
   getQueryParamsFromUseCase,
   getUseCaseStringWithSortedKeys,
   parseFetchedUseCase,
@@ -111,8 +112,6 @@ export const SingleExampleEvaluation = () => {
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
 
   const runEvaluation = async () => {
-    // const criteriaDescription = getEditorContents(editors['criteria-description'])
-    // console.log(criteriaDescription)
     if (currentUseCase === null) return
     setEvaluationFailed(false)
     setEvaluationRunning(true)
@@ -129,28 +128,30 @@ export const SingleExampleEvaluation = () => {
       (acc, item, index) => ({ ...acc, [item.variable]: item.value }),
       {},
     )
+    let body = {
+      context_variables: parsedContextVariables,
+      responses: currentUseCase.responses,
+      bam_api_key: bamAPIKey,
+      pipeline: currentUseCase.pipeline,
+    }
+    const startEvaluationTime = new Date().getTime() / 1000
     if (currentUseCase.type === PipelineType.RUBRIC) {
       response = await post('evaluate/rubric/', {
-        context_variables: parsedContextVariables,
-        responses: currentUseCase.responses,
-        rubric: {
+        ...body,
+        criteria: {
           name: currentUseCase.criteria.name,
           criteria: currentUseCase.criteria.criteria,
           options: (currentUseCase.criteria as RubricCriteria).options,
         },
-        bam_api_key: bamAPIKey,
-        pipeline: currentUseCase.pipeline,
       })
     } else {
       response = await post('evaluate/pairwise/', {
-        context_variables: parsedContextVariables,
-        responses: currentUseCase.responses,
+        ...body,
         criteria: { name: currentUseCase.criteria.name, criteria: currentUseCase.criteria.criteria },
-        bam_api_key: bamAPIKey,
-        pipeline: currentUseCase.pipeline,
       })
     }
-
+    const endEvaluationTime = new Date().getTime() / 1000
+    const totalEvaluationTime = Math.round(endEvaluationTime - startEvaluationTime)
     // only perform after-evaluation-finished actions if the current test case didn't change
     if (isEqualToCurrentTemporaryId(temporaryIdSnapshot)) {
       setEvaluationRunning(false)
@@ -181,11 +182,11 @@ export const SingleExampleEvaluation = () => {
       }
 
       // response is ok
-
       const responseBody = await response.json()
       addToast({
         kind: 'success',
         title: 'Evaluation finished',
+        subtitle: `Took ${totalEvaluationTime}s`,
         timeout: 5000,
       })
 
@@ -267,11 +268,7 @@ export const SingleExampleEvaluation = () => {
     [changeUseCaseURL, evaluationRunning, evaluationRunningToastId, removeToast],
   )
 
-  const updateLastSavedPipeline = useCallback(() => {
-    setLastSavedUseCaseString(currentUseCaseString)
-  }, [setLastSavedUseCaseString, currentUseCaseString])
-
-  const onSave = async () => {
+  const onSave = useCallback(async () => {
     if (currentUseCase === null) return
     const savedUseCase: StoredUseCase = await (
       await put('use_case/', {
@@ -286,6 +283,7 @@ export const SingleExampleEvaluation = () => {
             pipeline: currentUseCase.pipeline,
             expectedResults: currentUseCase.expectedResults,
             responseVariableName: currentUseCase.responseVariableName,
+            contentFormatVersion: CURRENT_FORMAT_VERSION,
           }),
           user_id: -1,
           id: currentUseCase.id,
@@ -295,13 +293,14 @@ export const SingleExampleEvaluation = () => {
     ).json()
 
     const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
+
     setCurrentUseCase(parsedSavedUseCase)
     // update use case in the use cases list
     const i = userUseCases.findIndex((useCase) => useCase.id === currentUseCase.id)
     setUserUseCases([...userUseCases.slice(0, i), parsedSavedUseCase, ...userUseCases.slice(i + 1)])
 
     // update lastSavedUseCase
-    updateLastSavedPipeline()
+    setLastSavedUseCaseString(currentUseCaseString)
 
     // notify the user
     addToast({
@@ -309,64 +308,78 @@ export const SingleExampleEvaluation = () => {
       title: `Test case saved`,
       timeout: 5000,
     })
-  }
+  }, [addToast, currentUseCase, currentUseCaseString, getUserName, put, setUserUseCases, userUseCases])
 
-  const onSaveAs = async (name: string, fromUseCase?: UseCase) => {
-    if (currentUseCase === null) return false
-    const toSaveUseCase = fromUseCase ?? currentUseCase
-    const res = await put('use_case/', {
-      use_case: {
-        name: name,
-        content: JSON.stringify({
-          contextVariables: toSaveUseCase.contextVariables,
-          responses: toSaveUseCase.responses,
-          criteria: toSaveUseCase.criteria,
-          results: toSaveUseCase.results,
-          type: toSaveUseCase.type,
-          pipeline: toSaveUseCase.pipeline,
-          expectedResults: toSaveUseCase.expectedResults,
-          responseVariableName: toSaveUseCase.responseVariableName,
-        }),
-        user_id: -1,
-        id: -1,
-      } as StoredUseCase,
-      user: getUserName(),
-    })
-    if (!res.ok) {
-      const error = (await res.json()) as {
-        detail: string
-      }
-      addToast({
-        kind: 'error',
-        title: error.detail,
-        timeout: 5000,
+  const onSaveAs = useCallback(
+    async (name: string, fromUseCase?: UseCase) => {
+      if (currentUseCase === null) return false
+      const toSaveUseCase = fromUseCase ?? currentUseCase
+      const res = await put('use_case/', {
+        use_case: {
+          name: name,
+          content: JSON.stringify({
+            contextVariables: toSaveUseCase.contextVariables,
+            responses: toSaveUseCase.responses,
+            criteria: toSaveUseCase.criteria,
+            results: toSaveUseCase.results,
+            type: toSaveUseCase.type,
+            pipeline: toSaveUseCase.pipeline,
+            expectedResults: toSaveUseCase.expectedResults,
+            responseVariableName: toSaveUseCase.responseVariableName,
+            contentFormatVersion: CURRENT_FORMAT_VERSION,
+          }),
+          user_id: -1,
+          id: -1,
+        } as StoredUseCase,
+        user: getUserName(),
       })
-      return false
-    } else {
-      const savedUseCase: StoredUseCase = await res.json()
-      const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
-      // useCaseSelected will be different from null when
-      // save as is done before switching from an unsaved
-      // test case that has changes detected
-      // if useCaseSelected is different from null
-      // a rediction will be done to that selected test casen
-      if (useCaseSelected === null) {
-        updateURLFromUseCase(parsedSavedUseCase)
-        setSidebarTabSelected('user_use_cases')
+      if (!res.ok) {
+        const error = (await res.json()) as {
+          detail: string
+        }
+        addToast({
+          kind: 'error',
+          title: error.detail,
+          timeout: 5000,
+        })
+        return false
       } else {
-        updateURLFromUseCase(useCaseSelected)
-      }
-      setUserUseCases([...userUseCases, parsedSavedUseCase])
+        const savedUseCase: StoredUseCase = await res.json()
+        const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
+        // useCaseSelected will be different from null when
+        // save as is done before switching from an unsaved
+        // test case that has changes detected
+        // if useCaseSelected is different from null
+        // a rediction will be done to that selected test casen
+        if (useCaseSelected === null) {
+          updateURLFromUseCase(parsedSavedUseCase)
+          setSidebarTabSelected('user_use_cases')
+        } else {
+          updateURLFromUseCase(useCaseSelected)
+        }
+        setUserUseCases([...userUseCases, parsedSavedUseCase])
 
-      // notify the user
-      addToast({
-        kind: 'success',
-        title: `Created use case '${parsedSavedUseCase.name}'`,
-        timeout: 5000,
-      })
-    }
-    return true
-  }
+        // notify the user
+        addToast({
+          kind: 'success',
+          title: `Created use case '${parsedSavedUseCase.name}'`,
+          timeout: 5000,
+        })
+      }
+      return true
+    },
+    [
+      addToast,
+      currentUseCase,
+      getUserName,
+      put,
+      setSidebarTabSelected,
+      setUserUseCases,
+      updateURLFromUseCase,
+      useCaseSelected,
+      userUseCases,
+    ],
+  )
 
   useSaveShortcut({ onSave, isUseCaseSaved, changesDetected, setSaveUseCaseModalOpen })
 
@@ -477,7 +490,7 @@ export const SingleExampleEvaluation = () => {
                 )
               }
               contextVariableNames={[
-                ...currentUseCase.contextVariables.map((contextVariable) => contextVariable.variable),
+                ...Object.keys(currentUseCase.contextVariables),
                 currentUseCase.responseVariableName,
               ]}
               type={currentUseCase.type}

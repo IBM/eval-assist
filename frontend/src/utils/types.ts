@@ -55,7 +55,7 @@ export interface Option {
   description: string
 }
 
-export interface UseCase {
+export interface UseCaseV0 {
   id: number | null
   name: string
   type: PipelineType
@@ -67,6 +67,12 @@ export interface UseCase {
   expectedResults: null | string[]
   pipeline: string | null
 }
+
+// export interface UseCaseV1 extends Omit<UseCaseV0, 'contextVariables'> {
+//   contextVariables: Record<string, string>
+// }
+
+export type UseCase = UseCaseV0
 
 export enum PipelineType {
   RUBRIC = 'rubric',
