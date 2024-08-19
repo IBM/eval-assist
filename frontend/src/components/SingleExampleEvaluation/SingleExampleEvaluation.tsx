@@ -176,6 +176,7 @@ export const SingleExampleEvaluation = () => {
           kind: 'error',
           title: 'Evaluation failed',
           subtitle: errorMessage,
+          timeout: 5000,
         })
 
         return
@@ -186,7 +187,7 @@ export const SingleExampleEvaluation = () => {
       addToast({
         kind: 'success',
         title: 'Evaluation finished',
-        subtitle: `Took ${totalEvaluationTime}s`,
+        subtitle: `Took ${totalEvaluationTime} seconds`,
         timeout: 5000,
       })
 
