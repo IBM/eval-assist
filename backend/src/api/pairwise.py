@@ -32,7 +32,7 @@ class PairwiseEvalRequestModel(BaseModel):
         return key
 
     @validator('context_variables', pre=True, always=True)
-    def validate_api_key(cls, context_variables):
+    def validate_context_variables_key(cls, context_variables):
         for context_variable_name in context_variables.keys():
             if context_variable_name == "":
                 raise HTTPException(status_code=400, detail="Context variable names can't be empty.")
@@ -40,6 +40,9 @@ class PairwiseEvalRequestModel(BaseModel):
 
     @validator('responses', pre=True, always=True)
     def validate_responses_length(cls, responses):
+        if len(responses) == 0:
+            raise HTTPException(status_code=400, detail="At least one response is required to evaluate.")
+        
         all_valid = True
         for r in responses:
             if len(r.strip()) == 0:
