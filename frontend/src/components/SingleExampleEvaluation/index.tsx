@@ -1,5 +1,4 @@
 import { EditorProvider } from '@components/HighlightTextArea/EditorProvider'
-import { LexicalWrapper } from '@components/HighlightTextArea/LexicalWrapper'
 
 import { AppSidebarProvider } from './Providers/AppSidebarProvider'
 import { BackendUserProvider } from './Providers/BackendUserProvider'
@@ -14,11 +13,9 @@ const Landing = () => (
       <PipelineTypesProvider>
         <URLInfoProvider>
           <AppSidebarProvider>
-            {/* <EditorProvider> */}
-            {/* <LexicalWrapper> */}
-            <SingleExampleEvaluation />
-            {/* </LexicalWrapper> */}
-            {/* </EditorProvider> */}
+            <EditorProvider>
+              <SingleExampleEvaluation />
+            </EditorProvider>
           </AppSidebarProvider>
         </URLInfoProvider>
       </PipelineTypesProvider>

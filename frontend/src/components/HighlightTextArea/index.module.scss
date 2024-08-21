@@ -2,14 +2,17 @@
 @import '@carbon/styles/scss/components/tag/tokens';
 @import '@carbon/styles/scss/type';
 
-.primaryColor {
-  color: $text-primary;
-  white-space: pre;
-}
-
-.matchColor {
+.matchColorPurple {
   color: $tag-color-purple;
   background-color: $tag-background-purple;
+  // white-space: pre;
+  border-radius: 1rem !important;
+  padding: 2px 4px;
+}
+
+.matchColorBlue {
+  color: $tag-color-blue;
+  background-color: $tag-background-blue;
   // white-space: pre;
   border-radius: 1rem !important;
   padding: 2px 4px;
@@ -19,21 +22,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-}
-
-.displayedTextArea {
-  margin-top: -40px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.hiddenTextArea {
-  background: transparent !important;
-  color: transparent !important;
-  caret-color: $background-inverse;
-  z-index: 100;
 }
 
 .contentEditable {
@@ -61,6 +49,7 @@
 }
 
 .textInputLike {
+  max-width: 100%;
   height: 40px !important ;
 }
 

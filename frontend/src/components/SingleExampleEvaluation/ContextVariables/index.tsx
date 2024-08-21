@@ -76,9 +76,8 @@ export const ContextVariables = ({ style, className, contextVariables, setContex
                       ])
                     }}
                     value={contextVariable.value}
-                    id="text-area-model-output_2"
                     labelText={''}
-                    placeholder="The response/text to evaluate."
+                    placeholder="Context variable description"
                     key={`${i}_2`}
                     onFocus={setActive}
                     onBlur={setInactive}

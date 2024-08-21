@@ -129,7 +129,7 @@ export const Responses = ({
               <EditableTag
                 value={responseVariableName}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setResponseVariableName(e.target.value)}
-                color="purple"
+                color="blue"
               />
             </div>
             {expectedResultOn && (

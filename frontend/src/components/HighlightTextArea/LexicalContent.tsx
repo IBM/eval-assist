@@ -1,16 +1,19 @@
 import cx from 'classnames'
-import { EditorState } from 'lexical'
+import { $getRoot, BLUR_COMMAND, COMMAND_PRIORITY_LOW, FOCUS_COMMAND } from 'lexical'
+import { EditorState } from 'lexical/LexicalEditorState'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { TextInputProps } from '@carbon/react/lib/components/TextInput/TextInput'
 
+import { InitialConfigType, LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 
-import { useEditor, useEditorsContext } from './EditorProvider'
+import { BadgeNode } from './BadgeNode'
+import { useEditor } from './EditorProvider'
 import { MultipleEditorStorePlugin } from './MultipleEditorStorePlugin'
 import { NoEnterPlugin } from './NoEnterPlugin'
 import { MatchPlugin } from './TextNodeTransformPlugin'
@@ -20,49 +23,98 @@ import { getEditorContents, setEditorContent } from './utils'
 interface Props {
   isTextArea?: boolean
   isTextInput?: boolean
-  wordList: string[]
+  toHighlightWords: {
+    contextVariables: string[]
+    responseVariableName: string
+  }
   placeholder: TextInputProps['placeholder']
   value: TextInputProps['value']
-  lexicalId: string
+  editorId: string
+  onValueChange: (value: string) => void
 }
 
 const LexicalErrorBoundary: React.FC<{ children: JSX.Element; onError: (error: Error) => void }> = ({ children }) => {
   return <>{children}</>
 }
 
-export const LexicalContent = ({ isTextArea, isTextInput, wordList, placeholder, lexicalId, value }: Props) => {
-  const editor = useEditor(lexicalId)
-  console.log(editor)
-  const { textContents, setTextContents } = useEditorsContext()
+export const LexicalContent = ({
+  isTextArea,
+  isTextInput,
+  toHighlightWords,
+  placeholder,
+  editorId,
+  value,
+  onValueChange,
+}: Props) => {
+  const editor = useEditor(editorId)
+  const _onChange = useCallback(
+    (editorState: EditorState) => {
+      onValueChange(editorState.read(() => $getRoot().getTextContent()))
+    },
+    [onValueChange],
+  )
+
+  const [hasFocus, setFocus] = useState(false)
+
+  useEffect(
+    () =>
+      editor?.registerCommand(
+        BLUR_COMMAND,
+        () => {
+          setFocus(false)
+          return false
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+    [editor],
+  )
+
+  useEffect(
+    () =>
+      editor?.registerCommand(
+        FOCUS_COMMAND,
+        () => {
+          setFocus(true)
+          return false
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+    [editor],
+  )
+
   useEffect(() => {
     if (editor !== null) {
       const editorContents = getEditorContents(editor)
-      // console.log('lexicalId')
-      // console.log(lexicalId)
-      // console.log('value')
-      // console.log(value)
-      // console.log('editorContents')
-      // console.log(editorContents)
-      // console.log('textContents')
-      // console.log(textContents[lexicalId])
-      // console.log("editorContents === ''")
-      // console.log(editorContents === '')
-      // console.log('editorContents !== value')
-      // console.log(editorContents !== value)
-      // console.log('\n')
       if ((editorContents === '' && value !== '') || editorContents !== value) {
-        console.log(`updating ${lexicalId} with: \n ${value}`)
         setEditorContent(value as string, editor)
-        setTextContents((currTextContents) => {
-          return { ...currTextContents, [lexicalId]: value as string }
-        })
       }
     }
-  }, [editor, lexicalId, setTextContents, textContents, value])
+  }, [editor, editorId, value])
 
-  // if (editorIds.length === 0) return null
+  const theme = useMemo(
+    () => ({
+      paragraph: cx(classes.paragraph, {
+        [classes.textAreaLikeInner]: isTextArea,
+        [classes.textInputLike]: isTextInput,
+      }),
+    }),
+    [isTextArea, isTextInput],
+  )
+
+  const initialConfig: InitialConfigType = useMemo(
+    () => ({
+      namespace: editorId,
+      onError(error: Error) {
+        console.error(error)
+      },
+      nodes: [BadgeNode],
+      theme,
+    }),
+    [editorId, theme],
+  )
+
   return (
-    <>
+    <LexicalComposer initialConfig={{ ...initialConfig, namespace: editorId }} key={editorId}>
       <RichTextPlugin
         contentEditable={
           <ContentEditable
@@ -76,15 +128,16 @@ export const LexicalContent = ({ isTextArea, isTextInput, wordList, placeholder,
         }
         ErrorBoundary={LexicalErrorBoundary}
       />
-      <MatchPlugin wordList={wordList} />
+      <MatchPlugin toHighlightWords={toHighlightWords} />
       {isTextInput && <NoEnterPlugin />}
       <HistoryPlugin />
-      {/* <MultipleEditorStorePlugin id={lexicalId} /> */}
-      {/* <OnChangePlugin
-      onChange={(editorState: EditorState) => {
-        onChange(editorState, lexicalId)
-      }}
-    /> */}
-    </>
+      <MultipleEditorStorePlugin id={editorId} />
+      <OnChangePlugin
+        ignoreSelectionChange
+        onChange={(editorState: EditorState) => {
+          _onChange(editorState)
+        }}
+      />
+    </LexicalComposer>
   )
 }

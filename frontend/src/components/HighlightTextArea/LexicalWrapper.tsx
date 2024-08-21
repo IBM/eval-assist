@@ -67,9 +67,7 @@ export const LexicalWrapper = ({ children, ids }: Props) => {
 
   return (
     <LexicalComposer initialConfig={{ ...initialConfig, namespace: id }} key={id}>
-      <MultipleEditorStorePlugin id={id}>
-        <LexicalWrapper ids={nextIds}>{children}</LexicalWrapper>
-      </MultipleEditorStorePlugin>
+      <LexicalWrapper ids={nextIds}>{children}</LexicalWrapper>
     </LexicalComposer>
   )
 }

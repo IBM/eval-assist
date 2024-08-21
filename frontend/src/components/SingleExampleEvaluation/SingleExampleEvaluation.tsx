@@ -3,8 +3,11 @@ import { useLocalStorage } from 'usehooks-ts'
 import { v4 as uuid } from 'uuid'
 
 import { LegacyRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { usePrevious } from 'react-use'
 
 import { useRouter } from 'next/router'
+
+import { TextArea } from '@carbon/react'
 
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
@@ -95,6 +98,27 @@ export const SingleExampleEvaluation = () => {
     [showingTestCase, lastSavedUseCaseString, currentUseCaseString],
   )
 
+  const noUseCaseSelected = useMemo(() => currentUseCase === null, [currentUseCase])
+  const contextVariables = useMemo(
+    () => (noUseCaseSelected ? [] : (currentUseCase as UseCase).contextVariables),
+    [currentUseCase, noUseCaseSelected],
+  )
+  const responseVariableName = useMemo(
+    () => (noUseCaseSelected ? '' : (currentUseCase as UseCase).responseVariableName),
+    [currentUseCase, noUseCaseSelected],
+  )
+  const toHighlightWords = useMemo(() => {
+    return !noUseCaseSelected
+      ? {
+          contextVariables: contextVariables?.map((c) => c.variable),
+          responseVariableName,
+        }
+      : {
+          contextVariables: [],
+          responseVariableName: '',
+        }
+  }, [contextVariables, noUseCaseSelected, responseVariableName])
+
   const [bamAPIKey, setBamAPIKey, removeBamAPIKey] = useLocalStorage<string>('bamAPIKey', '')
 
   const popoverRef = useRef<HTMLDivElement>()
@@ -111,7 +135,7 @@ export const SingleExampleEvaluation = () => {
 
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
 
-  const runEvaluation = async () => {
+  const runEvaluation = useCallback(async () => {
     if (currentUseCase === null) return
     setEvaluationFailed(false)
     setEvaluationRunning(true)
@@ -238,7 +262,7 @@ export const SingleExampleEvaluation = () => {
 
       removeToast(inProgressEvalToastId)
     }
-  }
+  }, [addToast, bamAPIKey, currentUseCase, isEqualToCurrentTemporaryId, post, removeToast])
 
   const changeUseCaseURL = useCallback(
     (queryParams: { key: string; value: string }[] | null) => {
@@ -490,10 +514,7 @@ export const SingleExampleEvaluation = () => {
                   previousCurrentUseCase !== null ? { ...previousCurrentUseCase, criteria } : null,
                 )
               }
-              contextVariableNames={[
-                ...Object.keys(currentUseCase.contextVariables),
-                currentUseCase.responseVariableName,
-              ]}
+              toHighlightWords={toHighlightWords}
               type={currentUseCase.type}
               temporaryId={temporaryIdRef.current}
               style={{ marginBottom: '1rem' }}

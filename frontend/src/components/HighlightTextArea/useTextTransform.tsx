@@ -1,39 +1,47 @@
-import { TextNode } from 'lexical'
+import { $getSelection, $isRangeSelection, TextNode } from 'lexical'
+import { useMediaQuery } from 'usehooks-ts'
 
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
+
+import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
 
 import { $createBadgeNode, BadgeNode } from './BadgeNode'
 import { useFindMatch } from './useFindMatch'
 
-export const useTextTransform = ({ wordList }: { wordList: string[] }) => {
-  const { findMatch } = useFindMatch({ wordList })
+interface Props {
+  contextVariables: string[]
+  responseVariableName: string
+}
+
+export const useTextTransform = ({ contextVariables, responseVariableName }: Props) => {
+  const responseVariableNameAsList = useMemo(() => [responseVariableName], [responseVariableName])
+  const { findMatch: findContextVariablesMatch } = useFindMatch({ wordList: contextVariables })
+  const { findMatch: findResponseVariableMatch } = useFindMatch({ wordList: responseVariableNameAsList })
 
   const textNodeTransform = useCallback(
     (node: TextNode): void => {
-      if (!node.isSimpleText() || node.hasFormat('code')) {
-        return
-      }
-
       const text = node.getTextContent()
-
       // Find only 1st occurrence as transform will be re-run anyway for the rest
       // because newly inserted nodes are considered to be dirty
-      const match = findMatch(text)
+      const match = findContextVariablesMatch(text) || findResponseVariableMatch(text)
       if (match === null) {
         return
       }
       const splits = node.splitText(match.position, match.position + match.length)
 
-      const badgeNode = $createBadgeNode(match.text)
+      const badgeNode = $createBadgeNode(
+        text.substring(match.position, match.position + match.length),
+        match.text === responseVariableName,
+      )
       splits[match.position === 0 ? 0 : 1].replace(badgeNode)
     },
-    [findMatch],
+    [findContextVariablesMatch, findResponseVariableMatch, responseVariableName],
   )
 
   const badgeNodeTransform = useCallback(
     (node: BadgeNode): void => {
       const text = node.getTextContent()
-      const match = findMatch(text)
+      const match = findContextVariablesMatch(text) || findResponseVariableMatch(text)
       if (match === null) {
         node.replace(new TextNode(text))
         return
@@ -43,7 +51,7 @@ export const useTextTransform = ({ wordList }: { wordList: string[] }) => {
         splits[1].replace(new TextNode(splits[1].getTextContent()))
       }
     },
-    [findMatch],
+    [findContextVariablesMatch, findResponseVariableMatch],
   )
 
   return {

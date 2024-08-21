@@ -1,6 +1,6 @@
 import { $getRoot, EditorState, LexicalEditor } from 'lexical'
 
-import { Dispatch, SetStateAction, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 
 type EditorMutationsValue = {
   createEditor: (id: string, editor: LexicalEditor) => void
@@ -8,15 +8,10 @@ type EditorMutationsValue = {
 }
 
 type EditorMap = Record<string, LexicalEditor>
-type TextMap = Record<string, string>
 
 type EditorContextValue = {
   editors: EditorMap
-  textContents: TextMap
-  onChange: (editorState: EditorState, id: string) => void
-  setTextContents: Dispatch<SetStateAction<TextMap>>
-  // editorIds: string[]
-  // setEditorIds: Dispatch<SetStateAction<string[]>>
+  getEditorById: (id: string) => LexicalEditor
 }
 
 const EditorContext = createContext<EditorContextValue | null>(null)
@@ -25,7 +20,7 @@ const EditorMutationContext = createContext<EditorMutationsValue | null>(null)
 export const EditorProvider = (props: React.PropsWithChildren<{}>) => {
   // const [editorIds, setEditorIds] = useState<string[]>([])
   const [editors, setEditors] = useState<EditorMap>({})
-  const [textContents, setTextContents] = useState<TextMap>({})
+
   const createEditor = useCallback((id: string, editor: LexicalEditor) => {
     setEditors((editors) => {
       if (editors[id]) return editors
@@ -41,11 +36,10 @@ export const EditorProvider = (props: React.PropsWithChildren<{}>) => {
     })
   }, [])
 
-  const onChange = (editorState: EditorState, id: string) => {
-    setTextContents((currTextContents) => {
-      return { ...currTextContents, [id]: editorState.read(() => $getRoot().getTextContent()) }
-    })
+  const getEditorById = (id: string): LexicalEditor => {
+    return editors[id]
   }
+
   const mutationsValue = useMemo(
     () => ({
       createEditor,
@@ -58,11 +52,7 @@ export const EditorProvider = (props: React.PropsWithChildren<{}>) => {
     <EditorContext.Provider
       value={{
         editors,
-        textContents,
-        setTextContents,
-        onChange,
-        // editorIds,
-        // setEditorIds,
+        getEditorById,
       }}
     >
       <EditorMutationContext.Provider value={mutationsValue}>{props.children}</EditorMutationContext.Provider>

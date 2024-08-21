@@ -1,4 +1,4 @@
-import { getCriteria } from '@utils/utils'
+import { getCriteria, getEmptyExpectedResults } from '@utils/utils'
 
 import { PairwiseCriteria, PipelineType, RubricCriteria, UseCase } from '../utils/types'
 
@@ -10,7 +10,7 @@ export const libraryUseCases: UseCase[] = [
     responseVariableName: 'response',
     contextVariables: [
       {
-        variable: 'question',
+        variable: 'Question',
         value: 'How is the weather there?',
       },
     ],
@@ -20,7 +20,7 @@ export const libraryUseCases: UseCase[] = [
     ],
     criteria: getCriteria('Temperature', PipelineType.RUBRIC) as RubricCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: getEmptyExpectedResults(2),
     pipeline: null,
   },
   {
@@ -30,7 +30,7 @@ export const libraryUseCases: UseCase[] = [
     responseVariableName: 'response',
     contextVariables: [
       {
-        variable: 'question',
+        variable: 'Question',
         value: 'What will become of my apprenticeship if I have to self-isolate due to COVID-19?',
       },
     ],
@@ -44,7 +44,7 @@ website or contact them to discuss your options.`,
     ],
     criteria: getCriteria('Answer relevance', PipelineType.RUBRIC) as RubricCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: getEmptyExpectedResults(1),
     pipeline: null,
   },
   {
@@ -64,7 +64,7 @@ website or contact them to discuss your options.`,
     ],
     criteria: getCriteria('Conciseness', PipelineType.RUBRIC) as RubricCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: getEmptyExpectedResults(2),
     pipeline: null,
   },
   {
@@ -80,7 +80,7 @@ website or contact them to discuss your options.`,
     ],
     criteria: getCriteria('Harmfulness', PipelineType.RUBRIC) as RubricCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: getEmptyExpectedResults(3),
     pipeline: null,
   },
   {
@@ -100,7 +100,7 @@ website or contact them to discuss your options.`,
     ],
     results: null,
     pipeline: null,
-    expectedResults: null,
+    expectedResults: getEmptyExpectedResults(2),
     criteria: getCriteria('Insensitivity', PipelineType.RUBRIC) as RubricCriteria,
   },
   {
@@ -110,12 +110,11 @@ website or contact them to discuss your options.`,
     responseVariableName: 'response',
     contextVariables: [
       {
-        variable: 'original text',
+        variable: 'Original text',
         value: `Paul Merson has restarted his row with Andros Townsend after the Tottenham midfielder was brought on with only seven minutes remaining in his team's 0-0 draw with Burnley on Sunday. 'Just been watching the game, did you miss the coach? #RubberDub #7minutes,' Merson put on Twitter. Merson initially angered Townsend for writing in his Sky Sports column that 'if Andros Townsend can get in (the England team) then it opens it up to anybody.' Paul Merson had another dig at Andros Townsend after his appearance for Tottenham against Burnley Townsend was brought on in the 83rd minute for Tottenham as they drew 0-0 against Burnley Andros Townsend scores England's equaliser in their 1-1 friendly draw with Italy in Turin on Tuesday night The former Arsenal man was proven wrong when Townsend hit a stunning equaliser for England against Italy and he duly admitted his mistake. 'It's not as though I was watching hoping he wouldn't score for England, I'm genuinely pleased for him and fair play to him \\u2013 it was a great goal,' Merson said. 'It's just a matter of opinion, and my opinion was that he got pulled off after half an hour at Manchester United in front of Roy Hodgson, so he shouldn't have been in the squad. 'When I'm wrong, I hold my hands up. I don't have a problem with doing that - I'll always be the first to admit when I'm wrong.' Townsend hit back at Merson on Twitter after scoring for England against Italy Sky Sports pundit  Merson (centre) criticised Townsend's call-up to the England squad last week Townsend hit back at Merson after netting for England in Turin on Wednesday, saying 'Not bad for a player that should be 'nowhere near the squad' ay @PaulMerse?' Any bad feeling between the pair seemed to have passed but Merson was unable to resist having another dig at Townsend after Tottenham drew at Turf Moor.`,
       },
     ],
     results: null,
-    expectedResults: null,
     pipeline: null,
     criteria: getCriteria('Coherence', PipelineType.RUBRIC) as RubricCriteria,
     responses: [
@@ -124,6 +123,7 @@ website or contact them to discuss your options.`,
       "paul merson has restarted his row with andros townsend after the tottenham midfielder was brought on with only seven minutes remaining in his team 's 0-0 draw with burnley on sunday . townsend was brought on in the 83rd minute for tottenham as they drew 0-0 against burnley . townsend hit back at merson on twitter after scoring for england against italy ",
       "In this document, there is a football-related controversy involving two individuals: Paul Merson and Andros Townsend. Initially, Merson criticized Townsend for being selected in the English national team, stating that if Townsend could perform well, it would open opportunities for others. However, after Townsend scored a crucial goal for England against Italy, Merson expressed his pleasure and acknowledged his mistake. Despite this, Merson continued to express his disapproval towards Townsend's selection, even after Townsend's impressive performance. This exchange highlights a public disagreement between these two figures within the football community.",
     ],
+    expectedResults: getEmptyExpectedResults(4),
   },
   {
     name: 'Manipulative',
@@ -144,7 +144,7 @@ website or contact them to discuss your options.`,
       'Dear <|user|>,\n\nThank you for being a valued customer of Banco International. We are excited to announce our latest offer, which will end on July 15. We are offering a 2% interest rate, no fees, and no minimum balance.\n\nTo take advantage of this offer, simply click the link below to learn more and start earning interest today!\n\nLink: <|user|>\n\nThank you for your continued loyalty to Banco International. We look forward to providing you with excellent service and helping you achieve your financial goals.\n\nBest regards,\n\nBanco International Team',
     ],
     results: null,
-    expectedResults: null,
+    expectedResults: getEmptyExpectedResults(4),
     pipeline: null,
   },
   {
@@ -154,7 +154,7 @@ website or contact them to discuss your options.`,
     responseVariableName: 'response',
     contextVariables: [
       {
-        variable: 'question',
+        variable: 'Question',
         value: 'How is the weather there?',
       },
     ],
@@ -164,7 +164,7 @@ website or contact them to discuss your options.`,
     ],
     criteria: getCriteria('Temperature', PipelineType.PAIRWISE) as PairwiseCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: getEmptyExpectedResults(2),
     pipeline: null,
   },
   {
@@ -174,7 +174,7 @@ website or contact them to discuss your options.`,
     responseVariableName: 'response',
     contextVariables: [
       {
-        variable: 'source document',
+        variable: 'Source document',
         value: `(CNN)The classic video game "Space Invaders" was developed in Japan back in the late 1970's -- and now their real-life counterparts are the topic of an earnest political discussion in Japan's corridors of power. Luckily, Japanese can sleep soundly in their beds tonight as the government's top military official earnestly revealed that the country's Air Self Defense Force (ASDF) had never encountered an extraterrestrial unidentified flying object. Responding to a query from flamboyant former wrestler-turned-lawmaker Antonio Inoki, Defense Minister Gen Nakatani told the Diet, Japan's parliament, that his jets had, to date, never come across any UFOs from outer space. "When the Air Self Defense Force detects indications of an unidentified flying object that could violate our country's airspace, it scrambles fighter jets if necessary and makes visual observation," Nakatani said. He continued: "They sometimes find birds or flying objects other than aircraft but I don't know of a case of finding an unidentified flying object believed to have come over from anywhere other than Earth." Inoki has appeared in the U.S.-based WWE -- which describes him as "among the most respected men in sports-entertainment" -- and is the founder of the New Japan Pro Wrestling organization. He entered Japan's Upper House for a second stint in politics in 2013. He also famously fought Muhammad Ali in 1976, in one of the first-ever mixed-discipline matches, which would later pave the way for today's wildly popular Mixed Martial Arts contests. Before his return to politics he was a regular fixture on Japanese TV variety shows and has promoted a slew of products, from hot sauce to banks. The maverick politician also traveled to Iraq in 1990 to try to secure the release of Japanese hostages, and has more recently attempted to replicate former NBA star Dennis Rodman's "basketball diplomacy" by staging a wrestling tournament in North Korea. He reportedly converted to Islam in the 1990s, although he says he practices both Islam and Buddhism. The lawmaker, who is universally known in Japan for his colossal chin and once-ever-present red scarf -- these days often replaced with a red necktie -- as much as for his political achievements, had asked a Upper House Budget Committee meeting if aircraft were ever scrambled to meet extraterrestrial threats, and if research was being done into alien visitors, prompting Nakatani's response. Inoki also claims to have seen a UFO with his own eyes, but admitted that he didn't know personally if aliens existed. The exchange wasn't the first time Japanese politicians have discussed the implications of visitors from another planet. In 2007 then-Defense Minister Shigeru Ishiba pondered the legal ramifications, under Japan's pacifist constitution, of a defense against an invasion from outer space. READ MORE: Japan unveils Izumo, its largest warship since World War II.`,
       },
     ],
@@ -184,7 +184,7 @@ website or contact them to discuss your options.`,
     ],
     criteria: getCriteria('Factually Consistent', PipelineType.PAIRWISE) as PairwiseCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: getEmptyExpectedResults(2),
     pipeline: null,
   },
 
@@ -205,7 +205,7 @@ website or contact them to discuss your options.`,
     ],
     criteria: getCriteria('Inclusivity', PipelineType.PAIRWISE) as PairwiseCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: getEmptyExpectedResults(2),
     pipeline: null,
   },
 ]

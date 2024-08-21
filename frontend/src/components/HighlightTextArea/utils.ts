@@ -3,7 +3,6 @@ import {
   $createParagraphNode,
   $createTextNode,
   $getRoot,
-  $isParagraphNode,
   $setSelection,
   LexicalEditor,
   LexicalNode,

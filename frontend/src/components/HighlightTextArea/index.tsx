@@ -1,46 +1,43 @@
-import { $createParagraphNode, $createTextNode, $getRoot, LexicalEditor } from 'lexical'
-
-import React, { useCallback, useEffect } from 'react'
+import React, { memo } from 'react'
 
 import { TextInputProps } from '@carbon/react/lib/components/TextInput/TextInput'
 
 import { CarbonWrapper } from './CarbonWrapper'
-import { useEditor } from './EditorProvider'
 import { LexicalContent } from './LexicalContent'
-import { LexicalWrapper } from './LexicalWrapper'
-import { getEditorContents, setEditorContent } from './utils'
 
 interface Props extends TextInputProps {
-  wordList: string[]
+  toHighlightWords: {
+    contextVariables: string[]
+    responseVariableName: string
+  }
   isTextArea?: boolean
   isTextInput?: boolean
-  lexicalId: string
+  editorId: string
+  onValueChange: (value: string) => void
 }
 
-const HighlightTextArea = ({
+export const HighlightTextArea = memo(function HighlightTextArea({
   value,
   labelText,
-  wordList,
+  toHighlightWords,
   className,
   placeholder,
   isTextArea = false,
   isTextInput = false,
-  lexicalId,
-}: Props) => {
+  editorId,
+  onValueChange,
+}: Props) {
   return (
-    // <LexicalWrapper lexicalId={lexicalId} isTextArea={isTextArea} isTextInput={isTextInput}>
     <CarbonWrapper isTextArea={isTextArea} isTextInput={isTextInput} labelText={labelText} className={className}>
       <LexicalContent
         isTextArea={isTextArea}
         isTextInput={isTextInput}
-        wordList={wordList}
+        toHighlightWords={toHighlightWords}
         placeholder={placeholder}
-        lexicalId={lexicalId}
+        editorId={editorId}
         value={value}
+        onValueChange={onValueChange}
       />
     </CarbonWrapper>
-    // </LexicalWrapper>
   )
-}
-
-export default HighlightTextArea
+})

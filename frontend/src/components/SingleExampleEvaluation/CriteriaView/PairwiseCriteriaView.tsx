@@ -11,24 +11,27 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  TextArea,
   TextInput,
 } from '@carbon/react'
 import { Edit, Save } from '@carbon/react/icons'
 
-import HighlightTextArea from '@components/HighlightTextArea'
+import { HighlightTextArea } from '@components/HighlightTextArea'
 import { isInstanceOfPairwiseCriteria } from '@utils/utils'
 
 import { PairwiseCriteria } from '../../../utils/types'
 import { JSONTextArea } from '../JSONTextArea'
 import classes from '../SingleExampleEvaluation.module.scss'
+import customClasses from './index.module.scss'
 
 interface EvaluationCriteriaProps {
   pairwiseCriteria: PairwiseCriteria
   setCriteria: Dispatch<SetStateAction<PairwiseCriteria>>
   selectedTabIndex: number
   setSelectedTabIndex: Dispatch<SetStateAction<number>>
-  contextVariableNames: string[]
+  toHighlightWords: {
+    contextVariables: string[]
+    responseVariableName: string
+  }
   className?: string
   style?: CSSProperties
 }
@@ -38,7 +41,7 @@ export const PairwiseCriteriaView = ({
   setCriteria,
   selectedTabIndex,
   setSelectedTabIndex,
-  contextVariableNames,
+  toHighlightWords,
   style,
 }: EvaluationCriteriaProps) => {
   const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(pairwiseCriteria.name === '')
@@ -121,24 +124,24 @@ export const PairwiseCriteriaView = ({
                           )}
                         </div>
                       </div>
-                      {/* <HighlightTextArea
-                        onChange={(e) => setCriteria({ ...pairwiseCriteria, criteria: e.target.value })}
-                        value={pairwiseCriteria.criteria}
-                        id="text-area-evaluation-instruction"
+                      <HighlightTextArea
+                        id="criteria-description-rubric"
+                        key="criteria-description-rubric"
                         labelText="Criteria"
+                        toHighlightWords={toHighlightWords}
+                        value={pairwiseCriteria.criteria}
+                        className={customClasses.criteriaText}
+                        isTextInput={false}
+                        isTextArea={true}
+                        editorId={'criteria-description-rubric'}
                         style={{ marginBottom: '1rem' }}
                         placeholder="Describe your evaluation criteria as a question e.g Is the response gramatically correct?"
-                        wordList={contextVariableNames}
-                        isTextArea
-                        lexicalId={'criteria-description-pairwise'}
-                      /> */}
-                      <TextArea
-                        onChange={(e) => setCriteria({ ...pairwiseCriteria, criteria: e.target.value })}
-                        value={pairwiseCriteria.criteria}
-                        id="text-area-evaluation-instruction"
-                        labelText="Criteria"
-                        style={{ marginBottom: '1rem' }}
-                        placeholder="Describe your evaluation criteria as a question e.g Is the response gramatically correct?"
+                        onValueChange={(value: string) =>
+                          setCriteria({
+                            ...pairwiseCriteria,
+                            criteria: value,
+                          })
+                        }
                       />
                     </Layer>
                   </div>

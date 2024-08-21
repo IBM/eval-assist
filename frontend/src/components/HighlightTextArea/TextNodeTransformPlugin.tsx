@@ -1,23 +1,30 @@
-import { LexicalEditor, TextNode } from 'lexical'
+import { $getRoot, $setSelection, LexicalEditor, TextNode } from 'lexical'
 
 import { useEffect } from 'react'
 
+import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 
-import { $createBadgeNode, BadgeNode } from './BadgeNode'
+import { BadgeNode } from './BadgeNode'
 import { useTextTransform } from './useTextTransform'
 
 interface Props {
-  wordList: string[]
+  toHighlightWords: {
+    contextVariables: string[]
+    responseVariableName: string
+  }
 }
 
-export const MatchPlugin = ({ wordList }: Props) => {
+export const MatchPlugin = ({ toHighlightWords }: Props) => {
   const [editor] = useLexicalComposerContext()
-  const { textNodeTransform, badgeNodeTransform } = useTextTransform({ wordList })
+  const { textNodeTransform, badgeNodeTransform } = useTextTransform(toHighlightWords)
 
   useEffect(() => {
     const unregisterTextNodeTransform = editor.registerNodeTransform(TextNode, textNodeTransform)
     const unregisterBadgeNodeTransform = editor.registerNodeTransform(BadgeNode, badgeNodeTransform)
+    editor.update(() => {
+      $setSelection(null)
+    })
     return () => {
       unregisterTextNodeTransform()
       unregisterBadgeNodeTransform()

@@ -13,7 +13,7 @@ interface Props {
 
 export const CarbonWrapper = ({ isTextArea, isTextInput, className, labelText, children }: Props) => {
   return isTextInput ? (
-    <div className={cx('cds--form-item', 'cds--text-input-wrapper', className)} key={uuid()}>
+    <div className={cx('cds--form-item', 'cds--text-input-wrapper', className)} style={{ overflow: 'hidden' }}>
       <div className="cds--text-input__label-wrapper">
         <label htmlFor="text-area-evaluation-instruction" className="cds--label">
           {labelText}
@@ -24,7 +24,7 @@ export const CarbonWrapper = ({ isTextArea, isTextInput, className, labelText, c
       </div>
     </div>
   ) : isTextArea ? (
-    <div className={cx('cds--form-item', className)} key={uuid()}>
+    <div className={cx('cds--form-item', className)}>
       <div className={cx('cds--text-area-label-wrapper')}>
         <label htmlFor="text-area-evaluation-instruction" className="cds--label">
           {labelText}
