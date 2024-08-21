@@ -25,7 +25,6 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ ses
         <meta name="msapplication-TileColor" content="#052fad" />
         <meta name="theme-color" content="#161616" />
       </Head>
-      <RouterLoading />
       <SessionProvider session={session}>
         <AppShell>
           <Component {...pageProps} />
