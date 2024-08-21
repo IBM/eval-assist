@@ -4,7 +4,7 @@ import { ReactNode, createContext, useContext, useEffect, useMemo, useState } fr
 
 import { Loading } from '@carbon/react'
 
-import { get } from '@utils/fetchUtils'
+import { useFetchUtils } from '@customHooks/useFetchUtils'
 
 import { Pipeline, PipelineType } from '../../../utils/types'
 
@@ -27,7 +27,7 @@ export const usePipelineTypesContext = () => {
 export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => {
   const [pipelines, setPipelines] = useState<Pipeline[] | null>(null)
   const [loadingPipelines, setLoadingPipelines] = useState(false)
-
+  const { get } = useFetchUtils()
   const rubricPipelines = useMemo(
     () => pipelines?.filter((p) => p.type === PipelineType.RUBRIC).map((p) => p.name) ?? null,
     [pipelines],

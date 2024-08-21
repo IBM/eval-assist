@@ -3,8 +3,8 @@ import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffe
 import { Loading } from '@carbon/react'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
+import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { StoredUseCase } from '@prisma/client'
-import { get } from '@utils/fetchUtils'
 import { parseFetchedUseCase } from '@utils/utils'
 
 import { UseCase } from '../../../utils/types'
@@ -27,6 +27,8 @@ export const UserUseCasesProvider = ({ children }: { children: ReactNode }) => {
   const [loadingUseCases, setLoadingUseCases] = useState(false)
   const [userUseCases, setUserUseCases] = useState<UseCase[] | null>(null)
   const { getUserName } = useAuthentication()
+  const { get } = useFetchUtils()
+
   useEffect(() => {
     const fetchUseCases = async () => {
       setLoadingUseCases(true)

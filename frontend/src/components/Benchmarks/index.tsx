@@ -1,5 +1,3 @@
-import { Benchmark } from '@utils/types'
-
 import { BenchmarkView } from './BenchmarkView'
 import { Landing } from './Landing'
 import { BenchmarksProvider } from './Providers/BenchmarksProvider'

@@ -3,8 +3,8 @@ import { ReactNode, createContext, useContext, useEffect, useState } from 'react
 import { Loading } from '@carbon/react'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
+import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { AppUser } from '@prisma/client'
-import { post } from '@utils/fetchUtils'
 
 interface BackendUserContextValue {
   backendUser: AppUser | null
@@ -24,6 +24,7 @@ export const BackendUserProvider = ({ children }: { children: ReactNode }) => {
   const [fetchingBackendUser, setFetchingBackendUser] = useState(false)
   const { user, authenticationEnabled, defaultUserName } = useAuthentication()
   const [backendUser, setBackendUser] = useState<AppUser | null>(null)
+  const { post } = useFetchUtils()
 
   useEffect(() => {
     const createUserIfNotExist = async () => {

@@ -2,7 +2,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from 'react
 
 import { Loading } from '@carbon/react'
 
-import { get } from '@utils/fetchUtils'
+import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { Benchmark } from '@utils/types'
 
 interface BenchmarksContextValue {
@@ -20,6 +20,7 @@ export const useBenchmarksContext = () => {
 export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
   const [benchmarks, setBenchmarks] = useState<Benchmark[]>([])
   const [loadingBenchmarks, setLoadingBenchmarks] = useState(false)
+  const { get } = useFetchUtils()
 
   useEffect(() => {
     const getBenchmarks = async () => {
