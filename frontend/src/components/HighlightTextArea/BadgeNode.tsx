@@ -25,7 +25,7 @@ export class BadgeNode extends TextNode {
 
   createDOM(): HTMLElement {
     const span = document.createElement('span')
-    span.className = cx('cds--tag', 'cds--layout--size-md', classes.tag, {
+    span.className = cx('cds--tag', 'cds--layout--size-sm', classes.tag, {
       'cds--tag--blue': this.isResponseVariable,
       'cds--tag--purple': !this.isResponseVariable,
     })

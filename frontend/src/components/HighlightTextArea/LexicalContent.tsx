@@ -47,39 +47,12 @@ export const LexicalContent = ({
   onValueChange,
 }: Props) => {
   const editor = useEditor(editorId)
+
   const _onChange = useCallback(
     (editorState: EditorState) => {
       onValueChange(editorState.read(() => $getRoot().getTextContent()))
     },
     [onValueChange],
-  )
-
-  const [hasFocus, setFocus] = useState(false)
-
-  useEffect(
-    () =>
-      editor?.registerCommand(
-        BLUR_COMMAND,
-        () => {
-          setFocus(false)
-          return false
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-    [editor],
-  )
-
-  useEffect(
-    () =>
-      editor?.registerCommand(
-        FOCUS_COMMAND,
-        () => {
-          setFocus(true)
-          return false
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-    [editor],
   )
 
   useEffect(() => {
@@ -97,7 +70,6 @@ export const LexicalContent = ({
         [classes.textAreaLikeInner]: isTextArea,
         [classes.textInputLike]: isTextInput,
       }),
-      text: { base: cx(classes.normalSpan) },
     }),
     [isTextArea, isTextInput],
   )
