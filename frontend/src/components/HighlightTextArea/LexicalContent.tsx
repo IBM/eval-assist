@@ -91,12 +91,13 @@ export const LexicalContent = ({
     }
   }, [editor, editorId, value])
 
-  const theme = useMemo(
+  const theme: InitialConfigType['theme'] = useMemo(
     () => ({
       paragraph: cx(classes.paragraph, {
         [classes.textAreaLikeInner]: isTextArea,
         [classes.textInputLike]: isTextInput,
       }),
+      text: { base: cx(classes.normalSpan) },
     }),
     [isTextArea, isTextInput],
   )
