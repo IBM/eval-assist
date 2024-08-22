@@ -4,6 +4,10 @@ import { NodeKey } from 'lexical/LexicalNode'
 
 import classes from './index.module.scss'
 
+interface SerializedBadgeNode extends SerializedTextNode {
+  isResponseVariable: boolean
+}
+
 export class BadgeNode extends TextNode {
   isResponseVariable: boolean
   static getType(): string {
@@ -29,14 +33,15 @@ export class BadgeNode extends TextNode {
     return span
   }
 
-  static importJSON(serializedNode: SerializedTextNode): BadgeNode {
-    return $createBadgeNode(serializedNode.text, false)
+  static importJSON(serializedNode: SerializedBadgeNode): BadgeNode {
+    return $createBadgeNode(serializedNode.text, serializedNode.isResponseVariable)
   }
 
-  exportJSON(): SerializedTextNode {
+  exportJSON(): SerializedBadgeNode {
     return {
       ...super.exportJSON(),
       type: 'badge',
+      isResponseVariable: this.isResponseVariable,
     }
   }
 }
