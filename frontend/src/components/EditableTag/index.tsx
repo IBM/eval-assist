@@ -55,7 +55,7 @@ export const EditableTag = ({ value, onChange, setActive, setInactive, i, color,
           </>
         ) : (
           <>
-            <Tag type={color} size={'md'} className={cx(classes.tag)}>
+            <Tag type={color} size={'sm'} className={cx(classes.tag)}>
               {value}
             </Tag>
             <IconButton kind={'ghost'} label={'Edit'} onClick={() => setIsEditing(true)}>
