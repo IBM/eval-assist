@@ -9,7 +9,10 @@ export const useFetchUtils = () => {
     async (path: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', body?: any) => {
       const isFormData = body instanceof FormData
       const contentType = 'application/json'
-      const headers: { [key: string]: any } = { user_id: backendUser?.id ?? null }
+      const headers: { [key: string]: any } = {}
+      if (backendUser) {
+        headers['user_id'] = backendUser.id
+      }
       if (!isFormData) {
         headers['Content-Type'] = contentType
       }
