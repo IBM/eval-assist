@@ -578,6 +578,12 @@ export const SingleExampleEvaluation = () => {
           </>
         )}
       </div>
+      <NewUseCaseModal
+        open={newUseCaseModalOpen}
+        setOpen={setNewUseCaseModalOpen}
+        changesDetected={changesDetected}
+        setCurrentUseCase={updateURLFromUseCase}
+      />
       {currentUseCase !== null && (
         <>
           <SwitchUseCaseModal
@@ -598,12 +604,7 @@ export const SingleExampleEvaluation = () => {
             setOpen={setSaveUseCaseModalOpen}
             onSaveAs={onSaveAs}
           />
-          <NewUseCaseModal
-            open={newUseCaseModalOpen}
-            setOpen={setNewUseCaseModalOpen}
-            changesDetected={changesDetected}
-            setCurrentUseCase={updateURLFromUseCase}
-          />
+
           <DeleteUseCaseModal
             open={deleteUseCaseModalOpen}
             setOpen={setDeleteUseCaseModalOpen}
