@@ -1,26 +1,24 @@
-from typing import Optional
+import traceback
+from typing import Optional, Union
 from fastapi import FastAPI, status, HTTPException, APIRouter
-from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, RootModel
+
+from .api.pairwise import PairwiseEvalRequestModel, PairwiseEvalResponseModel
+from .api.rubric import RubricEvalRequestModel, RubricEvalResponseModel
 
 from .db_client import db
-import pandas as pd 
 import json
-from genai import Credentials, Client
 from prisma.models import StoredUseCase
 from prisma.errors import PrismaError
-from llmasajudge.evaluators import RubricCriteria, PairwiseCriteria
-from llmasajudge.evaluators import AllVsAllPairwiseEvaluator, RubricEvaluator, list_pairwise, list_rubric, PAIRWISE_TYPE, RUBRIC_TYPE
+from llmasajudge.evaluators import get_rubric_evaluator, get_all_vs_all_pairwise_evaluator, available_evaluators, EvaluatorTypeEnum, PairwiseCriteria, RubricCriteria, Evaluator
 from llmasajudge.benchmark.utils import get_all_benchmarks
 from genai.exceptions import ApiResponseException, ApiNetworkException
-import os
+from ibm_watsonx_ai.wml_client_error import ApiRequestFailure
 import json
 
 # API type definitions
-from  .api.pipelines import PipelinesResponseModel, PipelineModel, PAIRWISE_TYPE, RUBRIC_TYPE
-from  .api.pairwise import PairwiseEvalRequestModel, PairwiseEvalResponseModel
-from  .api.rubric import RubricEvalRequestModel, RubricEvalResponseModel
+from .api.pipelines import PipelinesResponseModel
 
 # Logging req/resp
 from .logger import LoggingRoute
@@ -68,63 +66,38 @@ Get the list of available pipelines, as supported by llm-as-a-judge library
 '''
 @router.get("/pipelines/", response_model=PipelinesResponseModel)
 def get_pipelines():
-    available_pipelines = []
-    for name in list_rubric():
-        available_pipelines.append(PipelineModel(name=name, type=RUBRIC_TYPE))
-    for name in list_pairwise():
-        available_pipelines.append(PipelineModel(name=name, type=PAIRWISE_TYPE))
+    available_pipelines = [e.metadata for e in available_evaluators]
     return PipelinesResponseModel(pipelines=available_pipelines)
 
-'''
-Single pairwise evaluation endpoint
-'''
-@router.post("/evaluate/pairwise/", response_model=PairwiseEvalResponseModel)
-def evaluate(req: PairwiseEvalRequestModel):
-    BAM_API_URL = os.getenv("GENAI_API", None)  
-    credentials = Credentials(api_key=req.bam_api_key, api_endpoint=BAM_API_URL)
-    client = Client(credentials=credentials)
 
+
+'''
+Single evaluation endpoint
+TODO: Update endpoint path 
+'''
+@router.post("/evaluate/", response_model=Union[RubricEvalResponseModel, PairwiseEvalResponseModel])
+def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
+    # Gen ai client
     try:
-        evaluator = AllVsAllPairwiseEvaluator(id=req.pipeline, client=client)
-        criteria = PairwiseCriteria.from_json(req.criteria.model_dump_json())
-        [per_response_results, ranking] = evaluator.evaluate(
+        if req.type == EvaluatorTypeEnum.RUBRIC:
+            evaluator = get_rubric_evaluator(name=req.pipeline, credentials=req.model_provider_credentials)
+            criteria = RubricCriteria(name=req.criteria.name, criteria=req.criteria.criteria, options=req.criteria.options)
+
+            res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses), 
+                                    responses=req.responses, 
+                                    criteria=criteria,
+                                    check_bias=True)
+            return RubricEvalResponseModel(results=res)
+        elif req.type == EvaluatorTypeEnum.ALL_V_ALL_PAIRWISE:
+            evaluator = get_all_vs_all_pairwise_evaluator(name=req.pipeline, credentials=req.model_provider_credentials)
+            criteria = PairwiseCriteria(name=req.criteria.name, criteria=req.criteria.criteria)
+            [per_response_results, ranking] = evaluator.evaluate(
                                 context_variables=req.context_variables, 
                                 responses=req.responses, 
                                 criteria=criteria,
                                 check_bias=True)
-        return PairwiseEvalResponseModel(per_response_results=per_response_results, ranking=ranking)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=e)
-    except ApiResponseException as e:
-        if e.response.error == "Unauthorized":
-            throw_authorized_exception()
-        print('raised ApiResponseException')
-        print(e.response.error)
-        raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
-    except ApiNetworkException as e:
-        # I think the random errors thrown by BAM are of type ApiNetworkException, lets maintain error
-        # handling this way till we know better how they are thrown
-        print('raised ApiNetworkException')
-        print(e.response.error)
-        raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
+            return PairwiseEvalResponseModel(per_response_results=per_response_results, ranking=ranking)
 
-'''
-Single rubric evaluation endpoint
-TODO: Update endpoint path 
-'''
-@router.post("/evaluate/rubric/", response_model=RubricEvalResponseModel)
-def evaluate(req: RubricEvalRequestModel):
-    # Gen ai client
-    BAM_API_URL = os.getenv("GENAI_API", None)  
-    credentials = Credentials(api_key=req.bam_api_key, api_endpoint=BAM_API_URL)
-    client = Client(credentials=credentials)
-    try:
-        evaluator = RubricEvaluator(id=req.pipeline, client=client)
-        criteria = RubricCriteria.from_json(req.criteria.model_dump_json())
-        res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses), 
-                                responses=req.responses, 
-                                rubric=criteria)
-        return RubricEvalResponseModel(results=res)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except ApiResponseException as e:
@@ -132,14 +105,16 @@ def evaluate(req: RubricEvalRequestModel):
             throw_authorized_exception()
         print('raised ApiResponseException')
         print(e.response.error)
-        raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
+        raise HTTPException(status_code=400, detail="Something went wrong running the evaluation. Please try again.")
     except ApiNetworkException as e:
         # I think the random errors thrown by BAM are of type ApiNetworkException, lets maintain error
         # handling this way till we know better how they are thrown
         print('raised ApiNetworkException')
-        print(e.response.error)
+        traceback.print_exc()      
         raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
-
+    except ApiRequestFailure as e:
+        traceback.print_exc()      
+        raise HTTPException(status_code=400, detail="e.error_msg")
 
 @router.get("/use_case/")
 def get_use_cases(user: str):

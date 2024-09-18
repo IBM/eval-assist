@@ -1,6 +1,9 @@
 from pydantic import BaseModel, validator
 from fastapi import HTTPException
-from typing import Dict, List, Optional
+from typing import List, Literal, Optional
+from llmasajudge.evaluators import  EvaluatorTypeEnum
+
+from .common import CriteriaModel, EvalRequestModel
 
 class RubricOptionModel(BaseModel):
     option: str
@@ -12,16 +15,8 @@ class RubricOptionModel(BaseModel):
             raise HTTPException(status_code=400, detail="Invalid criteria, empty rubric answers are not allowed.")
         return option
 
-class RubricModel(BaseModel):
-    name: str
-    criteria: str
+class RubricCriteriaModel(CriteriaModel):
     options: List[RubricOptionModel]
-
-    @validator('criteria', pre=True, always=True)
-    def validate_criteria(cls, criteria):
-        if len(criteria.strip()) == 0:
-            raise HTTPException(status_code=400, detail="Rubric criteria is required.")
-        return criteria
 
     @validator('options', pre=True, always=True)
     def validate_options_length(cls, options):
@@ -29,32 +24,9 @@ class RubricModel(BaseModel):
             raise HTTPException(status_code=400, detail="Rubrics require a minimum of 2 options.")
         return options
 
-class RubricEvalRequestModel(BaseModel):
-    context_variables: Dict[str, str]
-    responses: List[str]
-    criteria: RubricModel
-    bam_api_key: str
-    pipeline: str
+class RubricEvalRequestModel(EvalRequestModel):
+    criteria: RubricCriteriaModel
 
-    @validator('bam_api_key', pre=True, always=True)
-    def validate_api_key(cls, key):
-        if not key:
-            raise HTTPException(status_code=400, detail="A valid API Key is required.")
-        return key
-    
-    @validator('context_variables', pre=True, always=True)
-    def validate_context_variables_key(cls, context_variables):
-        for context_variable_name in context_variables.keys():
-            if context_variable_name == "":
-                raise HTTPException(status_code=400, detail="Context variable names can't be empty.")
-        return context_variables
-
-    @validator('pipeline', pre=True, always=True)
-    def validate_pipeline(cls, pipeline):
-        if not pipeline:
-            raise HTTPException(status_code=400, detail="A valid pipeline name is required.")
-        return pipeline
-    
     @validator('responses', pre=True, always=True)
     def validate_responses_length(cls, responses):
         if len(responses) == 0:
