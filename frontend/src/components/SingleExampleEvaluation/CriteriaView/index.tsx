@@ -2,7 +2,7 @@ import { CSSProperties, Dispatch, SetStateAction, useEffect, useState } from 're
 
 import { returnByPipelineType } from '@utils/utils'
 
-import { PairwiseCriteria, PipelineType, RubricCriteria } from '../../../utils/types'
+import { PairwiseCriteria, PipelineType, RubricCriteria } from '../../../types'
 import { PairwiseCriteriaView } from './PairwiseCriteriaView'
 import { RubricCriteriaView } from './RubricCriteriaView'
 

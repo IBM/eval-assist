@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
 import { useMemo, useState } from 'react'
 
@@ -9,12 +10,11 @@ import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
-import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 
-import { UseCase } from '../../../utils/types'
+import { UseCase } from '../../../types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
+import classes from './LibraryUseCasePanel.module.scss'
 import { LinkButton } from './LinkButton'
-import classes from './UseCasePanel.module.scss'
 
 interface Props {
   onUseCaseClick: (useCase: UseCase) => void
@@ -22,9 +22,12 @@ interface Props {
 }
 
 export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
-  const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean }>({
+  const { rubricLibraryTestCases, pairwiseLibraryTestCases } = useLibraryTestCases()
+
+  const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean } & { [key: string]: boolean }>({
     rubric: true,
     pairwise: true,
+    ...Object.keys(rubricLibraryTestCases).reduce((acc, item, index) => ({ ...acc, [item]: true }), {}),
   })
 
   const { preloadedUseCase } = useURLInfoContext()
@@ -35,13 +38,11 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
       : []
   }, [preloadedUseCase])
 
-  const handleToggle = (key: 'rubric' | 'pairwise') =>
+  const handleToggle = (key: string) =>
     setExpanded({
       ...expanded,
       [key]: !expanded[key],
     })
-
-  const { rubricLibraryTestCases, pairwiseLibraryTestCases } = useLibraryTestCases()
 
   const onClick = (e: any, useCase: UseCase) => {
     e.stopPropagation()
@@ -58,22 +59,29 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
         </IconButton>
       </header>
       <div className={classes.content}>
-        <div className={classes.prompts}>
-          <section className={classes.section}>
-            <div className={classes['tree-wrapper']}>
-              <TreeView className={classes['tree-root']} label="" selected={selectedNode}>
+        <div className={classes.treeWrapper}>
+          <TreeView label="" selected={selectedNode}>
+            <TreeNode
+              key={'rubric'}
+              label={RUBRIC_NAME}
+              onSelect={() => handleToggle('rubric')}
+              onToggle={() => handleToggle('rubric')}
+              isExpanded={expanded.rubric}
+            >
+              {Object.entries(rubricLibraryTestCases).map(([categoryName, useCases]) => (
                 <TreeNode
-                  id={'rubric'}
-                  label={RUBRIC_NAME}
-                  onSelect={() => handleToggle('rubric')}
-                  onToggle={() => handleToggle('rubric')}
-                  isExpanded={expanded['rubric']}
+                  label={categoryName}
+                  onSelect={() => handleToggle(categoryName)}
+                  onToggle={() => handleToggle(categoryName)}
+                  isExpanded={expanded[categoryName]}
+                  key={categoryName}
+                  className={classes.treeCategory}
                 >
-                  {rubricLibraryTestCases.map((useCase, i) => (
+                  {useCases.map((useCase, i) => (
                     <TreeNode
                       label={
-                        <div className={classes['tree-node-content']}>
-                          <span className={classes['tree-node-label']}>{useCase.name}</span>
+                        <div className={classes['treeNodeContent']}>
+                          <span className={classes['treeNodeLabel']}>{useCase.name}</span>
                           <LinkButton useCase={useCase} />
                         </div>
                       }
@@ -84,31 +92,31 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
                     />
                   ))}
                 </TreeNode>
+              ))}
+            </TreeNode>
+            <TreeNode
+              key={'pairwise'}
+              label={PAIRWISE_NAME}
+              onSelect={() => handleToggle('pairwise')}
+              onToggle={() => handleToggle('pairwise')}
+              isExpanded={expanded.pairwise}
+            >
+              {pairwiseLibraryTestCases.map((useCase, i) => (
                 <TreeNode
-                  id={'pairwise'}
-                  label={PAIRWISE_NAME}
-                  onSelect={() => handleToggle('pairwise')}
-                  onToggle={() => handleToggle('pairwise')}
-                  isExpanded={expanded['pairwise']}
-                >
-                  {pairwiseLibraryTestCases.map((useCase, i) => (
-                    <TreeNode
-                      label={
-                        <div className={classes['tree-node-content']}>
-                          <span className={classes['tree-node-label']}>{useCase.name}</span>
-                          <LinkButton useCase={useCase} />
-                        </div>
-                      }
-                      key={`${useCase.name}_pairwise`}
-                      id={`${useCase.name}_pairwise`}
-                      renderIcon={Compare}
-                      onClick={(e: any) => onClick(e, useCase)}
-                    />
-                  ))}
-                </TreeNode>
-              </TreeView>
-            </div>
-          </section>
+                  label={
+                    <div className={classes['treeNodeContent']}>
+                      <span className={classes['treeNodeLAabel']}>{useCase.name}</span>
+                      <LinkButton useCase={useCase} />
+                    </div>
+                  }
+                  key={`${useCase.name}_pairwise`}
+                  id={`${useCase.name}_pairwise`}
+                  renderIcon={Compare}
+                  onClick={(e: any) => onClick(e, useCase)}
+                />
+              ))}
+            </TreeNode>
+          </TreeView>
         </div>
       </div>
     </section>

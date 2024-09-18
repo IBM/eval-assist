@@ -18,7 +18,7 @@ import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 import { HighlightTextArea } from '@components/HighlightTextArea'
 import { isInstanceOfRubricCriteria } from '@utils/utils'
 
-import { RubricCriteria } from '../../../utils/types'
+import { RubricCriteria } from '../../../types'
 import { JSONTextArea } from '../JSONTextArea'
 import classes from '../SingleExampleEvaluation.module.scss'
 import customClasses from './index.module.scss'

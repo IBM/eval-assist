@@ -1,10 +1,14 @@
-import { CSSProperties, Dispatch, SetStateAction, useEffect } from 'react'
+import { pipeline } from 'stream'
+
+import { CSSProperties } from 'react'
 
 import Link from 'next/link'
 
 import { Select, SelectItem, SelectSkeleton } from '@carbon/react'
 
-import { PipelineType, UseCase } from '../../utils/types'
+import { returnByPipelineType } from '@utils/utils'
+
+import { Pipeline, PipelineType, UseCase } from '../../types'
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import classes from './SingleExampleEvaluation.module.scss'
 
@@ -12,8 +16,8 @@ interface Props {
   type: PipelineType
   style?: CSSProperties
   className?: string
-  selectedPipeline: string | null
-  setSelectedPipeline: (pipeline: string) => Promise<void>
+  selectedPipeline: Pipeline | null
+  setSelectedPipeline: (pipeline: Pipeline | null) => Promise<void>
 }
 
 export const PipelineSelect = ({ style, className, selectedPipeline, setSelectedPipeline, type }: Props) => {
@@ -33,13 +37,18 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
               How do evaluators work?
             </Link>
           }
-          value={selectedPipeline || ''}
+          value={selectedPipeline?.name || ''}
           onChange={(e) => {
-            setSelectedPipeline(e.target.value)
+            const selectedPipelineName = e.target.value
+            const selectedPipeline =
+              rubricPipelines.find((p) => p.name === selectedPipelineName) ||
+              pairwisePipelines.find((p) => p.name === selectedPipelineName) ||
+              null
+            setSelectedPipeline(selectedPipeline)
           }}
         >
-          {(PipelineType.RUBRIC ? rubricPipelines : pairwisePipelines).map((pipeline, i) => (
-            <SelectItem value={pipeline} text={pipeline} key={i} />
+          {(returnByPipelineType(type, rubricPipelines, pairwisePipelines) as Pipeline[]).map((pipeline, i) => (
+            <SelectItem value={pipeline.name} text={`${pipeline.name} (${pipeline.provider.toUpperCase()})`} key={i} />
           ))}
         </Select>
       )}

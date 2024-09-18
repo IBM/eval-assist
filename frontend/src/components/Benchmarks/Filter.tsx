@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from 'react'
 // @ts-ignore
 import { MultiSelect } from '@carbon/react'
 
-import { BadgeColor } from '@utils/types'
+import { BadgeColor } from '@types'
 
 import classes from './Filter.module.scss'
 import { TagBadge } from './TagBadge'

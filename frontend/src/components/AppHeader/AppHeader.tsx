@@ -1,3 +1,5 @@
+import { PLATFORM_NAME } from 'src/constants'
+
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -13,7 +15,6 @@ import {
 } from '@carbon/react'
 import { AddComment, Document, Logout, QqPlot } from '@carbon/react/icons'
 
-import { PLATFORM_NAME } from '@constants'
 import { useAuthentication } from '@customHooks/useAuthentication'
 
 import classes from './AppHeader.module.scss'

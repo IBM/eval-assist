@@ -3,9 +3,10 @@ import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffe
 import { useRouter } from 'next/router'
 
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
+import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
 import { getEmptyUseCase, getUseCaseWithCriteria, returnByPipelineType } from '@utils/utils'
 
-import { PipelineType, UseCase } from '../../../utils/types'
+import { PipelineType, UseCase } from '../../../types'
 import { usePipelineTypesContext } from './PipelineTypesProvider'
 import { useUserUseCasesContext } from './UserUseCasesProvider'
 
@@ -30,7 +31,7 @@ export const useURLInfoContext = () => {
 export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
 
-  const { libraryUseCases } = useLibraryTestCases()
+  const { allLibraryUseCases } = useLibraryTestCases()
   const { userUseCases } = useUserUseCasesContext()
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
 
@@ -55,7 +56,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
       pu = userUseCases.find((userUseCase) => userUseCase.id === useCaseId) || null
     } else if (libraryTestCaseName !== null && useCaseType !== null) {
       pu =
-        libraryUseCases.find(
+        allLibraryUseCases.find(
           (libraryUseCase) => libraryUseCase.name === libraryTestCaseName && libraryUseCase.type === useCaseType,
         ) || null
     } else if (useCaseType !== null && useCaseId === null && libraryTestCaseName === null) {
@@ -67,7 +68,6 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     } else {
       pu = null
     }
-
     if (pu !== null && rubricPipelines !== null && pairwisePipelines !== null && pu.pipeline === null) {
       pu = {
         ...pu,
@@ -81,7 +81,6 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
         expectedResults: new Array(pu.responses.length).fill(''),
       }
     }
-
     return pu
   }, [
     useCaseId,
@@ -90,7 +89,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     useCaseType,
     rubricPipelines,
     pairwisePipelines,
-    libraryUseCases,
+    allLibraryUseCases,
     criteriaName,
   ])
 

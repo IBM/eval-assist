@@ -8,7 +8,7 @@ import { Add } from '@carbon/react/icons'
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 import RemovableSection from '@components/RemovableSection/RemovableSection'
 
-import { UseCase } from '../../../utils/types'
+import { UseCase } from '../../../types'
 import { ContextVariableName } from './ContextVariableName'
 import classes from './index.module.scss'
 

@@ -1,12 +1,12 @@
 import cx from 'classnames'
+import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
 import Link from 'next/link'
 
 import { ListItem, Tile, UnorderedList } from '@carbon/react'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
-import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
-import { BadgeColor, Benchmark } from '@utils/types'
+import { BadgeColor, Benchmark } from '@types'
 import { returnByPipelineType } from '@utils/utils'
 
 import classes from './BenchmarkCard.module.scss'

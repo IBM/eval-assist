@@ -25,7 +25,6 @@ export const BackendUserProvider = ({ children }: { children: ReactNode }) => {
   const { user, authenticationEnabled, defaultUserName } = useAuthentication()
   const [backendUser, setBackendUser] = useState<AppUser | null>(null)
   const { post } = useFetchUtils()
-
   useEffect(() => {
     const createUserIfNotExist = async () => {
       setFetchingBackendUser(true)

@@ -1,7 +1,7 @@
 import { CSSProperties, ChangeEvent } from 'react'
 
 import { EditableTag } from '@components/EditableTag'
-import { UseCase } from '@utils/types'
+import { UseCase } from '@types'
 
 import classes from './index.module.scss'
 

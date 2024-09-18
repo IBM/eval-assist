@@ -9,8 +9,8 @@ import { SingleExampleEvaluation } from './SingleExampleEvaluation'
 
 const Landing = () => (
   <BackendUserProvider>
-    <UserUseCasesProvider>
-      <PipelineTypesProvider>
+    <PipelineTypesProvider>
+      <UserUseCasesProvider>
         <URLInfoProvider>
           <AppSidebarProvider>
             <EditorProvider>
@@ -18,8 +18,8 @@ const Landing = () => (
             </EditorProvider>
           </AppSidebarProvider>
         </URLInfoProvider>
-      </PipelineTypesProvider>
-    </UserUseCasesProvider>
+      </UserUseCasesProvider>
+    </PipelineTypesProvider>
   </BackendUserProvider>
 )
 

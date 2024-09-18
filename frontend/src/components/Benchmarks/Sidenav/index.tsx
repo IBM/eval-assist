@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
 import { useEffect, useMemo, useState } from 'react'
 
@@ -7,8 +8,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { IbmEngineeringSystemsDesignRhapsodyModelManager, List } from '@carbon/react/icons'
 
-import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
-import { Benchmark, CriteriaBenchmark, PipelineType } from '@utils/types'
+import { Benchmark, CriteriaBenchmark, PipelineType } from '@types'
 
 import { useBenchmarksContext } from '../Providers/BenchmarksProvider'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'

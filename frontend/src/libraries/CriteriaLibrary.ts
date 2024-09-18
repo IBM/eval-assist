@@ -1,4 +1,4 @@
-import { PairwiseCriteria, RubricCriteria } from '../utils/types'
+import { PairwiseCriteria, RubricCriteria } from '../types'
 
 export const rubricCriteriaLibrary: RubricCriteria[] = [
   {
@@ -327,6 +327,174 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
         option: 'No',
         description: "The user response doesn't contain information outside of the reference document.",
       },
+    ],
+  },
+  {
+    name: 'Bias',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'Jailbreaking',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'Violence',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'Profanity',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'Sexual Content',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'Unethical Behavior',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'answer-relevance',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'context-relevance',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'groundedness',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'Informational_sufficiency',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'informational_conciseness',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'conversational_faithfulness',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'direct_helpfulness',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'topical_relevance',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'semantic_clarity',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'language_accessibility',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'harm_prevention',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'harm_reduction',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'knowledge_transparency',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'operational_transparency',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
+    ],
+  },
+  {
+    name: 'non_evasiveness',
+    criteria: '',
+    options: [
+      { option: 'yes', description: '' },
+      { option: 'no', description: '' },
     ],
   },
 ]

@@ -1,16 +1,15 @@
 import cx from 'classnames'
-import { libraryUseCases } from 'src/libraries/UseCaseLibrary'
 
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction, useCallback } from 'react'
 
 import { Button, Layer, ListItem, Modal, UnorderedList } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
-import { PairwiseCriteria, PipelineType, RubricCriteria } from '@utils/types'
+import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
+import { PairwiseCriteria, PipelineType, RubricCriteria } from '@types'
 import { isInstanceOfRubricCriteria } from '@utils/utils'
 
 import classes from './CriteriaDetailsModal.module.scss'
-import { useBenchmarksContext } from './Providers/BenchmarksProvider'
 
 interface Props {
   open: boolean
@@ -20,23 +19,28 @@ interface Props {
 }
 
 export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) => {
-  const { benchmarks } = useBenchmarksContext()
+  const { allLibraryUseCases } = useLibraryTestCases()
 
   const onClose = () => {
     setOpen(false)
   }
 
-  const getLibraryTestCaseNameFromCriteriaName = (criteriaName: string) =>
-    libraryUseCases.find((l) => l.criteria.name === criteriaName)?.name ?? null
+  const getLibraryTestCaseNameFromCriteriaName = useCallback(
+    (criteriaName: string) => allLibraryUseCases.find((l) => l.criteria.name === criteriaName)?.name ?? null,
+    [allLibraryUseCases],
+  )
 
-  const getURLFromCriteriaName = (criteriaName: string) => {
-    const libraryTestCaseName = getLibraryTestCaseNameFromCriteriaName(criteriaName)
-    if (libraryTestCaseName !== null) {
-      return `/?libraryTestCase=${getLibraryTestCaseNameFromCriteriaName(criteriaName)}&type=${type}`
-    } else {
-      return `/?&type=${type}&criteriaName=${criteriaName}`
-    }
-  }
+  const getURLFromCriteriaName = useCallback(
+    (criteriaName: string) => {
+      const libraryTestCaseName = getLibraryTestCaseNameFromCriteriaName(criteriaName)
+      if (libraryTestCaseName !== null) {
+        return `/?libraryTestCase=${getLibraryTestCaseNameFromCriteriaName(criteriaName)}&type=${type}`
+      } else {
+        return `/?&type=${type}&criteriaName=${criteriaName}`
+      }
+    },
+    [type],
+  )
 
   return (
     <Modal

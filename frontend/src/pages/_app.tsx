@@ -1,3 +1,5 @@
+import { PLATFORM_NAME } from 'src/constants'
+
 import type { Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
 import type { AppProps } from 'next/app'
@@ -7,7 +9,6 @@ import '@styles/globals.scss'
 
 import { AppShell } from '@components/AppShell/AppShell'
 import { RouterLoading } from '@components/RouterLoading/RouterLoading'
-import { PLATFORM_NAME } from '@constants'
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ session: Session }>) => {
   const title = `IBM ${PLATFORM_NAME}`

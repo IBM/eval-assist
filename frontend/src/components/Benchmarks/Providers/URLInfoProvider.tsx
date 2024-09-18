@@ -2,7 +2,7 @@ import { ReactNode, createContext, useCallback, useContext, useMemo, useState } 
 
 import { useRouter } from 'next/router'
 
-import { Benchmark, CriteriaBenchmark, PipelineType } from '@utils/types'
+import { Benchmark, CriteriaBenchmark, PipelineType } from '@types'
 import { stringifyQueryParams } from '@utils/utils'
 
 import { useBenchmarksContext } from './BenchmarksProvider'

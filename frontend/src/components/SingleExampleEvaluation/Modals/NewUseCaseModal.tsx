@@ -6,7 +6,7 @@ import { Layer, Modal } from '@carbon/react'
 
 import { getEmptyUseCase } from '@utils/utils'
 
-import { PipelineType, UseCase } from '../../../utils/types'
+import { PipelineType, UseCase } from '../../../types'
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'
 import { usePipelineTypesContext } from '../Providers/PipelineTypesProvider'
 import { useToastContext } from '../Providers/ToastProvider'

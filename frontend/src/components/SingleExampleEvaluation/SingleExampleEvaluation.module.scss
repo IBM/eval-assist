@@ -31,10 +31,6 @@
   overflow: visible;
 }
 
-.api-key-content-div {
-  border: 1px solid $border-strong-01;
-}
-
 .bottom-divider {
   border-bottom: 1px solid $border-subtle-00;
 }
@@ -58,6 +54,7 @@
 
 .api-key-reminder-text {
   color: $text-secondary;
+  margin-top: 1rem;
 }
 
 .horizontal-divider {
@@ -65,10 +62,6 @@
   border: 0;
   border-bottom: 1px solid $border-subtle-00;
   margin-bottom: 2rem;
-}
-
-.api-key-password-style {
-  -webkit-text-security: disc;
 }
 
 .toggle-span {

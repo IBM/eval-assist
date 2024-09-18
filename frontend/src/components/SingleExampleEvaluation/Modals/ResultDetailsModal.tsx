@@ -6,7 +6,7 @@ import { Layer, Link, ListItem, Modal, UnorderedList } from '@carbon/react'
 
 import { getOrdinalSuffix, toPercentage } from '@utils/utils'
 
-import { PerResponsePairwiseResult, PipelineType, RubricResult } from '../../../utils/types'
+import { PerResponsePairwiseResult, PipelineType, RubricResult } from '../../../types'
 import classes from './ResultDetailsModal.module.scss'
 
 interface Props {

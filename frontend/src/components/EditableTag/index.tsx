@@ -5,7 +5,7 @@ import { CSSProperties, ChangeEvent, useRef, useState } from 'react'
 import { IconButton, Tag, TextInput } from '@carbon/react'
 import { Edit, Save } from '@carbon/react/icons'
 
-import { BadgeColor } from '@utils/types'
+import { BadgeColor } from '@types'
 
 import classes from './index.module.scss'
 

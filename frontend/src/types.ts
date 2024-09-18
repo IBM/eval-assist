@@ -72,16 +72,30 @@ export interface UseCaseV0 {
 //   contextVariables: Record<string, string>
 // }
 
-export type UseCase = UseCaseV0
+export interface UseCaseV1 extends Omit<UseCaseV0, 'pipeline'> {
+  pipeline: Pipeline | null
+}
+
+export type UseCase = UseCaseV1
 
 export enum PipelineType {
   RUBRIC = 'rubric',
-  PAIRWISE = 'pairwise',
+  // PAIRWISE = 'pairwise',
+  PAIRWISE = 'all_vs_all_pairwise',
+}
+
+export enum ModelProviderType {
+  WATSONX = 'watsonx',
+  BAM = 'bam',
+  OPENAI = 'openai',
 }
 
 export interface Pipeline {
+  model_id: string
   name: string
   type: PipelineType
+  provider: ModelProviderType
+  version: string
 }
 
 export interface Dataset {
@@ -142,3 +156,16 @@ export class Version {
 export const badgeColorsArray = ['red', 'magenta', 'cyan', 'teal', 'green', 'blue', 'purple'] as const
 
 export type BadgeColor = (typeof badgeColorsArray)[number]
+
+export type ModelProviderCredentials = {
+  bam: {
+    api_key: string
+  }
+  watsonx: {
+    api_key: string
+    project_id: string
+  }
+  openai: {
+    api_key: string
+  }
+}

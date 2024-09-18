@@ -4,7 +4,6 @@ import { useBackendUserContext } from '@components/SingleExampleEvaluation/Provi
 
 export const useFetchUtils = () => {
   const { backendUser } = useBackendUserContext()
-
   const makeRequest = useCallback(
     async (path: string, method: 'GET' | 'POST' | 'PUT' | 'DELETE', body?: any) => {
       const isFormData = body instanceof FormData

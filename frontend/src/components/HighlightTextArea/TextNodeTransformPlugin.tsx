@@ -1,8 +1,7 @@
-import { $getRoot, $setSelection, LexicalEditor, TextNode } from 'lexical'
+import { $setSelection, TextNode } from 'lexical'
 
 import { useEffect } from 'react'
 
-import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 
 import { BadgeNode } from './BadgeNode'

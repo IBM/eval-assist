@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Modal, TextInput } from '@carbon/react'
 
-import { PipelineType, UseCase } from '../../../utils/types'
+import { PipelineType, UseCase } from '../../../types'
 import { UseCaseTypeBadge } from '../../UseCaseTypeBadge/UseCaseTypeBadge'
 
 interface Props {

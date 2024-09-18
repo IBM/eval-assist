@@ -3,7 +3,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from 'react
 import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { Benchmark } from '@utils/types'
+import { Benchmark } from '@types'
 
 interface BenchmarksContextValue {
   benchmarks: Benchmark[]

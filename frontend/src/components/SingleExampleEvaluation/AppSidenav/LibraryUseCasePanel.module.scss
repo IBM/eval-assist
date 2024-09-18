@@ -12,7 +12,6 @@
 }
 
 .header {
-  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -28,75 +27,14 @@
 }
 
 .content {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: minmax(0, max-content) max-content;
-}
-
-.prompts {
   overflow-y: auto;
   scrollbar-width: thin;
-}
-
-.section {
   padding-bottom: $spacing-02;
   display: flex;
   flex-direction: column;
-  &::after {
-    content: '';
-    margin: $spacing-05 $spacing-05 0 $spacing-05;
-    border-bottom: 1px solid $border-subtle;
-  }
-  &:last-child {
-    margin-bottom: $spacing-05;
-    &::after {
-      display: none;
-    }
-  }
 }
 
-.tree-root :global .cds--tree-node {
-  background-color: $background;
-  padding-inline-start: 1rem;
-}
-
-.tree-node-content {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr max-content;
-  align-items: center;
-  padding: $spacing-02 0;
-
-  .tree-node-label {
-    display: grid;
-    grid-template-columns: minmax(0, max-content) max-content;
-    gap: $spacing-02;
-    display: -webkit-box;
-    text-overflow: ellipsis;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    word-break: break-word;
-  }
-}
-
-.link-button {
-  background-color: transparent;
-  border: none;
-  padding: $spacing-02;
-  height: rem(24px);
-  align-self: start;
-  cursor: pointer;
-  svg {
-    fill: $link-primary;
-    &:hover {
-      fill: $link-primary-hover;
-    }
-  }
-}
-
-.tree-wrapper {
+.treeWrapper {
   padding-top: $spacing-03;
 
   > label {
@@ -106,7 +44,7 @@
   :global(.cds--tree-node) {
     padding-left: 0;
     margin-left: 0;
-    background-color: transparent;
+    background-color: $background;
 
     :global(.cds--tree-node__label) {
       margin-inline-start: 0 !important;
@@ -122,8 +60,8 @@
       margin-left: $spacing-02;
       align-self: center;
     }
-    ul li :global(.cds--tree-node__label) {
-      padding-inline-start: 2rem !important;
+    ul li :not(.treeCategory) :global(.cds--tree-node__label) {
+      padding-inline-start: 3rem !important;
     }
   }
   :global(.cds--tree-node--selected) {
@@ -135,7 +73,37 @@
   }
 }
 
-.empty-message {
+.treeNodeContent {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .treeNodeLabel {
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+  }
+}
+
+.linkButton {
+  background-color: transparent;
+  border: none;
+  padding: $spacing-02;
+  height: rem(24px);
+  align-self: start;
+  cursor: pointer;
+  svg {
+    fill: $link-primary;
+    &:hover {
+      fill: $link-primary-hover;
+    }
+  }
+}
+
+.emptyMessage {
   padding-left: $spacing-05;
   padding-right: $spacing-05;
   @include type-style('helper-text-01');

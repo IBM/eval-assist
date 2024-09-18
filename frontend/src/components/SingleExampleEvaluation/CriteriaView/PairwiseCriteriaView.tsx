@@ -18,7 +18,7 @@ import { Edit, Save } from '@carbon/react/icons'
 import { HighlightTextArea } from '@components/HighlightTextArea'
 import { isInstanceOfPairwiseCriteria } from '@utils/utils'
 
-import { PairwiseCriteria } from '../../../utils/types'
+import { PairwiseCriteria } from '../../../types'
 import { JSONTextArea } from '../JSONTextArea'
 import classes from '../SingleExampleEvaluation.module.scss'
 import customClasses from './index.module.scss'

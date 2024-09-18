@@ -1,11 +1,11 @@
 import cx from 'classnames'
+import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 import { returnByPipelineType } from '@utils/utils'
 
-import { PipelineType } from '../../../utils/types'
+import { PipelineType } from '../../../types'
 import { Card } from './Card'
 import classes from './PipelineOptionCard.module.scss'
 

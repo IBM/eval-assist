@@ -16,7 +16,7 @@ import {
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
-import { CriteriaBenchmark, EvaluatorBenchmark, PipelineType, Version } from '@utils/types'
+import { CriteriaBenchmark, EvaluatorBenchmark, PipelineType, Version } from '@types'
 import { getCriteria } from '@utils/utils'
 
 import classes from './CriteriaBenchmarkCard.module.scss'

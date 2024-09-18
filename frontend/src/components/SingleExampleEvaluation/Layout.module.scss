@@ -5,7 +5,7 @@
   top: rem(48px);
   width: rem(48px);
   &.expanded {
-    width: rem(272px + 48px);
+    width: rem(302px + 48px);
   }
   transition: width $duration-fast-02 motion(standard, productive);
   inset-block-end: 0;
@@ -16,5 +16,5 @@
 }
 
 .sidebar.expanded ~ .main-content {
-  margin-inline-start: rem(272px + 48px);
+  margin-inline-start: rem(302px + 48px);
 }

@@ -1,13 +1,13 @@
 import cx from 'classnames'
+import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
 import { CSSProperties } from 'react'
 
 import { Tag } from '@carbon/react'
 
-import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 import { returnByPipelineType } from '@utils/utils'
 
-import { PipelineType } from '../../utils/types'
+import { PipelineType } from '../../types'
 import classes from './UseCaseTypeBadge.module.scss'
 
 interface Props {

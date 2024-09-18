@@ -1,9 +1,6 @@
-import { $getSelection, $isRangeSelection, TextNode } from 'lexical'
-import { useMediaQuery } from 'usehooks-ts'
+import { TextNode } from 'lexical'
 
 import { useCallback, useMemo } from 'react'
-
-import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
 
 import { $createBadgeNode, BadgeNode } from './BadgeNode'
 import { useFindMatch } from './useFindMatch'

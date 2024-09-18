@@ -3,37 +3,31 @@ import { useLocalStorage } from 'usehooks-ts'
 import { v4 as uuid } from 'uuid'
 
 import { LegacyRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { usePrevious } from 'react-use'
 
 import { useRouter } from 'next/router'
-
-import { TextArea } from '@carbon/react'
 
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
 import { StoredUseCase } from '@prisma/client'
-import {
-  CURRENT_FORMAT_VERSION,
-  getQueryParamsFromUseCase,
-  getUseCaseStringWithSortedKeys,
-  parseFetchedUseCase,
-  stringifyQueryParams,
-} from '@utils/utils'
+import { getQueryParamsFromUseCase, getUseCaseStringWithSortedKeys, stringifyQueryParams } from '@utils/utils'
 
 import {
   FetchedPairwiseResults,
-  FetchedResults,
   FetchedRubricResult,
+  ModelProviderCredentials,
+  ModelProviderType,
   PairwiseResults,
   PerResponsePairwiseResult,
+  Pipeline,
   PipelineType,
   RubricCriteria,
   RubricResult,
   UseCase,
-} from '../../utils/types'
+} from '../../types'
 import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { ContextVariables } from './ContextVariables'
@@ -119,7 +113,20 @@ export const SingleExampleEvaluation = () => {
         }
   }, [contextVariables, noUseCaseSelected, responseVariableName])
 
-  const [bamAPIKey, setBamAPIKey, removeBamAPIKey] = useLocalStorage<string>('bamAPIKey', '')
+  const [modelProviderCredentials, setModelProviderCredentials, removeModelProviderCredentials] =
+    useLocalStorage<ModelProviderCredentials>('modelProviderCrentials', {
+      bam: { api_key: '' },
+      watsonx: { api_key: '', project_id: '' },
+      openai: { api_key: '' },
+    })
+
+  const areRelevantCredentialsProvided = useMemo(
+    () =>
+      Object.values(modelProviderCredentials[currentUseCase?.pipeline?.provider || ModelProviderType.BAM]).every(
+        (key) => key !== '',
+      ),
+    [currentUseCase?.pipeline?.provider, modelProviderCredentials],
+  )
 
   const popoverRef = useRef<HTMLDivElement>()
   const [evaluationRunningToastId, setEvaluationRunningToastId] = useState<string | null>(null)
@@ -130,7 +137,7 @@ export const SingleExampleEvaluation = () => {
   const { addToast, removeToast } = useToastContext()
   const { deleteCustom, post, put } = useFetchUtils()
   useBeforeOnload(changesDetected)
-
+  const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
   const temporaryIdRef = useRef(uuid())
 
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
@@ -155,25 +162,13 @@ export const SingleExampleEvaluation = () => {
     let body = {
       context_variables: parsedContextVariables,
       responses: currentUseCase.responses,
-      bam_api_key: bamAPIKey,
-      pipeline: currentUseCase.pipeline,
+      model_provider_credentials: modelProviderCredentials[currentUseCase.pipeline?.provider || 'bam'],
+      pipeline: currentUseCase.pipeline?.name,
+      criteria: currentUseCase.criteria,
+      type: currentUseCase.type,
     }
     const startEvaluationTime = new Date().getTime() / 1000
-    if (currentUseCase.type === PipelineType.RUBRIC) {
-      response = await post('evaluate/rubric/', {
-        ...body,
-        criteria: {
-          name: currentUseCase.criteria.name,
-          criteria: currentUseCase.criteria.criteria,
-          options: (currentUseCase.criteria as RubricCriteria).options,
-        },
-      })
-    } else {
-      response = await post('evaluate/pairwise/', {
-        ...body,
-        criteria: { name: currentUseCase.criteria.name, criteria: currentUseCase.criteria.criteria },
-      })
-    }
+    response = await post('evaluate/', body)
     const endEvaluationTime = new Date().getTime() / 1000
     const totalEvaluationTime = Math.round(endEvaluationTime - startEvaluationTime)
     // only perform after-evaluation-finished actions if the current test case didn't change
@@ -262,7 +257,7 @@ export const SingleExampleEvaluation = () => {
 
       removeToast(inProgressEvalToastId)
     }
-  }, [addToast, bamAPIKey, currentUseCase, isEqualToCurrentTemporaryId, post, removeToast])
+  }, [addToast, currentUseCase, isEqualToCurrentTemporaryId, modelProviderCredentials, post, removeToast])
 
   const changeUseCaseURL = useCallback(
     (queryParams: { key: string; value: string }[] | null) => {
@@ -333,7 +328,17 @@ export const SingleExampleEvaluation = () => {
       title: `Test case saved`,
       timeout: 5000,
     })
-  }, [addToast, currentUseCase, currentUseCaseString, getUserName, put, setUserUseCases, userUseCases])
+  }, [
+    CURRENT_FORMAT_VERSION,
+    addToast,
+    currentUseCase,
+    currentUseCaseString,
+    getUserName,
+    parseFetchedUseCase,
+    put,
+    setUserUseCases,
+    userUseCases,
+  ])
 
   const onSaveAs = useCallback(
     async (name: string, fromUseCase?: UseCase) => {
@@ -394,9 +399,11 @@ export const SingleExampleEvaluation = () => {
       return true
     },
     [
+      CURRENT_FORMAT_VERSION,
       addToast,
       currentUseCase,
       getUserName,
+      parseFetchedUseCase,
       put,
       setSidebarTabSelected,
       setUserUseCases,
@@ -408,7 +415,7 @@ export const SingleExampleEvaluation = () => {
 
   useSaveShortcut({ onSave, isUseCaseSaved, changesDetected, setSaveUseCaseModalOpen })
 
-  const onSetSelectedPipeline = async (pipeline: string) => {
+  const onSetSelectedPipeline = async (pipeline: Pipeline | null) => {
     if (currentUseCase === null) return
     setCurrentUseCase({
       ...currentUseCase,
@@ -476,8 +483,9 @@ export const SingleExampleEvaluation = () => {
               <APIKeyPopover
                 popoverOpen={popoverOpen}
                 setPopoverOpen={setPopoverOpen}
-                bamAPIKey={bamAPIKey}
-                setBamAPIKey={setBamAPIKey}
+                modelProviderCrentials={modelProviderCredentials}
+                setModelProviderCredentials={setModelProviderCredentials}
+                areRelevantCredentialsProvided={areRelevantCredentialsProvided}
               />
             </div>
             <UseCaseOptions
@@ -566,13 +574,13 @@ export const SingleExampleEvaluation = () => {
             <EvaluateButton
               evaluationRunning={evaluationRunning}
               runEvaluation={runEvaluation}
-              bamAPIKey={bamAPIKey}
+              areRelevantCredentialsProvided={areRelevantCredentialsProvided}
               className={classes['left-padding']}
             />
 
-            {bamAPIKey === '' && !evaluationRunning && currentUseCase.results === null && !evaluationFailed && (
+            {!areRelevantCredentialsProvided && !evaluationRunning && !evaluationFailed && (
               <p className={`${classes['left-padding']} ${classes['api-key-reminder-text']}`}>
-                {'You will need to provide your BAM API key to run the evaluation'}
+                {`You need to provide the ${currentUseCase.pipeline?.provider.toUpperCase()} credentials to run evaluations.`}
               </p>
             )}
           </>

@@ -3,7 +3,7 @@ import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 import { Button, IconButton } from '@carbon/react'
 import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
-import { PipelineType, UseCase } from '../../utils/types'
+import { PipelineType, UseCase } from '../../types'
 import { UseCaseTypeBadge } from '../UseCaseTypeBadge/UseCaseTypeBadge'
 import classes from './UseCaseOptions.module.scss'
 

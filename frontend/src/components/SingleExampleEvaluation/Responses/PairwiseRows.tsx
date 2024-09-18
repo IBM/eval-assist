@@ -9,7 +9,7 @@ import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 import RemovableSection from '@components/RemovableSection/RemovableSection'
 import { getOrdinalSuffix, toPercentage } from '@utils/utils'
 
-import { PairwiseResults, PerResponsePairwiseResult, RubricResult, UseCase } from '../../../utils/types'
+import { PairwiseResults, PerResponsePairwiseResult, RubricResult, UseCase } from '../../../types'
 import classes from './index.module.scss'
 
 interface Props {

@@ -16,7 +16,7 @@ import {
   RubricCriteria,
   RubricResult,
   UseCase,
-} from '../../../utils/types'
+} from '../../../types'
 import { PairwiseRows } from './PairwiseRows'
 import { RubricRows } from './RubricRows'
 import classes from './index.module.scss'

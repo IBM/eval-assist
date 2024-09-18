@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
 import { useMemo, useState } from 'react'
 
@@ -8,9 +9,7 @@ import { IconButton } from '@carbon/react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 
-import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
-
-import { PipelineType, UseCase } from '../../../utils/types'
+import { PipelineType, UseCase } from '../../../types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import { LinkButton } from './LinkButton'
 import classes from './UseCasePanel.module.scss'

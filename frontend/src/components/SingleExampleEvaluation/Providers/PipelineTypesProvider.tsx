@@ -6,11 +6,11 @@ import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 
-import { Pipeline, PipelineType } from '../../../utils/types'
+import { Pipeline, PipelineType } from '../../../types'
 
 interface PipelineContextValue {
-  rubricPipelines: string[] | null
-  pairwisePipelines: string[] | null
+  rubricPipelines: Pipeline[] | null
+  pairwisePipelines: Pipeline[] | null
   loadingPipelines: boolean
 }
 
@@ -28,13 +28,11 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
   const [pipelines, setPipelines] = useState<Pipeline[] | null>(null)
   const [loadingPipelines, setLoadingPipelines] = useState(false)
   const { get } = useFetchUtils()
-  const rubricPipelines = useMemo(
-    () => pipelines?.filter((p) => p.type === PipelineType.RUBRIC).map((p) => p.name) ?? null,
-    [pipelines],
-  )
+
+  const rubricPipelines = useMemo(() => pipelines?.filter((p) => p.type === PipelineType.RUBRIC) ?? null, [pipelines])
 
   const pairwisePipelines = useMemo(
-    () => pipelines?.filter((p) => p.type === PipelineType.PAIRWISE).map((p) => p.name) ?? null,
+    () => pipelines?.filter((p) => p.type === PipelineType.PAIRWISE) ?? null,
     [pipelines],
   )
 
@@ -47,7 +45,7 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
       setPipelines(data.pipelines)
     }
     fetchData()
-  }, [])
+  }, [get])
 
   if (loadingPipelines || pipelines === null) return <Loading withOverlay />
 

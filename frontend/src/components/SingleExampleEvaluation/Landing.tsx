@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
 import { Dispatch, SetStateAction } from 'react'
 
@@ -7,10 +8,9 @@ import { Add, ArrowRight, Launch, View } from '@carbon/react/icons'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
-import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
 import { getEmptyUseCase } from '@utils/utils'
 
-import { PipelineType, UseCase } from '../../utils/types'
+import { PipelineType, UseCase } from '../../types'
 import { Card } from './Card/Card'
 import classes from './Landing.module.scss'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
@@ -41,7 +41,23 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
   return (
     <div className={classes.root}>
       <h2 className={classes.heading}>{`Welcome${user && user.name ? ', ' + user.name : ''}`}</h2>
-      <p className={classes.description}>{'Here are some key features we offer'}</p>
+      <p className={classes.description}>{'New features'}</p>
+      <div className={cx(classes.cards, { [classes['sidebar-expanded']]: sidebarTabSelected !== null })}>
+        <Card
+          title={'Direct Assessment On Risk & Harms'}
+          description={'Try Granite Guardian LLM judges'}
+          imageSrc="python_library"
+          onClick={openTestCasesLibrary}
+          actionButton={
+            <Button renderIcon={View} kind="ghost" onClick={openTestCasesLibrary}>
+              {'View it'}
+            </Button>
+          }
+          className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
+          badge={{ text: 'Granite', color: 'teal' }}
+        />
+      </div>
+      <p className={cx(classes.description, classes.sectionSeparation)}>{'Here are some key features we offer'}</p>
       <div className={cx(classes.cards, { [classes['sidebar-expanded']]: sidebarTabSelected !== null })}>
         <Card
           title={RUBRIC_NAME}

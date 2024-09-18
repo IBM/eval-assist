@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 
 import { Button, ComposedModal, Modal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 
-import { UseCase } from '../../../utils/types'
+import { UseCase } from '../../../types'
 
 interface Props {
   setCurrentUseCase: (useCase: UseCase) => void

@@ -4,10 +4,10 @@ import { Loading } from '@carbon/react'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { StoredUseCase } from '@prisma/client'
-import { parseFetchedUseCase } from '@utils/utils'
 
-import { UseCase } from '../../../utils/types'
+import { UseCase } from '../../../types'
 
 interface UserUseCasesContextValue {
   userUseCases: UseCase[]
@@ -28,6 +28,7 @@ export const UserUseCasesProvider = ({ children }: { children: ReactNode }) => {
   const [userUseCases, setUserUseCases] = useState<UseCase[] | null>(null)
   const { getUserName } = useAuthentication()
   const { get } = useFetchUtils()
+  const { parseFetchedUseCase } = useParseFetchedUseCase()
 
   useEffect(() => {
     const fetchUseCases = async () => {
@@ -40,7 +41,7 @@ export const UserUseCasesProvider = ({ children }: { children: ReactNode }) => {
       setLoadingUseCases(false)
     }
     fetchUseCases()
-  }, [getUserName])
+  }, [get, getUserName, parseFetchedUseCase])
 
   if (loadingUseCases || userUseCases === null) return <Loading withOverlay />
 

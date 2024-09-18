@@ -1,9 +1,9 @@
 import cx from 'classnames'
+import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
 import { useMemo, useState } from 'react'
 
-import { PAIRWISE_NAME, RUBRIC_NAME } from '@utils/constants'
-import { BadgeColor, PipelineType, badgeColorsArray } from '@utils/types'
+import { BadgeColor, PipelineType, badgeColorsArray } from '@types'
 
 import { BenchmarkCard } from './BenchmarkCard'
 import { Filter } from './Filter'
