@@ -22,6 +22,14 @@
   font-weight: 550;
 }
 
+.criteriaHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .criteriaInfo {
   display: flex;
   flex-direction: row;
@@ -44,4 +52,8 @@
     color: $layer-accent-active-01;
     background-color: transparent;
   }
+}
+
+.toggle :global .cds--toggle__text {
+  color: $text-helper;
 }

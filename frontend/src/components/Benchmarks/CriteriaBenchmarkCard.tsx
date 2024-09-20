@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
   Tile,
+  Toggle,
   Tooltip,
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
@@ -38,7 +39,7 @@ const beatutifyName: { [key: string]: string } = {
 export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: Props) => {
   const { benchmark } = useURLInfoContext()
   const [criteriaDetailsModal, setCriteriaDetailsModal] = useState(false)
-
+  const [showAllVersions, setShowAllVersions] = useState(false)
   const criteria = useMemo(
     () => getCriteria(criteriaBenchmark.name, benchmark?.type as PipelineType),
     [benchmark?.type, criteriaBenchmark.name],
@@ -104,21 +105,38 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
 
   // sorts the evaluators alphabetically and parses the results
   const parsedNewestEvaluators = useMemo(() => {
-    return newestEvaluators.sort((a, b) => a.evaluator_id.localeCompare(b.evaluator_id))
-  }, [newestEvaluators])
+    return (showAllVersions ? criteriaBenchmark.evaluatorBenchmarks : newestEvaluators).sort((a, b) =>
+      a.evaluator_id.localeCompare(b.evaluator_id),
+    )
+  }, [criteriaBenchmark.evaluatorBenchmarks, newestEvaluators, showAllVersions])
 
   return (
     benchmark !== null && (
       <>
         <Tile className={cx(className, classes.root)} style={style}>
-          <div className={classes.criteriaInfo}>
-            <h5>{`Criteria: ${criteriaBenchmark.name}`}</h5>
-            {criteria !== null && (
-              <Link onClick={() => setCriteriaDetailsModal(true)} style={{ textDecoration: 'none', cursor: 'pointer' }}>
-                {'(View details)'}
-              </Link>
-            )}
+          <div className={classes.criteriaHeader}>
+            <div className={classes.criteriaInfo}>
+              <h5>{`Criteria: ${criteriaBenchmark.name}`}</h5>
+              {criteria !== null && (
+                <Link
+                  onClick={() => setCriteriaDetailsModal(true)}
+                  style={{ textDecoration: 'none', cursor: 'pointer' }}
+                >
+                  {'(View details)'}
+                </Link>
+              )}
+            </div>
+            <Toggle
+              labelText={'Show all versions'}
+              toggled={showAllVersions}
+              onToggle={() => setShowAllVersions(!showAllVersions)}
+              size="sm"
+              hideLabel
+              id="toggle-expected-result"
+              className={classes.toggle}
+            />
           </div>
+
           <div className={cx(classes.table)}>
             <Table size="lg" useZebraStyles={false}>
               <TableHead>
@@ -133,7 +151,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
                 {parsedNewestEvaluators.map((evaluatorBenchmark, i) => (
                   <TableRow key={i}>
                     {/* <TableCell>{`${evaluatorBenchmark.evaluator_id} (v${evaluatorBenchmark.laaj_version})`}</TableCell> */}
-                    <TableCell>{`${evaluatorBenchmark.evaluator_id}`}</TableCell>
+                    <TableCell>{`${evaluatorBenchmark.evaluator_id} (${evaluatorBenchmark.laaj_version})`}</TableCell>
                     {benchmarkMetrics.map((metric) => (
                       <TableCell
                         key={metric}
