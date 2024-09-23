@@ -129,7 +129,7 @@ export const APIKeyPopover = ({
             <p className="cds--form__helper-text">
               {"Don't have a key? Get one "}
               <Link
-                href={'https://bam.res.ibm.com/'}
+                href={'https://cloud.ibm.com/'}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ textDecoration: 'none' }}
@@ -163,7 +163,7 @@ export const APIKeyPopover = ({
             <p className="cds--form__helper-text">
               {"Don't have a key? Get one "}
               <Link
-                href={'https://bam.res.ibm.com/'}
+                href={'https://platform.openai.com/api-keys'}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ textDecoration: 'none' }}
