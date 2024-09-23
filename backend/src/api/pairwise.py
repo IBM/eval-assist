@@ -12,8 +12,8 @@ class PairwiseEvalRequestModel(EvalRequestModel):
 
     @validator('responses', pre=True, always=True)
     def validate_responses_length(cls, responses):
-        if len(responses) < 2:
-            raise HTTPException(status_code=400, detail="At least two responses are required to evaluate.")
+        # if len(responses) < 2:
+        #     raise HTTPException(status_code=400, detail="At least two responses are required to evaluate.")
         
         all_valid = True
         for r in responses:

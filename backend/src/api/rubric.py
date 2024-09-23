@@ -29,8 +29,8 @@ class RubricEvalRequestModel(EvalRequestModel):
 
     @validator('responses', pre=True, always=True)
     def validate_responses_length(cls, responses):
-        if len(responses) == 0:
-            raise HTTPException(status_code=400, detail="At least one response is required to evaluate.")
+        # if len(responses) == 0:
+        #     raise HTTPException(status_code=400, detail="At least one response is required to evaluate.")
         
         all_valid = True
         for r in responses:
