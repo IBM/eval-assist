@@ -105,7 +105,7 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
             throw_authorized_exception()
         print('raised ApiResponseException')
         print(e.response.error)
-        raise HTTPException(status_code=400, detail="Something went wrong running the evaluation. Please try again.")
+        raise HTTPException(status_code=400, detail=f"{e.response.error}. {e.response.message}")
     except ApiNetworkException as e:
         # I think the random errors thrown by BAM are of type ApiNetworkException, lets maintain error
         # handling this way till we know better how they are thrown
@@ -114,7 +114,7 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
         raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
     except ApiRequestFailure as e:
         traceback.print_exc()      
-        raise HTTPException(status_code=400, detail="e.error_msg")
+        raise HTTPException(status_code=400, detail=e.error_msg)
 
 @router.get("/use_case/")
 def get_use_cases(user: str):
