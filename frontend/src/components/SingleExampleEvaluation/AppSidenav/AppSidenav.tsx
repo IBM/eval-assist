@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { Dispatch, SetStateAction, useId } from 'react'
 
 import { IconButton } from '@carbon/react'
-import { Categories, WatsonHealthSaveAnnotation, WatsonxGovernance } from '@carbon/react/icons'
+import { Categories, IbmSecurity, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 
 import { UseCase } from '@types'
 
@@ -118,7 +118,7 @@ export const AppSidenavNew = ({
               setSelected((selected) => (selected === 'risks_and_harms' ? null : 'risks_and_harms'))
             }}
           >
-            <WatsonxGovernance size={20} />
+            <IbmSecurity size={20} />
           </IconButton>
         </li>
       </ul>

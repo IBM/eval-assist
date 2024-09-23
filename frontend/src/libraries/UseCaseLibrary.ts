@@ -31,15 +31,15 @@ export const risksAndHarmsLibraryUseCases: { [useCaseCategory: string]: UseCase[
   ],
   RAG: [
     {
-      ...getUseCaseWithCriteria('', PipelineType.RUBRIC),
+      ...getUseCaseWithCriteria('answer-relevance', PipelineType.RUBRIC),
       name: 'answer-relevance',
     },
     {
-      ...getUseCaseWithCriteria('', PipelineType.RUBRIC),
+      ...getUseCaseWithCriteria('context-relevance', PipelineType.RUBRIC),
       name: 'context-relevance',
     },
     {
-      ...getUseCaseWithCriteria('', PipelineType.RUBRIC),
+      ...getUseCaseWithCriteria('groundedness', PipelineType.RUBRIC),
       name: 'groundedness',
     },
   ],
