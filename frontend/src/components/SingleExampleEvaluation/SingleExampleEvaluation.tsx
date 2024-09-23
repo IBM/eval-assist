@@ -10,10 +10,11 @@ import { useToastContext } from '@components/SingleExampleEvaluation/Providers/T
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFromUseCase'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
 import { StoredUseCase } from '@prisma/client'
-import { getQueryParamsFromUseCase, getUseCaseStringWithSortedKeys, stringifyQueryParams } from '@utils/utils'
+import { getUseCaseStringWithSortedKeys, stringifyQueryParams } from '@utils/utils'
 
 import {
   FetchedPairwiseResults,
@@ -136,6 +137,7 @@ export const SingleExampleEvaluation = () => {
 
   const { addToast, removeToast } = useToastContext()
   const { deleteCustom, post, put } = useFetchUtils()
+  const { getQueryParamsFromUseCase } = useGetQueryParamsFromUseCase()
   useBeforeOnload(changesDetected)
   const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
   const temporaryIdRef = useRef(uuid())
@@ -162,7 +164,7 @@ export const SingleExampleEvaluation = () => {
     let body = {
       context_variables: parsedContextVariables,
       responses: currentUseCase.responses,
-      model_provider_credentials: modelProviderCredentials[currentUseCase.pipeline?.provider || 'bam'],
+      llm_provider_credentials: modelProviderCredentials[currentUseCase.pipeline?.provider || 'bam'],
       pipeline: currentUseCase.pipeline?.name,
       criteria: currentUseCase.criteria,
       type: currentUseCase.type,
@@ -285,7 +287,7 @@ export const SingleExampleEvaluation = () => {
         setEvaluationRunning(false)
       }
     },
-    [changeUseCaseURL, evaluationRunning, evaluationRunningToastId, removeToast],
+    [changeUseCaseURL, evaluationRunning, evaluationRunningToastId, getQueryParamsFromUseCase, removeToast],
   )
 
   const onSave = useCallback(async () => {
@@ -476,7 +478,7 @@ export const SingleExampleEvaluation = () => {
                 marginBottom: '1rem',
               }}
               ref={popoverRef as LegacyRef<HTMLDivElement> | undefined}
-              className={`${classes['bottom-divider']} ${classes['left-padding']}`}
+              className={cx(classes['bottom-divider'], classes['left-padding'])}
             >
               <h3>Evaluation sandbox</h3>
 
@@ -533,6 +535,7 @@ export const SingleExampleEvaluation = () => {
               selectedPipeline={currentUseCase.pipeline}
               setSelectedPipeline={onSetSelectedPipeline}
               style={{ marginBottom: '2rem' }}
+              className={classes['left-padding']}
             />
             <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>
               <strong>Test data</strong>

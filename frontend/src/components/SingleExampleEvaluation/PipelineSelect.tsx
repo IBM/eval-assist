@@ -9,8 +9,9 @@ import { Select, SelectItem, SelectSkeleton } from '@carbon/react'
 import { returnByPipelineType } from '@utils/utils'
 
 import { Pipeline, PipelineType, UseCase } from '../../types'
+import classes from './PipelineSelect.module.scss'
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
-import classes from './SingleExampleEvaluation.module.scss'
+import { useURLInfoContext } from './Providers/URLInfoProvider'
 
 interface Props {
   type: PipelineType
@@ -22,9 +23,9 @@ interface Props {
 
 export const PipelineSelect = ({ style, className, selectedPipeline, setSelectedPipeline, type }: Props) => {
   const { rubricPipelines, pairwisePipelines, loadingPipelines } = usePipelineTypesContext()
-
+  const { isRisksAndHarms } = useURLInfoContext()
   return (
-    <div style={{ marginBottom: '1.5rem' }} className={classes['left-padding']}>
+    <div style={{ marginBottom: '1.5rem' }} className={className}>
       <span className={classes['toggle-span']}>Evaluator</span>
       {loadingPipelines || rubricPipelines === null || pairwisePipelines === null ? (
         <SelectSkeleton />
@@ -46,6 +47,8 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
               null
             setSelectedPipeline(selectedPipeline)
           }}
+          className={classes.selectReadOnly}
+          readOnly
         >
           {(returnByPipelineType(type, rubricPipelines, pairwisePipelines) as Pipeline[]).map((pipeline, i) => (
             <SelectItem value={pipeline.name} text={`${pipeline.name} (${pipeline.provider.toUpperCase()})`} key={i} />

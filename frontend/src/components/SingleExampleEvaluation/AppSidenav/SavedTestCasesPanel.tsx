@@ -12,7 +12,7 @@ import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 import { PipelineType, UseCase } from '../../../types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import { LinkButton } from './LinkButton'
-import classes from './UseCasePanel.module.scss'
+import classes from './TwoLevelsPanel.module.scss'
 
 interface Props {
   onUseCaseClick: (useCase: UseCase) => void
@@ -20,7 +20,7 @@ interface Props {
   userUseCases: UseCase[]
 }
 
-export const UserUseCasePanel = ({ onClose, onUseCaseClick, userUseCases }: Props) => {
+export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: Props) => {
   const { useCaseId } = useURLInfoContext()
 
   const selectedNode = useMemo(() => {

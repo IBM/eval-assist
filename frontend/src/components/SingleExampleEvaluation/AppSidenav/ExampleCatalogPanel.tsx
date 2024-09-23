@@ -13,15 +13,15 @@ import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
 
 import { UseCase } from '../../../types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
-import classes from './LibraryUseCasePanel.module.scss'
 import { LinkButton } from './LinkButton'
+import classes from './ThreeLevelsPanel.module.scss'
 
 interface Props {
   onUseCaseClick: (useCase: UseCase) => void
   onClose: () => void
 }
 
-export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
+export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
   const { rubricLibraryTestCases, pairwiseLibraryTestCases } = useLibraryTestCases()
 
   const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean } & { [key: string]: boolean }>({
@@ -66,32 +66,21 @@ export const LibraryPanel = ({ onClose, onUseCaseClick }: Props) => {
               label={RUBRIC_NAME}
               onSelect={() => handleToggle('rubric')}
               onToggle={() => handleToggle('rubric')}
-              isExpanded={expanded.rubric}
+              isExpanded={expanded.pairwise}
             >
-              {Object.entries(rubricLibraryTestCases).map(([categoryName, useCases]) => (
+              {rubricLibraryTestCases.map((useCase, i) => (
                 <TreeNode
-                  label={categoryName}
-                  onSelect={() => handleToggle(categoryName)}
-                  onToggle={() => handleToggle(categoryName)}
-                  isExpanded={expanded[categoryName]}
-                  key={categoryName}
-                  className={classes.treeCategory}
-                >
-                  {useCases.map((useCase, i) => (
-                    <TreeNode
-                      label={
-                        <div className={classes['treeNodeContent']}>
-                          <span className={classes['treeNodeLabel']}>{useCase.name}</span>
-                          <LinkButton useCase={useCase} />
-                        </div>
-                      }
-                      key={`${useCase.name}_rubric`}
-                      id={`${useCase.name}_rubric`}
-                      renderIcon={List}
-                      onClick={(e: any) => onClick(e, useCase)}
-                    />
-                  ))}
-                </TreeNode>
+                  label={
+                    <div className={classes['treeNodeContent']}>
+                      <span className={classes['treeNodeLAabel']}>{useCase.name}</span>
+                      <LinkButton useCase={useCase} />
+                    </div>
+                  }
+                  key={`${useCase.name}_rubric`}
+                  id={`${useCase.name}_rubric`}
+                  renderIcon={Compare}
+                  onClick={(e: any) => onClick(e, useCase)}
+                />
               ))}
             </TreeNode>
             <TreeNode

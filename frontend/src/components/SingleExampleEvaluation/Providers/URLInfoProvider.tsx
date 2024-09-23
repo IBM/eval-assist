@@ -15,6 +15,7 @@ interface URLInfoContextValue {
   useCaseType: PipelineType | null
   libraryTestCaseName: string | null
   preloadedUseCase: UseCase | null
+  isRisksAndHarms: boolean
 }
 
 const URLInfoContext = createContext<URLInfoContextValue>({
@@ -22,6 +23,7 @@ const URLInfoContext = createContext<URLInfoContextValue>({
   useCaseType: null,
   libraryTestCaseName: null,
   preloadedUseCase: null,
+  isRisksAndHarms: false,
 })
 
 export const useURLInfoContext = () => {
@@ -40,6 +42,12 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     () => (router.query.type ? (router.query.type as PipelineType) : null),
     [router.query.type],
   )
+
+  const isRisksAndHarms = useMemo(
+    () => (router.query.isRisksAndHarms ? router.query.isRisksAndHarms === 'true' : false),
+    [router.query.isRisksAndHarms],
+  )
+
   const libraryTestCaseName = useMemo(
     () => (router.query.libraryTestCase ? (router.query.libraryTestCase as string) : null),
     [router.query.libraryTestCase],
@@ -100,6 +108,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
         useCaseType,
         libraryTestCaseName,
         preloadedUseCase,
+        isRisksAndHarms,
       }}
     >
       {children}

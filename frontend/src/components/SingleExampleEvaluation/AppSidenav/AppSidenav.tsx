@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { Dispatch, SetStateAction, useId } from 'react'
 
 import { IconButton } from '@carbon/react'
-import { Categories, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
+import { Categories, WatsonHealthSaveAnnotation, WatsonxGovernance } from '@carbon/react/icons'
 
 import { UseCase } from '@types'
 
@@ -11,8 +11,9 @@ import layoutClasses from '../Layout.module.scss'
 import { useAppSidebarContext } from '../Providers/AppSidebarProvider'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import classes from './AppSidenav.module.scss'
-import { LibraryPanel } from './LibraryUseCasePanel'
-import { UserUseCasePanel } from './UserUseCasePanel'
+import { ExampleCatalogPanel } from './ExampleCatalogPanel'
+import { RiskAndHarmPanel } from './RiskAndHarmPanel'
+import { SavedTestCasesPanel } from './SavedTestCasesPanel'
 
 interface AppSidenavProps {
   setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
@@ -100,16 +101,36 @@ export const AppSidenavNew = ({
             <WatsonHealthSaveAnnotation size={20} />
           </IconButton>
         </li>
+        <li>
+          <IconButton
+            align="right"
+            label="Risks and Harms"
+            kind="ghost"
+            size="lg"
+            className={cx(classes.itemBtn, {
+              [classes.selected]: selected === 'risks_and_harms',
+            })}
+            id={`${id}-tab__risks_and_harms`}
+            role="tab"
+            aria-selected={selected === 'risks_and_harms'}
+            aria-controls={`${id}-tabpanel_risks_and_harms`}
+            onClick={() => {
+              setSelected((selected) => (selected === 'risks_and_harms' ? null : 'risks_and_harms'))
+            }}
+          >
+            <WatsonxGovernance size={20} />
+          </IconButton>
+        </li>
       </ul>
       <div
         role="tabpanel"
         className={classes.panel}
-        id={`${id}-tabpanel__library_use_cases`}
+        id={`${id}-tabpanel__example_catalog`}
         hidden={selected !== 'library_use_cases'}
         tabIndex={-1}
       >
         {selected === 'library_use_cases' && (
-          <LibraryPanel
+          <ExampleCatalogPanel
             onUseCaseClick={onUseCaseClick}
             onClose={() => {
               setSelected(null)
@@ -125,12 +146,28 @@ export const AppSidenavNew = ({
         tabIndex={-1}
       >
         {selected === 'user_use_cases' && (
-          <UserUseCasePanel
+          <SavedTestCasesPanel
             onUseCaseClick={onUseCaseClick}
             onClose={() => {
               setSelected(null)
             }}
             userUseCases={userUseCases}
+          />
+        )}
+      </div>
+      <div
+        role="tabpanel"
+        className={classes.panel}
+        id={`${id}-tabpanel__risks_and_harms`}
+        hidden={selected !== 'risks_and_harms'}
+        tabIndex={-1}
+      >
+        {selected === 'risks_and_harms' && (
+          <RiskAndHarmPanel
+            onUseCaseClick={onUseCaseClick}
+            onClose={() => {
+              setSelected(null)
+            }}
           />
         )}
       </div>

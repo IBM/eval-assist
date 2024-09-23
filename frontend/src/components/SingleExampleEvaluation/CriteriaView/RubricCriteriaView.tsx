@@ -20,6 +20,7 @@ import { isInstanceOfRubricCriteria } from '@utils/utils'
 
 import { RubricCriteria } from '../../../types'
 import { JSONTextArea } from '../JSONTextArea'
+import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import classes from '../SingleExampleEvaluation.module.scss'
 import customClasses from './index.module.scss'
 
@@ -46,7 +47,7 @@ export const RubricCriteriaView = ({
 }: EvaluationCriteriaProps) => {
   const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(rubricCriteria.name === '')
   const [rawJSONCriteria, setRawJSONCriteria] = useState('')
-
+  const { isRisksAndHarms } = useURLInfoContext()
   const isValidRawJSONCriteria = (jsonCriteria: string) => {
     try {
       const rawJSONCriteriaObj = JSON.parse(jsonCriteria)
@@ -142,6 +143,7 @@ export const RubricCriteriaView = ({
                             criteria: value,
                           })
                         }
+                        // readOnly={isRisksAndHarms}
                       />
                       {rubricCriteria.options.map((scale, i) => (
                         <div key={i} className={customClasses.optionsGrid}>
@@ -161,6 +163,7 @@ export const RubricCriteriaView = ({
                             }
                             id={`criteria-option-value-${i}`}
                             key={`criteria-option-value-${i}`}
+                            // readOnly={isRisksAndHarms}
                           />
                           <HighlightTextArea
                             id={`criteria-option-description-${i}`}
@@ -182,6 +185,7 @@ export const RubricCriteriaView = ({
                                 ],
                               })
                             }
+                            // readOnly={isRisksAndHarms}
                           />
                           {rubricCriteria.options.length > 2 && (
                             <IconButton
