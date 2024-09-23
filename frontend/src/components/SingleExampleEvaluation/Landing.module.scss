@@ -6,6 +6,14 @@
   flex-direction: column;
 }
 
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: $spacing-04;
+  align-items: flex-start;
+}
+
 .heading {
   //styleName: Productive/heading-01;
   font-family: IBM Plex Sans;
@@ -29,12 +37,8 @@
   margin-bottom: $spacing-05;
 }
 
-.sectionSeparation {
-  margin-top: 1rem;
-}
-
 .cards {
-  margin-bottom: $spacing-06;
+  // margin-bottom: $spacing-06;
   display: grid;
   grid-gap: 2rem;
   grid-template-columns: 1fr;
@@ -73,6 +77,8 @@
 }
 
 .bottomDivider {
-  padding-bottom: 1rem;
+  margin-top: $spacing-06;
+  margin-bottom: $spacing-04;
+  height: 1px;
   border-bottom: 1px solid $border-subtle-00;
 }
