@@ -48,7 +48,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
             setSelectedPipeline(selectedPipeline)
           }}
           className={classes.selectReadOnly}
-          readOnly
+          readOnly={isRisksAndHarms}
         >
           {(returnByPipelineType(type, rubricPipelines, pairwisePipelines) as Pipeline[]).map((pipeline, i) => (
             <SelectItem value={pipeline.name} text={`${pipeline.name} (${pipeline.provider.toUpperCase()})`} key={i} />
