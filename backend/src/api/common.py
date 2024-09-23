@@ -15,11 +15,11 @@ class CriteriaModel(BaseModel):
 class EvalRequestModel(BaseModel):
     context_variables: dict[str, str]
     responses: list[str]
-    model_provider_credentials: dict[str,str]
+    llm_provider_credentials: dict[str,str]
     pipeline: str
     type: EvaluatorTypeEnum
 
-    @validator('model_provider_credentials', pre=True, always=True)
+    @validator('llm_provider_credentials', pre=True, always=True)
     def validate_api_key(cls, key):
         if not key:
             raise HTTPException(status_code=400, detail="API credentials are required.")

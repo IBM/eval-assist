@@ -80,7 +80,7 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
     # Gen ai client
     try:
         if req.type == EvaluatorTypeEnum.RUBRIC:
-            evaluator = get_rubric_evaluator(name=req.pipeline, credentials=req.model_provider_credentials)
+            evaluator = get_rubric_evaluator(name=req.pipeline, credentials=req.llm_provider_credentials)
             criteria = RubricCriteria(name=req.criteria.name, criteria=req.criteria.criteria, options=req.criteria.options)
 
             res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses), 
@@ -89,7 +89,7 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
                                     check_bias=True)
             return RubricEvalResponseModel(results=res)
         elif req.type == EvaluatorTypeEnum.ALL_V_ALL_PAIRWISE:
-            evaluator = get_all_vs_all_pairwise_evaluator(name=req.pipeline, credentials=req.model_provider_credentials)
+            evaluator = get_all_vs_all_pairwise_evaluator(name=req.pipeline, credentials=req.llm_provider_credentials)
             criteria = PairwiseCriteria(name=req.criteria.name, criteria=req.criteria.criteria)
             [per_response_results, ranking] = evaluator.evaluate(
                                 context_variables=req.context_variables, 
