@@ -88,9 +88,11 @@ export const SingleExampleEvaluation = () => {
 
   const [lastSavedUseCaseString, setLastSavedUseCaseString] = useState<string>(currentUseCaseString)
 
+  const { isRisksAndHarms } = useURLInfoContext()
+
   const changesDetected = useMemo(
-    () => showingTestCase && lastSavedUseCaseString !== currentUseCaseString,
-    [showingTestCase, lastSavedUseCaseString, currentUseCaseString],
+    () => showingTestCase && lastSavedUseCaseString !== currentUseCaseString && !isRisksAndHarms,
+    [showingTestCase, lastSavedUseCaseString, currentUseCaseString, isRisksAndHarms],
   )
 
   const noUseCaseSelected = useMemo(() => currentUseCase === null, [currentUseCase])
@@ -123,6 +125,7 @@ export const SingleExampleEvaluation = () => {
 
   const areRelevantCredentialsProvided = useMemo(
     () =>
+      currentUseCase?.pipeline?.provider === ModelProviderType.LOCAL ||
       Object.values(modelProviderCredentials[currentUseCase?.pipeline?.provider || ModelProviderType.BAM]).every(
         (key) => key !== '',
       ),
@@ -161,13 +164,19 @@ export const SingleExampleEvaluation = () => {
       (acc, item, index) => ({ ...acc, [item.variable]: item.value }),
       {},
     )
-    let body = {
+    let body: any = {
       context_variables: parsedContextVariables,
       responses: currentUseCase.responses,
-      llm_provider_credentials: modelProviderCredentials[currentUseCase.pipeline?.provider || 'bam'],
       pipeline: currentUseCase.pipeline?.name,
       criteria: currentUseCase.criteria,
       type: currentUseCase.type,
+      response_variable_name: currentUseCase.responseVariableName,
+    }
+    if (currentUseCase.pipeline?.provider !== ModelProviderType.LOCAL) {
+      body['llm_provider_credentials'] =
+        modelProviderCredentials[currentUseCase.pipeline?.provider || ModelProviderType.BAM]
+    } else {
+      body['llm_provider_credentials'] = {}
     }
     const startEvaluationTime = new Date().getTime() / 1000
     response = await post('evaluate/', body)

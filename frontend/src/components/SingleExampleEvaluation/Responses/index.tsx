@@ -17,6 +17,7 @@ import {
   RubricResult,
   UseCase,
 } from '../../../types'
+import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import { PairwiseRows } from './PairwiseRows'
 import { RubricRows } from './RubricRows'
 import classes from './index.module.scss'
@@ -64,6 +65,8 @@ export const Responses = ({
 }: Props) => {
   const [explanationOn, setExplanationOn] = useState(type === PipelineType.RUBRIC)
   const [expectedResultOn, setExpectedResultOn] = useState(true)
+
+  const { isRisksAndHarms } = useURLInfoContext()
 
   const pairwiseWinnerIndex = useMemo(() => {
     if (results === null || type !== PipelineType.PAIRWISE) return null
@@ -146,7 +149,9 @@ export const Responses = ({
             )}
             {results !== null && !evaluationRunning && explanationOn && type === PipelineType.RUBRIC && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
-                <strong className={cx(classes.headerTypography)}>{'Explanation'}</strong>
+                <strong className={cx(classes.headerTypography)}>
+                  {isRisksAndHarms ? 'Certainty' : 'Explanation'}
+                </strong>
               </div>
             )}
           </div>

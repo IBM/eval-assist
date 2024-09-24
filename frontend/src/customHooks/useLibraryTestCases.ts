@@ -19,7 +19,7 @@ export const useLibraryTestCases = () => {
         rubricPipelines !== null && rubricPipelines.length > 0
           ? {
               ...u,
-              pipeline: rubricPipelines.find((p) => p.name === 'Granite Guardian') as Pipeline,
+              pipeline: rubricPipelines.find((p) => p.name === 'Granite Guardian Checkpoint') as Pipeline,
             }
           : u,
       )

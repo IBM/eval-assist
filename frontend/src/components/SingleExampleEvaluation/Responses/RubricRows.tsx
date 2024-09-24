@@ -3,12 +3,11 @@ import { v4 as uuid } from 'uuid'
 
 import { Dispatch, SetStateAction } from 'react'
 
-import { Button, Link, Select, SelectItem } from '@carbon/react'
-import { Add } from '@carbon/react/icons'
+import { Link, Select, SelectItem } from '@carbon/react'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
-import { PairwiseResults, RubricCriteria, RubricResult, UseCase } from '../../../types'
+import { RubricCriteria, RubricResult, UseCase } from '../../../types'
 import RemovableSection from '../../RemovableSection/RemovableSection'
 import classes from './index.module.scss'
 

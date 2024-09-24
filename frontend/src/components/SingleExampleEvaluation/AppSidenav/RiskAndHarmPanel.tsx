@@ -53,7 +53,7 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
   return (
     <section className={cx(classes.root)}>
       <header className={classes.header}>
-        <h2 className={classes.heading}>Example Catalog</h2>
+        <h2 className={classes.heading}>Example Catalog - Harms & Risks</h2>
         <IconButton label="Close" align="right" kind="ghost" onClick={onClose}>
           <ChevronLeft />
         </IconButton>

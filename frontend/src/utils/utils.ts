@@ -64,7 +64,7 @@ export const getEmptyExpectedResults = (count: number) => {
   return new Array(count).fill(null).map((_) => '')
 }
 
-export const getUseCaseWithCriteria = (criteriaName: string, type: PipelineType): UseCase => ({
+export const getEmptyUseCaseWithCriteria = (criteriaName: string, type: PipelineType): UseCase => ({
   ...getEmptyUseCase(type),
   criteria: getCriteria(criteriaName, type) || getEmptyCriteria(type),
 })

@@ -45,29 +45,7 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
   return (
     <div className={classes.root}>
       <div className={classes.header}>
-        <div>
-          <h2 className={classes.heading}>{`Welcome${user && user.name ? ', ' + user.name : ''}`}</h2>
-          <p className={classes.description}>{'New features'}</p>
-          <div
-            className={cx(classes.cards, {
-              [classes['sidebar-expanded']]: sidebarTabSelected !== null,
-            })}
-          >
-            <Card
-              title={'Direct Assessment On Risk & Harms'}
-              description={'Try Granite Guardian LLM judges'}
-              imageSrc="python_library"
-              onClick={openRisksAndHarms}
-              actionButton={
-                <Button renderIcon={View} kind="ghost" onClick={openRisksAndHarms}>
-                  {'View it'}
-                </Button>
-              }
-              className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
-              badge={{ text: 'Catalog', color: 'purple' }}
-            />
-          </div>
-        </div>
+        <h2 className={classes.heading}>{`Welcome${user && user.name ? ', ' + user.name : ''}`}</h2>
         <Button
           renderIcon={Add}
           onClick={() => {
@@ -77,7 +55,26 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
           {'Create New Test Case'}
         </Button>
       </div>
-
+      <p className={classes.description}>{'New features'}</p>
+      <div
+        className={cx(classes.cards, {
+          [classes['sidebar-expanded']]: sidebarTabSelected !== null,
+        })}
+      >
+        <Card
+          title={'Direct Assessment of Harms & Risks'}
+          description={'Try Granite Guardian LLM judges'}
+          imageSrc="python_library"
+          onClick={openRisksAndHarms}
+          actionButton={
+            <Button renderIcon={View} kind="ghost" onClick={openRisksAndHarms}>
+              {'View it'}
+            </Button>
+          }
+          className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
+          badge={{ text: 'Catalog', color: 'purple' }}
+        />
+      </div>
       <div className={cx(classes.bottomDivider)}></div>
       <p className={cx(classes.description, classes.sectionSeparation)}>{'Here are some key features we offer'}</p>
       <div className={cx(classes.cards, { [classes['sidebar-expanded']]: sidebarTabSelected !== null })}>

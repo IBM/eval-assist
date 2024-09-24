@@ -64,7 +64,7 @@ export const AppSidenavNew = ({
         <li>
           <IconButton
             align="right"
-            label="Example Catalog"
+            label="Example Catalog - General"
             kind="ghost"
             size="lg"
             className={cx(classes.itemBtn, {
@@ -79,6 +79,26 @@ export const AppSidenavNew = ({
             }}
           >
             <Categories size={20} />
+          </IconButton>
+        </li>
+        <li>
+          <IconButton
+            align="right"
+            label="Example Catalog - Harms & Risks"
+            kind="ghost"
+            size="lg"
+            className={cx(classes.itemBtn, {
+              [classes.selected]: selected === 'risks_and_harms',
+            })}
+            id={`${id}-tab__risks_and_harms`}
+            role="tab"
+            aria-selected={selected === 'risks_and_harms'}
+            aria-controls={`${id}-tabpanel_risks_and_harms`}
+            onClick={() => {
+              setSelected((selected) => (selected === 'risks_and_harms' ? null : 'risks_and_harms'))
+            }}
+          >
+            <IbmSecurity size={20} />
           </IconButton>
         </li>
         <li>
@@ -99,26 +119,6 @@ export const AppSidenavNew = ({
             }}
           >
             <WatsonHealthSaveAnnotation size={20} />
-          </IconButton>
-        </li>
-        <li>
-          <IconButton
-            align="right"
-            label="Risks and Harms"
-            kind="ghost"
-            size="lg"
-            className={cx(classes.itemBtn, {
-              [classes.selected]: selected === 'risks_and_harms',
-            })}
-            id={`${id}-tab__risks_and_harms`}
-            role="tab"
-            aria-selected={selected === 'risks_and_harms'}
-            aria-controls={`${id}-tabpanel_risks_and_harms`}
-            onClick={() => {
-              setSelected((selected) => (selected === 'risks_and_harms' ? null : 'risks_and_harms'))
-            }}
-          >
-            <IbmSecurity size={20} />
           </IconButton>
         </li>
       </ul>

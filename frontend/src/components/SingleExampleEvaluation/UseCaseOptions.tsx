@@ -5,6 +5,7 @@ import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/
 
 import { PipelineType, UseCase } from '../../types'
 import { UseCaseTypeBadge } from '../UseCaseTypeBadge/UseCaseTypeBadge'
+import { useURLInfoContext } from './Providers/URLInfoProvider'
 import classes from './UseCaseOptions.module.scss'
 
 interface UseCaseOptionsProps {
@@ -36,6 +37,7 @@ export const UseCaseOptions = ({
   setEditNameModalOpen,
 }: UseCaseOptionsProps) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
+  const { isRisksAndHarms } = useURLInfoContext()
   const onSaveClick = async () => {
     setSavingUseCase(true)
     await onSave()
@@ -66,14 +68,24 @@ export const UseCaseOptions = ({
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
       {isUseCaseSaved ? (
         <>
-          <Button disabled={savingUseCase || !changesDetected} kind="ghost" renderIcon={Save} onClick={onSaveClick}>
+          <Button
+            disabled={savingUseCase || !changesDetected || isRisksAndHarms}
+            kind="ghost"
+            renderIcon={Save}
+            onClick={onSaveClick}
+          >
             {'Save'}
           </Button>
           <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
         </>
       ) : null}
 
-      <Button kind="ghost" renderIcon={WatsonHealthSaveImage} onClick={() => setSaveUseCaseModalOpen(true)}>
+      <Button
+        disabled={isRisksAndHarms}
+        kind="ghost"
+        renderIcon={WatsonHealthSaveImage}
+        onClick={() => setSaveUseCaseModalOpen(true)}
+      >
         {'Save as'}
       </Button>
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>

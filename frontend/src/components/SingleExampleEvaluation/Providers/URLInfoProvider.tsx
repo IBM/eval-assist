@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
 import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
-import { getEmptyUseCase, getUseCaseWithCriteria, returnByPipelineType } from '@utils/utils'
+import { getEmptyUseCase, getEmptyUseCaseWithCriteria, returnByPipelineType } from '@utils/utils'
 
 import { PipelineType, UseCase } from '../../../types'
 import { usePipelineTypesContext } from './PipelineTypesProvider'
@@ -69,7 +69,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
         ) || null
     } else if (useCaseType !== null && useCaseId === null && libraryTestCaseName === null) {
       if (criteriaName !== null) {
-        pu = getUseCaseWithCriteria(criteriaName, useCaseType)
+        pu = getEmptyUseCaseWithCriteria(criteriaName, useCaseType)
       } else {
         pu = getEmptyUseCase(useCaseType)
       }
