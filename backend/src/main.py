@@ -99,12 +99,13 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
             return PairwiseEvalResponseModel(per_response_results=per_response_results, ranking=ranking)
 
     except ValueError as e:
+        traceback.print_exc()      
         raise HTTPException(status_code=400, detail=str(e))
     except ApiResponseException as e:
         if e.response.error == "Unauthorized":
             throw_authorized_exception()
         print('raised ApiResponseException')
-        print(e.response.error)
+        traceback.print_exc()      
         raise HTTPException(status_code=400, detail=f"{e.response.error}. {e.response.message}")
     except ApiNetworkException as e:
         # I think the random errors thrown by BAM are of type ApiNetworkException, lets maintain error
@@ -115,6 +116,8 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
     except ApiRequestFailure as e:
         traceback.print_exc()      
         raise HTTPException(status_code=400, detail=e.error_msg)
+    except:
+        traceback.print_exc()      
 
 @router.get("/use_case/")
 def get_use_cases(user: str):
