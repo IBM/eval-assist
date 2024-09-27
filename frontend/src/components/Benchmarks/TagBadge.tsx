@@ -13,11 +13,18 @@ interface Props {
   size?: 'sm' | 'md' | 'lg'
   name: string
   color: BadgeColor
+  onClick?: (e: UIEvent) => void
 }
 
-export const TagBadge = ({ style, className, size, name, color }: Props) => {
+export const TagBadge = ({ style, className, size, name, color, onClick }: Props) => {
   return (
-    <Tag style={style} className={cx(className, classes['usecase-tag'])} type={color} size={size || 'md'}>
+    <Tag
+      style={style}
+      className={cx(className, classes['usecase-tag'])}
+      type={color}
+      size={size || 'md'}
+      onClick={onClick}
+    >
       {name}
     </Tag>
   )

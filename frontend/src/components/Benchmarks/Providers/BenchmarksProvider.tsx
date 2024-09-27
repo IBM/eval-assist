@@ -3,7 +3,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from 'react
 import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { Benchmark } from '@types'
+import { Benchmark, PipelineType } from '@types'
 
 interface BenchmarksContextValue {
   benchmarks: Benchmark[]
@@ -29,6 +29,9 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
       benchmarks.sort((b1, b2) => b1.name.localeCompare(b2.name))
       benchmarks.forEach((benchmark) => {
         benchmark.criteriaBenchmarks.sort((c1, c2) => c1.name.localeCompare(c2.name))
+        if (benchmark.type === PipelineType.OLD_PAIRWISE) {
+          benchmark.type = PipelineType.PAIRWISE
+        }
       })
       setBenchmarks(benchmarks)
       setLoadingBenchmarks(false)

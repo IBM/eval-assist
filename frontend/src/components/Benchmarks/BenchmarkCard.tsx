@@ -1,6 +1,8 @@
 import cx from 'classnames'
 import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
+import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
+
 import Link from 'next/link'
 
 import { ListItem, Tile, UnorderedList } from '@carbon/react'
@@ -19,9 +21,10 @@ interface Props {
     [key: string]: BadgeColor
   }
   selectedCriteriaItems: string[]
+  setSelectedItems: Dispatch<SetStateAction<string[]>>
 }
 
-export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems }: Props) => {
+export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, setSelectedItems }: Props) => {
   const { isDarkMode } = useThemeContext()
 
   const { getURLFromBenchmark, updateURLFromBenchmark } = useURLInfoContext()
@@ -29,28 +32,103 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems }: 
   const onClick = () => {
     updateURLFromBenchmark(benchmark)
   }
+
+  const displayedCriterias = useMemo<{ name: string; highlighted: boolean; clickable: boolean }[]>(() => {
+    const allCriterias = benchmark.criteriaBenchmarks
+    const maximumListLength = 5
+    const threeDotsItem = {
+      name: '...',
+      highlighted: false,
+      clickable: false,
+    }
+    if (allCriterias.length >= maximumListLength) {
+      if (selectedCriteriaItems.length === 0) {
+        return [
+          ...allCriterias.slice(0, maximumListLength).map((c) => ({
+            name: c.name,
+            highlighted: false,
+            clickable: true,
+          })),
+          threeDotsItem,
+        ]
+      } else {
+        const currentBenchmarkSelectedCriterias = allCriterias.filter((c) => selectedCriteriaItems.includes(c.name))
+        if (currentBenchmarkSelectedCriterias.length >= maximumListLength) {
+          return [
+            ...currentBenchmarkSelectedCriterias.map((c) => ({
+              name: c.name,
+              highlighted: true,
+              clickable: true,
+            })),
+            threeDotsItem,
+          ]
+        } else {
+          return [
+            ...[
+              ...currentBenchmarkSelectedCriterias.map((c) => ({
+                name: c.name,
+                highlighted: true,
+                clickable: true,
+              })),
+              ...allCriterias
+                .filter(
+                  (c) =>
+                    !currentBenchmarkSelectedCriterias
+                      .map((selectedCriteria) => selectedCriteria.name)
+                      .includes(c.name),
+                )
+                .slice(0, maximumListLength - currentBenchmarkSelectedCriterias.length)
+                .map((c) => ({
+                  name: c.name,
+                  highlighted: false,
+                  clickable: true,
+                })),
+            ].toSorted((a, b) => a.name.localeCompare(b.name)),
+            threeDotsItem,
+          ]
+        }
+      }
+    } else {
+      return allCriterias.map((c) => ({
+        name: c.name,
+        highlighted: selectedCriteriaItems.includes(c.name),
+        clickable: true,
+      }))
+    }
+  }, [benchmark.criteriaBenchmarks, selectedCriteriaItems])
+
+  const onTagClick = useCallback(
+    (e: UIEvent, tag: string) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setSelectedItems((prevValue) => [...prevValue, tag])
+    },
+    [setSelectedItems],
+  )
+
   return (
     <Tile className={cx(classes.root, { [classes['card-white-mode']]: !!!isDarkMode() })} onClick={onClick}>
       <div className={classes['title-row']}>
         <h5 className={classes.title}>{benchmark.name}</h5>
       </div>
       <UnorderedList className={classes.list}>
-        {benchmark.criteriaBenchmarks
-          // .filter(
-          //   (criteriaBenchmark) =>
-          //     selectedCriteriaItems.length === 0 || selectedCriteriaItems.includes(criteriaBenchmark.name),
-          // )
-          .map((criteriaBenchmark, i) => (
-            <ListItem key={i}>
-              <Link href={getURLFromBenchmark(benchmark, criteriaBenchmark)} className={classes.criteriaNameLink}>
-                {selectedCriteriaItems.includes(criteriaBenchmark.name) ? (
-                  <mark>{criteriaBenchmark.name}</mark>
-                ) : (
-                  criteriaBenchmark.name
+        {displayedCriterias.map((displayedCriteria, i) => (
+          <ListItem key={i}>
+            {displayedCriteria.clickable ? (
+              <Link
+                href={getURLFromBenchmark(
+                  benchmark,
+                  benchmark.criteriaBenchmarks.find((c) => c.name === displayedCriteria.name),
                 )}
+                className={classes.nameLink}
+              >
+                {displayedCriteria.highlighted ? <mark>{displayedCriteria.name}</mark> : displayedCriteria.name}
               </Link>
-            </ListItem>
-          ))}
+            ) : (
+              <div>{displayedCriteria.name}</div>
+            )}
+          </ListItem>
+        ))}
       </UnorderedList>
       <div className={classes.tagList}>
         <TagBadge
@@ -58,9 +136,17 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems }: 
           className={classes.badge}
           size="md"
           color={tagToColor[returnByPipelineType(benchmark.type, RUBRIC_NAME, PAIRWISE_NAME)]}
+          onClick={(e) => onTagClick(e, returnByPipelineType(benchmark.type, RUBRIC_NAME, PAIRWISE_NAME))}
         />
         {benchmark.tags.map((tag, i) => (
-          <TagBadge className={classes.badge} key={i} name={tag} color={tagToColor[tag]} size="md" />
+          <TagBadge
+            className={classes.badge}
+            key={i}
+            name={tag}
+            color={tagToColor[tag]}
+            size="md"
+            onClick={(e) => onTagClick(e, tag)}
+          />
         ))}
       </div>
     </Tile>

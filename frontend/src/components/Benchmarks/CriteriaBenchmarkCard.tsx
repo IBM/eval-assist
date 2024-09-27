@@ -103,12 +103,13 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
     [criteriaBenchmark.evaluatorBenchmarks],
   )
 
-  // sorts the evaluators alphabetically and parses the results
-  const parsedNewestEvaluators = useMemo(() => {
-    return (showAllVersions ? criteriaBenchmark.evaluatorBenchmarks : newestEvaluators).sort((a, b) =>
-      a.evaluator_id.localeCompare(b.evaluator_id),
-    )
-  }, [criteriaBenchmark.evaluatorBenchmarks, newestEvaluators, showAllVersions])
+  const displayedEvaluators = useMemo(
+    () =>
+      (showAllVersions ? criteriaBenchmark.evaluatorBenchmarks : newestEvaluators).sort((a, b) =>
+        a.evaluator_id.localeCompare(b.evaluator_id),
+      ),
+    [criteriaBenchmark.evaluatorBenchmarks, newestEvaluators, showAllVersions],
+  )
 
   return (
     benchmark !== null && (
@@ -132,7 +133,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
               onToggle={() => setShowAllVersions(!showAllVersions)}
               size="sm"
               hideLabel
-              id="toggle-expected-result"
+              id={`toggle-expected-result-${criteriaBenchmark.name}`}
               className={classes.toggle}
             />
           </div>
@@ -148,7 +149,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
                 </TableRow>
               </TableHead>
               <TableBody>
-                {parsedNewestEvaluators.map((evaluatorBenchmark, i) => (
+                {displayedEvaluators.map((evaluatorBenchmark, i) => (
                   <TableRow key={i}>
                     {/* <TableCell>{`${evaluatorBenchmark.evaluator_id} (v${evaluatorBenchmark.laaj_version})`}</TableCell> */}
                     <TableCell>{`${evaluatorBenchmark.evaluator_id} (${evaluatorBenchmark.laaj_version})`}</TableCell>

@@ -82,6 +82,7 @@ export enum PipelineType {
   RUBRIC = 'rubric',
   // PAIRWISE = 'pairwise',
   PAIRWISE = 'all_vs_all_pairwise',
+  OLD_PAIRWISE = 'pairwise',
 }
 
 export enum ModelProviderType {

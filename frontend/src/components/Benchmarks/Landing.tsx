@@ -16,7 +16,6 @@ export const Landing = () => {
   const { benchmarks } = useBenchmarksContext()
   const [selectedTagItems, setSelectedTagItems] = useState<string[]>([])
   const [selectedCriteriaItems, setSelectedCriteriaItems] = useState<string[]>([])
-
   const filteredBenchmarks = useMemo(() => {
     if (selectedTagItems.length === 0 && selectedCriteriaItems.length === 0) {
       return benchmarks
@@ -77,6 +76,8 @@ export const Landing = () => {
     return dict
   }, [allTags])
 
+  console.log(benchmarks)
+
   return (
     <>
       <BenchmarkSidenav />
@@ -104,6 +105,7 @@ export const Landing = () => {
             {filteredBenchmarks.map((benchmark, i) => (
               <BenchmarkCard
                 selectedCriteriaItems={selectedCriteriaItems}
+                setSelectedItems={setSelectedTagItems}
                 key={i}
                 benchmark={benchmark}
                 tagToColor={tagToColor}

@@ -39,7 +39,7 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
         return `/?&type=${type}&criteriaName=${criteriaName}`
       }
     },
-    [type],
+    [getLibraryTestCaseNameFromCriteriaName, type],
   )
 
   return (
