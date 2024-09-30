@@ -3,7 +3,7 @@ import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
 import { useMemo, useState } from 'react'
 
-import { BadgeColor, PipelineType, badgeColorsArray } from '@types'
+import { BadgeColor, Benchmark, PipelineType, badgeColorsArray } from '@types'
 
 import { BenchmarkCard } from './BenchmarkCard'
 import { Filter } from './Filter'
@@ -15,30 +15,41 @@ import classes from './index.module.scss'
 export const Landing = () => {
   const { benchmarks } = useBenchmarksContext()
   const [selectedTagItems, setSelectedTagItems] = useState<string[]>([])
+  const [selectedBenchmarkItems, setSelectedBenchmarkItems] = useState<string[]>([])
   const [selectedCriteriaItems, setSelectedCriteriaItems] = useState<string[]>([])
+
   const filteredBenchmarks = useMemo(() => {
-    if (selectedTagItems.length === 0 && selectedCriteriaItems.length === 0) {
-      return benchmarks
-    } else {
-      const filteredByTags = benchmarks.filter((b) => {
-        return selectedTagItems.every((selectedTag) => {
-          if (selectedTag === RUBRIC_NAME && b.type === PipelineType.RUBRIC) {
-            return true
-          }
-          if (selectedTag === PAIRWISE_NAME && b.type === PipelineType.PAIRWISE) {
-            return true
-          }
-          return b.tags.includes(selectedTag)
-        })
-      })
-      const filteredByCriteriasAndTag = filteredByTags.filter((b) => {
-        return selectedCriteriaItems.every((selectedCriteria) => {
-          return b.criteriaBenchmarks.map((criteriaBenchmark) => criteriaBenchmark.name).includes(selectedCriteria)
-        })
-      })
-      return filteredByCriteriasAndTag
-    }
-  }, [benchmarks, selectedCriteriaItems, selectedTagItems])
+    let result = [...benchmarks]
+
+    result =
+      selectedBenchmarkItems.length === 0 ? result : result.filter((b) => selectedBenchmarkItems.includes(b.name))
+
+    result =
+      selectedTagItems.length === 0
+        ? result
+        : result.filter((b) => {
+            return selectedTagItems.every((selectedTag) => {
+              if (selectedTag === RUBRIC_NAME && b.type === PipelineType.RUBRIC) {
+                return true
+              }
+              if (selectedTag === PAIRWISE_NAME && b.type === PipelineType.PAIRWISE) {
+                return true
+              }
+              return b.tags.includes(selectedTag)
+            })
+          })
+
+    result =
+      selectedCriteriaItems.length === 0
+        ? result
+        : result.filter((b) =>
+            selectedCriteriaItems.every((selectedCriteria) =>
+              b.criteriaBenchmarks.map((criteriaBenchmark) => criteriaBenchmark.name).includes(selectedCriteria),
+            ),
+          )
+
+    return result
+  }, [benchmarks, selectedBenchmarkItems, selectedCriteriaItems, selectedTagItems])
 
   const allTags = useMemo(() => {
     const tags: string[] = []
@@ -76,30 +87,38 @@ export const Landing = () => {
     return dict
   }, [allTags])
 
-  console.log(benchmarks)
-
   return (
     <>
       <BenchmarkSidenav />
       <div className={cx(classes.root, landingClasses.root, classes.leftPadding)}>
         <h3 className={cx(classes.title, classes.bottomDivider)}>Benchmarks</h3>
-        <Filter
-          items={[RUBRIC_NAME, PAIRWISE_NAME, ...allTags]}
-          selectedItems={selectedTagItems}
-          setSelectedItems={setSelectedTagItems}
-          tagToColor={tagToColor}
-          title={'Benchmarks filter'}
-          label={selectedTagItems.length > 0 ? selectedTagItems.join(', ') : 'No filters selected'}
-          className={landingClasses.benchmarkFilter}
-        />
-        <Filter
-          items={criteriaList}
-          selectedItems={selectedCriteriaItems}
-          setSelectedItems={setSelectedCriteriaItems}
-          tagToColor={tagToColor}
-          title={'Criteria filter'}
-          label={selectedCriteriaItems.length > 0 ? selectedCriteriaItems.join(', ') : 'No criterias selected'}
-        />
+        <div className={landingClasses.filters}>
+          <Filter
+            items={benchmarks.map((b) => b.name)}
+            selectedItems={selectedBenchmarkItems}
+            setSelectedItems={setSelectedBenchmarkItems}
+            tagToColor={tagToColor}
+            title={'Benchmark filter'}
+            label={selectedTagItems.length > 0 ? selectedTagItems.join(', ') : 'No filters selected'}
+          />
+          <Filter
+            items={[RUBRIC_NAME, PAIRWISE_NAME, ...allTags]}
+            selectedItems={selectedTagItems}
+            setSelectedItems={setSelectedTagItems}
+            tagToColor={tagToColor}
+            title={'Tag filter'}
+            label={selectedTagItems.length > 0 ? selectedTagItems.join(', ') : 'No filters selected'}
+          />
+          <Filter
+            items={criteriaList}
+            selectedItems={selectedCriteriaItems}
+            setSelectedItems={setSelectedCriteriaItems}
+            tagToColor={tagToColor}
+            title={'Criteria filter'}
+            label={selectedCriteriaItems.length > 0 ? selectedCriteriaItems.join(', ') : 'No criterias selected'}
+          />
+        </div>
+
         {filteredBenchmarks.length > 0 ? (
           <div className={cx(landingClasses.cardsGrid)}>
             {filteredBenchmarks.map((benchmark, i) => (

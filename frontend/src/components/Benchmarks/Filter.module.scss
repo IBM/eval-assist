@@ -1,5 +1,17 @@
 @import '@carbon/styles/scss/theme';
 
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .placeholderText :global .cds--list-box__label {
   color: $text-placeholder;
+}
+
+.selectedItems {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }

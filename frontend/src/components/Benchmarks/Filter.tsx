@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { Dispatch, SetStateAction } from 'react'
 
 // @ts-ignore
-import { MultiSelect } from '@carbon/react'
+import { FilterableMultiSelect } from '@carbon/react'
 
 import { BadgeColor } from '@types'
 
@@ -28,17 +28,14 @@ export const Filter = ({ items, selectedItems, setSelectedItems, tagToColor, tit
   }
 
   return (
-    <div
-      className={cx(className, { [classes.placeholderText]: selectedItems.length === 0 })}
-      style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end' }}
-    >
+    <div className={cx(className, classes.root, { [classes.placeholderText]: selectedItems.length === 0 })}>
       <div
         style={{
           width: 300,
           marginRight: '1rem',
         }}
       >
-        <MultiSelect
+        <FilterableMultiSelect
           titleText={title}
           label={label}
           items={items}
@@ -46,11 +43,14 @@ export const Filter = ({ items, selectedItems, setSelectedItems, tagToColor, tit
           onChange={onSelectionChanged}
           selectionFeedback="top-after-reopen"
           id={'filter-multiselect'}
+          itemToString={(i: string) => i}
         />
       </div>
-      {selectedItems.map((tag, i) => (
-        <TagBadge key={i} name={tag} color={tagToColor[tag]} size="md" />
-      ))}
+      <div className={classes.selectedItems}>
+        {selectedItems.map((tag, i) => (
+          <TagBadge key={i} name={tag} color={tagToColor[tag]} size="md" />
+        ))}
+      </div>
     </div>
   )
 }

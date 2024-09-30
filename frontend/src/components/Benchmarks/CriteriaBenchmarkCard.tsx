@@ -39,7 +39,7 @@ const beatutifyName: { [key: string]: string } = {
 export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: Props) => {
   const { benchmark } = useURLInfoContext()
   const [criteriaDetailsModal, setCriteriaDetailsModal] = useState(false)
-  const [showAllVersions, setShowAllVersions] = useState(false)
+  const [showAllVersions, setShowAllVersions] = useState(true)
   const criteria = useMemo(
     () => getCriteria(criteriaBenchmark.name, benchmark?.type as PipelineType),
     [benchmark?.type, criteriaBenchmark.name],
