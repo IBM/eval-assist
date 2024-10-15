@@ -11,11 +11,12 @@ from .db_client import db
 import json
 from prisma.models import StoredUseCase
 from prisma.errors import PrismaError
-from llmasajudge.evaluators import get_rubric_evaluator, get_all_vs_all_pairwise_evaluator, available_evaluators, EvaluatorTypeEnum, PairwiseCriteria, RubricCriteria, Evaluator
+from llmasajudge.evaluators import get_rubric_evaluator, get_all_vs_all_pairwise_evaluator, AVAILABLE_EVALUATORS, EvaluatorTypeEnum, PairwiseCriteria, RubricCriteria, Evaluator
 from llmasajudge.benchmark.utils import get_all_benchmarks
 from genai.exceptions import ApiResponseException, ApiNetworkException
 from ibm_watsonx_ai.wml_client_error import ApiRequestFailure
 import json
+from openai import AuthenticationError
 
 # API type definitions
 from .api.pipelines import PipelinesResponseModel
@@ -61,30 +62,24 @@ async def app_shutdown():
 def throw_authorized_exception():
     raise HTTPException(status_code=401, detail=f"Couldn't connect to BAM. Please check that the provided API key is correct." )
 
-'''
-Get the list of available pipelines, as supported by llm-as-a-judge library
-'''
+
 @router.get("/pipelines/", response_model=PipelinesResponseModel)
 def get_pipelines():
-    available_pipelines = [e.metadata for e in available_evaluators]
+    '''Get the list of available pipelines, as supported by llm-as-a-judge library'''
+    available_pipelines = [e.metadata for e in AVAILABLE_EVALUATORS]
     return PipelinesResponseModel(pipelines=available_pipelines)
 
 
 
-'''
-Single evaluation endpoint
-TODO: Update endpoint path 
-'''
 @router.post("/evaluate/", response_model=Union[RubricEvalResponseModel, PairwiseEvalResponseModel])
 def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
-    # Gen ai client
     try:
         if req.type == EvaluatorTypeEnum.RUBRIC:
             evaluator = get_rubric_evaluator(name=req.pipeline, credentials=req.llm_provider_credentials)
             criteria = RubricCriteria(name=req.criteria.name, criteria=req.criteria.criteria, options=req.criteria.options)
 
-            res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses), 
-                                    responses=req.responses, 
+            res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses),
+                                    responses=req.responses,
                                     criteria=criteria,
                                     check_bias=True)
             return RubricEvalResponseModel(results=res)
@@ -92,8 +87,8 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
             evaluator = get_all_vs_all_pairwise_evaluator(name=req.pipeline, credentials=req.llm_provider_credentials)
             criteria = PairwiseCriteria(name=req.criteria.name, criteria=req.criteria.criteria)
             [per_response_results, ranking] = evaluator.evaluate(
-                                context_variables=req.context_variables, 
-                                responses=req.responses, 
+                                context_variables=req.context_variables,
+                                responses=req.responses,
                                 criteria=criteria,
                                 check_bias=True)
             return PairwiseEvalResponseModel(per_response_results=per_response_results, ranking=ranking)
@@ -111,13 +106,17 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
         # I think the random errors thrown by BAM are of type ApiNetworkException, lets maintain error
         # handling this way till we know better how they are thrown
         print('raised ApiNetworkException')
-        traceback.print_exc()      
+        traceback.print_exc()   
         raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
     except ApiRequestFailure as e:
-        traceback.print_exc()      
+        traceback.print_exc()
         raise HTTPException(status_code=400, detail=e.error_msg)
+    except AuthenticationError as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail="Invalid OPENAI credentials provided.")
     except:
         traceback.print_exc()      
+        raise HTTPException(status_code=400, detail="Unknown error.")
 
 @router.get("/use_case/")
 def get_use_cases(user: str):
