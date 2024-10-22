@@ -127,7 +127,7 @@ export const Responses = ({
           >
             <div className={cx(classes.blockElement, classes.headerBlock, classes.headerResponseBlock)}>
               <strong className={cx(classes.headerTypography)}>
-                {returnByPipelineType(type, 'Responses to evaluate', 'Responses to compare')}
+                {returnByPipelineType(type, 'Text to evaluate', 'Text to compare')}
               </strong>
               <EditableTag
                 value={responseVariableName}
@@ -149,9 +149,7 @@ export const Responses = ({
             )}
             {results !== null && !evaluationRunning && explanationOn && type === PipelineType.RUBRIC && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
-                <strong className={cx(classes.headerTypography)}>
-                  {isRisksAndHarms ? 'Certainty' : 'Explanation'}
-                </strong>
+                <strong className={cx(classes.headerTypography)}>{'Explanation'}</strong>
               </div>
             )}
           </div>
@@ -203,7 +201,7 @@ export const Responses = ({
           <div className={cx(classes.tableRow, classes.addResponseRow)}>
             <div className={cx(classes.blockElement, classes.addResponseBlock)}>
               <Button kind="ghost" size="sm" renderIcon={Add} onClick={onAddResponse}>
-                {'Add response'}
+                {'Add'}
               </Button>
             </div>
           </div>

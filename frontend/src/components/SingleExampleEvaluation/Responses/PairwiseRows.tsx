@@ -114,7 +114,7 @@ export const PairwiseRows = ({
                 value={response}
                 id="text-area-model-output"
                 labelText={''}
-                placeholder="The response/text to evaluate."
+                placeholder="The text to evaluate"
                 key={`${i}_1`}
                 className={cx(classes.blockElement)}
               />
