@@ -26,7 +26,8 @@ class RubricCriteriaModel(CriteriaModel):
 
 class RubricEvalRequestModel(EvalRequestModel):
     criteria: RubricCriteriaModel
-
+    response_variable_name: str 
+    
     @validator('responses', pre=True, always=True)
     def validate_responses_length(cls, responses):
         # if len(responses) == 0:

@@ -80,7 +80,8 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
 
             res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses),
                                     responses=req.responses,
-                                    criteria=criteria,
+                                    criteria=[criteria] * len(req.responses),
+                                    response_variable_name_list=[req.response_variable_name] * len(req.responses),
                                     check_bias=True)
             return RubricEvalResponseModel(results=res)
         elif req.type == EvaluatorTypeEnum.ALL_V_ALL_PAIRWISE:
