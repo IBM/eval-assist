@@ -7,9 +7,10 @@ import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
 // @ts-ignore
 import { TreeNode, TreeView } from '@carbon/react'
-import { ChevronLeft, Compare, List } from '@carbon/react/icons'
+import { ChevronLeft, List } from '@carbon/react/icons'
 
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
+import { toTitleCase } from '@utils/utils'
 
 import { UseCase } from '../../../types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
@@ -17,26 +18,26 @@ import { LinkButton } from './LinkButton'
 import classes from './ThreeLevelsPanel.module.scss'
 
 interface Props {
-  onUseCaseClick: (useCase: UseCase) => void
+  onUseCaseClick: (useCase: UseCase, subCatalogName?: string) => void
   onClose: () => void
 }
 
 export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
-  const { risksAndHarmsLibraryTestCases } = useLibraryTestCases()
+  const { harmsAndRisksLibraryTestCases } = useLibraryTestCases()
 
   const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean } & { [key: string]: boolean }>({
     rubric: true,
     pairwise: true,
-    ...Object.keys(risksAndHarmsLibraryTestCases).reduce((acc, item, index) => ({ ...acc, [item]: true }), {}),
+    ...Object.keys(harmsAndRisksLibraryTestCases).reduce((acc, item, index) => ({ ...acc, [item]: true }), {}),
   })
 
-  const { preloadedUseCase } = useURLInfoContext()
+  const { preloadedUseCase, subCatalogName } = useURLInfoContext()
 
   const selectedNode = useMemo(() => {
     return preloadedUseCase !== null && preloadedUseCase.id === null
-      ? [`${preloadedUseCase.name}_${preloadedUseCase.type}`]
+      ? [`${preloadedUseCase.name}_${subCatalogName}`]
       : []
-  }, [preloadedUseCase])
+  }, [preloadedUseCase, subCatalogName])
 
   const handleToggle = (key: string) =>
     setExpanded({
@@ -44,10 +45,10 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
       [key]: !expanded[key],
     })
 
-  const onClick = (e: any, useCase: UseCase) => {
+  const onClick = (e: any, useCase: UseCase, subCatalogName: string) => {
     e.stopPropagation()
     e.preventDefault()
-    onUseCaseClick(useCase)
+    onUseCaseClick(useCase, subCatalogName)
   }
 
   return (
@@ -68,27 +69,27 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
               onToggle={() => handleToggle('rubric')}
               isExpanded={expanded.rubric}
             > */}
-            {Object.entries(risksAndHarmsLibraryTestCases).map(([categoryName, useCases]) => (
+            {Object.entries(harmsAndRisksLibraryTestCases).map(([subCatalogName, useCases]) => (
               <TreeNode
-                label={categoryName}
-                onSelect={() => handleToggle(categoryName)}
-                onToggle={() => handleToggle(categoryName)}
-                isExpanded={expanded[categoryName]}
-                key={categoryName}
+                label={subCatalogName}
+                onSelect={() => handleToggle(subCatalogName)}
+                onToggle={() => handleToggle(subCatalogName)}
+                isExpanded={expanded[subCatalogName]}
+                key={subCatalogName}
                 className={classes.treeCategory}
               >
                 {useCases.map((useCase, i) => (
                   <TreeNode
                     label={
                       <div className={classes['treeNodeContent']}>
-                        <span className={classes['treeNodeLabel']}>{useCase.name}</span>
-                        <LinkButton useCase={useCase} />
+                        <span className={classes['treeNodeLabel']}>{toTitleCase(useCase.name)}</span>
+                        <LinkButton useCase={useCase} subCatalogName={subCatalogName} />
                       </div>
                     }
-                    key={`${useCase.name}_rubric`}
-                    id={`${useCase.name}_rubric`}
+                    key={`${useCase.name}_${subCatalogName}`}
+                    id={`${useCase.name}_${subCatalogName}`}
                     renderIcon={List}
-                    onClick={(e: any) => onClick(e, useCase)}
+                    onClick={(e: any) => onClick(e, useCase, subCatalogName)}
                   />
                 ))}
               </TreeNode>

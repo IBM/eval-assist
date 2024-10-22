@@ -3,6 +3,8 @@ import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 import { Button, IconButton } from '@carbon/react'
 import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
+import { toTitleCase } from '@utils/utils'
+
 import { PipelineType, UseCase } from '../../types'
 import { UseCaseTypeBadge } from '../UseCaseTypeBadge/UseCaseTypeBadge'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
@@ -51,7 +53,7 @@ export const UseCaseOptions = ({
           opacity: useCaseName ? 'inherit' : '0.5',
         }}
       >
-        {useCaseName || 'Unsaved test case'}
+        {toTitleCase(useCaseName) || 'Unsaved test case'}
       </h4>
       {isUseCaseSaved && (
         <IconButton

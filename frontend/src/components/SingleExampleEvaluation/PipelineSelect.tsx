@@ -1,6 +1,6 @@
 import { pipeline } from 'stream'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, useMemo } from 'react'
 
 import Link from 'next/link'
 
@@ -24,6 +24,15 @@ interface Props {
 export const PipelineSelect = ({ style, className, selectedPipeline, setSelectedPipeline, type }: Props) => {
   const { rubricPipelines, pairwisePipelines, loadingPipelines } = usePipelineTypesContext()
   const { isRisksAndHarms } = useURLInfoContext()
+
+  const filteredPipelines = useMemo(() => {
+    let pipelines = returnByPipelineType(type, rubricPipelines, pairwisePipelines) as Pipeline[]
+    if (!isRisksAndHarms) {
+      pipelines = pipelines.filter((p) => p.name !== 'Granite Guardian')
+    }
+    return pipelines
+  }, [isRisksAndHarms, pairwisePipelines, rubricPipelines, type])
+
   return (
     <div style={{ marginBottom: '1.5rem' }} className={className}>
       <span className={classes['toggle-span']}>Evaluator</span>
@@ -50,7 +59,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
           className={classes.selectReadOnly}
           readOnly={isRisksAndHarms}
         >
-          {(returnByPipelineType(type, rubricPipelines, pairwisePipelines) as Pipeline[]).map((pipeline, i) => (
+          {filteredPipelines.map((pipeline, i) => (
             <SelectItem value={pipeline.name} text={`${pipeline.name} (${pipeline.provider.toUpperCase()})`} key={i} />
           ))}
         </Select>

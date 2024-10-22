@@ -285,10 +285,10 @@ export const SingleExampleEvaluation = () => {
   )
 
   const updateURLFromUseCase = useCallback(
-    (useCase: UseCase) => {
+    (useCase: UseCase, subCatalogName?: string) => {
       let urlChangePromise: Promise<boolean>
       // use case is a saved user test case
-      urlChangePromise = changeUseCaseURL(getQueryParamsFromUseCase(useCase))
+      urlChangePromise = changeUseCaseURL(getQueryParamsFromUseCase(useCase, subCatalogName))
       if (evaluationRunningToastId) removeToast(evaluationRunningToastId)
       setEvaluationRunningToastId(null)
       // if evaluation is running, cancel it (superficially)

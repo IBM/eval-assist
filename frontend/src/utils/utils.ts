@@ -147,3 +147,24 @@ export const getOrdinalSuffix = (x: number): string => {
 }
 
 export const toPercentage = (value: number) => (value * 100).toFixed(0) + '%'
+
+export const toTitleCase = (inputString: string) => {
+  if (inputString === 'rag_hallucination_risks') {
+    return 'RAG Hallucination Risks'
+  }
+  return inputString
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+export const capitalizeFirstWord = (inputString: string) => {
+  return inputString
+    .split('_')
+    .map((word, i) => (i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+    .join(' ')
+}
+
+export const toSnakeCase = (text: string) => {
+  return text.toLowerCase().replace(/ /g, '_')
+}

@@ -20,7 +20,7 @@ interface AppSidenavProps {
   setLibraryUseCaseSelected: Dispatch<SetStateAction<UseCase | null>>
   userUseCases: UseCase[]
   changesDetected: boolean
-  updateURLFromUseCase: (useCase: UseCase) => void
+  updateURLFromUseCase: (useCase: UseCase, subCatalogName?: string) => void
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
 }
@@ -38,7 +38,7 @@ export const AppSidenavNew = ({
   const { sidebarTabSelected: selected, setSidebarTabSelected: setSelected } = useAppSidebarContext()
   const { useCaseId } = useURLInfoContext()
 
-  const onUseCaseClick = (useCase: UseCase) => {
+  const onUseCaseClick = (useCase: UseCase, subCatalogName?: string) => {
     // if the usecase is already selected don't do nothing
     if (useCaseId !== null && useCaseId === useCase.id) return
     // if there are unsaved changes, let the user know that they may lose work
@@ -50,7 +50,7 @@ export const AppSidenavNew = ({
       setEvaluationRunningModalOpen(true)
     } else {
       // no unsaved changes and model is not running update the current use case without modals
-      updateURLFromUseCase(useCase)
+      updateURLFromUseCase(useCase, subCatalogName)
     }
   }
 

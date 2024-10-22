@@ -1,3 +1,5 @@
+import { harmsAndRisksLibraryUseCases } from 'src/libraries/UseCaseLibrary'
+
 import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 import { useRouter } from 'next/router'
@@ -16,6 +18,7 @@ interface URLInfoContextValue {
   libraryTestCaseName: string | null
   preloadedUseCase: UseCase | null
   isRisksAndHarms: boolean
+  subCatalogName: string | null
 }
 
 const URLInfoContext = createContext<URLInfoContextValue>({
@@ -24,6 +27,7 @@ const URLInfoContext = createContext<URLInfoContextValue>({
   libraryTestCaseName: null,
   preloadedUseCase: null,
   isRisksAndHarms: false,
+  subCatalogName: null,
 })
 
 export const useURLInfoContext = () => {
@@ -33,7 +37,7 @@ export const useURLInfoContext = () => {
 export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
 
-  const { allLibraryUseCases } = useLibraryTestCases()
+  const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useLibraryTestCases()
   const { userUseCases } = useUserUseCasesContext()
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
 
@@ -47,6 +51,8 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     () => (router.query.isRisksAndHarms ? router.query.isRisksAndHarms === 'true' : false),
     [router.query.isRisksAndHarms],
   )
+
+  const subCatalogName = useMemo(() => (router.query.subCatalogName as string) || null, [router.query.subCatalogName])
 
   const libraryTestCaseName = useMemo(
     () => (router.query.libraryTestCase ? (router.query.libraryTestCase as string) : null),
@@ -63,10 +69,17 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     if (useCaseId !== null && userUseCases !== null) {
       pu = userUseCases.find((userUseCase) => userUseCase.id === useCaseId) || null
     } else if (libraryTestCaseName !== null && useCaseType !== null) {
-      pu =
-        allLibraryUseCases.find(
-          (libraryUseCase) => libraryUseCase.name === libraryTestCaseName && libraryUseCase.type === useCaseType,
-        ) || null
+      if (isRisksAndHarms && subCatalogName !== null) {
+        pu =
+          harmsAndRisksLibraryTestCases[subCatalogName].find(
+            (libraryUseCase) => libraryUseCase.name === libraryTestCaseName,
+          ) || null
+      } else {
+        pu =
+          allLibraryUseCases.find(
+            (libraryUseCase) => libraryUseCase.name === libraryTestCaseName && libraryUseCase.type === useCaseType,
+          ) || null
+      }
     } else if (useCaseType !== null && useCaseId === null && libraryTestCaseName === null) {
       if (criteriaName !== null) {
         pu = getEmptyUseCaseWithCriteria(criteriaName, useCaseType)
@@ -97,6 +110,9 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     useCaseType,
     rubricPipelines,
     pairwisePipelines,
+    isRisksAndHarms,
+    subCatalogName,
+    harmsAndRisksLibraryTestCases,
     allLibraryUseCases,
     criteriaName,
   ])
@@ -109,6 +125,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
         libraryTestCaseName,
         preloadedUseCase,
         isRisksAndHarms,
+        subCatalogName,
       }}
     >
       {children}

@@ -5,19 +5,22 @@ import { UseCase } from '@types'
 import { useLibraryTestCases } from './useLibraryTestCases'
 
 export const useGetQueryParamsFromUseCase = () => {
-  const { risksAndHarmsLibraryTestCases } = useLibraryTestCases()
-  const risksAndHarmsLibraryTestCasesNames = useMemo<string[]>(
+  const { harmsAndRisksLibraryTestCases } = useLibraryTestCases()
+  const harmsAndRisksLibraryTestCasesNames = useMemo<string[]>(
     () =>
-      Object.values(risksAndHarmsLibraryTestCases).reduce<string[]>(
+      Object.values(harmsAndRisksLibraryTestCases).reduce<string[]>(
         (acc, item, index) => [...acc, ...item.map((i) => i.name)],
         [],
       ),
-    [risksAndHarmsLibraryTestCases],
+    [harmsAndRisksLibraryTestCases],
   )
 
   const getQueryParamsFromUseCase = useCallback(
-    (useCase: UseCase) => {
+    (useCase: UseCase, subCatalogName?: string) => {
       let params: { key: string; value: string }[] = []
+      if (subCatalogName) {
+        params.push({ key: 'subCatalogName', value: subCatalogName })
+      }
       if (useCase.id !== null) {
         params = [{ key: 'id', value: `${useCase.id}` }]
       } else {
@@ -28,13 +31,15 @@ export const useGetQueryParamsFromUseCase = () => {
           // used when redirected from benchmarks and test case doesnt exist in catalog
           params.push({ key: 'type', value: useCase.type })
         }
-        if (risksAndHarmsLibraryTestCasesNames.includes(useCase.name)) {
+        if (harmsAndRisksLibraryTestCasesNames.includes(useCase.name)) {
           params.push({ key: 'isRisksAndHarms', value: 'true' })
+        } else {
+          params.push({ key: 'isRisksAndHarms', value: 'false' })
         }
       }
       return params
     },
-    [risksAndHarmsLibraryTestCasesNames],
+    [harmsAndRisksLibraryTestCases],
   )
 
   return { getQueryParamsFromUseCase }

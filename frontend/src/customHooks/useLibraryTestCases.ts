@@ -1,6 +1,6 @@
 import {
   pairwiseLibraryUseCases as _pairwiseLibraryUseCases,
-  risksAndHarmsLibraryUseCases as _risksAndHarmsLibraryUseCases,
+  harmsAndRisksLibraryUseCases as _risksAndHarmsLibraryUseCases,
   rubricLibraryUseCases as _rubricLibraryUseCases,
 } from 'src/libraries/UseCaseLibrary'
 
@@ -8,21 +8,31 @@ import { useMemo } from 'react'
 
 import { usePipelineTypesContext } from '@components/SingleExampleEvaluation/Providers/PipelineTypesProvider'
 import { Pipeline, UseCase } from '@types'
+import { toTitleCase } from '@utils/utils'
 
 export const useLibraryTestCases = () => {
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
 
-  const risksAndHarmsLibraryTestCases = useMemo(() => {
+  const harmsAndRisksLibraryTestCases = useMemo(() => {
     let result: typeof _risksAndHarmsLibraryUseCases = {}
     Object.keys(_risksAndHarmsLibraryUseCases).forEach((k) => {
-      result[k] = _risksAndHarmsLibraryUseCases[k].map((u) =>
-        rubricPipelines !== null && rubricPipelines.length > 0
-          ? {
-              ...u,
-              pipeline: rubricPipelines.find((p) => p.name === 'Granite Guardian Checkpoint') as Pipeline,
-            }
-          : u,
-      )
+      result[k] = _risksAndHarmsLibraryUseCases[k].map((u) => {
+        let parsed = { ...u }
+        if (rubricPipelines !== null && rubricPipelines.length > 0) {
+          parsed = {
+            ...parsed,
+            pipeline: rubricPipelines.find((p) => p.name === 'Granite Guardian') as Pipeline,
+          }
+        }
+        parsed = {
+          ...parsed,
+          criteria: {
+            ...parsed.criteria,
+            name: toTitleCase(parsed.criteria.name.split('>')[0]),
+          },
+        }
+        return parsed
+      })
     })
     return result
   }, [rubricPipelines])
@@ -57,10 +67,15 @@ export const useLibraryTestCases = () => {
     () => [
       ...pairwiseLibraryTestCases,
       ...rubricLibraryTestCases,
-      ...Object.values(risksAndHarmsLibraryTestCases).reduce((acc, item, index) => [...acc, ...item], []),
+      ...Object.values(harmsAndRisksLibraryTestCases).reduce((acc, item, index) => [...acc, ...item], []),
     ],
-    [pairwiseLibraryTestCases, risksAndHarmsLibraryTestCases, rubricLibraryTestCases],
+    [pairwiseLibraryTestCases, harmsAndRisksLibraryTestCases, rubricLibraryTestCases],
   )
 
-  return { rubricLibraryTestCases, pairwiseLibraryTestCases, risksAndHarmsLibraryTestCases, allLibraryUseCases }
+  return {
+    rubricLibraryTestCases,
+    pairwiseLibraryTestCases,
+    harmsAndRisksLibraryTestCases,
+    allLibraryUseCases,
+  }
 }
