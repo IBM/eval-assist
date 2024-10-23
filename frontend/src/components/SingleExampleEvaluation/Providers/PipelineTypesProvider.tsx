@@ -6,17 +6,19 @@ import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 
-import { Pipeline, PipelineType } from '../../../types'
+import { FetchedPipeline, ModelProviderType, Pipeline, PipelineType } from '../../../types'
 
 interface PipelineContextValue {
   rubricPipelines: Pipeline[] | null
   pairwisePipelines: Pipeline[] | null
+  graniteGuardianPipelines: Pipeline[] | null
   loadingPipelines: boolean
 }
 
 const PipelineTypesContext = createContext<PipelineContextValue>({
   rubricPipelines: null,
   pairwisePipelines: null,
+  graniteGuardianPipelines: null,
   loadingPipelines: false,
 })
 
@@ -36,13 +38,24 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
     [pipelines],
   )
 
+  const graniteGuardianPipelines = useMemo(
+    () => rubricPipelines?.filter((p) => p.name.startsWith('Granite Guardian')) || null,
+    [rubricPipelines],
+  )
+
   useEffect(() => {
     const fetchData = async () => {
       setLoadingPipelines(true)
       const response = await get('pipelines/')
       const data = await response.json()
       setLoadingPipelines(false)
-      setPipelines(data.pipelines)
+      let pipelines: Pipeline[] = []
+      data.pipelines.forEach((p: FetchedPipeline) => {
+        p.providers.forEach((provider) => {
+          pipelines.push({ ...p, provider })
+        })
+      })
+      setPipelines(pipelines)
     }
     fetchData()
   }, [get])
@@ -54,6 +67,7 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
       value={{
         rubricPipelines,
         pairwisePipelines,
+        graniteGuardianPipelines,
         loadingPipelines,
       }}
     >

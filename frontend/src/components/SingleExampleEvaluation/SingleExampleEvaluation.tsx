@@ -118,14 +118,13 @@ export const SingleExampleEvaluation = () => {
 
   const [modelProviderCredentials, setModelProviderCredentials, removeModelProviderCredentials] =
     useLocalStorage<ModelProviderCredentials>('modelProviderCrentials', {
-      bam: { api_key: '' },
-      watsonx: { api_key: '', project_id: '' },
-      openai: { api_key: '' },
+      [ModelProviderType.BAM]: { api_key: '' },
+      [ModelProviderType.WATSONX]: { api_key: '', project_id: '' },
+      [ModelProviderType.OPENAI]: { api_key: '' },
     })
 
   const areRelevantCredentialsProvided = useMemo(
     () =>
-      currentUseCase?.pipeline?.provider === ModelProviderType.LOCAL ||
       Object.values(modelProviderCredentials[currentUseCase?.pipeline?.provider || ModelProviderType.BAM]).every(
         (key) => key !== '',
       ),
@@ -168,16 +167,13 @@ export const SingleExampleEvaluation = () => {
       context_variables: parsedContextVariables,
       responses: currentUseCase.responses,
       pipeline: currentUseCase.pipeline?.name,
+      provider: currentUseCase.pipeline?.provider,
       criteria: currentUseCase.criteria,
       type: currentUseCase.type,
       response_variable_name: currentUseCase.responseVariableName,
     }
-    if (currentUseCase.pipeline?.provider !== ModelProviderType.LOCAL) {
-      body['llm_provider_credentials'] =
-        modelProviderCredentials[currentUseCase.pipeline?.provider || ModelProviderType.BAM]
-    } else {
-      body['llm_provider_credentials'] = {}
-    }
+    body['llm_provider_credentials'] =
+      modelProviderCredentials[currentUseCase.pipeline?.provider || ModelProviderType.BAM]
     const startEvaluationTime = new Date().getTime() / 1000
     response = await post('evaluate/', body)
     const endEvaluationTime = new Date().getTime() / 1000

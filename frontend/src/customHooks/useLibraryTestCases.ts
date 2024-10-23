@@ -21,7 +21,7 @@ export const useLibraryTestCases = () => {
         if (rubricPipelines !== null && rubricPipelines.length > 0) {
           parsed = {
             ...parsed,
-            pipeline: rubricPipelines.find((p) => p.name === 'Granite Guardian') as Pipeline,
+            pipeline: rubricPipelines.find((p) => p.name === 'Granite Guardian 3.0 8B') as Pipeline,
           }
         }
         parsed = {

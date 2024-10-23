@@ -89,7 +89,6 @@ export enum ModelProviderType {
   WATSONX = 'watsonx',
   BAM = 'bam',
   OPENAI = 'openai',
-  LOCAL = 'local',
 }
 
 export interface Pipeline {
@@ -97,6 +96,14 @@ export interface Pipeline {
   name: string
   type: PipelineType
   provider: ModelProviderType
+  version: string
+}
+
+export interface FetchedPipeline {
+  model_id: string
+  name: string
+  type: PipelineType
+  providers: ModelProviderType[]
   version: string
 }
 
