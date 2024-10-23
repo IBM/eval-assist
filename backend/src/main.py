@@ -66,8 +66,7 @@ def throw_authorized_exception():
 @router.get("/pipelines/", response_model=PipelinesResponseModel)
 def get_pipelines():
     '''Get the list of available pipelines, as supported by llm-as-a-judge library'''
-    available_pipelines = [e.metadata for e in AVAILABLE_EVALUATORS]
-    return PipelinesResponseModel(pipelines=available_pipelines)
+    return PipelinesResponseModel(pipelines=[e.metadata for e in AVAILABLE_EVALUATORS])
 
 
 
@@ -75,7 +74,7 @@ def get_pipelines():
 def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
     try:
         if req.type == EvaluatorTypeEnum.RUBRIC:
-            evaluator = get_rubric_evaluator(name=req.pipeline, credentials=req.llm_provider_credentials)
+            evaluator = get_rubric_evaluator(name=req.pipeline, credentials=req.llm_provider_credentials, provider=req.provider)
             criteria = RubricCriteria(name=req.criteria.name, criteria=req.criteria.criteria, options=req.criteria.options)
 
             res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses),
