@@ -1,5 +1,3 @@
-import { pipeline } from 'stream'
-
 import { CSSProperties, useMemo } from 'react'
 
 import Link from 'next/link'
@@ -43,6 +41,16 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
       }
       result[p.provider].push(p)
     })
+
+    Object.values(result).forEach((pipelines) =>
+      pipelines.sort((a, b) => {
+        a.name.split('-').forEach((aSplit, i) => {
+          const splitComparison = aSplit.localeCompare(b.name.split('-')[i])
+          if (splitComparison !== 0) return splitComparison
+        })
+        return 1
+      }),
+    )
     return result
   }, [filteredPipelines])
 
