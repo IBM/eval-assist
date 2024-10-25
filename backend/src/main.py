@@ -120,6 +120,8 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
     except WMLClientError as e:
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=f'watsonx authentication failed: {e.error_msg}')
+    except AssertionError as e:
+        raise HTTPException(status_code=400, detail=f'{e}')
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=e.error_msg if hasattr(e, 'error_msg') else "Unknown error.")
