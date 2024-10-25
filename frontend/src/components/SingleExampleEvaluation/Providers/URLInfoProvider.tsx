@@ -1,4 +1,4 @@
-import { harmsAndRisksLibraryUseCases } from 'src/libraries/UseCaseLibrary'
+import { harmsAndRisksLibraryTestCases } from 'src/libraries/UseCaseLibrary'
 
 import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffect, useMemo, useState } from 'react'
 
@@ -8,7 +8,7 @@ import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
 import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
 import { getEmptyUseCase, getEmptyUseCaseWithCriteria, returnByPipelineType } from '@utils/utils'
 
-import { PipelineType, UseCase } from '../../../types'
+import { Pipeline, PipelineType, UseCase } from '../../../types'
 import { usePipelineTypesContext } from './PipelineTypesProvider'
 import { useUserUseCasesContext } from './UserUseCasesProvider'
 
@@ -89,10 +89,22 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     } else {
       pu = null
     }
+
     if (pu !== null && rubricPipelines !== null && pairwisePipelines !== null && pu.pipeline === null) {
-      pu = {
-        ...pu,
-        pipeline: returnByPipelineType(pu.type, rubricPipelines[0], pairwisePipelines[0]),
+      if (isRisksAndHarms) {
+        pu = {
+          ...pu,
+          pipeline: rubricPipelines.find((p) => p.name === 'Granite Guardian 3.0 8B') as Pipeline,
+        }
+      } else {
+        pu = {
+          ...pu,
+          pipeline: returnByPipelineType(
+            pu.type,
+            rubricPipelines.find((p) => p.name.includes('Mixtral')) as Pipeline,
+            pairwisePipelines.find((p) => p.name.includes('Mixtral')) as Pipeline,
+          ),
+        }
       }
     }
 

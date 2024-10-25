@@ -44,11 +44,24 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
 
     Object.values(result).forEach((pipelines) =>
       pipelines.sort((a, b) => {
-        a.name.split('-').forEach((aSplit, i) => {
-          const splitComparison = aSplit.localeCompare(b.name.split('-')[i])
-          if (splitComparison !== 0) return splitComparison
-        })
-        return 1
+        let splitComparison = 0
+        for (const i in a.name.split('-')) {
+          const idx = parseInt(i)
+          const aSplit = a.name.split('-')[i]
+          const bSplit = b.name.split('-')[i]
+          if (idx === 1) {
+            const aSplitNumber = parseInt(aSplit.slice(0, -1))
+            const bSplitNumber = parseInt(bSplit.slice(0, -1))
+            const comparison = aSplitNumber - bSplitNumber
+            return comparison
+          } else {
+            const comparison = aSplit.localeCompare(bSplit)
+            if (comparison !== 0) {
+              return comparison
+            }
+          }
+        }
+        return splitComparison
       }),
     )
     return result

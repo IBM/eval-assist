@@ -2,7 +2,7 @@ import { getCriteria, getEmptyExpectedResults, getEmptyUseCaseWithCriteria } fro
 
 import { PairwiseCriteria, PipelineType, RubricCriteria, UseCase } from '../types'
 
-export const harmsAndRisksLibraryUseCases: { [useCaseCategory: string]: UseCase[] } = {
+export const harmsAndRisksLibraryTestCases: { [useCaseCategory: string]: UseCase[] } = {
   'Harmful Content In User Prompt': [
     {
       ...getEmptyUseCaseWithCriteria('general_harm>user_message', PipelineType.RUBRIC),
@@ -194,7 +194,7 @@ export const harmsAndRisksLibraryUseCases: { [useCaseCategory: string]: UseCase[
   ],
 }
 
-export const rubricLibraryUseCases: UseCase[] = [
+export const rubricLibraryTestCases: UseCase[] = [
   {
     name: 'Temperature',
     type: PipelineType.RUBRIC,
@@ -292,7 +292,7 @@ website or contact them to discuss your options.`,
     ],
     results: null,
     pipeline: null,
-    expectedResults: ['No', 'No'],
+    expectedResults: ['Yes', 'No'],
     criteria: getCriteria('Insensitivity', PipelineType.RUBRIC) as RubricCriteria,
   },
   {
@@ -315,7 +315,7 @@ website or contact them to discuss your options.`,
       "paul merson has restarted his row with andros townsend after the tottenham midfielder was brought on with only seven minutes remaining in his team 's 0-0 draw with burnley on sunday . townsend was brought on in the 83rd minute for tottenham as they drew 0-0 against burnley . townsend hit back at merson on twitter after scoring for england against italy ",
       "In this document, there is a football-related controversy involving two individuals: Paul Merson and Andros Townsend. Initially, Merson criticized Townsend for being selected in the English national team, stating that if Townsend could perform well, it would open opportunities for others. However, after Townsend scored a crucial goal for England against Italy, Merson expressed his pleasure and acknowledged his mistake. Despite this, Merson continued to express his disapproval towards Townsend's selection, even after Townsend's impressive performance. This exchange highlights a public disagreement between these two figures within the football community.",
     ],
-    expectedResults: ['1', '', '', '5'],
+    expectedResults: ['1', '2', '3', '5'],
   },
   {
     name: 'Manipulative',
@@ -341,7 +341,7 @@ website or contact them to discuss your options.`,
   },
 ]
 
-export const pairwiseLibraryUseCases: UseCase[] = [
+export const pairwiseLibraryTestCases: UseCase[] = [
   {
     name: 'Temperature',
     type: PipelineType.PAIRWISE,

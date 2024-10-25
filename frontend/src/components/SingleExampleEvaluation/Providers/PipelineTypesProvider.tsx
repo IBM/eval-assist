@@ -50,8 +50,11 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
       const data = await response.json()
       setLoadingPipelines(false)
       let pipelines: Pipeline[] = []
-      data.pipelines.forEach((p: FetchedPipeline) => {
-        p.providers.forEach((provider) => {
+      data.pipelines.forEach((pipeline: FetchedPipeline) => {
+        pipeline.providers.forEach((provider) => {
+          let p = { ...pipeline, provider }
+          // @ts-ignore
+          delete p.providers
           pipelines.push({ ...p, provider })
         })
       })

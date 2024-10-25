@@ -1,7 +1,5 @@
 import { pairwiseCriteriaLibrary, rubricCriteriaLibrary } from 'src/libraries/CriteriaLibrary'
 
-import { StoredUseCase } from '@prisma/client'
-import { JsonObject } from '@prisma/client/runtime/library'
 import { Option, PairwiseCriteria, PairwiseResults, PipelineType, RubricCriteria, UseCase, UseCaseV0 } from '@types'
 
 export const isInstanceOfOption = (obj: any): obj is Option =>

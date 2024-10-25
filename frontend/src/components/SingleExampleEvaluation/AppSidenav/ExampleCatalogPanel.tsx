@@ -37,7 +37,6 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
       ? [`${preloadedUseCase.name}_${preloadedUseCase.type}`]
       : []
   }, [preloadedUseCase])
-
   const handleToggle = (key: string) =>
     setExpanded({
       ...expanded,
@@ -84,10 +83,10 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
               ))}
             </TreeNode>
             <TreeNode
-              key={'pairwise'}
+              key={'all_vs_all_pairwise'}
               label={PAIRWISE_NAME}
-              onSelect={() => handleToggle('pairwise')}
-              onToggle={() => handleToggle('pairwise')}
+              onSelect={() => handleToggle('all_vs_all_pairwise')}
+              onToggle={() => handleToggle('all_vs_all_pairwise')}
               isExpanded={expanded.pairwise}
             >
               {pairwiseLibraryTestCases.map((useCase, i) => (
@@ -98,8 +97,8 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
                       <LinkButton useCase={useCase} />
                     </div>
                   }
-                  key={`${useCase.name}_pairwise`}
-                  id={`${useCase.name}_pairwise`}
+                  key={`${useCase.name}_all_vs_all_pairwise`}
+                  id={`${useCase.name}_all_vs_all_pairwise`}
                   renderIcon={Compare}
                   onClick={(e: any) => onClick(e, useCase)}
                 />
