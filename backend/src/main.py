@@ -14,7 +14,7 @@ from prisma.errors import PrismaError
 from llmasajudge.evaluators import get_rubric_evaluator, get_all_vs_all_pairwise_evaluator, AVAILABLE_EVALUATORS, EvaluatorTypeEnum, PairwiseCriteria, RubricCriteria, Evaluator
 from llmasajudge.benchmark.utils import get_all_benchmarks
 from genai.exceptions import ApiResponseException, ApiNetworkException
-from ibm_watsonx_ai.wml_client_error import ApiRequestFailure, CannotSetProjectOrSpace
+from ibm_watsonx_ai.wml_client_error import ApiRequestFailure, CannotSetProjectOrSpace, WMLClientError
 import json
 from openai import AuthenticationError
 
@@ -117,12 +117,12 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
     except CannotSetProjectOrSpace as e:
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=f'watsonx authentication failed: {e.error_msg}')
+    except WMLClientError as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail=f'watsonx authentication failed: {e.error_msg}')
     except Exception as e:
         traceback.print_exc()
-        try:
-            raise HTTPException(status_code=400, detail=e.error_msg)
-        except:
-            raise HTTPException(status_code=400, detail="Unknown error.")
+        raise HTTPException(status_code=400, detail=e.error_msg if hasattr(e, 'error_msg') else "Unknown error.")
 
 @router.get("/use_case/")
 def get_use_cases(user: str):
