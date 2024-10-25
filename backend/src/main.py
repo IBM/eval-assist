@@ -14,7 +14,7 @@ from prisma.errors import PrismaError
 from llmasajudge.evaluators import get_rubric_evaluator, get_all_vs_all_pairwise_evaluator, AVAILABLE_EVALUATORS, EvaluatorTypeEnum, PairwiseCriteria, RubricCriteria, Evaluator
 from llmasajudge.benchmark.utils import get_all_benchmarks
 from genai.exceptions import ApiResponseException, ApiNetworkException
-from ibm_watsonx_ai.wml_client_error import ApiRequestFailure
+from ibm_watsonx_ai.wml_client_error import ApiRequestFailure, CannotSetProjectOrSpace
 import json
 from openai import AuthenticationError
 
@@ -114,6 +114,9 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
     except AuthenticationError as e:
         traceback.print_exc()
         raise HTTPException(status_code=400, detail="Invalid OPENAI credentials provided.")
+    except CannotSetProjectOrSpace as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=400, detail=e.error_msg)
     except:
         traceback.print_exc()      
         raise HTTPException(status_code=400, detail="Unknown error.")
