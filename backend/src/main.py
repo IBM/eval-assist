@@ -116,10 +116,13 @@ def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
         raise HTTPException(status_code=400, detail="Invalid OPENAI credentials provided.")
     except CannotSetProjectOrSpace as e:
         traceback.print_exc()
-        raise HTTPException(status_code=400, detail=e.error_msg)
-    except:
-        traceback.print_exc()      
-        raise HTTPException(status_code=400, detail="Unknown error.")
+        raise HTTPException(status_code=400, detail=f'watsonx authentication failed: {e.error_msg}')
+    except Exception as e:
+        traceback.print_exc()
+        try:
+            raise HTTPException(status_code=400, detail=e.error_msg)
+        except:
+            raise HTTPException(status_code=400, detail="Unknown error.")
 
 @router.get("/use_case/")
 def get_use_cases(user: str):
