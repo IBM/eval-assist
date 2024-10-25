@@ -9,11 +9,11 @@ class RubricOptionModel(BaseModel):
     option: str
     description: str
 
-    @validator('option', pre=True, always=True)
-    def validate_option(cls, option):
-        if len(option.strip()) == 0:
-            raise HTTPException(status_code=400, detail="Invalid criteria, empty rubric answers are not allowed.")
-        return option
+    # @validator('option', pre=True, always=True)
+    # def validate_option(cls, option):
+    #     if len(option.strip()) == 0:
+    #         raise HTTPException(status_code=400, detail="Invalid criteria, empty rubric answers are not allowed.")
+    #     return option
 
 class RubricCriteriaModel(CriteriaModel):
     options: List[RubricOptionModel]
