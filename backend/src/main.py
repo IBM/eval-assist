@@ -11,7 +11,8 @@ from .db_client import db
 import json
 from prisma.models import StoredUseCase
 from prisma.errors import PrismaError
-from llmasajudge.evaluators import get_rubric_evaluator, get_all_vs_all_pairwise_evaluator, AVAILABLE_EVALUATORS, EvaluatorTypeEnum, PairwiseCriteria, RubricCriteria, Evaluator
+from llmasajudge.evaluators import get_rubric_evaluator, get_all_vs_all_pairwise_evaluator, AVAILABLE_EVALUATORS, EvaluatorTypeEnum, PairwiseCriteria, RubricCriteria, Evaluator, EvaluatorNameEnum
+from llmasajudge.evaluators.rubric import GraniteGuardianRubricEvaluator
 from llmasajudge.benchmark.utils import get_all_benchmarks
 from genai.exceptions import ApiResponseException, ApiNetworkException
 from ibm_watsonx_ai.wml_client_error import ApiRequestFailure, CannotSetProjectOrSpace, WMLClientError
@@ -68,6 +69,18 @@ def get_pipelines():
     '''Get the list of available pipelines, as supported by llm-as-a-judge library'''
     return PipelinesResponseModel(pipelines=[e.metadata for e in AVAILABLE_EVALUATORS])
 
+@router.post("/prompt/", response_model=list[str])
+def get_prompt(req: RubricEvalRequestModel):
+    gg_evaluator: GraniteGuardianRubricEvaluator = get_rubric_evaluator(name=EvaluatorNameEnum.GRANITE_GUARDIAN_2B, credentials=req.llm_provider_credentials, provider=req.provider)
+    criteria = RubricCriteria(name=req.criteria.name, criteria=req.criteria.criteria, options=req.criteria.options)
+
+    res = gg_evaluator.get_prompt(
+        contexts=[req.context_variables] * len(req.responses),
+        responses=req.responses,
+        criteria=[criteria] * len(req.responses),
+        response_variable_name_list=[req.response_variable_name] * len(req.responses),
+    )
+    return res
 
 
 @router.post("/evaluate/", response_model=Union[RubricEvalResponseModel, PairwiseEvalResponseModel])
