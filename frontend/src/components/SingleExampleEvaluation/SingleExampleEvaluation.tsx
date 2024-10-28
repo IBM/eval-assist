@@ -14,7 +14,7 @@ import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFrom
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
 import { StoredUseCase } from '@prisma/client'
-import { getUseCaseStringWithSortedKeys, stringifyQueryParams } from '@utils/utils'
+import { getCriteria, getUseCaseStringWithSortedKeys, stringifyQueryParams, toSnakeCase } from '@utils/utils'
 
 import {
   FetchedPairwiseResults,
@@ -163,12 +163,26 @@ export const SingleExampleEvaluation = () => {
       (acc, item, index) => ({ ...acc, [item.variable]: item.value }),
       {},
     )
+
+    const parsedCriteria = { ...currentUseCase.criteria }
+    if (isRisksAndHarms) {
+      // check if criteria description changed and criteria name didn't
+      const harmsAndRiskCriteria = getCriteria(
+        `${toSnakeCase(currentUseCase.criteria.name)}>${toSnakeCase(currentUseCase.responseVariableName)}`,
+        PipelineType.RUBRIC,
+      )
+      if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.criteria !== currentUseCase.criteria.criteria) {
+        // the tokenizer of granite guardian will complain if we send a predefined criteria name
+        // with a custom description.
+        parsedCriteria.name = `${parsedCriteria.name}_variation`
+      }
+    }
     let body: any = {
       context_variables: parsedContextVariables,
       responses: currentUseCase.responses,
       pipeline: currentUseCase.pipeline?.name,
       provider: currentUseCase.pipeline?.provider,
-      criteria: currentUseCase.criteria,
+      criteria: parsedCriteria,
       type: currentUseCase.type,
       response_variable_name: currentUseCase.responseVariableName,
     }

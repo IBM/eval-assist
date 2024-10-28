@@ -135,7 +135,7 @@ export const harmsAndRisksLibraryTestCases: { [useCaseCategory: string]: UseCase
   ],
   'RAG Hallucination Risks': [
     {
-      ...getEmptyUseCaseWithCriteria('context_relevance', PipelineType.RUBRIC),
+      ...getEmptyUseCaseWithCriteria('context_relevance>context', PipelineType.RUBRIC),
       name: 'context_relevance',
       responseVariableName: 'Context',
       contextVariables: [
@@ -154,7 +154,7 @@ export const harmsAndRisksLibraryTestCases: { [useCaseCategory: string]: UseCase
       expectedResults: ['Yes'],
     },
     {
-      ...getEmptyUseCaseWithCriteria('groundedness', PipelineType.RUBRIC),
+      ...getEmptyUseCaseWithCriteria('groundedness>assistant_message', PipelineType.RUBRIC),
       name: 'groundedness',
       responseVariableName: 'Assistant message',
       contextVariables: [
@@ -174,7 +174,7 @@ export const harmsAndRisksLibraryTestCases: { [useCaseCategory: string]: UseCase
       expectedResults: ['Yes'],
     },
     {
-      ...getEmptyUseCaseWithCriteria('answer_relevance', PipelineType.RUBRIC),
+      ...getEmptyUseCaseWithCriteria('answer_relevance>assistant_message', PipelineType.RUBRIC),
       name: 'answer_relevance',
       responseVariableName: 'Assistant message',
       contextVariables: [

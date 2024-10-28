@@ -493,7 +493,7 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
     ],
   },
   {
-    name: 'context_relevance',
+    name: 'context_relevance>context',
     criteria:
       "Context is not relevant to the User message. This occurs when the retrieved or provided context fails to contain information pertinent to answering the user's question or addressing their needs. Irrelevant context may be on a different topic, from an unrelated domain, or contain information that doesn't help in formulating an appropriate response to the user.",
     options: [
@@ -508,7 +508,7 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
     ],
   },
   {
-    name: 'groundedness',
+    name: 'groundedness>assistant_message',
     criteria:
       "Assistant message is not grounded or faithful to the information provided in the Context. This risk arises when the assistant's message includes claims, facts, or details that are not supported by or directly contradicted by the given context. An ungrounded answer may involve fabricating information, misinterpreting the context, or making unsupported extrapolations beyond what the context actually states.",
     options: [
@@ -523,7 +523,7 @@ export const rubricCriteriaLibrary: RubricCriteria[] = [
     ],
   },
   {
-    name: 'answer_relevance',
+    name: 'answer_relevance>assistant_message',
     criteria:
       "Assistant message fails to address or properly respond to the User's input. This includes providing off-topic information, misinterpreting the query, or omitting crucial details requested by the User. An irrelevant answer may contain factually correct information but still fail to meet the User's specific needs or answer their intended question.",
     options: [
