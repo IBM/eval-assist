@@ -19,7 +19,7 @@ export const LinkButton = ({ useCase, subCatalogName }: LinkButtonProps) => {
   const { getQueryParamsFromUseCase } = useGetQueryParamsFromUseCase()
 
   const urlParams = useMemo(
-    () => getQueryParamsFromUseCase(useCase, subCatalogName),
+    () => getQueryParamsFromUseCase(useCase, subCatalogName || null),
     [getQueryParamsFromUseCase, subCatalogName, useCase],
   )
 
