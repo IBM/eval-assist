@@ -40,6 +40,7 @@ import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
 import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
 import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
 import { NewUseCaseModal } from './Modals/NewUseCaseModal'
+import { PromptModal } from './Modals/PromptModal'
 import { ResultDetailsModal } from './Modals/ResultDetailsModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
@@ -58,7 +59,9 @@ export const SingleExampleEvaluation = () => {
 
   // we are ignoring client side rendering to be able to use useSessionStorage
   const showingTestCase = useMemo<boolean>(() => preloadedUseCase !== null, [preloadedUseCase])
-  const [useCaseSelected, setUseCaseSelected] = useState<UseCase | null>(preloadedUseCase)
+  const [useCaseSelected, setUseCaseSelected] = useState<{ useCase: UseCase; subCatalogName: string | null } | null>(
+    null,
+  )
 
   // if the usecase doesnt have an id, it means it hasn't been stored
   const isUseCaseSaved = useMemo(() => currentUseCase !== null && currentUseCase.id !== null, [currentUseCase])
@@ -72,6 +75,7 @@ export const SingleExampleEvaluation = () => {
   const [editNameModalOpen, setEditNameModalOpen] = useState(false)
   const [resultDetailsModalOpen, setResultDetailsModalOpen] = useState(false)
   const [evaluationRunningModalOpen, setEvaluationRunningModalOpen] = useState(false)
+  const [promptModalOpen, setPromptModalOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [selectedResultDetails, setSelectedResultDetails] = useState<{
     result: RubricResult | PerResponsePairwiseResult | null
@@ -278,7 +282,15 @@ export const SingleExampleEvaluation = () => {
 
       removeToast(inProgressEvalToastId)
     }
-  }, [addToast, currentUseCase, isEqualToCurrentTemporaryId, modelProviderCredentials, post, removeToast])
+  }, [
+    addToast,
+    currentUseCase,
+    isEqualToCurrentTemporaryId,
+    isRisksAndHarms,
+    modelProviderCredentials,
+    post,
+    removeToast,
+  ])
 
   const changeUseCaseURL = useCallback(
     (queryParams: { key: string; value: string }[] | null) => {
@@ -295,15 +307,19 @@ export const SingleExampleEvaluation = () => {
   )
 
   const updateURLFromUseCase = useCallback(
-    (useCase: UseCase, subCatalogName?: string) => {
+    (useCaseSelected: { useCase: UseCase; subCatalogName: string | null } | null) => {
       let urlChangePromise: Promise<boolean>
-      // use case is a saved user test case
-      urlChangePromise = changeUseCaseURL(getQueryParamsFromUseCase(useCase, subCatalogName))
-      if (evaluationRunningToastId) removeToast(evaluationRunningToastId)
-      setEvaluationRunningToastId(null)
-      // if evaluation is running, cancel it (superficially)
-      if (evaluationRunning) {
-        setEvaluationRunning(false)
+      if (useCaseSelected !== null) {
+        // use case is a saved user test case
+        urlChangePromise = changeUseCaseURL(
+          getQueryParamsFromUseCase(useCaseSelected.useCase, useCaseSelected.subCatalogName),
+        )
+        if (evaluationRunningToastId) removeToast(evaluationRunningToastId)
+        setEvaluationRunningToastId(null)
+        // if evaluation is running, cancel it (superficially)
+        if (evaluationRunning) {
+          setEvaluationRunning(false)
+        }
       }
     },
     [changeUseCaseURL, evaluationRunning, evaluationRunningToastId, getQueryParamsFromUseCase, removeToast],
@@ -403,7 +419,7 @@ export const SingleExampleEvaluation = () => {
         // if useCaseSelected is different from null
         // a rediction will be done to that selected test casen
         if (useCaseSelected === null) {
-          updateURLFromUseCase(parsedSavedUseCase)
+          updateURLFromUseCase({ useCase: parsedSavedUseCase, subCatalogName: null })
           setSidebarTabSelected('user_use_cases')
         } else {
           updateURLFromUseCase(useCaseSelected)
@@ -592,12 +608,12 @@ export const SingleExampleEvaluation = () => {
                 )
               }
             />
-
             <EvaluateButton
               evaluationRunning={evaluationRunning}
               runEvaluation={runEvaluation}
               areRelevantCredentialsProvided={areRelevantCredentialsProvided}
               className={classes['left-padding']}
+              setPromptModalOpen={setPromptModalOpen}
             />
 
             {!areRelevantCredentialsProvided && !evaluationRunning && !evaluationFailed && (
@@ -612,12 +628,12 @@ export const SingleExampleEvaluation = () => {
         open={newUseCaseModalOpen}
         setOpen={setNewUseCaseModalOpen}
         changesDetected={changesDetected}
-        setCurrentUseCase={updateURLFromUseCase}
+        updateURLFromUseCase={updateURLFromUseCase}
       />
       {currentUseCase !== null && (
         <>
           <SwitchUseCaseModal
-            setCurrentUseCase={updateURLFromUseCase}
+            updateURLFromUseCase={updateURLFromUseCase}
             open={confirmationModalOpen}
             setOpen={setConfirmationModalOpen}
             selectedUseCase={useCaseSelected}
@@ -656,7 +672,7 @@ export const SingleExampleEvaluation = () => {
           <EvaluationRunningModal
             open={evaluationRunningModalOpen}
             setOpen={setEvaluationRunningModalOpen}
-            setCurrentUseCase={updateURLFromUseCase}
+            updateURLFromUseCase={updateURLFromUseCase}
             selectedUseCase={useCaseSelected}
             setConfirmationModalOpen={setConfirmationModalOpen}
             changesDetected={changesDetected}
@@ -667,6 +683,12 @@ export const SingleExampleEvaluation = () => {
             selectedResultDetails={selectedResultDetails}
             setSelectedResultDetails={setSelectedResultDetails}
             type={currentUseCase.type}
+          />
+          <PromptModal
+            open={promptModalOpen}
+            setOpen={setPromptModalOpen}
+            currentUseCase={currentUseCase}
+            modelProviderCredentials={modelProviderCredentials}
           />
         </>
       )}

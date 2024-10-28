@@ -7,8 +7,11 @@ import { Button, ComposedModal, Modal, ModalBody, ModalFooter, ModalHeader } fro
 import { UseCase } from '../../../types'
 
 interface Props {
-  setCurrentUseCase: (useCase: UseCase) => void
-  selectedUseCase: UseCase | null
+  updateURLFromUseCase: (useCaseSelected: { useCase: UseCase; subCatalogName: string | null } | null) => void
+  selectedUseCase: {
+    useCase: UseCase
+    subCatalogName: string | null
+  } | null
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   currentUseCase: UseCase
@@ -16,13 +19,18 @@ interface Props {
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
-  setLibraryUseCaseSelected: Dispatch<SetStateAction<UseCase | null>>
+  setLibraryUseCaseSelected: Dispatch<
+    SetStateAction<{
+      useCase: UseCase
+      subCatalogName: string | null
+    } | null>
+  >
 }
 
 export const SwitchUseCaseModal = ({
   open,
   setOpen,
-  setCurrentUseCase,
+  updateURLFromUseCase,
   currentUseCase,
   selectedUseCase,
   onSave,
@@ -49,7 +57,7 @@ export const SwitchUseCaseModal = ({
     if (evaluationRunning) {
       setEvaluationRunningModalOpen(true)
     } else {
-      setCurrentUseCase(selectedUseCase as UseCase)
+      updateURLFromUseCase(selectedUseCase)
     }
   }
 
@@ -62,7 +70,7 @@ export const SwitchUseCaseModal = ({
   }
 
   const onDontSave = async () => {
-    setCurrentUseCase(selectedUseCase as UseCase)
+    updateURLFromUseCase(selectedUseCase)
     setOpen(false)
   }
 

@@ -17,10 +17,10 @@ import { SavedTestCasesPanel } from './SavedTestCasesPanel'
 
 interface AppSidenavProps {
   setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
-  setLibraryUseCaseSelected: Dispatch<SetStateAction<UseCase | null>>
+  setLibraryUseCaseSelected: Dispatch<SetStateAction<{ useCase: UseCase; subCatalogName: string | null } | null>>
   userUseCases: UseCase[]
   changesDetected: boolean
-  updateURLFromUseCase: (useCase: UseCase, subCatalogName?: string) => void
+  updateURLFromUseCase: (selectedUseCase: { useCase: UseCase; subCatalogName: string | null }) => void
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
 }
@@ -43,14 +43,14 @@ export const AppSidenavNew = ({
     if (useCaseId !== null && useCaseId === useCase.id) return
     // if there are unsaved changes, let the user know that they may lose work
     if (changesDetected) {
-      setLibraryUseCaseSelected(useCase)
+      setLibraryUseCaseSelected({ useCase, subCatalogName: subCatalogName || null })
       setConfirmationModalOpen(true)
     } else if (evaluationRunning) {
-      setLibraryUseCaseSelected(useCase)
+      setLibraryUseCaseSelected({ useCase, subCatalogName: subCatalogName || null })
       setEvaluationRunningModalOpen(true)
     } else {
       // no unsaved changes and model is not running update the current use case without modals
-      updateURLFromUseCase(useCase, subCatalogName)
+      updateURLFromUseCase({ useCase, subCatalogName: subCatalogName || null })
     }
   }
 

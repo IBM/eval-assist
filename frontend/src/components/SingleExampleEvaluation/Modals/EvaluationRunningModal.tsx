@@ -7,8 +7,16 @@ import { Button, ComposedModal, Modal, ModalBody, ModalFooter, ModalHeader } fro
 import { UseCase } from '../../../types'
 
 interface Props {
-  setCurrentUseCase: (useCase: UseCase) => void
-  selectedUseCase: UseCase | null
+  updateURLFromUseCase: (
+    selectedUseCase: {
+      useCase: UseCase
+      subCatalogName: string | null
+    } | null,
+  ) => void
+  selectedUseCase: {
+    useCase: UseCase
+    subCatalogName: string | null
+  } | null
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
@@ -18,7 +26,7 @@ interface Props {
 export const EvaluationRunningModal = ({
   open,
   setOpen,
-  setCurrentUseCase,
+  updateURLFromUseCase,
   selectedUseCase,
   setConfirmationModalOpen,
   changesDetected,
@@ -31,7 +39,7 @@ export const EvaluationRunningModal = ({
     if (changesDetected) {
       setConfirmationModalOpen(true)
     } else {
-      setCurrentUseCase(selectedUseCase as UseCase)
+      updateURLFromUseCase(selectedUseCase)
     }
     setOpen(false)
   }

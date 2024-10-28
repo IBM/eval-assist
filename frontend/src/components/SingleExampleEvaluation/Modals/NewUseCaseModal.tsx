@@ -16,10 +16,10 @@ interface Props {
   open: boolean
   changesDetected: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  setCurrentUseCase: (useCase: UseCase) => void
+  updateURLFromUseCase: (useCaseSelected: { useCase: UseCase; subCatalogName: string | null }) => void
 }
 
-export const NewUseCaseModal = ({ open, changesDetected, setOpen, setCurrentUseCase }: Props) => {
+export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromUseCase }: Props) => {
   const [selectedType, setSelectedType] = useState<PipelineType | null>(null)
 
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
@@ -28,12 +28,15 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, setCurrentUseC
 
   const onSubmit = async () => {
     if (rubricPipelines !== null && pairwisePipelines !== null) {
-      setCurrentUseCase({
-        ...getEmptyUseCase(selectedType as PipelineType),
-        pipeline: selectedType === PipelineType.RUBRIC ? rubricPipelines[0] : pairwisePipelines[0],
+      updateURLFromUseCase({
+        useCase: {
+          ...getEmptyUseCase(selectedType as PipelineType),
+          pipeline: selectedType === PipelineType.RUBRIC ? rubricPipelines[0] : pairwisePipelines[0],
+        },
+        subCatalogName: null,
       })
     } else {
-      setCurrentUseCase(getEmptyUseCase(selectedType as PipelineType))
+      updateURLFromUseCase({ useCase: getEmptyUseCase(selectedType as PipelineType), subCatalogName: null })
       addToast({
         kind: 'info',
         title: 'Evaluator options are not yet available',
