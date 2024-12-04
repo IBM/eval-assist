@@ -132,3 +132,5 @@ Secrets.yaml
 .env
 
 .vscode
+
+.litellm_cache/

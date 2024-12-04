@@ -57,7 +57,7 @@ class Evaluator(ABC):
 
 
         metric_catalog_definition: CatalogDefinition = {
-            'name': f'metrics.llm_as_judge.eval_assist.{self.evaluator_type.name}',
+            'name': f'metrics.llm_as_judge.eval_assist.{self.evaluator_type.name.lower()}',
             'params': {
                 'inference_engine': inference_engine_catalog_definition,
                 "option_selection_strategy": OptionSelectionStrategyEnum.PARSE_OUTPUT_TEXT.name, #PROVIDER_TO_STRATEGY[provider].name,
