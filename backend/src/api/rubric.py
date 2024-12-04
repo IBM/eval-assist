@@ -1,9 +1,9 @@
 from pydantic import BaseModel, validator
 from fastapi import HTTPException
-from typing import List, Literal, Optional
-from llmasajudge.evaluators import  EvaluatorTypeEnum
+from typing import Optional
 
 from .common import CriteriaModel, EvalRequestModel
+from unitxt.eval_assist_constants import CriteriaWithOptions
 
 class RubricOptionModel(BaseModel):
     option: str
@@ -16,7 +16,7 @@ class RubricOptionModel(BaseModel):
     #     return option
 
 class RubricCriteriaModel(CriteriaModel):
-    options: List[RubricOptionModel]
+    options: list[RubricOptionModel]
 
     @validator('options', pre=True, always=True)
     def validate_options_length(cls, options):
@@ -24,9 +24,19 @@ class RubricCriteriaModel(CriteriaModel):
             raise HTTPException(status_code=400, detail="Rubrics require a minimum of 2 options.")
         return options
 
+
+class CriteriaOptionAPI(BaseModel):
+    option: str
+    description: str
+
+class CriteriaWithOptionsAPI(BaseModel):
+    name: str
+    criteria: str
+    options: list[CriteriaOptionAPI]
+
 class RubricEvalRequestModel(EvalRequestModel):
-    criteria: RubricCriteriaModel
-    response_variable_name: str 
+    criteria: CriteriaWithOptionsAPI | str
+    response_variable_name: str
     
     @validator('responses', pre=True, always=True)
     def validate_responses_length(cls, responses):
@@ -45,10 +55,11 @@ class RubricEvalRequestModel(EvalRequestModel):
 
 class RubricEvalResultModel(BaseModel):
     option: str
-    explanation: str
-    p_bias: Optional[bool] = None
+    summary: str
     certainty: Optional[float] = None
+    positional_bias: Optional[bool] = None
+    positional_bias_option: Optional[str] = None
 
 class RubricEvalResponseModel(BaseModel):
-    results: List[RubricEvalResultModel]
+    results: list[RubricEvalResultModel]
 

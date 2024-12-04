@@ -1,7 +1,6 @@
 from fastapi import HTTPException
 from pydantic import BaseModel, validator
-from llmasajudge.evaluators import EvaluatorTypeEnum, EvaluatorNameEnum, ModelProviderEnum
-
+from unitxt.eval_assist_constants import EvaluatorTypeEnum, EvaluatorNameEnum, ModelProviderEnum
 class CriteriaModel(BaseModel):
     name: str
     criteria: str

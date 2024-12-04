@@ -1,7 +1,6 @@
 from pydantic import BaseModel, validator
 from fastapi import HTTPException
-from typing import Dict, List, Literal, Optional
-from llmasajudge.evaluators import  EvaluatorTypeEnum
+from typing import Literal, Optional
 from .common import CriteriaModel, EvalRequestModel
 
 class PairwiseCriteriaModel(CriteriaModel):
@@ -27,14 +26,14 @@ class PairwiseEvalRequestModel(EvalRequestModel):
     
 
 class PairwiseEvalResultModel(BaseModel):
-    contest_results: List[bool]
-    compared_to_indexes: List[int]
-    explanations: Dict[int, str]
-    p_bias: Optional[List[bool]] = None
-    certainty: List[float]
+    contest_results: list[bool]
+    compared_to: list[int]
+    summaries: list[str]
+    positional_bias: Optional[list[bool]] = None
+    certainty: Optional[list[float]] = None
     winrate: float
     ranking: int
+    selections: list[str]
 
 class PairwiseEvalResponseModel(BaseModel):
-    per_response_results: Dict[int, PairwiseEvalResultModel]
-    ranking: List[int]
+    results: dict[int, PairwiseEvalResultModel]

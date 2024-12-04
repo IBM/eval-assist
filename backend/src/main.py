@@ -1,29 +1,36 @@
 import traceback
-from typing import Optional, Union
+from typing import Optional, Union, cast
 from fastapi import FastAPI, status, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, RootModel
+from pydantic import BaseModel
+
+from .evaluators.unitxt import DirectAssessmentEvaluator, PairwiseComparisonEvaluator
 
 from .api.pairwise import PairwiseEvalRequestModel, PairwiseEvalResponseModel
-from .api.rubric import RubricEvalRequestModel, RubricEvalResponseModel
+from .api.rubric import CriteriaOptionAPI, CriteriaWithOptionsAPI, RubricEvalRequestModel, RubricEvalResponseModel
 
 from .db_client import db
 import json
 from prisma.models import StoredUseCase
 from prisma.errors import PrismaError
-from llmasajudge.evaluators import get_rubric_evaluator, get_all_vs_all_pairwise_evaluator, AVAILABLE_EVALUATORS, EvaluatorTypeEnum, PairwiseCriteria, RubricCriteria, Evaluator, EvaluatorNameEnum
-from llmasajudge.evaluators.rubric import GraniteGuardianRubricEvaluator
-from llmasajudge.benchmark.utils import get_all_benchmarks
+# from llmasajudge.evaluators.rubric import GraniteGuardianRubricEvaluator
+# from llmasajudge.benchmark.utils import get_all_benchmarks
 from genai.exceptions import ApiResponseException, ApiNetworkException
 from ibm_watsonx_ai.wml_client_error import ApiRequestFailure, CannotSetProjectOrSpace, WMLClientError
 import json
 from openai import AuthenticationError
-
+from llmasajudge.evaluators import get_rubric_evaluator, RubricCriteria, EvaluatorNameEnum as EvaluatorNameEnumOld, ModelProviderEnum as ModelProviderEnumOld, GraniteGuardianRubricEvaluator
+from llmasajudge.benchmark.utils import get_all_benchmarks
 # API type definitions
-from .api.pipelines import PipelinesResponseModel
+from .api.pipelines import EvaluatorMetadataAPI, PipelinesResponseModel
 
 # Logging req/resp
 from .logger import LoggingRoute
+
+from unitxt.eval_assist_constants import EVALUATORS_METADATA, EvaluatorNameEnum, OptionSelectionStrategyEnum, Criteria, CriteriaOption, EvaluatorTypeEnum, CriteriaWithOptions
+
+import nest_asyncio
+nest_asyncio.apply()
 
 app = FastAPI()
 app.add_middleware(
@@ -67,12 +74,23 @@ def throw_authorized_exception():
 @router.get("/pipelines/", response_model=PipelinesResponseModel)
 def get_pipelines():
     '''Get the list of available pipelines, as supported by llm-as-a-judge library'''
-    return PipelinesResponseModel(pipelines=[e.metadata for e in AVAILABLE_EVALUATORS])
+    pipelines=[EvaluatorMetadataAPI(**e.__dict__) for e in EVALUATORS_METADATA]
+    # for e in AVAILABLE_EVALUATORS:
+    #     if e.metadata.name.value in [EvaluatorNameEnum.GRANITE_GUARDIAN_2B.value, EvaluatorNameEnum.GRANITE_GUARDIAN_8B.value]:
+    #         pipelines.extend(EvaluatorMetadataAPI(
+    #             name=e.metadata.name.value,
+    #             option_selection_strategy=OptionSelectionStrategyEnum.PARSE_OUTPUT_TEXT.value, 
+    #             providers=['watsonx']))
+    return PipelinesResponseModel(pipelines=pipelines)
 
 @router.post("/prompt/", response_model=list[str])
 def get_prompt(req: RubricEvalRequestModel):
-    gg_evaluator: GraniteGuardianRubricEvaluator = get_rubric_evaluator(name=EvaluatorNameEnum.GRANITE_GUARDIAN_2B, credentials=req.llm_provider_credentials, provider=req.provider)
-    criteria = RubricCriteria(name=req.criteria.name, criteria=req.criteria.criteria, options=req.criteria.options)
+    gg_evaluator: GraniteGuardianRubricEvaluator = get_rubric_evaluator(name=EvaluatorNameEnumOld.GRANITE_GUARDIAN_2B, credentials=req.llm_provider_credentials, provider=ModelProviderEnumOld[req.provider.name])
+    criteria = CriteriaWithOptions(
+        name=req.criteria.name,
+        description=req.criteria.criteria,
+        options=req.criteria.options,
+    )
 
     res = gg_evaluator.get_prompt(
         contexts=[req.context_variables] * len(req.responses),
@@ -84,27 +102,53 @@ def get_prompt(req: RubricEvalRequestModel):
 
 
 @router.post("/evaluate/", response_model=Union[RubricEvalResponseModel, PairwiseEvalResponseModel])
-def evaluate(req: Union[RubricEvalRequestModel, PairwiseEvalRequestModel]):
+async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
     try:
-        if req.type == EvaluatorTypeEnum.RUBRIC:
-            evaluator = get_rubric_evaluator(name=req.pipeline, credentials=req.llm_provider_credentials, provider=req.provider)
-            criteria = RubricCriteria(name=req.criteria.name, criteria=req.criteria.criteria, options=req.criteria.options)
+        if req.type == EvaluatorTypeEnum.DIRECT_ASSESSMENT:
+            if req.pipeline in [EvaluatorNameEnum.GRANITE_GUARDIAN_2B, EvaluatorNameEnum.GRANITE_GUARDIAN_8B]:
+                evaluator = get_rubric_evaluator(name=EvaluatorNameEnumOld[req.pipeline.name], credentials=req.llm_provider_credentials, provider=ModelProviderEnumOld[req.provider.name])
+                criteria = RubricCriteria(name=req.criteria.name, criteria=req.criteria.criteria, options=req.criteria.options)
 
-            res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses),
-                                    responses=req.responses,
-                                    criteria=[criteria] * len(req.responses),
-                                    response_variable_name_list=[req.response_variable_name] * len(req.responses),
-                                    check_bias=True)
+                res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses),
+                                        responses=req.responses,
+                                        criteria=[criteria] * len(req.responses),
+                                        response_variable_name_list=[req.response_variable_name] * len(req.responses),
+                                        check_bias=True)
+                print('res')
+                print(res)
+                for r in res:
+                    r['summary'] = r['explanation']
+                    del r['explanation']
+                return RubricEvalResponseModel(results=res)
+
+            evaluator = DirectAssessmentEvaluator(req.pipeline)
+            criteria = CriteriaWithOptions(
+                name=req.criteria.name,
+                description=req.criteria.criteria,
+                options=[CriteriaOption(
+                    name=o.option,
+                    description=o.description
+                ) for o in cast(CriteriaWithOptionsAPI, req.criteria).options]) \
+                    if not isinstance(req.criteria, str) else req.criteria
+        else:
+            evaluator = PairwiseComparisonEvaluator(req.pipeline)
+            criteria = Criteria(
+                name=req.criteria.name,
+                description=req.criteria.criteria) \
+                    if not isinstance(req.criteria, str) else req.criteria
+
+        res = evaluator.evaluate(
+            contexts=[req.context_variables] * len(req.responses),
+            responses=req.responses,
+            criteria=criteria,
+            # response_variable_name_list=[req.response_variable_name] * len(req.responses),
+            credentials=req.llm_provider_credentials,
+            provider=req.provider
+        )
+        if req.type == EvaluatorTypeEnum.DIRECT_ASSESSMENT:
             return RubricEvalResponseModel(results=res)
-        elif req.type == EvaluatorTypeEnum.ALL_V_ALL_PAIRWISE:
-            evaluator = get_all_vs_all_pairwise_evaluator(name=req.pipeline, credentials=req.llm_provider_credentials)
-            criteria = PairwiseCriteria(name=req.criteria.name, criteria=req.criteria.criteria)
-            [per_response_results, ranking] = evaluator.evaluate(
-                                context_variables=req.context_variables,
-                                responses=req.responses,
-                                criteria=criteria,
-                                check_bias=True)
-            return PairwiseEvalResponseModel(per_response_results=per_response_results, ranking=ranking)
+        else:
+            return PairwiseEvalResponseModel(results=res)
 
     except ValueError as e:
         traceback.print_exc()      

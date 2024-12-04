@@ -1,5 +1,9 @@
-from pydantic import BaseModel
-from llmasajudge.evaluators import PipelineModelMetadata
+from pydantic import BaseModel, ConfigDict
+from unitxt.eval_assist_constants import EvaluatorMetadata
+
+class EvaluatorMetadataAPI(BaseModel, EvaluatorMetadata):
+    pass
 
 class PipelinesResponseModel(BaseModel):
-    pipelines: list[PipelineModelMetadata]
+    # model_config = ConfigDict(arbitrary_types_allowed=True)
+    pipelines: list[EvaluatorMetadataAPI]
