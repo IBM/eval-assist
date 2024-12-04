@@ -22,6 +22,7 @@ interface Props {
 export const PipelineSelect = ({ style, className, selectedPipeline, setSelectedPipeline, type }: Props) => {
   const { rubricPipelines, pairwisePipelines, graniteGuardianPipelines, loadingPipelines } = usePipelineTypesContext()
   const { isRisksAndHarms } = useURLInfoContext()
+
   const filteredPipelines = useMemo(() => {
     let pipelines = returnByPipelineType(type, rubricPipelines, pairwisePipelines) as Pipeline[]
     if (!isRisksAndHarms) {
@@ -31,7 +32,6 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
     }
     return pipelines
   }, [graniteGuardianPipelines, isRisksAndHarms, pairwisePipelines, rubricPipelines, type])
-
   const providerToEvaluators = useMemo(() => {
     const result: { [key: string]: Pipeline[] } = {}
 
@@ -71,6 +71,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
     [ModelProviderType.WATSONX]: 'WatsonX',
     [ModelProviderType.BAM]: 'BAM',
     [ModelProviderType.OPENAI]: 'OpenAI',
+    [ModelProviderType.RITS]: 'RITS',
   }
 
   return (

@@ -29,7 +29,7 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
       benchmarks.sort((b1, b2) => b1.name.localeCompare(b2.name))
       benchmarks.forEach((benchmark) => {
         benchmark.criteriaBenchmarks.sort((c1, c2) => c1.name.localeCompare(c2.name))
-        if (benchmark.type === PipelineType.OLD_PAIRWISE) {
+        if (benchmark.type === PipelineType.OLD_PAIRWISE || benchmark.type === PipelineType.OLD_ALL_VS_ALL_PAIRWISE) {
           benchmark.type = PipelineType.PAIRWISE
         }
       })

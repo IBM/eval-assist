@@ -4,11 +4,13 @@ import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffe
 
 import { useRouter } from 'next/router'
 
+import { Model } from '@carbon/react/icons'
+
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
 import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
 import { getEmptyUseCase, getEmptyUseCaseWithCriteria, returnByPipelineType } from '@utils/utils'
 
-import { Pipeline, PipelineType, UseCase } from '../../../types'
+import { ModelProviderType, Pipeline, PipelineType, UseCase } from '../../../types'
 import { usePipelineTypesContext } from './PipelineTypesProvider'
 import { useUserUseCasesContext } from './UserUseCasesProvider'
 
@@ -101,8 +103,12 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
           ...pu,
           pipeline: returnByPipelineType(
             pu.type,
-            rubricPipelines.find((p) => p.name.includes('Mixtral')) as Pipeline,
-            pairwisePipelines.find((p) => p.name.includes('Mixtral')) as Pipeline,
+            rubricPipelines.find(
+              (p) => p.name.toLowerCase().includes('llama') && p.provider === ModelProviderType.RITS,
+            ) as Pipeline,
+            pairwisePipelines.find(
+              (p) => p.name.toLowerCase().includes('llama') && p.provider === ModelProviderType.RITS,
+            ) as Pipeline,
           ),
         }
       }

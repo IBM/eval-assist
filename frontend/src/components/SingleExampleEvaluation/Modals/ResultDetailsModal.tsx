@@ -35,6 +35,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
 
   const positionalBiasString = useMemo(() => {
     if (selectedResultDetails.result === null) return null
+
     let pb: string
     if (type === PipelineType.RUBRIC) {
       pb = `${(selectedResultDetails.result as RubricResult)?.positionalBias}`
@@ -43,7 +44,11 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
         (pBias) => pBias === true,
       )}`
     }
-    return pb.charAt(0).toUpperCase() + pb.slice(1) + ' '
+    pb = pb.charAt(0).toUpperCase() + pb.slice(1) + ' '
+    if (type === PipelineType.RUBRIC && (selectedResultDetails.result as RubricResult)?.positionalBias) {
+      pb += `/ '${(selectedResultDetails.result as RubricResult).positionalBiasOption}' was selected `
+    }
+    return pb
   }, [selectedResultDetails, type])
 
   return (
@@ -173,7 +178,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
                           <p key={i} className={classes.explanation}>
                             <strong>
                               {`Against response ${
-                                (selectedResultDetails.result as PerResponsePairwiseResult).comparedToIndexes[i] + 1
+                                (selectedResultDetails.result as PerResponsePairwiseResult).comparedToIndexes[i]
                               }: `}
                             </strong>
                             {explanation}

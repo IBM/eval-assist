@@ -97,11 +97,11 @@ export const APIKeyPopover = ({
                   ref={apiKeyInputRef}
                   id={'watsonx-api-key-input'}
                   labelText=""
-                  value={modelProviderCrentials.watsonx.api_key}
+                  value={modelProviderCrentials.watsonx.apikey}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setModelProviderCredentials({
                       ...modelProviderCrentials,
-                      watsonx: { ...modelProviderCrentials.watsonx, api_key: e.target.value },
+                      watsonx: { ...modelProviderCrentials.watsonx, apikey: e.target.value },
                     })
                   }
                   autoComplete="off"
@@ -130,6 +130,40 @@ export const APIKeyPopover = ({
               {"Don't have a key? Get one "}
               <Link
                 href={'https://cloud.ibm.com/'}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: 'none' }}
+              >
+                {'here'}
+              </Link>
+            </p>
+          </div>
+          <div className={classes.bottomDivider} />
+          <div className={cx(classes.modelProvider)}>
+            <p className={cx(classes.modelProviderName)}>RITS</p>
+            <Layer>
+              <div className={cx(classes.credential)}>
+                <div className={cx(classes.credentialLabel, 'cds--label')}>API key: </div>
+                <TextInput
+                  ref={apiKeyInputRef}
+                  id={'openai-api-key-input'}
+                  labelText=""
+                  value={modelProviderCrentials.rits.api_key}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCrentials,
+                      rits: { api_key: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                  className={classes['api-key-password-style']}
+                />
+              </div>
+            </Layer>
+            <p className="cds--form__helper-text">
+              {"Don't have a key? Get one "}
+              <Link
+                href={'https://platform.openai.com/api-keys'}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ textDecoration: 'none' }}

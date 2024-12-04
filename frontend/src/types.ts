@@ -1,6 +1,7 @@
 export interface RubricResult {
   name: string
   option: string
+  positionalBiasOption: string
   explanation: string
   positionalBias: boolean
   certainty: number
@@ -24,26 +25,25 @@ export interface PairwiseResults {
 }
 
 export interface FetchedRubricResult {
-  name: string
   option: string
-  explanation: string
-  p_bias: boolean
+  summary: string
   certainty: number
+  positional_bias: boolean
+  positional_bias_option: string
 }
 
 export interface FetchedPairwiseResults {
-  per_response_results: {
+  results: {
     [key: string]: {
       contest_results: boolean[]
-      compared_to_indexes: number[]
-      explanations: { [key: string]: string }
-      p_bias?: boolean[]
+      compared_to: number[]
+      summaries: { [key: string]: string }
+      positional_bias?: boolean[]
       certainty: number[]
       winrate: number
       ranking: number
     }
   }
-  ranking: number[]
 }
 
 export interface FetchedResults {
@@ -79,32 +79,28 @@ export interface UseCaseV1 extends Omit<UseCaseV0, 'pipeline'> {
 export type UseCase = UseCaseV1
 
 export enum PipelineType {
-  RUBRIC = 'rubric',
-  // PAIRWISE = 'pairwise',
-  PAIRWISE = 'all_vs_all_pairwise',
+  RUBRIC = 'direct_assessment',
+  PAIRWISE = 'pairwise_comparison',
   OLD_PAIRWISE = 'pairwise',
+  OLD_ALL_VS_ALL_PAIRWISE = 'all_vs_all_pairwise',
 }
 
 export enum ModelProviderType {
   WATSONX = 'watsonx',
   BAM = 'bam',
   OPENAI = 'openai',
+  RITS = 'rits',
 }
 
 export interface Pipeline {
-  model_id: string
   name: string
   type: PipelineType
   provider: ModelProviderType
-  version: string
 }
 
 export interface FetchedPipeline {
-  model_id: string
   name: string
-  type: PipelineType
   providers: ModelProviderType[]
-  version: string
 }
 
 export interface Dataset {
@@ -171,10 +167,14 @@ export type ModelProviderCredentials = {
     api_key: string
   }
   watsonx: {
-    api_key: string
+    apikey: string
     project_id: string
+    url: string
   }
   openai: {
+    api_key: string
+  }
+  rits: {
     api_key: string
   }
 }

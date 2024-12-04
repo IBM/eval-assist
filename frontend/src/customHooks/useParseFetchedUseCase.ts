@@ -90,7 +90,7 @@ export const useParseFetchedUseCase = () => {
             rubricPipelines,
             pairwisePipelines,
           ) as Pipeline[]
-        ).find((pipeline) => pipeline.model_id === fetchedUseCase.pipeline) ?? null,
+        ).find((pipeline) => pipeline.name === fetchedUseCase.pipeline) ?? null,
     }),
     [pairwisePipelines, rubricPipelines],
   )

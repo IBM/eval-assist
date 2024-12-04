@@ -123,10 +123,10 @@ export const SingleExampleEvaluation = () => {
   const [modelProviderCredentials, setModelProviderCredentials, removeModelProviderCredentials] =
     useLocalStorage<ModelProviderCredentials>('modelProviderCrentials', {
       [ModelProviderType.BAM]: { api_key: '' },
-      [ModelProviderType.WATSONX]: { api_key: '', project_id: '' },
+      [ModelProviderType.WATSONX]: { apikey: '', project_id: '', url: 'https://us-south.ml.cloud.ibm.com' },
       [ModelProviderType.OPENAI]: { api_key: '' },
+      [ModelProviderType.RITS]: { api_key: '' },
     })
-
   const areRelevantCredentialsProvided = useMemo(
     () =>
       Object.values(modelProviderCredentials[currentUseCase?.pipeline?.provider || ModelProviderType.BAM]).every(
@@ -192,6 +192,7 @@ export const SingleExampleEvaluation = () => {
     }
     body['llm_provider_credentials'] =
       modelProviderCredentials[currentUseCase.pipeline?.provider || ModelProviderType.BAM]
+    console.log(body['llm_provider_credentials'])
     const startEvaluationTime = new Date().getTime() / 1000
     response = await post('evaluate/', body)
     const endEvaluationTime = new Date().getTime() / 1000
@@ -243,21 +244,23 @@ export const SingleExampleEvaluation = () => {
             ({
               name: currentUseCase.criteria.name,
               option: result.option,
-              explanation: result.explanation,
-              positionalBias: result.p_bias,
+              positionalBiasOption: result.positional_bias_option,
+              explanation: result.summary,
+              positionalBias: result.positional_bias,
               certainty: result.certainty,
             } as RubricResult),
         )
       } else {
         const perResponseResults: PairwiseResults['perResponseResults'] = {}
         const fetchedResults = responseBody as FetchedPairwiseResults
-        Object.entries(fetchedResults.per_response_results).forEach(([result_idx, fetchedPerResponseResult]) => {
+        Object.entries(fetchedResults.results).forEach(([result_idx, fetchedPerResponseResult]) => {
           perResponseResults[result_idx] = {
             contestResults: fetchedPerResponseResult.contest_results,
-            comparedToIndexes: fetchedPerResponseResult.compared_to_indexes,
-            explanations: fetchedPerResponseResult.explanations,
+            comparedToIndexes: fetchedPerResponseResult.compared_to,
+            explanations: fetchedPerResponseResult.summaries,
             positionalBias:
-              fetchedPerResponseResult.p_bias || new Array(fetchedPerResponseResult.contest_results.length).fill(false),
+              fetchedPerResponseResult.positional_bias ||
+              new Array(fetchedPerResponseResult.contest_results.length).fill(false),
             certainty: fetchedPerResponseResult.certainty,
             winrate: fetchedPerResponseResult.winrate,
             ranking: fetchedPerResponseResult.ranking,
@@ -265,7 +268,7 @@ export const SingleExampleEvaluation = () => {
         })
         results = {
           perResponseResults,
-          ranking: fetchedResults.ranking,
+          ranking: Object.values(perResponseResults).map((r) => r.ranking),
         }
       }
 

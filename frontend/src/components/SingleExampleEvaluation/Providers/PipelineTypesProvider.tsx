@@ -37,7 +37,6 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
     () => pipelines?.filter((p) => p.type === PipelineType.PAIRWISE) ?? null,
     [pipelines],
   )
-
   const graniteGuardianPipelines = useMemo(
     () => rubricPipelines?.filter((p) => p.name.startsWith('Granite Guardian')) || null,
     [rubricPipelines],
@@ -52,10 +51,12 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
       let pipelines: Pipeline[] = []
       data.pipelines.forEach((pipeline: FetchedPipeline) => {
         pipeline.providers.forEach((provider) => {
-          let p = { ...pipeline, provider }
-          // @ts-ignore
-          delete p.providers
-          pipelines.push({ ...p, provider })
+          Object.values(PipelineType).forEach((type) => {
+            let p = { ...pipeline, provider, type: type as PipelineType }
+            // @ts-ignore
+            delete p.providers
+            pipelines.push({ ...p })
+          })
         })
       })
       setPipelines(pipelines)

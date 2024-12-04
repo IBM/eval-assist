@@ -62,7 +62,7 @@ export const PairwiseRows = ({
         // there are no results for this response
         return ''
       }
-      const ranking = results.ranking[i] + 1
+      const ranking = results.ranking[i]
       return `Ranking: ${ranking}${getOrdinalSuffix(ranking)} (${toPercentage(
         // perResponseResults is a dict, and the value may have been deleted!
         Object.values(results.perResponseResults)[i].winrate,
@@ -192,9 +192,9 @@ export const PairwiseRows = ({
                             <div
                               className={cx(classes.resultBlockTypography, {
                                 [classes.untrastedResultTypography]: results.ranking[i] + 1 !== +expectedResults[i],
-                                [classes.softText]: results.ranking[i] + 1 === +expectedResults[i],
+                                [classes.softText]: results.ranking[i] === +expectedResults[i],
                               })}
-                            >{`Agreement: ${results.ranking[i] + 1 === +expectedResults[i] ? 'Yes' : 'No'}`}</div>
+                            >{`Agreement: ${results.ranking[i] === +expectedResults[i] ? 'Yes' : 'No'}`}</div>
                           )}
                         </div>
                         <Link style={{ alignSelft: 'flex-end' }} className={classes.resultDetailsAction}>

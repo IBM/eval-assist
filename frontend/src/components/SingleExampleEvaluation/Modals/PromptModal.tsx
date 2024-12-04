@@ -80,7 +80,7 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
       size="sm"
       modalHeading={currentUseCase !== null && currentUseCase.responses.length > 1 ? 'Prompts' : 'Prompt'}
     >
-      <Layer style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
         {prompts === null ? (
           <div className={classes.loadingRoot}>
             <span>{'Loading'}</span>
@@ -108,7 +108,7 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
             <div className={classes.prompt}>{prompts[selectedPromptIndex]}</div>
           </div>
         )}
-      </Layer>
+      </div>
     </Modal>
   )
 }
