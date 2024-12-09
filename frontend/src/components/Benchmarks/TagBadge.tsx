@@ -4,7 +4,7 @@ import { CSSProperties } from 'react'
 
 import { Tag } from '@carbon/react'
 
-import { BadgeColor, PipelineType } from '../../types'
+import { BadgeColor } from '../../types'
 import classes from './TagBadge.module.scss'
 
 interface Props {

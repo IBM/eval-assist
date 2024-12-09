@@ -6,7 +6,7 @@ import { Button, Layer, ListItem, Modal, UnorderedList } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
-import { PairwiseCriteria, PipelineType, RubricCriteria } from '@types'
+import { DirectAssessmentCriteria, EvaluationType, PairwiseComparisonCriteria } from '@types'
 import { isInstanceOfRubricCriteria } from '@utils/utils'
 
 import classes from './CriteriaDetailsModal.module.scss'
@@ -14,8 +14,8 @@ import classes from './CriteriaDetailsModal.module.scss'
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  criteria: RubricCriteria | PairwiseCriteria
-  type: PipelineType
+  criteria: DirectAssessmentCriteria | PairwiseComparisonCriteria
+  type: EvaluationType
 }
 
 export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) => {
@@ -58,7 +58,7 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
 
         <p>
           <strong>{'Criteria: '}</strong>
-          {criteria.criteria}
+          {criteria.description}
         </p>
 
         {isInstanceOfRubricCriteria(criteria) && (
@@ -70,7 +70,7 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
               {criteria.options.map((option, i) => (
                 <ListItem key={i}>
                   <p>
-                    <span style={{ fontWeight: 500 }}>{option.option + ': '}</span>
+                    <span style={{ fontWeight: 500 }}>{option.name + ': '}</span>
                     {option.description}
                   </p>
                 </ListItem>

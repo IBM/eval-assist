@@ -1,5 +1,4 @@
 import cx from 'classnames'
-import { useLocalStorage } from 'usehooks-ts'
 import { v4 as uuid } from 'uuid'
 
 import { LegacyRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -11,22 +10,22 @@ import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFromUseCase'
+import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
 import { StoredUseCase } from '@prisma/client'
 import { getCriteria, getUseCaseStringWithSortedKeys, stringifyQueryParams, toSnakeCase } from '@utils/utils'
 
 import {
-  FetchedPairwiseResults,
-  FetchedRubricResult,
-  ModelProviderCredentials,
+  DirectAssessmentResult,
+  DirectAssessmentResults,
+  EvaluationType,
+  Evaluator,
+  FetchedDirectAssessmentResults,
+  FetchedPairwiseComparisonResults,
   ModelProviderType,
-  PairwiseResults,
+  PairwiseComparisonResults,
   PerResponsePairwiseResult,
-  Pipeline,
-  PipelineType,
-  RubricCriteria,
-  RubricResult,
   UseCase,
 } from '../../types'
 import { APIKeyPopover } from './APIKeyPopover'
@@ -78,7 +77,7 @@ export const SingleExampleEvaluation = () => {
   const [promptModalOpen, setPromptModalOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [selectedResultDetails, setSelectedResultDetails] = useState<{
-    result: RubricResult | PerResponsePairwiseResult | null
+    result: DirectAssessmentResult | PerResponsePairwiseResult | null
     expectedResult: string
     responseIndex: string
   }>({ result: null, expectedResult: '', responseIndex: '' })
@@ -120,19 +119,12 @@ export const SingleExampleEvaluation = () => {
         }
   }, [contextVariables, noUseCaseSelected, responseVariableName])
 
-  const [modelProviderCredentials, setModelProviderCredentials, removeModelProviderCredentials] =
-    useLocalStorage<ModelProviderCredentials>('modelProviderCrentials', {
-      [ModelProviderType.BAM]: { api_key: '' },
-      [ModelProviderType.WATSONX]: { apikey: '', project_id: '', url: 'https://us-south.ml.cloud.ibm.com' },
-      [ModelProviderType.OPENAI]: { api_key: '' },
-      [ModelProviderType.RITS]: { api_key: '' },
-    })
+  const { modelProviderCredentials, setModelProviderCredentials, getAreRelevantCredentialsProvided } =
+    useModelProviderCredentials()
+
   const areRelevantCredentialsProvided = useMemo(
-    () =>
-      Object.values(modelProviderCredentials[currentUseCase?.pipeline?.provider || ModelProviderType.BAM]).every(
-        (key) => key !== '',
-      ),
-    [currentUseCase?.pipeline?.provider, modelProviderCredentials],
+    () => getAreRelevantCredentialsProvided(currentUseCase?.evaluator?.provider || ModelProviderType.RITS),
+    [currentUseCase?.evaluator?.provider, getAreRelevantCredentialsProvided],
   )
 
   const popoverRef = useRef<HTMLDivElement>()
@@ -173,9 +165,9 @@ export const SingleExampleEvaluation = () => {
       // check if criteria description changed and criteria name didn't
       const harmsAndRiskCriteria = getCriteria(
         `${toSnakeCase(currentUseCase.criteria.name)}>${toSnakeCase(currentUseCase.responseVariableName)}`,
-        PipelineType.RUBRIC,
+        EvaluationType.RUBRIC,
       )
-      if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.criteria !== currentUseCase.criteria.criteria) {
+      if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.description !== currentUseCase.criteria.description) {
         // the tokenizer of granite guardian will complain if we send a predefined criteria name
         // with a custom description.
         parsedCriteria.name = `${parsedCriteria.name}_variation`
@@ -184,15 +176,21 @@ export const SingleExampleEvaluation = () => {
     let body: any = {
       context_variables: parsedContextVariables,
       responses: currentUseCase.responses,
-      pipeline: currentUseCase.pipeline?.name,
-      provider: currentUseCase.pipeline?.provider,
+      evaluator_name: currentUseCase.evaluator?.name,
+      provider: currentUseCase.evaluator?.provider,
       criteria: parsedCriteria,
       type: currentUseCase.type,
       response_variable_name: currentUseCase.responseVariableName,
     }
-    body['llm_provider_credentials'] =
-      modelProviderCredentials[currentUseCase.pipeline?.provider || ModelProviderType.BAM]
-    console.log(body['llm_provider_credentials'])
+    body['llm_provider_credentials'] = {
+      ...modelProviderCredentials[currentUseCase.evaluator?.provider || ModelProviderType.RITS],
+    }
+
+    // changing api_key to apikey this way for backward compatibility
+    // if (currentUseCase.evaluator?.provider === ModelProviderType.WATSONX) {
+    //   body['llm_provider_credentials']['apikey'] = modelProviderCredentials[ModelProviderType.WATSONX].api_key
+    //   delete body['llm_provider_credentials']['api_key']
+    // }
     const startEvaluationTime = new Date().getTime() / 1000
     response = await post('evaluate/', body)
     const endEvaluationTime = new Date().getTime() / 1000
@@ -236,40 +234,37 @@ export const SingleExampleEvaluation = () => {
         timeout: 5000,
       })
 
-      let results: RubricResult[] | PairwiseResults
+      let results: DirectAssessmentResults | PairwiseComparisonResults
 
-      if (currentUseCase.type === PipelineType.RUBRIC) {
-        results = (responseBody.results as FetchedRubricResult[]).map(
+      if (currentUseCase.type === EvaluationType.RUBRIC) {
+        results = (responseBody.results as FetchedDirectAssessmentResults).map(
           (result) =>
             ({
               name: currentUseCase.criteria.name,
               option: result.option,
               positionalBiasOption: result.positional_bias_option,
-              explanation: result.summary,
+              summary: result.summary,
               positionalBias: result.positional_bias,
               certainty: result.certainty,
-            } as RubricResult),
+            } as DirectAssessmentResult),
         )
       } else {
-        const perResponseResults: PairwiseResults['perResponseResults'] = {}
-        const fetchedResults = responseBody as FetchedPairwiseResults
+        const perResponseResults: PairwiseComparisonResults = {}
+        const fetchedResults = responseBody as FetchedPairwiseComparisonResults
         Object.entries(fetchedResults.results).forEach(([result_idx, fetchedPerResponseResult]) => {
           perResponseResults[result_idx] = {
             contestResults: fetchedPerResponseResult.contest_results,
-            comparedToIndexes: fetchedPerResponseResult.compared_to,
-            explanations: fetchedPerResponseResult.summaries,
+            comparedTo: fetchedPerResponseResult.compared_to,
+            summaries: fetchedPerResponseResult.summaries,
             positionalBias:
               fetchedPerResponseResult.positional_bias ||
               new Array(fetchedPerResponseResult.contest_results.length).fill(false),
-            certainty: fetchedPerResponseResult.certainty,
+            certainties: fetchedPerResponseResult.certainty,
             winrate: fetchedPerResponseResult.winrate,
             ranking: fetchedPerResponseResult.ranking,
           }
         })
-        results = {
-          perResponseResults,
-          ranking: Object.values(perResponseResults).map((r) => r.ranking),
-        }
+        results = perResponseResults
       }
 
       setCurrentUseCase((previousCurrentUseCase) => {
@@ -340,7 +335,7 @@ export const SingleExampleEvaluation = () => {
             criteria: currentUseCase.criteria,
             results: currentUseCase.results,
             type: currentUseCase.type,
-            pipeline: currentUseCase.pipeline,
+            pipeline: currentUseCase.evaluator,
             expectedResults: currentUseCase.expectedResults,
             responseVariableName: currentUseCase.responseVariableName,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
@@ -393,7 +388,7 @@ export const SingleExampleEvaluation = () => {
             criteria: toSaveUseCase.criteria,
             results: toSaveUseCase.results,
             type: toSaveUseCase.type,
-            pipeline: toSaveUseCase.pipeline,
+            pipeline: toSaveUseCase.evaluator,
             expectedResults: toSaveUseCase.expectedResults,
             responseVariableName: toSaveUseCase.responseVariableName,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
@@ -455,11 +450,11 @@ export const SingleExampleEvaluation = () => {
 
   useSaveShortcut({ onSave, isUseCaseSaved, changesDetected, setSaveUseCaseModalOpen })
 
-  const onSetSelectedPipeline = async (pipeline: Pipeline | null) => {
+  const onSetSelectedPipeline = async (evaluator: Evaluator | null) => {
     if (currentUseCase === null) return
     setCurrentUseCase({
       ...currentUseCase,
-      pipeline,
+      evaluator,
     })
   }
 
@@ -570,7 +565,7 @@ export const SingleExampleEvaluation = () => {
             />
             <PipelineSelect
               type={currentUseCase.type}
-              selectedPipeline={currentUseCase.pipeline}
+              selectedPipeline={currentUseCase.evaluator}
               setSelectedPipeline={onSetSelectedPipeline}
               style={{ marginBottom: '2rem' }}
               className={classes['left-padding']}
@@ -621,7 +616,7 @@ export const SingleExampleEvaluation = () => {
 
             {!areRelevantCredentialsProvided && !evaluationRunning && !evaluationFailed && (
               <p className={`${classes['left-padding']} ${classes['api-key-reminder-text']}`}>
-                {`You need to provide the ${currentUseCase.pipeline?.provider.toUpperCase()} credentials to run evaluations.`}
+                {`You need to provide the ${currentUseCase.evaluator?.provider.toUpperCase()} credentials to run evaluations.`}
               </p>
             )}
           </>

@@ -6,17 +6,17 @@ import { Select, SelectItem, SelectItemGroup, SelectSkeleton } from '@carbon/rea
 
 import { returnByPipelineType } from '@utils/utils'
 
-import { ModelProviderType, Pipeline, PipelineType, UseCase } from '../../types'
+import { EvaluationType, Evaluator, ModelProviderType } from '../../types'
 import classes from './PipelineSelect.module.scss'
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
 
 interface Props {
-  type: PipelineType
+  type: EvaluationType
   style?: CSSProperties
   className?: string
-  selectedPipeline: Pipeline | null
-  setSelectedPipeline: (pipeline: Pipeline | null) => Promise<void>
+  selectedPipeline: Evaluator | null
+  setSelectedPipeline: (pipeline: Evaluator | null) => Promise<void>
 }
 
 export const PipelineSelect = ({ style, className, selectedPipeline, setSelectedPipeline, type }: Props) => {
@@ -24,7 +24,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
   const { isRisksAndHarms } = useURLInfoContext()
 
   const filteredPipelines = useMemo(() => {
-    let pipelines = returnByPipelineType(type, rubricPipelines, pairwisePipelines) as Pipeline[]
+    let pipelines = returnByPipelineType(type, rubricPipelines, pairwisePipelines) as Evaluator[]
     if (!isRisksAndHarms) {
       pipelines = pipelines.filter((p) => !p.name.startsWith('Granite Guardian'))
     } else {
@@ -32,8 +32,9 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
     }
     return pipelines
   }, [graniteGuardianPipelines, isRisksAndHarms, pairwisePipelines, rubricPipelines, type])
+
   const providerToEvaluators = useMemo(() => {
-    const result: { [key: string]: Pipeline[] } = {}
+    const result: { [key: string]: Evaluator[] } = {}
 
     filteredPipelines.forEach((p) => {
       if (!(p.provider in result)) {
@@ -69,7 +70,6 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
 
   const modelProviderBeautifiedName = {
     [ModelProviderType.WATSONX]: 'WatsonX',
-    [ModelProviderType.BAM]: 'BAM',
     [ModelProviderType.OPENAI]: 'OpenAI',
     [ModelProviderType.RITS]: 'RITS',
   }

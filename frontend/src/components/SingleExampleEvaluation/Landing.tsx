@@ -10,7 +10,7 @@ import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { getEmptyUseCase } from '@utils/utils'
 
-import { PipelineType, UseCase } from '../../types'
+import { EvaluationType, UseCase } from '../../types'
 import { Card } from './Card/Card'
 import classes from './Landing.module.scss'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
@@ -25,11 +25,11 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
   const { sidebarTabSelected, setSidebarTabSelected } = useAppSidebarContext()
 
   const createEmptyRubric = () => {
-    updateURLFromUseCase({ useCase: getEmptyUseCase(PipelineType.RUBRIC), subCatalogName: null })
+    updateURLFromUseCase({ useCase: getEmptyUseCase(EvaluationType.RUBRIC), subCatalogName: null })
   }
 
   const createEmptyPairwise = () => {
-    updateURLFromUseCase({ useCase: getEmptyUseCase(PipelineType.PAIRWISE), subCatalogName: null })
+    updateURLFromUseCase({ useCase: getEmptyUseCase(EvaluationType.PAIRWISE), subCatalogName: null })
   }
 
   const openTestCasesLibrary = () => {

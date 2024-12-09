@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import { v4 as uuid } from 'uuid'
 
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction, useMemo } from 'react'
 
 import { Link, Select, SelectItem } from '@carbon/react'
 
@@ -9,13 +9,13 @@ import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 import RemovableSection from '@components/RemovableSection/RemovableSection'
 import { getOrdinalSuffix, toPercentage } from '@utils/utils'
 
-import { PairwiseResults, PerResponsePairwiseResult, RubricResult, UseCase } from '../../../types'
+import { PairwiseComparisonResults, PerResponsePairwiseResult, UseCase } from '../../../types'
 import classes from './index.module.scss'
 
 interface Props {
   responses: UseCase['responses']
   setResponses: (responses: UseCase['responses']) => void
-  results: PairwiseResults
+  results: PairwiseComparisonResults
   setResults: (results: UseCase['results']) => void
   explanationOn: boolean
   expectedResultOn: boolean
@@ -47,25 +47,26 @@ export const PairwiseRows = ({
   setExpectedResults,
   gridClasses,
 }: Props) => {
+  const ranking = useMemo(() => (results !== null ? Object.values(results).map((r) => r.ranking) : []), [results])
+
   const onResultBlockClick = (i: number) => {
     setSelectedResultDetails({
-      result: Object.values(results.perResponseResults)[i],
+      result: Object.values(results)[i],
       expectedResult: expectedResults !== null ? expectedResults[i] : '',
-      responseIndex: (+Object.keys(results.perResponseResults)[i] + 1).toString(),
+      responseIndex: Object.keys(results)[i],
     })
     setResultDetailsModalOpen(true)
   }
 
   const getResultToDisplay = (i: number) => {
     if (results !== null) {
-      if (i >= results.ranking.length) {
+      if (i >= ranking.length) {
         // there are no results for this response
         return ''
       }
-      const ranking = results.ranking[i]
-      return `Ranking: ${ranking}${getOrdinalSuffix(ranking)} (${toPercentage(
+      return `Ranking: ${ranking[i]}${getOrdinalSuffix(ranking[i])} (${toPercentage(
         // perResponseResults is a dict, and the value may have been deleted!
-        Object.values(results.perResponseResults)[i].winrate,
+        Object.values(results)[i].winrate,
       )} winrate)`
     }
   }
@@ -74,12 +75,9 @@ export const PairwiseRows = ({
     if (responses.length === 1) return
     setResponses(responses.filter((_, j) => i !== j))
     if (results !== null) {
-      const perResponseResults = { ...results.perResponseResults }
-      delete perResponseResults[i]
-      setResults({
-        ranking: [...results.ranking.slice(0, i), ...results.ranking.slice(i + 1)],
-        perResponseResults,
-      })
+      const resultsCopy = { ...results }
+      delete resultsCopy[i]
+      setResults(resultsCopy)
     }
 
     expectedResults !== null &&
@@ -134,15 +132,16 @@ export const PairwiseRows = ({
                         ])
                     }}
                   >
-                    <SelectItem key={i} value={''} text={''} />
-                    {responses.map((_, i) => (
-                      <SelectItem key={i} text={`${i + 1}${getOrdinalSuffix(i + 1)}`} value={i + 1} />
-                    ))}
+                    <SelectItem key={`${i}-empty`} value={''} text={''} />
+                    {expectedResults !== null &&
+                      responses.map((_, j) => (
+                        <SelectItem key={j} text={`${j + 1}${getOrdinalSuffix(j + 1)}`} value={`${j + 1}`} />
+                      ))}
                   </Select>
                 </div>
               )}
               {results !== null && !evaluationRunning ? (
-                i < results.ranking.length ? (
+                i < ranking.length ? (
                   <>
                     <div
                       className={cx(
@@ -161,40 +160,27 @@ export const PairwiseRows = ({
                               className={cx(classes.resultBlockTypography, {
                                 [classes.untrastedResultTypography]:
                                   (results !== null &&
-                                    Object.values(results.perResponseResults)[i].positionalBias.some(
-                                      (pBias) => pBias === true,
-                                    )) ||
+                                    Object.values(results)[i].positionalBias.some((pBias) => pBias === true)) ||
                                   (expectedResults !== null &&
                                     expectedResults[i] !== '' &&
-                                    +expectedResults[i] !== Object.values(results.perResponseResults)[i].ranking + 1),
+                                    +expectedResults[i] !== Object.values(results)[i].ranking),
                               })}
                             >
                               <strong>{'Winner'}</strong>
                             </div>
                           )}
 
-                          <div
-                            className={cx(classes.resultBlockTypography, {
-                              // [classes.untrastedResultTypography]:
-                              //   (results !== null &&
-                              //     'positionalBias' in results &&
-                              //     results.perResponseResults[i].positionalBias.some((pBias) => pBias === true)) ||
-                              //   (expectedResults !== null &&
-                              //     +expectedResults[i] !== results.perResponseResults[i].ranking),
-                            })}
-                          >
-                            {getResultToDisplay(i)}
-                          </div>
-                          {Object.values(results.perResponseResults)[i].positionalBias.some(
-                            (pBias) => pBias === true,
-                          ) && <div className={cx(classes.positionalBias)}>{'Positional bias detected'}</div>}
+                          <div className={cx(classes.resultBlockTypography, {})}>{getResultToDisplay(i)}</div>
+                          {Object.values(results)[i].positionalBias.some((pBias) => pBias === true) && (
+                            <div className={cx(classes.positionalBias)}>{'Positional bias detected'}</div>
+                          )}
                           {expectedResults !== null && expectedResults[i] !== '' && (
                             <div
                               className={cx(classes.resultBlockTypography, {
-                                [classes.untrastedResultTypography]: results.ranking[i] + 1 !== +expectedResults[i],
-                                [classes.softText]: results.ranking[i] === +expectedResults[i],
+                                [classes.untrastedResultTypography]: ranking[i] !== +expectedResults[i],
+                                [classes.softText]: ranking[i] === +expectedResults[i],
                               })}
-                            >{`Agreement: ${results.ranking[i] === +expectedResults[i] ? 'Yes' : 'No'}`}</div>
+                            >{`Agreement: ${ranking[i] === +expectedResults[i] ? 'Yes' : 'No'}`}</div>
                           )}
                         </div>
                         <Link style={{ alignSelft: 'flex-end' }} className={classes.resultDetailsAction}>
@@ -202,20 +188,6 @@ export const PairwiseRows = ({
                         </Link>
                       </div>
                     </div>
-                    {/* {explanationOn && (
-                      <FlexTextArea
-                        readOnly
-                        value={
-                          i !== pairwiseWinnerIndex ? Object.values(results.perResponseResults[i].explanations)[0] : ''
-                        }
-                        labelText={''}
-                        placeholder={''}
-                        key={`pairwise_${i}_3_${uuid()}`}
-                        id={`pairwise_${i}_3_${uuid()}`}
-                        className={cx(classes.blockElement, classes.explanationBlock)}
-                        tabIndex={-1}
-                      />
-                    )} */}
                   </>
                 ) : (
                   <>

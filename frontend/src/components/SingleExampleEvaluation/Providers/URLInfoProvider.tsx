@@ -1,22 +1,18 @@
-import { harmsAndRisksLibraryTestCases } from 'src/libraries/UseCaseLibrary'
-
-import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { ReactNode, createContext, useContext, useMemo } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { Model } from '@carbon/react/icons'
-
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
-import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
+import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { getEmptyUseCase, getEmptyUseCaseWithCriteria, returnByPipelineType } from '@utils/utils'
 
-import { ModelProviderType, Pipeline, PipelineType, UseCase } from '../../../types'
+import { EvaluationType, Evaluator, ModelProviderType, UseCase } from '../../../types'
 import { usePipelineTypesContext } from './PipelineTypesProvider'
 import { useUserUseCasesContext } from './UserUseCasesProvider'
 
 interface URLInfoContextValue {
   useCaseId: number | null
-  useCaseType: PipelineType | null
+  useCaseType: EvaluationType | null
   libraryTestCaseName: string | null
   preloadedUseCase: UseCase | null
   isRisksAndHarms: boolean
@@ -42,10 +38,11 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useLibraryTestCases()
   const { userUseCases } = useUserUseCasesContext()
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
+  const { getAreRelevantCredentialsProvided } = useModelProviderCredentials()
 
   const useCaseId = useMemo(() => (router.query.id ? +router.query.id : null), [router.query.id])
   const useCaseType = useMemo(
-    () => (router.query.type ? (router.query.type as PipelineType) : null),
+    () => (router.query.type ? (router.query.type as EvaluationType) : null),
     [router.query.type],
   )
 
@@ -92,23 +89,36 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
       pu = null
     }
 
-    if (pu !== null && rubricPipelines !== null && pairwisePipelines !== null && pu.pipeline === null) {
+    if (pu !== null && rubricPipelines !== null && pairwisePipelines !== null && !pu.evaluator) {
       if (isRisksAndHarms) {
         pu = {
           ...pu,
-          pipeline: rubricPipelines.find((p) => p.name === 'Granite Guardian 3.0 8B') as Pipeline,
+          evaluator: rubricPipelines.find((p) => p.name === 'Granite Guardian 3.0 8B') as Evaluator,
         }
       } else {
+        const ritsCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.RITS)
+        const watsonxCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.WATSONX)
+        const openaiCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.OPENAI)
+        const defaultProvider = watsonxCredentialsExist
+          ? ModelProviderType.WATSONX
+          : ritsCredentialsExist
+          ? ModelProviderType.RITS
+          : openaiCredentialsExist
+          ? ModelProviderType.OPENAI
+          : ModelProviderType.RITS
+
+        const defaultEvaluatorKeyword =
+          watsonxCredentialsExist || ritsCredentialsExist || !openaiCredentialsExist ? 'llama' : 'gpt'
         pu = {
           ...pu,
-          pipeline: returnByPipelineType(
+          evaluator: returnByPipelineType(
             pu.type,
             rubricPipelines.find(
-              (p) => p.name.toLowerCase().includes('llama') && p.provider === ModelProviderType.RITS,
-            ) as Pipeline,
+              (p) => p.name.toLowerCase().includes(defaultEvaluatorKeyword) && p.provider === defaultProvider,
+            ) as Evaluator,
             pairwisePipelines.find(
-              (p) => p.name.toLowerCase().includes('llama') && p.provider === ModelProviderType.RITS,
-            ) as Pipeline,
+              (p) => p.name.toLowerCase().includes(defaultEvaluatorKeyword) && p.provider === defaultProvider,
+            ) as Evaluator,
           ),
         }
       }
@@ -133,6 +143,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     harmsAndRisksLibraryTestCases,
     allLibraryUseCases,
     criteriaName,
+    // getAreRelevantCredentialsProvided,
   ])
 
   return (

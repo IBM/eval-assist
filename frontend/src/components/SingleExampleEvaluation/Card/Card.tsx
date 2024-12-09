@@ -4,7 +4,7 @@ import { CSSProperties } from 'react'
 
 import Image from 'next/image'
 
-import { Tag, Tile, useTheme } from '@carbon/react'
+import { Tag, Tile } from '@carbon/react'
 import { CheckmarkFilled } from '@carbon/react/icons'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'

@@ -5,7 +5,7 @@ import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/
 
 import { toTitleCase } from '@utils/utils'
 
-import { PipelineType, UseCase } from '../../types'
+import { EvaluationType } from '../../types'
 import { UseCaseTypeBadge } from '../UseCaseTypeBadge/UseCaseTypeBadge'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
 import classes from './UseCaseOptions.module.scss'
@@ -15,7 +15,7 @@ interface UseCaseOptionsProps {
   className?: string
   isUseCaseSaved: boolean
   useCaseName: string
-  type: PipelineType
+  type: EvaluationType
   changesDetected: boolean
   onSave: () => Promise<void>
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>

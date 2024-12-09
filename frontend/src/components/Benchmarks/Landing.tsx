@@ -3,7 +3,7 @@ import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
 
 import { useMemo, useState } from 'react'
 
-import { BadgeColor, Benchmark, PipelineType, badgeColorsArray } from '@types'
+import { BadgeColor, EvaluationType, badgeColorsArray } from '@types'
 
 import { BenchmarkCard } from './BenchmarkCard'
 import { Filter } from './Filter'
@@ -29,10 +29,10 @@ export const Landing = () => {
         ? result
         : result.filter((b) => {
             return selectedTagItems.every((selectedTag) => {
-              if (selectedTag === RUBRIC_NAME && b.type === PipelineType.RUBRIC) {
+              if (selectedTag === RUBRIC_NAME && b.type === EvaluationType.RUBRIC) {
                 return true
               }
-              if (selectedTag === PAIRWISE_NAME && b.type === PipelineType.PAIRWISE) {
+              if (selectedTag === PAIRWISE_NAME && b.type === EvaluationType.PAIRWISE) {
                 return true
               }
               return b.tags.includes(selectedTag)

@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { IbmEngineeringSystemsDesignRhapsodyModelManager, List } from '@carbon/react/icons'
 
-import { Benchmark, CriteriaBenchmark, PipelineType } from '@types'
+import { Benchmark, CriteriaBenchmark, EvaluationType } from '@types'
 
 import { useBenchmarksContext } from '../Providers/BenchmarksProvider'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
@@ -17,8 +17,8 @@ import classes from './index.module.scss'
 export const BenchmarkSidenav = () => {
   const { benchmarks } = useBenchmarksContext()
   const { benchmark, selectedCriteriaName, updateURLFromBenchmark } = useURLInfoContext()
-  const rubricBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === PipelineType.RUBRIC), [benchmarks])
-  const pairwiseBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === PipelineType.PAIRWISE), [benchmarks])
+  const rubricBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === EvaluationType.RUBRIC), [benchmarks])
+  const pairwiseBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === EvaluationType.PAIRWISE), [benchmarks])
   const [typeExpanded, setTypeExpanded] = useState<{ rubric: boolean; pairwise: boolean }>({
     rubric: true,
     pairwise: true,

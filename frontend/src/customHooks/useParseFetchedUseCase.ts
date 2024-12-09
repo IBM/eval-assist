@@ -2,7 +2,23 @@ import { useCallback, useMemo } from 'react'
 
 import { usePipelineTypesContext } from '@components/SingleExampleEvaluation/Providers/PipelineTypesProvider'
 import { StoredUseCase } from '@prisma/client'
-import { Pipeline, UseCase, UseCaseV0, UseCaseV1 } from '@types'
+import {
+  DirectAssessmentCriteriaV0,
+  DirectAssessmentCriteriaV1,
+  DirectAssessmentResultsV0,
+  DirectAssessmentResultsV1,
+  EvaluationType,
+  Evaluator,
+  PairwiseComparisonCriteriaV1,
+  PairwiseComparisonResultsV0,
+  PairwiseComparisonResultsV1,
+  ResultsV0,
+  ResultsV1,
+  UseCase,
+  UseCaseV0,
+  UseCaseV1,
+  UseCaseV2,
+} from '@types'
 import { returnByPipelineType } from '@utils/utils'
 
 // EXAMPLES
@@ -19,8 +35,55 @@ import { returnByPipelineType } from '@utils/utils'
 export const useParseFetchedUseCase = () => {
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
 
+  const parseDirectAssessmentResultsV0ToV1 = useCallback(
+    (results: DirectAssessmentResultsV0): DirectAssessmentResultsV1 | null => {
+      return (
+        results?.map((r) => ({
+          positionalBias: r.positionalBias,
+          positionalBiasOption: '',
+          summary: r.explanation,
+          certainty: r.certainty,
+          option: r.option,
+        })) || null
+      )
+    },
+    [],
+  )
+
+  const parsePairwiseComparisonResultsV0ToV1 = useCallback(
+    (results: PairwiseComparisonResultsV0): PairwiseComparisonResultsV1 | null => {
+      const perResponseResults: PairwiseComparisonResultsV1 = {}
+      results !== null
+        ? Object.keys(results.perResponseResults).forEach((key) => {
+            const r = results.perResponseResults[key]
+            perResponseResults[key] = {
+              positionalBias: r.positionalBias || Array(Object.keys(results.perResponseResults).length - 1).fill(false),
+              certainties: r.certainty,
+              comparedTo: r.comparedToIndexes.map((x) => `${x}`),
+              summaries: Object.values(r.explanations),
+              ranking: r.ranking,
+              winrate: r.winrate,
+              contestResults: r.contestResults,
+            }
+          })
+        : null
+      return perResponseResults
+    },
+    [],
+  )
+
+  const parseResultsV0ToV1 = useCallback(
+    (results: ResultsV0, type: EvaluationType): ResultsV1 => {
+      return returnByPipelineType(
+        type,
+        () => parseDirectAssessmentResultsV0ToV1(results as DirectAssessmentResultsV0),
+        () => parsePairwiseComparisonResultsV0ToV1(results as PairwiseComparisonResultsV0),
+      )
+    },
+    [parseDirectAssessmentResultsV0ToV1, parsePairwiseComparisonResultsV0ToV1],
+  )
+
   const parseFetchedUseCaseV0 = useCallback((fetchedUseCase: Record<string, any>): UseCaseV0 => {
-    // initial parsing function from V0
     const type = fetchedUseCase['type']
     const fetchedResults = fetchedUseCase.results
     return {
@@ -41,7 +104,7 @@ export const useParseFetchedUseCase = () => {
         type,
         fetchedResults,
         // newer pairwise results contain a ranking attribute,
-        // is this are old results, discard them
+        // if this are old results, discard them
         fetchedResults === null ? null : 'ranking' in fetchedResults ? fetchedResults : null,
       ),
       pipeline: fetchedUseCase.pipeline,
@@ -76,8 +139,15 @@ export const useParseFetchedUseCase = () => {
     [parseFetchedUseCaseV0],
   )
 
+  const parseFetchedUseCaseV2 = useCallback((fetchedUseCase: Record<string, any>): UseCaseV2 => {
+    return {
+      ...fetchedUseCase,
+      type: returnByPipelineType(fetchedUseCase.type, EvaluationType.RUBRIC, EvaluationType.PAIRWISE),
+    } as UseCaseV2
+  }, [])
+
   // this version changes contextVariables from a list of {variable: string, value: string} to Record<string, string>
-  const parseFetchedUseCaseV0toV1 = useCallback(
+  const parseFetchedUseCaseV0ToV1 = useCallback(
     (fetchedUseCase: UseCaseV0): UseCaseV1 => ({
       ...fetchedUseCase,
       // we are sure that by the time the usecases are being fetched
@@ -85,27 +155,69 @@ export const useParseFetchedUseCase = () => {
       // so casting them to Pipeline[] is safe
       pipeline:
         (
-          returnByPipelineType<typeof rubricPipelines>(
+          returnByPipelineType<typeof rubricPipelines, typeof pairwisePipelines>(
             fetchedUseCase.type,
             rubricPipelines,
             pairwisePipelines,
-          ) as Pipeline[]
+          ) as Evaluator[]
         ).find((pipeline) => pipeline.name === fetchedUseCase.pipeline) ?? null,
     }),
     [pairwisePipelines, rubricPipelines],
   )
 
+  /*
+  Many things change from V1 to V2:
+  - pipeline was renamed to evaluator
+  - criteria fields were renamed
+  - positionalBiasOption was added to the DA results
+  - explanations were renamed to summaries
+  - comparedToIndexes were renamed to comparedTo
+  - p_bias was renamed to positional_bias
+  - results was renamed to perResponseResults in fetched PC results
+  - 
+  */
+  const parseFetchedUseCaseV1ToV2 = useCallback(
+    (useCaseV1: UseCaseV1): UseCaseV2 => {
+      const type = returnByPipelineType(useCaseV1.type, EvaluationType.RUBRIC, EvaluationType.PAIRWISE)
+      const useCaseV2 = {
+        id: useCaseV1.id,
+        name: useCaseV1.name,
+        type: type,
+        contextVariables: useCaseV1.contextVariables,
+        responseVariableName: useCaseV1.responseVariableName,
+        responses: useCaseV1.responses,
+        evaluator: useCaseV1.pipeline,
+        expectedResults: useCaseV1.expectedResults,
+        results: parseResultsV0ToV1(useCaseV1.results, type),
+        criteria: returnByPipelineType<DirectAssessmentCriteriaV1, PairwiseComparisonCriteriaV1>(
+          type,
+          () => ({
+            name: useCaseV1.criteria.name,
+            description: useCaseV1.criteria.criteria,
+            options: (useCaseV1.criteria as DirectAssessmentCriteriaV0).options.map((o) => ({
+              name: o.option,
+              description: o.description,
+            })),
+          }),
+          () => ({ name: useCaseV1.criteria.name, description: useCaseV1.criteria.criteria }),
+        ),
+      }
+      return useCaseV2
+    },
+    [parseResultsV0ToV1],
+  )
+
   const useCaseParsingVersionToVersionFunctions: any[] = useMemo(
-    () => [parseFetchedUseCaseV0toV1],
-    [parseFetchedUseCaseV0toV1],
+    () => [parseFetchedUseCaseV0ToV1, parseFetchedUseCaseV1ToV2],
+    [parseFetchedUseCaseV0ToV1, parseFetchedUseCaseV1ToV2],
   )
 
   const useCaseParsingVersionFunctions = useMemo(
-    () => [parseFetchedUseCaseV0, parseFetchedUseCaseV1],
-    [parseFetchedUseCaseV0, parseFetchedUseCaseV1],
+    () => [parseFetchedUseCaseV0, parseFetchedUseCaseV1, parseFetchedUseCaseV2],
+    [parseFetchedUseCaseV0, parseFetchedUseCaseV1, parseFetchedUseCaseV2],
   )
 
-  const CURRENT_FORMAT_VERSION = useMemo(() => 1, [])
+  const CURRENT_FORMAT_VERSION = useMemo(() => 2, [])
 
   const parseFetchedUseCase = useCallback(
     (fetchedUseCase: StoredUseCase): UseCase => {

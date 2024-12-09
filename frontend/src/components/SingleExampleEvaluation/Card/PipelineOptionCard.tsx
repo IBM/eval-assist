@@ -5,14 +5,14 @@ import { Dispatch, SetStateAction } from 'react'
 
 import { returnByPipelineType } from '@utils/utils'
 
-import { PipelineType } from '../../../types'
+import { EvaluationType } from '../../../types'
 import { Card } from './Card'
 import classes from './PipelineOptionCard.module.scss'
 
 interface PipelineOptionCardProps {
-  type: PipelineType
-  selectedType: PipelineType | null
-  setSelectedType: Dispatch<SetStateAction<PipelineType | null>>
+  type: EvaluationType
+  selectedType: EvaluationType | null
+  setSelectedType: Dispatch<SetStateAction<EvaluationType | null>>
 }
 
 export const PipelineOptionCard = ({ type, selectedType, setSelectedType }: PipelineOptionCardProps) => {

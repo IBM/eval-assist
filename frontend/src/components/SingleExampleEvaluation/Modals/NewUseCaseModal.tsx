@@ -6,7 +6,7 @@ import { Layer, Modal } from '@carbon/react'
 
 import { getEmptyUseCase } from '@utils/utils'
 
-import { PipelineType, UseCase } from '../../../types'
+import { EvaluationType, UseCase } from '../../../types'
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'
 import { usePipelineTypesContext } from '../Providers/PipelineTypesProvider'
 import { useToastContext } from '../Providers/ToastProvider'
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromUseCase }: Props) => {
-  const [selectedType, setSelectedType] = useState<PipelineType | null>(null)
+  const [selectedType, setSelectedType] = useState<EvaluationType | null>(null)
 
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
 
@@ -30,13 +30,13 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
     if (rubricPipelines !== null && pairwisePipelines !== null) {
       updateURLFromUseCase({
         useCase: {
-          ...getEmptyUseCase(selectedType as PipelineType),
-          pipeline: selectedType === PipelineType.RUBRIC ? rubricPipelines[0] : pairwisePipelines[0],
+          ...getEmptyUseCase(selectedType as EvaluationType),
+          evaluator: selectedType === EvaluationType.RUBRIC ? rubricPipelines[0] : pairwisePipelines[0],
         },
         subCatalogName: null,
       })
     } else {
-      updateURLFromUseCase({ useCase: getEmptyUseCase(selectedType as PipelineType), subCatalogName: null })
+      updateURLFromUseCase({ useCase: getEmptyUseCase(selectedType as EvaluationType), subCatalogName: null })
       addToast({
         kind: 'info',
         title: 'Evaluator options are not yet available',
@@ -68,12 +68,12 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
         <p className={'cds--label'}>Select an Evaluation Method</p>
         <div className={classes.cards}>
           <PipelineOptionCard
-            type={PipelineType.RUBRIC}
+            type={EvaluationType.RUBRIC}
             selectedType={selectedType}
             setSelectedType={setSelectedType}
           />
           <PipelineOptionCard
-            type={PipelineType.PAIRWISE}
+            type={EvaluationType.PAIRWISE}
             selectedType={selectedType}
             setSelectedType={setSelectedType}
           />

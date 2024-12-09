@@ -7,23 +7,23 @@ import { Link, Select, SelectItem } from '@carbon/react'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
-import { RubricCriteria, RubricResult, UseCase } from '../../../types'
+import { DirectAssessmentCriteria, DirectAssessmentResult, DirectAssessmentResults, UseCase } from '../../../types'
 import RemovableSection from '../../RemovableSection/RemovableSection'
 import classes from './index.module.scss'
 
 interface Props {
   responses: UseCase['responses']
   setResponses: (responses: UseCase['responses']) => void
-  results: RubricResult[] | null
+  results: DirectAssessmentResults | null
   setResults: (results: UseCase['results']) => void
   explanationOn: boolean
   expectedResultOn: boolean
   setSelectedResultDetails: Dispatch<
-    SetStateAction<{ result: RubricResult | null; expectedResult: string; responseIndex: string }>
+    SetStateAction<{ result: DirectAssessmentResult | null; expectedResult: string; responseIndex: string }>
   >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
-  criteria: RubricCriteria
+  criteria: DirectAssessmentCriteria
   setExpectedResults: (expectedResults: UseCase['expectedResults']) => void
   expectedResults: UseCase['expectedResults']
   gridClasses: {
@@ -58,7 +58,7 @@ export const RubricRows = ({
   }
   const getResultToDisplay = (i: number) => {
     if (results !== null) {
-      return results[i] ? (results[i] as RubricResult).option : ''
+      return results[i] ? (results[i] as DirectAssessmentResult).option : ''
     }
     return ''
   }
@@ -118,7 +118,7 @@ export const RubricRows = ({
                   >
                     <SelectItem key={i} value={''} text={''} />
                     {criteria.options
-                      .map((option) => option.option)
+                      .map((option) => option.name)
                       .map((option, i) => (
                         <SelectItem key={i} text={option} value={option} />
                       ))}
@@ -183,7 +183,7 @@ export const RubricRows = ({
                   {explanationOn && (
                     <FlexTextArea
                       readOnly
-                      value={results[i] !== undefined ? results[i].explanation : undefined}
+                      value={results[i] !== undefined ? results[i].summary : undefined}
                       labelText={''}
                       placeholder=""
                       key={`rubric_${i}_3_${uuid()}`}

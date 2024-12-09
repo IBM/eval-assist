@@ -2,14 +2,14 @@ import { CSSProperties, Dispatch, SetStateAction, useEffect, useState } from 're
 
 import { returnByPipelineType } from '@utils/utils'
 
-import { PairwiseCriteria, PipelineType, RubricCriteria } from '../../../types'
+import { DirectAssessmentCriteria, EvaluationType, PairwiseComparisonCriteria } from '../../../types'
 import { PairwiseCriteriaView } from './PairwiseCriteriaView'
 import { RubricCriteriaView } from './RubricCriteriaView'
 
 interface Props {
-  criteria: RubricCriteria | PairwiseCriteria
-  setCriteria: (criteria: RubricCriteria | PairwiseCriteria) => void
-  type: PipelineType
+  criteria: DirectAssessmentCriteria | PairwiseComparisonCriteria
+  setCriteria: (criteria: DirectAssessmentCriteria | PairwiseComparisonCriteria) => void
+  type: EvaluationType
   toHighlightWords: {
     contextVariables: string[]
     responseVariableName: string
@@ -37,8 +37,8 @@ export const CriteriaView = ({
   return returnByPipelineType(
     type,
     <RubricCriteriaView
-      rubricCriteria={criteria as RubricCriteria}
-      setCriteria={setCriteria as Dispatch<SetStateAction<RubricCriteria>>}
+      rubricCriteria={criteria as DirectAssessmentCriteria}
+      setCriteria={setCriteria as Dispatch<SetStateAction<DirectAssessmentCriteria>>}
       selectedTabIndex={selectedTabIndex}
       setSelectedTabIndex={setSelectedTabIndex}
       toHighlightWords={toHighlightWords}
@@ -46,8 +46,8 @@ export const CriteriaView = ({
       style={style}
     />,
     <PairwiseCriteriaView
-      pairwiseCriteria={criteria as PairwiseCriteria}
-      setCriteria={setCriteria as Dispatch<SetStateAction<PairwiseCriteria>>}
+      pairwiseCriteria={criteria as PairwiseComparisonCriteria}
+      setCriteria={setCriteria as Dispatch<SetStateAction<PairwiseComparisonCriteria>>}
       selectedTabIndex={selectedTabIndex}
       setSelectedTabIndex={setSelectedTabIndex}
       toHighlightWords={toHighlightWords}

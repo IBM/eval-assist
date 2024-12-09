@@ -7,7 +7,7 @@ import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
 // @ts-ignore
 import { TreeNode, TreeView } from '@carbon/react'
-import { ChevronLeft, Compare, List } from '@carbon/react/icons'
+import { ChevronLeft, Compare } from '@carbon/react/icons'
 
 import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
 
@@ -24,9 +24,11 @@ interface Props {
 export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
   const { rubricLibraryTestCases, pairwiseLibraryTestCases } = useLibraryTestCases()
 
-  const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean } & { [key: string]: boolean }>({
-    rubric: true,
-    pairwise: true,
+  const [expanded, setExpanded] = useState<
+    { direct_assessment: boolean; pairwise_comparison: boolean } & { [key: string]: boolean }
+  >({
+    direct_assessment: true,
+    pairwise_comparison: true,
     ...Object.keys(rubricLibraryTestCases).reduce((acc, item, index) => ({ ...acc, [item]: true }), {}),
   })
 
@@ -37,6 +39,7 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
       ? [`${preloadedUseCase.name}_${preloadedUseCase.type}`]
       : []
   }, [preloadedUseCase])
+
   const handleToggle = (key: string) =>
     setExpanded({
       ...expanded,
@@ -61,11 +64,11 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
         <div className={classes.treeWrapper}>
           <TreeView label="" selected={selectedNode}>
             <TreeNode
-              key={'rubric'}
+              key={'direct_assessment'}
               label={RUBRIC_NAME}
-              onSelect={() => handleToggle('rubric')}
-              onToggle={() => handleToggle('rubric')}
-              isExpanded={expanded.pairwise}
+              onSelect={() => handleToggle('direct_assessment')}
+              onToggle={() => handleToggle('direct_assessment')}
+              isExpanded={expanded.pairwise_comparison}
             >
               {rubricLibraryTestCases.map((useCase, i) => (
                 <TreeNode
@@ -75,19 +78,20 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
                       <LinkButton useCase={useCase} />
                     </div>
                   }
-                  key={`${useCase.name}_rubric`}
-                  id={`${useCase.name}_rubric`}
+                  key={`${useCase.name}_direct_assessment`}
+                  id={`${useCase.name}_direct_assessment`}
+                  selected={selectedNode}
                   renderIcon={Compare}
                   onClick={(e: any) => onClick(e, useCase)}
                 />
               ))}
             </TreeNode>
             <TreeNode
-              key={'all_vs_all_pairwise'}
+              key={'pairwise_comparison'}
               label={PAIRWISE_NAME}
-              onSelect={() => handleToggle('all_vs_all_pairwise')}
-              onToggle={() => handleToggle('all_vs_all_pairwise')}
-              isExpanded={expanded.pairwise}
+              onSelect={() => handleToggle('pairwise_comparison')}
+              onToggle={() => handleToggle('pairwise_comparison')}
+              isExpanded={expanded.pairwise_comparison}
             >
               {pairwiseLibraryTestCases.map((useCase, i) => (
                 <TreeNode
@@ -97,8 +101,8 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
                       <LinkButton useCase={useCase} />
                     </div>
                   }
-                  key={`${useCase.name}_all_vs_all_pairwise`}
-                  id={`${useCase.name}_all_vs_all_pairwise`}
+                  key={`${useCase.name}_pairwise_comparison`}
+                  id={`${useCase.name}_pairwise_comparison`}
                   renderIcon={Compare}
                   onClick={(e: any) => onClick(e, useCase)}
                 />

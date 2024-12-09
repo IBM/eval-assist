@@ -1,11 +1,9 @@
-import cx from 'classnames'
-
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-import { Layer, Link, Loading, Modal, Select, SelectItem, SelectItemGroup } from '@carbon/react'
+import { Loading, Modal, Select, SelectItem } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { ModelProviderCredentials, ModelProviderType, PipelineType, UseCaseV1 } from '@types'
+import { EvaluationType, ModelProviderCredentials, ModelProviderType, UseCase } from '@types'
 import { getCriteria, toSnakeCase } from '@utils/utils'
 
 import classes from './PromptModal.module.scss'
@@ -13,7 +11,7 @@ import classes from './PromptModal.module.scss'
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  currentUseCase: UseCaseV1 | null
+  currentUseCase: UseCase | null
   modelProviderCredentials: ModelProviderCredentials
 }
 
@@ -30,9 +28,9 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
         // check if criteria description changed and criteria name didn't
         const harmsAndRiskCriteria = getCriteria(
           `${toSnakeCase(currentUseCase.criteria.name)}>${toSnakeCase(currentUseCase.responseVariableName)}`,
-          PipelineType.RUBRIC,
+          EvaluationType.RUBRIC,
         )
-        if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.criteria !== currentUseCase.criteria.criteria) {
+        if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.description !== currentUseCase.criteria.description) {
           // the tokenizer of granite guardian will complain if we send a predefined criteria name
           // with a custom description.
           parsedCriteria.name = `${parsedCriteria.name}_variation`
@@ -46,13 +44,12 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
         let body: any = {
           context_variables: parsedContextVariables,
           responses: currentUseCase.responses,
-          pipeline: currentUseCase.pipeline?.name,
-          provider: currentUseCase.pipeline?.provider,
+          pipeline: currentUseCase.evaluator?.name,
+          provider: currentUseCase.evaluator?.provider,
           criteria: parsedCriteria,
           type: currentUseCase.type,
           response_variable_name: currentUseCase.responseVariableName,
-          llm_provider_credentials:
-            modelProviderCredentials[currentUseCase.pipeline?.provider || ModelProviderType.BAM],
+          llm_provider_credentials: modelProviderCredentials[ModelProviderType.WATSONX],
         }
 
         const prompts = await (await post('prompt/', body)).json()

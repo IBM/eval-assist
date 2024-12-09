@@ -17,7 +17,7 @@ import {
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
-import { CriteriaBenchmark, EvaluatorBenchmark, PipelineType, Version } from '@types'
+import { CriteriaBenchmark, EvaluationType, EvaluatorBenchmark, Version } from '@types'
 import { getCriteria } from '@utils/utils'
 
 import classes from './CriteriaBenchmarkCard.module.scss'
@@ -41,7 +41,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
   const [criteriaDetailsModal, setCriteriaDetailsModal] = useState(false)
   const [showAllVersions, setShowAllVersions] = useState(true)
   const criteria = useMemo(
-    () => getCriteria(criteriaBenchmark.name, benchmark?.type as PipelineType),
+    () => getCriteria(criteriaBenchmark.name, benchmark?.type as EvaluationType),
     [benchmark?.type, criteriaBenchmark.name],
   )
 

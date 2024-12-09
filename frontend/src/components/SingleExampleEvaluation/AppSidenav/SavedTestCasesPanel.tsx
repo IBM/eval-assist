@@ -9,7 +9,7 @@ import { IconButton } from '@carbon/react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 
-import { PipelineType, UseCase } from '../../../types'
+import { EvaluationType, UseCase } from '../../../types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import { LinkButton } from './LinkButton'
 import classes from './TwoLevelsPanel.module.scss'
@@ -32,8 +32,14 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
     pairwise: true,
   })
 
-  const rubricTestCases = useMemo(() => userUseCases.filter((u) => u.type === PipelineType.RUBRIC), [userUseCases])
-  const pairwiseTestCases = useMemo(() => userUseCases.filter((u) => u.type === PipelineType.PAIRWISE), [userUseCases])
+  const directAssessmentTestCases = useMemo(
+    () => userUseCases.filter((u) => u.type === EvaluationType.RUBRIC),
+    [userUseCases],
+  )
+  const pairwiseComparisonTestCases = useMemo(
+    () => userUseCases.filter((u) => u.type === EvaluationType.PAIRWISE),
+    [userUseCases],
+  )
 
   const handleToggle = (key: 'rubric' | 'pairwise') =>
     setExpanded({
@@ -64,10 +70,10 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
                     onToggle={() => handleToggle('rubric')}
                     isExpanded={expanded['rubric']}
                   >
-                    {rubricTestCases.length === 0 ? (
+                    {directAssessmentTestCases.length === 0 ? (
                       <p className={classes['empty-message']}>Empty</p>
                     ) : (
-                      rubricTestCases.map((useCase) => (
+                      directAssessmentTestCases.map((useCase) => (
                         <TreeNode
                           onSelect={() => {
                             onUseCaseClick(useCase)
@@ -93,10 +99,10 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
                     onToggle={() => handleToggle('pairwise')}
                     isExpanded={expanded['pairwise']}
                   >
-                    {pairwiseTestCases.length === 0 ? (
+                    {pairwiseComparisonTestCases.length === 0 ? (
                       <p className={classes['empty-message']}>Empty</p>
                     ) : (
-                      pairwiseTestCases.map((useCase) => (
+                      pairwiseComparisonTestCases.map((useCase) => (
                         <TreeNode
                           onSelect={() => {
                             onUseCaseClick(useCase)

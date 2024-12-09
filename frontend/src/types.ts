@@ -1,13 +1,20 @@
-export interface RubricResult {
+export interface DirectAssessmentResultV0 {
   name: string
   option: string
-  positionalBiasOption: string
   explanation: string
   positionalBias: boolean
   certainty: number
 }
 
-export interface PerResponsePairwiseResult {
+export interface DirectAssessmentResultV1 extends Omit<DirectAssessmentResultV0, 'certainty' | 'name' | 'explanation'> {
+  positionalBiasOption: string
+  certainty: FetchedDirectAssessmentResultV1['certainty']
+  summary: string
+}
+
+export type DirectAssessmentResult = DirectAssessmentResultV1
+
+export interface PerResponsePairwiseResultV0 {
   contestResults: boolean[]
   comparedToIndexes: number[]
   explanations: { [key: string]: string }
@@ -17,69 +24,128 @@ export interface PerResponsePairwiseResult {
   ranking: number
 }
 
-export interface PairwiseResults {
+export interface PerResponsePairwiseResultV1
+  extends Omit<PerResponsePairwiseResultV0, 'comparedToIndexes' | 'explanations' | 'certainty'> {
+  comparedTo: string[]
+  summaries: FetchedPerResponsePairwiseResultV1['summaries']
+  certainties: FetchedPerResponsePairwiseResultV1['certainties']
+}
+
+export type PerResponsePairwiseResult = PerResponsePairwiseResultV1
+
+export interface PairwiseComparisonResultsV0 {
   perResponseResults: {
-    [key: string]: PerResponsePairwiseResult
+    [key: string]: PerResponsePairwiseResultV0
   }
   ranking: number[]
 }
 
-export interface FetchedRubricResult {
+export type PairwiseComparisonResultsV1 = { [key: string]: PerResponsePairwiseResultV1 }
+
+export type PairwiseComparisonResults = PairwiseComparisonResultsV1
+
+export interface FetchedDirectAssessmentResultV0 {
+  name: string
   option: string
-  summary: string
+  explanation: string
+  p_bias: boolean
   certainty: number
+}
+
+export interface FetchedDirectAssessmentResultV1
+  extends Omit<FetchedDirectAssessmentResultV0, 'p_bias' | 'explanation' | 'name' | 'certainty'> {
+  summary: string
   positional_bias: boolean
   positional_bias_option: string
+  certainty?: number
 }
 
-export interface FetchedPairwiseResults {
-  results: {
-    [key: string]: {
-      contest_results: boolean[]
-      compared_to: number[]
-      summaries: { [key: string]: string }
-      positional_bias?: boolean[]
-      certainty: number[]
-      winrate: number
-      ranking: number
-    }
+export type FetchedDirectAssessmentResultsV0 = FetchedDirectAssessmentResultV0[]
+export type FetchedDirectAssessmentResultsV1 = FetchedDirectAssessmentResultV1[]
+export type FetchedDirectAssessmentResults = FetchedDirectAssessmentResultsV1
+
+export type DirectAssessmentResultsV0 = DirectAssessmentResultV0[]
+export type DirectAssessmentResultsV1 = DirectAssessmentResultV1[]
+export type DirectAssessmentResults = DirectAssessmentResultsV1
+
+interface FetchedPerResponsePairwiseResultV0 {
+  contest_results: boolean[]
+  compared_to_indexes: number[]
+  explanations: { [key: string]: string }
+  p_bias?: boolean[]
+  certainty: number[]
+  winrate: number
+  ranking: number
+}
+
+interface FetchedPerResponsePairwiseResultV1
+  extends Omit<FetchedPerResponsePairwiseResultV0, 'compared_to_indexes' | 'explanations' | 'p_bias' | 'certainty'> {
+  compared_to: string[]
+  summaries: string[]
+  certainties?: number[]
+  positional_bias: boolean[]
+}
+
+export interface FetchedPairwiseComparisonResultsV0 {
+  perResponseResults: {
+    [key: string]: FetchedPerResponsePairwiseResultV0
   }
+  ranking: number[]
 }
 
-export interface FetchedResults {
-  results: FetchedRubricResult[] | FetchedPairwiseResults
+export type FetchedPairwiseComparisonResultsV1 = {
+  [key: string]: FetchedPerResponsePairwiseResultV1
 }
 
-export interface Option {
+export type FetchedPairwiseComparisonResults = FetchedPairwiseComparisonResultsV1
+
+export type FetchedResultsV0 = FetchedDirectAssessmentResultsV0 | FetchedPairwiseComparisonResultsV0 | null
+
+export type FetchedResultsV1 = FetchedDirectAssessmentResultsV1 | FetchedPairwiseComparisonResultsV1 | null
+
+export type ResultsV0 = DirectAssessmentResultsV0 | PairwiseComparisonResultsV0 | null
+export type ResultsV1 = DirectAssessmentResultsV1 | PairwiseComparisonResultsV1 | null
+
+export interface OptionV0 {
   option: string
   description: string
 }
 
+export interface OptionV1 {
+  name: string
+  description: string
+}
+
+export type Option = OptionV1
+
 export interface UseCaseV0 {
   id: number | null
   name: string
-  type: PipelineType
+  type: EvaluationType
   contextVariables: { variable: string; value: string }[]
   responseVariableName: string
   responses: string[]
-  criteria: RubricCriteria | PairwiseCriteria
-  results: RubricResult[] | PairwiseResults | null
+  criteria: DirectAssessmentCriteriaV0 | PairwiseComparisonCriteriaV0
+  results: ResultsV0
   expectedResults: null | string[]
   pipeline: string | null
 }
 
-// export interface UseCaseV1 extends Omit<UseCaseV0, 'contextVariables'> {
-//   contextVariables: Record<string, string>
-// }
-
 export interface UseCaseV1 extends Omit<UseCaseV0, 'pipeline'> {
-  pipeline: Pipeline | null
+  pipeline: Evaluator | null
 }
 
-export type UseCase = UseCaseV1
+export interface UseCaseV2 extends Omit<UseCaseV1, 'criteria' | 'pipeline' | 'results'> {
+  evaluator: Evaluator | null
+  criteria: DirectAssessmentCriteriaV1 | PairwiseComparisonCriteriaV1
+  results: ResultsV1
+}
 
-export enum PipelineType {
+export type UseCase = UseCaseV2
+
+export enum EvaluationType {
   RUBRIC = 'direct_assessment',
+  OLD_RUBRIC = 'rubric',
   PAIRWISE = 'pairwise_comparison',
   OLD_PAIRWISE = 'pairwise',
   OLD_ALL_VS_ALL_PAIRWISE = 'all_vs_all_pairwise',
@@ -87,21 +153,30 @@ export enum PipelineType {
 
 export enum ModelProviderType {
   WATSONX = 'watsonx',
-  BAM = 'bam',
   OPENAI = 'openai',
   RITS = 'rits',
 }
 
-export interface Pipeline {
+export interface Evaluator {
   name: string
-  type: PipelineType
+  type: EvaluationType
   provider: ModelProviderType
 }
 
-export interface FetchedPipeline {
+export interface FetchedEvaluatorV0 {
+  name: string
+  model_id: string
+  type: EvaluationType
+  version: string
+  providers: ModelProviderType[]
+}
+
+export interface FetchedEvaluatorV1 extends Omit<FetchedEvaluatorV0, 'model_id' | 'version' | 'type'> {
   name: string
   providers: ModelProviderType[]
 }
+
+export type FetchedEvaluator = FetchedEvaluatorV1
 
 export interface Dataset {
   name: string
@@ -123,22 +198,35 @@ export interface Benchmark {
   name: string
   description: string
   link?: string
-  type: PipelineType // rubric or pairwise
+  type: EvaluationType // rubric or pairwise
   dataset: Dataset
   criteriaBenchmarks: CriteriaBenchmark[]
   tags: string[]
 }
 
-export type RubricCriteria = {
+export type DirectAssessmentCriteriaV0 = {
   name: string
   criteria: string
-  options: Option[]
+  options: OptionV0[]
 }
 
-export interface PairwiseCriteria {
+export interface DirectAssessmentCriteriaV1 extends Omit<DirectAssessmentCriteriaV0, 'criteria' | 'options'> {
+  description: string
+  options: OptionV1[]
+}
+
+export type DirectAssessmentCriteria = DirectAssessmentCriteriaV1
+
+export interface PairwiseComparisonCriteriaV0 {
   name: string
   criteria: string
 }
+
+export interface PairwiseComparisonCriteriaV1 extends Omit<PairwiseComparisonCriteriaV0, 'criteria'> {
+  description: string
+}
+
+export type PairwiseComparisonCriteria = PairwiseComparisonCriteriaV1
 
 export class Version {
   version: string
@@ -163,9 +251,6 @@ export const badgeColorsArray = ['red', 'magenta', 'cyan', 'teal', 'green', 'blu
 export type BadgeColor = (typeof badgeColorsArray)[number]
 
 export type ModelProviderCredentials = {
-  bam: {
-    api_key: string
-  }
   watsonx: {
     apikey: string
     project_id: string

@@ -9,12 +9,13 @@ import { EditableTag } from '@components/EditableTag'
 import { returnByPipelineType } from '@utils/utils'
 
 import {
-  PairwiseCriteria,
-  PairwiseResults,
+  DirectAssessmentCriteria,
+  DirectAssessmentResult,
+  DirectAssessmentResults,
+  EvaluationType,
+  PairwiseComparisonCriteria,
+  PairwiseComparisonResults,
   PerResponsePairwiseResult,
-  PipelineType,
-  RubricCriteria,
-  RubricResult,
   UseCase,
 } from '../../../types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
@@ -27,19 +28,19 @@ interface Props {
   setResponses: (responses: UseCase['responses']) => void
   style?: CSSProperties
   className?: string
-  type: PipelineType
+  type: EvaluationType
   results: UseCase['results']
   setResults: (results: UseCase['results']) => void
   evaluationRunning: boolean
   setSelectedResultDetails: Dispatch<
     SetStateAction<{
-      result: RubricResult | PerResponsePairwiseResult | null
+      result: DirectAssessmentResult | PerResponsePairwiseResult | null
       expectedResult: string
       responseIndex: string
     }>
   >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
-  criteria: RubricCriteria | PairwiseCriteria
+  criteria: DirectAssessmentCriteria | PairwiseComparisonCriteria
   expectedResults: UseCase['expectedResults']
   setExpectedResults: (expectedResults: UseCase['expectedResults']) => void
   responseVariableName: string
@@ -63,14 +64,16 @@ export const Responses = ({
   responseVariableName,
   setResponseVariableName,
 }: Props) => {
-  const [explanationOn, setExplanationOn] = useState(type === PipelineType.RUBRIC)
+  const [explanationOn, setExplanationOn] = useState(type === EvaluationType.RUBRIC)
   const [expectedResultOn, setExpectedResultOn] = useState(true)
 
   const { isRisksAndHarms } = useURLInfoContext()
 
   const pairwiseWinnerIndex = useMemo(() => {
-    if (results === null || type !== PipelineType.PAIRWISE) return null
-    return (results as PairwiseResults).ranking.indexOf(0)
+    if (results === null || type !== EvaluationType.PAIRWISE) return null
+    return Object.values(results as PairwiseComparisonResults)
+      .map((r) => r.ranking)
+      .indexOf(1)
   }, [results, type])
 
   const rubricGridClasses = useMemo(
@@ -101,9 +104,9 @@ export const Responses = ({
 
   const noPositionalBias = useMemo(() => {
     if (results === null) return
-    return type === PipelineType.RUBRIC
-      ? (results as RubricResult[])?.every((result) => result.positionalBias == false)
-      : Object.values((results as PairwiseResults)?.perResponseResults).every((perResponseResults) =>
+    return type === EvaluationType.RUBRIC
+      ? (results as DirectAssessmentResults)?.every((result) => result.positionalBias == false)
+      : Object.values(results as PairwiseComparisonResults).every((perResponseResults) =>
           perResponseResults.positionalBias.every((pBias) => pBias === false),
         )
   }, [results, type])
@@ -111,7 +114,7 @@ export const Responses = ({
   const onAddResponse = () => {
     setResponses([...responses, ''])
     expectedResults !== null && setExpectedResults([...expectedResults, ''])
-    if (type === PipelineType.PAIRWISE) {
+    if (type === EvaluationType.PAIRWISE) {
     }
   }
 
@@ -147,7 +150,7 @@ export const Responses = ({
                 <strong className={classes.headerTypography}>{'Result'}</strong>
               </div>
             )}
-            {results !== null && !evaluationRunning && explanationOn && type === PipelineType.RUBRIC && (
+            {results !== null && !evaluationRunning && explanationOn && type === EvaluationType.RUBRIC && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
                 <strong className={cx(classes.headerTypography)}>{'Explanation'}</strong>
               </div>
@@ -158,18 +161,22 @@ export const Responses = ({
             <RubricRows
               responses={responses}
               setResponses={setResponses}
-              results={results as RubricResult[]}
+              results={results as DirectAssessmentResults}
               setResults={setResults}
               explanationOn={explanationOn}
               expectedResultOn={expectedResultOn}
               setSelectedResultDetails={
                 setSelectedResultDetails as Dispatch<
-                  SetStateAction<{ result: RubricResult | null; expectedResult: string; responseIndex: string }>
+                  SetStateAction<{
+                    result: DirectAssessmentResult | null
+                    expectedResult: string
+                    responseIndex: string
+                  }>
                 >
               }
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               evaluationRunning={evaluationRunning}
-              criteria={criteria as RubricCriteria}
+              criteria={criteria as DirectAssessmentCriteria}
               expectedResults={expectedResults}
               setExpectedResults={setExpectedResults}
               gridClasses={rubricGridClasses}
@@ -177,7 +184,7 @@ export const Responses = ({
             <PairwiseRows
               responses={responses}
               setResponses={setResponses}
-              results={results as PairwiseResults}
+              results={results as PairwiseComparisonResults}
               setResults={setResults}
               explanationOn={explanationOn}
               expectedResultOn={expectedResultOn}
@@ -213,7 +220,7 @@ export const Responses = ({
         </p>
       ) : null}
       <div className={classes.toggles}>
-        {results !== null && !evaluationRunning && type === PipelineType.RUBRIC && (
+        {results !== null && !evaluationRunning && type === EvaluationType.RUBRIC && (
           <Toggle
             labelText={'Show Explanation'}
             toggled={explanationOn}

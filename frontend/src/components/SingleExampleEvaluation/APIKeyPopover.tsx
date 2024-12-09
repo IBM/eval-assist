@@ -55,40 +55,6 @@ export const APIKeyPopover = ({
           </p>
           <div className={classes.bottomDivider} />
           <div className={cx(classes.modelProvider)}>
-            <p className={cx(classes.modelProviderName)}>BAM</p>
-            <Layer>
-              <div className={cx(classes.credential)}>
-                <div className={cx(classes.credentialLabel, 'cds--label')}>API key: </div>
-                <TextInput
-                  ref={apiKeyInputRef}
-                  id={'bam-api-key-input'}
-                  labelText=""
-                  value={modelProviderCrentials.bam.api_key}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setModelProviderCredentials({
-                      ...modelProviderCrentials,
-                      bam: { api_key: e.target.value },
-                    })
-                  }
-                  autoComplete="off"
-                  className={classes['api-key-password-style']}
-                />
-              </div>
-            </Layer>
-            <p className="cds--form__helper-text">
-              {"Don't have a key? Get one "}
-              <Link
-                href={'https://bam.res.ibm.com/'}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: 'none' }}
-              >
-                {'here'}
-              </Link>
-            </p>
-          </div>
-          <div className={classes.bottomDivider} />
-          <div className={cx(classes.modelProvider)}>
             <p className={cx(classes.modelProviderName)}>Watsonx</p>
             <Layer>
               <div className={cx(classes.credential)}>
@@ -163,7 +129,7 @@ export const APIKeyPopover = ({
             <p className="cds--form__helper-text">
               {"Don't have a key? Get one "}
               <Link
-                href={'https://platform.openai.com/api-keys'}
+                href={'https://rits.fmaas.res.ibm.com/'}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ textDecoration: 'none' }}

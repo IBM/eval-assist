@@ -16,17 +16,17 @@ import {
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 
 import { HighlightTextArea } from '@components/HighlightTextArea'
+import { DirectAssessmentCriteria } from '@types'
 import { isInstanceOfRubricCriteria } from '@utils/utils'
 
-import { RubricCriteria } from '../../../types'
 import { JSONTextArea } from '../JSONTextArea'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import classes from '../SingleExampleEvaluation.module.scss'
 import customClasses from './index.module.scss'
 
 interface EvaluationCriteriaProps {
-  rubricCriteria: RubricCriteria
-  setCriteria: Dispatch<SetStateAction<RubricCriteria>>
+  rubricCriteria: DirectAssessmentCriteria
+  setCriteria: Dispatch<SetStateAction<DirectAssessmentCriteria>>
   selectedTabIndex: number
   setSelectedTabIndex: Dispatch<SetStateAction<number>>
   toHighlightWords: {
@@ -130,7 +130,7 @@ export const RubricCriteriaView = ({
                         key="criteria-description-rubric"
                         labelText="Criteria"
                         toHighlightWords={toHighlightWords}
-                        value={rubricCriteria.criteria}
+                        value={rubricCriteria.description}
                         className={customClasses.criteriaText}
                         isTextInput={false}
                         isTextArea={true}
@@ -140,7 +140,7 @@ export const RubricCriteriaView = ({
                         onValueChange={(value: string) =>
                           setCriteria({
                             ...rubricCriteria,
-                            criteria: value,
+                            description: value,
                           })
                         }
                         // readOnly={isRisksAndHarms}
@@ -149,14 +149,14 @@ export const RubricCriteriaView = ({
                         <div key={i} className={customClasses.optionsGrid}>
                           <TextInput
                             labelText="Option"
-                            value={scale.option}
+                            value={scale.name}
                             placeholder="Answer"
                             onChange={(e) =>
                               setCriteria({
                                 ...rubricCriteria,
                                 options: [
                                   ...rubricCriteria.options.slice(0, i),
-                                  { option: e.target.value, description: rubricCriteria.options[i].description },
+                                  { name: e.target.value, description: rubricCriteria.options[i].description },
                                   ...rubricCriteria.options.slice(i + 1),
                                 ],
                               })
@@ -180,7 +180,7 @@ export const RubricCriteriaView = ({
                                 ...rubricCriteria,
                                 options: [
                                   ...rubricCriteria.options.slice(0, i),
-                                  { option: scale.option, description: value },
+                                  { name: scale.name, description: value },
                                   ...rubricCriteria.options.slice(i + 1),
                                 ],
                               })
@@ -212,7 +212,7 @@ export const RubricCriteriaView = ({
                         onClick={() =>
                           setCriteria({
                             ...rubricCriteria,
-                            options: [...rubricCriteria.options, { option: '', description: '' }],
+                            options: [...rubricCriteria.options, { name: '', description: '' }],
                           })
                         }
                         renderIcon={Add}

@@ -1,8 +1,6 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 
-import { useRouter } from 'next/router'
-
-import { Button, ComposedModal, Modal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
+import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 
 import { UseCase } from '../../../types'
 

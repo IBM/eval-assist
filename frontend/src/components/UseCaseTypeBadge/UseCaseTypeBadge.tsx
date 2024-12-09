@@ -7,11 +7,11 @@ import { Tag } from '@carbon/react'
 
 import { returnByPipelineType } from '@utils/utils'
 
-import { PipelineType } from '../../types'
+import { EvaluationType } from '../../types'
 import classes from './UseCaseTypeBadge.module.scss'
 
 interface Props {
-  type: PipelineType
+  type: EvaluationType
   style?: CSSProperties
   className?: string
   size?: 'sm' | 'md' | 'lg'

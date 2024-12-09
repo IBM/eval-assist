@@ -2,7 +2,7 @@ import { ReactNode, createContext, useCallback, useContext, useMemo, useState } 
 
 import { useRouter } from 'next/router'
 
-import { Benchmark, CriteriaBenchmark, PipelineType } from '@types'
+import { Benchmark, CriteriaBenchmark, EvaluationType } from '@types'
 import { stringifyQueryParams } from '@utils/utils'
 
 import { useBenchmarksContext } from './BenchmarksProvider'
@@ -35,7 +35,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
 
   const benchmark = useMemo(() => {
     const urlBenchmark = router.query.benchmark ? (router.query.benchmark as string) : null
-    const urlType: PipelineType | null = router.query.type ? (router.query.type as PipelineType) : null
+    const urlType: EvaluationType | null = router.query.type ? (router.query.type as EvaluationType) : null
     const criteriaName = router.query.criteriaName ? (router.query.criteriaName as string) : null
     if (urlBenchmark !== null && urlType !== null) {
       const selectedBenchmark = benchmarks.find((b) => b.name === urlBenchmark && b.type === urlType) as Benchmark

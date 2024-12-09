@@ -16,16 +16,16 @@ import {
 import { Edit, Save } from '@carbon/react/icons'
 
 import { HighlightTextArea } from '@components/HighlightTextArea'
+import { PairwiseComparisonCriteria } from '@types'
 import { isInstanceOfPairwiseCriteria } from '@utils/utils'
 
-import { PairwiseCriteria } from '../../../types'
 import { JSONTextArea } from '../JSONTextArea'
 import classes from '../SingleExampleEvaluation.module.scss'
 import customClasses from './index.module.scss'
 
 interface EvaluationCriteriaProps {
-  pairwiseCriteria: PairwiseCriteria
-  setCriteria: Dispatch<SetStateAction<PairwiseCriteria>>
+  pairwiseCriteria: PairwiseComparisonCriteria
+  setCriteria: Dispatch<SetStateAction<PairwiseComparisonCriteria>>
   selectedTabIndex: number
   setSelectedTabIndex: Dispatch<SetStateAction<number>>
   toHighlightWords: {
@@ -129,7 +129,7 @@ export const PairwiseCriteriaView = ({
                         key="criteria-description-rubric"
                         labelText="Criteria"
                         toHighlightWords={toHighlightWords}
-                        value={pairwiseCriteria.criteria}
+                        value={pairwiseCriteria.description}
                         className={customClasses.criteriaText}
                         isTextInput={false}
                         isTextArea={true}
@@ -139,7 +139,7 @@ export const PairwiseCriteriaView = ({
                         onValueChange={(value: string) =>
                           setCriteria({
                             ...pairwiseCriteria,
-                            criteria: value,
+                            description: value,
                           })
                         }
                       />

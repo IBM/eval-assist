@@ -1,7 +1,5 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 
-import { useRouter } from 'next/router'
-
 import { Modal } from '@carbon/react'
 
 interface Props {

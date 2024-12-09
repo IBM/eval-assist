@@ -6,25 +6,25 @@ import { Layer, Link, ListItem, Modal, UnorderedList } from '@carbon/react'
 
 import { getOrdinalSuffix, toPercentage } from '@utils/utils'
 
-import { PerResponsePairwiseResult, PipelineType, RubricResult } from '../../../types'
+import { DirectAssessmentResult, EvaluationType, PerResponsePairwiseResult } from '../../../types'
 import classes from './ResultDetailsModal.module.scss'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   selectedResultDetails: {
-    result: RubricResult | PerResponsePairwiseResult | null
+    result: DirectAssessmentResult | PerResponsePairwiseResult | null
     expectedResult: string
     responseIndex: string
   }
   setSelectedResultDetails: Dispatch<
     SetStateAction<{
-      result: RubricResult | PerResponsePairwiseResult | null
+      result: DirectAssessmentResult | PerResponsePairwiseResult | null
       expectedResult: string
       responseIndex: string
     }>
   >
-  type: PipelineType
+  type: EvaluationType
 }
 
 export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSelectedResultDetails, type }: Props) => {
@@ -37,16 +37,16 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
     if (selectedResultDetails.result === null) return null
 
     let pb: string
-    if (type === PipelineType.RUBRIC) {
-      pb = `${(selectedResultDetails.result as RubricResult)?.positionalBias}`
+    if (type === EvaluationType.RUBRIC) {
+      pb = `${(selectedResultDetails.result as DirectAssessmentResult)?.positionalBias}`
     } else {
       pb = `${(selectedResultDetails.result as PerResponsePairwiseResult).positionalBias.some(
         (pBias) => pBias === true,
       )}`
     }
     pb = pb.charAt(0).toUpperCase() + pb.slice(1) + ' '
-    if (type === PipelineType.RUBRIC && (selectedResultDetails.result as RubricResult)?.positionalBias) {
-      pb += `/ '${(selectedResultDetails.result as RubricResult).positionalBiasOption}' was selected `
+    if (type === EvaluationType.RUBRIC && (selectedResultDetails.result as DirectAssessmentResult)?.positionalBias) {
+      pb += `/ '${(selectedResultDetails.result as DirectAssessmentResult).positionalBiasOption}' was selected `
     }
     return pb
   }, [selectedResultDetails, type])
@@ -61,7 +61,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
         modalHeading={`Result details: Response ${selectedResultDetails.responseIndex}`}
       >
         <Layer style={{ display: 'flex', flexDirection: 'column' }}>
-          {type === PipelineType.RUBRIC && (
+          {type === EvaluationType.RUBRIC && (
             <>
               {selectedResultDetails.expectedResult !== '' && (
                 <p style={{ marginBottom: '0.5rem' }}>
@@ -70,7 +70,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
                 </p>
               )}
               <p style={{ marginBottom: '0.5rem' }}>
-                <strong>{'Result: '}</strong> {(selectedResultDetails.result as RubricResult).option}
+                <strong>{'Result: '}</strong> {(selectedResultDetails.result as DirectAssessmentResult).option}
               </p>
               <p style={{ marginBottom: '0.5rem' }}>
                 <strong>Positional bias:</strong>{' '}
@@ -89,7 +89,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
                 </Link>
               </p>
               <p style={{ marginBottom: '0.5rem' }}>
-                <strong>Explanation:</strong> {(selectedResultDetails.result as RubricResult).explanation}
+                <strong>Explanation:</strong> {(selectedResultDetails.result as DirectAssessmentResult).summary}
               </p>
               {/* {selectedResultDetails.result.certainty && (
                 <p style={{ marginBottom: '0.5rem' }}>
@@ -108,7 +108,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
             </>
           )}
 
-          {type === PipelineType.PAIRWISE && (
+          {type === EvaluationType.PAIRWISE && (
             <>
               <p style={{ marginBottom: '0.5rem' }}>
                 <strong>{'Ranking: '}</strong>
@@ -171,14 +171,14 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
                 </p>
 
                 <UnorderedList>
-                  {Object.values((selectedResultDetails.result as PerResponsePairwiseResult).explanations).map(
+                  {Object.values((selectedResultDetails.result as PerResponsePairwiseResult).summaries).map(
                     (explanation, i) => (
                       <ListItem key={i}>
                         <>
                           <p key={i} className={classes.explanation}>
                             <strong>
                               {`Against response ${
-                                (selectedResultDetails.result as PerResponsePairwiseResult).comparedToIndexes[i]
+                                (selectedResultDetails.result as PerResponsePairwiseResult).comparedTo[i]
                               }: `}
                             </strong>
                             {explanation}

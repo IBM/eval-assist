@@ -1,11 +1,20 @@
 import { pairwiseCriteriaLibrary, rubricCriteriaLibrary } from 'src/libraries/CriteriaLibrary'
 
-import { Option, PairwiseCriteria, PairwiseResults, PipelineType, RubricCriteria, UseCase, UseCaseV0 } from '@types'
+import {
+  DirectAssessmentCriteria,
+  EvaluationType,
+  Option,
+  PairwiseComparisonCriteria,
+  PairwiseComparisonResults,
+  PairwiseComparisonResultsV1,
+  UseCase,
+  UseCaseV0,
+} from '@types'
 
 export const isInstanceOfOption = (obj: any): obj is Option =>
   typeof obj.option === 'string' && typeof obj.description === 'string'
 
-export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseResults =>
+export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseComparisonResults =>
   obj !== null &&
   typeof obj.name === 'string' &&
   typeof obj.winnerIndex === 'number' &&
@@ -13,48 +22,48 @@ export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseResults =>
   typeof obj.explanation === 'string' &&
   typeof obj.certainty === 'number'
 
-export const isInstanceOfRubricCriteria = (obj: any): obj is RubricCriteria =>
+export const isInstanceOfRubricCriteria = (obj: any): obj is DirectAssessmentCriteria =>
   typeof obj.name === 'string' &&
   typeof obj.criteria === 'string' &&
   obj.options !== undefined &&
   obj.options.every((o: Option) => isInstanceOfOption(o))
 
-export const isInstanceOfPairwiseCriteria = (obj: any): obj is PairwiseCriteria =>
+export const isInstanceOfPairwiseCriteria = (obj: any): obj is PairwiseComparisonCriteria =>
   typeof obj.name === 'string' && typeof obj.criteria === 'string'
 
-export const getEmptyRubricCriteria = (): RubricCriteria => ({
+export const getEmptyRubricCriteria = (): DirectAssessmentCriteria => ({
   name: '',
-  criteria: '',
+  description: '',
   options: [
     {
-      option: '',
+      name: '',
       description: '',
     },
     {
-      option: '',
+      name: '',
       description: '',
     },
   ],
 })
 
-export const getEmptyPairwiseCriteria = (): PairwiseCriteria => ({
+export const getEmptyPairwiseCriteria = (): PairwiseComparisonCriteria => ({
   name: '',
-  criteria: '',
+  description: '',
 })
 
-export const getEmptyCriteria = (type: PipelineType): RubricCriteria | PairwiseCriteria =>
-  type === PipelineType.RUBRIC ? getEmptyRubricCriteria() : getEmptyPairwiseCriteria()
+export const getEmptyCriteria = (type: EvaluationType): DirectAssessmentCriteria | PairwiseComparisonCriteria =>
+  type === EvaluationType.RUBRIC ? getEmptyRubricCriteria() : getEmptyPairwiseCriteria()
 
-export const getEmptyUseCase = (type: PipelineType): UseCase => ({
+export const getEmptyUseCase = (type: EvaluationType): UseCase => ({
   id: null,
   name: '',
   type,
   contextVariables: [{ variable: 'context', value: '' }],
   responseVariableName: 'response',
-  responses: type === PipelineType.RUBRIC ? [''] : ['', ''],
+  responses: type === EvaluationType.RUBRIC ? [''] : ['', ''],
   criteria: getEmptyRubricCriteria(),
   results: null,
-  pipeline: null,
+  evaluator: null,
   expectedResults: null,
 })
 
@@ -62,13 +71,26 @@ export const getEmptyExpectedResults = (count: number) => {
   return new Array(count).fill(null).map((_) => '')
 }
 
-export const getEmptyUseCaseWithCriteria = (criteriaName: string, type: PipelineType): UseCase => ({
+export const getEmptyUseCaseWithCriteria = (criteriaName: string, type: EvaluationType): UseCase => ({
   ...getEmptyUseCase(type),
   criteria: getCriteria(criteriaName, type) || getEmptyCriteria(type),
 })
 
-export const returnByPipelineType = <T = any>(type: PipelineType, returnIfRubric: T, returnIfPairwise: T): T =>
-  type === PipelineType.RUBRIC ? returnIfRubric : returnIfPairwise
+export const returnByPipelineType = <T = any, S = any>(
+  type: EvaluationType,
+  returnIfRubric: T | (() => T),
+  returnIfPairwise: S | (() => S),
+): T | S => {
+  if ([EvaluationType.RUBRIC, EvaluationType.OLD_RUBRIC].includes(type)) {
+    return typeof returnIfRubric === 'function' ? (returnIfRubric as () => T)() : returnIfRubric
+  } else if (
+    [EvaluationType.PAIRWISE, EvaluationType.OLD_PAIRWISE, EvaluationType.OLD_ALL_VS_ALL_PAIRWISE].includes(type)
+  ) {
+    return typeof returnIfPairwise === 'function' ? (returnIfPairwise as () => S)() : returnIfPairwise
+  } else {
+    throw new Error(`In 'returnByPipelineType' an unknown type was received: ${type}`)
+  }
+}
 
 export const getUseCaseStringWithSortedKeys = (unsortedObj: UseCase) => {
   const aux = unsortedObj as unknown as { [key: string]: string }
@@ -108,10 +130,13 @@ export const stringifyQueryParams = (
     .join('&')}`
 }
 
-export const getCriteria = (name: string, type: PipelineType): RubricCriteria | PairwiseCriteria | null => {
+export const getCriteria = (
+  name: string,
+  type: EvaluationType,
+): DirectAssessmentCriteria | PairwiseComparisonCriteria | null => {
   const criteria = returnByPipelineType(type, rubricCriteriaLibrary, pairwiseCriteriaLibrary).find(
-    (c: RubricCriteria | PairwiseCriteria) => c.name === name,
-  ) as RubricCriteria | PairwiseCriteria | undefined
+    (c: DirectAssessmentCriteria | PairwiseComparisonCriteria) => c.name === name,
+  ) as DirectAssessmentCriteria | PairwiseComparisonCriteria | undefined
   return criteria ?? null
 }
 
