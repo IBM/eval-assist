@@ -3,20 +3,20 @@ from pydantic import BaseModel, validator
 from unitxt.eval_assist_constants import EvaluatorTypeEnum, EvaluatorNameEnum, ModelProviderEnum
 class CriteriaModel(BaseModel):
     name: str
-    criteria: str
+    description: str
 
-    @validator('criteria', pre=True, always=True)
-    def validate_criteria(cls, criteria):
-        if len(criteria.strip()) == 0:
+    @validator('description', pre=True, always=True)
+    def validate_criteria(cls, description):
+        if len(description.strip()) == 0:
             raise HTTPException(status_code=400, detail="Evaluation criteria is required.")
-        return criteria
+        return description
 
 class EvalRequestModel(BaseModel):
     context_variables: dict[str, str]
     responses: list[str]
     provider: ModelProviderEnum
     llm_provider_credentials: dict[str,str]
-    pipeline: EvaluatorNameEnum
+    evaluator_name: EvaluatorNameEnum
     type: EvaluatorTypeEnum
 
     @validator('llm_provider_credentials', pre=True, always=True)
@@ -33,9 +33,9 @@ class EvalRequestModel(BaseModel):
                 raise HTTPException(status_code=400, detail="Context variable names can't be empty.")
         return context_variables
 
-    @validator('pipeline', pre=True, always=True)
-    def validate_pipeline(cls, pipeline):
-        if not pipeline:
+    @validator('evaluator_name', pre=True, always=True)
+    def validate_pipeline(cls, evaluator_name):
+        if not evaluator_name:
             raise HTTPException(status_code=400, detail="A valid pipeline name is required.")
-        return pipeline
+        return evaluator_name
 

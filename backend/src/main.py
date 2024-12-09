@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from .evaluators.unitxt import DirectAssessmentEvaluator, PairwiseComparisonEvaluator
 
 from .api.pairwise import PairwiseEvalRequestModel, PairwiseEvalResponseModel
-from .api.rubric import CriteriaOptionAPI, CriteriaWithOptionsAPI, RubricEvalRequestModel, RubricEvalResponseModel
+from .api.rubric import CriteriaWithOptionsAPI, RubricEvalRequestModel, RubricEvalResponseModel
 
 from .db_client import db
 import json
@@ -71,17 +71,17 @@ def throw_authorized_exception():
     raise HTTPException(status_code=401, detail=f"Couldn't connect to BAM. Please check that the provided API key is correct." )
 
 
-@router.get("/pipelines/", response_model=PipelinesResponseModel)
-def get_pipelines():
+@router.get("/evaluators/", response_model=PipelinesResponseModel)
+def get_evaluators():
     '''Get the list of available pipelines, as supported by llm-as-a-judge library'''
-    pipelines=[EvaluatorMetadataAPI(**e.__dict__) for e in EVALUATORS_METADATA]
+    evaluators=[EvaluatorMetadataAPI(**e.__dict__) for e in EVALUATORS_METADATA]
     # for e in AVAILABLE_EVALUATORS:
     #     if e.metadata.name.value in [EvaluatorNameEnum.GRANITE_GUARDIAN_2B.value, EvaluatorNameEnum.GRANITE_GUARDIAN_8B.value]:
     #         pipelines.extend(EvaluatorMetadataAPI(
     #             name=e.metadata.name.value,
     #             option_selection_strategy=OptionSelectionStrategyEnum.PARSE_OUTPUT_TEXT.value, 
     #             providers=['watsonx']))
-    return PipelinesResponseModel(pipelines=pipelines)
+    return PipelinesResponseModel(evaluators=evaluators)
 
 @router.post("/prompt/", response_model=list[str])
 def get_prompt(req: RubricEvalRequestModel):
@@ -105,13 +105,11 @@ def get_prompt(req: RubricEvalRequestModel):
 async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
     try:
         if req.type == EvaluatorTypeEnum.DIRECT_ASSESSMENT:
-            if req.pipeline in [EvaluatorNameEnum.GRANITE_GUARDIAN_2B, EvaluatorNameEnum.GRANITE_GUARDIAN_8B]:
-                evaluator = get_rubric_evaluator(name=EvaluatorNameEnumOld[req.pipeline.name], credentials=req.llm_provider_credentials, provider=ModelProviderEnumOld[req.provider.name])
-                criteria = RubricCriteria(name=req.criteria.name, criteria=req.criteria.criteria, options=req.criteria.options)
-
+            if req.evaluator_name in [EvaluatorNameEnum.GRANITE_GUARDIAN_2B, EvaluatorNameEnum.GRANITE_GUARDIAN_8B]:
+                evaluator = get_rubric_evaluator(name=EvaluatorNameEnumOld[req.evaluator_name.name], credentials=req.llm_provider_credentials, provider=ModelProviderEnumOld[req.provider.name])
                 res = evaluator.evaluate(contexts=[req.context_variables] * len(req.responses),
                                         responses=req.responses,
-                                        criteria=[criteria] * len(req.responses),
+                                        criteria=[req.criteria] * len(req.responses),
                                         response_variable_name_list=[req.response_variable_name] * len(req.responses),
                                         check_bias=True)
                 print('res')
@@ -121,20 +119,20 @@ async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
                     del r['explanation']
                 return RubricEvalResponseModel(results=res)
 
-            evaluator = DirectAssessmentEvaluator(req.pipeline)
+            evaluator = DirectAssessmentEvaluator(req.evaluator_name)
             criteria = CriteriaWithOptions(
                 name=req.criteria.name,
-                description=req.criteria.criteria,
+                description=req.criteria.description,
                 options=[CriteriaOption(
-                    name=o.option,
+                    name=o.name,
                     description=o.description
                 ) for o in cast(CriteriaWithOptionsAPI, req.criteria).options]) \
                     if not isinstance(req.criteria, str) else req.criteria
         else:
-            evaluator = PairwiseComparisonEvaluator(req.pipeline)
+            evaluator = PairwiseComparisonEvaluator(req.evaluator_name)
             criteria = Criteria(
                 name=req.criteria.name,
-                description=req.criteria.criteria) \
+                description=req.criteria.description) \
                     if not isinstance(req.criteria, str) else req.criteria
 
         res = evaluator.evaluate(

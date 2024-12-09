@@ -3,7 +3,6 @@ from fastapi import HTTPException
 from typing import Optional
 
 from .common import CriteriaModel, EvalRequestModel
-from unitxt.eval_assist_constants import CriteriaWithOptions
 
 class RubricOptionModel(BaseModel):
     option: str
@@ -26,12 +25,12 @@ class RubricCriteriaModel(CriteriaModel):
 
 
 class CriteriaOptionAPI(BaseModel):
-    option: str
+    name: str
     description: str
 
 class CriteriaWithOptionsAPI(BaseModel):
     name: str
-    criteria: str
+    description: str
     options: list[CriteriaOptionAPI]
 
 class RubricEvalRequestModel(EvalRequestModel):
