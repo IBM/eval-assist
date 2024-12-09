@@ -339,7 +339,6 @@ website or contact them to discuss your options.`,
     expectedResults: ['No', 'No', 'Yes', 'No'],
     evaluator: null,
   },
-
   {
     name: 'Summarization Preference',
     type: EvaluationType.RUBRIC,
@@ -367,56 +366,56 @@ website or contact them to discuss your options.`,
     expectedResults: null,
     evaluator: null,
   },
-  {
-    name: 'Email Inclusivity',
-    type: EvaluationType.RUBRIC,
-    id: null,
-    responseVariableName: 'email',
-    contextVariables: [
-      {
-        variable: 'context',
-        value:
-          'Generate a company wide email to employees inviting them to the yearly Holiday Party. The party takes place on December 20th from 6 PM to 10 PM and is located in the main conference hall. There will be decorations, a gift exchange, music and food.',
-      },
-    ],
-    responses: [
-      `Subject: Join Us for a Multicultural Holiday Celebration!\n\nDear Team,\n\nAs the holiday season approaches, we are thrilled to announce our annual company holiday party! This year, we are embracing the diverse cultures within our team and celebrating a variety of holiday traditions.\n\nDetails are as follows:\n- Date: December 20th\n- Time: 6:00 PM - 10:00 PM\n- Location: Main Conference Hall\n\nOur celebration will feature a variety of activities that honor different cultural traditions, including:\n- Decorations from Around the World: Help us decorate the office with symbols and ornaments from various holidays, such as Christmas trees, Hanukkah menorahs, Kwanzaa kinaras, Diwali lamps, and more.\n- Inclusive Gift Exchange: Participate in a gift exchange that embraces the spirit of giving across cultures. Bring a wrapped gift (under $20) or a small item that represents your cultural heritage.\n- Global Holiday Music: Enjoy a diverse selection of holiday music, including Christmas carols, Hanukkah songs, Kwanzaa tunes, and traditional music from different cultures.\n- International Feast: Indulge in a delicious array of holiday dishes from around the world. We will have a variety of foods to cater to different tastes and dietary preferences.\n\nFeel free to wear traditional attire or festive clothing that reflects your cultural heritage. Whether it’s a Christmas sweater, traditional clothing for Hanukkah, Kwanzaa, Diwali, or any other holiday, we welcome it all!\n\nWe would love to hear your ideas and suggestions to make this event even more inclusive and enjoyable. If you have any special traditions or activities you’d like to share, please let us know.\n\nLet’s come together to celebrate the season and the wonderful diversity within our team.\n\nHappy Holidays!\n\nBest regards,\nCompany CEO`,
-      `Subject: Exciting Christmas Party Announcement!\nDear Team,\nIt's that wonderful time of the year again, and we are thrilled to announce our annual company holiday party! This year, we're going all out with a spectacular Christmas celebration, and we can't wait to see everyone join in the fun.\nDetails are as follows:\n\nDate: December 20th\nTime: 6:00 PM - 10:00 PM\nLocation: Main Conference Hall\n\nWe've planned a night filled with traditional Christmas activities, including:\nChristmas Tree Decorating: Let's make our office tree the most beautiful ever!\nSecret Santa Gift Exchange: Bring a wrapped gift (under $20) to participate. Who knows, you might get something awesome!\nChristmas Carols: We’ll be singing all the classic Christmas songs, so get ready to belt out your favorites!\nHoliday Feast: Enjoy a feast with all your favorite Christmas foods like roast turkey, ham, eggnog, and Christmas cookies.\n\nWe expect everyone to attend and fully participate in the festivities to spread the Christmas cheer!\nLooking forward to celebrating with you all.\nMerry Christmas!\nBest regards,\nCompany CEO`,
-      `Subject: You're Invited to Our Annual Holiday Party!\n\nDear [Company Name] Team,\n\nThe holiday season is upon us, and we are thrilled to invite you to our annual Holiday Party! This year's celebration promises to be an unforgettable evening filled with joy, laughter, and festive cheer.\n\n**Event Details:**\n- **Date:** December 20th\n- **Time:** 6:00 PM to 10:00 PM\n- **Location:** Main Conference Hall\n\n**What to Expect:**\n- **Festive Decorations:** Our conference hall will be transformed into a winter wonderland, complete with sparkling lights and holiday decor.\n- **Gift Exchange:** Participate in our fun and friendly gift exchange! Please bring a wrapped gift valued at $20 or less if you wish to join.\n- **Music:** Enjoy a curated playlist of holiday classics and contemporary hits to keep the party lively.\n- **Food:** A delicious array of food and beverages will be available for everyone to enjoy.\n\nThis is a perfect opportunity to celebrate the season with your colleagues, reflect on our achievements, and look forward to the year ahead. We encourage everyone to join in the festivities and make this night a memorable one.\n\nPlease RSVP by [RSVP Deadline Date] so we can ensure there's plenty of food and drink for all.\n\nWe look forward to celebrating with you!\n\nBest wishes,\n\n[Your Name]\n[Your Position]\n[Company Name]\n[Contact Information]\n\nHappy Holidays! 🎄`,
-      `Subject: Join Us for a Merry Christmas Party!\n\nDear [Company Name] Team,\n\nThe most wonderful time of the year is here, and we are excited to invite you to our annual Christmas Party! Let's come together to celebrate the joy and magic of the holiday season.\n\n**Event Details:**\n- **Date:** December 20th\n- **Time:** 6:00 PM to 10:00 PM\n- **Location:** Main Conference Hall\n\n**What to Expect:**\n- **Festive Decorations:** Our conference hall will be transformed into a Christmas wonderland with twinkling lights, Christmas trees, and holiday decor.\n- **Gift Exchange:** Participate in our delightful gift exchange! Please bring a wrapped gift valued at $20 or less to join in the fun.\n- **Christmas Music:** Enjoy a festive playlist filled with classic Christmas carols and holiday hits to keep the spirit high.\n- **Holiday Feast:** A scrumptious spread of Christmas food and drinks will be available for everyone to savor.\n\nThis is the perfect opportunity to spread Christmas cheer with your colleagues, share in the joy of the season, and reflect on our accomplishments. We encourage everyone to don their favorite Christmas attire and join in the merriment.\n\nPlease RSVP by [RSVP Deadline Date] so we can ensure there's plenty of festive fare for all.\n\nWe look forward to celebrating a Merry Christmas with you!\n\nWarmest Christmas Wishes,\n\n[Your Name]\n[Your Position]\n[Company Name]\n[Contact Information]\n\nMerry Christmas! 🎄✨`,
-    ],
-    criteria: getEmptyCriteria(EvaluationType.RUBRIC),
-    results: null,
-    expectedResults: null,
-    evaluator: null,
-  },
-  {
-    name: 'Reference Document Faithfulness',
-    type: EvaluationType.RUBRIC,
-    id: null,
-    responseVariableName: 'response',
-    contextVariables: [
-      {
-        variable: 'conversation',
-        value: 'Customer: How do i go about upgrading to business class using my corporate card?',
-      },
-      {
-        variable: 'reference document',
-        value:
-          'Choosing your Airfare\n\nEmployees should book airfares presented as "in policy" by the IBM Travel & Expense application or contracted travel agency. This policy applies to all IBM employees for any air travel regardless of trip length and/or same day meetings.\n\nAll air expenses are expected to be charged to the corporate card where issued. \nUpgrading as a Personal Cost\nIf you are upgrading your airfare as a personal cost, the additional cost associated with upgrading your ticket for the same flight is non-reimbursable. When claiming the expense, claim the "in policy" portion as a business expense and provide proof of the IBM "in policy" airfare. Claim the amount in excess of the "in policy" airfare as non-reimbursable/personal.',
-      },
-    ],
-    responses: [
-      `You can use your corporate card to pay for the entire ticket.`,
-      `You can upgrade to business class by paying the business class portion of the airline ticket with a personal credit card to avoid the perception of a policy bypass.`,
-      `You can pay the business class portion of the airline ticket with a personal credit card to avoid the perception of a policy bypass. Claim the coach portion as a business expense through the expense reimbursement tool and claim the amount in excess of the "in policy" airfare as non-reimbursable.`,
-      `When you file your expense, make sure to claim the "in policy" portion as a business expense, and include proof of the IBM-approved airfare. The amount over the "in policy" fare should be claimed as non-reimbursable or personal. Remember, the extra cost for the upgrade won't be reimbursed. `,
-    ],
-    criteria: getCriteria('Reference Document Faithfulnes', EvaluationType.RUBRIC) as DirectAssessmentCriteria,
-    results: null,
-    expectedResults: null,
-    evaluator: null,
-  },
+  // {
+  //   name: 'Email Inclusivity',
+  //   type: EvaluationType.RUBRIC,
+  //   id: null,
+  //   responseVariableName: 'email',
+  //   contextVariables: [
+  //     {
+  //       variable: 'context',
+  //       value:
+  //         'Generate a company wide email to employees inviting them to the yearly Holiday Party. The party takes place on December 20th from 6 PM to 10 PM and is located in the main conference hall. There will be decorations, a gift exchange, music and food.',
+  //     },
+  //   ],
+  //   responses: [
+  //     `Subject: Join Us for a Multicultural Holiday Celebration!\n\nDear Team,\n\nAs the holiday season approaches, we are thrilled to announce our annual company holiday party! This year, we are embracing the diverse cultures within our team and celebrating a variety of holiday traditions.\n\nDetails are as follows:\n- Date: December 20th\n- Time: 6:00 PM - 10:00 PM\n- Location: Main Conference Hall\n\nOur celebration will feature a variety of activities that honor different cultural traditions, including:\n- Decorations from Around the World: Help us decorate the office with symbols and ornaments from various holidays, such as Christmas trees, Hanukkah menorahs, Kwanzaa kinaras, Diwali lamps, and more.\n- Inclusive Gift Exchange: Participate in a gift exchange that embraces the spirit of giving across cultures. Bring a wrapped gift (under $20) or a small item that represents your cultural heritage.\n- Global Holiday Music: Enjoy a diverse selection of holiday music, including Christmas carols, Hanukkah songs, Kwanzaa tunes, and traditional music from different cultures.\n- International Feast: Indulge in a delicious array of holiday dishes from around the world. We will have a variety of foods to cater to different tastes and dietary preferences.\n\nFeel free to wear traditional attire or festive clothing that reflects your cultural heritage. Whether it’s a Christmas sweater, traditional clothing for Hanukkah, Kwanzaa, Diwali, or any other holiday, we welcome it all!\n\nWe would love to hear your ideas and suggestions to make this event even more inclusive and enjoyable. If you have any special traditions or activities you’d like to share, please let us know.\n\nLet’s come together to celebrate the season and the wonderful diversity within our team.\n\nHappy Holidays!\n\nBest regards,\nCompany CEO`,
+  //     `Subject: Exciting Christmas Party Announcement!\nDear Team,\nIt's that wonderful time of the year again, and we are thrilled to announce our annual company holiday party! This year, we're going all out with a spectacular Christmas celebration, and we can't wait to see everyone join in the fun.\nDetails are as follows:\n\nDate: December 20th\nTime: 6:00 PM - 10:00 PM\nLocation: Main Conference Hall\n\nWe've planned a night filled with traditional Christmas activities, including:\nChristmas Tree Decorating: Let's make our office tree the most beautiful ever!\nSecret Santa Gift Exchange: Bring a wrapped gift (under $20) to participate. Who knows, you might get something awesome!\nChristmas Carols: We’ll be singing all the classic Christmas songs, so get ready to belt out your favorites!\nHoliday Feast: Enjoy a feast with all your favorite Christmas foods like roast turkey, ham, eggnog, and Christmas cookies.\n\nWe expect everyone to attend and fully participate in the festivities to spread the Christmas cheer!\nLooking forward to celebrating with you all.\nMerry Christmas!\nBest regards,\nCompany CEO`,
+  //     `Subject: You're Invited to Our Annual Holiday Party!\n\nDear [Company Name] Team,\n\nThe holiday season is upon us, and we are thrilled to invite you to our annual Holiday Party! This year's celebration promises to be an unforgettable evening filled with joy, laughter, and festive cheer.\n\n**Event Details:**\n- **Date:** December 20th\n- **Time:** 6:00 PM to 10:00 PM\n- **Location:** Main Conference Hall\n\n**What to Expect:**\n- **Festive Decorations:** Our conference hall will be transformed into a winter wonderland, complete with sparkling lights and holiday decor.\n- **Gift Exchange:** Participate in our fun and friendly gift exchange! Please bring a wrapped gift valued at $20 or less if you wish to join.\n- **Music:** Enjoy a curated playlist of holiday classics and contemporary hits to keep the party lively.\n- **Food:** A delicious array of food and beverages will be available for everyone to enjoy.\n\nThis is a perfect opportunity to celebrate the season with your colleagues, reflect on our achievements, and look forward to the year ahead. We encourage everyone to join in the festivities and make this night a memorable one.\n\nPlease RSVP by [RSVP Deadline Date] so we can ensure there's plenty of food and drink for all.\n\nWe look forward to celebrating with you!\n\nBest wishes,\n\n[Your Name]\n[Your Position]\n[Company Name]\n[Contact Information]\n\nHappy Holidays! 🎄`,
+  //     `Subject: Join Us for a Merry Christmas Party!\n\nDear [Company Name] Team,\n\nThe most wonderful time of the year is here, and we are excited to invite you to our annual Christmas Party! Let's come together to celebrate the joy and magic of the holiday season.\n\n**Event Details:**\n- **Date:** December 20th\n- **Time:** 6:00 PM to 10:00 PM\n- **Location:** Main Conference Hall\n\n**What to Expect:**\n- **Festive Decorations:** Our conference hall will be transformed into a Christmas wonderland with twinkling lights, Christmas trees, and holiday decor.\n- **Gift Exchange:** Participate in our delightful gift exchange! Please bring a wrapped gift valued at $20 or less to join in the fun.\n- **Christmas Music:** Enjoy a festive playlist filled with classic Christmas carols and holiday hits to keep the spirit high.\n- **Holiday Feast:** A scrumptious spread of Christmas food and drinks will be available for everyone to savor.\n\nThis is the perfect opportunity to spread Christmas cheer with your colleagues, share in the joy of the season, and reflect on our accomplishments. We encourage everyone to don their favorite Christmas attire and join in the merriment.\n\nPlease RSVP by [RSVP Deadline Date] so we can ensure there's plenty of festive fare for all.\n\nWe look forward to celebrating a Merry Christmas with you!\n\nWarmest Christmas Wishes,\n\n[Your Name]\n[Your Position]\n[Company Name]\n[Contact Information]\n\nMerry Christmas! 🎄✨`,
+  //   ],
+  //   criteria: getEmptyCriteria(EvaluationType.RUBRIC),
+  //   results: null,
+  //   expectedResults: null,
+  //   evaluator: null,
+  // },
+  // {
+  //   name: 'Reference Document Faithfulness',
+  //   type: EvaluationType.RUBRIC,
+  //   id: null,
+  //   responseVariableName: 'response',
+  //   contextVariables: [
+  //     {
+  //       variable: 'conversation',
+  //       value: 'Customer: How do i go about upgrading to business class using my corporate card?',
+  //     },
+  //     {
+  //       variable: 'reference document',
+  //       value:
+  //         'Choosing your Airfare\n\nEmployees should book airfares presented as "in policy" by the IBM Travel & Expense application or contracted travel agency. This policy applies to all IBM employees for any air travel regardless of trip length and/or same day meetings.\n\nAll air expenses are expected to be charged to the corporate card where issued. \nUpgrading as a Personal Cost\nIf you are upgrading your airfare as a personal cost, the additional cost associated with upgrading your ticket for the same flight is non-reimbursable. When claiming the expense, claim the "in policy" portion as a business expense and provide proof of the IBM "in policy" airfare. Claim the amount in excess of the "in policy" airfare as non-reimbursable/personal.',
+  //     },
+  //   ],
+  //   responses: [
+  //     `You can use your corporate card to pay for the entire ticket.`,
+  //     `You can upgrade to business class by paying the business class portion of the airline ticket with a personal credit card to avoid the perception of a policy bypass.`,
+  //     `You can pay the business class portion of the airline ticket with a personal credit card to avoid the perception of a policy bypass. Claim the coach portion as a business expense through the expense reimbursement tool and claim the amount in excess of the "in policy" airfare as non-reimbursable.`,
+  //     `When you file your expense, make sure to claim the "in policy" portion as a business expense, and include proof of the IBM-approved airfare. The amount over the "in policy" fare should be claimed as non-reimbursable or personal. Remember, the extra cost for the upgrade won't be reimbursed. `,
+  //   ],
+  //   criteria: getCriteria('Reference Document Faithfulnes', EvaluationType.RUBRIC) as DirectAssessmentCriteria,
+  //   results: null,
+  //   expectedResults: null,
+  //   evaluator: null,
+  // },
 ]
 
 export const pairwiseLibraryTestCases: UseCase[] = [
