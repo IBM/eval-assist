@@ -30,9 +30,6 @@ class Evaluator(ABC):
             provider: ModelProviderEnum,
             credentials: dict[str,str]):
        
-        input_fields = {"context": dict}
-
-        
         params = {
             "max_tokens": 1024,
             "seed": 42,
@@ -73,27 +70,26 @@ class Evaluator(ABC):
                     name=criteria.name,
                     description=criteria.description,
                 )   
-    
-        if self.evaluator_type == EvaluatorTypeEnum.DIRECT_ASSESSMENT:
-            metric = EvalAssistLLMAsJudgeDirect(
-                inference_engine=inference_engine,
-                option_selection_strategy="PARSE_OUTPUT_TEXT",
-                evaluator_name=self.evaluator.name.name,
-                criteria_or_criterias=criteria,
-            )
-        else:
-            metric = EvalAssistLLMAsJudgePairwise(
-                inference_engine=inference_engine,
-                option_selection_strategy="PARSE_OUTPUT_TEXT",
-                evaluator_name=self.evaluator.name.name,
-                criteria_or_criterias=criteria,
-            )
-            
-        data = {"test": [{"context": context} for context in contexts]}
+
+        evalutor_params = {
+            'inference_engine': inference_engine,
+            'option_selection_strategy': "PARSE_OUTPUT_TEXT",
+            'evaluator_name': self.evaluator.name.name,
+            'criteria': criteria,
+            'context_fields': list(contexts[0].keys()),
+        }
+
+        evaluator_klass = (
+            EvalAssistLLMAsJudgeDirect if self.evaluator_type == EvaluatorTypeEnum.DIRECT_ASSESSMENT 
+            else EvalAssistLLMAsJudgePairwise
+        )
+
+        metric = evaluator_klass(**evalutor_params)
+        data = {"test": contexts}
         card = TaskCard(
             loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
             task=Task(
-                input_fields=input_fields,
+                input_fields={input_field: str for input_field in contexts[0].keys()},
                 reference_fields={},
                 prediction_type=str,
                 metrics=[metric],
