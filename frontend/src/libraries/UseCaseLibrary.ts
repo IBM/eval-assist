@@ -553,7 +553,7 @@ export const pairwiseLibraryTestCases: UseCase[] = [
     ],
     criteria: getCriteria('Email Inclusivity', EvaluationType.PAIRWISE) as PairwiseComparisonCriteria,
     results: null,
-    expectedResults: ['1', '4', '3', '2'],
+    expectedResults: ['1', '4', '2', '3'],
     evaluator: null,
   },
 ]
