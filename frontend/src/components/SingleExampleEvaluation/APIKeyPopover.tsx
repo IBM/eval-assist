@@ -49,7 +49,7 @@ export const APIKeyPopover = ({
       </Button>
       <PopoverContent>
         <div style={{ padding: '1rem' }} className={classes['api-key-content-div']}>
-          <h4 style={{ marginBottom: '0.75rem' }}>API crendentials</h4>
+          <h4 style={{ marginBottom: '0.75rem' }}>API credentials</h4>
           <p className={'cds--label'} style={{ marginBottom: '1rem' }}>
             Your credentials are only stored in your browser and are used solely to communicate directly to services.
           </p>

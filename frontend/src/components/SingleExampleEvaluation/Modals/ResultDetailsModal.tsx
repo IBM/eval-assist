@@ -112,8 +112,8 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
             <>
               <p style={{ marginBottom: '0.5rem' }}>
                 <strong>{'Ranking: '}</strong>
-                {`${(selectedResultDetails.result as PerResponsePairwiseResult).ranking + 1}${getOrdinalSuffix(
-                  (selectedResultDetails.result as PerResponsePairwiseResult).ranking + 1,
+                {`${(selectedResultDetails.result as PerResponsePairwiseResult).ranking}${getOrdinalSuffix(
+                  (selectedResultDetails.result as PerResponsePairwiseResult).ranking,
                 )}`}
               </p>
               {selectedResultDetails.expectedResult !== '' && (
