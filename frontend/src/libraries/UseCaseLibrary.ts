@@ -363,7 +363,7 @@ website or contact them to discuss your options.`,
     ],
     criteria: getCriteria('Summarization Preference', EvaluationType.RUBRIC) as DirectAssessmentCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: ['Poor', 'Poor', 'Poor', 'Poor'],
     evaluator: null,
   },
   // {
@@ -389,33 +389,33 @@ website or contact them to discuss your options.`,
   //   expectedResults: null,
   //   evaluator: null,
   // },
-  // {
-  //   name: 'Reference Document Faithfulness',
-  //   type: EvaluationType.RUBRIC,
-  //   id: null,
-  //   responseVariableName: 'response',
-  //   contextVariables: [
-  //     {
-  //       variable: 'conversation',
-  //       value: 'Customer: How do i go about upgrading to business class using my corporate card?',
-  //     },
-  //     {
-  //       variable: 'reference document',
-  //       value:
-  //         'Choosing your Airfare\n\nEmployees should book airfares presented as "in policy" by the IBM Travel & Expense application or contracted travel agency. This policy applies to all IBM employees for any air travel regardless of trip length and/or same day meetings.\n\nAll air expenses are expected to be charged to the corporate card where issued. \nUpgrading as a Personal Cost\nIf you are upgrading your airfare as a personal cost, the additional cost associated with upgrading your ticket for the same flight is non-reimbursable. When claiming the expense, claim the "in policy" portion as a business expense and provide proof of the IBM "in policy" airfare. Claim the amount in excess of the "in policy" airfare as non-reimbursable/personal.',
-  //     },
-  //   ],
-  //   responses: [
-  //     `You can use your corporate card to pay for the entire ticket.`,
-  //     `You can upgrade to business class by paying the business class portion of the airline ticket with a personal credit card to avoid the perception of a policy bypass.`,
-  //     `You can pay the business class portion of the airline ticket with a personal credit card to avoid the perception of a policy bypass. Claim the coach portion as a business expense through the expense reimbursement tool and claim the amount in excess of the "in policy" airfare as non-reimbursable.`,
-  //     `When you file your expense, make sure to claim the "in policy" portion as a business expense, and include proof of the IBM-approved airfare. The amount over the "in policy" fare should be claimed as non-reimbursable or personal. Remember, the extra cost for the upgrade won't be reimbursed. `,
-  //   ],
-  //   criteria: getCriteria('Reference Document Faithfulnes', EvaluationType.RUBRIC) as DirectAssessmentCriteria,
-  //   results: null,
-  //   expectedResults: null,
-  //   evaluator: null,
-  // },
+  {
+    name: 'Reference Document Faithfulness',
+    type: EvaluationType.RUBRIC,
+    id: null,
+    responseVariableName: 'response',
+    contextVariables: [
+      {
+        variable: 'conversation',
+        value: 'Customer: How do i go about upgrading to business class using my corporate card?',
+      },
+      {
+        variable: 'reference document',
+        value:
+          'Choosing your Airfare\n\nEmployees should book airfares presented as "in policy" by the IBM Travel & Expense application or contracted travel agency. This policy applies to all IBM employees for any air travel regardless of trip length and/or same day meetings.\n\nAll air expenses are expected to be charged to the corporate card where issued. \nUpgrading as a Personal Cost\nIf you are upgrading your airfare as a personal cost, the additional cost associated with upgrading your ticket for the same flight is non-reimbursable. When claiming the expense, claim the "in policy" portion as a business expense and provide proof of the IBM "in policy" airfare. Claim the amount in excess of the "in policy" airfare as non-reimbursable/personal.',
+      },
+    ],
+    responses: [
+      `You can use your corporate card to pay for the entire ticket.`,
+      `You can upgrade to business class by paying the business class portion of the airline ticket with a personal credit card to avoid the perception of a policy bypass.`,
+      `You can pay the business class portion of the airline ticket with a personal credit card to avoid the perception of a policy bypass. Claim the coach portion as a business expense through the expense reimbursement tool and claim the amount in excess of the "in policy" airfare as non-reimbursable.`,
+      `When you file your expense, make sure to claim the "in policy" portion as a business expense, and include proof of the IBM-approved airfare. The amount over the "in policy" fare should be claimed as non-reimbursable or personal. Remember, the extra cost for the upgrade won't be reimbursed. `,
+    ],
+    criteria: getCriteria('Reference Document Faithfulnes', EvaluationType.RUBRIC) as DirectAssessmentCriteria,
+    results: null,
+    expectedResults: ['No', 'No', 'Yes', 'Yes'],
+    evaluator: null,
+  },
 ]
 
 export const pairwiseLibraryTestCases: UseCase[] = [
@@ -503,7 +503,7 @@ export const pairwiseLibraryTestCases: UseCase[] = [
     ],
     criteria: getCriteria('Reference Document Faithfulnes', EvaluationType.PAIRWISE) as PairwiseComparisonCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: ['4', '3', '2', '1'],
     evaluator: null,
   },
   {
@@ -530,7 +530,7 @@ export const pairwiseLibraryTestCases: UseCase[] = [
     ],
     criteria: getCriteria('Summarization Preference', EvaluationType.PAIRWISE) as PairwiseComparisonCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: ['3', '1', '4', '2'],
     evaluator: null,
   },
   {
@@ -553,7 +553,7 @@ export const pairwiseLibraryTestCases: UseCase[] = [
     ],
     criteria: getCriteria('Email Inclusivity', EvaluationType.PAIRWISE) as PairwiseComparisonCriteria,
     results: null,
-    expectedResults: null,
+    expectedResults: ['1', '4', '3', '2'],
     evaluator: null,
   },
 ]

@@ -335,24 +335,24 @@ export const rubricCriteriaLibrary: DirectAssessmentCriteria[] = [
       {
         name: 'Excellent',
         description:
-          'Does the response include details such as key figures, numbers, dates and details which are very crucial for the entire understanding',
+          'The response includes details such as key figures, numbers, dates and details which are crucial for the entire understanding.',
       },
+      { name: 'Good', description: 'The response includes statements expressing emotions and acclamations.' },
+      { name: 'Average', description: 'The order of events in the response follows a suitable chronological order.' },
       {
         name: 'Poor',
-        description: 'The response includes minor and irrelevant details which add no value in a summary',
+        description: 'The response includes minor and irrelevant details which add no value in a summary.',
       },
-      { name: 'Average', description: 'The order of events in the response follows a suitable chronological order' },
-      { name: 'Good', description: 'The response should include statements expressing emotions and acclamations' },
     ],
-    description: 'Does the response capture the summary in the best possible way',
+    description: 'Does the response capture the summary in the best possible way.',
   },
   {
     name: 'Reference Document Faithfulnes',
     options: [
-      { name: 'Factual', description: 'All claims in the summary can be traced to the article.' },
-      { name: 'Intracable', description: 'The summary contains claims that cannot be traced to the article.' },
+      { name: 'Yes', description: 'The response is faithful according to reference document.' },
+      { name: 'No', description: 'The response is not faithful according to reference document.' },
     ],
-    description: 'Does the summary factually and adequatly summairse the original article?',
+    description: 'Is the response faithful according to reference document?',
   },
   {
     name: 'general_harm>user_message',
@@ -593,12 +593,12 @@ export const pairwiseCriteriaLibrary: PairwiseComparisonCriteria[] = [
   {
     name: 'Summarization Preference',
     description:
-      'The summary should be accurate and concise. It covers all the of the article and accurately summarizes it. Keeps the length of summary reasonable. Has no fake data generated outside of the reference article.',
+      'The summary should be accurate and concise. It covers all the article and accurately summarizes it. Keeps the length of summary reasonable. Has no fake data generated outside of the reference article.',
   },
   {
     name: 'Email Inclusivity',
     description:
-      'The email is inclusive. It uses inclusive language amd does not target any particular culture or group.',
+      'The email is inclusive. It uses inclusive language and does not target any particular culture or group.',
   },
 ]
 
