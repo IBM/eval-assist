@@ -4,9 +4,9 @@ import Link from 'next/link'
 
 import { Select, SelectItem, SelectItemGroup, SelectSkeleton } from '@carbon/react'
 
-import { returnByPipelineType } from '@utils/utils'
+import { getJSONStringWithSortedKeys, returnByPipelineType } from '@utils/utils'
 
-import { EvaluationType, Evaluator, ModelProviderType } from '../../types'
+import { EvaluationType, Evaluator, ModelProviderCredentials, ModelProviderType } from '../../types'
 import classes from './PipelineSelect.module.scss'
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
@@ -68,10 +68,11 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
     return result
   }, [filteredPipelines])
 
-  const modelProviderBeautifiedName = {
+  const modelProviderBeautifiedName: Record<ModelProviderType, string> = {
     [ModelProviderType.WATSONX]: 'WatsonX',
     [ModelProviderType.OPENAI]: 'OpenAI',
     [ModelProviderType.RITS]: 'RITS',
+    [ModelProviderType.AZURE_OPENAI]: 'Azure OpenAI',
   }
 
   return (
@@ -95,7 +96,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
               </Link>
             </div>
           }
-          value={JSON.stringify(selectedPipeline) || ''}
+          value={getJSONStringWithSortedKeys(selectedPipeline) || ''}
           onChange={(e) => {
             const selectedPipeline = JSON.parse(e.target.value)
             setSelectedPipeline(selectedPipeline)
@@ -103,10 +104,10 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
           className={classes.selectReadOnly}
           // readOnly={isRisksAndHarms}
         >
-          {Object.entries(providerToEvaluators).map(([provider, pipelines]) => (
+          {Object.entries(providerToEvaluators).map(([provider, providerEvaluators]) => (
             <SelectItemGroup label={modelProviderBeautifiedName[provider as ModelProviderType]} key={provider}>
-              {pipelines.map((pipeline, i) => (
-                <SelectItem value={JSON.stringify(pipeline)} text={pipeline.name} key={i} />
+              {providerEvaluators.map((evaluator, i) => (
+                <SelectItem value={getJSONStringWithSortedKeys(evaluator)} text={evaluator.name} key={i} />
               ))}
             </SelectItemGroup>
           ))}

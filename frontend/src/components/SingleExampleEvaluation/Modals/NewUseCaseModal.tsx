@@ -31,7 +31,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
       updateURLFromUseCase({
         useCase: {
           ...getEmptyUseCase(selectedType as EvaluationType),
-          evaluator: selectedType === EvaluationType.RUBRIC ? rubricPipelines[0] : pairwisePipelines[0],
+          evaluator: selectedType === EvaluationType.DIRECT ? rubricPipelines[0] : pairwisePipelines[0],
         },
         subCatalogName: null,
       })
@@ -68,7 +68,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
         <p className={'cds--label'}>Select an Evaluation Method</p>
         <div className={classes.cards}>
           <PipelineOptionCard
-            type={EvaluationType.RUBRIC}
+            type={EvaluationType.DIRECT}
             selectedType={selectedType}
             setSelectedType={setSelectedType}
           />

@@ -29,7 +29,7 @@ export const Landing = () => {
         ? result
         : result.filter((b) => {
             return selectedTagItems.every((selectedTag) => {
-              if (selectedTag === RUBRIC_NAME && b.type === EvaluationType.RUBRIC) {
+              if (selectedTag === RUBRIC_NAME && b.type === EvaluationType.DIRECT) {
                 return true
               }
               if (selectedTag === PAIRWISE_NAME && b.type === EvaluationType.PAIRWISE) {

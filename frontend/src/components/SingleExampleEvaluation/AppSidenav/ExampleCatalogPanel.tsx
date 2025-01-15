@@ -9,7 +9,7 @@ import { IconButton } from '@carbon/react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, Compare } from '@carbon/react/icons'
 
-import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
+import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
 import { UseCase } from '../../../types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
@@ -22,7 +22,7 @@ interface Props {
 }
 
 export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
-  const { rubricLibraryTestCases, pairwiseLibraryTestCases } = useLibraryTestCases()
+  const { rubricLibraryTestCases, pairwiseLibraryTestCases } = useTestCaseLibrary()
 
   const [expanded, setExpanded] = useState<
     { direct_assessment: boolean; pairwise_comparison: boolean } & { [key: string]: boolean }

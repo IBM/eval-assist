@@ -113,7 +113,7 @@ export const rubricCriteriaLibrary: DirectAssessmentCriteria[] = [
     description: 'Is the response coherent with respect to the original text?',
   },
   {
-    name: 'Manipulative',
+    name: 'Manipulative Email',
     options: [
       {
         name: 'Yes',

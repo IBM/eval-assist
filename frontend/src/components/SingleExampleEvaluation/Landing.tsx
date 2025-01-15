@@ -25,7 +25,7 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
   const { sidebarTabSelected, setSidebarTabSelected } = useAppSidebarContext()
 
   const createEmptyRubric = () => {
-    updateURLFromUseCase({ useCase: getEmptyUseCase(EvaluationType.RUBRIC), subCatalogName: null })
+    updateURLFromUseCase({ useCase: getEmptyUseCase(EvaluationType.DIRECT), subCatalogName: null })
   }
 
   const createEmptyPairwise = () => {

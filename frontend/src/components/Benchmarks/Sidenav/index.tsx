@@ -17,7 +17,7 @@ import classes from './index.module.scss'
 export const BenchmarkSidenav = () => {
   const { benchmarks } = useBenchmarksContext()
   const { benchmark, selectedCriteriaName, updateURLFromBenchmark } = useURLInfoContext()
-  const rubricBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === EvaluationType.RUBRIC), [benchmarks])
+  const rubricBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === EvaluationType.DIRECT), [benchmarks])
   const pairwiseBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === EvaluationType.PAIRWISE), [benchmarks])
   const [typeExpanded, setTypeExpanded] = useState<{ rubric: boolean; pairwise: boolean }>({
     rubric: true,

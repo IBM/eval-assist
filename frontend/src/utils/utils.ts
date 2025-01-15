@@ -1,14 +1,10 @@
-import { pairwiseCriteriaLibrary, rubricCriteriaLibrary } from 'src/libraries/CriteriaLibrary'
-
 import {
   DirectAssessmentCriteria,
   EvaluationType,
   Option,
   PairwiseComparisonCriteria,
   PairwiseComparisonResults,
-  PairwiseComparisonResultsV1,
   UseCase,
-  UseCaseV0,
 } from '@types'
 
 export const isInstanceOfOption = (obj: any): obj is Option =>
@@ -52,7 +48,7 @@ export const getEmptyPairwiseCriteria = (): PairwiseComparisonCriteria => ({
 })
 
 export const getEmptyCriteria = (type: EvaluationType): DirectAssessmentCriteria | PairwiseComparisonCriteria =>
-  type === EvaluationType.RUBRIC ? getEmptyRubricCriteria() : getEmptyPairwiseCriteria()
+  type === EvaluationType.DIRECT ? getEmptyRubricCriteria() : getEmptyPairwiseCriteria()
 
 export const getEmptyUseCase = (type: EvaluationType): UseCase => ({
   id: null,
@@ -60,7 +56,7 @@ export const getEmptyUseCase = (type: EvaluationType): UseCase => ({
   type,
   contextVariables: [{ variable: 'context', value: '' }],
   responseVariableName: 'response',
-  responses: type === EvaluationType.RUBRIC ? [''] : ['', ''],
+  responses: type === EvaluationType.DIRECT ? [''] : ['', ''],
   criteria: getEmptyRubricCriteria(),
   results: null,
   evaluator: null,
@@ -71,17 +67,12 @@ export const getEmptyExpectedResults = (count: number) => {
   return new Array(count).fill(null).map((_) => '')
 }
 
-export const getEmptyUseCaseWithCriteria = (criteriaName: string, type: EvaluationType): UseCase => ({
-  ...getEmptyUseCase(type),
-  criteria: getCriteria(criteriaName, type) || getEmptyCriteria(type),
-})
-
 export const returnByPipelineType = <T = any, S = any>(
   type: EvaluationType,
   returnIfRubric: T | (() => T),
   returnIfPairwise: S | (() => S),
 ): T | S => {
-  if ([EvaluationType.RUBRIC, EvaluationType.OLD_RUBRIC].includes(type)) {
+  if ([EvaluationType.DIRECT, EvaluationType.OLD_RUBRIC].includes(type)) {
     return typeof returnIfRubric === 'function' ? (returnIfRubric as () => T)() : returnIfRubric
   } else if (
     [EvaluationType.PAIRWISE, EvaluationType.OLD_PAIRWISE, EvaluationType.OLD_ALL_VS_ALL_PAIRWISE].includes(type)
@@ -92,7 +83,7 @@ export const returnByPipelineType = <T = any, S = any>(
   }
 }
 
-export const getUseCaseStringWithSortedKeys = (unsortedObj: UseCase) => {
+export const getJSONStringWithSortedKeys = (unsortedObj: any) => {
   const aux = unsortedObj as unknown as { [key: string]: string }
   return JSON.stringify(
     Object.keys(aux)
@@ -128,16 +119,6 @@ export const stringifyQueryParams = (
   return `?${queryParams
     .map((queryParam) => encodeURIComponent(queryParam.key) + '=' + encodeURIComponent(queryParam.value))
     .join('&')}`
-}
-
-export const getCriteria = (
-  name: string,
-  type: EvaluationType,
-): DirectAssessmentCriteria | PairwiseComparisonCriteria | null => {
-  const criteria = returnByPipelineType(type, rubricCriteriaLibrary, pairwiseCriteriaLibrary).find(
-    (c: DirectAssessmentCriteria | PairwiseComparisonCriteria) => c.name === name,
-  ) as DirectAssessmentCriteria | PairwiseComparisonCriteria | undefined
-  return criteria ?? null
 }
 
 export const fromLexicalToString = () => {}

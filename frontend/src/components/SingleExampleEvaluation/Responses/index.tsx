@@ -64,7 +64,7 @@ export const Responses = ({
   responseVariableName,
   setResponseVariableName,
 }: Props) => {
-  const [explanationOn, setExplanationOn] = useState(type === EvaluationType.RUBRIC)
+  const [explanationOn, setExplanationOn] = useState(type === EvaluationType.DIRECT)
   const [expectedResultOn, setExpectedResultOn] = useState(true)
 
   const { isRisksAndHarms } = useURLInfoContext()
@@ -104,7 +104,7 @@ export const Responses = ({
 
   const noPositionalBias = useMemo(() => {
     if (results === null) return
-    return type === EvaluationType.RUBRIC
+    return type === EvaluationType.DIRECT
       ? (results as DirectAssessmentResults)?.every((result) => result.positionalBias == false)
       : Object.values(results as PairwiseComparisonResults).every((perResponseResults) =>
           perResponseResults.positionalBias.every((pBias) => pBias === false),
@@ -150,7 +150,7 @@ export const Responses = ({
                 <strong className={classes.headerTypography}>{'Result'}</strong>
               </div>
             )}
-            {results !== null && !evaluationRunning && explanationOn && type === EvaluationType.RUBRIC && (
+            {results !== null && !evaluationRunning && explanationOn && type === EvaluationType.DIRECT && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
                 <strong className={cx(classes.headerTypography)}>{'Explanation'}</strong>
               </div>
@@ -220,7 +220,7 @@ export const Responses = ({
         </p>
       ) : null}
       <div className={classes.toggles}>
-        {results !== null && !evaluationRunning && type === EvaluationType.RUBRIC && (
+        {results !== null && !evaluationRunning && type === EvaluationType.DIRECT && (
           <Toggle
             labelText={'Show Explanation'}
             toggled={explanationOn}

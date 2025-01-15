@@ -140,9 +140,10 @@ export const useParseFetchedUseCase = () => {
   )
 
   const parseFetchedUseCaseV2 = useCallback((fetchedUseCase: Record<string, any>): UseCaseV2 => {
+    // console.log(fetchedUseCase)
     return {
       ...fetchedUseCase,
-      type: returnByPipelineType(fetchedUseCase.type, EvaluationType.RUBRIC, EvaluationType.PAIRWISE),
+      type: returnByPipelineType(fetchedUseCase.type, EvaluationType.DIRECT, EvaluationType.PAIRWISE),
     } as UseCaseV2
   }, [])
 
@@ -178,7 +179,7 @@ export const useParseFetchedUseCase = () => {
   */
   const parseFetchedUseCaseV1ToV2 = useCallback(
     (useCaseV1: UseCaseV1): UseCaseV2 => {
-      const type = returnByPipelineType(useCaseV1.type, EvaluationType.RUBRIC, EvaluationType.PAIRWISE)
+      const type = returnByPipelineType(useCaseV1.type, EvaluationType.DIRECT, EvaluationType.PAIRWISE)
       const useCaseV2 = {
         id: useCaseV1.id,
         name: useCaseV1.name,

@@ -30,7 +30,7 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
   const { get } = useFetchUtils()
 
   const rubricPipelines = useMemo(
-    () => evaluators?.filter((p) => p.type === EvaluationType.RUBRIC) ?? null,
+    () => evaluators?.filter((p) => p.type === EvaluationType.DIRECT) ?? null,
     [evaluators],
   )
 
@@ -52,7 +52,7 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
       let evaluators: Evaluator[] = []
       data.evaluators.forEach((evaluator: FetchedEvaluator) => {
         evaluator.providers.forEach((provider) => {
-          Object.values(EvaluationType).forEach((type) => {
+          ;[EvaluationType.DIRECT, EvaluationType.PAIRWISE].forEach((type) => {
             let p = { ...evaluator, provider, type: type as EvaluationType }
             // @ts-ignore
             delete p.providers

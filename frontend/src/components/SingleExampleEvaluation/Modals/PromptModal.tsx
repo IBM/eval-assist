@@ -28,7 +28,7 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
         // check if criteria description changed and criteria name didn't
         const harmsAndRiskCriteria = getCriteria(
           `${toSnakeCase(currentUseCase.criteria.name)}>${toSnakeCase(currentUseCase.responseVariableName)}`,
-          EvaluationType.RUBRIC,
+          EvaluationType.DIRECT,
         )
         if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.description !== currentUseCase.criteria.description) {
           // the tokenizer of granite guardian will complain if we send a predefined criteria name

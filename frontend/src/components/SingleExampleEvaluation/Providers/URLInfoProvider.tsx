@@ -2,9 +2,11 @@ import { ReactNode, createContext, useContext, useMemo } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
+import { useCriterias } from '@customHooks/useCriterias'
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
-import { getEmptyUseCase, getEmptyUseCaseWithCriteria, returnByPipelineType } from '@utils/utils'
+import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
+import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
+import { getEmptyUseCase, returnByPipelineType } from '@utils/utils'
 
 import { EvaluationType, Evaluator, ModelProviderType, UseCase } from '../../../types'
 import { usePipelineTypesContext } from './PipelineTypesProvider'
@@ -34,8 +36,8 @@ export const useURLInfoContext = () => {
 
 export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
-
-  const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useLibraryTestCases()
+  const { getEmptyUseCaseWithCriteria } = useCriterias()
+  const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
   const { userUseCases } = useUserUseCasesContext()
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
   const { getAreRelevantCredentialsProvided } = useModelProviderCredentials()
@@ -88,7 +90,6 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     } else {
       pu = null
     }
-
     if (pu !== null && rubricPipelines !== null && pairwisePipelines !== null && !pu.evaluator) {
       if (isRisksAndHarms) {
         pu = {
@@ -143,6 +144,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     harmsAndRisksLibraryTestCases,
     allLibraryUseCases,
     criteriaName,
+    getEmptyUseCaseWithCriteria,
     // getAreRelevantCredentialsProvided,
   ])
 

@@ -37,7 +37,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
     if (selectedResultDetails.result === null) return null
 
     let pb: string
-    if (type === EvaluationType.RUBRIC) {
+    if (type === EvaluationType.DIRECT) {
       pb = `${(selectedResultDetails.result as DirectAssessmentResult)?.positionalBias}`
     } else {
       pb = `${(selectedResultDetails.result as PerResponsePairwiseResult).positionalBias.some(
@@ -45,7 +45,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
       )}`
     }
     pb = pb.charAt(0).toUpperCase() + pb.slice(1) + ' '
-    if (type === EvaluationType.RUBRIC && (selectedResultDetails.result as DirectAssessmentResult)?.positionalBias) {
+    if (type === EvaluationType.DIRECT && (selectedResultDetails.result as DirectAssessmentResult)?.positionalBias) {
       pb += `/ '${(selectedResultDetails.result as DirectAssessmentResult).positionalBiasOption}' was selected `
     }
     return pb
@@ -61,7 +61,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
         modalHeading={`Result details: Response ${selectedResultDetails.responseIndex}`}
       >
         <Layer style={{ display: 'flex', flexDirection: 'column' }}>
-          {type === EvaluationType.RUBRIC && (
+          {type === EvaluationType.DIRECT && (
             <>
               {selectedResultDetails.expectedResult !== '' && (
                 <p style={{ marginBottom: '0.5rem' }}>

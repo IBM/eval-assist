@@ -8,7 +8,7 @@ import { IconButton } from '@carbon/react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, List } from '@carbon/react/icons'
 
-import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
+import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 import { toTitleCase } from '@utils/utils'
 
 import { UseCase } from '../../../types'
@@ -22,7 +22,7 @@ interface Props {
 }
 
 export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
-  const { harmsAndRisksLibraryTestCases } = useLibraryTestCases()
+  const { harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
 
   const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean } & { [key: string]: boolean }>({
     rubric: true,

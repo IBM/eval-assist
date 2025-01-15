@@ -2,10 +2,10 @@ import { use, useCallback, useMemo } from 'react'
 
 import { UseCase } from '@types'
 
-import { useLibraryTestCases } from './useLibraryTestCases'
+import { useTestCaseLibrary } from './useTestCaseLibrary'
 
 export const useGetQueryParamsFromUseCase = () => {
-  const { harmsAndRisksLibraryTestCases } = useLibraryTestCases()
+  const { harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
   const harmsAndRisksLibraryTestCasesNames = useMemo<string[]>(
     () =>
       Object.values(harmsAndRisksLibraryTestCases).reduce<string[]>(

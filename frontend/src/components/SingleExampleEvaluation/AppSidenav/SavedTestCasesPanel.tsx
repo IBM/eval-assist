@@ -33,7 +33,7 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
   })
 
   const directAssessmentTestCases = useMemo(
-    () => userUseCases.filter((u) => u.type === EvaluationType.RUBRIC),
+    () => userUseCases.filter((u) => u.type === EvaluationType.DIRECT),
     [userUseCases],
   )
   const pairwiseComparisonTestCases = useMemo(

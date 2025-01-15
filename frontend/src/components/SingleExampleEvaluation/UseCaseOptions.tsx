@@ -1,7 +1,7 @@
 import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 
 import { Button, IconButton } from '@carbon/react'
-import { Add, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
+import { Add, Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
 import { toTitleCase } from '@utils/utils'
 
@@ -23,6 +23,7 @@ interface UseCaseOptionsProps {
   setUseCaseName: (name: string) => void
   setEditNameModalOpen: Dispatch<SetStateAction<boolean>>
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
+  downloadUnitxtNotebook: () => Promise<void>
 }
 
 export const UseCaseOptions = ({
@@ -37,6 +38,7 @@ export const UseCaseOptions = ({
   changesDetected,
   setDeleteUseCaseModalOpen,
   setEditNameModalOpen,
+  downloadUnitxtNotebook,
 }: UseCaseOptionsProps) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
   const { isRisksAndHarms } = useURLInfoContext()
@@ -110,6 +112,10 @@ export const UseCaseOptions = ({
         }}
       >
         {'Delete Test Case'}
+      </Button>
+      <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
+      <Button kind="ghost" renderIcon={Download} onClick={downloadUnitxtNotebook}>
+        {'Download sample notebook'}
       </Button>
     </div>
   )

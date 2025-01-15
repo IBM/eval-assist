@@ -144,9 +144,9 @@ export interface UseCaseV2 extends Omit<UseCaseV1, 'criteria' | 'pipeline' | 're
 export type UseCase = UseCaseV2
 
 export enum EvaluationType {
-  RUBRIC = 'direct_assessment',
+  DIRECT = 'direct',
   OLD_RUBRIC = 'rubric',
-  PAIRWISE = 'pairwise_comparison',
+  PAIRWISE = 'pairwise',
   OLD_PAIRWISE = 'pairwise',
   OLD_ALL_VS_ALL_PAIRWISE = 'all_vs_all_pairwise',
 }
@@ -155,6 +155,7 @@ export enum ModelProviderType {
   WATSONX = 'watsonx',
   OPENAI = 'openai',
   RITS = 'rits',
+  AZURE_OPENAI = 'azure_openai',
 }
 
 export interface Evaluator {
@@ -260,6 +261,9 @@ export type ModelProviderCredentials = {
     api_key: string
   }
   rits: {
+    api_key: string
+  }
+  azure_openai: {
     api_key: string
   }
 }

@@ -172,6 +172,40 @@ export const APIKeyPopover = ({
               </Link>
             </p>
           </div>
+          <div className={classes.bottomDivider} />
+          <div className={cx(classes.modelProvider)}>
+            <p className={cx(classes.modelProviderName)}>Azure OpenAI</p>
+            <Layer>
+              <div className={cx(classes.credential)}>
+                <div className={cx(classes.credentialLabel, 'cds--label')}>API key: </div>
+                <TextInput
+                  ref={apiKeyInputRef}
+                  id={'openai-api-key-input'}
+                  labelText=""
+                  value={modelProviderCrentials.azure_openai.api_key}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCrentials,
+                      azure_openai: { api_key: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                  className={classes['api-key-password-style']}
+                />
+              </div>
+            </Layer>
+            <p className="cds--form__helper-text">
+              {"Don't have a key? Get one "}
+              <Link
+                href={'https://platform.openai.com/api-keys'}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: 'none' }}
+              >
+                {'here'}
+              </Link>
+            </p>
+          </div>
         </div>
       </PopoverContent>
     </Popover>

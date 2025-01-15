@@ -8,13 +8,15 @@ import { useRouter } from 'next/router'
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
+import { useCriterias } from '@customHooks/useCriterias'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFromUseCase'
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
+import { useUnitxtNotebook } from '@customHooks/useUnitxtNotebook'
 import { StoredUseCase } from '@prisma/client'
-import { getCriteria, getUseCaseStringWithSortedKeys, stringifyQueryParams, toSnakeCase } from '@utils/utils'
+import { getJSONStringWithSortedKeys, stringifyQueryParams, toSnakeCase } from '@utils/utils'
 
 import {
   DirectAssessmentResult,
@@ -55,7 +57,6 @@ export const SingleExampleEvaluation = () => {
   const { preloadedUseCase } = useURLInfoContext()
   const [currentUseCase, setCurrentUseCase] = useState(preloadedUseCase)
   const { userUseCases, setUserUseCases } = useUserUseCasesContext()
-
   // we are ignoring client side rendering to be able to use useSessionStorage
   const showingTestCase = useMemo<boolean>(() => preloadedUseCase !== null, [preloadedUseCase])
   const [useCaseSelected, setUseCaseSelected] = useState<{ useCase: UseCase; subCatalogName: string | null } | null>(
@@ -85,7 +86,7 @@ export const SingleExampleEvaluation = () => {
   const { setSidebarTabSelected } = useAppSidebarContext()
 
   const currentUseCaseString = useMemo<string>(
-    () => (currentUseCase !== null && showingTestCase ? getUseCaseStringWithSortedKeys(currentUseCase) : ''),
+    () => (currentUseCase !== null && showingTestCase ? getJSONStringWithSortedKeys(currentUseCase) : ''),
     [showingTestCase, currentUseCase],
   )
 
@@ -139,7 +140,13 @@ export const SingleExampleEvaluation = () => {
   useBeforeOnload(changesDetected)
   const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
   const temporaryIdRef = useRef(uuid())
-
+  const { getCriteria } = useCriterias()
+  const { downloadUnitxtNotebook } = useUnitxtNotebook({
+    criteria: currentUseCase?.criteria,
+    model_name: currentUseCase?.evaluator?.name,
+    responses: currentUseCase?.responses,
+    contextVariables: currentUseCase?.contextVariables,
+  })
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
 
   const runEvaluation = useCallback(async () => {
@@ -165,7 +172,7 @@ export const SingleExampleEvaluation = () => {
       // check if criteria description changed and criteria name didn't
       const harmsAndRiskCriteria = getCriteria(
         `${toSnakeCase(currentUseCase.criteria.name)}>${toSnakeCase(currentUseCase.responseVariableName)}`,
-        EvaluationType.RUBRIC,
+        EvaluationType.DIRECT,
       )
       if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.description !== currentUseCase.criteria.description) {
         // the tokenizer of granite guardian will complain if we send a predefined criteria name
@@ -236,7 +243,7 @@ export const SingleExampleEvaluation = () => {
 
       let results: DirectAssessmentResults | PairwiseComparisonResults
 
-      if (currentUseCase.type === EvaluationType.RUBRIC) {
+      if (currentUseCase.type === EvaluationType.DIRECT) {
         results = (responseBody.results as FetchedDirectAssessmentResults).map(
           (result) =>
             ({
@@ -283,6 +290,7 @@ export const SingleExampleEvaluation = () => {
   }, [
     addToast,
     currentUseCase,
+    getCriteria,
     isEqualToCurrentTemporaryId,
     isRisksAndHarms,
     modelProviderCredentials,
@@ -335,7 +343,7 @@ export const SingleExampleEvaluation = () => {
             criteria: currentUseCase.criteria,
             results: currentUseCase.results,
             type: currentUseCase.type,
-            pipeline: currentUseCase.evaluator,
+            evaluator: currentUseCase.evaluator,
             expectedResults: currentUseCase.expectedResults,
             responseVariableName: currentUseCase.responseVariableName,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
@@ -478,7 +486,7 @@ export const SingleExampleEvaluation = () => {
     if (preloadedUseCase !== null) {
       setUseCaseSelected(null)
       setCurrentUseCase({ ...preloadedUseCase })
-      setLastSavedUseCaseString(getUseCaseStringWithSortedKeys(preloadedUseCase))
+      setLastSavedUseCaseString(getJSONStringWithSortedKeys(preloadedUseCase))
       temporaryIdRef.current = uuid()
     } else {
       setCurrentUseCase(null)
@@ -540,6 +548,7 @@ export const SingleExampleEvaluation = () => {
               setDeleteUseCaseModalOpen={setDeleteUseCaseModalOpen}
               setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
               setEditNameModalOpen={setEditNameModalOpen}
+              downloadUnitxtNotebook={downloadUnitxtNotebook}
             />
             <ContextVariables
               contextVariables={currentUseCase.contextVariables}
