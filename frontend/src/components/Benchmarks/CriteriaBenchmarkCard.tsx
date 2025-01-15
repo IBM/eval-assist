@@ -1,9 +1,8 @@
 import cx from 'classnames'
 
-import { CSSProperties, useCallback, useMemo, useState } from 'react'
+import { CSSProperties, useMemo, useState } from 'react'
 
 import {
-  IconButton,
   Link,
   Table,
   TableBody,
@@ -17,8 +16,8 @@ import {
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
+import { useCriterias } from '@customHooks/useCriterias'
 import { CriteriaBenchmark, EvaluationType, EvaluatorBenchmark, Version } from '@types'
-import { getCriteria } from '@utils/utils'
 
 import classes from './CriteriaBenchmarkCard.module.scss'
 import { CriteriaDetailsModal } from './CriteriaDetailsModal'
@@ -38,11 +37,12 @@ const beatutifyName: { [key: string]: string } = {
 
 export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: Props) => {
   const { benchmark } = useURLInfoContext()
+  const { getCriteria } = useCriterias()
   const [criteriaDetailsModal, setCriteriaDetailsModal] = useState(false)
   const [showAllVersions, setShowAllVersions] = useState(true)
   const criteria = useMemo(
     () => getCriteria(criteriaBenchmark.name, benchmark?.type as EvaluationType),
-    [benchmark?.type, criteriaBenchmark.name],
+    [benchmark?.type, criteriaBenchmark.name, getCriteria],
   )
 
   const benchmarkMetrics = useMemo(() => {

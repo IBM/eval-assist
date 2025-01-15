@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useCallback } from 'react'
 import { Button, Layer, ListItem, Modal, UnorderedList } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
-import { useLibraryTestCases } from '@customHooks/useLibraryTestCases'
+import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 import { DirectAssessmentCriteria, EvaluationType, PairwiseComparisonCriteria } from '@types'
 import { isInstanceOfRubricCriteria } from '@utils/utils'
 
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) => {
-  const { allLibraryUseCases } = useLibraryTestCases()
+  const { allLibraryUseCases } = useTestCaseLibrary()
 
   const onClose = () => {
     setOpen(false)

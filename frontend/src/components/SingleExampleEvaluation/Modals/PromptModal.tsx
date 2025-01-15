@@ -2,9 +2,10 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { Loading, Modal, Select, SelectItem } from '@carbon/react'
 
+import { useCriterias } from '@customHooks/useCriterias'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { EvaluationType, ModelProviderCredentials, ModelProviderType, UseCase } from '@types'
-import { getCriteria, toSnakeCase } from '@utils/utils'
+import { toSnakeCase } from '@utils/utils'
 
 import classes from './PromptModal.module.scss'
 
@@ -18,6 +19,7 @@ interface Props {
 export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCredentials }: Props) => {
   const [prompts, setPrompts] = useState<string[] | null>(null)
   const [selectedPromptIndex, setSelectedPromptIndex] = useState<number>(0)
+  const { getCriteria } = useCriterias()
 
   const { post } = useFetchUtils()
 
