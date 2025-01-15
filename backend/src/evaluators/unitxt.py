@@ -1,131 +1,154 @@
-# from unitxt import get_logger
+import json
 from abc import ABC
+from typing import Any, List
+
 from unitxt.api import evaluate, load_dataset
 from unitxt.blocks import Task, TaskCard
-from unitxt.eval_assist_utils import get_evaluator_metadata, rename_model_if_required, CatalogDefinition
+from unitxt.inference import LiteLLMInferenceEngine, RITSInferenceEngine
+from unitxt.llm_as_judge import (
+    EVALUATOR_TO_MODEL_ID,
+    Criteria,
+    CriteriaWithOptions,
+    EvaluatorNameEnum,
+    EvaluatorTypeEnum,
+    LLMJudgeDirect,
+    LLMJudgePairwise,
+    LoadCriteria,
+    LoadCriteriaWithOptions,
+    ModelProviderEnum,
+    get_evaluator_metadata,
+    rename_model_if_required,
+)
 from unitxt.loaders import LoadFromDictionary
-from unitxt.eval_assist_constants import  EVALUATOR_TO_MODEL_ID, EvaluatorNameEnum, CriteriaWithOptions, CriteriaOption, ModelProviderEnum, PROVIDER_TO_STRATEGY, Criteria, EvaluatorTypeEnum
-from unitxt.inference import RITSInferenceEngine, LiteLLMInferenceEngine
-from unitxt.eval_assist_llm_as_judge_direct import EvalAssistLLMAsJudgeDirect
-from unitxt.eval_assist_llm_as_judge_pairwise import EvalAssistLLMAsJudgePairwise
-from typing import Any
-from unitxt.operators import Set
+from unitxt.templates import NullTemplate
 
-from ..api.rubric import CriteriaWithOptionsAPI
 
 class Evaluator(ABC):
     evaluator_type: EvaluatorTypeEnum
 
     def __init__(self, name: EvaluatorNameEnum):
         self.evaluator = get_evaluator_metadata(name)
-    
+
     def parse_results(self, dataset):
         raise NotImplementedError("This method must be implemented.")
 
     def evaluate(
-            self,
-            contexts,
-            responses,
-            criteria: str | CriteriaWithOptionsAPI,
-            provider: ModelProviderEnum,
-            credentials: dict[str,str]):
-       
+        self,
+        contexts,
+        responses,
+        criteria: Criteria | CriteriaWithOptions,
+        provider: ModelProviderEnum,
+        credentials: dict[str, str],
+    ):
+
         params = {
             "max_tokens": 1024,
             "seed": 42,
-            "credentials": credentials
+            "credentials": credentials,
+            "max_requests_per_second": 10,
         }
 
         model = rename_model_if_required(EVALUATOR_TO_MODEL_ID[self.evaluator.name], provider)
+
         if provider == ModelProviderEnum.WATSONX:
             model = "watsonx/" + model
 
+        if provider == ModelProviderEnum.AZURE_OPENAI:
+            params["credentials"][
+                "api_base"
+            ] = f"https://eteopenai.azure-api.net/openai/deployments/{model}/chat/completions?api-version=2024-08-01-preview"
+            model = "azure/" + model
         if provider == ModelProviderEnum.RITS:
-            params['credentials']['api_base'] = RITSInferenceEngine.get_base_url_from_model_name(model) + '/v1'
-            params['extra_headers'] = {'RITS_API_KEY': credentials['api_key']}
-            model = f'openai/{model}'
+            params["credentials"]["api_base"] = RITSInferenceEngine.get_base_url_from_model_name(model) + "/v1"
+            params["extra_headers"] = {"RITS_API_KEY": credentials["api_key"]}
+            model = f"openai/{model}"
 
-        params['model'] = model
-        
+        params["model"] = model
+
         inference_engine = LiteLLMInferenceEngine(**params)
 
-        # process criteria
-        is_predefined_criteria = isinstance(criteria, str)
-        if is_predefined_criteria:
-            criteria = f"metrics.llm_as_judge.eval_assist.{self.evaluator_type.name}.criteria.{criteria}"
-        else:
-            if self.evaluator_type == EvaluatorTypeEnum.DIRECT_ASSESSMENT:
-                criteria = CriteriaWithOptions(
-                    name=criteria.name,
-                    description=criteria.description,
-                    options=[
-                        CriteriaOption(
-                            name=option.name,
-                            description=option.description,
-                        ) for option in criteria.options
-                    ],
-                )
-            else:
-                criteria = Criteria(
-                    name=criteria.name,
-                    description=criteria.description,
-                )   
-
         evalutor_params = {
-            'inference_engine': inference_engine,
-            'option_selection_strategy': "PARSE_OUTPUT_TEXT",
-            'evaluator_name': self.evaluator.name.name,
-            'criteria': criteria,
-            'context_fields': list(contexts[0].keys()),
+            "inference_engine": inference_engine,
+            "evaluator_name": self.evaluator.name.name,
+            "context_fields": list(contexts[0].keys()),
+            "criteria_field": "criteria",
         }
 
-        evaluator_klass = (
-            EvalAssistLLMAsJudgeDirect if self.evaluator_type == EvaluatorTypeEnum.DIRECT_ASSESSMENT 
-            else EvalAssistLLMAsJudgePairwise
-        )
+        evaluator_klass = LLMJudgeDirect if self.evaluator_type == EvaluatorTypeEnum.DIRECT else LLMJudgePairwise
 
+        input_fields = {input_field: str for input_field in contexts[0].keys()}
         metric = evaluator_klass(**evalutor_params)
-        data = {"test": contexts}
+        data = {"test": contexts if self.evaluator_type == EvaluatorTypeEnum.DIRECT else [contexts[0]]}
+        data["test"] = [{**d, "judgement": criteria} for d in data["test"]]
         card = TaskCard(
             loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
+            preprocess_steps=[
+                (
+                    LoadCriteriaWithOptions(field="judgement", to_field="criteria")
+                    if self.evaluator_type == EvaluatorTypeEnum.DIRECT
+                    else LoadCriteria(field="judgement", to_field="criteria")
+                ),
+            ],
             task=Task(
-                input_fields={input_field: str for input_field in contexts[0].keys()},
-                reference_fields={},
-                prediction_type=str,
+                input_fields=input_fields,
+                prediction_type=str if self.evaluator_type == EvaluatorTypeEnum.DIRECT else List[str],
                 metrics=[metric],
-            )
+                reference_fields={"criteria": Any},
+                default_template=NullTemplate(),
+            ),
         )
 
-        test_dataset = load_dataset(card=card, template="templates.empty")["test"]
-
-        evaluated_dataset = evaluate(predictions=responses, data=test_dataset)
+        dataset = load_dataset(card=card, split="test")
+        predictions = responses if self.evaluator_type == EvaluatorTypeEnum.DIRECT else [responses]
+        evaluated_dataset = evaluate(predictions=predictions, data=dataset)
         return self.parse_results(evaluated_dataset)
+
 
 class DirectAssessmentEvaluator(Evaluator):
     def __init__(self, name: EvaluatorNameEnum):
         super().__init__(name)
-        self.evaluator_type = EvaluatorTypeEnum.DIRECT_ASSESSMENT
+        self.evaluator_type = EvaluatorTypeEnum.DIRECT
 
     def parse_results(self, dataset):
         results = []
+        prefix = dataset[0]["score"]["instance"]["score_name"]
         for instance in dataset:
-            instance_score = instance['score']['instance']
-            results.append({
-                'positional_bias_option': instance_score['positional_bias_selected_option'],
-                'option': instance_score['selected_option'],
-                'summary': instance_score["summary"],
-                'positional_bias': instance_score["positional_bias"]
-            })
+            instance_score = instance["score"]["instance"]
+
+            print(json.dumps(instance_score, indent=4))
+            results.append(
+                {
+                    "option": instance_score[f"{prefix}_selected_option"],
+                    "summary": instance_score[f"{prefix}_summary"],
+                    "positional_bias": instance_score[f"{prefix}_positional_bias"],
+                    "positional_bias_option": instance_score[f"{prefix}_positional_bias_selected_option"],
+                }
+            )
         return results
+
 
 class PairwiseComparisonEvaluator(Evaluator):
     def __init__(self, name: EvaluatorNameEnum):
         super().__init__(name)
-        self.evaluator_type = EvaluatorTypeEnum.PAIRWISE_COMPARISON
+        self.evaluator_type = EvaluatorTypeEnum.PAIRWISE
 
     def parse_results(self, dataset):
-        results = {}
-        for instance in dataset:
-            instance_score = instance['score']['instance']
-            results[instance_score['response_name']] = instance_score
-        return results
+        score = dataset[0]["score"]["instance"]
+        import json
+
+        print(json.dumps(score, indent=4))
+        parsed_score = {}
+        for key in score.keys():
+            outer_key = key.split("_")[0]
+            if outer_key not in ["score", "criteria"]:
+                parsed_score[outer_key] = {
+                    "contest_results": score[f"{outer_key}_contest_results"],
+                    "compared_to": score[f"{outer_key}_compared_to"],
+                    "summaries": score[f"{outer_key}_summaries"],
+                    "positional_bias": score[f"{outer_key}_positional_bias"],
+                    "winrate": score[f"{outer_key}_winrate"],
+                    "ranking": score[f"{outer_key}_ranking"],
+                    "selections": score[f"{outer_key}_selections"],
+                }
+
+        return parsed_score
