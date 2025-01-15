@@ -248,6 +248,7 @@ async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
         raise HTTPException(status_code=400, detail=e.error_msg if hasattr(e, "error_msg") else "Unknown error.")
 
 
+
 @router.get("/use_case/")
 def get_use_cases(user: str):
     use_cases = db.storedusecase.find_many(where={"app_user": {"email": user}})
