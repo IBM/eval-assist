@@ -72,7 +72,7 @@ export const returnByPipelineType = <T = any, S = any>(
   returnIfRubric: T | (() => T),
   returnIfPairwise: S | (() => S),
 ): T | S => {
-  if ([EvaluationType.DIRECT, EvaluationType.OLD_RUBRIC].includes(type)) {
+  if ([EvaluationType.DIRECT, EvaluationType.OLD_DIRECT, EvaluationType.OLD_RUBRIC].includes(type)) {
     return typeof returnIfRubric === 'function' ? (returnIfRubric as () => T)() : returnIfRubric
   } else if (
     [EvaluationType.PAIRWISE, EvaluationType.OLD_PAIRWISE, EvaluationType.OLD_ALL_VS_ALL_PAIRWISE].includes(type)
