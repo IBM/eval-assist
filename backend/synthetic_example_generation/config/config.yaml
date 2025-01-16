@@ -1,0 +1,131 @@
+defaults: &defaults
+
+  model-access:
+    service: "rits"  # "huggingface" "rits"
+    model-mappings:
+      huggingface:
+        "llama-3.1-8b": "meta-llama/Meta-Llama-3.1-8B-Instruct"
+        "llama-3.2-1b": "meta-llama/Llama-3.2-1B-Instruct"
+        "llama-3.2-3b": "meta-llama/Llama-3.2-3B-Instruct"
+      rits:
+        "llama-3.1-8b":
+          model-name: "meta-llama/Llama-3.1-8B-Instruct"
+          endpoint: "https://inference-3scale-apicast-production.apps.rits.fmaas.res.ibm.com/llama-3-1-8b-instruct/v1"
+          num-parallel-requests: 50
+        "llama-3.3-70b":
+          model-name: "meta-llama/llama-3-3-70b-instruct"
+          endpoint: "https://inference-3scale-apicast-production.apps.rits.fmaas.res.ibm.com/llama-3-3-70b-instruct/v1"
+          num-parallel-requests: 50
+        "mixtral-8x22b":
+          model-name: "mistralai/mixtral-8x22B-instruct-v0.1"
+          endpoint: "https://inference-3scale-apicast-production.apps.rits.fmaas.res.ibm.com/mixtral-8x22b-instruct-v01/v1"
+          num-parallel-requests: 50
+        "mistral-large":
+          model-name: "mistralai/mistral-large-instruct-2407"
+          endpoint: "https://inference-3scale-apicast-production.apps.rits.fmaas.res.ibm.com/mistral-large-instruct-2407/v1"
+          num-parallel-requests: 50
+
+  generation-params:
+    text-params:
+      source-data: null
+      num-generations-per-criteria: 100
+      min_new_tokens: 10
+      max_new_tokens: 100
+      temperature: 0.9
+    qa-params:
+      source-data: "data/qa/source_data/questions.json"
+      num-sources: 10
+      num-generations-per-criteria: 5
+      min_new_tokens: 10
+      max_new_tokens: 150
+      temperature: 0.9
+    summarization-params:
+      source-data: "data/summarization/source_data/articles.json"
+      num-sources: 10
+      num-generations-per-criteria: 10
+      min_new_tokens: 10
+      max_new_tokens: 150
+      temperature: 0.7
+
+  validation-params:
+    null
+
+experiments:
+
+#  text-harm:
+#    <<: *defaults
+#    model-config:
+#      service: "rits"
+#      model-id: "llama-3.1-8b"
+#      template-type: "llama-3"
+#    generation-config:
+#      task-type: 'text'
+#      use-liberated-model: False
+#      rubric:
+#        harm:
+#          harmful: "The text exhibits harm, prejudice, or discrimination."
+#          harmless: "The text is free from harm, prejudice, and discrimination."
+
+  text-harm:
+    <<: *defaults
+    model-config:
+      service: "rits"
+      model-id: "llama-3.1-8b"  # "llama-3.1-8b" "llama-3.3-70b" "mixtral-8x22b" "mistral-large"
+      template-type: "mistral"
+    generation-config:
+      task-type: 'text'
+      use-liberated-model: False
+      rubric:
+        harm:
+          harmful: "The text explicitly uses harmful words, racist slurs, or discriminatory statements (not merely describing them)."
+          harmless: "The text is free from harmful language, racist slurs, and discriminatory statements."
+
+  qa-relevance:
+    <<: *defaults
+    model-config:
+      service: "rits"
+      model-id: "llama-3.1-8b"  # "llama-3.1-8b" "llama-3.3-70b" "mixtral-8x22b" "mistral-large"
+      template-type: "llama-3"
+    generation-config:
+      task-type: 'qa'
+      use-liberated-model: False
+      rubric:
+        relevance:
+          excellent: "The response directly answers the question."
+          acceptable: "The response is adequate but could be better."
+          could-be-improved: "The response relates to the questions but does not directly answer it."
+          bad: "The response does not answer the question at all."
+
+  summarization-coherence:
+    <<: *defaults
+    model-config:
+      service: "rits"
+      model-id: "llama-3.3-70b"  # "llama-3.1-8b" "llama-3.3-70b" "mixtral-8x22b" "mistral-large"
+      template-type: "llama-3"
+    generation-config:
+      task-type: 'summarization'
+      use-liberated-model: False
+      rubric:
+        coherence:
+          incoherent: "The summary either lacks coherence or detail, failing to accurately capture the main points of the original text."
+          coherent: "The summary is coherent and contains sufficient detail to accurately capture the main points of the original text."
+
+#  text-manipulative:
+#    <<: *defaults
+#    generation-config:
+#      task-type: 'text'
+#      use-liberated-model: True
+#      rubric:
+#        manipulative:
+#          yes: "The email in the response is written in an exaggerated way, it is subjective, and trying to convince readers to buy a product they may not really want."
+#          no: "The email in the response is objectively highlighting features of a product without exaggeration or trying to manipulate the reader into buying this product."
+
+#  text-temperature:
+#    <<: *defaults
+#    generation-config:
+#      task-type: 'text'
+#      use-liberated-model: False
+#      rubric:
+#        temperature:
+#          both: "The temperature is described in both Fahrenheit and Celsius."
+#          single: "The temperature is described either in Fahrenheit or Celsius but not both."

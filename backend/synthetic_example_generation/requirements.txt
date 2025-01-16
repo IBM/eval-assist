@@ -1,0 +1,11 @@
+git+https://github.com/IBM/activation-steering.git
+accelerate
+datasets
+langchain
+numpy
+openai
+pandas
+python-dotenv
+scipy
+transformers
+torch

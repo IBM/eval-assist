@@ -1,0 +1,70 @@
+service-config:
+  vllm:
+    base-url: "http://<endpoint>:8000/v1"
+    concurrency-limit: 10
+  rits:
+    base-url: "https://inference-3scale-apicast-production.apps.rits.fmaas.res.ibm.com"
+    num-parallel-requests: 4
+    temperature: 0.5
+    max-new-tokens: 150
+    min-new-tokens: 10
+    top-p: 0.95
+    do-sample: true
+
+model-config:
+  llama-3.1-8b:
+    template-category: "llama-3"
+    access:
+      huggingface:
+        model-id: "meta-llama/Meta-Llama-3.1-8B-Instruct"
+      vllm:
+        model-path: ""
+      rits:
+        model-path: "llama-3-1-8b-instruct/v1"
+        model-name: "meta-llama/Llama-3.1-8B-Instruct"
+  llama-3.3-70b:
+    template-category: "llama-3"
+    access:
+      huggingface:
+        model-id: "meta-llama/llama-3-3-70b-instruct"
+      rits:
+        model-path: "llama-3-3-70b-instruct/v1"
+        model-name: "meta-llama/llama-3-3-70b-instruct"
+  mixtral-8x22b:
+    template-category: "mistral"
+    access:
+      huggingface:
+        model-id: "mixtral-8x22b-instruct-v01"
+      vllm:
+        model-path: ""
+      rits:
+        model-path: "mixtral-8x22b-instruct-v01/v1"
+        model-name: "mistralai/mixtral-8x22B-instruct-v0.1"
+  mistral-large:
+    template-category: "mistral"
+    access:
+      huggingface:
+        model-id: "mistralai/mistral-large-instruct-2407"
+      rits:
+        model-path: "mistral-large-instruct-2407/v1"
+        model-name: "mistralai/mistral-large-instruct-2407"
+
+selector:
+  - random: &random_config
+      name: "random"
+      num-examples-per-crit: 2
+  - max-info: &max_info_config
+      name: "max_info"
+      num-examples-per-crit: 2
+      diversity-weight:
+      embedding-model:
+
+defaults:
+  model:
+    service: "rits"
+  labeler:
+    num-samples: 3
+  selector:
+    <<: *random_config
+  formatter:
+    shuffle-criteria: false
