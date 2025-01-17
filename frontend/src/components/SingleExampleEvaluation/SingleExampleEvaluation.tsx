@@ -142,13 +142,14 @@ export const SingleExampleEvaluation = () => {
   const temporaryIdRef = useRef(uuid())
   const { getCriteria } = useCriterias()
   const { downloadUnitxtNotebook } = useUnitxtNotebook({
+    testCaseName: currentUseCase?.name,
     criteria: currentUseCase?.criteria,
     evaluatorName: currentUseCase?.evaluator?.name,
     responses: currentUseCase?.responses,
     contextVariables: currentUseCase?.contextVariables,
     provider: currentUseCase?.evaluator?.provider,
     credentials: modelProviderCredentials[currentUseCase?.evaluator?.provider || ModelProviderType.RITS],
-    evaluator_type: currentUseCase?.type,
+    evaluatorType: currentUseCase?.type,
   })
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
 

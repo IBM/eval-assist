@@ -4,6 +4,7 @@ import { EvaluationType, UseCase } from '../types'
 import { useFetchUtils } from './useFetchUtils'
 
 interface Props {
+  testCaseName: UseCase['name'] | undefined
   criteria: UseCase['criteria'] | undefined
   evaluatorName: string | undefined
   responses: UseCase['responses'] | undefined
@@ -12,7 +13,7 @@ interface Props {
   // tslint says UseCase['evaluator'] can be null, but it can't be null
   provider: UseCase['evaluator']['provider'] | undefined
   credentials: { [key: string]: string } | undefined
-  evaluator_type: EvaluationType | undefined
+  evaluatorType: EvaluationType | undefined
 }
 export const useUnitxtNotebook = ({
   criteria,
@@ -21,13 +22,14 @@ export const useUnitxtNotebook = ({
   contextVariables,
   provider,
   credentials,
-  evaluator_type,
+  evaluatorType: evaluator_type,
+  testCaseName,
 }: Props) => {
   const { post } = useFetchUtils()
   const { addToast } = useToastContext()
 
   const downloadUnitxtNotebook = async () => {
-    if (!criteria || !evaluatorName || !responses || !contextVariables || !provider) return
+    if (!testCaseName || !criteria || !evaluatorName || !responses || !contextVariables || !provider) return
     try {
       const response = await post('download-notebook/', {
         criteria,
@@ -37,6 +39,7 @@ export const useUnitxtNotebook = ({
         provider,
         credentials,
         evaluator_type,
+        test_case_name: testCaseName,
       })
 
       if (!response.ok) {
