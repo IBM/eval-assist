@@ -345,6 +345,7 @@ def get_benchmarks():
 
 
 class NotebookParams(BaseModel):
+    test_case_name: str
     criteria: dict
     evaluator_name: EvaluatorNameEnum
     provider: ModelProviderEnum
@@ -379,55 +380,87 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
     input_fields = {k: 'str' for k in parsed_context_variables.keys()}
     context_fields = list(parsed_context_variables.keys())
     
-    # Create a Jupyter notebook object
+
     nb = nbf.v4.new_notebook()
 
-    # Define notebook cells
-    code_cells = [f"""
-from unitxt.api import evaluate, load_dataset
-from unitxt.card import TaskCard
+    title = f"# Unitxt sample notebook: {params.test_case_name}'\n\nThis notebook was generated automatically from your EvalAssist test case '{params.test_case_name}'. It contains code to evaluate a set of responses using the specified criteria and evaluator.\n\n"
+    import_md = "### Import the necessary libraries"
+    import_code = f"""
+from unitxt.api import evaluate, create_dataset
 from unitxt.inference import LiteLLMInferenceEngine
-from unitxt.llm_as_judge import LLMJudgeDirect, EvaluatorNameEnum
-from unitxt.llm_as_judge_constants import (
-    CriteriaWithOptions,
-)
-from unitxt.loaders import LoadFromDictionary
+from unitxt.llm_as_judge import LLMJudgeDirect, EvaluatorNameEnum, CriteriaWithOptions
 from unitxt.task import Task
 from unitxt.templates import NullTemplate
-
-criteria = CriteriaWithOptions.from_obj({params.criteria})
-
-data = {{"test":[{parsed_context_variables}] * len({params.responses})}}
-
-metric = LLMJudgeDirect(    
+import pandas as pd
+import nest_asyncio
+nest_asyncio.apply()
+"""
+    
+    load_dataset_md = """### Laoding the dataset
+This code block creates a dataset from the context variables and the prediction. It simulates the sceario where the dataset is loaded from a csv file.
+"""
+    load_dataset_code = f"""context_variables = {parsed_context_variables}
+predictions = {params.responses}
+dataset_rows = [context_variables | {{'prediction': prediction}} for prediction in predictions]
+df = pd.DataFrame(dataset_rows)
+# load a csv if data is stored in a csv file
+# df = pd.read_csv(file_path)
+"""
+    
+    load_criteria_md = """### Load the criteria
+The criteria in direct evaluation need an option map that matches a string to a numerical value. This code block creates an option map, but it may not be accurate as it assume equal distribution between 0 and 1 and ascending order.
+"""
+    options_count = len(params.criteria['options'])
+    option_value_step = 1 / (options_count - 1)
+    default_option_map = {option['name']: option_value_step * i for i, option in enumerate(params.criteria['options'])}
+    criteria = params.criteria | {"option_map": default_option_map}
+    load_criteria_code = f"""
+option_map = {default_option_map}
+criteria = CriteriaWithOptions.from_obj({criteria})
+"""
+    setup_md = """### Setup the evaluation
+This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables. 
+"""
+    setup_code = f"""metric = LLMJudgeDirect(    
     evaluator_name={f"EvaluatorNameEnum.{get_enum_by_value(params.evaluator_name).name}.name"},
     inference_engine=LiteLLMInferenceEngine({inference_engine_params_string}),
     criteria=criteria,
     context_fields={context_fields},
     criteria_field="criteria",
 )
-
-card = TaskCard(
-    loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
+dataset_content = df.drop(columns=['prediction']).to_dict(orient='records')
+dataset = create_dataset(
     task=Task(
         input_fields={input_fields},
         reference_fields={{}},
         prediction_type=str,
-        metrics=[metric],
         default_template=NullTemplate(),
+        metrics=[metric],
     ),
-)
-
-dataset = load_dataset(card=card, split="test")
-
-predictions = {params.responses}
-
+    test_set=dataset_content,
+    split="test")
+"""
+    evaluation_md = "### Evaluate the responses and print the results"
+    evaluation_code = f"""predictions = df['prediction'].tolist()
 results = evaluate(predictions=predictions, data=dataset)
-"""]
+print("Global Scores:")
+print(results.global_scores.summary)
 
-    # Add cells to the notebook
-    for cell in code_cells:
-        nb.cells.append(nbf.v4.new_code_cell(cell))
+print("Instance Scores:")
+print(results.instance_scores.summary)
+"""
+
+    nb.cells.append(nbf.v4.new_markdown_cell(title))
+    nb.cells.append(nbf.v4.new_markdown_cell(import_md))
+    nb.cells.append(nbf.v4.new_code_cell(import_code))
+    nb.cells.append(nbf.v4.new_markdown_cell(load_dataset_md))
+    nb.cells.append(nbf.v4.new_code_cell(load_dataset_code))
+    nb.cells.append(nbf.v4.new_markdown_cell(load_criteria_md))
+    nb.cells.append(nbf.v4.new_code_cell(load_criteria_code))
+    nb.cells.append(nbf.v4.new_markdown_cell(setup_md))
+    nb.cells.append(nbf.v4.new_code_cell(setup_code))
+    nb.cells.append(nbf.v4.new_markdown_cell(evaluation_md))
+    nb.cells.append(nbf.v4.new_code_cell(evaluation_code))
 
     # Define file path
     if not os.path.exists("generated_notebooks"):
