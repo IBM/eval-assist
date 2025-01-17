@@ -48,7 +48,7 @@ class LoggingRoute(APIRoute):
                 request.method,
                 request.url.path,
                 req_body,
-                response.body if hasattr(response, "body") else "No body",
+                response.body if hasattr(response, "body") else None,
                 request.headers,
                 runtime,
             )
