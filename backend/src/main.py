@@ -1,13 +1,15 @@
 import json
+import logging
 import os
 import traceback
-from typing import Union, cast
 import uuid
-from fastapi.exceptions import RequestValidationError
+from typing import Union, cast
+
 import nbformat as nbf
 import nest_asyncio
 from dotenv import load_dotenv
 from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException, Request, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from genai.exceptions import ApiNetworkException, ApiResponseException
@@ -17,25 +19,30 @@ from ibm_watsonx_ai.wml_client_error import (
     WMLClientError,
 )
 from llmasajudge.benchmark.utils import get_all_benchmarks
-from llmasajudge.evaluators import EvaluatorNameEnum as EvaluatorNameEnumOld,  GraniteGuardianRubricEvaluator, ModelProviderEnum as ModelProviderEnumOld, get_rubric_evaluator
+from llmasajudge.evaluators import EvaluatorNameEnum as EvaluatorNameEnumOld
+from llmasajudge.evaluators import GraniteGuardianRubricEvaluator
+from llmasajudge.evaluators import ModelProviderEnum as ModelProviderEnumOld
+from llmasajudge.evaluators import get_rubric_evaluator
 from openai import AuthenticationError
 from prisma.errors import PrismaError
 from prisma.models import StoredUseCase
 from pydantic import BaseModel
 from unitxt.llm_as_judge import (
     DIRECT_CRITERIAS,
-    EVALUATORS_METADATA,
     EVALUATOR_TO_MODEL_ID,
+    EVALUATORS_METADATA,
     PAIRWISE_CRITERIAS,
     Criteria,
     CriteriaOption,
     CriteriaWithOptions,
     EvaluatorNameEnum,
     EvaluatorTypeEnum,
-    ModelProviderEnum,
-    rename_model_if_required,
 )
-import logging
+
+from .api.common import NotebookParams
+
+from .notebook_generation import generate_direct_notebook, generate_pairwise_notebook
+
 from .api.pairwise import (
     CriteriaAPI,
     PairwiseEvalRequestModel,
@@ -51,7 +58,12 @@ from .api.rubric import (
     RubricEvalResponseModel,
 )
 from .db_client import db
-from .evaluators.unitxt import DirectAssessmentEvaluator, PairwiseComparisonEvaluator, get_enum_by_value, get_inference_engine_params
+from .evaluators.unitxt import (
+    DirectAssessmentEvaluator,
+    PairwiseComparisonEvaluator,
+    get_enum_by_value,
+    get_inference_engine_params,
+)
 
 # Logging req/resp
 from .logger import LoggingRoute
@@ -248,7 +260,6 @@ async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
         raise HTTPException(status_code=400, detail=e.error_msg if hasattr(e, "error_msg") else "Unknown error.")
 
 
-
 @router.get("/use_case/")
 def get_use_cases(user: str):
     use_cases = db.storedusecase.find_many(where={"app_user": {"email": user}})
@@ -343,17 +354,6 @@ def get_benchmarks():
     json_data = get_all_benchmarks()
     return json_data
 
-
-class NotebookParams(BaseModel):
-    test_case_name: str
-    criteria: dict
-    evaluator_name: EvaluatorNameEnum
-    provider: ModelProviderEnum
-    responses: list
-    context_variables: list
-    credentials: dict[str, str]
-    evaluator_type: EvaluatorTypeEnum
-
 def cleanup_file(filepath: str):
     """Safely remove a file after it has been served."""
     try:
@@ -364,103 +364,17 @@ def cleanup_file(filepath: str):
     except Exception as e:
         print(f"Error deleting file: {filepath}, {e}")
 
+
 @router.post("/download-notebook/")
 def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks):
     # Validate inputs
     if not params.criteria or not params.evaluator_name or not params.responses or not params.context_variables:
         raise HTTPException(status_code=400, detail="Missing required fields")
 
-    inference_engine_params = get_inference_engine_params(provider=params.provider, evaluator_name=params.evaluator_name, credentials=params.credentials)
-    inference_engine_params_string = ','.join([f"{k}={repr(v) if isinstance(v, str) else v}" for k,v in inference_engine_params.items()])
-    
-    parsed_context_variables = {
-        item["variable"]: item["value"]
-        for item in params.context_variables
-    }
-    input_fields = {k: 'str' for k in parsed_context_variables.keys()}
-    context_fields = list(parsed_context_variables.keys())
-    
-
-    nb = nbf.v4.new_notebook()
-
-    title = f"# Unitxt sample notebook: {params.test_case_name}'\n\nThis notebook was generated automatically from your EvalAssist test case '{params.test_case_name}'. It contains code to evaluate a set of responses using the specified criteria and evaluator.\n\n"
-    import_md = "### Import the necessary libraries"
-    import_code = f"""
-from unitxt.api import evaluate, create_dataset
-from unitxt.inference import LiteLLMInferenceEngine
-from unitxt.llm_as_judge import LLMJudgeDirect, EvaluatorNameEnum, CriteriaWithOptions
-from unitxt.task import Task
-from unitxt.templates import NullTemplate
-import pandas as pd
-import nest_asyncio
-nest_asyncio.apply()
-"""
-    
-    load_dataset_md = """### Laoding the dataset
-This code block creates a dataset from the context variables and the prediction. It simulates the sceario where the dataset is loaded from a csv file.
-"""
-    load_dataset_code = f"""context_variables = {parsed_context_variables}
-predictions = {params.responses}
-dataset_rows = [context_variables | {{'prediction': prediction}} for prediction in predictions]
-df = pd.DataFrame(dataset_rows)
-# load a csv if data is stored in a csv file
-# df = pd.read_csv(file_path)
-"""
-    
-    load_criteria_md = """### Load the criteria
-The criteria in direct evaluation need an option map that matches a string to a numerical value. This code block creates an option map, but it may not be accurate as it assume equal distribution between 0 and 1 and ascending order.
-"""
-    options_count = len(params.criteria['options'])
-    option_value_step = 1 / (options_count - 1)
-    default_option_map = {option['name']: option_value_step * i for i, option in enumerate(params.criteria['options'])}
-    criteria = params.criteria | {"option_map": default_option_map}
-    load_criteria_code = f"""
-option_map = {default_option_map}
-criteria = CriteriaWithOptions.from_obj({criteria})
-"""
-    setup_md = """### Setup the evaluation
-This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables. 
-"""
-    setup_code = f"""metric = LLMJudgeDirect(    
-    evaluator_name={f"EvaluatorNameEnum.{get_enum_by_value(params.evaluator_name).name}.name"},
-    inference_engine=LiteLLMInferenceEngine({inference_engine_params_string}),
-    criteria=criteria,
-    context_fields={context_fields},
-    criteria_field="criteria",
-)
-dataset_content = df.drop(columns=['prediction']).to_dict(orient='records')
-dataset = create_dataset(
-    task=Task(
-        input_fields={input_fields},
-        reference_fields={{}},
-        prediction_type=str,
-        default_template=NullTemplate(),
-        metrics=[metric],
-    ),
-    test_set=dataset_content,
-    split="test")
-"""
-    evaluation_md = "### Evaluate the responses and print the results"
-    evaluation_code = f"""predictions = df['prediction'].tolist()
-results = evaluate(predictions=predictions, data=dataset)
-print("Global Scores:")
-print(results.global_scores.summary)
-
-print("Instance Scores:")
-print(results.instance_scores.summary)
-"""
-
-    nb.cells.append(nbf.v4.new_markdown_cell(title))
-    nb.cells.append(nbf.v4.new_markdown_cell(import_md))
-    nb.cells.append(nbf.v4.new_code_cell(import_code))
-    nb.cells.append(nbf.v4.new_markdown_cell(load_dataset_md))
-    nb.cells.append(nbf.v4.new_code_cell(load_dataset_code))
-    nb.cells.append(nbf.v4.new_markdown_cell(load_criteria_md))
-    nb.cells.append(nbf.v4.new_code_cell(load_criteria_code))
-    nb.cells.append(nbf.v4.new_markdown_cell(setup_md))
-    nb.cells.append(nbf.v4.new_code_cell(setup_code))
-    nb.cells.append(nbf.v4.new_markdown_cell(evaluation_md))
-    nb.cells.append(nbf.v4.new_code_cell(evaluation_code))
+    if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
+        nb = generate_direct_notebook(params)
+    elif params.evaluator_type == EvaluatorTypeEnum.PAIRWISE:
+        nb = generate_pairwise_notebook(params)
 
     # Define file path
     if not os.path.exists("generated_notebooks"):
@@ -481,9 +395,10 @@ print(results.instance_scores.summary)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-	exc_str = f'{exc}'.replace('\n', ' ').replace('   ', ' ')
-	logging.error(f"{request}: {exc_str}")
-	content = {'status_code': 10422, 'message': exc_str, 'data': None}
-	return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    exc_str = f"{exc}".replace("\n", " ").replace("   ", " ")
+    logging.error(f"{request}: {exc_str}")
+    content = {"status_code": 10422, "message": exc_str, "data": None}
+    return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
 
 app.include_router(router)

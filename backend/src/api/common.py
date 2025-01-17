@@ -40,3 +40,14 @@ class EvalRequestModel(BaseModel):
         if not evaluator_name:
             raise HTTPException(status_code=400, detail="A valid pipeline name is required.")
         return evaluator_name
+
+
+class NotebookParams(BaseModel):
+    test_case_name: str
+    criteria: dict
+    evaluator_name: EvaluatorNameEnum
+    provider: ModelProviderEnum
+    responses: list
+    context_variables: list
+    credentials: dict[str, str]
+    evaluator_type: EvaluatorTypeEnum
