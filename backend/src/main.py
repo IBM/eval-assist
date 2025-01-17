@@ -2,13 +2,14 @@ import json
 import os
 import traceback
 from typing import Union, cast
-
+import uuid
+from fastapi.exceptions import RequestValidationError
 import nbformat as nbf
 import nest_asyncio
 from dotenv import load_dotenv
-from fastapi import APIRouter, FastAPI, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from genai.exceptions import ApiNetworkException, ApiResponseException
 from ibm_watsonx_ai.wml_client_error import (
     ApiRequestFailure,
@@ -16,10 +17,7 @@ from ibm_watsonx_ai.wml_client_error import (
     WMLClientError,
 )
 from llmasajudge.benchmark.utils import get_all_benchmarks
-from llmasajudge.evaluators import EvaluatorNameEnum as EvaluatorNameEnumOld
-from llmasajudge.evaluators import GraniteGuardianRubricEvaluator
-from llmasajudge.evaluators import ModelProviderEnum as ModelProviderEnumOld
-from llmasajudge.evaluators import get_rubric_evaluator
+from llmasajudge.evaluators import EvaluatorNameEnum as EvaluatorNameEnumOld,  GraniteGuardianRubricEvaluator, ModelProviderEnum as ModelProviderEnumOld, get_rubric_evaluator
 from openai import AuthenticationError
 from prisma.errors import PrismaError
 from prisma.models import StoredUseCase
@@ -27,14 +25,17 @@ from pydantic import BaseModel
 from unitxt.llm_as_judge import (
     DIRECT_CRITERIAS,
     EVALUATORS_METADATA,
+    EVALUATOR_TO_MODEL_ID,
     PAIRWISE_CRITERIAS,
     Criteria,
     CriteriaOption,
     CriteriaWithOptions,
     EvaluatorNameEnum,
     EvaluatorTypeEnum,
+    ModelProviderEnum,
+    rename_model_if_required,
 )
-
+import logging
 from .api.pairwise import (
     CriteriaAPI,
     PairwiseEvalRequestModel,
@@ -50,7 +51,7 @@ from .api.rubric import (
     RubricEvalResponseModel,
 )
 from .db_client import db
-from .evaluators.unitxt import DirectAssessmentEvaluator, PairwiseComparisonEvaluator
+from .evaluators.unitxt import DirectAssessmentEvaluator, PairwiseComparisonEvaluator, get_enum_by_value, get_inference_engine_params
 
 # Logging req/resp
 from .logger import LoggingRoute
@@ -66,6 +67,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 router = APIRouter(route_class=LoggingRoute)
 
 
@@ -173,8 +175,6 @@ async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
                     response_variable_name_list=[req.response_variable_name] * len(req.responses),
                     check_bias=True,
                 )
-                print("res")
-                print(res)
                 for r in res:
                     r["summary"] = r["explanation"]
                     del r["explanation"]
@@ -346,48 +346,84 @@ def get_benchmarks():
 
 class NotebookParams(BaseModel):
     criteria: dict
-    model_name: str
+    evaluator_name: EvaluatorNameEnum
+    provider: ModelProviderEnum
     responses: list
-    contexts: list
+    context_variables: list
+    credentials: dict[str, str]
+    evaluator_type: EvaluatorTypeEnum
 
+def cleanup_file(filepath: str):
+    """Safely remove a file after it has been served."""
+    try:
+        os.remove(filepath)
+        print(f"Deleted file: {filepath}")
+    except FileNotFoundError:
+        print(f"File not found for deletion: {filepath}")
+    except Exception as e:
+        print(f"Error deleting file: {filepath}, {e}")
 
 @router.post("/download-notebook/")
-def download_notebook(params: NotebookParams):
+def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks):
     # Validate inputs
-    if not params.criteria or not params.model_name or not params.responses or not params.contexts:
+    if not params.criteria or not params.evaluator_name or not params.responses or not params.context_variables:
         raise HTTPException(status_code=400, detail="Missing required fields")
 
+    inference_engine_params = get_inference_engine_params(provider=params.provider, evaluator_name=params.evaluator_name, credentials=params.credentials)
+    inference_engine_params_string = ','.join([f"{k}={repr(v) if isinstance(v, str) else v}" for k,v in inference_engine_params.items()])
+    
+    parsed_context_variables = {
+        item["variable"]: item["value"]
+        for item in params.context_variables
+    }
+    input_fields = {k: 'str' for k in parsed_context_variables.keys()}
+    context_fields = list(parsed_context_variables.keys())
+    
     # Create a Jupyter notebook object
     nb = nbf.v4.new_notebook()
 
     # Define notebook cells
-    code_cells = [
-        """from unitxt.api import create_dataset, evaluate
-from unitxt.inference import CrossProviderInferenceEngine
-from unitxt.llm_as_judge import LLMJudgeDirect
-from unitxt.llm_as_judge_constants import CriteriaWithOptions""",
-        f"""criteria = CriteriaWithOptions.from_obj({params.criteria})""",
-        f"""data = {params.contexts}""",
-        f"""metric = LLMJudgeDirect(
-    inference_engine=CrossProviderInferenceEngine(
-        model="{params.model_name}", max_tokens=1024
-    ),
+    code_cells = [f"""
+from unitxt.api import evaluate, load_dataset
+from unitxt.card import TaskCard
+from unitxt.inference import LiteLLMInferenceEngine
+from unitxt.llm_as_judge import LLMJudgeDirect, EvaluatorNameEnum
+from unitxt.llm_as_judge_constants import (
+    CriteriaWithOptions,
+)
+from unitxt.loaders import LoadFromDictionary
+from unitxt.task import Task
+from unitxt.templates import NullTemplate
+
+criteria = CriteriaWithOptions.from_obj({params.criteria})
+
+data = {{"test":[{parsed_context_variables}] * len({params.responses})}}
+
+metric = LLMJudgeDirect(    
+    evaluator_name={f"EvaluatorNameEnum.{get_enum_by_value(params.evaluator_name).name}.name"},
+    inference_engine=LiteLLMInferenceEngine({inference_engine_params_string}),
     criteria=criteria,
-    context_fields=["question"],
+    context_fields={context_fields},
     criteria_field="criteria",
-)""",
-        """dataset = create_dataset(
-    task="tasks.qa.open", test_set=data, metrics=[metric], split="test"
-)""",
-        f"""predictions = {params.responses}""",
-        """results = evaluate(predictions=predictions, data=dataset)
+)
 
-print("Global Scores:")
-print(results.global_scores.summary)
+card = TaskCard(
+    loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
+    task=Task(
+        input_fields={input_fields},
+        reference_fields={{}},
+        prediction_type=str,
+        metrics=[metric],
+        default_template=NullTemplate(),
+    ),
+)
 
-print("Instance Scores:")
-print(results.instance_scores.summary)""",
-    ]
+dataset = load_dataset(card=card, split="test")
+
+predictions = {params.responses}
+
+results = evaluate(predictions=predictions, data=dataset)
+"""]
 
     # Add cells to the notebook
     for cell in code_cells:
@@ -397,13 +433,24 @@ print(results.instance_scores.summary)""",
     if not os.path.exists("generated_notebooks"):
         os.mkdir("generated_notebooks")
 
-    notebook_path = os.path.join("generated_notebooks", "generated_notebook.ipynb")
-    # Write notebook to file
+    if not os.path.exists(os.path.join("generated_notebooks", params.evaluator_type.value)):
+        os.mkdir(os.path.join("generated_notebooks", params.evaluator_type.value))
+
+    notebook_path = os.path.join("generated_notebooks", params.evaluator_type.value, f"{uuid.uuid4().hex}.ipynb")
+
     with open(notebook_path, "w") as f:
         nbf.write(nb, f)
 
-    # Return the notebook as a file response
+    background_tasks.add_task(cleanup_file, notebook_path)
+
     return FileResponse(notebook_path, media_type="application/x-ipynb+json", filename="generated_notebook.ipynb")
 
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+	exc_str = f'{exc}'.replace('\n', ' ').replace('   ', ' ')
+	logging.error(f"{request}: {exc_str}")
+	content = {'status_code': 10422, 'message': exc_str, 'data': None}
+	return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 app.include_router(router)
