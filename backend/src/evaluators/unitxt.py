@@ -23,6 +23,39 @@ from unitxt.loaders import LoadFromDictionary
 from unitxt.templates import NullTemplate
 
 
+def get_inference_engine_params(credentials: dict, provider: ModelProviderEnum, evaluator_name:EvaluatorNameEnum, ):
+    inference_engine_params = {
+        "max_tokens": 1024,
+        "seed": 42,
+        "credentials": credentials,
+        "max_requests_per_second": 10,
+    }
+
+    model_name = rename_model_if_required(EVALUATOR_TO_MODEL_ID[evaluator_name], provider)
+
+    if provider == ModelProviderEnum.WATSONX:
+        model_name = "watsonx/" + model_name
+
+    if provider == ModelProviderEnum.AZURE_OPENAI:
+        inference_engine_params["credentials"][
+            "api_base"
+        ] = f"https://eteopenai.azure-api.net/openai/deployments/{model_name}/chat/completions?api-version=2024-08-01-preview"
+        model_name = "azure/" + model_name
+    if provider == ModelProviderEnum.RITS:
+        inference_engine_params["credentials"]["api_base"] = RITSInferenceEngine.get_base_url_from_model_name(model_name) + "/v1"
+        inference_engine_params["extra_headers"] = {"RITS_API_KEY": credentials["api_key"]}
+        model_name = f"openai/{model_name}"
+
+    inference_engine_params["model"] = model_name
+    
+    return inference_engine_params
+
+def get_enum_by_value(value: str) -> EvaluatorNameEnum:
+    for enum_member in EvaluatorNameEnum:
+        if enum_member.value == value:
+            return enum_member
+    raise ValueError(f"No matching enum found for value: {value}")
+
 class Evaluator(ABC):
     evaluator_type: EvaluatorTypeEnum
 
@@ -40,32 +73,8 @@ class Evaluator(ABC):
         provider: ModelProviderEnum,
         credentials: dict[str, str],
     ):
-
-        params = {
-            "max_tokens": 1024,
-            "seed": 42,
-            "credentials": credentials,
-            "max_requests_per_second": 10,
-        }
-
-        model = rename_model_if_required(EVALUATOR_TO_MODEL_ID[self.evaluator.name], provider)
-
-        if provider == ModelProviderEnum.WATSONX:
-            model = "watsonx/" + model
-
-        if provider == ModelProviderEnum.AZURE_OPENAI:
-            params["credentials"][
-                "api_base"
-            ] = f"https://eteopenai.azure-api.net/openai/deployments/{model}/chat/completions?api-version=2024-08-01-preview"
-            model = "azure/" + model
-        if provider == ModelProviderEnum.RITS:
-            params["credentials"]["api_base"] = RITSInferenceEngine.get_base_url_from_model_name(model) + "/v1"
-            params["extra_headers"] = {"RITS_API_KEY": credentials["api_key"]}
-            model = f"openai/{model}"
-
-        params["model"] = model
-
-        inference_engine = LiteLLMInferenceEngine(**params)
+        inference_engine_params = get_inference_engine_params(credentials, provider, self.evaluator.name)
+        inference_engine = LiteLLMInferenceEngine(**inference_engine_params)
 
         evalutor_params = {
             "inference_engine": inference_engine,
