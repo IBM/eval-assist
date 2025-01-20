@@ -145,7 +145,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     allLibraryUseCases,
     criteriaName,
     getEmptyUseCaseWithCriteria,
-    // getAreRelevantCredentialsProvided,
+    getAreRelevantCredentialsProvided,
   ])
 
   return (

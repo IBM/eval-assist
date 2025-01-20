@@ -4,10 +4,12 @@ import { useCallback, useEffect } from 'react'
 
 import { ModelProviderCredentials, ModelProviderType } from '../types'
 
+const watsonx_url = 'https://us-south.ml.cloud.ibm.com'
+
 export const useModelProviderCredentials = () => {
   const [modelProviderCredentials, setModelProviderCredentials, removeModelProviderCredentials] =
     useLocalStorage<ModelProviderCredentials>('modelProviderCrentials', {
-      [ModelProviderType.WATSONX]: { api_key: '', project_id: '', url: 'https://us-south.ml.cloud.ibm.com' },
+      [ModelProviderType.WATSONX]: { api_key: '', project_id: '', api_base: watsonx_url },
       [ModelProviderType.OPENAI]: { api_key: '' },
       [ModelProviderType.RITS]: { api_key: '' },
       [ModelProviderType.AZURE_OPENAI]: { api_key: '' },
@@ -23,22 +25,44 @@ export const useModelProviderCredentials = () => {
     }
 
     // watsonx key was apikey before, so we adapt it to api_key
-    if (!modelProviderCredentials.watsonx.api_key) {
+    if (!('api_key' in modelProviderCredentials.watsonx)) {
       setModelProviderCredentials({
         ...modelProviderCredentials,
         watsonx: {
-          ...modelProviderCredentials.watsonx,
           // @ts-ignore
+          ...modelProviderCredentials.watsonx,
           api_key: modelProviderCredentials.watsonx['apikey'] || '',
         },
       })
     }
 
     // @ts-ignore
-    if (modelProviderCredentials.watsonx['apikey']) {
+    if ('apikey' in modelProviderCredentials.watsonx) {
       const aux = { ...modelProviderCredentials.watsonx }
       // @ts-ignore
       delete aux['apikey']
+      setModelProviderCredentials({
+        ...modelProviderCredentials,
+        watsonx: aux,
+      })
+    }
+
+    if (!('api_base' in modelProviderCredentials.watsonx) || modelProviderCredentials.watsonx.api_base === '') {
+      setModelProviderCredentials({
+        ...modelProviderCredentials,
+        watsonx: {
+          // @ts-ignore
+          ...modelProviderCredentials.watsonx,
+          api_base: watsonx_url,
+        },
+      })
+    }
+
+    // @ts-ignore
+    if ('url' in modelProviderCredentials.watsonx) {
+      const aux = { ...modelProviderCredentials.watsonx }
+      // @ts-ignore
+      delete aux['url']
       setModelProviderCredentials({
         ...modelProviderCredentials,
         watsonx: aux,

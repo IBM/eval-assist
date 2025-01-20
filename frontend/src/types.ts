@@ -256,7 +256,7 @@ export type ModelProviderCredentials = {
   watsonx: {
     api_key: string
     project_id: string
-    url: string
+    api_base: string
   }
   openai: {
     api_key: string

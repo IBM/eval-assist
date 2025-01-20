@@ -24,11 +24,9 @@ interface Props {
 export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
   const { rubricLibraryTestCases, pairwiseLibraryTestCases } = useTestCaseLibrary()
 
-  const [expanded, setExpanded] = useState<
-    { direct_assessment: boolean; pairwise_comparison: boolean } & { [key: string]: boolean }
-  >({
-    direct_assessment: true,
-    pairwise_comparison: true,
+  const [expanded, setExpanded] = useState<{ direct: boolean; pairwise: boolean } & { [key: string]: boolean }>({
+    direct: true,
+    pairwise: true,
     ...Object.keys(rubricLibraryTestCases).reduce((acc, item, index) => ({ ...acc, [item]: true }), {}),
   })
 
@@ -64,11 +62,11 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
         <div className={classes.treeWrapper}>
           <TreeView label="" selected={selectedNode}>
             <TreeNode
-              key={'direct_assessment'}
+              key={'direct'}
               label={RUBRIC_NAME}
-              onSelect={() => handleToggle('direct_assessment')}
-              onToggle={() => handleToggle('direct_assessment')}
-              isExpanded={expanded.pairwise_comparison}
+              onSelect={() => handleToggle('direct')}
+              onToggle={() => handleToggle('direct')}
+              isExpanded={expanded.pairwise}
             >
               {rubricLibraryTestCases.map((useCase, i) => (
                 <TreeNode
@@ -78,8 +76,8 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
                       <LinkButton useCase={useCase} />
                     </div>
                   }
-                  key={`${useCase.name}_direct_assessment`}
-                  id={`${useCase.name}_direct_assessment`}
+                  key={`${useCase.name}_direct`}
+                  id={`${useCase.name}_direct`}
                   selected={selectedNode}
                   renderIcon={Compare}
                   onClick={(e: any) => onClick(e, useCase)}
@@ -87,11 +85,11 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
               ))}
             </TreeNode>
             <TreeNode
-              key={'pairwise_comparison'}
+              key={'pairwise'}
               label={PAIRWISE_NAME}
-              onSelect={() => handleToggle('pairwise_comparison')}
-              onToggle={() => handleToggle('pairwise_comparison')}
-              isExpanded={expanded.pairwise_comparison}
+              onSelect={() => handleToggle('pairwise')}
+              onToggle={() => handleToggle('pairwise')}
+              isExpanded={expanded.pairwise}
             >
               {pairwiseLibraryTestCases.map((useCase, i) => (
                 <TreeNode
@@ -101,8 +99,8 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
                       <LinkButton useCase={useCase} />
                     </div>
                   }
-                  key={`${useCase.name}_pairwise_comparison`}
-                  id={`${useCase.name}_pairwise_comparison`}
+                  key={`${useCase.name}_pairwise`}
+                  id={`${useCase.name}_pairwise`}
                   renderIcon={Compare}
                   onClick={(e: any) => onClick(e, useCase)}
                 />
