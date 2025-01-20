@@ -5,3 +5,6 @@ uvicorn==0.29.0
 nest_asyncio>=1.6.0
 python-dotenv
 nbformat
+litellm
+tenacity
+diskcache
