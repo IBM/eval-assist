@@ -358,11 +358,11 @@ def cleanup_file(filepath: str):
     """Safely remove a file after it has been served."""
     try:
         os.remove(filepath)
-        print(f"Deleted file: {filepath}")
+        logging.debug(f"Deleted file: {filepath}")
     except FileNotFoundError:
-        print(f"File not found for deletion: {filepath}")
+        logging.debug(f"File not found for deletion: {filepath}")
     except Exception as e:
-        print(f"Error deleting file: {filepath}, {e}")
+        logging.debug(f"Error deleting file: {filepath}, {e}")
 
 
 @router.post("/download-notebook/")
@@ -373,17 +373,17 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
 
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
         nb = generate_direct_notebook(params)
-    elif params.evaluator_type == EvaluatorTypeEnum.PAIRWISE:
+    else:
         nb = generate_pairwise_notebook(params)
 
     # Define file path
     if not os.path.exists("generated_notebooks"):
         os.mkdir("generated_notebooks")
+    root_folder = "generated_notebooks"
+    if not os.path.exists(os.path.join(root_folder)):
+        os.mkdir(os.path.join(root_folder))
 
-    if not os.path.exists(os.path.join("generated_notebooks", params.evaluator_type.value)):
-        os.mkdir(os.path.join("generated_notebooks", params.evaluator_type.value))
-
-    notebook_path = os.path.join("generated_notebooks", params.evaluator_type.value, f"{uuid.uuid4().hex}.ipynb")
+    notebook_path = os.path.join(root_folder, f"{uuid.uuid4().hex}.ipynb")
 
     with open(notebook_path, "w") as f:
         nbf.write(nb, f)

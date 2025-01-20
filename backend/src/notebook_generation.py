@@ -42,17 +42,15 @@ df = pd.DataFrame(dataset_rows)
 """
 
     load_criteria_md = """### Load the criteria
-The criteria in direct evaluation need an option map that matches a string to a numerical value. This code block creates an option map, but it may not be accurate as it assume equal distribution between 0 and 1 and ascending order.
+The criteria in a direct evaluation needs an option map that matches a string to a numerical value. Replace the NaN value of each option with your desire numerical value.
 """
-    options_count = len(params.criteria["options"])
-    option_value_step = 1 / (options_count - 1)
-    default_option_map = {
-        option["name"]: option_value_step * i for i, option in enumerate(reversed(params.criteria["options"]))
-    }
-    criteria = params.criteria | {"option_map": default_option_map}
+    option_map_string = ', '.join([f'\'{option_name}\': float(\'nan\')' for option_name in [option['name'] for option in params.criteria['options']]])
+
     load_criteria_code = f"""
-option_map = {default_option_map}
-criteria = CriteriaWithOptions.from_obj({criteria})
+criteria = {params.criteria}
+option_map = {{{option_map_string}}}
+criteria["option_map"] = option_map
+criteria = CriteriaWithOptions.from_obj(criteria)
 """
     setup_md = """### Setup the evaluation
 This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables. 
@@ -80,10 +78,10 @@ dataset = create_dataset(
     evaluation_code = f"""predictions = df['prediction'].tolist()
 results = evaluate(predictions=predictions, data=dataset)
 print("Global Scores:")
-print(results.global_scores.summary)
+print(results.global_scores)
 
 print("Instance Scores:")
-print(results.instance_scores.summary)
+print(results.instance_scores)
 """
 
     nb.cells.append(nbf.v4.new_markdown_cell(title))
@@ -175,10 +173,10 @@ dataset = create_dataset(
     evaluation_code = f"""predictions = df.filter(regex=r'^system_\d+$').values.tolist()
 results = evaluate(predictions=predictions, data=dataset)
 print("Global Scores:")
-print(results.global_scores.summary)
+print(results.global_scores)
 
 print("Instance Scores:")
-print(results.instance_scores.summary)
+print(results.instance_scores)
 """
 
     nb.cells.append(nbf.v4.new_markdown_cell(title))
