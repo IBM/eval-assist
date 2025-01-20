@@ -9,6 +9,7 @@ import {
   DirectAssessmentResultsV1,
   EvaluationType,
   Evaluator,
+  ModelProviderType,
   PairwiseComparisonCriteriaV1,
   PairwiseComparisonResultsV0,
   PairwiseComparisonResultsV1,
@@ -168,7 +169,7 @@ export const useParseFetchedUseCase = () => {
 
   /*
   Many things change from V1 to V2:
-  - pipeline was renamed to evaluator
+  - pipeline was renamed to evaluator (bam was removed)
   - criteria fields were renamed
   - positionalBiasOption was added to the DA results
   - explanations were renamed to summaries
@@ -180,6 +181,9 @@ export const useParseFetchedUseCase = () => {
   const parseFetchedUseCaseV1ToV2 = useCallback(
     (useCaseV1: UseCaseV1): UseCaseV2 => {
       const type = returnByPipelineType(useCaseV1.type, EvaluationType.DIRECT, EvaluationType.PAIRWISE)
+      // @ts-ignore
+      const evaluator = useCaseV1.pipeline?.provider === 'bam' ? null : useCaseV1.pipeline
+      console.log(evaluator)
       const useCaseV2 = {
         id: useCaseV1.id,
         name: useCaseV1.name,
@@ -187,7 +191,7 @@ export const useParseFetchedUseCase = () => {
         contextVariables: useCaseV1.contextVariables,
         responseVariableName: useCaseV1.responseVariableName,
         responses: useCaseV1.responses,
-        evaluator: useCaseV1.pipeline,
+        evaluator: evaluator,
         expectedResults: useCaseV1.expectedResults,
         results: parseResultsV0ToV1(useCaseV1.results, type),
         criteria: returnByPipelineType<DirectAssessmentCriteriaV1, PairwiseComparisonCriteriaV1>(
