@@ -63,11 +63,11 @@ export const APIKeyPopover = ({
                   ref={apiKeyInputRef}
                   id={'watsonx-api-key-input'}
                   labelText=""
-                  value={modelProviderCrentials.watsonx.apikey}
+                  value={modelProviderCrentials.watsonx.api_key}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setModelProviderCredentials({
                       ...modelProviderCrentials,
-                      watsonx: { ...modelProviderCrentials.watsonx, apikey: e.target.value },
+                      watsonx: { ...modelProviderCrentials.watsonx, api_key: e.target.value },
                     })
                   }
                   autoComplete="off"
