@@ -254,7 +254,7 @@ export type BadgeColor = (typeof badgeColorsArray)[number]
 
 export type ModelProviderCredentials = {
   watsonx: {
-    apikey: string
+    api_key: string
     project_id: string
     url: string
   }
