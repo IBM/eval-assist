@@ -1,14 +1,7 @@
-import {
-  DirectAssessmentCriteria,
-  EvaluationType,
-  Option,
-  PairwiseComparisonCriteria,
-  PairwiseComparisonResults,
-  UseCase,
-} from '@types'
+import { Criteria, CriteriaWithOptions, EvaluationType, Option, PairwiseComparisonResults, UseCase } from '@types'
 
 export const isInstanceOfOption = (obj: any): obj is Option =>
-  typeof obj.option === 'string' && typeof obj.description === 'string'
+  typeof obj.name === 'string' && typeof obj.description === 'string'
 
 export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseComparisonResults =>
   obj !== null &&
@@ -18,16 +11,16 @@ export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseComparisonR
   typeof obj.explanation === 'string' &&
   typeof obj.certainty === 'number'
 
-export const isInstanceOfRubricCriteria = (obj: any): obj is DirectAssessmentCriteria =>
+export const isInstanceOfCriteriaWithOptions = (obj: any): obj is CriteriaWithOptions =>
   typeof obj.name === 'string' &&
-  typeof obj.criteria === 'string' &&
+  typeof obj.description === 'string' &&
   obj.options !== undefined &&
   obj.options.every((o: Option) => isInstanceOfOption(o))
 
-export const isInstanceOfPairwiseCriteria = (obj: any): obj is PairwiseComparisonCriteria =>
-  typeof obj.name === 'string' && typeof obj.criteria === 'string'
+export const isInstanceOfCriteria = (obj: any): obj is Criteria =>
+  typeof obj.name === 'string' && typeof obj.description === 'string'
 
-export const getEmptyRubricCriteria = (): DirectAssessmentCriteria => ({
+export const getEmptyCriteriaWithTwoOptions = (): CriteriaWithOptions => ({
   name: '',
   description: '',
   options: [
@@ -42,13 +35,13 @@ export const getEmptyRubricCriteria = (): DirectAssessmentCriteria => ({
   ],
 })
 
-export const getEmptyPairwiseCriteria = (): PairwiseComparisonCriteria => ({
+export const getEmptyCriteria = (): Criteria => ({
   name: '',
   description: '',
 })
 
-export const getEmptyCriteria = (type: EvaluationType): DirectAssessmentCriteria | PairwiseComparisonCriteria =>
-  type === EvaluationType.DIRECT ? getEmptyRubricCriteria() : getEmptyPairwiseCriteria()
+export const getEmptyCriteriaByType = (type: EvaluationType): CriteriaWithOptions | Criteria =>
+  type === EvaluationType.DIRECT ? getEmptyCriteriaWithTwoOptions() : getEmptyCriteria()
 
 export const getEmptyUseCase = (type: EvaluationType): UseCase => ({
   id: null,
@@ -57,7 +50,7 @@ export const getEmptyUseCase = (type: EvaluationType): UseCase => ({
   contextVariables: [{ variable: 'context', value: '' }],
   responseVariableName: 'response',
   responses: type === EvaluationType.DIRECT ? [''] : ['', ''],
-  criteria: getEmptyRubricCriteria(),
+  criteria: getEmptyCriteriaWithTwoOptions(),
   results: null,
   evaluator: null,
   expectedResults: null,
