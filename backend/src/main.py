@@ -22,7 +22,7 @@ from llmasajudge.benchmark.utils import get_all_benchmarks
 from llmasajudge.evaluators import EvaluatorNameEnum as EvaluatorNameEnumOld
 from llmasajudge.evaluators import GraniteGuardianRubricEvaluator
 from llmasajudge.evaluators import ModelProviderEnum as ModelProviderEnumOld
-from llmasajudge.evaluators import get_rubric_evaluator
+from llmasajudge.evaluators import get_rubric_evaluator, RubricCriteria, RubricOption
 from openai import AuthenticationError
 from prisma.errors import PrismaError
 from prisma.models import StoredUseCase
@@ -183,7 +183,11 @@ async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
                 res = evaluator.evaluate(
                     contexts=[req.context_variables] * len(req.responses),
                     responses=req.responses,
-                    criteria=[req.criteria] * len(req.responses),
+                    criteria=[RubricCriteria(
+                        name=req.criteria.name,
+                        criteria=req.criteria.description,
+                        options=[RubricOption(option=o.name, description=o.description) for o in req.criteria.options],
+                    )] * len(req.responses),
                     response_variable_name_list=[req.response_variable_name] * len(req.responses),
                     check_bias=True,
                 )
