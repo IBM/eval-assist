@@ -114,7 +114,7 @@ export const UseCaseOptions = ({
         {'Delete Test Case'}
       </Button>
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
-      <Button kind="ghost" renderIcon={Download} onClick={downloadUnitxtNotebook}>
+      <Button disabled={isRisksAndHarms} kind="ghost" renderIcon={Download} onClick={downloadUnitxtNotebook}>
         {'Jupyter notebook'}
       </Button>
     </div>
