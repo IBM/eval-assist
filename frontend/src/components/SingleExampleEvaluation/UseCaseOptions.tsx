@@ -115,7 +115,7 @@ export const UseCaseOptions = ({
       </Button>
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
       <Button kind="ghost" renderIcon={Download} onClick={downloadUnitxtNotebook}>
-        {'Download sample notebook'}
+        {'Jupyter notebook'}
       </Button>
     </div>
   )
