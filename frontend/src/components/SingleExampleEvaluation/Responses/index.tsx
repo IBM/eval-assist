@@ -9,11 +9,11 @@ import { EditableTag } from '@components/EditableTag'
 import { returnByPipelineType } from '@utils/utils'
 
 import {
-  DirectAssessmentCriteria,
+  Criteria,
+  CriteriaWithOptions,
   DirectAssessmentResult,
   DirectAssessmentResults,
   EvaluationType,
-  PairwiseComparisonCriteria,
   PairwiseComparisonResults,
   PerResponsePairwiseResult,
   UseCase,
@@ -40,7 +40,7 @@ interface Props {
     }>
   >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
-  criteria: DirectAssessmentCriteria | PairwiseComparisonCriteria
+  criteria: CriteriaWithOptions | Criteria
   expectedResults: UseCase['expectedResults']
   setExpectedResults: (expectedResults: UseCase['expectedResults']) => void
   responseVariableName: string
@@ -176,7 +176,7 @@ export const Responses = ({
               }
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               evaluationRunning={evaluationRunning}
-              criteria={criteria as DirectAssessmentCriteria}
+              criteria={criteria as CriteriaWithOptions}
               expectedResults={expectedResults}
               setExpectedResults={setExpectedResults}
               gridClasses={rubricGridClasses}

@@ -1,6 +1,6 @@
-import { DirectAssessmentCriteria, PairwiseComparisonCriteria } from '@types'
+import { Criteria, CriteriaWithOptions } from '@types'
 
-export const rubricCriteriaLibrary: DirectAssessmentCriteria[] = [
+export const rubricCriteriaLibrary: CriteriaWithOptions[] = [
   {
     name: 'Temperature',
     description: 'Is temperature described in both Fahrenheit and Celsius?',
@@ -564,7 +564,7 @@ export const rubricCriteriaLibrary: DirectAssessmentCriteria[] = [
   },
 ]
 
-export const pairwiseCriteriaLibrary: PairwiseComparisonCriteria[] = [
+export const pairwiseCriteriaLibrary: Criteria[] = [
   {
     name: 'Factually Consistent',
     description: 'A factually consistent response contains only statements that are entailed by the source document.',
@@ -602,7 +602,7 @@ export const pairwiseCriteriaLibrary: PairwiseComparisonCriteria[] = [
   },
 ]
 
-export const criteriaLibrary: (DirectAssessmentCriteria | PairwiseComparisonCriteria)[] = [
+export const criteriaLibrary: (CriteriaWithOptions | Criteria)[] = [
   ...rubricCriteriaLibrary,
   ...pairwiseCriteriaLibrary,
 ]

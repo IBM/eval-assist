@@ -1,4 +1,4 @@
-import { CSSProperties, Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 
 import {
   Accordion,
@@ -16,8 +16,8 @@ import {
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 
 import { HighlightTextArea } from '@components/HighlightTextArea'
-import { DirectAssessmentCriteria } from '@types'
-import { isInstanceOfRubricCriteria } from '@utils/utils'
+import { CriteriaWithOptions } from '@types'
+import { isInstanceOfCriteriaWithOptions } from '@utils/utils'
 
 import { JSONTextArea } from '../JSONTextArea'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
@@ -25,8 +25,8 @@ import classes from '../SingleExampleEvaluation.module.scss'
 import customClasses from './index.module.scss'
 
 interface EvaluationCriteriaProps {
-  rubricCriteria: DirectAssessmentCriteria
-  setCriteria: Dispatch<SetStateAction<DirectAssessmentCriteria>>
+  rubricCriteria: CriteriaWithOptions
+  setCriteria: Dispatch<SetStateAction<CriteriaWithOptions>>
   selectedTabIndex: number
   setSelectedTabIndex: Dispatch<SetStateAction<number>>
   toHighlightWords: {
@@ -51,7 +51,7 @@ export const RubricCriteriaView = ({
   const isValidRawJSONCriteria = (jsonCriteria: string) => {
     try {
       const rawJSONCriteriaObj = JSON.parse(jsonCriteria)
-      return isInstanceOfRubricCriteria(rawJSONCriteriaObj)
+      return isInstanceOfCriteriaWithOptions(rawJSONCriteriaObj)
     } catch {
       return false
     }

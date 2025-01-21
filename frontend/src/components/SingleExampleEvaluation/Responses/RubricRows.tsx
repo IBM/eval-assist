@@ -7,7 +7,7 @@ import { Link, Select, SelectItem } from '@carbon/react'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
-import { DirectAssessmentCriteria, DirectAssessmentResult, DirectAssessmentResults, UseCase } from '../../../types'
+import { CriteriaWithOptions, DirectAssessmentResult, DirectAssessmentResults, UseCase } from '../../../types'
 import RemovableSection from '../../RemovableSection/RemovableSection'
 import classes from './index.module.scss'
 
@@ -23,7 +23,7 @@ interface Props {
   >
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
-  criteria: DirectAssessmentCriteria
+  criteria: CriteriaWithOptions
   setExpectedResults: (expectedResults: UseCase['expectedResults']) => void
   expectedResults: UseCase['expectedResults']
   gridClasses: {

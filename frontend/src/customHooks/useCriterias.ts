@@ -1,18 +1,18 @@
 import { useCallback } from 'react'
 
 import { useCriteriasContext } from '@components/SingleExampleEvaluation/Providers/CriteriasProvider'
-import { DirectAssessmentCriteria, EvaluationType, PairwiseComparisonCriteria, UseCase } from '@types'
-import { capitalizeFirstWord, getEmptyCriteria, getEmptyUseCase, returnByPipelineType } from '@utils/utils'
+import { Criteria, CriteriaWithOptions, EvaluationType, UseCase } from '@types'
+import { capitalizeFirstWord, getEmptyCriteriaByType, getEmptyUseCase, returnByPipelineType } from '@utils/utils'
 
 export const useCriterias = () => {
   const { directCriterias, pairwiseCriterias } = useCriteriasContext()
 
   const getCriteria = useCallback(
-    (name: string, type: EvaluationType): DirectAssessmentCriteria | PairwiseComparisonCriteria | null => {
+    (name: string, type: EvaluationType): CriteriaWithOptions | Criteria | null => {
       if (!directCriterias || !pairwiseCriterias) return null
       const criteria = returnByPipelineType(type, directCriterias, pairwiseCriterias).find(
         (c) => c.name === capitalizeFirstWord(name),
-      ) as DirectAssessmentCriteria | PairwiseComparisonCriteria | undefined
+      ) as CriteriaWithOptions | Criteria | undefined
       return criteria ?? null
     },
     [directCriterias, pairwiseCriterias],
@@ -21,7 +21,7 @@ export const useCriterias = () => {
   const getEmptyUseCaseWithCriteria = useCallback(
     (criteriaName: string, type: EvaluationType): UseCase => ({
       ...getEmptyUseCase(type),
-      criteria: getCriteria(criteriaName, type) || getEmptyCriteria(type),
+      criteria: getCriteria(criteriaName, type) || getEmptyCriteriaByType(type),
     }),
     [getCriteria],
   )

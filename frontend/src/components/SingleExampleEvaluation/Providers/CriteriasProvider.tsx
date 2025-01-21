@@ -3,18 +3,12 @@ import { ReactNode, createContext, useContext, useEffect, useMemo, useState } fr
 import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import {
-  DirectAssessmentCriteria,
-  EvaluationType,
-  Evaluator,
-  FetchedEvaluator,
-  PairwiseComparisonCriteria,
-} from '@types'
+import { Criteria, CriteriaWithOptions, EvaluationType, Evaluator, FetchedEvaluator } from '@types'
 import { capitalizeFirstWord } from '@utils/utils'
 
 interface PipelineContextValue {
-  directCriterias: DirectAssessmentCriteria[] | null
-  pairwiseCriterias: PairwiseComparisonCriteria[] | null
+  directCriterias: CriteriaWithOptions[] | null
+  pairwiseCriterias: Criteria[] | null
   loadingCriterias: boolean
 }
 
@@ -29,8 +23,8 @@ export const useCriteriasContext = () => {
 }
 
 export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
-  const [directCriterias, setDirectCriterias] = useState<DirectAssessmentCriteria[] | null>(null)
-  const [pairwiseCriterias, setPairwiseCriterias] = useState<PairwiseComparisonCriteria[] | null>(null)
+  const [directCriterias, setDirectCriterias] = useState<CriteriaWithOptions[] | null>(null)
+  const [pairwiseCriterias, setPairwiseCriterias] = useState<Criteria[] | null>(null)
   const [loadingCriterias, setLoadingCriterias] = useState(false)
   const { get } = useFetchUtils()
 
@@ -40,12 +34,8 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
       const response = await get('criterias/')
       const data = await response.json()
       setLoadingCriterias(false)
-      setDirectCriterias(
-        data.direct.map((c: DirectAssessmentCriteria) => ({ ...c, name: capitalizeFirstWord(c.name) })),
-      )
-      setPairwiseCriterias(
-        data.pairwise.map((c: PairwiseComparisonCriteria) => ({ ...c, name: capitalizeFirstWord(c.name) })),
-      )
+      setDirectCriterias(data.direct.map((c: CriteriaWithOptions) => ({ ...c, name: capitalizeFirstWord(c.name) })))
+      setPairwiseCriterias(data.pairwise.map((c: Criteria) => ({ ...c, name: capitalizeFirstWord(c.name) })))
     }
     fetchData()
   }, [get])

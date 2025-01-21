@@ -125,7 +125,7 @@ export interface UseCaseV0 {
   contextVariables: { variable: string; value: string }[]
   responseVariableName: string
   responses: string[]
-  criteria: DirectAssessmentCriteriaV0 | PairwiseComparisonCriteriaV0
+  criteria: CriteriaWithOptionsV0 | CriteriaV0
   results: ResultsV0
   expectedResults: null | string[]
   pipeline: string | null
@@ -137,7 +137,7 @@ export interface UseCaseV1 extends Omit<UseCaseV0, 'pipeline'> {
 
 export interface UseCaseV2 extends Omit<UseCaseV1, 'criteria' | 'pipeline' | 'results'> {
   evaluator: Evaluator | null
-  criteria: DirectAssessmentCriteriaV1 | PairwiseComparisonCriteriaV1
+  criteria: CriteriaWithOptionsV1 | CriteriaV1
   results: ResultsV1
 }
 
@@ -206,29 +206,29 @@ export interface Benchmark {
   tags: string[]
 }
 
-export type DirectAssessmentCriteriaV0 = {
+export type CriteriaWithOptionsV0 = {
   name: string
   criteria: string
   options: OptionV0[]
 }
 
-export interface DirectAssessmentCriteriaV1 extends Omit<DirectAssessmentCriteriaV0, 'criteria' | 'options'> {
+export interface CriteriaWithOptionsV1 extends Omit<CriteriaWithOptionsV0, 'criteria' | 'options'> {
   description: string
   options: OptionV1[]
 }
 
-export type DirectAssessmentCriteria = DirectAssessmentCriteriaV1
+export type CriteriaWithOptions = CriteriaWithOptionsV1
 
-export interface PairwiseComparisonCriteriaV0 {
+export interface CriteriaV0 {
   name: string
   criteria: string
 }
 
-export interface PairwiseComparisonCriteriaV1 extends Omit<PairwiseComparisonCriteriaV0, 'criteria'> {
+export interface CriteriaV1 extends Omit<CriteriaV0, 'criteria'> {
   description: string
 }
 
-export type PairwiseComparisonCriteria = PairwiseComparisonCriteriaV1
+export type Criteria = CriteriaV1
 
 export class Version {
   version: string

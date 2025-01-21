@@ -3,14 +3,14 @@ import { useCallback, useMemo } from 'react'
 import { usePipelineTypesContext } from '@components/SingleExampleEvaluation/Providers/PipelineTypesProvider'
 import { StoredUseCase } from '@prisma/client'
 import {
-  DirectAssessmentCriteriaV0,
-  DirectAssessmentCriteriaV1,
+  CriteriaV1,
+  CriteriaWithOptionsV0,
+  CriteriaWithOptionsV1,
   DirectAssessmentResultsV0,
   DirectAssessmentResultsV1,
   EvaluationType,
   Evaluator,
   ModelProviderType,
-  PairwiseComparisonCriteriaV1,
   PairwiseComparisonResultsV0,
   PairwiseComparisonResultsV1,
   ResultsV0,
@@ -183,7 +183,6 @@ export const useParseFetchedUseCase = () => {
       const type = returnByPipelineType(useCaseV1.type, EvaluationType.DIRECT, EvaluationType.PAIRWISE)
       // @ts-ignore
       const evaluator = useCaseV1.pipeline?.provider === 'bam' ? null : useCaseV1.pipeline
-      console.log(evaluator)
       const useCaseV2 = {
         id: useCaseV1.id,
         name: useCaseV1.name,
@@ -194,12 +193,12 @@ export const useParseFetchedUseCase = () => {
         evaluator: evaluator,
         expectedResults: useCaseV1.expectedResults,
         results: parseResultsV0ToV1(useCaseV1.results, type),
-        criteria: returnByPipelineType<DirectAssessmentCriteriaV1, PairwiseComparisonCriteriaV1>(
+        criteria: returnByPipelineType<CriteriaWithOptionsV1, CriteriaV1>(
           type,
           () => ({
             name: useCaseV1.criteria.name,
             description: useCaseV1.criteria.criteria,
-            options: (useCaseV1.criteria as DirectAssessmentCriteriaV0).options.map((o) => ({
+            options: (useCaseV1.criteria as CriteriaWithOptionsV0).options.map((o) => ({
               name: o.option,
               description: o.description,
             })),

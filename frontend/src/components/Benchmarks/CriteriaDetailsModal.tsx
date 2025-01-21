@@ -6,15 +6,15 @@ import { Button, Layer, ListItem, Modal, UnorderedList } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
-import { DirectAssessmentCriteria, EvaluationType, PairwiseComparisonCriteria } from '@types'
-import { isInstanceOfRubricCriteria } from '@utils/utils'
+import { Criteria, CriteriaWithOptions, EvaluationType } from '@types'
+import { isInstanceOfCriteriaWithOptions } from '@utils/utils'
 
 import classes from './CriteriaDetailsModal.module.scss'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  criteria: DirectAssessmentCriteria | PairwiseComparisonCriteria
+  criteria: CriteriaWithOptions | Criteria
   type: EvaluationType
 }
 
@@ -61,7 +61,7 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
           {criteria.description}
         </p>
 
-        {isInstanceOfRubricCriteria(criteria) && (
+        {isInstanceOfCriteriaWithOptions(criteria) && (
           <div>
             <p style={{ marginBottom: '0.25rem' }}>
               <strong>Options:</strong>
