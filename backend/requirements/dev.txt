@@ -1,3 +1,3 @@
 -r common.txt
-git+ssh://git@github.ibm.com/AIExperience/llm-as-a-judge.git@0.0.17
+git+ssh://git@github.ibm.com/AIExperience/llm-as-a-judge.git@0.0.18
 git+ssh://git@github.com/IBM/unitxt.git@bd7bcf00e152138f04bbad2156bf070dc3147936
