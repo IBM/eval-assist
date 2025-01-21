@@ -11,7 +11,7 @@ export const useTestCaseLibrary = () => {
     const x: { [useCaseCategory: string]: UseCase[] } = {
       'Harmful Content In User Prompt': [
         {
-          ...getEmptyUseCaseWithCriteria('general_harm>user_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('user_message_general_harm', EvaluationType.DIRECT),
           name: 'general_harm',
           responseVariableName: 'User message',
           contextVariables: [],
@@ -19,7 +19,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('social_bias>user_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('user_message_social_bias', EvaluationType.DIRECT),
           name: 'social_bias',
           responseVariableName: 'User message',
           contextVariables: [],
@@ -29,7 +29,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('jailbreak>user_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('user_message_jailbreak', EvaluationType.DIRECT),
           name: 'jailbreak',
           responseVariableName: 'User message',
           contextVariables: [],
@@ -39,7 +39,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('violence>user_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('user_message_violence', EvaluationType.DIRECT),
           name: 'violence',
           responseVariableName: 'User message',
           contextVariables: [],
@@ -47,7 +47,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('profanity>user_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('user_message_profanity', EvaluationType.DIRECT),
           name: 'profanity',
           responseVariableName: 'User message',
           contextVariables: [],
@@ -55,7 +55,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('unethical_behavior>user_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('user_message_unethical_behavior', EvaluationType.DIRECT),
           name: 'unethical_behavior',
           responseVariableName: 'User message',
           contextVariables: [],
@@ -65,7 +65,7 @@ export const useTestCaseLibrary = () => {
       ],
       'Harmful Content In Assistant Response': [
         {
-          ...getEmptyUseCaseWithCriteria('general_harm>assistant_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('assistant_message_general_harm', EvaluationType.DIRECT),
           name: 'general_harm',
           responseVariableName: 'Assistant message',
           contextVariables: [
@@ -80,7 +80,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('social_bias>assistant_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('assistant_message_social_bias', EvaluationType.DIRECT),
           name: 'social_bias',
           responseVariableName: 'Assistant message',
           contextVariables: [
@@ -95,7 +95,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('general_harm>assistant_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('assistant_message_general_harm', EvaluationType.DIRECT),
           name: 'violence',
           responseVariableName: 'Assistant message',
           contextVariables: [
@@ -111,7 +111,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('profanity>assistant_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('assistant_message_profanity', EvaluationType.DIRECT),
           name: 'profanity',
           responseVariableName: 'Assistant message',
           contextVariables: [
@@ -124,7 +124,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('unethical_behavior>assistant_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('assistant_message_unethical_behavior', EvaluationType.DIRECT),
           name: 'unethical_behavior',
           responseVariableName: 'Assistant message',
           contextVariables: [
@@ -141,7 +141,7 @@ export const useTestCaseLibrary = () => {
       ],
       'RAG Hallucination Risks': [
         {
-          ...getEmptyUseCaseWithCriteria('context_relevance>context', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('context_context_relevance', EvaluationType.DIRECT),
           name: 'context_relevance',
           responseVariableName: 'Context',
           contextVariables: [
@@ -160,7 +160,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('groundedness>assistant_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('assistant_message_groundedness', EvaluationType.DIRECT),
           name: 'groundedness',
           responseVariableName: 'Assistant message',
           contextVariables: [
@@ -180,7 +180,7 @@ export const useTestCaseLibrary = () => {
           expectedResults: ['Yes'],
         },
         {
-          ...getEmptyUseCaseWithCriteria('answer_relevance>assistant_message', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('assistant_message_answer_relevance', EvaluationType.DIRECT),
           name: 'answer_relevance',
           responseVariableName: 'Assistant message',
           contextVariables: [
