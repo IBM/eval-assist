@@ -17,7 +17,7 @@ def generate_direct_notebook(params: NotebookParams):
 
     nb = nbf.v4.new_notebook()
 
-    title = f"# Unitxt direct evaluation notebook: {params.test_case_name}\n\nThis notebook was generated automatically from your EvalAssist test case '{params.test_case_name}'. It contains code to evaluate a set of responses using the specified criteria and evaluator.\n\n"
+    title = f"# Unitxt direct evaluation notebook: {params.test_case_name}\n\nThis notebook was generated automatically from your EvalAssist test case '{params.test_case_name}'. It contains code to evaluate a set of responses using the specified criteria and evaluator. EvalAssist uses [unitxt](https://www.unitxt.ai/en/latest/index.html) to create and run the evaluations. You can find the documentation [here](https://www.unitxt.ai/en/latest/docs/llm_as_judge.html).\n\n"
     import_md = "### Import the necessary libraries"
     import_code = f"""
 from unitxt.api import evaluate, create_dataset
@@ -114,7 +114,7 @@ def generate_pairwise_notebook(params: NotebookParams):
 
     nb = nbf.v4.new_notebook()
 
-    title = f"# Unitxt pairwise evaluation notebook: {params.test_case_name}\n\nThis notebook was generated automatically from your EvalAssist test case '{params.test_case_name}'. It contains code to evaluate a set of responses using the specified criteria and evaluator.\n\n"
+    title = f"# Unitxt pairwise evaluation notebook: {params.test_case_name}\n\nThis notebook was generated automatically from your EvalAssist test case '{params.test_case_name}'. It contains code to evaluate a set of responses using the specified criteria and evaluator. EvalAssist uses [unitxt](https://www.unitxt.ai/en/latest/index.html) to create and run the evaluations. You can find the documentation [here](https://www.unitxt.ai/en/latest/docs/llm_as_judge.html).\n\n"
     import_md = "### Import the necessary libraries"
     import_code = f"""
 from typing import List
