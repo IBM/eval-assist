@@ -372,7 +372,7 @@ def cleanup_file(filepath: str):
 @router.post("/download-notebook/")
 def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks):
     # Validate inputs
-    if not params.criteria or not params.evaluator_name or not params.responses or not params.context_variables:
+    if not hasattr(params, 'criteria') or not hasattr(params, 'evaluator_name') or not hasattr(params, 'responses') or not hasattr(params, 'context_variables'):
         raise HTTPException(status_code=400, detail="Missing required fields")
 
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
