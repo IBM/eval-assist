@@ -1,11 +1,10 @@
-import { ReactNode, createContext, useContext, useMemo } from 'react'
+import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
 
 import { useRouter } from 'next/router'
 
 import { useCriterias } from '@customHooks/useCriterias'
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
-import { useWhyDidYouUpdate } from '@customHooks/useWhyDidYouUpdate'
 import { getEmptyUseCase, returnByPipelineType } from '@utils/utils'
 
 import { EvaluationType, Evaluator, ModelProviderType, UseCase } from '../../../types'
@@ -65,6 +64,46 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     [router.query.criteriaName],
   )
 
+  const getDefaultEvaluator = useCallback(() => {
+    if (rubricPipelines === null || pairwisePipelines === null || useCaseType === null)
+      // won't happen!
+      return null
+    if (isRisksAndHarms) {
+      return rubricPipelines.find((p) => p.name === 'Granite Guardian 3.0 8B') as Evaluator
+    } else {
+      const ritsCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.RITS)
+      const watsonxCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.WATSONX)
+      const openaiCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.OPENAI)
+      const defaultProvider = watsonxCredentialsExist
+        ? ModelProviderType.WATSONX
+        : ritsCredentialsExist
+        ? ModelProviderType.RITS
+        : openaiCredentialsExist
+        ? ModelProviderType.OPENAI
+        : ModelProviderType.RITS
+
+      const defaultEvaluatorKeyword =
+        watsonxCredentialsExist || ritsCredentialsExist || !openaiCredentialsExist ? 'llama' : 'gpt'
+      return returnByPipelineType(
+        useCaseType,
+        rubricPipelines.find(
+          (p) => p.name.toLowerCase().includes(defaultEvaluatorKeyword) && p.provider === defaultProvider,
+        ) as Evaluator,
+        pairwisePipelines.find(
+          (p) => p.name.toLowerCase().includes(defaultEvaluatorKeyword) && p.provider === defaultProvider,
+        ) as Evaluator,
+      )
+    }
+  }, [
+    // if uncomment the next line the current chosen selected model can automatically
+    // change if the used sets adds credentials for a new provider
+    // getAreRelevantCredentialsProvided,
+    isRisksAndHarms,
+    pairwisePipelines,
+    rubricPipelines,
+    useCaseType,
+  ])
+
   const preloadedUseCase = useMemo(() => {
     let pu: UseCase | null
     if (useCaseId !== null && userUseCases !== null) {
@@ -90,39 +129,8 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     } else {
       pu = null
     }
-    if (pu !== null && rubricPipelines !== null && pairwisePipelines !== null && !pu.evaluator) {
-      if (isRisksAndHarms) {
-        pu = {
-          ...pu,
-          evaluator: rubricPipelines.find((p) => p.name === 'Granite Guardian 3.0 8B') as Evaluator,
-        }
-      } else {
-        const ritsCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.RITS)
-        const watsonxCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.WATSONX)
-        const openaiCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.OPENAI)
-        const defaultProvider = watsonxCredentialsExist
-          ? ModelProviderType.WATSONX
-          : ritsCredentialsExist
-          ? ModelProviderType.RITS
-          : openaiCredentialsExist
-          ? ModelProviderType.OPENAI
-          : ModelProviderType.RITS
-
-        const defaultEvaluatorKeyword =
-          watsonxCredentialsExist || ritsCredentialsExist || !openaiCredentialsExist ? 'llama' : 'gpt'
-        pu = {
-          ...pu,
-          evaluator: returnByPipelineType(
-            pu.type,
-            rubricPipelines.find(
-              (p) => p.name.toLowerCase().includes(defaultEvaluatorKeyword) && p.provider === defaultProvider,
-            ) as Evaluator,
-            pairwisePipelines.find(
-              (p) => p.name.toLowerCase().includes(defaultEvaluatorKeyword) && p.provider === defaultProvider,
-            ) as Evaluator,
-          ),
-        }
-      }
+    if (pu !== null && !pu.evaluator) {
+      pu = { ...pu, evaluator: getDefaultEvaluator() }
     }
 
     if (pu !== null && !pu.expectedResults) {
@@ -137,16 +145,16 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     userUseCases,
     libraryTestCaseName,
     useCaseType,
-    rubricPipelines,
-    pairwisePipelines,
     isRisksAndHarms,
     subCatalogName,
     harmsAndRisksLibraryTestCases,
     allLibraryUseCases,
     criteriaName,
     getEmptyUseCaseWithCriteria,
-    getAreRelevantCredentialsProvided,
+    getDefaultEvaluator,
   ])
+
+  const defaultModelWasChosen = useMemo(() => {}, [])
 
   return (
     <URLInfoContext.Provider

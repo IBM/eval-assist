@@ -4,6 +4,7 @@ import { Loading } from '@carbon/react'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { StoredUseCase } from '@prisma/client'
 
@@ -29,6 +30,7 @@ export const UserUseCasesProvider = ({ children }: { children: ReactNode }) => {
   const { getUserName } = useAuthentication()
   const { get } = useFetchUtils()
   const { parseFetchedUseCase } = useParseFetchedUseCase()
+  const { initializedModelProviderCredentials } = useModelProviderCredentials()
 
   useEffect(() => {
     const fetchUseCases = async () => {
@@ -43,7 +45,7 @@ export const UserUseCasesProvider = ({ children }: { children: ReactNode }) => {
     fetchUseCases()
   }, [get, getUserName, parseFetchedUseCase])
 
-  if (loadingUseCases || userUseCases === null) return <Loading withOverlay />
+  if (loadingUseCases || userUseCases === null || !initializedModelProviderCredentials) return <Loading withOverlay />
 
   return (
     <UserUseCasesContext.Provider

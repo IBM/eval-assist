@@ -1,74 +1,80 @@
+import { set } from 'lodash'
 import { useLocalStorage } from 'usehooks-ts'
 
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
+import { getJSONStringWithSortedKeys } from '@utils/utils'
 
 import { ModelProviderCredentials, ModelProviderType } from '../types'
 
 const watsonx_url = 'https://us-south.ml.cloud.ibm.com'
 
 export const useModelProviderCredentials = () => {
-  const [modelProviderCredentials, setModelProviderCredentials, removeModelProviderCredentials] =
-    useLocalStorage<ModelProviderCredentials>('modelProviderCrentials', {
+  const defaultCredentialStorage = useMemo(
+    () => ({
       [ModelProviderType.WATSONX]: { api_key: '', project_id: '', api_base: watsonx_url },
       [ModelProviderType.OPENAI]: { api_key: '' },
       [ModelProviderType.RITS]: { api_key: '' },
       [ModelProviderType.AZURE_OPENAI]: { api_key: '' },
-    })
+    }),
+    [],
+  )
+  const [modelProviderCredentials, setModelProviderCredentials, removeModelProviderCredentials] =
+    useLocalStorage<ModelProviderCredentials>('modelProviderCrentials', defaultCredentialStorage)
+  const [initializedModelProviderCredentials, setInitializedModelProviderCredentials] = useState(false)
 
   // Set default values for new model providers
   useEffect(() => {
-    if (!modelProviderCredentials.azure_openai) {
-      setModelProviderCredentials({
-        ...modelProviderCredentials,
-        azure_openai: { api_key: '' },
-      })
+    const parsedCredentials = { ...modelProviderCredentials }
+    Object.keys(defaultCredentialStorage).forEach((key) => {
+      if (!(key in parsedCredentials)) {
+        // @ts-ignore
+        parsedCredentials[key] = defaultCredentialStorage[key]
+      }
+    })
+
+    if ('bam' in parsedCredentials) {
+      // @ts-ignore
+      delete parsedCredentials['bam']
+    }
+
+    if (!parsedCredentials.azure_openai) {
+      parsedCredentials['azure_openai'] = { api_key: '' }
     }
 
     // watsonx key was apikey before, so we adapt it to api_key
-    if (!('api_key' in modelProviderCredentials.watsonx)) {
-      setModelProviderCredentials({
-        ...modelProviderCredentials,
-        watsonx: {
-          // @ts-ignore
-          ...modelProviderCredentials.watsonx,
-          api_key: modelProviderCredentials.watsonx['apikey'] || '',
-        },
-      })
+    if (!('api_key' in parsedCredentials.watsonx)) {
+      parsedCredentials['watsonx'] = {
+        // @ts-ignore
+        ...parsedCredentials.watsonx,
+        api_key: parsedCredentials.watsonx['apikey'] || '',
+      }
     }
 
     // @ts-ignore
-    if ('apikey' in modelProviderCredentials.watsonx) {
-      const aux = { ...modelProviderCredentials.watsonx }
+    if ('apikey' in parsedCredentials.watsonx) {
+      const aux = { ...parsedCredentials.watsonx }
       // @ts-ignore
       delete aux['apikey']
-      setModelProviderCredentials({
-        ...modelProviderCredentials,
-        watsonx: aux,
-      })
+      parsedCredentials['watsonx'] = aux
     }
 
-    if (!('api_base' in modelProviderCredentials.watsonx) || modelProviderCredentials.watsonx.api_base === '') {
-      setModelProviderCredentials({
-        ...modelProviderCredentials,
-        watsonx: {
-          // @ts-ignore
-          ...modelProviderCredentials.watsonx,
-          api_base: watsonx_url,
-        },
-      })
+    if (!('api_base' in parsedCredentials.watsonx) || parsedCredentials.watsonx.api_base === '') {
+      parsedCredentials['watsonx']['api_base'] = watsonx_url
     }
 
     // @ts-ignore
-    if ('url' in modelProviderCredentials.watsonx) {
-      const aux = { ...modelProviderCredentials.watsonx }
+    if ('url' in parsedCredentials.watsonx) {
+      const aux = { ...parsedCredentials.watsonx }
       // @ts-ignore
       delete aux['url']
-      setModelProviderCredentials({
-        ...modelProviderCredentials,
-        watsonx: aux,
-      })
+      parsedCredentials['watsonx'] = aux
     }
-  }, [modelProviderCredentials, setModelProviderCredentials])
+    if (getJSONStringWithSortedKeys(modelProviderCredentials) !== getJSONStringWithSortedKeys(parsedCredentials)) {
+      setModelProviderCredentials(parsedCredentials)
+    }
+    setInitializedModelProviderCredentials(true)
+  }, [defaultCredentialStorage, modelProviderCredentials, setModelProviderCredentials])
 
   const getAreRelevantCredentialsProvided = useCallback(
     (provider: ModelProviderType): boolean => {
@@ -81,5 +87,6 @@ export const useModelProviderCredentials = () => {
     modelProviderCredentials,
     setModelProviderCredentials,
     getAreRelevantCredentialsProvided,
+    initializedModelProviderCredentials,
   }
 }
