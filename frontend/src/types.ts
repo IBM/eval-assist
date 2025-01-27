@@ -118,6 +118,22 @@ export interface OptionV1 {
 
 export type Option = OptionV1
 
+export type Instance = {
+  contextVariables: UseCaseV2['contextVariables']
+  responseVariableName: UseCaseV2['responseVariableName']
+  expectedResult: string
+}
+
+export interface DirectInstance extends Instance {
+  response: string
+  result: DirectAssessmentResult
+}
+
+export interface PairwiseInstance extends Instance {
+  responses: UseCaseV2['responses']
+  result: PairwiseComparisonResultsV1
+}
+
 export interface UseCaseV0 {
   id: number | null
   name: string
@@ -139,6 +155,11 @@ export interface UseCaseV2 extends Omit<UseCaseV1, 'criteria' | 'pipeline' | 're
   evaluator: Evaluator | null
   criteria: CriteriaWithOptionsV1 | CriteriaV1
   results: ResultsV1
+}
+
+export interface UseCaseV3
+  extends Omit<UseCaseV2, 'results' | 'contextVariables' | 'responseVariableName' | 'responses' | 'expectedResults'> {
+  instances: Instance[]
 }
 
 export type UseCase = UseCaseV2
