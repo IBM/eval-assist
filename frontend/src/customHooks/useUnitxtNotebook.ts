@@ -1,14 +1,14 @@
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 
-import { EvaluationType, UseCase } from '../types'
+import { DirectInstance, EvaluationType, Instance, PairwiseInstance, UseCase } from '../types'
 import { useFetchUtils } from './useFetchUtils'
 
 interface Props {
   testCaseName: UseCase['name'] | undefined
   criteria: UseCase['criteria'] | undefined
   evaluatorName: string | undefined
-  responses: UseCase['responses'] | undefined
-  contextVariables: UseCase['contextVariables'] | undefined
+  responses: DirectInstance['response'][] | PairwiseInstance['responses'][] | undefined
+  contextVariables: Instance['contextVariables'][] | undefined
   // @ts-ignore
   // tslint says UseCase['evaluator'] can be null, but it can't be null
   provider: UseCase['evaluator']['provider'] | undefined

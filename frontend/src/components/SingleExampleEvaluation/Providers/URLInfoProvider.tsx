@@ -68,10 +68,6 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     (type: EvaluationType) => {
       if (rubricPipelines === null || pairwisePipelines === null || type === null) {
         // won't happen!
-        console.log(rubricPipelines)
-        console.log(pairwisePipelines)
-        console.log(type)
-        console.log('happened')
         return null
       }
       if (isRisksAndHarms) {
@@ -101,6 +97,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
         )
       }
     },
+    // eslint-disable-next-line
     [
       // if uncomment the next line the current chosen selected model can automatically
       // change if the used sets adds credentials for a new provider
@@ -141,12 +138,6 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
       pu = { ...pu, evaluator: getDefaultEvaluator(pu.type) }
     }
 
-    if (pu !== null && !pu.expectedResults) {
-      pu = {
-        ...pu,
-        expectedResults: new Array(pu.responses.length).fill(''),
-      }
-    }
     return pu
   }, [
     useCaseId,

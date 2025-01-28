@@ -4,7 +4,7 @@ import { Loading, Modal, Select, SelectItem } from '@carbon/react'
 
 import { useCriterias } from '@customHooks/useCriterias'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { EvaluationType, ModelProviderCredentials, ModelProviderType, UseCase } from '@types'
+import { DirectInstance, EvaluationType, ModelProviderCredentials, ModelProviderType, UseCase } from '@types'
 import { toSnakeCase } from '@utils/utils'
 
 import classes from './PromptModal.module.scss'
@@ -38,14 +38,14 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
           parsedCriteria.name = `${parsedCriteria.name}_variation`
         }
 
-        const parsedContextVariables = currentUseCase.contextVariables.reduce(
-          (acc, item, index) => ({ ...acc, [item.variable]: item.value }),
+        const parsedContextVariables = currentUseCase.instances[0].contextVariables.reduce(
+          (acc, item, index) => ({ ...acc, [item.name]: item.value }),
           {},
         )
 
         let body: any = {
           context_variables: parsedContextVariables,
-          responses: currentUseCase.responses,
+          responses: (currentUseCase.instances as DirectInstance[]).map((instance) => instance.response),
           pipeline: currentUseCase.evaluator?.name,
           provider: currentUseCase.evaluator?.provider,
           criteria: parsedCriteria,
@@ -59,7 +59,7 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
       }
     }
     getPrompts()
-  }, [currentUseCase, modelProviderCredentials, open, post])
+  }, [currentUseCase, getCriteria, modelProviderCredentials, open, post])
 
   useEffect(() => {
     if (open) {
@@ -77,7 +77,12 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
       onRequestClose={onClose}
       passiveModal
       size="sm"
-      modalHeading={currentUseCase !== null && currentUseCase.responses.length > 1 ? 'Prompts' : 'Prompt'}
+      modalHeading={
+        currentUseCase !== null &&
+        (currentUseCase.instances as DirectInstance[]).map((instance) => instance.response).length > 1
+          ? 'Prompts'
+          : 'Prompt'
+      }
     >
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {prompts === null ? (

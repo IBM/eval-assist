@@ -1,4 +1,14 @@
-import { Criteria, CriteriaWithOptions, EvaluationType, Option, PairwiseComparisonResults, UseCase } from '@types'
+import {
+  Criteria,
+  CriteriaWithOptions,
+  DirectInstance,
+  EvaluationType,
+  Instance,
+  Option,
+  PairwiseComparisonResults,
+  PairwiseInstance,
+  UseCase,
+} from '@types'
 
 export const isInstanceOfOption = (obj: any): obj is Option =>
   typeof obj.name === 'string' && typeof obj.description === 'string'
@@ -43,17 +53,26 @@ export const getEmptyCriteria = (): Criteria => ({
 export const getEmptyCriteriaByType = (type: EvaluationType): CriteriaWithOptions | Criteria =>
   type === EvaluationType.DIRECT ? getEmptyCriteriaWithTwoOptions() : getEmptyCriteria()
 
+export const getEmptyInstance = (): Instance => ({
+  contextVariables: [{ name: 'context', value: '' }],
+  expectedResult: '',
+})
+
+export const getEmptyPairwiseInstance = (): PairwiseInstance => ({
+  ...getEmptyInstance(),
+  responses: ['', ''],
+  result: null,
+})
+export const getEmptyDirectInstance = (): DirectInstance => ({ ...getEmptyInstance(), response: '', result: null })
+
 export const getEmptyUseCase = (type: EvaluationType): UseCase => ({
   id: null,
   name: '',
   type,
-  contextVariables: [{ variable: 'context', value: '' }],
-  responseVariableName: 'response',
-  responses: type === EvaluationType.DIRECT ? [''] : ['', ''],
+  instances: returnByPipelineType(type, [getEmptyDirectInstance()], [getEmptyPairwiseInstance()]),
   criteria: getEmptyCriteriaWithTwoOptions(),
-  results: null,
   evaluator: null,
-  expectedResults: null,
+  responseVariableName: 'response',
 })
 
 export const getEmptyExpectedResults = (count: number) => {
@@ -165,3 +184,6 @@ export const capitalizeFirstWord = (inputString: string) => {
 export const toSnakeCase = (text: string) => {
   return text.toLowerCase().replace(/ /g, '_')
 }
+
+// python's zip-like function
+export const zip = (rows: any[][]) => rows[0].map((_, c) => rows.map((row) => row[c]))

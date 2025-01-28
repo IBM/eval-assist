@@ -8,19 +8,22 @@ import {
   CriteriaWithOptionsV1,
   DirectAssessmentResultsV0,
   DirectAssessmentResultsV1,
+  DirectInstance,
   EvaluationType,
   Evaluator,
   ModelProviderType,
   PairwiseComparisonResultsV0,
   PairwiseComparisonResultsV1,
+  PairwiseInstance,
   ResultsV0,
   ResultsV1,
   UseCase,
   UseCaseV0,
   UseCaseV1,
   UseCaseV2,
+  UseCaseV3,
 } from '@types'
-import { returnByPipelineType } from '@utils/utils'
+import { returnByPipelineType, zip } from '@utils/utils'
 
 // EXAMPLES
 // fetched use case is v0 and current is v1
@@ -91,7 +94,7 @@ export const useParseFetchedUseCase = () => {
       id: fetchedUseCase.id,
       name: fetchedUseCase.name,
       type: type,
-      contextVariables: fetchedUseCase.contextVariables || [{ variable: 'context', value: fetchedUseCase.context }],
+      contextVariables: fetchedUseCase.contextVariables || [{ name: 'context', value: fetchedUseCase.context }],
       responseVariableName: fetchedUseCase.responseVariableName || 'Response',
       responses: fetchedUseCase.responses,
       criteria: returnByPipelineType(
@@ -146,6 +149,12 @@ export const useParseFetchedUseCase = () => {
       ...fetchedUseCase,
       type: returnByPipelineType(fetchedUseCase.type, EvaluationType.DIRECT, EvaluationType.PAIRWISE),
     } as UseCaseV2
+  }, [])
+
+  const parseFetchedUseCaseV3 = useCallback((fetchedUseCase: Record<string, any>): UseCaseV3 => {
+    return {
+      ...fetchedUseCase,
+    } as UseCaseV3
   }, [])
 
   // this version changes contextVariables from a list of {variable: string, value: string} to Record<string, string>
@@ -211,17 +220,61 @@ export const useParseFetchedUseCase = () => {
     [parseResultsV0ToV1],
   )
 
+  const parseFetchedUseCaseV2ToV3 = useCallback((useCaseV2: UseCaseV2): UseCaseV3 => {
+    const type = returnByPipelineType(useCaseV2.type, EvaluationType.DIRECT, EvaluationType.PAIRWISE)
+    // @ts-ignore
+    const evaluator = useCaseV2.pipeline?.provider === 'bam' ? null : useCaseV2.pipeline
+    // console.log(useCaseV2.name)
+    const contextVariables = useCaseV2.contextVariables.map((oldContextVariable) => ({
+      name: oldContextVariable.variable,
+      value: oldContextVariable.value,
+    }))
+
+    const useCaseV3 = {
+      id: useCaseV2.id,
+      name: useCaseV2.name,
+      type: type,
+      evaluator: evaluator,
+      criteria: useCaseV2.criteria,
+      responseVariableName: useCaseV2.responseVariableName,
+      instances: returnByPipelineType(
+        type,
+        () =>
+          useCaseV2.responses.map(
+            (response, i) =>
+              ({
+                contextVariables,
+                expectedResult: useCaseV2.expectedResults ? useCaseV2.expectedResults[i] : '',
+                response,
+                result: (useCaseV2.results as DirectAssessmentResultsV1)
+                  ? (useCaseV2.results as DirectAssessmentResultsV1)[i]
+                  : null,
+              } as DirectInstance),
+          ),
+        () => [
+          {
+            contextVariables,
+            expectedResult: useCaseV2.expectedResults || '',
+            responses: useCaseV2.responses,
+            result: useCaseV2.results as PairwiseComparisonResultsV1,
+          } as PairwiseInstance,
+        ],
+      ),
+    }
+    return useCaseV3
+  }, [])
+
   const useCaseParsingVersionToVersionFunctions: any[] = useMemo(
-    () => [parseFetchedUseCaseV0ToV1, parseFetchedUseCaseV1ToV2],
-    [parseFetchedUseCaseV0ToV1, parseFetchedUseCaseV1ToV2],
+    () => [parseFetchedUseCaseV0ToV1, parseFetchedUseCaseV1ToV2, parseFetchedUseCaseV2ToV3],
+    [parseFetchedUseCaseV0ToV1, parseFetchedUseCaseV1ToV2, parseFetchedUseCaseV2ToV3],
   )
 
   const useCaseParsingVersionFunctions = useMemo(
-    () => [parseFetchedUseCaseV0, parseFetchedUseCaseV1, parseFetchedUseCaseV2],
-    [parseFetchedUseCaseV0, parseFetchedUseCaseV1, parseFetchedUseCaseV2],
+    () => [parseFetchedUseCaseV0, parseFetchedUseCaseV1, parseFetchedUseCaseV2, parseFetchedUseCaseV3],
+    [parseFetchedUseCaseV0, parseFetchedUseCaseV1, parseFetchedUseCaseV2, parseFetchedUseCaseV3],
   )
 
-  const CURRENT_FORMAT_VERSION = useMemo(() => 2, [])
+  const CURRENT_FORMAT_VERSION = useMemo(() => 3, [])
 
   const parseFetchedUseCase = useCallback(
     (fetchedUseCase: StoredUseCase): UseCase => {

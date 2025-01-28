@@ -119,26 +119,28 @@ export interface OptionV1 {
 export type Option = OptionV1
 
 export type Instance = {
-  contextVariables: UseCaseV2['contextVariables']
-  responseVariableName: UseCaseV2['responseVariableName']
+  contextVariables: ContextVariableV1[]
   expectedResult: string
 }
 
 export interface DirectInstance extends Instance {
   response: string
-  result: DirectAssessmentResult
+  result: DirectAssessmentResult | null
 }
 
 export interface PairwiseInstance extends Instance {
   responses: UseCaseV2['responses']
-  result: PairwiseComparisonResultsV1
+  result: PairwiseComparisonResultsV1 | null
 }
+
+type ContextVariableV0 = { variable: string; value: string }
+type ContextVariableV1 = { name: string; value: string }
 
 export interface UseCaseV0 {
   id: number | null
   name: string
   type: EvaluationType
-  contextVariables: { variable: string; value: string }[]
+  contextVariables: ContextVariableV0[]
   responseVariableName: string
   responses: string[]
   criteria: CriteriaWithOptionsV0 | CriteriaV0
@@ -157,12 +159,11 @@ export interface UseCaseV2 extends Omit<UseCaseV1, 'criteria' | 'pipeline' | 're
   results: ResultsV1
 }
 
-export interface UseCaseV3
-  extends Omit<UseCaseV2, 'results' | 'contextVariables' | 'responseVariableName' | 'responses' | 'expectedResults'> {
+export interface UseCaseV3 extends Omit<UseCaseV2, 'results' | 'contextVariables' | 'responses' | 'expectedResults'> {
   instances: Instance[]
 }
 
-export type UseCase = UseCaseV2
+export type UseCase = UseCaseV3
 
 export enum EvaluationType {
   DIRECT = 'direct',
