@@ -4,6 +4,7 @@ import nbformat as nbf
 
 
 def generate_direct_notebook(params: NotebookParams):
+    
     inference_engine_params = get_inference_engine_params(
         provider=params.provider, evaluator_name=params.evaluator_name, credentials=params.credentials
     )
@@ -11,9 +12,8 @@ def generate_direct_notebook(params: NotebookParams):
         [f"{k}={repr(v) if isinstance(v, str) else v}" for k, v in inference_engine_params.items()]
     )
 
-    parsed_context_variables = {item["variable"]: item["value"] for item in params.context_variables}
-    input_fields = {k: "str" for k in parsed_context_variables.keys()}
-    context_fields = list(parsed_context_variables.keys())
+    input_fields = {k: "str" for k in params.context_variables[0].keys()}
+    context_fields = list(params.context_variables[0].keys())
 
     nb = nbf.v4.new_notebook()
 
@@ -33,9 +33,9 @@ nest_asyncio.apply()
     load_dataset_md = """### Loading the dataset
 This code block creates a dataset from the context variables and the prediction. It simulates the sceario where the dataset is loaded from a csv file.
 """
-    load_dataset_code = f"""context_variables = {parsed_context_variables}
-predictions = {params.responses}
-dataset_rows = [context_variables | {{'prediction': prediction}} for prediction in predictions]
+    load_dataset_code = f"""context_variables = {params.context_variables}
+predictions = {params.predictions}
+dataset_rows = [instance_context_variable | {{'prediction': prediction}} for instance_context_variable, prediction in zip(context_variables, predictions)]
 df = pd.DataFrame(dataset_rows)
 # load a csv if data is stored in a csv file
 # df = pd.read_csv(file_path)
@@ -108,9 +108,8 @@ def generate_pairwise_notebook(params: NotebookParams):
         [f"{k}={repr(v) if isinstance(v, str) else v}" for k, v in inference_engine_params.items()]
     )
 
-    parsed_context_variables = {item["variable"]: item["value"] for item in params.context_variables}
-    input_fields = {k: "str" for k in parsed_context_variables.keys()}
-    context_fields = list(parsed_context_variables.keys())
+    input_fields = {k: "str" for k in params.context_variables[0].keys()}
+    context_fields = list(params.context_variables[0].keys())
 
     nb = nbf.v4.new_notebook()
 
@@ -134,10 +133,10 @@ This code block creates a dataset from the context variables and the prediction.
 _Note: in a pairwise dataset, each instance is composed by a context, a criteria and a list of responses. Therefore, this dataset is composed by just one instance._
 """
 
-    responses_to_compare = {f"system_{i+1}": r for i, r in enumerate(params.responses)}
-    load_dataset_code = f"""context_variables = {parsed_context_variables}
-responses_to_compare = {params.responses}
-dataset_rows = [context_variables | {responses_to_compare}]
+    system_predictions = [{f"system_{i+1}": instance_predictions for i, instance_predictions in enumerate(instance_predictions)} for instance_predictions in params.predictions]
+    load_dataset_code = f"""context_variables = {params.context_variables}
+system_predictions = {system_predictions}
+dataset_rows = [instance_context_variable | instance_predictions for instance_context_variable, instance_predictions in zip(context_variables, system_predictions)]
 df = pd.DataFrame(dataset_rows)
 # load a csv if data is stored in a csv file
 # df = pd.read_csv(file_path)

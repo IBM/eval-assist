@@ -1,6 +1,6 @@
 import json
 from abc import ABC
-from typing import Any, List
+from typing import Any, List, cast
 
 from unitxt.api import evaluate, load_dataset
 from unitxt.blocks import Task, TaskCard
@@ -21,6 +21,8 @@ from unitxt.llm_as_judge import (
 )
 from unitxt.loaders import LoadFromDictionary
 from unitxt.templates import NullTemplate
+
+from ..api.common import Instance
 
 
 def get_inference_engine_params(
@@ -53,7 +55,6 @@ def get_inference_engine_params(
         model_name = f"openai/{model_name}"
 
     inference_engine_params["model"] = model_name
-
     return inference_engine_params
 
 
@@ -70,45 +71,48 @@ class Evaluator(ABC):
     def __init__(self, name: EvaluatorNameEnum):
         self.evaluator = get_evaluator_metadata(name)
 
+    def get_preprocess_steps(self):
+        raise NotImplementedError("This method must be implemented.")
+
     def parse_results(self, dataset):
         raise NotImplementedError("This method must be implemented.")
 
+    def get_prediction_type(self):
+        raise NotImplementedError("This method must be implemented.")
+
+    def get_evaluator_klass(self):
+        raise NotImplementedError("This method must be implemented.")
+
+    def get_predictions(self, instances: list[Instance]) -> list[str | list[str]]:
+        return [instance.prediction for instance in instances]  
+
     def evaluate(
         self,
-        contexts,
-        responses,
+        instances: list[Instance],
         criteria: Criteria | CriteriaWithOptions,
         provider: ModelProviderEnum,
         credentials: dict[str, str],
     ):
         inference_engine_params = get_inference_engine_params(credentials, provider, self.evaluator.name)
         inference_engine = LiteLLMInferenceEngine(**inference_engine_params)
-
+        context_variables_list = [instance.context_variables for instance in instances]
         evalutor_params = {
             "inference_engine": inference_engine,
             "evaluator_name": self.evaluator.name.name,
-            "context_fields": list(contexts[0].keys()),
+            "context_fields": list(context_variables_list[0].keys()),
             "criteria_field": "criteria",
         }
 
-        evaluator_klass = LLMJudgeDirect if self.evaluator_type == EvaluatorTypeEnum.DIRECT else LLMJudgePairwise
-
-        input_fields = {input_field: str for input_field in contexts[0].keys()}
-        metric = evaluator_klass(**evalutor_params)
-        data = {"test": contexts if self.evaluator_type == EvaluatorTypeEnum.DIRECT else [contexts[0]]}
+        input_fields = {input_field: str for input_field in context_variables_list[0].keys()}
+        metric = self.get_evaluator_klass()(**evalutor_params)
+        data = {"test": context_variables_list}
         data["test"] = [{**d, "judgement": criteria} for d in data["test"]]
         card = TaskCard(
             loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
-            preprocess_steps=[
-                (
-                    LoadCriteriaWithOptions(field="judgement", to_field="criteria")
-                    if self.evaluator_type == EvaluatorTypeEnum.DIRECT
-                    else LoadCriteria(field="judgement", to_field="criteria")
-                ),
-            ],
+            preprocess_steps=self.get_preprocess_steps(),
             task=Task(
                 input_fields=input_fields,
-                prediction_type=str if self.evaluator_type == EvaluatorTypeEnum.DIRECT else List[str],
+                prediction_type=self.get_prediction_type(),
                 metrics=[metric],
                 reference_fields={"criteria": Any},
                 default_template=NullTemplate(),
@@ -116,7 +120,7 @@ class Evaluator(ABC):
         )
 
         dataset = load_dataset(card=card, split="test")
-        predictions = responses if self.evaluator_type == EvaluatorTypeEnum.DIRECT else [responses]
+        predictions = self.get_predictions(instances)
         evaluated_dataset = evaluate(predictions=predictions, data=dataset)
         return self.parse_results(evaluated_dataset)
 
@@ -126,6 +130,17 @@ class DirectAssessmentEvaluator(Evaluator):
         super().__init__(name)
         self.evaluator_type = EvaluatorTypeEnum.DIRECT
 
+    def get_preprocess_steps(self):
+        return [
+            LoadCriteriaWithOptions(field="judgement", to_field="criteria")
+        ]
+
+    def get_prediction_type(self):
+        return str
+    
+    def get_evaluator_klass(self):
+        return LLMJudgeDirect
+    
     def parse_results(self, dataset):
         results = []
         prefix = dataset[0]["score"]["instance"]["score_name"]
@@ -149,23 +164,36 @@ class PairwiseComparisonEvaluator(Evaluator):
         super().__init__(name)
         self.evaluator_type = EvaluatorTypeEnum.PAIRWISE
 
+    def get_preprocess_steps(self):
+        return [
+            LoadCriteria(field="judgement", to_field="criteria")
+        ]
+    
+    def get_prediction_type(self):
+        return List[str]
+    
+    def get_evaluator_klass(self): 
+        return LLMJudgePairwise
+    
     def parse_results(self, dataset):
-        score = dataset[0]["score"]["instance"]
-        import json
+        results = []
+        for instance in dataset:
+            score = instance["score"]["instance"]
 
-        print(json.dumps(score, indent=4))
-        parsed_score = {}
-        for key in score.keys():
-            outer_key = key.split("_")[0]
-            if outer_key not in ["score", "criteria"]:
-                parsed_score[outer_key] = {
-                    "contest_results": score[f"{outer_key}_contest_results"],
-                    "compared_to": score[f"{outer_key}_compared_to"],
-                    "summaries": score[f"{outer_key}_summaries"],
-                    "positional_bias": score[f"{outer_key}_positional_bias"],
-                    "winrate": score[f"{outer_key}_winrate"],
-                    "ranking": score[f"{outer_key}_ranking"],
-                    "selections": score[f"{outer_key}_selections"],
-                }
+            print(json.dumps(score, indent=4))
+            parsed_score = {}
+            for key in score.keys():
+                outer_key = key.split("_")[0]
+                if outer_key not in ["score", "criteria"]:
+                    parsed_score[outer_key] = {
+                        "contest_results": score[f"{outer_key}_contest_results"],
+                        "compared_to": score[f"{outer_key}_compared_to"],
+                        "summaries": score[f"{outer_key}_summaries"],
+                        "positional_bias": score[f"{outer_key}_positional_bias"],
+                        "winrate": score[f"{outer_key}_winrate"],
+                        "ranking": score[f"{outer_key}_ranking"],
+                        "selections": score[f"{outer_key}_selections"],
+                    }
+            results.append(parsed_score)
 
-        return parsed_score
+        return results

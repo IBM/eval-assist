@@ -40,26 +40,25 @@ class RubricEvalRequestModel(EvalRequestModel):
     criteria: CriteriaWithOptionsAPI | str
     response_variable_name: str
 
-    @validator("responses", pre=True, always=True)
-    def validate_responses_length(cls, responses):
-        # if len(responses) == 0:
-        #     raise HTTPException(status_code=400, detail="At least one response is required to evaluate.")
+    # @validator("responses", pre=True, always=True)
+    # def validate_responses_length(cls, responses):
+    #     # if len(responses) == 0:
+    #     #     raise HTTPException(status_code=400, detail="At least one response is required to evaluate.")
 
-        all_valid = True
-        for r in responses:
-            if len(r.strip()) == 0:
-                all_valid = False
-                break
-        if not all_valid:
-            raise HTTPException(status_code=400, detail="Responses can't be an empty string.")
+    #     all_valid = True
+    #     for r in responses:
+    #         if len(r.strip()) == 0:
+    #             all_valid = False
+    #             break
+    #     if not all_valid:
+    #         raise HTTPException(status_code=400, detail="Responses can't be an empty string.")
 
-        return responses
+    #     return responses
 
 
 class RubricEvalResultModel(BaseModel):
     option: str
     summary: str
-    certainty: float | None = None
     positional_bias: bool | None = None
     positional_bias_option: str | None = None
 

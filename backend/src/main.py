@@ -218,8 +218,7 @@ async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
             )
 
         res = evaluator.evaluate(
-            contexts=[req.context_variables] * len(req.responses),
-            responses=req.responses,
+            instances=req.instances,
             criteria=criteria,
             # response_variable_name_list=[req.response_variable_name] * len(req.responses),
             credentials=req.llm_provider_credentials,
@@ -372,7 +371,7 @@ def cleanup_file(filepath: str):
 @router.post("/download-notebook/")
 def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks):
     # Validate inputs
-    if not hasattr(params, 'criteria') or not hasattr(params, 'evaluator_name') or not hasattr(params, 'responses') or not hasattr(params, 'context_variables'):
+    if not hasattr(params, 'criteria') or not hasattr(params, 'evaluator_name') or not hasattr(params, 'predictions') or not hasattr(params, 'context_variables'):
         raise HTTPException(status_code=400, detail="Missing required fields")
 
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
@@ -394,7 +393,7 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
 
     background_tasks.add_task(cleanup_file, notebook_path)
 
-    return FileResponse(notebook_path, media_type="application/x-ipynb+json", filename="generated_notebook.ipynb")
+    return FileResponse(notebook_path, media_type="application/x-ipynb+json", filename=f"{params.evaluator_type}_generated_notebook.ipynb")
 
 
 @app.exception_handler(RequestValidationError)

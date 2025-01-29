@@ -14,13 +14,16 @@ class CriteriaModel(BaseModel):
         return description
 
 
-class EvalRequestModel(BaseModel):
+class Instance(BaseModel):
     context_variables: dict[str, str]
-    responses: list[str]
+    prediction: str | list[str]
+
+class EvalRequestModel(BaseModel):
     provider: ModelProviderEnum
     llm_provider_credentials: dict[str, str]
     evaluator_name: EvaluatorNameEnum
     type: EvaluatorTypeEnum
+    instances: list[Instance]
 
     @validator("llm_provider_credentials", pre=True, always=True)
     def validate_api_key(cls, key):
@@ -28,12 +31,12 @@ class EvalRequestModel(BaseModel):
             raise HTTPException(status_code=400, detail="API credentials are required.")
         return key
 
-    @validator("context_variables", pre=True, always=True)
-    def validate_context_variables_key(cls, context_variables):
-        for context_variable_name in context_variables.keys():
-            if context_variable_name == "":
-                raise HTTPException(status_code=400, detail="Context variable names can't be empty.")
-        return context_variables
+    # @validator("context_variables", pre=True, always=True)
+    # def validate_context_variables_key(cls, context_variables):
+    #     for context_variable_name in context_variables.keys():
+    #         if context_variable_name == "":
+    #             raise HTTPException(status_code=400, detail="Context variable names can't be empty.")
+    #     return context_variables
 
     @validator("evaluator_name", pre=True, always=True)
     def validate_pipeline(cls, evaluator_name):
@@ -47,7 +50,7 @@ class NotebookParams(BaseModel):
     criteria: dict
     evaluator_name: EvaluatorNameEnum
     provider: ModelProviderEnum
-    responses: list
-    context_variables: list
+    predictions: list[str | list[str]]
+    context_variables: list[dict[str,str]]
     credentials: dict[str, str]
     evaluator_type: EvaluatorTypeEnum
