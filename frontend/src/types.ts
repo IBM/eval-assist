@@ -105,8 +105,9 @@ export type FetchedPairwiseResultsV0 = FetchedPairwiseInstanceResultV0[]
 export type FetchedPairwiseResultsV1 = FetchedPairwiseInstanceResultV1[]
 export type FetchedPairwiseResults = FetchedPairwiseResultsV1
 
-export type PairwiseResultsV0 = PairwiseInstanceResultV0[]
-export type PairwiseResultsV1 = PairwiseInstanceResultV1[]
+export type PairwiseResultsV0 = PairwiseInstanceResultV0
+export type PairwiseResultsV1 = PairwiseInstanceResultV1
+export type PairwiseResultsV2 = PairwiseInstanceResultV1[]
 export type PairwiseResults = PairwiseResultsV1
 
 export type FetchedResultsV0 = FetchedDirectResultsV0 | FetchedPairwiseResultsV0 | null
@@ -115,8 +116,9 @@ export type FetchedResultsV1 = FetchedDirectResultsV1 | FetchedPairwiseInstanceR
 
 export type ResultsV0 = DirectResultsV0 | PairwiseResultsV0 | null
 export type ResultsV1 = DirectResultsV1 | PairwiseResultsV1 | null
+export type ResultsV2 = DirectResultsV1 | PairwiseResultsV2 | null
 
-export type Results = ResultsV1
+export type Results = ResultsV2
 
 export interface OptionV0 {
   option: string

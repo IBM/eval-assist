@@ -56,12 +56,12 @@ export const getEmptyCriteriaByType = (type: EvaluationType): CriteriaWithOption
 export const getEmptyInstance = (): Instance => ({
   contextVariables: [{ name: 'context', value: '' }],
   expectedResult: '',
+  result: null,
 })
 
 export const getEmptyPairwiseInstance = (): PairwiseInstance => ({
   ...getEmptyInstance(),
   responses: ['', ''],
-  result: null,
 })
 export const getEmptyDirectInstance = (): DirectInstance => ({ ...getEmptyInstance(), response: '', result: null })
 

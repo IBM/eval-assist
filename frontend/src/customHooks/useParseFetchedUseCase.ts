@@ -60,7 +60,6 @@ export const useParseFetchedUseCase = () => {
             const r = results.perResponseResults[key]
             perResponseResults[key] = {
               positionalBias: r.positionalBias || Array(Object.keys(results.perResponseResults).length - 1).fill(false),
-              certainties: r.certainty,
               comparedTo: r.comparedToIndexes.map((x) => `${x}`),
               summaries: Object.values(r.explanations),
               ranking: r.ranking,
