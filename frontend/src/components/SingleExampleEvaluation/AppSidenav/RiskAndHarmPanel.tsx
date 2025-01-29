@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import { toTitleCase } from 'src/utils'
 
 import { useMemo, useState } from 'react'
 
@@ -9,7 +10,6 @@ import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, List } from '@carbon/react/icons'
 
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
-import { toTitleCase } from '@utils/utils'
 
 import { UseCase } from '../../../types'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'

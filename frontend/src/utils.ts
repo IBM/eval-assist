@@ -5,15 +5,15 @@ import {
   EvaluationType,
   Instance,
   Option,
-  PairwiseComparisonResults,
   PairwiseInstance,
+  PairwiseInstanceResult,
   UseCase,
 } from '@types'
 
 export const isInstanceOfOption = (obj: any): obj is Option =>
   typeof obj.name === 'string' && typeof obj.description === 'string'
 
-export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseComparisonResults =>
+export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseInstanceResult =>
   obj !== null &&
   typeof obj.name === 'string' &&
   typeof obj.winnerIndex === 'number' &&

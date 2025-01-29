@@ -1,17 +1,17 @@
 import cx from 'classnames'
+import { returnByPipelineType } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 
 import { Link, Select, SelectItem } from '@carbon/react'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
-import { returnByPipelineType } from '@utils/utils'
 
 import {
   Criteria,
   CriteriaWithOptions,
-  DirectAssessmentResult,
   DirectInstance,
+  DirectInstanceResult,
   EvaluationType,
   Instance,
   PairwiseInstance,
@@ -25,7 +25,7 @@ interface Props {
   expectedResultOn: boolean
   setSelectedResultDetails: Dispatch<
     SetStateAction<{
-      result: DirectAssessmentResult | PerResponsePairwiseResult | null
+      result: DirectInstanceResult | PerResponsePairwiseResult | null
       expectedResult: string
       responseIndex: string
     }>
@@ -99,8 +99,9 @@ export const TestDataTableRow = ({
     () =>
       returnByPipelineType(
         type,
-        () => (criteria as CriteriaWithOptions).options.map((option) => option.name),
-        () => responses.map((_, i) => `Response ${i + 1}`),
+        () => (criteria as CriteriaWithOptions).options.map((option) => ({ value: option.name, text: option.name })),
+
+        () => responses.map((_, i) => ({ text: `Response ${i + 1}`, value: i + 1 })),
       ),
     [responses, criteria, type],
   )
@@ -108,20 +109,22 @@ export const TestDataTableRow = ({
   const result = useMemo<{ result: string; positionalBias: boolean; agreement: boolean } | null>(() => {
     if (type == EvaluationType.DIRECT) {
       const directInstance = instance as DirectInstance
-      if (directInstance.result === null) return null
+      const result = directInstance.result as DirectInstanceResult
+      if (!result) return null
       return {
-        result: directInstance.result.option,
-        positionalBias: directInstance.result.positionalBias,
-        agreement: directInstance.result.option === directInstance.expectedResult,
+        result: (result as DirectInstanceResult).option,
+        positionalBias: result.positionalBias,
+        agreement: result.option === directInstance.expectedResult,
       }
     } else {
       const pairwiseInstance = instance as PairwiseInstance
       if (pairwiseInstance.result === null) return null
       const winnerIndex = Object.values(pairwiseInstance.result).findIndex((r) => r.ranking === 1)
+      const winner = `Response ${winnerIndex + 1}`
       return {
-        result: `Response ${winnerIndex + 1}`,
+        result: winner,
         positionalBias: false,
-        agreement: `${winnerIndex}` === instance.expectedResult,
+        agreement: `${winnerIndex + 1}` === instance.expectedResult,
       }
     }
   }, [instance, type])
@@ -204,7 +207,7 @@ export const TestDataTableRow = ({
                 >
                   <SelectItem value={''} text={''} />
                   {expectedResultsOptions.map((option, i) => (
-                    <SelectItem key={i} text={option} value={option} />
+                    <SelectItem key={i} text={option.text} value={option.value} />
                   ))}
                 </Select>
               </div>
@@ -224,7 +227,8 @@ export const TestDataTableRow = ({
                     <div className={classes.resultBlockInner}>
                       <div
                         className={cx(classes.resultBlockTypography, {
-                          [classes.untrastedResultTypography]: result.positionalBias || !result.agreement,
+                          [classes.untrastedResultTypography]:
+                            instance.expectedResult && (result.positionalBias || !result.agreement),
                         })}
                         onFocus={setActive}
                         onBlur={setInactive}
@@ -235,7 +239,7 @@ export const TestDataTableRow = ({
                         <div className={cx(classes.positionalBias)}>{'Positional bias detected'}</div>
                       )}
 
-                      {!result.agreement && (
+                      {instance.expectedResult && (
                         <div
                           className={cx(classes.resultBlockTypography, {
                             [classes.untrastedResultTypography]: !result.agreement,
@@ -254,7 +258,7 @@ export const TestDataTableRow = ({
                 {type === EvaluationType.DIRECT && explanationOn && (
                   <FlexTextArea
                     readOnly
-                    value={(instance as DirectInstance).result?.summary || undefined}
+                    value={(instance.result as DirectInstanceResult)?.summary || undefined}
                     labelText={''}
                     placeholder=""
                     // key={`rubric_${i}`}

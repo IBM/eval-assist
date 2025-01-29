@@ -1,10 +1,9 @@
 import cx from 'classnames'
+import { getEmptyUseCase } from 'src/utils'
 
 import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Layer, Modal } from '@carbon/react'
-
-import { getEmptyUseCase } from '@utils/utils'
 
 import { EvaluationType, UseCase } from '../../../types'
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'

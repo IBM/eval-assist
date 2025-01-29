@@ -1,3 +1,5 @@
+import { isInstanceOfCriteriaWithOptions } from 'src/utils'
+
 import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 
 import {
@@ -17,7 +19,6 @@ import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 
 import { HighlightTextArea } from '@components/HighlightTextArea'
 import { CriteriaWithOptions } from '@types'
-import { isInstanceOfCriteriaWithOptions } from '@utils/utils'
 
 import { JSONTextArea } from '../JSONTextArea'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'

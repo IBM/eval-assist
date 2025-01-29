@@ -1,10 +1,10 @@
+import { getJSONStringWithSortedKeys, returnByPipelineType } from 'src/utils'
+
 import { CSSProperties, useMemo } from 'react'
 
 import Link from 'next/link'
 
 import { Select, SelectItem, SelectItemGroup, SelectSkeleton } from '@carbon/react'
-
-import { getJSONStringWithSortedKeys, returnByPipelineType } from '@utils/utils'
 
 import { EvaluationType, Evaluator, ModelProviderCredentials, ModelProviderType } from '../../types'
 import classes from './PipelineSelect.module.scss'

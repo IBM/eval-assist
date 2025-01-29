@@ -1,5 +1,6 @@
 import cx from 'classnames'
 import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { getEmptyUseCase } from 'src/utils'
 
 import { Dispatch, SetStateAction } from 'react'
 
@@ -8,7 +9,6 @@ import { Add, ArrowRight, Launch, View } from '@carbon/react/icons'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
-import { getEmptyUseCase } from '@utils/utils'
 
 import { EvaluationType, UseCase } from '../../types'
 import { Card } from './Card/Card'

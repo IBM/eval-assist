@@ -1,5 +1,6 @@
 import cx from 'classnames'
 import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { returnByPipelineType } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 
@@ -9,7 +10,6 @@ import { ListItem, Tile, UnorderedList } from '@carbon/react'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { BadgeColor, Benchmark } from '@types'
-import { returnByPipelineType } from '@utils/utils'
 
 import classes from './BenchmarkCard.module.scss'
 import { useURLInfoContext } from './Providers/URLInfoProvider'

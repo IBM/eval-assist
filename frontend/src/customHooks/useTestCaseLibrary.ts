@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
+import { toTitleCase } from 'src/utils'
 
-import { toTitleCase } from '@utils/utils'
+import { useMemo } from 'react'
 
 import { Criteria, CriteriaWithOptions, DirectInstance, EvaluationType, PairwiseInstance, UseCase } from '../types'
 import { useCriterias } from './useCriterias'

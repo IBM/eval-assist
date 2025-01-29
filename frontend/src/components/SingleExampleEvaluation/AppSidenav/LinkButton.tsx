@@ -1,3 +1,5 @@
+import { stringifyQueryParams } from 'src/utils'
+
 import { useMemo } from 'react'
 
 import Link from 'next/link'
@@ -5,7 +7,6 @@ import Link from 'next/link'
 import { Launch } from '@carbon/react/icons'
 
 import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFromUseCase'
-import { stringifyQueryParams } from '@utils/utils'
 
 import { UseCase } from '../../../types'
 import classes from './LinkButton.module.scss'

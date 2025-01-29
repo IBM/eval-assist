@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import { getJSONStringWithSortedKeys, returnByPipelineType, stringifyQueryParams, toSnakeCase } from 'src/utils'
 import { v4 as uuid } from 'uuid'
 
 import { LegacyRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -16,19 +17,22 @@ import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
 import { useUnitxtNotebook } from '@customHooks/useUnitxtNotebook'
 import { StoredUseCase } from '@prisma/client'
-import { getJSONStringWithSortedKeys, returnByPipelineType, stringifyQueryParams, toSnakeCase } from '@utils/utils'
 
 import {
-  DirectAssessmentResult,
-  DirectAssessmentResults,
   DirectInstance,
+  DirectInstanceResult,
+  DirectResults,
   EvaluationType,
   Evaluator,
-  FetchedDirectAssessmentResults,
-  FetchedPairwiseComparisonResults,
+  FetchedDirectInstanceResult,
+  FetchedDirectInstanceResultV1,
+  FetchedDirectResults,
+  FetchedPairwiseInstanceResult,
+  FetchedPairwiseResults,
+  Instance,
   ModelProviderType,
-  PairwiseComparisonResults,
   PairwiseInstance,
+  PairwiseInstanceResult,
   PerResponsePairwiseResult,
   UseCase,
 } from '../../types'
@@ -79,7 +83,7 @@ export const SingleExampleEvaluation = () => {
   const [promptModalOpen, setPromptModalOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [selectedResultDetails, setSelectedResultDetails] = useState<{
-    result: DirectAssessmentResult | PerResponsePairwiseResult | null
+    result: DirectInstanceResult | PerResponsePairwiseResult | null
     expectedResult: string
     responseIndex: string
   }>({ result: null, expectedResult: '', responseIndex: '' })
@@ -169,13 +173,12 @@ export const SingleExampleEvaluation = () => {
     criteria: currentUseCase?.criteria,
     evaluatorName: currentUseCase?.evaluator?.name,
     responses,
-    contextVariables: currentUseCase?.instances.map((instance) => instance.contextVariables),
+    contextVariablesList: currentUseCase?.instances.map((instance) => instance.contextVariables),
     provider: currentUseCase?.evaluator?.provider,
     credentials: modelProviderCredentials[currentUseCase?.evaluator?.provider || ModelProviderType.RITS],
     evaluatorType: currentUseCase?.type,
   })
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
-
   const runEvaluation = useCallback(async () => {
     if (currentUseCase === null) return
     setEvaluationFailed(false)
@@ -189,11 +192,6 @@ export const SingleExampleEvaluation = () => {
     // was changed during the evaluation request
     const temporaryIdSnapshot = temporaryIdRef.current
     let response
-    const parsedContextVariables = currentUseCase.instances[0].contextVariables.reduce(
-      (acc, item, index) => ({ ...acc, [item.name]: item.value }),
-      {},
-    )
-
     const parsedCriteria = { ...currentUseCase.criteria }
     if (isRisksAndHarms) {
       // check if criteria description changed and criteria name didn't
@@ -208,8 +206,17 @@ export const SingleExampleEvaluation = () => {
       }
     }
     let body: any = {
-      context_variables: parsedContextVariables,
-      responses,
+      instances: currentUseCase.instances.map((instance) => ({
+        context_variables: instance.contextVariables.reduce(
+          (acc, item, index) => ({ ...acc, [item.name]: item.value }),
+          {},
+        ),
+        prediction: returnByPipelineType(
+          currentUseCase.type,
+          (instance as DirectInstance).response,
+          (instance as PairwiseInstance).responses,
+        ),
+      })),
       evaluator_name: currentUseCase.evaluator?.name,
       provider: currentUseCase.evaluator?.provider,
       criteria: parsedCriteria,
@@ -267,45 +274,47 @@ export const SingleExampleEvaluation = () => {
         subtitle: `Took ${totalEvaluationTime} seconds`,
         timeout: 5000,
       })
-
-      let results: DirectAssessmentResults | PairwiseComparisonResults
-
+      let instancesWithResults: Instance[]
       if (currentUseCase.type === EvaluationType.DIRECT) {
-        results = (responseBody.results as FetchedDirectAssessmentResults).map(
-          (result) =>
-            ({
-              name: currentUseCase.criteria.name,
-              option: result.option,
-              positionalBiasOption: result.positional_bias_option,
-              summary: result.summary,
-              positionalBias: result.positional_bias,
-              certainty: result.certainty,
-            } as DirectAssessmentResult),
+        instancesWithResults = currentUseCase.instances.map((instance) => ({ ...instance } as DirectInstance))
+        ;(responseBody.results as FetchedDirectResults).forEach(
+          (fetchedInstanceResult: FetchedDirectInstanceResult, i) => {
+            const instanceResult: DirectInstanceResult = {
+              option: fetchedInstanceResult.option,
+              positionalBiasOption: fetchedInstanceResult.positional_bias_option,
+              summary: fetchedInstanceResult.summary,
+              positionalBias: fetchedInstanceResult.positional_bias,
+              certainty: fetchedInstanceResult.certainty,
+            }
+            instancesWithResults[i] = { ...instancesWithResults[i], result: instanceResult }
+          },
         )
       } else {
-        const perResponseResults: PairwiseComparisonResults = {}
-        const fetchedResults = responseBody as FetchedPairwiseComparisonResults
-        Object.entries(fetchedResults.results).forEach(([result_idx, fetchedPerResponseResult]) => {
-          perResponseResults[result_idx] = {
-            contestResults: fetchedPerResponseResult.contest_results,
-            comparedTo: fetchedPerResponseResult.compared_to,
-            summaries: fetchedPerResponseResult.summaries,
-            positionalBias:
-              fetchedPerResponseResult.positional_bias ||
-              new Array(fetchedPerResponseResult.contest_results.length).fill(false),
-            certainties: fetchedPerResponseResult.certainty,
-            winrate: fetchedPerResponseResult.winrate,
-            ranking: fetchedPerResponseResult.ranking,
-          }
-        })
-        results = perResponseResults
+        instancesWithResults = currentUseCase.instances.map((instance) => ({ ...instance } as PairwiseInstance))
+        ;(responseBody.results as FetchedPairwiseResults).forEach(
+          (fetchedInstanceResult: FetchedPairwiseInstanceResult, i) => {
+            let instanceResult: PairwiseInstanceResult = {}
+            Object.entries(fetchedInstanceResult).forEach(([result_idx, fetchedPerResponseResult]) => {
+              instanceResult[result_idx] = {
+                contestResults: fetchedPerResponseResult.contest_results,
+                comparedTo: fetchedPerResponseResult.compared_to,
+                summaries: fetchedPerResponseResult.summaries,
+                positionalBias:
+                  fetchedPerResponseResult.positional_bias ||
+                  new Array(fetchedPerResponseResult.contest_results.length).fill(false),
+                winrate: fetchedPerResponseResult.winrate,
+                ranking: fetchedPerResponseResult.ranking,
+              }
+            })
+            instancesWithResults[i] = { ...instancesWithResults[i], result: instanceResult }
+          },
+        )
       }
-
       setCurrentUseCase((previousCurrentUseCase) => {
         if (previousCurrentUseCase !== null) {
           return {
             ...previousCurrentUseCase,
-            results,
+            instances: instancesWithResults,
           }
         } else {
           return null
@@ -323,7 +332,6 @@ export const SingleExampleEvaluation = () => {
     modelProviderCredentials,
     post,
     removeToast,
-    responses,
   ])
 
   const changeUseCaseURL = useCallback(

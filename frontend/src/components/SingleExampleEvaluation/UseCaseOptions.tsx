@@ -1,9 +1,9 @@
+import { toTitleCase } from 'src/utils'
+
 import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 
 import { Button, IconButton } from '@carbon/react'
 import { Add, Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
-
-import { toTitleCase } from '@utils/utils'
 
 import { EvaluationType } from '../../types'
 import { UseCaseTypeBadge } from '../UseCaseTypeBadge/UseCaseTypeBadge'

@@ -1,9 +1,8 @@
 import cx from 'classnames'
 import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { returnByPipelineType } from 'src/utils'
 
 import { Dispatch, SetStateAction } from 'react'
-
-import { returnByPipelineType } from '@utils/utils'
 
 import { EvaluationType } from '../../../types'
 import { Card } from './Card'

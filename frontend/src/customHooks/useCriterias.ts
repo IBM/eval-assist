@@ -1,8 +1,9 @@
+import { capitalizeFirstWord, getEmptyCriteriaByType, getEmptyUseCase, returnByPipelineType } from 'src/utils'
+
 import { useCallback } from 'react'
 
 import { useCriteriasContext } from '@components/SingleExampleEvaluation/Providers/CriteriasProvider'
 import { Criteria, CriteriaWithOptions, EvaluationType, UseCase } from '@types'
-import { capitalizeFirstWord, getEmptyCriteriaByType, getEmptyUseCase, returnByPipelineType } from '@utils/utils'
 
 export const useCriterias = () => {
   const { directCriterias, pairwiseCriterias } = useCriteriasContext()

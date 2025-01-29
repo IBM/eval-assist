@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import { isInstanceOfCriteriaWithOptions } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback } from 'react'
 
@@ -7,7 +8,6 @@ import { Launch } from '@carbon/react/icons'
 
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 import { Criteria, CriteriaWithOptions, EvaluationType } from '@types'
-import { isInstanceOfCriteriaWithOptions } from '@utils/utils'
 
 import classes from './CriteriaDetailsModal.module.scss'
 

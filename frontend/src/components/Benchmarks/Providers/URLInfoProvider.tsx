@@ -1,9 +1,10 @@
+import { stringifyQueryParams } from 'src/utils'
+
 import { ReactNode, createContext, useCallback, useContext, useMemo, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
 import { Benchmark, CriteriaBenchmark, EvaluationType } from '@types'
-import { stringifyQueryParams } from '@utils/utils'
 
 import { useBenchmarksContext } from './BenchmarksProvider'
 

@@ -1,25 +1,24 @@
 import cx from 'classnames'
+import { getOrdinalSuffix, toPercentage } from 'src/utils'
 
 import { Dispatch, SetStateAction, useMemo } from 'react'
 
 import { Layer, Link, ListItem, Modal, UnorderedList } from '@carbon/react'
 
-import { getOrdinalSuffix, toPercentage } from '@utils/utils'
-
-import { DirectAssessmentResult, EvaluationType, PerResponsePairwiseResult } from '../../../types'
+import { DirectInstanceResult, EvaluationType, PerResponsePairwiseResult } from '../../../types'
 import classes from './ResultDetailsModal.module.scss'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   selectedResultDetails: {
-    result: DirectAssessmentResult | PerResponsePairwiseResult | null
+    result: DirectInstanceResult | PerResponsePairwiseResult | null
     expectedResult: string
     responseIndex: string
   }
   setSelectedResultDetails: Dispatch<
     SetStateAction<{
-      result: DirectAssessmentResult | PerResponsePairwiseResult | null
+      result: DirectInstanceResult | PerResponsePairwiseResult | null
       expectedResult: string
       responseIndex: string
     }>
@@ -38,15 +37,15 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
 
     let pb: string
     if (type === EvaluationType.DIRECT) {
-      pb = `${(selectedResultDetails.result as DirectAssessmentResult)?.positionalBias}`
+      pb = `${(selectedResultDetails.result as DirectInstanceResult)?.positionalBias}`
     } else {
       pb = `${(selectedResultDetails.result as PerResponsePairwiseResult).positionalBias.some(
         (pBias) => pBias === true,
       )}`
     }
     pb = pb.charAt(0).toUpperCase() + pb.slice(1) + ' '
-    if (type === EvaluationType.DIRECT && (selectedResultDetails.result as DirectAssessmentResult)?.positionalBias) {
-      pb += `/ '${(selectedResultDetails.result as DirectAssessmentResult).positionalBiasOption}' was selected `
+    if (type === EvaluationType.DIRECT && (selectedResultDetails.result as DirectInstanceResult)?.positionalBias) {
+      pb += `/ '${(selectedResultDetails.result as DirectInstanceResult).positionalBiasOption}' was selected `
     }
     return pb
   }, [selectedResultDetails, type])
@@ -70,7 +69,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
                 </p>
               )}
               <p style={{ marginBottom: '0.5rem' }}>
-                <strong>{'Result: '}</strong> {(selectedResultDetails.result as DirectAssessmentResult).option}
+                <strong>{'Result: '}</strong> {(selectedResultDetails.result as DirectInstanceResult).option}
               </p>
               <p style={{ marginBottom: '0.5rem' }}>
                 <strong>Positional bias:</strong>{' '}
@@ -89,7 +88,7 @@ export const ResultDetailsModal = ({ open, setOpen, selectedResultDetails, setSe
                 </Link>
               </p>
               <p style={{ marginBottom: '0.5rem' }}>
-                <strong>Explanation:</strong> {(selectedResultDetails.result as DirectAssessmentResult).summary}
+                <strong>Explanation:</strong> {(selectedResultDetails.result as DirectInstanceResult).summary}
               </p>
               {/* {selectedResultDetails.result.certainty && (
                 <p style={{ marginBottom: '0.5rem' }}>

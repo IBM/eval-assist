@@ -1,3 +1,5 @@
+import { returnByPipelineType, zip } from 'src/utils'
+
 import { useCallback, useMemo } from 'react'
 
 import { usePipelineTypesContext } from '@components/SingleExampleEvaluation/Providers/PipelineTypesProvider'
@@ -6,15 +8,15 @@ import {
   CriteriaV1,
   CriteriaWithOptionsV0,
   CriteriaWithOptionsV1,
-  DirectAssessmentResultsV0,
-  DirectAssessmentResultsV1,
   DirectInstance,
+  DirectResultsV0,
+  DirectResultsV1,
   EvaluationType,
   Evaluator,
   ModelProviderType,
-  PairwiseComparisonResultsV0,
-  PairwiseComparisonResultsV1,
   PairwiseInstance,
+  PairwiseInstanceResultV0,
+  PairwiseInstanceResultV1,
   ResultsV0,
   ResultsV1,
   UseCase,
@@ -23,7 +25,6 @@ import {
   UseCaseV2,
   UseCaseV3,
 } from '@types'
-import { returnByPipelineType, zip } from '@utils/utils'
 
 // EXAMPLES
 // fetched use case is v0 and current is v1
@@ -39,24 +40,21 @@ import { returnByPipelineType, zip } from '@utils/utils'
 export const useParseFetchedUseCase = () => {
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
 
-  const parseDirectAssessmentResultsV0ToV1 = useCallback(
-    (results: DirectAssessmentResultsV0): DirectAssessmentResultsV1 | null => {
-      return (
-        results?.map((r) => ({
-          positionalBias: r.positionalBias,
-          positionalBiasOption: '',
-          summary: r.explanation,
-          certainty: r.certainty,
-          option: r.option,
-        })) || null
-      )
-    },
-    [],
-  )
+  const parseDirectAssessmentResultsV0ToV1 = useCallback((results: DirectResultsV0): DirectResultsV1 | null => {
+    return (
+      results?.map((r) => ({
+        positionalBias: r.positionalBias,
+        positionalBiasOption: '',
+        summary: r.explanation,
+        certainty: r.certainty,
+        option: r.option,
+      })) || null
+    )
+  }, [])
 
   const parsePairwiseComparisonResultsV0ToV1 = useCallback(
-    (results: PairwiseComparisonResultsV0): PairwiseComparisonResultsV1 | null => {
-      const perResponseResults: PairwiseComparisonResultsV1 = {}
+    (results: PairwiseInstanceResultV0): PairwiseInstanceResultV1 | null => {
+      const perResponseResults: PairwiseInstanceResultV1 = {}
       results !== null
         ? Object.keys(results.perResponseResults).forEach((key) => {
             const r = results.perResponseResults[key]
@@ -80,8 +78,8 @@ export const useParseFetchedUseCase = () => {
     (results: ResultsV0, type: EvaluationType): ResultsV1 => {
       return returnByPipelineType(
         type,
-        () => parseDirectAssessmentResultsV0ToV1(results as DirectAssessmentResultsV0),
-        () => parsePairwiseComparisonResultsV0ToV1(results as PairwiseComparisonResultsV0),
+        () => parseDirectAssessmentResultsV0ToV1(results as DirectResultsV0),
+        () => parsePairwiseComparisonResultsV0ToV1(results as PairwiseInstanceResultV0),
       )
     },
     [parseDirectAssessmentResultsV0ToV1, parsePairwiseComparisonResultsV0ToV1],
@@ -246,9 +244,7 @@ export const useParseFetchedUseCase = () => {
                 contextVariables,
                 expectedResult: useCaseV2.expectedResults ? useCaseV2.expectedResults[i] : '',
                 response,
-                result: (useCaseV2.results as DirectAssessmentResultsV1)
-                  ? (useCaseV2.results as DirectAssessmentResultsV1)[i]
-                  : null,
+                result: (useCaseV2.results as DirectResultsV1) ? (useCaseV2.results as DirectResultsV1)[i] : null,
               } as DirectInstance),
           ),
         () => [
@@ -256,7 +252,7 @@ export const useParseFetchedUseCase = () => {
             contextVariables,
             expectedResult: useCaseV2.expectedResults || '',
             responses: useCaseV2.responses,
-            result: useCaseV2.results as PairwiseComparisonResultsV1,
+            result: useCaseV2.results as PairwiseInstanceResultV1,
           } as PairwiseInstance,
         ],
       ),

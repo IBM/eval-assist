@@ -1,3 +1,5 @@
+import { toSnakeCase } from 'src/utils'
+
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { Loading, Modal, Select, SelectItem } from '@carbon/react'
@@ -5,7 +7,6 @@ import { Loading, Modal, Select, SelectItem } from '@carbon/react'
 import { useCriterias } from '@customHooks/useCriterias'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { DirectInstance, EvaluationType, ModelProviderCredentials, ModelProviderType, UseCase } from '@types'
-import { toSnakeCase } from '@utils/utils'
 
 import classes from './PromptModal.module.scss'
 

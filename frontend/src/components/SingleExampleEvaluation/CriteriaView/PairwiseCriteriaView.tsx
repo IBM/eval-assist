@@ -1,3 +1,5 @@
+import { isInstanceOfCriteria } from 'src/utils'
+
 import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 
 import {
@@ -17,7 +19,6 @@ import { Edit, Save } from '@carbon/react/icons'
 
 import { HighlightTextArea } from '@components/HighlightTextArea'
 import { Criteria } from '@types'
-import { isInstanceOfCriteria } from '@utils/utils'
 
 import { JSONTextArea } from '../JSONTextArea'
 import classes from '../SingleExampleEvaluation.module.scss'

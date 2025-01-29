@@ -1,3 +1,5 @@
+import { getEmptyUseCase, returnByPipelineType } from 'src/utils'
+
 import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
 
 import { useRouter } from 'next/router'
@@ -5,7 +7,6 @@ import { useRouter } from 'next/router'
 import { useCriterias } from '@customHooks/useCriterias'
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
-import { getEmptyUseCase, returnByPipelineType } from '@utils/utils'
 
 import { EvaluationType, Evaluator, ModelProviderType, UseCase } from '../../../types'
 import { usePipelineTypesContext } from './PipelineTypesProvider'

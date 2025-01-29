@@ -1,23 +1,23 @@
 import cx from 'classnames'
+import { getEmptyDirectInstance, getEmptyPairwiseInstance, returnByPipelineType } from 'src/utils'
 
-import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
+import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button, IconButton, Toggle } from '@carbon/react'
 import { Add, TrashCan } from '@carbon/react/icons'
 
 import { EditableTag } from '@components/EditableTag'
-import { getEmptyDirectInstance, getEmptyPairwiseInstance, returnByPipelineType } from '@utils/utils'
 
 import {
   Criteria,
   CriteriaWithOptions,
-  DirectAssessmentResult,
   DirectInstance,
+  DirectInstanceResult,
   EvaluationType,
   Instance,
-  PairwiseComparisonResults,
-  PairwiseComparisonResultsV1,
   PairwiseInstance,
+  PairwiseInstanceResult,
+  PairwiseInstanceResultV1,
   PerResponsePairwiseResult,
   UseCase,
 } from '../../../types'
@@ -32,7 +32,7 @@ interface Props {
   evaluationRunning: boolean
   setSelectedResultDetails: Dispatch<
     SetStateAction<{
-      result: DirectAssessmentResult | PerResponsePairwiseResult | null
+      result: DirectInstanceResult | PerResponsePairwiseResult | null
       expectedResult: string
       responseIndex: string
     }>
@@ -59,6 +59,7 @@ export const TestDataTable = ({
   setResponseVariableName,
 }: Props) => {
   const [explanationOn, setExplanationOn] = useState(type === EvaluationType.DIRECT)
+
   const [expectedResultOn, setExpectedResultOn] = useState(true)
 
   const { isRisksAndHarms } = useURLInfoContext()
@@ -106,7 +107,6 @@ export const TestDataTable = ({
     }),
     [evaluationRunning, expectedResultOn, resultsAvailable],
   )
-  console.log(instances)
 
   const noPositionalBias = useMemo(() => {
     if (!resultsAvailable) return
@@ -115,18 +115,18 @@ export const TestDataTable = ({
       : (instances as PairwiseInstance[])?.every(
           (instance) =>
             instance.result === null ||
-            Object.values(instance.result as PairwiseComparisonResultsV1).every((perResponseResults) =>
+            Object.values(instance.result as PairwiseInstanceResultV1).every((perResponseResults) =>
               perResponseResults.positionalBias.every((pBias) => pBias === false),
             ),
         )
   }, [instances, resultsAvailable, type])
 
   const addRow = () => {
-    let newEmptyInstance: Instance = { contextVariables: [], expectedResult: '' }
+    let newEmptyInstance: Instance = { contextVariables: [], expectedResult: '', result: null }
     if (type === EvaluationType.DIRECT) {
-      ;(newEmptyInstance as DirectInstance) = { ...newEmptyInstance, response: '', result: null }
+      ;(newEmptyInstance as DirectInstance) = { ...newEmptyInstance, response: '' }
     } else {
-      ;(newEmptyInstance as PairwiseInstance) = { ...newEmptyInstance, responses: ['', ''], result: null }
+      ;(newEmptyInstance as PairwiseInstance) = { ...newEmptyInstance, responses: ['', ''] }
     }
     setInstances([...instances, returnByPipelineType(type, getEmptyDirectInstance(), getEmptyPairwiseInstance())])
   }
@@ -289,7 +289,7 @@ export const TestDataTable = ({
               expectedResultOn={expectedResultOn}
               setSelectedResultDetails={setSelectedResultDetails}
               setResultDetailsModalOpen={setResultDetailsModalOpen}
-              evaluationRunning={false}
+              evaluationRunning={evaluationRunning}
               criteria={criteria}
               gridClasses={returnByPipelineType(type, directGridClasses, pairwiseGridClasses)}
               instance={instance}

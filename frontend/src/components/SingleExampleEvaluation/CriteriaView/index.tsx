@@ -1,6 +1,6 @@
-import { CSSProperties, Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { returnByPipelineType } from 'src/utils'
 
-import { returnByPipelineType } from '@utils/utils'
+import { CSSProperties, Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { Criteria, CriteriaWithOptions, EvaluationType } from '../../../types'
 import { PairwiseCriteriaView } from './PairwiseCriteriaView'

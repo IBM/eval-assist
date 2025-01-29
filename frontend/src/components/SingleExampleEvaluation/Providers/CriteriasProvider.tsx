@@ -1,10 +1,11 @@
+import { capitalizeFirstWord } from 'src/utils'
+
 import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { Criteria, CriteriaWithOptions, EvaluationType, Evaluator, FetchedEvaluator } from '@types'
-import { capitalizeFirstWord } from '@utils/utils'
 
 interface PipelineContextValue {
   directCriterias: CriteriaWithOptions[] | null

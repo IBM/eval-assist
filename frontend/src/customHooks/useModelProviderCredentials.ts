@@ -1,9 +1,8 @@
 import { set } from 'lodash'
+import { getJSONStringWithSortedKeys } from 'src/utils'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-
-import { getJSONStringWithSortedKeys } from '@utils/utils'
 
 import { ModelProviderCredentials, ModelProviderType } from '../types'
 
