@@ -1,6 +1,0 @@
-{
-  "meta-llama/Meta-Llama-3.1-8B-Instruct": {
-    "behavior_layer_ids": [15, 17, 18, 19, 20, 21, 22, 23, 24],
-    "behavior_vector_strength": 1.7
-  }
-}
