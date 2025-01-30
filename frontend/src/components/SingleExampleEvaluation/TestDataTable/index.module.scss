@@ -48,7 +48,7 @@ $columns-4: 3fr 1fr 1fr 2fr;
   border-left: 1px solid $border-subtle-01;
   border-right: 1px solid $border-subtle-01;
   border-radius: $block-radius;
-  &:not(:last-child):not(.addResponseBlock) {
+  &:not(:last-child):not(.actionButtonBlock) {
     border-right: none;
   }
 }
@@ -116,9 +116,17 @@ $columns-4: 3fr 1fr 1fr 2fr;
   border-bottom: 1px solid $border-subtle-01;
 }
 
-.addResponseRow {
-  grid-template-columns: $columns-1;
+.actionButtonsRow {
   border-bottom: 1px solid $border-subtle-01;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: rem(60px);
+  border-left: 1px solid $border-subtle-01;
+  border-right: 1px solid $border-subtle-01;
+  padding-left: 0.5rem;
+  gap: 0.5rem;
 }
 
 .columns1 {
@@ -153,19 +161,10 @@ $columns-4: 3fr 1fr 1fr 2fr;
   grid-template-columns: $columns-4;
 }
 
-.addResponseBlock {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: rem(50px);
+.actionButton {
   border-radius: 0 0 $block-radius $block-radius !important;
-  > button {
-    display: flex;
-    align-items: center;
-
-    &:hover {
-      background: transparent;
-    }
+  > button:hover {
+    // background: transparent;
   }
 }
 

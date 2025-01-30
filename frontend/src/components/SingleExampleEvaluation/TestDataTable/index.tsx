@@ -122,13 +122,23 @@ export const TestDataTable = ({
   }, [instances, resultsAvailable, type])
 
   const addRow = () => {
-    let newEmptyInstance: Instance = { contextVariables: [], expectedResult: '', result: null }
+    let newEmptyInstance: Instance = {
+      contextVariables: instances[0].contextVariables.map((contextVariable) => ({
+        name: contextVariable.name,
+        value: '',
+      })),
+      expectedResult: '',
+      result: null,
+    }
     if (type === EvaluationType.DIRECT) {
       ;(newEmptyInstance as DirectInstance) = { ...newEmptyInstance, response: '' }
     } else {
-      ;(newEmptyInstance as PairwiseInstance) = { ...newEmptyInstance, responses: ['', ''] }
+      ;(newEmptyInstance as PairwiseInstance) = {
+        ...newEmptyInstance,
+        responses: (instances[0] as PairwiseInstance).responses.map((_) => ''),
+      }
     }
-    setInstances([...instances, returnByPipelineType(type, getEmptyDirectInstance(), getEmptyPairwiseInstance())])
+    setInstances([...instances, newEmptyInstance])
   }
 
   const addContextVariable = () => {
@@ -301,10 +311,15 @@ export const TestDataTable = ({
               type={type}
             />
           ))}
-          <div className={cx(classes.tableRow, classes.addResponseRow)}>
-            <div className={cx(classes.blockElement, classes.addResponseBlock)}>
-              <Button kind="ghost" size="sm" renderIcon={Add} onClick={addRow}>
+          <div className={cx(classes.tableRow, classes.actionButtonsRow)}>
+            <div className={cx(classes.actionButton)}>
+              <Button kind="tertiary" size="sm" renderIcon={Add} onClick={addRow}>
                 {'Add row'}
+              </Button>
+            </div>
+            <div className={cx(classes.actionButton)}>
+              <Button kind="tertiary" size="sm" renderIcon={Add} onClick={addRow}>
+                {'Generate test data'}
               </Button>
             </div>
           </div>
