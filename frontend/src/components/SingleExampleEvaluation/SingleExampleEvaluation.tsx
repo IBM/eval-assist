@@ -178,7 +178,9 @@ export const SingleExampleEvaluation = () => {
     credentials: modelProviderCredentials[currentUseCase?.evaluator?.provider || ModelProviderType.RITS],
     evaluatorType: currentUseCase?.type,
   })
+
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
+
   const runEvaluation = useCallback(async () => {
     if (currentUseCase === null) return
     setEvaluationFailed(false)
@@ -374,13 +376,10 @@ export const SingleExampleEvaluation = () => {
         use_case: {
           name: currentUseCase.name,
           content: JSON.stringify({
-            contextVariables: currentUseCase.instances[0].contextVariables,
-            responses,
+            instances: currentUseCase.instances,
             criteria: currentUseCase.criteria,
-            results,
             type: currentUseCase.type,
             evaluator: currentUseCase.evaluator,
-            expectedResults: currentUseCase.instances.map((instance) => instance.expectedResult),
             responseVariableName: currentUseCase.responseVariableName,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
           }),
@@ -429,13 +428,10 @@ export const SingleExampleEvaluation = () => {
         use_case: {
           name: name,
           content: JSON.stringify({
-            contextVariables: currentUseCase.instances[0].contextVariables,
-            responses,
+            instances: currentUseCase.instances,
             criteria: toSaveUseCase.criteria,
-            results,
             type: toSaveUseCase.type,
             pipeline: toSaveUseCase.evaluator,
-            expectedResults: currentUseCase.instances.map((instance) => instance.expectedResult),
             responseVariableName: currentUseCase.responseVariableName,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
           }),
@@ -486,8 +482,6 @@ export const SingleExampleEvaluation = () => {
       getUserName,
       parseFetchedUseCase,
       put,
-      responses,
-      results,
       setSidebarTabSelected,
       setUserUseCases,
       updateURLFromUseCase,

@@ -148,11 +148,13 @@ export const useParseFetchedUseCase = () => {
     } as UseCaseV2
   }, [])
 
-  const parseFetchedUseCaseV3 = useCallback((fetchedUseCase: Record<string, any>): UseCaseV3 => {
-    return {
-      ...fetchedUseCase,
-    } as UseCaseV3
-  }, [])
+  const parseFetchedUseCaseV3 = useCallback(
+    (fetchedUseCase: Record<string, any>): UseCaseV3 =>
+      ({
+        ...fetchedUseCase,
+      } as UseCaseV3),
+    [],
+  )
 
   // this version changes contextVariables from a list of {variable: string, value: string} to Record<string, string>
   const parseFetchedUseCaseV0ToV1 = useCallback(
