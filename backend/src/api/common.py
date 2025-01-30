@@ -18,6 +18,7 @@ class Instance(BaseModel):
     context_variables: dict[str, str]
     prediction: str | list[str]
 
+
 class EvalRequestModel(BaseModel):
     provider: ModelProviderEnum
     llm_provider_credentials: dict[str, str]
@@ -51,6 +52,6 @@ class NotebookParams(BaseModel):
     evaluator_name: EvaluatorNameEnum
     provider: ModelProviderEnum
     predictions: list[str | list[str]]
-    context_variables: list[dict[str,str]]
+    context_variables: list[dict[str, str]]
     credentials: dict[str, str]
     evaluator_type: EvaluatorTypeEnum

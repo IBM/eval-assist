@@ -1,10 +1,11 @@
+import nbformat as nbf
+
 from .api.common import NotebookParams
 from .evaluators.unitxt import get_enum_by_value, get_inference_engine_params
-import nbformat as nbf
 
 
 def generate_direct_notebook(params: NotebookParams):
-    
+
     inference_engine_params = get_inference_engine_params(
         provider=params.provider, evaluator_name=params.evaluator_name, credentials=params.credentials
     )
@@ -19,7 +20,7 @@ def generate_direct_notebook(params: NotebookParams):
 
     title = f"# Unitxt direct evaluation notebook: {params.test_case_name}\n\nThis notebook was generated automatically from your EvalAssist test case '{params.test_case_name}'. It contains code to evaluate a set of responses using the specified criteria and evaluator. EvalAssist uses [unitxt](https://www.unitxt.ai/en/latest/index.html) to create and run the evaluations. You can find the documentation [here](https://www.unitxt.ai/en/latest/docs/llm_as_judge.html).\n\n"
     import_md = "### Import the necessary libraries"
-    import_code = f"""
+    import_code = """
 from unitxt.api import evaluate, create_dataset
 from unitxt.inference import LiteLLMInferenceEngine
 from unitxt.llm_as_judge import LLMJudgeDirect, EvaluatorNameEnum, CriteriaWithOptions
@@ -44,7 +45,9 @@ df = pd.DataFrame(dataset_rows)
     load_criteria_md = """### Load the criteria
 The criteria in a direct evaluation needs an option map that matches a string to a numerical value. Replace the NaN value of each option with your desire numerical value.
 """
-    option_map_string = ', '.join([f'\'{option_name}\': float(\'nan\')' for option_name in [option['name'] for option in params.criteria['options']]])
+    option_map_string = ", ".join(
+        [f"'{option_name}': float('nan')" for option_name in [option["name"] for option in params.criteria["options"]]]
+    )
 
     load_criteria_code = f"""
 criteria = {params.criteria}
@@ -53,9 +56,9 @@ criteria["option_map"] = option_map
 criteria = CriteriaWithOptions.from_obj(criteria)
 """
     setup_md = """### Setup the evaluation
-This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables. 
+This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables.
 """
-    setup_code = f"""metric = LLMJudgeDirect(    
+    setup_code = f"""metric = LLMJudgeDirect(
     evaluator_name={f"EvaluatorNameEnum.{get_enum_by_value(params.evaluator_name).name}.name"},
     inference_engine=LiteLLMInferenceEngine({inference_engine_params_string}),
     criteria=criteria,
@@ -75,7 +78,7 @@ dataset = create_dataset(
     split="test")
 """
     evaluation_md = "### Evaluate the responses and print the results"
-    evaluation_code = f"""predictions = df['prediction'].tolist()
+    evaluation_code = """predictions = df['prediction'].tolist()
 results = evaluate(predictions=predictions, data=dataset)
 print("Global Scores:")
 print(results.global_scores)
@@ -99,7 +102,6 @@ print(results.instance_scores)
     return nb
 
 
-
 def generate_pairwise_notebook(params: NotebookParams):
     inference_engine_params = get_inference_engine_params(
         provider=params.provider, evaluator_name=params.evaluator_name, credentials=params.credentials
@@ -115,7 +117,7 @@ def generate_pairwise_notebook(params: NotebookParams):
 
     title = f"# Unitxt pairwise evaluation notebook: {params.test_case_name}\n\nThis notebook was generated automatically from your EvalAssist test case '{params.test_case_name}'. It contains code to evaluate a set of responses using the specified criteria and evaluator. EvalAssist uses [unitxt](https://www.unitxt.ai/en/latest/index.html) to create and run the evaluations. You can find the documentation [here](https://www.unitxt.ai/en/latest/docs/llm_as_judge.html).\n\n"
     import_md = "### Import the necessary libraries"
-    import_code = f"""
+    import_code = """
 from typing import List
 from unitxt.api import evaluate, create_dataset
 from unitxt.inference import LiteLLMInferenceEngine
@@ -133,7 +135,10 @@ This code block creates a dataset from the context variables and the prediction.
 _Note: in a pairwise dataset, each instance is composed by a context, a criteria and a list of responses. Therefore, this dataset is composed by just one instance._
 """
 
-    system_predictions = [{f"system_{i+1}": instance_predictions for i, instance_predictions in enumerate(instance_predictions)} for instance_predictions in params.predictions]
+    system_predictions = [
+        {f"system_{i+1}": instance_predictions for i, instance_predictions in enumerate(instance_predictions)}
+        for instance_predictions in params.predictions
+    ]
     load_dataset_code = f"""context_variables = {params.context_variables}
 system_predictions = {system_predictions}
 dataset_rows = [instance_context_variable | instance_predictions for instance_context_variable, instance_predictions in zip(context_variables, system_predictions)]
@@ -147,7 +152,7 @@ The criteria in direct evaluation need an option map that matches a string to a 
 """
     load_criteria_code = f"""criteria = Criteria.from_obj({params.criteria})"""
     setup_md = """### Setup the evaluation
-This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables. 
+This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables.
 """
     setup_code = f"""metric = LLMJudgePairwise(
     evaluator_name={f"EvaluatorNameEnum.{get_enum_by_value(params.evaluator_name).name}.name"},
@@ -169,7 +174,7 @@ dataset = create_dataset(
     split="test")
 """
     evaluation_md = "### Evaluate the responses and print the results"
-    evaluation_code = f"""predictions = df.filter(regex=r'^system_\d+$').values.tolist()
+    evaluation_code = """predictions = df.filter(regex=r'^system_\d+$').values.tolist()
 results = evaluate(predictions=predictions, data=dataset)
 print("Global Scores:")
 print(results.global_scores)

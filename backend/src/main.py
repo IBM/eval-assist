@@ -22,14 +22,13 @@ from llmasajudge.benchmark.utils import get_all_benchmarks
 from llmasajudge.evaluators import EvaluatorNameEnum as EvaluatorNameEnumOld
 from llmasajudge.evaluators import GraniteGuardianRubricEvaluator
 from llmasajudge.evaluators import ModelProviderEnum as ModelProviderEnumOld
-from llmasajudge.evaluators import get_rubric_evaluator, RubricCriteria, RubricOption
+from llmasajudge.evaluators import RubricCriteria, RubricOption, get_rubric_evaluator
 from openai import AuthenticationError
 from prisma.errors import PrismaError
 from prisma.models import StoredUseCase
 from pydantic import BaseModel
 from unitxt.llm_as_judge import (
     DIRECT_CRITERIAS,
-    EVALUATOR_TO_MODEL_ID,
     EVALUATORS_METADATA,
     PAIRWISE_CRITERIAS,
     Criteria,
@@ -40,9 +39,6 @@ from unitxt.llm_as_judge import (
 )
 
 from .api.common import NotebookParams
-
-from .notebook_generation import generate_direct_notebook, generate_pairwise_notebook
-
 from .api.pairwise import (
     CriteriaAPI,
     PairwiseEvalRequestModel,
@@ -58,15 +54,11 @@ from .api.rubric import (
     RubricEvalResponseModel,
 )
 from .db_client import db
-from .evaluators.unitxt import (
-    DirectAssessmentEvaluator,
-    PairwiseComparisonEvaluator,
-    get_enum_by_value,
-    get_inference_engine_params,
-)
+from .evaluators.unitxt import DirectAssessmentEvaluator, PairwiseComparisonEvaluator
 
 # Logging req/resp
 from .logger import LoggingRoute
+from .notebook_generation import generate_direct_notebook, generate_pairwise_notebook
 
 nest_asyncio.apply()
 load_dotenv()
@@ -183,11 +175,16 @@ async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
                 res = evaluator.evaluate(
                     contexts=[req.context_variables] * len(req.responses),
                     responses=req.responses,
-                    criteria=[RubricCriteria(
-                        name=req.criteria.name,
-                        criteria=req.criteria.description,
-                        options=[RubricOption(option=o.name, description=o.description) for o in req.criteria.options],
-                    )] * len(req.responses),
+                    criteria=[
+                        RubricCriteria(
+                            name=req.criteria.name,
+                            criteria=req.criteria.description,
+                            options=[
+                                RubricOption(option=o.name, description=o.description) for o in req.criteria.options
+                            ],
+                        )
+                    ]
+                    * len(req.responses),
                     response_variable_name_list=[req.response_variable_name] * len(req.responses),
                     check_bias=True,
                 )
@@ -357,6 +354,7 @@ def get_benchmarks():
     json_data = get_all_benchmarks()
     return json_data
 
+
 def cleanup_file(filepath: str):
     """Safely remove a file after it has been served."""
     try:
@@ -371,7 +369,12 @@ def cleanup_file(filepath: str):
 @router.post("/download-notebook/")
 def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks):
     # Validate inputs
-    if not hasattr(params, 'criteria') or not hasattr(params, 'evaluator_name') or not hasattr(params, 'predictions') or not hasattr(params, 'context_variables'):
+    if (
+        not hasattr(params, "criteria")
+        or not hasattr(params, "evaluator_name")
+        or not hasattr(params, "predictions")
+        or not hasattr(params, "context_variables")
+    ):
         raise HTTPException(status_code=400, detail="Missing required fields")
 
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
@@ -393,7 +396,11 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
 
     background_tasks.add_task(cleanup_file, notebook_path)
 
-    return FileResponse(notebook_path, media_type="application/x-ipynb+json", filename=f"{params.evaluator_type}_generated_notebook.ipynb")
+    return FileResponse(
+        notebook_path,
+        media_type="application/x-ipynb+json",
+        filename=f"{params.evaluator_type}_generated_notebook.ipynb",
+    )
 
 
 @app.exception_handler(RequestValidationError)

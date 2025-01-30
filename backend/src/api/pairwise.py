@@ -1,5 +1,4 @@
-from fastapi import HTTPException
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 
 from .common import CriteriaModel, EvalRequestModel
 
@@ -21,15 +20,15 @@ class PairwiseEvalRequestModel(EvalRequestModel):
     #     # if len(responses) < 2:
     #     #     raise HTTPException(status_code=400, detail="At least two responses are required to evaluate.")
 
-        # all_valid = True
-        # for r in responses:
-        #     if len(r.strip()) == 0:
-        #         all_valid = False
-        #         break
-        # if not all_valid:
-        #     raise HTTPException(status_code=400, detail="Responses can't be an empty string.")
+    # all_valid = True
+    # for r in responses:
+    #     if len(r.strip()) == 0:
+    #         all_valid = False
+    #         break
+    # if not all_valid:
+    #     raise HTTPException(status_code=400, detail="Responses can't be an empty string.")
 
-        # return responses
+    # return responses
 
 
 class PairwiseEvalResultModel(BaseModel):

@@ -1,6 +1,6 @@
 import json
 from abc import ABC
-from typing import Any, List, cast
+from typing import Any, List
 
 from unitxt.api import evaluate, load_dataset
 from unitxt.blocks import Task, TaskCard
@@ -84,7 +84,7 @@ class Evaluator(ABC):
         raise NotImplementedError("This method must be implemented.")
 
     def get_predictions(self, instances: list[Instance]) -> list[str | list[str]]:
-        return [instance.prediction for instance in instances]  
+        return [instance.prediction for instance in instances]
 
     def evaluate(
         self,
@@ -131,16 +131,14 @@ class DirectAssessmentEvaluator(Evaluator):
         self.evaluator_type = EvaluatorTypeEnum.DIRECT
 
     def get_preprocess_steps(self):
-        return [
-            LoadCriteriaWithOptions(field="judgement", to_field="criteria")
-        ]
+        return [LoadCriteriaWithOptions(field="judgement", to_field="criteria")]
 
     def get_prediction_type(self):
         return str
-    
+
     def get_evaluator_klass(self):
         return LLMJudgeDirect
-    
+
     def parse_results(self, dataset):
         results = []
         prefix = dataset[0]["score"]["instance"]["score_name"]
@@ -165,16 +163,14 @@ class PairwiseComparisonEvaluator(Evaluator):
         self.evaluator_type = EvaluatorTypeEnum.PAIRWISE
 
     def get_preprocess_steps(self):
-        return [
-            LoadCriteria(field="judgement", to_field="criteria")
-        ]
-    
+        return [LoadCriteria(field="judgement", to_field="criteria")]
+
     def get_prediction_type(self):
         return List[str]
-    
-    def get_evaluator_klass(self): 
+
+    def get_evaluator_klass(self):
         return LLMJudgePairwise
-    
+
     def parse_results(self, dataset):
         results = []
         for instance in dataset:
