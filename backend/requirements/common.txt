@@ -8,3 +8,9 @@ nbformat
 litellm
 tenacity
 diskcache
+datasets
+langchain
+numpy
+openai
+pandas
+scipy
