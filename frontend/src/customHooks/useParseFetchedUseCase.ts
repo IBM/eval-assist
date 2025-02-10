@@ -274,7 +274,7 @@ export const useParseFetchedUseCase = () => {
   const CURRENT_FORMAT_VERSION = useMemo(() => 3, [])
 
   const parseFetchedUseCase = useCallback(
-    (fetchedUseCase: StoredUseCase): UseCase => {
+    (fetchedUseCase: StoredUseCase): UseCase | null => {
       const toParseObj: Record<string, any> = {
         ...(fetchedUseCase.content as Record<string, any>),
         id: fetchedUseCase.id,
@@ -282,6 +282,10 @@ export const useParseFetchedUseCase = () => {
       }
 
       const version = (toParseObj.contentFormatVersion as number) || 0
+      if (version > CURRENT_FORMAT_VERSION) {
+        console.log(`Discarding test case ${fetchedUseCase.name} because its newer than the current system version.`)
+        return null
+      }
       const readFetchedUseCase = useCaseParsingVersionFunctions[version]
 
       let parsedUseCase = readFetchedUseCase(toParseObj)
@@ -292,7 +296,7 @@ export const useParseFetchedUseCase = () => {
         })
       return parsedUseCase as UseCase
     },
-    [useCaseParsingVersionFunctions, useCaseParsingVersionToVersionFunctions],
+    [CURRENT_FORMAT_VERSION, useCaseParsingVersionFunctions, useCaseParsingVersionToVersionFunctions],
   )
 
   return {

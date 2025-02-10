@@ -38,7 +38,9 @@ export const UserUseCasesProvider = ({ children }: { children: ReactNode }) => {
       const fetchedUserUseCases: StoredUseCase[] = await (
         await get(`use_case/?user=${encodeURIComponent(getUserName())}`)
       ).json()
-      const parsedFetchedUserUseCases = fetchedUserUseCases.map((testCase) => parseFetchedUseCase(testCase))
+      const parsedFetchedUserUseCases = fetchedUserUseCases
+        .map((testCase) => parseFetchedUseCase(testCase))
+        .filter((testCase) => testCase !== null) as UseCase[]
       setUserUseCases(parsedFetchedUserUseCases)
       setLoadingUseCases(false)
     }

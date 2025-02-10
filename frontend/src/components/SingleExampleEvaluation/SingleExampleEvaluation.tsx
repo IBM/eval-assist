@@ -390,7 +390,7 @@ export const SingleExampleEvaluation = () => {
       })
     ).json()
 
-    const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
+    const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as UseCase
 
     setCurrentUseCase(parsedSavedUseCase)
     // update use case in the use cases list
@@ -450,7 +450,7 @@ export const SingleExampleEvaluation = () => {
         return false
       } else {
         const savedUseCase: StoredUseCase = await res.json()
-        const parsedSavedUseCase = parseFetchedUseCase(savedUseCase)
+        const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as UseCase
         // useCaseSelected will be different from null when
         // save as is done before switching from an unsaved
         // test case that has changes detected
