@@ -72,7 +72,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
         return null
       }
       if (isRisksAndHarms) {
-        return rubricPipelines.find((p) => p.name === 'Granite Guardian 3.0 8B') as Evaluator
+        return rubricPipelines.find((p) => p.name.toLocaleLowerCase().includes('granite guardian')) as Evaluator
       } else {
         const ritsCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.RITS)
         const watsonxCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.WATSONX)
@@ -120,6 +120,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
           harmsAndRisksLibraryTestCases[subCatalogName].find(
             (libraryUseCase) => libraryUseCase.name === libraryTestCaseName,
           ) || null
+        console.log(pu)
       } else {
         pu =
           allLibraryUseCases.find(

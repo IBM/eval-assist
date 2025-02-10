@@ -1,4 +1,3 @@
-import { set } from 'lodash'
 import { getJSONStringWithSortedKeys } from 'src/utils'
 import { useLocalStorage } from 'usehooks-ts'
 

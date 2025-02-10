@@ -89,7 +89,6 @@ export const SingleExampleEvaluation = () => {
   }>({ result: null, expectedResult: '', responseIndex: '' })
 
   const { setSidebarTabSelected } = useAppSidebarContext()
-
   const currentUseCaseString = useMemo<string>(
     () => (currentUseCase !== null && showingTestCase ? getJSONStringWithSortedKeys(currentUseCase) : ''),
     [showingTestCase, currentUseCase],
@@ -218,6 +217,7 @@ export const SingleExampleEvaluation = () => {
           (instance as DirectInstance).response,
           (instance as PairwiseInstance).responses,
         ),
+        prediction_variable_name: currentUseCase.responseVariableName,
       })),
       evaluator_name: currentUseCase.evaluator?.name,
       provider: currentUseCase.evaluator?.provider,
@@ -414,8 +414,6 @@ export const SingleExampleEvaluation = () => {
     getUserName,
     parseFetchedUseCase,
     put,
-    responses,
-    results,
     setUserUseCases,
     userUseCases,
   ])
