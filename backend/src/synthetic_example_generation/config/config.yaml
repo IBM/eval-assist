@@ -28,21 +28,21 @@ defaults: &defaults
   generation-params:
     text-params:
       source-data: null
-      num-generations-per-criteria: 100
+      num-generations-per-criteria: 1
       min_new_tokens: 10
       max_new_tokens: 100
       temperature: 0.9
     qa-params:
       source-data: "data/qa/source_data/questions.json"
-      num-sources: 10
-      num-generations-per-criteria: 5
-      min_new_tokens: 10
+      num-sources: 1
+      num-generations-per-criteria: 1
+      min_new_tokens: 1
       max_new_tokens: 150
       temperature: 0.9
     summarization-params:
       source-data: "data/summarization/source_data/articles.json"
-      num-sources: 10
-      num-generations-per-criteria: 10
+      num-sources: 1
+      num-generations-per-criteria: 1
       min_new_tokens: 10
       max_new_tokens: 150
       temperature: 0.7
@@ -70,7 +70,7 @@ experiments:
     <<: *defaults
     model-config:
       service: "rits"
-      model-id: "llama-3.1-8b"  # "llama-3.1-8b" "llama-3.3-70b" "mixtral-8x22b" "mistral-large"
+      model-id: "llama-3.3-70b"  # "llama-3.1-8b" "llama-3.3-70b" "mixtral-8x22b" "mistral-large"
       template-type: "mistral"
     generation-config:
       task-type: 'text'
@@ -84,7 +84,7 @@ experiments:
     <<: *defaults
     model-config:
       service: "rits"
-      model-id: "llama-3.1-8b"  # "llama-3.1-8b" "llama-3.3-70b" "mixtral-8x22b" "mistral-large"
+      model-id: "llama-3.3-70b"  # "llama-3.1-8b" "llama-3.3-70b" "mixtral-8x22b" "mistral-large"
       template-type: "llama-3"
     generation-config:
       task-type: 'qa'

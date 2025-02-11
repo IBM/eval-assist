@@ -19,22 +19,24 @@ class Model:
 
         self.model_mappings = config['defaults']['model-access']['model-mappings']
 
-        if self.service == "huggingface":
-            load_dotenv(dotenv_path="config/hf_access_token.env")
-            if self.model_id not in self.model_mappings['huggingface']:
-                available_models = list(self.model_mappings['huggingface'].keys())
-                raise ValueError(
-                    f"Model '{self.model_id}' not found in Hugging Face mappings; available models: {available_models}")
-            self.mapped_model_id = self.model_mappings['huggingface'][self.model_id]
+        # if self.service == "huggingface":
+        #     load_dotenv(dotenv_path="config/hf_access_token.env")
+        #     if self.model_id not in self.model_mappings['huggingface']:
+        #         available_models = list(self.model_mappings['huggingface'].keys())
+        #         raise ValueError(
+        #             f"Model '{self.model_id}' not found in Hugging Face mappings; available models: {available_models}")
+        #     self.mapped_model_id = self.model_mappings['huggingface'][self.model_id]
+        #
+        #     self.tokenizer = AutoTokenizer.from_pretrained(self.mapped_model_id)
+        #     self.model = AutoModelForCausalLM.from_pretrained(self.mapped_model_id)
+        #     if self.tokenizer.pad_token is None:
+        #         self.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+        #         self.model.resize_token_embeddings(len(self.tokenizer))
 
-            self.tokenizer = AutoTokenizer.from_pretrained(self.mapped_model_id)
-            self.model = AutoModelForCausalLM.from_pretrained(self.mapped_model_id)
-            if self.tokenizer.pad_token is None:
-                self.tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-                self.model.resize_token_embeddings(len(self.tokenizer))
+        if self.service == "rits":
 
-        elif self.service == "rits":
-            load_dotenv(dotenv_path="config/rits_access_token.env")
+            load_dotenv(dotenv_path=".env")  # todo: for some reason this is needed rather than simply load_dotenv()
+
             rits_api_key = os.getenv('RITS_API_KEY')
             if self.model_id not in self.model_mappings['rits']:
                 available_models = list(self.model_mappings['rits'].keys())
@@ -54,7 +56,7 @@ class Model:
         else:
             raise ValueError(f"unknown model service: {self.service}")
 
-    def generate_responses(self, system_prompts, queries, kwargs, max_retries=30):
+    def generate_responses(self, system_prompts, queries, kwargs=None, max_retries=30):
         responses = [None] * len(queries)
         retry_indices = list(range(len(queries)))
         retry_count = 0
@@ -68,29 +70,29 @@ class Model:
 
                 prompts = self._prepare_prompts(system_prompts, queries, retry_indices)
 
-                if self.service == "huggingface":
-                    inputs = self.tokenizer(prompts, padding=True, return_tensors="pt")
+                # if self.service == "huggingface":
+                #     inputs = self.tokenizer(prompts, padding=True, return_tensors="pt")
+                #
+                #     with torch.no_grad():
+                #         outputs = self.model.generate(
+                #             **inputs,
+                #             pad_token_id=self.tokenizer.eos_token_id,
+                #             max_new_tokens=generation_params['max_new_tokens'],
+                #             min_new_tokens=generation_params['min_new_tokens'],
+                #             temperature=generation_params['temperature'],
+                #             top_p=generation_params['top_p'],
+                #             do_sample=generation_params['do_sample']
+                #         )
+                #
+                #         generation_outputs = []
+                #         for output, input_length in zip(outputs, inputs.attention_mask.sum(1)):
+                #             response = self.tokenizer.decode(
+                #                 output[input_length:],
+                #                 skip_special_tokens=True
+                #             ).strip()
+                #             generation_outputs.append(response)
 
-                    with torch.no_grad():
-                        outputs = self.model.generate(
-                            **inputs,
-                            pad_token_id=self.tokenizer.eos_token_id,
-                            max_new_tokens=generation_params['max_new_tokens'],
-                            min_new_tokens=generation_params['min_new_tokens'],
-                            temperature=generation_params['temperature'],
-                            top_p=generation_params['top_p'],
-                            do_sample=generation_params['do_sample']
-                        )
-
-                        generation_outputs = []
-                        for output, input_length in zip(outputs, inputs.attention_mask.sum(1)):
-                            response = self.tokenizer.decode(
-                                output[input_length:],
-                                skip_special_tokens=True
-                            ).strip()
-                            generation_outputs.append(response)
-
-                elif self.service == "rits":
+                if self.service == "rits":
                     args_list = [(prompt, generation_params) for prompt in prompts]
 
                     generation_outputs = thread_map(
@@ -139,7 +141,7 @@ class Model:
     def _prepare_prompts(self, system_prompts, queries, indices):
         return [
             self._apply_model_template(
-                system_prompts[i],
+                system_prompts[i] if system_prompts else "",
                 queries[i],
                 self.model_config['template-type']
             ) for i in indices
@@ -168,10 +170,12 @@ class Model:
             'do_sample': True
         }
 
-        params.update(kwargs)
+        if kwargs is not None:
+            params.update(kwargs)
         return params
 
-    def _is_valid_json_response(self, response: str) -> bool:
+    @staticmethod
+    def _is_valid_json_response(response: str) -> bool:
         if not response:
             return False
 
@@ -194,7 +198,8 @@ class Model:
 
         return new_retry_indices
 
-    def _parse_json_responses(self, responses: list) -> list:
+    @staticmethod
+    def _parse_json_responses(responses: list) -> list:
         JSON_START_MARKER = "```json"
         JSON_END_MARKER = "```"
 

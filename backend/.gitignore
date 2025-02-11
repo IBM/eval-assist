@@ -134,3 +134,6 @@ Secrets.yaml
 .vscode
 
 .litellm_cache/
+
+# synthetic data generation (EM: temp)
+/src/synthetic_example_generation/out

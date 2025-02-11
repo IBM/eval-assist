@@ -186,6 +186,31 @@ Important:
 
         return generations
 
+    def _get_borderline_criteria(self, criteria_dict):
+
+        if len(criteria_dict) < 2:
+            raise ValueError("Need to specify at least two criteria to generate borderline case.")
+
+        # response schema
+        response_schemas = [
+            ResponseSchema(name="name", description="the name of borderline criteria"),
+            ResponseSchema(name="description", description="the description of borderline criteria"),
+        ]
+        output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+        format_instructions = output_parser.get_format_instructions()
+
+        # form query
+        criteria_list = [f"{i + 1}. {key}: {value}" for i, (key, value) in enumerate(criteria_dict.items())]
+        criteria_text = "\n".join(criteria_list)
+        query = f"Describe a borderline case that lies between these criteria:\n\n{criteria_text}\n\nProvide a natural language description of what it means to be a borderline case among these criteria. Your description should mirror the style and format of the original criteria but describe the subtle ways in which the case partially satisfies multiple criteria while not fully satisfying any single one.\n\n{format_instructions}"
+
+        # get criteria
+        criteria_other = self.model.generate_responses([], [query])[0]
+
+        # todo: add check for empty generation
+
+        return criteria_other
+
     def _format_prompts(self):
 
         system_prompts, queries, metadata = [], [], []
@@ -196,9 +221,9 @@ Important:
 
             for dimension, criteria_dict in self.rubric.items():
 
-                # # add "other" category, todo: use language model to phrase this
-                # __
-                # criteria_dict["other"] = "Borderline among the other categories."
+                # add "borderline" category
+                criteria_borderline = self._get_borderline_criteria(criteria_dict)
+                criteria_dict["borderline"] = criteria_borderline['description']
 
                 for target, target_description in criteria_dict.items():
                     for gen_idx in range(self.num_generations_per_criteria):
@@ -228,6 +253,11 @@ Important:
 
             for source in self.source_data:
                 for dimension, criteria_dict in self.rubric.items():
+
+                    # add "borderline" category
+                    criteria_borderline = self._get_borderline_criteria(criteria_dict)
+                    criteria_dict["borderline"] = criteria_borderline['description']
+
                     for target, target_description in criteria_dict.items():
                         for gen_idx in range(self.num_generations_per_criteria):
                             system_prompt = self.system_prompt_template.format(
@@ -258,6 +288,11 @@ Important:
 
             for source in self.source_data:
                 for dimension, criteria_dict in self.rubric.items():
+
+                    # add "borderline" category
+                    criteria_borderline = self._get_borderline_criteria(criteria_dict)
+                    criteria_dict["borderline"] = criteria_borderline['description']
+
                     for target, target_description in criteria_dict.items():
                         for gen_idx in range(self.num_generations_per_criteria):
                             system_prompt = self.system_prompt_template.format(
