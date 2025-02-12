@@ -1,10 +1,10 @@
 import cx from 'classnames'
-import { getEmptyDirectInstance, getEmptyPairwiseInstance, returnByPipelineType } from 'src/utils'
+import { returnByPipelineType } from 'src/utils'
 
 import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button, IconButton, Toggle } from '@carbon/react'
-import { Add, TrashCan } from '@carbon/react/icons'
+import { Add, AiGenerate, TrashCan } from '@carbon/react/icons'
 
 import { EditableTag } from '@components/EditableTag'
 
@@ -43,6 +43,7 @@ interface Props {
   setResponseVariableName: (newValue: string) => void
   instances: Instance[]
   setInstances: (instances: Instance[]) => void
+  fetchSystheticExamples: () => Promise<any>
 }
 
 export const TestDataTable = ({
@@ -57,6 +58,7 @@ export const TestDataTable = ({
   criteria,
   responseVariableName,
   setResponseVariableName,
+  fetchSystheticExamples,
 }: Props) => {
   const [explanationOn, setExplanationOn] = useState(type === EvaluationType.DIRECT)
 
@@ -121,7 +123,7 @@ export const TestDataTable = ({
         )
   }, [instances, resultsAvailable, type])
 
-  const addRow = () => {
+  const addEmptyRow = () => {
     let newEmptyInstance: Instance = {
       contextVariables: instances[0].contextVariables.map((contextVariable) => ({
         name: contextVariable.name,
@@ -140,6 +142,31 @@ export const TestDataTable = ({
     }
     setInstances([...instances, newEmptyInstance])
   }
+
+  const generateTestData = useCallback(async () => {
+    const syntheticExamples = await fetchSystheticExamples()
+    const syntheticExample = syntheticExamples[0]
+    let syntheticInstance: Instance = {
+      contextVariables: instances[0].contextVariables.map((contextVariable) => ({
+        name: contextVariable.name,
+        value: syntheticExample[contextVariable.name],
+      })),
+      expectedResult: '',
+      result: null,
+    }
+    if (type === EvaluationType.DIRECT) {
+      ;(syntheticInstance as DirectInstance) = {
+        ...syntheticInstance,
+        response: syntheticExample[responseVariableName],
+      }
+    } else {
+      ;(syntheticInstance as PairwiseInstance) = {
+        ...syntheticInstance,
+        responses: (instances[0] as PairwiseInstance).responses.map((_) => ''),
+      }
+    }
+    setInstances([...instances, syntheticInstance])
+  }, [fetchSystheticExamples, instances, responseVariableName, setInstances, type])
 
   const addContextVariable = () => {
     setInstances(
@@ -313,12 +340,12 @@ export const TestDataTable = ({
           ))}
           <div className={cx(classes.tableRow, classes.actionButtonsRow)}>
             <div className={cx(classes.actionButton)}>
-              <Button kind="tertiary" size="sm" renderIcon={Add} onClick={addRow}>
+              <Button kind="tertiary" size="sm" renderIcon={Add} onClick={addEmptyRow}>
                 {'Add row'}
               </Button>
             </div>
             <div className={cx(classes.actionButton)}>
-              <Button kind="tertiary" size="sm" renderIcon={Add} onClick={addRow}>
+              <Button kind="tertiary" size="sm" renderIcon={AiGenerate} onClick={generateTestData}>
                 {'Generate test data'}
               </Button>
             </div>

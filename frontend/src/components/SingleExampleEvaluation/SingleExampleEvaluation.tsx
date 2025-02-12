@@ -10,6 +10,7 @@ import { useToastContext } from '@components/SingleExampleEvaluation/Providers/T
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { useGenerateSystheticExamples } from '@customHooks/useGenerateSystheticExamples'
 import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFromUseCase'
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
@@ -142,6 +143,7 @@ export const SingleExampleEvaluation = () => {
   const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
   const temporaryIdRef = useRef(uuid())
   const { getCriteria } = useCriteriasContext()
+  const { fetchSystheticExamples } = useGenerateSystheticExamples({})
 
   const responses = useMemo(
     () =>
@@ -628,6 +630,7 @@ export const SingleExampleEvaluation = () => {
                   previousCurrentUseCase !== null ? { ...previousCurrentUseCase, responseVariableName } : null,
                 )
               }
+              fetchSystheticExamples={fetchSystheticExamples}
             />
             <EvaluateButton
               evaluationRunning={evaluationRunning}
