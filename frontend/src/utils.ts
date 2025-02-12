@@ -171,13 +171,17 @@ export const toTitleCase = (inputString: string) => {
   return inputString
     .split('_')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => (acronyms.includes(word.toLocaleLowerCase()) ? word.toUpperCase() : word))
     .join(' ')
 }
+
+const acronyms = ['rag', 'rqa']
 
 export const capitalizeFirstWord = (inputString: string) => {
   return inputString
     .split('_')
     .map((word, i) => (i === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+    .map((word) => (acronyms.includes(word.toLocaleLowerCase()) ? word.toUpperCase() : word))
     .join(' ')
 }
 

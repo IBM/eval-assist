@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { toTitleCase } from 'src/utils'
+import { capitalizeFirstWord, toTitleCase } from 'src/utils'
 
 import { useMemo, useState } from 'react'
 
@@ -70,7 +70,7 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
             > */}
             {Object.entries(harmsAndRisksLibraryTestCases).map(([subCatalogName, useCases]) => (
               <TreeNode
-                label={subCatalogName}
+                label={capitalizeFirstWord(subCatalogName)}
                 onSelect={() => handleToggle(subCatalogName)}
                 onToggle={() => handleToggle(subCatalogName)}
                 isExpanded={expanded[subCatalogName]}

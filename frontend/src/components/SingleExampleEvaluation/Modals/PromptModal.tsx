@@ -4,10 +4,12 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { Loading, Modal, Select, SelectItem } from '@carbon/react'
 
-import { useCriterias } from '@customHooks/useCriterias'
+import { HighlightTextArea } from '@components/HighlightTextArea'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { DirectInstance, EvaluationType, ModelProviderCredentials, ModelProviderType, UseCase } from '@types'
 
+import { useCriteriasContext } from '../Providers/CriteriasProvider'
+import { useToastContext } from '../Providers/ToastProvider'
 import classes from './PromptModal.module.scss'
 
 interface Props {
@@ -20,9 +22,10 @@ interface Props {
 export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCredentials }: Props) => {
   const [prompts, setPrompts] = useState<string[] | null>(null)
   const [selectedPromptIndex, setSelectedPromptIndex] = useState<number>(0)
-  const { getCriteria } = useCriterias()
+  const { getCriteria } = useCriteriasContext()
 
   const { post } = useFetchUtils()
+  const { addToast } = useToastContext()
 
   useEffect(() => {
     const getPrompts = async () => {
@@ -36,23 +39,30 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
         if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.description !== currentUseCase.criteria.description) {
           // the tokenizer of granite guardian will complain if we send a predefined criteria name
           // with a custom description.
-          parsedCriteria.name = `${parsedCriteria.name}_variation`
+          addToast({
+            kind: 'error',
+            title: 'That risk already exist',
+            subtitle: "Can't change the definition of an existing risk",
+            timeout: 5000,
+          })
+          return
         }
 
-        const parsedContextVariables = currentUseCase.instances[0].contextVariables.reduce(
-          (acc, item, index) => ({ ...acc, [item.name]: item.value }),
-          {},
-        )
-
         let body: any = {
-          context_variables: parsedContextVariables,
-          responses: (currentUseCase.instances as DirectInstance[]).map((instance) => instance.response),
-          pipeline: currentUseCase.evaluator?.name,
+          instances: currentUseCase.instances.map((instance) => ({
+            context_variables: instance.contextVariables.reduce(
+              (acc, item, index) => ({ ...acc, [item.name]: item.value }),
+              {},
+            ),
+            prediction: (instance as DirectInstance).response,
+            prediction_variable_name: currentUseCase.responseVariableName,
+          })),
+          evaluator_name: currentUseCase.evaluator?.name,
           provider: currentUseCase.evaluator?.provider,
           criteria: parsedCriteria,
           type: currentUseCase.type,
           response_variable_name: currentUseCase.responseVariableName,
-          llm_provider_credentials: modelProviderCredentials[ModelProviderType.WATSONX],
+          llm_provider_credentials: {},
         }
 
         const prompts = await (await post('prompt/', body)).json()
@@ -60,7 +70,7 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
       }
     }
     getPrompts()
-  }, [currentUseCase, getCriteria, modelProviderCredentials, open, post])
+  }, [addToast, currentUseCase, getCriteria, modelProviderCredentials, open, post])
 
   useEffect(() => {
     if (open) {
@@ -110,7 +120,28 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
                 ))}
               </Select>
             )}
-            <div className={classes.prompt}>{prompts[selectedPromptIndex]}</div>
+            <HighlightTextArea
+              value={prompts[selectedPromptIndex]}
+              toHighlightWords={{
+                contextVariables: [
+                  '<start_of_turn>',
+                  '<end_of_turn>',
+                  '<|end_of_text|>',
+                  '<|start_of_role|>',
+                  '<|end_of_role|>',
+                  '<start_of_risk_definition>',
+                  '<end_of_risk_definition>',
+                ],
+                responseVariableName: '',
+              }}
+              isTextArea={true}
+              editorId={'prompt'}
+              onValueChange={function (value: string): void {
+                throw new Error('Function not implemented.')
+              }}
+              id={''}
+              labelText={undefined}
+            />
           </div>
         )}
       </div>

@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 import { getEmptyUseCase } from 'src/utils'
 
 import { Dispatch, SetStateAction } from 'react'
@@ -79,7 +79,7 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
       <p className={cx(classes.description, classes.sectionSeparation)}>{'Here are some key features we offer'}</p>
       <div className={cx(classes.cards, { [classes['sidebar-expanded']]: sidebarTabSelected !== null })}>
         <Card
-          title={RUBRIC_NAME}
+          title={DIRECT_NAME}
           description={'Select an answer based on the criteria for the question'}
           imageSrc="rubric_helper"
           onClick={createEmptyRubric}

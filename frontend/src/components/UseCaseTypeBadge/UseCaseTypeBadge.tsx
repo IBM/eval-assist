@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 import { returnByPipelineType } from 'src/utils'
 
 import { CSSProperties } from 'react'
@@ -20,7 +20,7 @@ export const UseCaseTypeBadge = ({ type: currentType, style, className, size }: 
   return (
     <div style={style} className={cx(className)}>
       <Tag className={classes['usecase-tag']} type="blue" size={size || 'md'}>
-        {returnByPipelineType(currentType, RUBRIC_NAME, PAIRWISE_NAME)}
+        {returnByPipelineType(currentType, DIRECT_NAME, PAIRWISE_NAME)}
       </Tag>
     </div>
   )

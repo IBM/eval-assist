@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 
 import { useEffect, useMemo, useState } from 'react'
 
@@ -94,7 +94,7 @@ export const BenchmarkSidenav = () => {
                   >
                     <TreeNode
                       id={'rubric'}
-                      label={RUBRIC_NAME}
+                      label={DIRECT_NAME}
                       onSelect={() => handleTypeToggle('rubric')}
                       onToggle={() => handleTypeToggle('rubric')}
                       isExpanded={typeExpanded['rubric']}

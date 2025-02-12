@@ -9,7 +9,6 @@ import { useRouter } from 'next/router'
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
-import { useCriterias } from '@customHooks/useCriterias'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFromUseCase'
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
@@ -52,6 +51,7 @@ import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { PipelineSelect } from './PipelineSelect'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
+import { useCriteriasContext } from './Providers/CriteriasProvider'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
 import { useUserUseCasesContext } from './Providers/UserUseCasesProvider'
 import classes from './SingleExampleEvaluation.module.scss'
@@ -141,7 +141,7 @@ export const SingleExampleEvaluation = () => {
   useBeforeOnload(changesDetected)
   const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
   const temporaryIdRef = useRef(uuid())
-  const { getCriteria } = useCriterias()
+  const { getCriteria } = useCriteriasContext()
 
   const responses = useMemo(
     () =>
@@ -151,18 +151,6 @@ export const SingleExampleEvaluation = () => {
             currentUseCase?.type || EvaluationType.DIRECT, // right-side will never happen
             (currentUseCase?.instances as DirectInstance[]).map((instance) => instance.response),
             (currentUseCase?.instances as PairwiseInstance[]).map((instance) => instance.responses),
-          ),
-    [currentUseCase?.instances, currentUseCase?.type, noUseCaseSelected],
-  )
-
-  const results = useMemo(
-    () =>
-      noUseCaseSelected
-        ? null
-        : returnByPipelineType(
-            currentUseCase?.type || EvaluationType.DIRECT, // right-side will never happen
-            (currentUseCase?.instances as DirectInstance[]).map((instance) => instance.result),
-            (currentUseCase?.instances as PairwiseInstance[]).map((instance) => instance.result),
           ),
     [currentUseCase?.instances, currentUseCase?.type, noUseCaseSelected],
   )
@@ -196,14 +184,19 @@ export const SingleExampleEvaluation = () => {
     const parsedCriteria = { ...currentUseCase.criteria }
     if (isRisksAndHarms) {
       // check if criteria description changed and criteria name didn't
-      const harmsAndRiskCriteria = getCriteria(
-        `${toSnakeCase(currentUseCase.criteria.name)}>${toSnakeCase(currentUseCase.responseVariableName)}`,
-        EvaluationType.DIRECT,
-      )
+      const harmsAndRiskCriteria = getCriteria(toSnakeCase(currentUseCase.criteria.name), EvaluationType.DIRECT)
       if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.description !== currentUseCase.criteria.description) {
         // the tokenizer of granite guardian will complain if we send a predefined criteria name
         // with a custom description.
-        parsedCriteria.name = `${parsedCriteria.name}_variation`
+        removeToast(inProgressEvalToastId)
+        addToast({
+          kind: 'error',
+          title: 'That risk already exist',
+          subtitle: "Can't change the definition of an existing risk",
+          timeout: 5000,
+        })
+        setEvaluationRunning(false)
+        return
       }
     }
     let body: any = {

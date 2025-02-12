@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 
 import { useMemo, useState } from 'react'
 
@@ -63,10 +63,10 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
           <TreeView label="" selected={selectedNode}>
             <TreeNode
               key={'direct'}
-              label={RUBRIC_NAME}
+              label={DIRECT_NAME}
               onSelect={() => handleToggle('direct')}
               onToggle={() => handleToggle('direct')}
-              isExpanded={expanded.pairwise}
+              isExpanded={expanded.direct}
             >
               {rubricLibraryTestCases.map((useCase, i) => (
                 <TreeNode

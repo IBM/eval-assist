@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 import { returnByPipelineType } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
@@ -132,11 +132,11 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
       </UnorderedList>
       <div className={classes.tagList}>
         <TagBadge
-          name={returnByPipelineType(benchmark.type, RUBRIC_NAME, PAIRWISE_NAME)}
+          name={returnByPipelineType(benchmark.type, DIRECT_NAME, PAIRWISE_NAME)}
           className={classes.badge}
           size="md"
-          color={tagToColor[returnByPipelineType(benchmark.type, RUBRIC_NAME, PAIRWISE_NAME)]}
-          onClick={(e) => onTagClick(e, returnByPipelineType(benchmark.type, RUBRIC_NAME, PAIRWISE_NAME))}
+          color={tagToColor[returnByPipelineType(benchmark.type, DIRECT_NAME, PAIRWISE_NAME)]}
+          onClick={(e) => onTagClick(e, returnByPipelineType(benchmark.type, DIRECT_NAME, PAIRWISE_NAME))}
         />
         {benchmark.tags.map((tag, i) => (
           <TagBadge

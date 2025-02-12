@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 import { returnByPipelineType } from 'src/utils'
 
 import { Dispatch, SetStateAction } from 'react'
@@ -21,7 +21,7 @@ export const PipelineOptionCard = ({ type, selectedType, setSelectedType }: Pipe
 
   return (
     <Card
-      title={returnByPipelineType(type, RUBRIC_NAME, PAIRWISE_NAME)}
+      title={returnByPipelineType(type, DIRECT_NAME, PAIRWISE_NAME)}
       description={returnByPipelineType(
         type,
         'Select an answer based on the criteria for the question',

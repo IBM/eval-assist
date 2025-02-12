@@ -16,7 +16,7 @@ import {
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
-import { useCriterias } from '@customHooks/useCriterias'
+import { useCriteriasContext } from '@components/SingleExampleEvaluation/Providers/CriteriasProvider'
 import { CriteriaBenchmark, EvaluationType, EvaluatorBenchmark, Version } from '@types'
 
 import classes from './CriteriaBenchmarkCard.module.scss'
@@ -37,7 +37,7 @@ const beatutifyName: { [key: string]: string } = {
 
 export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: Props) => {
   const { benchmark } = useURLInfoContext()
-  const { getCriteria } = useCriterias()
+  const { getCriteria } = useCriteriasContext()
   const [criteriaDetailsModal, setCriteriaDetailsModal] = useState(false)
   const [showAllVersions, setShowAllVersions] = useState(true)
   const criteria = useMemo(

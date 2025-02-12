@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 
 import { useMemo, useState } from 'react'
 
@@ -27,8 +27,8 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
     return useCaseId !== null ? [`${useCaseId}`] : []
   }, [useCaseId])
 
-  const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean }>({
-    rubric: true,
+  const [expanded, setExpanded] = useState<{ direct: boolean; pairwise: boolean }>({
+    direct: true,
     pairwise: true,
   })
 
@@ -41,7 +41,7 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
     [userUseCases],
   )
 
-  const handleToggle = (key: 'rubric' | 'pairwise') =>
+  const handleToggle = (key: 'direct' | 'pairwise') =>
     setExpanded({
       ...expanded,
       [key]: !expanded[key],
@@ -64,11 +64,11 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
               <div className={classes['tree-wrapper']}>
                 <TreeView className={classes['tree-root']} label={''} hideLabel selected={selectedNode}>
                   <TreeNode
-                    id={'rubric'}
-                    label={RUBRIC_NAME}
-                    onSelect={() => handleToggle('rubric')}
-                    onToggle={() => handleToggle('rubric')}
-                    isExpanded={expanded['rubric']}
+                    id={'direct'}
+                    label={DIRECT_NAME}
+                    onSelect={() => handleToggle('direct')}
+                    onToggle={() => handleToggle('direct')}
+                    isExpanded={expanded['direct']}
                   >
                     {directAssessmentTestCases.length === 0 ? (
                       <p className={classes['empty-message']}>Empty</p>

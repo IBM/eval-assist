@@ -2,14 +2,15 @@ import { toTitleCase } from 'src/utils'
 
 import { useMemo } from 'react'
 
+import { useCriteriasContext } from '@components/SingleExampleEvaluation/Providers/CriteriasProvider'
+
 import { Criteria, CriteriaWithOptions, DirectInstance, EvaluationType, PairwiseInstance, UseCase } from '../types'
-import { useCriterias } from './useCriterias'
 
 export const useTestCaseLibrary = () => {
-  const { getCriteria, getEmptyUseCaseWithCriteria } = useCriterias()
-  const harmsAndRisksLibraryTestCases: { [useCaseCategory: string]: UseCase[] } = useMemo(() => {
-    const x: { [useCaseCategory: string]: UseCase[] } = {
-      'Harmful Content In User Prompt': [
+  const { getCriteria, getEmptyUseCaseWithCriteria } = useCriteriasContext()
+  const harmsAndRisksLibraryTestCases: { [useCaseCategory: string]: UseCase[] } = useMemo(
+    () => ({
+      harmful_content_in_user_prompt: [
         {
           ...getEmptyUseCaseWithCriteria('user_message_general_harm', EvaluationType.DIRECT),
           name: 'general_harm',
@@ -91,7 +92,7 @@ export const useTestCaseLibrary = () => {
           ],
         },
       ],
-      'Harmful Content In Assistant Response': [
+      harmful_content_in_assistant_response: [
         {
           ...getEmptyUseCaseWithCriteria('assistant_message_general_harm', EvaluationType.DIRECT),
           name: 'general_harm',
@@ -132,7 +133,7 @@ export const useTestCaseLibrary = () => {
           ],
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_general_harm', EvaluationType.DIRECT),
+          ...getEmptyUseCaseWithCriteria('assistant_message_violence', EvaluationType.DIRECT),
           name: 'violence',
           responseVariableName: 'Assistant message',
           instances: [
@@ -189,11 +190,11 @@ export const useTestCaseLibrary = () => {
           ],
         },
       ],
-      'RAG Hallucination Risks': [
+      rag_hallucination_risks: [
         {
           ...getEmptyUseCaseWithCriteria('context_context_relevance', EvaluationType.DIRECT),
           name: 'context_relevance',
-          responseVariableName: 'Assistant message',
+          responseVariableName: 'Context',
           instances: [
             {
               contextVariables: [
@@ -262,23 +263,9 @@ export const useTestCaseLibrary = () => {
           ],
         },
       ],
-    }
-    let result: { [useCaseCategory: string]: UseCase[] } = {}
-    Object.keys(x).forEach((k) => {
-      result[k] = x[k].map((u) => {
-        let parsed = { ...u }
-        parsed = {
-          ...parsed,
-          criteria: {
-            ...parsed.criteria,
-            name: toTitleCase(parsed.criteria.name.split('>')[0]),
-          },
-        }
-        return parsed
-      })
-    })
-    return result
-  }, [getEmptyUseCaseWithCriteria])
+    }),
+    [getEmptyUseCaseWithCriteria],
+  )
 
   const rubricLibraryTestCases: UseCase[] = useMemo(
     () => [

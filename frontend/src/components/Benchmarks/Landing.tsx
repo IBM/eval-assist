@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { PAIRWISE_NAME, RUBRIC_NAME } from 'src/constants'
+import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 
 import { useMemo, useState } from 'react'
 
@@ -29,7 +29,7 @@ export const Landing = () => {
         ? result
         : result.filter((b) => {
             return selectedTagItems.every((selectedTag) => {
-              if (selectedTag === RUBRIC_NAME && b.type === EvaluationType.DIRECT) {
+              if (selectedTag === DIRECT_NAME && b.type === EvaluationType.DIRECT) {
                 return true
               }
               if (selectedTag === PAIRWISE_NAME && b.type === EvaluationType.PAIRWISE) {
@@ -78,7 +78,7 @@ export const Landing = () => {
     [key: string]: BadgeColor
   } = useMemo(() => {
     const dict: { [key: string]: BadgeColor } = {}
-    dict[RUBRIC_NAME] = 'blue'
+    dict[DIRECT_NAME] = 'blue'
     dict[PAIRWISE_NAME] = 'purple'
     allTags.forEach((tag, i) => {
       const color = badgeColorsArray[i % badgeColorsArray.length]
@@ -102,7 +102,7 @@ export const Landing = () => {
             label={selectedTagItems.length > 0 ? selectedTagItems.join(', ') : 'No filters selected'}
           />
           <Filter
-            items={[RUBRIC_NAME, PAIRWISE_NAME, ...allTags]}
+            items={[DIRECT_NAME, PAIRWISE_NAME, ...allTags]}
             selectedItems={selectedTagItems}
             setSelectedItems={setSelectedTagItems}
             tagToColor={tagToColor}

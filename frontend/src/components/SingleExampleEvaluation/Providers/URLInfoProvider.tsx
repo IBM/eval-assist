@@ -4,11 +4,11 @@ import { ReactNode, createContext, useCallback, useContext, useMemo } from 'reac
 
 import { useRouter } from 'next/router'
 
-import { useCriterias } from '@customHooks/useCriterias'
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
 import { EvaluationType, Evaluator, ModelProviderType, UseCase } from '../../../types'
+import { useCriteriasContext } from './CriteriasProvider'
 import { usePipelineTypesContext } from './PipelineTypesProvider'
 import { useUserUseCasesContext } from './UserUseCasesProvider'
 
@@ -36,7 +36,7 @@ export const useURLInfoContext = () => {
 
 export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
-  const { getEmptyUseCaseWithCriteria } = useCriterias()
+  const { getEmptyUseCaseWithCriteria } = useCriteriasContext()
   const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
   const { userUseCases } = useUserUseCasesContext()
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
@@ -120,7 +120,6 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
           harmsAndRisksLibraryTestCases[subCatalogName].find(
             (libraryUseCase) => libraryUseCase.name === libraryTestCaseName,
           ) || null
-        console.log(pu)
       } else {
         pu =
           allLibraryUseCases.find(
@@ -130,6 +129,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     } else if (useCaseType !== null && useCaseId === null && libraryTestCaseName === null) {
       if (criteriaName !== null) {
         pu = getEmptyUseCaseWithCriteria(criteriaName, useCaseType)
+        console.log(pu)
       } else {
         pu = getEmptyUseCase(useCaseType)
       }
@@ -154,8 +154,6 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     getEmptyUseCaseWithCriteria,
     getDefaultEvaluator,
   ])
-
-  const defaultModelWasChosen = useMemo(() => {}, [])
 
   return (
     <URLInfoContext.Provider
