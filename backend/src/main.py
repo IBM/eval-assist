@@ -32,21 +32,10 @@ from unitxt.llm_as_judge import (
 )
 import uvicorn
 from .const import EXTENDED_EVALUATORS_METADATA, ExtendedEvaluatorNameEnum
-from .api.common import NotebookParams
-from .api.pairwise import (
-    CriteriaAPI,
-    PairwiseEvaluationRequestModel,
-    PairwiseResponseModel,
-)
+from .api.common import NotebookParams,CriteriaAPI, PairwiseEvaluationRequestModel, PairwiseResponseModel, CriteriaOptionAPI, CriteriaWithOptionsAPI, DirectResponseModel, DirectEvaluationRequestModel, SyntheticExampleGenerationRequest, SyntheticExampleGenerationResponse
 
 # API type definitions
 from .api.pipelines import EvaluatorMetadataAPI, PipelinesResponseModel
-from .api.rubric import (
-    CriteriaOptionAPI,
-    CriteriaWithOptionsAPI,
-    DirectResponseModel,
-    DirectEvaluationRequestModel,
-)
 from .db_client import db
 from .evaluators.unitxt import DirectAssessmentEvaluator, GraniteGuardianEvaluator, PairwiseComparisonEvaluator
 
@@ -182,12 +171,6 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
     except ValueError as e:
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=str(e))
-    except ApiNetworkException:
-        # I think the random errors thrown by BAM are of type ApiNetworkException, lets maintain error
-        # handling this way till we know better how they are thrown
-        print("raised ApiNetworkException")
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail="Something went wrong running the evaluation. Please try again.")
     except ApiRequestFailure as e:
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=e.error_msg)
@@ -349,6 +332,19 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
         media_type="application/x-ipynb+json",
         filename=f"{params.evaluator_type}_generated_notebook.ipynb",
     )
+
+@router.post("/synthetic-examples/", response_model=SyntheticExampleGenerationResponse)
+def download_notebook(
+    # params: SyntheticExampleGenerationRequest
+):
+    return SyntheticExampleGenerationResponse(
+            systhetic_examples=[
+                    {
+                        'Question': "Synthetically generated content",
+                        'response': "Synthetically generated content"
+                    },
+            ]
+        )
 
 
 @app.exception_handler(RequestValidationError)
