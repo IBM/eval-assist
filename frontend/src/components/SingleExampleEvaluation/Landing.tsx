@@ -118,7 +118,7 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
           className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
           badge={{ text: 'Catalog', color: 'purple' }}
         />
-        <Card
+        {/* <Card
           title={'LLM-as-a-judge Toolkit'}
           description={'Apply criteria from sandbox with larger dataset'}
           imageSrc="python_library"
@@ -143,7 +143,7 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
           }
           className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
           badge={{ text: 'Python Library', color: 'green' }}
-        />
+        /> */}
       </div>
     </div>
   )
