@@ -1,4 +1,4 @@
 # For travis build
 -r common.txt
 llmasajudge @ git+https://${GH_TOKEN}@github.ibm.com/AIExperience/llm-as-a-judge.git@0.0.18
-unitxt @ git+https://github.com/IBM/unitxt.git@feb3b15e87055a3df02001d33caca3e3350af2a5
+unitxt @ git+https://github.com/IBM/unitxt.git@granite-guardian-minor-changes

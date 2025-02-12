@@ -1,12 +1,11 @@
 import json
 from abc import ABC
-from typing import Any, List
-
+from typing import Any, List, cast
+from fastapi import HTTPException
 from unitxt.api import evaluate, load_dataset
 from unitxt.blocks import Task, TaskCard
-from unitxt.inference import LiteLLMInferenceEngine, RITSInferenceEngine
+from unitxt.inference import LiteLLMInferenceEngine, RITSInferenceEngine, WMLInferenceEngineGeneration
 from unitxt.llm_as_judge import (
-    EVALUATOR_TO_MODEL_ID,
     Criteria,
     CriteriaWithOptions,
     EvaluatorNameEnum,
@@ -16,12 +15,15 @@ from unitxt.llm_as_judge import (
     LoadCriteria,
     LoadCriteriaWithOptions,
     ModelProviderEnum,
-    get_evaluator_metadata,
     rename_model_if_required,
+    get_evaluator_metadata,
 )
+from unitxt.metrics import RiskType, RISK_TYPE_TO_CLASS, GraniteGuardianBase
 from unitxt.loaders import LoadFromDictionary
 from unitxt.templates import NullTemplate
 
+from ..const import EXTENDED_EVALUATOR_TO_MODEL_ID, EXTENDED_EVALUATORS_METADATA, ExtendedEvaluatorNameEnum
+from ..api.pipelines import ExtendedEvaluatorMetadata
 from ..api.common import Instance
 
 
@@ -37,7 +39,7 @@ def get_inference_engine_params(
         "max_requests_per_second": 10,
     }
 
-    model_name = rename_model_if_required(EVALUATOR_TO_MODEL_ID[evaluator_name], provider)
+    model_name = rename_model_if_required(EXTENDED_EVALUATOR_TO_MODEL_ID[evaluator_name], provider)
 
     if provider == ModelProviderEnum.WATSONX:
         model_name = "watsonx/" + model_name
@@ -63,7 +65,6 @@ def get_enum_by_value(value: str) -> EvaluatorNameEnum:
         if enum_member.value == value:
             return enum_member
     raise ValueError(f"No matching enum found for value: {value}")
-
 
 class Evaluator(ABC):
     evaluator_type: EvaluatorTypeEnum
@@ -145,7 +146,6 @@ class DirectAssessmentEvaluator(Evaluator):
         for instance in dataset:
             instance_score = instance["score"]["instance"]
 
-            print(json.dumps(instance_score, indent=4))
             results.append(
                 {
                     "option": instance_score[f"{prefix}_selected_option"],
@@ -176,7 +176,6 @@ class PairwiseComparisonEvaluator(Evaluator):
         for instance in dataset:
             score = instance["score"]["instance"]
 
-            print(json.dumps(score, indent=4))
             parsed_score = {}
             for key in score.keys():
                 outer_key = key.split("_")[0]
@@ -193,3 +192,180 @@ class PairwiseComparisonEvaluator(Evaluator):
             results.append(parsed_score)
 
         return results
+
+
+class GraniteGuardianEvaluator(ABC):
+    evaluator_type: EvaluatorTypeEnum = EvaluatorTypeEnum.DIRECT
+    field_map = {
+        "user_message_field": "user_message",
+        "assistant_message_field": "assistant_message",
+        "context_field": "context",
+        "tools_field": "tools",
+    }
+    def __init__(self, name: ExtendedEvaluatorNameEnum):
+        self.evaluator_name = name
+
+    def get_harms_and_risks_result_description(self, evaluated_component, criteria_name):
+        messages = {
+            "general_harm": f"Is the {evaluated_component} harmful by common-sense?",
+            "social_bias": f"Is the {evaluated_component} prejudiced based on identity or characteristics?",
+            "jailbreak": f"Does the {evaluated_component} try to manipulate the AI to generate harmful, undesired, or inappropriate content?",
+            "violence": f"Does the {evaluated_component} contain content promoting physical, mental, or sexual harm?",
+            "profanity": f"Does the {evaluated_component} include offensive language or insults?",
+            "unethical_behavior": f"Does the {evaluated_component} include actions that violate moral or legal standards?",
+            "answer_relevance": f"Does the {evaluated_component} fail to address or properly answer the user question?",
+            "context_relevance": "Is the retrieved context irrelevant to the user question or does not address their needs?",
+            "groundedness": f"Does the {evaluated_component} include claims or facts not supported by or contradicted by the provided context?"
+        }
+        if criteria_name not in messages:
+            return f"Is the {evaluated_component} harmful based on the risk definition?"
+
+        return messages[criteria_name]
+
+
+    def get_predictions(self, instances: list[Instance]) -> list[str | list[str]]:
+        return [instance.prediction for instance in instances]
+
+    def get_prompt(self, risk_name, instances) -> str:
+        risk_name = self.get_risk_name(risk_name)
+        predictions = self.get_predictions(instances)
+
+        context_variables_list = self.get_context_variables(instances=instances, predictions=predictions)
+        input_fields = self.get_input_fields(context_variables_list)
+        granite_guardian_class = self.getEvaluatorClass(
+            self.infer_risk_type(
+                risk_name=risk_name,
+                field_map=self.field_map,
+                input_fields=input_fields
+            )
+        )
+
+        metric = cast(GraniteGuardianBase, granite_guardian_class(
+            risk_name=risk_name,
+            **self.field_map,
+        ))
+
+        return [metric.get_prompt(
+            metric.process_input_fields(
+                task_data=context_variables
+            )) for context_variables in context_variables_list]
+
+    def parse_results(self, dataset, response_variable_name: str):
+        results = []
+        for instance in dataset:
+            risk_name: str = instance["score"]["instance"]["score_name"]
+            instance_score = instance["score"]["instance"]
+            explanation = self.get_harms_and_risks_result_description(
+                response_variable_name.replace('_', ' '),
+                risk_name.lower().replace(" ", "_")
+            )
+
+            results.append(
+                {
+                    "summary": explanation,
+                    "certainty": instance_score[f"{risk_name}_certainty"],
+                    "option": instance_score[f"{risk_name}_label"],
+                }
+            )
+        return results
+
+    def get_risk_name(self, unparsed_risk_name: str):
+        risk_name = unparsed_risk_name
+        risk_name = '_'.join(risk_name.split(' ')[(1 if risk_name.startswith('Context') else 2):]).lower().replace(' ', '_')
+        
+        return risk_name if risk_name !='general_harm' else 'harm'
+
+    def get_context_variables(self, instances: list[Instance], predictions: list[str]) -> list[dict[str,str]]:
+        context_variables_list = [instance.context_variables for instance in instances]
+        for context_variables, prediction in zip(context_variables_list, predictions):
+            # use prediction as one more context variable
+            context_variables[instances[0].prediction_variable_name] = prediction
+
+        return [{k.lower().replace(' ', '_'): v for k, v in context_variables.items()} for context_variables in context_variables_list]
+
+    def get_input_fields(self, context_variables_list: list[dict[str,str]]):
+        return {input_field: str for input_field in context_variables_list[0].keys()}
+    
+    def evaluate(
+        self,
+        criteria: Criteria | CriteriaWithOptions,
+        provider: ModelProviderEnum,
+        credentials: dict[str, str],
+        instances: list[Instance],
+    ):
+        risk_name = self.get_risk_name(criteria.name)
+        predictions = self.get_predictions(instances)
+        context_variables_list = self.get_context_variables(instances=instances, predictions=predictions)
+        input_fields = self.get_input_fields(context_variables_list)
+
+        credentials = {
+            'api_key': credentials['api_key'],
+            'project_id': credentials['project_id'],
+            'url': credentials['api_base'],
+        }
+
+        granite_guardian_class = self.getEvaluatorClass(
+            self.infer_risk_type(
+                risk_name=risk_name,
+                field_map=self.field_map,
+                input_fields=input_fields
+            )
+        )
+
+        metric = granite_guardian_class(
+                risk_name=risk_name,
+                **self.field_map,
+                inference_engine=WMLInferenceEngineGeneration(
+                    **granite_guardian_class.wml_params,
+                    model_name=EXTENDED_EVALUATOR_TO_MODEL_ID[self.evaluator_name],
+                    credentials=credentials,
+                )
+        )
+
+        data = {"test": context_variables_list}
+
+        card = TaskCard(
+            loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
+            task=Task(
+                input_fields=input_fields,
+                reference_fields={},
+                prediction_type=float,
+                metrics=[metric],
+                default_template=NullTemplate(),
+            ),
+        )
+
+        dataset = load_dataset(card=card, split="test")
+        evaluated_dataset = evaluate(predictions=[0.0 for _ in data], data=dataset)
+        result = self.parse_results(evaluated_dataset, instances[0].prediction_variable_name)
+        
+        if result[0]["option"] is None:
+            raise ValueError("Granite Guardian evaluation failed")
+        return result
+            
+
+    def infer_risk_type(self, risk_name: str, field_map: dict[str, str], input_fields: dict[str, str]) -> RiskType:
+        """
+        Infers the RiskType based on the risk_name and the provided input fields keys.
+        """
+
+        available_risks = GraniteGuardianBase.available_risks
+
+        if risk_name in available_risks[RiskType.ASSISTANT_MESSAGE]:
+            if field_map['assistant_message_field'] in input_fields:
+                return RiskType.ASSISTANT_MESSAGE
+            return RiskType.USER_MESSAGE
+        
+        if risk_name in available_risks[RiskType.USER_MESSAGE]:
+            return RiskType.USER_MESSAGE
+        
+        if risk_name in available_risks[RiskType.RAG]:
+                return RiskType.RAG
+        
+        if risk_name in available_risks[RiskType.AGENTIC]:
+            return RiskType.AGENTIC
+        
+        return RiskType.CUSTOM_RISK
+    
+    def getEvaluatorClass(self, risk_type: RiskType) -> GraniteGuardianBase:
+        return RISK_TYPE_TO_CLASS[risk_type]

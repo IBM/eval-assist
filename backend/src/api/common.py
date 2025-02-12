@@ -1,6 +1,9 @@
+from typing import Optional
 from fastapi import HTTPException
 from pydantic import BaseModel, validator
-from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
+from unitxt.llm_as_judge import EvaluatorTypeEnum, ModelProviderEnum, EvaluatorNameEnum
+
+from ..const import ExtendedEvaluatorNameEnum
 
 
 class CriteriaModel(BaseModel):
@@ -17,20 +20,22 @@ class CriteriaModel(BaseModel):
 class Instance(BaseModel):
     context_variables: dict[str, str]
     prediction: str | list[str]
+    prediction_variable_name: Optional[str]
 
 
-class EvalRequestModel(BaseModel):
-    provider: ModelProviderEnum
+
+class EvaluationRequestModel(BaseModel):
+    provider: ModelProviderEnum 
     llm_provider_credentials: dict[str, str]
-    evaluator_name: EvaluatorNameEnum
+    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
     type: EvaluatorTypeEnum
     instances: list[Instance]
 
-    @validator("llm_provider_credentials", pre=True, always=True)
-    def validate_api_key(cls, key):
-        if not key:
-            raise HTTPException(status_code=400, detail="API credentials are required.")
-        return key
+    # @validator("llm_provider_credentials", pre=True, always=True)
+    # def validate_api_key(cls, key):
+    #     if not key:
+    #         raise HTTPException(status_code=400, detail="API credentials are required.")
+    #     return key
 
     # @validator("context_variables", pre=True, always=True)
     # def validate_context_variables_key(cls, context_variables):
@@ -49,7 +54,7 @@ class EvalRequestModel(BaseModel):
 class NotebookParams(BaseModel):
     test_case_name: str
     criteria: dict
-    evaluator_name: EvaluatorNameEnum
+    evaluator_name: ExtendedEvaluatorNameEnum
     provider: ModelProviderEnum
     predictions: list[str | list[str]]
     context_variables: list[dict[str, str]]

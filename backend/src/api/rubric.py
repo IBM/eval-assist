@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from pydantic import BaseModel, validator
 
-from .common import CriteriaModel, EvalRequestModel
+from .common import CriteriaModel, EvaluationRequestModel
 
 
 class RubricOptionModel(BaseModel):
@@ -36,7 +36,7 @@ class CriteriaWithOptionsAPI(BaseModel):
     options: list[CriteriaOptionAPI]
 
 
-class RubricEvalRequestModel(EvalRequestModel):
+class DirectEvaluationRequestModel(EvaluationRequestModel):
     criteria: CriteriaWithOptionsAPI | str
     response_variable_name: str
 
@@ -56,12 +56,13 @@ class RubricEvalRequestModel(EvalRequestModel):
     #     return responses
 
 
-class RubricEvalResultModel(BaseModel):
+class DirectResultModel(BaseModel):
     option: str
     summary: str
     positional_bias: bool | None = None
     positional_bias_option: str | None = None
 
+class DirectResponseModel(BaseModel):
+    results: list[DirectResultModel]
 
-class RubricEvalResponseModel(BaseModel):
-    results: list[RubricEvalResultModel]
+

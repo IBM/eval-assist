@@ -12,37 +12,31 @@ from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException, Request,
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
-from genai.exceptions import ApiNetworkException, ApiResponseException
 from ibm_watsonx_ai.wml_client_error import (
     ApiRequestFailure,
     CannotSetProjectOrSpace,
     WMLClientError,
 )
 from llmasajudge.benchmark.utils import get_all_benchmarks
-from llmasajudge.evaluators import EvaluatorNameEnum as EvaluatorNameEnumOld
-from llmasajudge.evaluators import GraniteGuardianRubricEvaluator
-from llmasajudge.evaluators import ModelProviderEnum as ModelProviderEnumOld
-from llmasajudge.evaluators import RubricCriteria, RubricOption, get_rubric_evaluator
 from openai import AuthenticationError
 from prisma.errors import PrismaError
 from prisma.models import StoredUseCase
 from pydantic import BaseModel
 from unitxt.llm_as_judge import (
-    DIRECT_CRITERIAS,
-    EVALUATORS_METADATA,
-    PAIRWISE_CRITERIAS,
     Criteria,
     CriteriaOption,
     CriteriaWithOptions,
-    EvaluatorNameEnum,
     EvaluatorTypeEnum,
+    DIRECT_CRITERIA,
+    PAIRWISE_CRITERIA,
 )
-
+import uvicorn
+from .const import EXTENDED_EVALUATORS_METADATA, ExtendedEvaluatorNameEnum
 from .api.common import NotebookParams
 from .api.pairwise import (
     CriteriaAPI,
-    PairwiseEvalRequestModel,
-    PairwiseEvalResponseModel,
+    PairwiseEvaluationRequestModel,
+    PairwiseResponseModel,
 )
 
 # API type definitions
@@ -50,11 +44,11 @@ from .api.pipelines import EvaluatorMetadataAPI, PipelinesResponseModel
 from .api.rubric import (
     CriteriaOptionAPI,
     CriteriaWithOptionsAPI,
-    RubricEvalRequestModel,
-    RubricEvalResponseModel,
+    DirectResponseModel,
+    DirectEvaluationRequestModel,
 )
 from .db_client import db
-from .evaluators.unitxt import DirectAssessmentEvaluator, PairwiseComparisonEvaluator
+from .evaluators.unitxt import DirectAssessmentEvaluator, GraniteGuardianEvaluator, PairwiseComparisonEvaluator
 
 # Logging req/resp
 from .logger import LoggingRoute
@@ -105,16 +99,10 @@ async def app_shutdown():
     db.disconnect()
 
 
-def throw_authorized_exception():
-    raise HTTPException(
-        status_code=401, detail="Couldn't connect to BAM. Please check that the provided API key is correct."
-    )
-
-
 @router.get("/evaluators/", response_model=PipelinesResponseModel)
 def get_evaluators():
     """Get the list of available pipelines, as supported by llm-as-a-judge library"""
-    evaluators = [EvaluatorMetadataAPI(**e.__dict__) for e in EVALUATORS_METADATA]
+    evaluators = [EvaluatorMetadataAPI(**e.__dict__) for e in EXTENDED_EVALUATORS_METADATA]
     # for e in AVAILABLE_EVALUATORS:
     #     if e.metadata.name.value in [EvaluatorNameEnum.GRANITE_GUARDIAN_2B.value, EvaluatorNameEnum.GRANITE_GUARDIAN_8B.value]:
     #         pipelines.extend(EvaluatorMetadataAPI(
@@ -134,66 +122,31 @@ def get_criterias():
                 description=c.description,
                 options=[CriteriaOptionAPI(name=o.name, description=o.description) for o in c.options],
             )
-            for c in DIRECT_CRITERIAS
+            for c in DIRECT_CRITERIA
         ],
-        "pairwise": [CriteriaAPI(name=c.name, description=c.description) for c in PAIRWISE_CRITERIAS],
+        "pairwise": [CriteriaAPI(name=c.name, description=c.description) for c in PAIRWISE_CRITERIA],
     }
 
 
 @router.post("/prompt/", response_model=list[str])
-def get_prompt(req: RubricEvalRequestModel):
-    gg_evaluator: GraniteGuardianRubricEvaluator = get_rubric_evaluator(
-        name=EvaluatorNameEnumOld.GRANITE_GUARDIAN_2B,
-        credentials=req.llm_provider_credentials,
-        provider=ModelProviderEnumOld[req.provider.name],
-    )
-    criteria = CriteriaWithOptions(
-        name=req.criteria.name,
-        description=req.criteria.criteria,
-        options=req.criteria.options,
-    )
+def get_prompt(req: DirectEvaluationRequestModel):
+    evaluator = GraniteGuardianEvaluator(req.evaluator_name)
 
-    res = gg_evaluator.get_prompt(
-        contexts=[req.context_variables] * len(req.responses),
-        responses=req.responses,
-        criteria=[criteria] * len(req.responses),
-        response_variable_name_list=[req.response_variable_name] * len(req.responses),
+    res = evaluator.get_prompt(
+        instances=req.instances,
+        risk_name=req.criteria.name,
     )
     return res
 
 
-@router.post("/evaluate/", response_model=Union[RubricEvalResponseModel, PairwiseEvalResponseModel])
-async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
+@router.post("/evaluate/", response_model=Union[DirectResponseModel, PairwiseResponseModel])
+async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequestModel):
     try:
         if req.type == EvaluatorTypeEnum.DIRECT:
-            if req.evaluator_name in [EvaluatorNameEnum.GRANITE_GUARDIAN_2B, EvaluatorNameEnum.GRANITE_GUARDIAN_8B]:
-                evaluator = get_rubric_evaluator(
-                    name=EvaluatorNameEnumOld[req.evaluator_name.name],
-                    credentials=req.llm_provider_credentials,
-                    provider=ModelProviderEnumOld[req.provider.name],
-                )
-                res = evaluator.evaluate(
-                    contexts=[req.context_variables] * len(req.responses),
-                    responses=req.responses,
-                    criteria=[
-                        RubricCriteria(
-                            name=req.criteria.name,
-                            criteria=req.criteria.description,
-                            options=[
-                                RubricOption(option=o.name, description=o.description) for o in req.criteria.options
-                            ],
-                        )
-                    ]
-                    * len(req.responses),
-                    response_variable_name_list=[req.response_variable_name] * len(req.responses),
-                    check_bias=True,
-                )
-                for r in res:
-                    r["summary"] = r["explanation"]
-                    del r["explanation"]
-                return RubricEvalResponseModel(results=res)
-
-            evaluator = DirectAssessmentEvaluator(req.evaluator_name)
+            if req.evaluator_name in [ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B, ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B]:
+                evaluator = GraniteGuardianEvaluator(req.evaluator_name)
+            else:
+                evaluator = DirectAssessmentEvaluator(req.evaluator_name)
             criteria = (
                 CriteriaWithOptions(
                     name=req.criteria.name,
@@ -222,19 +175,13 @@ async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
             provider=req.provider,
         )
         if req.type == EvaluatorTypeEnum.DIRECT:
-            return RubricEvalResponseModel(results=res)
+            return DirectResponseModel(results=res)
         else:
-            return PairwiseEvalResponseModel(results=res)
+            return PairwiseResponseModel(results=res)
 
     except ValueError as e:
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=str(e))
-    except ApiResponseException as e:
-        if e.response.error == "Unauthorized":
-            throw_authorized_exception()
-        print("raised ApiResponseException")
-        traceback.print_exc()
-        raise HTTPException(status_code=400, detail=f"{e.response.error}. {e.response.message}")
     except ApiNetworkException:
         # I think the random errors thrown by BAM are of type ApiNetworkException, lets maintain error
         # handling this way till we know better how they are thrown
@@ -254,6 +201,7 @@ async def evaluate(req: RubricEvalRequestModel | PairwiseEvalRequestModel):
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=f"watsonx authentication failed: {e.error_msg}")
     except AssertionError as e:
+        traceback.print_exc()
         raise HTTPException(status_code=400, detail=f"{e}")
     except Exception as e:
         traceback.print_exc()
@@ -409,6 +357,5 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     logging.error(f"{request}: {exc_str}")
     content = {"status_code": 10422, "message": exc_str, "data": None}
     return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-
 
 app.include_router(router)

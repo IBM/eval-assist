@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from .common import CriteriaModel, EvalRequestModel
+from .common import CriteriaModel, EvaluationRequestModel
 
 
 class PairwiseCriteriaModel(CriteriaModel):
@@ -12,7 +12,7 @@ class CriteriaAPI(BaseModel):
     description: str
 
 
-class PairwiseEvalRequestModel(EvalRequestModel):
+class PairwiseEvaluationRequestModel(EvaluationRequestModel):
     criteria: PairwiseCriteriaModel
 
     # @validator("responses", pre=True, always=True)
@@ -31,7 +31,7 @@ class PairwiseEvalRequestModel(EvalRequestModel):
     # return responses
 
 
-class PairwiseEvalResultModel(BaseModel):
+class PairwiseResultModel(BaseModel):
     contest_results: list[bool]
     compared_to: list[int]
     summaries: list[str]
@@ -42,5 +42,5 @@ class PairwiseEvalResultModel(BaseModel):
     selections: list[str]
 
 
-class PairwiseEvalResponseModel(BaseModel):
-    results: list[dict[str, PairwiseEvalResultModel]]
+class PairwiseResponseModel(BaseModel):
+    results: list[dict[str, PairwiseResultModel]]
