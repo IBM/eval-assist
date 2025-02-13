@@ -16,3 +16,5 @@ pandas
 scipy
 ibm_watsonx_ai
 openai
+transformers
+torch

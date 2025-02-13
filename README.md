@@ -5,25 +5,23 @@
 
 <!-- Not always needed, but a scope helps the user understand in a short sentance like below, why this repo exists -->
 
-## Getting started
 
-### Run EvalAssist locally
+## Run EvalAssist locally
 
-#### 1. Requirements
+### 1. Requirements
 
-* Yarn
-* NPM
+* npm
 * Python >= 3.10
 
-#### 2. Install the dependencies
+### 2. Install the dependencies
 
-The following command will install the frontend dependencies using Yarn and the backend dependencies in a venv folder.
+The following command will install the frontend and backend dependencies. It will install frontend dependencies using npm. In addition, it will install backend dependencies by creating a virtual environment, activating it and using pip to install the dependencies.
 
 ```bash
-yarn run install
+npm install
 ```
 
-#### 3. Set the environment variables
+### 3. Set the environment variables
 
 Both frontend and backend need a few environment variables to be set.
 
@@ -37,10 +35,14 @@ Creante an `.env` file in the /frontend folder with the following entry:
 
 * NEXT_PUBLIC_USE_AUTH
 
-#### 4. Run the system
+### 4. Run the system
 
 The following command will run both the backend and the frontend concurrently. If you want to run them separately you can use `dev:backend` and `dev:frontend`.
 
 ```bash
-yarn run dev
+npm run dev
 ```
+
+### 5. Open EvalAssist
+
+Visit `https://localhost:3000`

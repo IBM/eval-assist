@@ -3,7 +3,7 @@
     "private": true,
     "scripts": {
       "install:backend": "cd backend && python -m venv venv && source venv/bin/activate && pip install -r requirements/dev.txt",
-      "install:frontend": "cd frontend && yarn install",
+      "install:frontend": "cd frontend && npm install",
       "install": "concurrently \"npm run install:backend\" \"npm run install:frontend\"",
       "dev:backend": "cd backend && source venv/bin/activate && python run.py",
       "dev:frontend": "cd frontend && npm run dev",
