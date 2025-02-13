@@ -1,0 +1,1 @@
+from .benchmark import get_all_benchmarks

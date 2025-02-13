@@ -17,7 +17,7 @@ from ibm_watsonx_ai.wml_client_error import (
     CannotSetProjectOrSpace,
     WMLClientError,
 )
-from llmasajudge.benchmark.utils import get_all_benchmarks
+from .benchmark import get_all_benchmarks
 from openai import AuthenticationError
 from prisma.errors import PrismaError
 from prisma.models import StoredUseCase

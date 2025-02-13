@@ -8,7 +8,6 @@
 .env
 .env*.local
 Secrets.yaml
-.litellm_cache/
 
 # Logs and debug files
 npm-debug.log*

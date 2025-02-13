@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "next lint",
     "lint-fix": "next lint --fix",
-    "prepare": "husky install",
     "pre-commit": "lint-staged",
     "test": "exit 0"
   },
