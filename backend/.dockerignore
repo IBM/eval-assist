@@ -1,7 +1,0 @@
-Secrets.yaml
-.env
-.dockerignore
-Dockerfile
-.vscode
-.git
-deployment_yaml/

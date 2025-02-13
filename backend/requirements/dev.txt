@@ -1,3 +1,2 @@
 -r common.txt
-git+ssh://git@github.ibm.com/AIExperience/llm-as-a-judge.git@0.0.18
-git+ssh://git@github.com/IBM/unitxt.git@granite-guardian-minor-changes
+unitxt @ git+ssh://git@github.com/IBM/unitxt.git

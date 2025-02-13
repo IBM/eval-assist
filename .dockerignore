@@ -1,0 +1,19 @@
+# Common OS files
+.DS_Store
+
+# Common editor/IDE files
+.vscode/
+
+# Environment variables and secrets
+.env
+.env*.local
+Secrets.yaml
+.litellm_cache/
+
+# Logs and debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+pip-log.txt
+pip-delete-this-directory.txt
