@@ -1,0 +1,72 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/spacing';
+
+.root {
+  padding: 1rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  &.selected {
+    border: 1px solid #0f62fe;
+  }
+  &:hover {
+    background-color: $layer-hover-01;
+  }
+}
+
+.title-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: $spacing-03;
+}
+
+.title {
+  //styleName: Productive/heading-03;
+  font-family: IBM Plex Sans;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 28px;
+  text-align: left;
+  color: $text-primary;
+  padding-bottom: 0;
+}
+
+.badge {
+  align-self: flex-start;
+  margin-bottom: $spacing-05;
+  margin-left: -3px !important;
+}
+
+.description {
+  color: $text-secondary;
+  //styleName: caption-01;
+  font-family: IBM Plex Sans;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0.3199999928474426px;
+  text-align: left;
+  margin-bottom: 1rem;
+  margin-bottom: $spacing-05;
+}
+
+.card-image {
+  align-self: start;
+}
+
+.card-image-margin {
+  margin-bottom: $spacing-09;
+}
+
+.check {
+  color: $icon-interactive;
+}
+
+.action-button {
+  position: absolute;
+  right: $spacing-02;
+  bottom: $spacing-02;
+}

@@ -1,0 +1,38 @@
+import { PLATFORM_NAME } from 'src/constants'
+
+import type { Session } from 'next-auth'
+import { SessionProvider } from 'next-auth/react'
+import type { AppProps } from 'next/app'
+import Head from 'next/head'
+
+import '@styles/globals.scss'
+
+import { AppShell } from '@components/AppShell/AppShell'
+import { RouterLoading } from '@components/RouterLoading/RouterLoading'
+
+const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ session: Session }>) => {
+  const title = `IBM ${PLATFORM_NAME}`
+  return (
+    <>
+      <Head>
+        <title>{title}</title>
+        <meta name="description" content="" />
+        <link rel="shortcut icon" href="/images/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
+        <meta name="apple-mobile-web-app-title" content={title} />
+        <meta name="application-name" content={title} />
+        <meta name="msapplication-TileColor" content="#052fad" />
+        <meta name="theme-color" content="#161616" />
+      </Head>
+      <SessionProvider session={session}>
+        <AppShell>
+          <Component {...pageProps} />
+        </AppShell>
+      </SessionProvider>
+    </>
+  )
+}
+
+export default App

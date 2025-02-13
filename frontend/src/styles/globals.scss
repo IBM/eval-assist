@@ -1,0 +1,17 @@
+@use '@carbon/react' with (
+  $css--default-type: true,
+  $css--reset: true,
+  $use-flexbox-grid: true
+);
+@import '@carbon/styles/scss/colors';
+
+:root {
+  &.cds--g100 {
+    color-scheme: dark;
+    scrollbar-color: $cool-gray-60 $cool-gray-80;
+  }
+}
+
+body {
+  overflow-y: scroll !important;
+}

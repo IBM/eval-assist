@@ -1,0 +1,18 @@
+@import '@carbon/styles/scss/spacing';
+@import '@carbon/styles/scss/utilities/z-index';
+@import '@carbon/styles/scss/utilities/convert';
+
+.toasts {
+  position: fixed;
+  // Offset by navbar height
+  top: $spacing-09;
+  right: 0;
+  // Set the z-index between the modal and dropdown.
+  z-index: z('modal') + 1;
+}
+
+.toasts :global .cds--toast-notification {
+  margin-right: $spacing-03;
+  margin-top: $spacing-03;
+  padding: 0 $spacing-03 $spacing-03 $spacing-03;
+}

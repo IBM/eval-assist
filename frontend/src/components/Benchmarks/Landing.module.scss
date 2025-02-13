@@ -1,0 +1,38 @@
+@import '@carbon/styles/scss/type';
+@import '@carbon/styles/scss/colors';
+@import '@carbon/styles/scss/theme';
+
+.cardsGrid {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.emptyFilterResult {
+  @include type-style('helper-text-01');
+}
+
+.root {
+  gap: 1rem;
+}
+
+.filters {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  max-width: max(50%);
+}
+
+.benchmarkFilter {
+  margin-top: -1rem;
+}
+
+.verticalDivider {
+  width: 1px;
+  background-color: $border-subtle-01;
+  margin-right: 1rem;
+  height: 36px;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}

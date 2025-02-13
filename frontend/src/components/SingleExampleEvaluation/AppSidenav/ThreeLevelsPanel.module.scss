@@ -1,0 +1,114 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/spacing';
+@import '@carbon/colors';
+@import '@carbon/styles/scss/type';
+
+.root {
+  height: 100%;
+  width: rem(300px);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.heading {
+  font-size: rem(16px);
+  line-height: 1.28572;
+  font-weight: 600;
+  color: $text-primary;
+  margin-top: $spacing-03;
+  padding-left: $spacing-05;
+}
+
+.content {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding-bottom: $spacing-02;
+  display: flex;
+  flex-direction: column;
+}
+
+.treeWrapper {
+  padding-top: $spacing-03;
+
+  > label {
+    display: none;
+  }
+
+  :global(.cds--tree-node) {
+    padding-left: 0;
+    margin-left: 0;
+    background-color: $background;
+
+    :global(.cds--tree-node__label) {
+      margin-inline-start: 0 !important;
+      padding: 0 $spacing-05;
+      display: flex;
+      align-items: center;
+      background-color: $background;
+      &:hover {
+        background-color: $layer-01;
+      }
+    }
+    :global(.cds--tree-node__icon) {
+      margin-left: $spacing-02;
+      align-self: center;
+    }
+    ul li :not(.treeCategory) :global(.cds--tree-node__label) {
+      padding-inline-start: 3rem !important;
+    }
+  }
+  :global(.cds--tree-node--selected) {
+    > :global(.cds--tree-node__label) {
+      background-color: $layer-01;
+      outline: 1px solid $link-primary;
+      outline-offset: -1px;
+    }
+  }
+}
+
+.treeNodeContent {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .treeNodeLabel {
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+  }
+}
+
+.linkButton {
+  background-color: transparent;
+  border: none;
+  padding: $spacing-02;
+  height: rem(24px);
+  align-self: start;
+  cursor: pointer;
+  svg {
+    fill: $link-primary;
+    &:hover {
+      fill: $link-primary-hover;
+    }
+  }
+}
+
+.emptyMessage {
+  padding-left: $spacing-05;
+  padding-right: $spacing-05;
+  @include type-style('helper-text-01');
+  color: $text-helper;
+  font-style: italic;
+  margin-left: $spacing-03;
+  margin-bottom: $spacing-03;
+}

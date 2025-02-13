@@ -1,0 +1,25 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/colors';
+
+.selectReadOnly :global .cds--select--readonly .cds--select-input__wrapper .cds--select-input {
+  background-color: $field !important;
+}
+
+.toggle-span {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  padding-right: 0.25rem;
+  display: inline-block;
+}
+
+.providerFont {
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+}
+
+.helperContent {
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}

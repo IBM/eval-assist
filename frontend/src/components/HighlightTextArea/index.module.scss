@@ -1,0 +1,63 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/components/tag/tokens';
+@import '@carbon/styles/scss/type';
+
+.tag {
+  margin: 0 !important;
+  padding: 0px 4px 0px 4px;
+  font-size: 14px;
+  min-height: 14px !important;
+  margin-bottom: 2px !important;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.contentEditable {
+  padding-top: 0.5rem;
+  height: auto !important;
+}
+
+.paragraph {
+  @include type-style('body-short-01');
+  overflow: hidden;
+  text-wrap: nowrap;
+  display: inline-block;
+  padding-left: 1px;
+
+  // &:not(:focus) {
+  //   text-overflow: ellipsis;
+  // }
+}
+
+.textAreaLikeOuter {
+  height: 102px;
+  overflow-y: scroll;
+}
+
+.textAreaLikeInner {
+  overflow-y: hidden;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.textInputLike {
+  max-width: 100%;
+  height: 40px !important ;
+}
+
+.placeholder {
+  color: #999;
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  top: 10px;
+  left: 17px;
+  font-size: 15px;
+  user-select: none;
+  display: inline-block;
+  pointer-events: none;
+}

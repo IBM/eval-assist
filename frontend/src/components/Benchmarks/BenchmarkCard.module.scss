@@ -1,0 +1,67 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/spacing';
+@import '@carbon/styles/scss/type';
+
+.root {
+  padding: 1rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  &:hover {
+    background-color: $layer-hover-01;
+  }
+}
+
+.list * {
+  margin-bottom: 0.25rem;
+}
+
+.title-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: $spacing-03;
+}
+
+.badge {
+  align-self: flex-start;
+  margin-left: -3px !important;
+  cursor: pointer;
+}
+
+.description {
+  color: $text-secondary;
+  //styleName: caption-01;
+  font-family: IBM Plex Sans;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0.3199999928474426px;
+  text-align: left;
+  margin-bottom: 1rem;
+  margin-bottom: $spacing-05;
+}
+
+.nameLink {
+  @include type-style('body-short-01');
+  margin-bottom: 0.35rem;
+  color: $text-primary !important;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.card-white-mode {
+  background-color: $background;
+}
+
+.tagList {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}

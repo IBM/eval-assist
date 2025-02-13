@@ -1,0 +1,18 @@
+@import '@carbon/react/scss/spacing';
+@import '@carbon/styles/scss/theme';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-inline-start: $spacing-06;
+  margin-top: $spacing-06;
+}
+
+.title {
+  font-size: 42px;
+  line-height: 50px;
+  font-weight: 300;
+  color: $text-primary;
+  margin-bottom: $spacing-06;
+}

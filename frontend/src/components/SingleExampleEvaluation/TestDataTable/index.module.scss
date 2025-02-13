@@ -1,0 +1,335 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/colors';
+@import '@carbon/styles/scss/motion';
+@import '@carbon/styles/scss/spacing';
+
+$block-radius: 4px;
+
+$columns-1: 1fr 0 0 0;
+$columns-2: 5fr 1fr 0 0;
+$columns-3-var1: 5fr 1fr 1fr 0;
+$columns-3-var2: 4fr 1fr 2fr 0;
+$columns-3-var3: 5fr 1fr 2fr 0;
+$columns-3-var4: 3fr 1fr 3fr 0;
+$columns-3-var5: 4fr 3fr 0 0;
+$columns-4: 3fr 1fr 1fr 2fr;
+
+.content {
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+  flex-wrap: wrap;
+  position: relative;
+
+  > * {
+    width: 100%;
+  }
+
+  textarea,
+  input[type='text'] {
+    resize: none;
+    border: none;
+    background: transparent;
+    font-size: rem(14px);
+    line-height: rem(18px);
+    padding-right: 10%;
+  }
+}
+
+.innerContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.blockElement {
+  background-color: $background;
+  border-left: 1px solid $border-subtle-01;
+  border-right: 1px solid $border-subtle-01;
+  border-radius: $block-radius;
+  &:not(:last-child):not(.actionButtonBlock) {
+    border-right: none;
+  }
+}
+
+.tableRow {
+  overflow-y: hidden;
+  max-width: 100%;
+  display: grid;
+  // fixes tooltip getting cut
+  overflow: visible;
+  // transition: grid-template-columns $duration-fast-01 motion(standard, productive);
+  .blockElement {
+    border-radius: 0;
+
+    textarea {
+      min-height: max(rem(50px), 100%);
+      height: rem(50px);
+    }
+
+    :global(.cds--text-area__wrapper) {
+      height: 100%;
+    }
+  }
+
+  &.noBorderBottom {
+    border-bottom: 0;
+  }
+}
+
+.tableRowSection {
+  overflow-y: hidden;
+  display: grid;
+  // fixes tooltip getting cut
+  overflow: visible;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  :last-child {
+    border-right: 0;
+  }
+  // transition: grid-template-columns $duration-fast-01 motion(standard, productive);
+  // .blockElement {
+  //   border-radius: 0;
+
+  //   textarea {
+  //     min-height: max(rem(50px), 100%);
+  //     height: rem(50px);
+  //   }
+
+  //   :global(.cds--text-area__wrapper) {
+  //     height: 100%;
+  //   }
+  // }
+
+  // &.noBorderBottom {
+  //   border-bottom: 0;
+  // }
+}
+
+.headerRow {
+  border-top: 1px solid $border-subtle-01;
+  border-bottom: 1px solid $border-subtle-01;
+}
+
+.subHeaderRow {
+  border-top: none;
+  border-bottom: 1px solid $border-subtle-01;
+}
+
+.actionButtonsRow {
+  border-bottom: 1px solid $border-subtle-01;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: rem(60px);
+  border-left: 1px solid $border-subtle-01;
+  border-right: 1px solid $border-subtle-01;
+  padding-left: 0.5rem;
+  gap: 0.5rem;
+}
+
+.columns1 {
+  grid-template-columns: $columns-1;
+}
+
+.columns2 {
+  grid-template-columns: $columns-2;
+}
+
+.columns3var1 {
+  grid-template-columns: $columns-3-var1;
+}
+
+.columns3var2 {
+  grid-template-columns: $columns-3-var2;
+}
+
+.columns3var3 {
+  grid-template-columns: $columns-3-var3;
+}
+
+.columns3var4 {
+  grid-template-columns: $columns-3-var4;
+}
+
+.columns3var5 {
+  grid-template-columns: $columns-3-var5;
+}
+
+.columns4 {
+  grid-template-columns: $columns-4;
+}
+
+.actionButton {
+  border-radius: 0 0 $block-radius $block-radius !important;
+  > button:hover {
+    // background: transparent;
+  }
+}
+
+.headerBlock {
+  padding-left: rem(11px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: $field-hover-01;
+  min-height: rem(48px);
+}
+
+.subHeaderBlock {
+  padding-left: rem(11px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: $field;
+  min-height: rem(48px);
+}
+
+.headerTypography {
+  font-weight: 800;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+}
+
+.resultBlock {
+  position: relative;
+  padding: 11px 16px 11px 16px;
+  :global(.cds--select-input) {
+    background-color: $background;
+  }
+}
+
+.resultBlockInner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+.resultBlockOuter {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.resultBlockHover {
+  &:hover {
+    background-color: $field-hover-01;
+  }
+}
+
+.resultBlockPointerCursor {
+  cursor: pointer;
+}
+
+.resultBlockDefaultCursor {
+  cursor: default !important;
+  textarea {
+    cursor: default !important;
+  }
+}
+
+.resultBlockTypography {
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+}
+
+.resultPlaceholder {
+  color: $text-placeholder;
+}
+
+.resultDetailsAction {
+  visibility: hidden;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-right: -13px;
+  svg {
+    fill: $link-primary;
+  }
+}
+
+.responsesRow {
+  min-height: rem(85px);
+  border-bottom: 1px solid $border-subtle-01;
+}
+
+.responsesRow:hover {
+  .resultDetailsAction {
+    visibility: visible;
+  }
+}
+
+.resultDetailsAction {
+  text-decoration: none !important;
+}
+
+.winnerResponseOutline {
+  border: 1px solid $support-success !important;
+  border-radius: 1px;
+  background-color: green !important;
+
+  .blockElement {
+    border-top: 0;
+    border-bottom: 0;
+    &:first-child {
+      border-left: 0;
+    }
+    &:last-child {
+      border-right: 0;
+    }
+  }
+}
+
+.innerContainer .winnerResponseOutline {
+  .responsesRow:first-child {
+    border-radius: 0;
+  }
+
+  .responsesRow:last-child {
+    border-radius: 0 0 $block-radius $block-radius;
+  }
+}
+
+.untrastedResultTypography {
+  color: $text-error;
+}
+
+.positionalBias {
+  color: $text-error;
+  font-size: small;
+}
+
+.softText {
+  display: flex;
+  align-items: center;
+  color: $text-helper;
+  font-size: small;
+}
+
+.positionalBiasTag {
+  margin-top: 0.5rem;
+  margin-left: -3px !important;
+}
+
+.toggle {
+  margin-top: 1rem;
+}
+
+.toggle :global .cds--toggle__text {
+  color: $text-helper;
+}
+
+.toggles {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.headerResponseBlock {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}

@@ -1,0 +1,20 @@
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/motion';
+
+.sidebar {
+  top: rem(48px);
+  width: rem(48px);
+  &.expanded {
+    width: rem(302px + 48px);
+  }
+  transition: width $duration-fast-02 motion(standard, productive);
+  inset-block-end: 0;
+}
+
+.sidebar ~ .main-content {
+  margin-inline-start: rem(48px);
+}
+
+.sidebar.expanded ~ .main-content {
+  margin-inline-start: rem(302px + 48px);
+}

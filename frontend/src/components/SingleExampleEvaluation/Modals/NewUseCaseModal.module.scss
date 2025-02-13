@@ -1,0 +1,39 @@
+@import '@carbon/styles/scss/theme';
+
+.cards {
+  display: grid;
+  margin-bottom: 1.5rem;
+  grid-gap: 1rem;
+}
+
+@media (min-width: 66rem) {
+  .cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 42rem) {
+  .root :global .cds--modal-container {
+    inline-size: 80%;
+  }
+}
+
+@media (min-width: 82rem) {
+  .root :global .cds--modal-container {
+    inline-size: 65%;
+  }
+}
+
+@media (min-width: 92rem) {
+  .root :global .cds--modal-container {
+    inline-size: 55%;
+  }
+}
+
+.bottom-padding :global .cds--modal-content {
+  padding-bottom: 1rem;
+}
+
+.danger-text {
+  color: $text-error;
+}

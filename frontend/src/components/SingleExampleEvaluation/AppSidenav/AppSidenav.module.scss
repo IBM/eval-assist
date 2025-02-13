@@ -1,0 +1,36 @@
+@use '@carbon/styles/scss/theme' as *;
+@use '@carbon/styles/scss/utilities/convert' as *;
+
+.root {
+  position: fixed;
+  color: $text-primary;
+  display: flex;
+  z-index: 1;
+  background-color: $background;
+}
+
+.items {
+  border-right: 1px solid $border-subtle;
+}
+
+.panel {
+  border-right: 1px solid $border-subtle;
+  overflow: hidden;
+}
+
+.itemBtn {
+  position: relative;
+  padding-left: rem(13px);
+  padding-right: rem(13px);
+
+  &.selected::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    right: 0;
+    bottom: -1px;
+    left: -1px;
+    width: 100%;
+    border-left: 4px solid $border-interactive;
+  }
+}

@@ -1,0 +1,59 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/colors';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.table {
+  align-self: stretch;
+
+  :global(.cds--data-table-content) {
+    overflow: visible;
+  }
+}
+
+.highlightedCellText {
+  color: $text-primary !important;
+  font-weight: 550;
+}
+
+.criteriaHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.criteriaInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.headerWithTooltip {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.headerInfoIcon {
+  color: $border-strong-02;
+  background-color: transparent;
+  margin-top: 0.2rem !important;
+  &:hover {
+    color: $layer-accent-active-01;
+    background-color: transparent;
+  }
+}
+
+.toggle :global .cds--toggle__text {
+  color: $text-helper;
+}

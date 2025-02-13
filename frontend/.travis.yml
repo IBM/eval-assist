@@ -1,0 +1,21 @@
+language: minimal
+
+branches:
+  only:
+  - main
+  - dev
+  - demo
+
+services: 
+  - docker
+
+jobs:
+  include:
+    - stage: build
+      script: ./ci-docker_build.sh
+      if: type = push AND (branch = dev OR branch = main OR branch = demo)
+    # deploy scripts:
+    - stage: deploy
+      script: ./ci-oc-refresh.sh
+      if: type = push AND (branch = dev OR branch = main OR branch = demo)
+

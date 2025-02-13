@@ -1,0 +1,78 @@
+@import '@carbon/styles/scss/theme';
+@import '@carbon/styles/scss/utilities/convert';
+@import '@carbon/styles/scss/spacing';
+@import '@carbon/styles/scss/colors';
+
+.cds--side-nav ~ .content {
+  margin-inline-start: rem(272px + 48px);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  padding: $spacing-06;
+  height: 100%;
+}
+
+.custom-sidenav {
+  border-right: 1px solid $border-subtle-00;
+}
+
+.accordion-wrapper :global .cds--accordion__wrapper .cds--accordion__content {
+  padding-right: 1rem !important;
+}
+
+.accordion-wrapper {
+  border-bottom: none !important;
+}
+
+// fixes tooltip getting cut
+.table-wrapper :global(.cds--data-table-content) {
+  overflow: visible;
+}
+
+.bottom-divider {
+  border-bottom: 1px solid $border-subtle-00;
+}
+
+.left-padding {
+  padding-left: 1rem;
+}
+
+.subtitle {
+  //styleName: Body/Body strong (ds-body ds-strong);
+  font-family: IBM Plex Sans;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  text-align: left;
+}
+
+.table-row-error :global td {
+  color: $text-error;
+}
+
+.api-key-reminder-text {
+  color: $text-secondary;
+  margin-top: 1rem;
+}
+
+.horizontal-divider {
+  height: 0;
+  border: 0;
+  border-bottom: 1px solid $border-subtle-00;
+  margin-bottom: 2rem;
+}
+
+.toggle-span {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  padding-right: 0.25rem;
+  display: inline-block;
+}
+
+.eval-info-button {
+  margin-left: 0.25rem;
+  position: relative;
+  top: 0.1rem;
+}

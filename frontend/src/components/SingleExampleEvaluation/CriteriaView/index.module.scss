@@ -1,0 +1,18 @@
+@import '@carbon/styles/scss/theme';
+
+.criteriaText {
+  margin-bottom: 1rem;
+}
+
+.text-overflow {
+  :global .cds--text-input {
+    text-overflow: ellipsis;
+  }
+}
+
+.optionsGrid {
+  display: grid;
+  margin-bottom: 1rem;
+  grid-template-columns: 1fr 6fr 3rem;
+  gap: 1rem;
+}
