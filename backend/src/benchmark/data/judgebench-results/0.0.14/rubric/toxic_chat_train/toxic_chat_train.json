@@ -1,0 +1,116 @@
+{
+    "name": "toxic_chat_train",
+    "description": "Toxic chat classification for toxicity and jailbreaking attributes.",
+    "link": "https://huggingface.co/datasets/lmsys/toxic-chat",
+    "type": "rubric",
+    "dataset": {
+        "name": "toxic_chat_train",
+        "description": ""
+    },
+    "tags": [
+        "Judgebench",
+        "categorical"
+    ],
+    "criteriaBenchmarks": [
+        {
+            "name": "Toxicity",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Mixtral",
+                    "laaj_version": "0.0.14",
+                    "results": {
+                        "agreement": 0.898,
+                        "p_bias": 0.036,
+                        "pearson": 0.587
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.14",
+                    "results": {
+                        "agreement": 0.892,
+                        "p_bias": 0.022,
+                        "pearson": 0.549
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-70b",
+                    "laaj_version": "0.0.14",
+                    "results": {
+                        "agreement": 0.894,
+                        "p_bias": 0.02,
+                        "pearson": 0.556
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.14",
+                    "results": {
+                        "agreement": 0.922,
+                        "p_bias": 0.016,
+                        "pearson": 0.692
+                    }
+                },
+                {
+                    "evaluator_id": "Prometheus",
+                    "laaj_version": "0.0.14",
+                    "results": {
+                        "agreement": 0.904,
+                        "p_bias": 0.022,
+                        "pearson": 0.637
+                    }
+                }
+            ]
+        },
+        {
+            "name": "jailbreaking",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Mixtral",
+                    "laaj_version": "0.0.14",
+                    "results": {
+                        "agreement": 0.856,
+                        "p_bias": 0.042,
+                        "pearson": 0.353
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.14",
+                    "results": {
+                        "agreement": 0.802,
+                        "p_bias": 0.022,
+                        "pearson": 0.406
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-70b",
+                    "laaj_version": "0.0.14",
+                    "results": {
+                        "agreement": 0.852,
+                        "p_bias": 0.028,
+                        "pearson": 0.365
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.14",
+                    "results": {
+                        "agreement": 0.85,
+                        "p_bias": 0.056,
+                        "pearson": 0.326
+                    }
+                },
+                {
+                    "evaluator_id": "Prometheus",
+                    "laaj_version": "0.0.14",
+                    "results": {
+                        "agreement": 0.768,
+                        "p_bias": 0.06,
+                        "pearson": 0.272
+                    }
+                }
+            ]
+        }
+    ]
+}

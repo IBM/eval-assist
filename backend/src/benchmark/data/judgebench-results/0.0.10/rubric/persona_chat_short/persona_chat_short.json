@@ -1,0 +1,262 @@
+{
+    "name": "persona_chat_short",
+    "description": "This dataset was collected with the goal of assessing dialog evaluation metrics. In our paper (accepted to ACL 2020), we collect this data to measure the quality of several existing word-overlap and embedding-based metrics, as well as our newly proposed USR metric. The human quality judgements were performed on two datasets: Amazon Topical-Chat for which we evaluated 6 systems: (1) original ground-truth, (2) 4 different Transformers (argmax decoding, nucleus decoding with p = {0.3, 0.5, 0.7}), and (3) a newly generated human-written utterance. Persona Chat for which we evaluated 5 systems: (1) original ground-truth, (2) 3 different models (KV-MemNN, Seq2Seq, LM), and (3) a newly generated human-written utterance.",
+    "link": "http://shikib.com/usr",
+    "type": "rubric",
+    "dataset": {
+        "name": "judgebench-persona_chat_short",
+        "description": ""
+    },
+    "tags": [
+        "Judgebench",
+        "categorical"
+    ],
+    "criteriaBenchmarks": [
+        {
+            "name": "engaging",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Llama3-70b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.167,
+                        "p_bias": 0.817,
+                        "pearson": 0.041
+                    }
+                },
+                {
+                    "evaluator_id": "Mixtral",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.15,
+                        "p_bias": 0.783,
+                        "pearson": 0.112
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.233,
+                        "p_bias": 0.767,
+                        "pearson": -0.054
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.267,
+                        "pearson": 0.065
+                    }
+                }
+            ]
+        },
+        {
+            "name": "maintains context",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Llama3-70b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.083,
+                        "p_bias": 0.9,
+                        "pearson": 0.166
+                    }
+                },
+                {
+                    "evaluator_id": "Mixtral",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.1,
+                        "p_bias": 0.9,
+                        "pearson": -0.028
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.133,
+                        "p_bias": 0.95,
+                        "pearson": -0.161
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.467,
+                        "p_bias": 0.2,
+                        "pearson": 0.19
+                    }
+                }
+            ]
+        },
+        {
+            "name": "natural",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Llama3-70b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.233,
+                        "p_bias": 0.817,
+                        "pearson": -0.036
+                    }
+                },
+                {
+                    "evaluator_id": "Mixtral",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.283,
+                        "p_bias": 0.867,
+                        "pearson": -0.048
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.367,
+                        "p_bias": 0.75,
+                        "pearson": -0.067
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.55,
+                        "p_bias": 0.25,
+                        "pearson": 0.223
+                    }
+                }
+            ]
+        },
+        {
+            "name": "overall",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Llama3-70b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.067,
+                        "p_bias": 0.75,
+                        "pearson": 0.177
+                    }
+                },
+                {
+                    "evaluator_id": "Mixtral",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.05,
+                        "p_bias": 0.783,
+                        "pearson": 0.187
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.083,
+                        "p_bias": 0.85,
+                        "pearson": 0.258
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.617,
+                        "pearson": 0.134
+                    }
+                }
+            ]
+        },
+        {
+            "name": "understandable",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Llama3-70b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.45,
+                        "pearson": 0
+                    }
+                },
+                {
+                    "evaluator_id": "Mixtral",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.533,
+                        "pearson": 0
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.4,
+                        "pearson": 0
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.033,
+                        "pearson": 0
+                    }
+                }
+            ]
+        },
+        {
+            "name": "uses knowledge",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Llama3-70b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.617,
+                        "pearson": 0
+                    }
+                },
+                {
+                    "evaluator_id": "Mixtral",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.517,
+                        "pearson": 0
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.55,
+                        "pearson": 0
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.167,
+                        "pearson": 0
+                    }
+                }
+            ]
+        }
+    ]
+}

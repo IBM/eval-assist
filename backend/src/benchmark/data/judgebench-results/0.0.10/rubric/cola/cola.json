@@ -1,0 +1,57 @@
+{
+    "name": "cola",
+    "description": "The Corpus of Linguistic Acceptability (CoLA) in its full form consists of 10657 sentences from 23 linguistics publications, expertly annotated for acceptability (grammaticality) by their original authors.",
+    "link": "https://nyu-mll.github.io/CoLA/",
+    "type": "rubric",
+    "dataset": {
+        "name": "judgebench-cola",
+        "description": ""
+    },
+    "tags": [
+        "Judgebench",
+        "categorical"
+    ],
+    "criteriaBenchmarks": [
+        {
+            "name": "grammaticality",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.64,
+                        "p_bias": 0.57,
+                        "pearson": 0.159
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-70b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.58,
+                        "p_bias": 0.53,
+                        "pearson": 0.037
+                    }
+                },
+                {
+                    "evaluator_id": "Mixtral",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.54,
+                        "p_bias": 0.56,
+                        "pearson": 0.0
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0.64,
+                        "p_bias": 0.12,
+                        "pearson": 0.401
+                    }
+                }
+            ]
+        }
+    ]
+}

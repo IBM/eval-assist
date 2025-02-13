@@ -1,0 +1,801 @@
+option,certainty,p_bias,evaluator_id,criteria_name,criteria_description,correct_option
+5,0.984305063459026,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9653544784355284,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.912040762274704,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.925622040998098,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.910585332580942,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+2,0.6395020370412172,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9673089855382384,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.7911518855221085,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.9290252039007028,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+2,0.7910712405241846,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9595691255079024,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.8912357849168142,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.8357028456258857,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+2,0.8271920914772611,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+2,0.9352597024362715,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+3,0.8650511704359375,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.8702983288619988,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.8852963685270522,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9110145191862056,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.9146441912954736,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.9597168924409508,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+4,0.9584014473450262,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.935017121114226,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9253358423772456,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.5584291451461858,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,3
+4,0.93517587144498,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,4
+5,0.9617571036927866,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9626720760757508,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,4
+4,0.9231707526646878,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,3
+2,0.8389820327469095,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.8811538013621284,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,4
+2,0.95239581096671,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9577606564675204,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9508475352074692,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.9759934409148314,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.908811472563079,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9716466089383602,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.9275819726895088,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+2,0.8855324302541596,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+2,0.9352811787609028,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9536473242449678,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.513105796848803,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9305219621070984,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.8166659401238446,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+1,0.9549365891872033,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+3,0.6650773465868116,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+4,0.8454531300436394,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.891372916092225,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9543160573701108,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9514523391651034,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9871035118191244,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.9767989795596396,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.948691691739142,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9316449000624648,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.991356512708996,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.877315832073875,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.9766941205277084,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+4,0.9642776430735578,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.9060148007015894,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9407354925520476,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.9965181414186032,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9515795893877812,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.9450186163995684,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+2,0.8957809617912179,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.8842419514481263,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.6460822095866415,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.7278631842922112,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9365718404109064,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9359767151174015,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.7748137618760375,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.6617133259597675,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9819853625528736,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9739610841422304,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.955438103046345,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+1,0.945457970897558,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+2,0.7874276776981486,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.9327112277466812,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9433517205181188,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.987880731706006,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9582391970128706,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.9772463032770652,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9442255096818049,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9598695380432468,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.8640725410668555,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.6418723975887669,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+3,0.949426553224099,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9670337780367502,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.932423844506544,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9599864127901574,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.8599970371170008,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9195302698052596,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9774904510727828,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.8650400204269009,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9454723588076198,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.8194254225904503,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+4,0.9886005693442692,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.9865236617307142,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.8347356128864573,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+1,0.9657405672934336,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9602935705043736,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9739011557426503,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.850218006258652,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.8362937971687263,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.983677161026251,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.5671343149514144,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9404592723677572,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.6891563405167483,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+2,0.9061923384378584,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+2,0.8461469725412939,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.922639306610411,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9806180643596162,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.893473855761933,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.93701687760298,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9377972881012192,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.815381802767802,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.7132663043142214,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9435979018788472,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.920405206631762,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.9676591331835072,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+2,0.8003761488597644,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.931101277645392,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.970580176879214,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.8451518591883883,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9406731458308432,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.9180513628973144,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+3,0.5439705039438074,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9655222569414325,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9061385023078062,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9240190402266756,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.9462344735720704,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9374596118003998,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9340794585805948,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.7269919908373557,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9752717698956622,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9350377558792008,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9390653662775832,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.8457192466053802,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.7509868642682819,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+4,0.9867837267861034,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9315966870720714,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.9025546210319332,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+2,0.9545573514716018,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.906833797429934,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.9252164340978254,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+3,0.7836094338826275,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9714763584014364,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.5804050846459794,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.8041221627126763,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+2,0.9505790260572518,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9275574596104096,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.8955583285296268,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+4,0.9580242633412392,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9792264484906722,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.8829548597270229,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+2,0.9080834569310546,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+4,0.9651333466762768,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9238980396742488,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.7716074977119052,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9584684646622798,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.842996460194834,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9463918284697468,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,4
+5,0.9717453204255868,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.8227811823601866,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9724634726806324,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9509859419156602,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.8947664346057363,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,4
+5,0.9809695415134184,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.8344982946000976,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.973037065852541,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.9092264709195258,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+2,0.9098343391540096,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9554483324841724,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9568029306109588,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9680425988368222,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9823349437936028,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.9686918566681738,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.9458227623132954,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.8452638375846999,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+2,0.940374089017107,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.8799227459684101,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.8600598967658912,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.8312226110313384,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+4,0.9331780346448733,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.9644179939089792,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9766084983676608,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9546587065005312,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.9942945994087136,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+3,0.8357811160365678,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+3,0.8329693719949639,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9660592073833912,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.8071169635331706,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.8564502332420703,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9644595735505388,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.7838573692369847,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+2,0.7580034338065901,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,1
+5,0.9919530856782434,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+2,0.9544600357358448,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,2
+5,0.9571211604545208,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.9568468054309022,False,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+4,0.964145311393137,True,Mixtral,Overall Quality,Does the generated response answer the question in a well-justified manner?,5
+5,0.974614119022482,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9571447468859948,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8464744174660306,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+5,0.9298723308901016,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8707714429289705,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+2,0.5721389192699563,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9568914451079112,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.6936535722600563,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.7927338385876305,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.7922875286117427,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9542142303940372,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9412487036783956,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+4,0.912527505557708,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.9180824034131796,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.6859394365963035,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.6774230904131722,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+4,0.9285233791253076,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9588442411672836,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9671715863769216,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+4,0.8058244977790526,True,Mixtral,Coherency,Does the whole generated response make sense?,3
+2,0.925232557900011,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.967017613837124,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9221888610098588,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.8362485248612227,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.5021444210328675,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9519845539089036,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9732157672086126,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9685219687136318,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9368590711781908,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+2,0.8589404273609998,True,Mixtral,Coherency,Does the whole generated response make sense?,1
+5,0.9672726232347956,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+2,0.9330232799720474,True,Mixtral,Coherency,Does the whole generated response make sense?,1
+5,0.9548496321122268,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.880144416947408,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.8941013289539881,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.8640198424984239,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+4,0.8419516041128069,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.9197827308180192,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+2,0.9375866077486008,True,Mixtral,Coherency,Does the whole generated response make sense?,3
+2,0.79699808222702,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+5,0.8714373018953194,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+4,0.689962823342879,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.9502988287764044,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+1,0.8693635462202018,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+1,0.8761767221361235,True,Mixtral,Coherency,Does the whole generated response make sense?,1
+3,0.5648155275095943,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9412960205620928,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.6878551240926907,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.9420605138653464,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9394516465455328,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.927505159835598,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9417200816406488,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+5,0.9628800390801964,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.959153956245092,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9527318860322336,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.946910160741438,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.7877624376649853,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.97932384869093,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+4,0.9414177180005608,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.967320477189618,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9592742781213176,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.951562751213249,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8364756712409526,True,Mixtral,Coherency,Does the whole generated response make sense?,1
+2,0.9139530061272956,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+5,0.9732144112683474,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+4,0.8820859221654939,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+3,0.4307466897961934,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9452496930061705,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9358094410968568,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+1,0.6491756468147055,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+2,0.650199093371834,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9812554940146602,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9526667497390074,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.9177996437960608,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+1,0.9066261147891664,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+2,0.8059005102361639,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+2,0.8577489441262186,True,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.9632333990490324,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9625211899780328,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.929770091777374,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9389697138776496,False,Mixtral,Coherency,Does the whole generated response make sense?,2
+5,0.9686399547252416,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9763313834115884,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9613214198912025,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.5200117653589404,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+1,0.9515445096029382,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.9632363881275928,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8614816737391977,True,Mixtral,Coherency,Does the whole generated response make sense?,1
+5,0.92606971319056,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9359638698896926,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9676712994977256,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9729114603752228,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8333986223378227,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.8650735611193691,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+4,0.6464844316880092,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9403110551523264,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9071588876637948,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.7846327109479826,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+2,0.6177432504640158,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.942740637771288,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9189349569831796,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9731804281792698,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8653910890909874,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9731560423688712,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.7282541359442254,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9552448748066936,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.7880395754670533,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+2,0.9280208712438412,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+2,0.7436094265795791,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9587221624691156,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9505161225669472,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.6431130773292947,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.9133825905931487,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9559090981748994,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+1,0.9303766454000114,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.5685876092776136,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9130566986152022,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9133895523705908,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.793846745056363,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.4823297127355988,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.9660494185582844,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9465339589699632,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.6538199891656479,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.9645484011142044,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8974973508626545,True,Mixtral,Coherency,Does the whole generated response make sense?,1
+3,0.4438164277476301,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9421703449608878,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.8919467981239455,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9530086504718492,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8815820028962176,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.9219451088692912,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.961041901214508,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.7189123471028919,True,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.9566865004640268,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9058015286809536,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.8673915681319901,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8760131320401945,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8608857004382702,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9664983057845208,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9601501321653448,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+4,0.8640671075451994,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+1,0.8060954374972199,True,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.970670698164517,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.616094741705724,True,Mixtral,Coherency,Does the whole generated response make sense?,3
+4,0.7892443222938018,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9732109126611486,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.646286091790536,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.4462648962306053,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+2,0.8760770840239793,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+5,0.808453797840017,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8416713969389062,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9688289087729184,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9184002289254553,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.5569213116475091,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+2,0.8556883429659001,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.913118721872302,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.914319797473384,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.3911099334870032,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9832631158064716,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8455479874636693,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9641596065493871,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.996384270949948,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.4935396781183911,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9562055828265849,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9713063909834156,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9584026505448392,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9628154966274723,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+4,0.85452823805981,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9704363444263844,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8649251514761365,True,Mixtral,Coherency,Does the whole generated response make sense?,1
+2,0.8663959863417514,True,Mixtral,Coherency,Does the whole generated response make sense?,2
+5,0.9443494503908012,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9617346109841776,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9803729253798964,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9397364312425782,False,Mixtral,Coherency,Does the whole generated response make sense?,4
+5,0.9602260785926408,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.7940430282112537,True,Mixtral,Coherency,Does the whole generated response make sense?,4
+3,0.3952996729763006,True,Mixtral,Coherency,Does the whole generated response make sense?,3
+3,0.5073207890921354,True,Mixtral,Coherency,Does the whole generated response make sense?,3
+3,0.4355509755900452,True,Mixtral,Coherency,Does the whole generated response make sense?,2
+5,0.9465365224581486,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.7153191069598229,True,Mixtral,Coherency,Does the whole generated response make sense?,1
+5,0.9165453541755124,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+2,0.8399184276509626,False,Mixtral,Coherency,Does the whole generated response make sense?,1
+5,0.9121942863080016,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.8612334019350582,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9350662078009434,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.7361616892610966,True,Mixtral,Coherency,Does the whole generated response make sense?,5
+3,0.2862207761754093,False,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.8715911408492849,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9147333582639364,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.954080525226174,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9466926967644248,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+4,0.8050618882873757,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+1,0.8489758344974976,True,Mixtral,Coherency,Does the whole generated response make sense?,2
+5,0.9493815332247144,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+1,0.9102611371987304,True,Mixtral,Coherency,Does the whole generated response make sense?,3
+5,0.9375800064133047,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9677290149714696,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+5,0.9510709031682668,False,Mixtral,Coherency,Does the whole generated response make sense?,5
+no,2.101007819505363e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,5.027432864990018e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,3.8504082455580405e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,3.840464261027833e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.1959559913744928e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,0.0021981302157627,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,9.784296407347348e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,2.101137127844183e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,8.880715042830216e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.8636874093640383e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,7.761898946610425e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,4.523632397483296e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,2.5433229850565654e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.4337791671100208e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.846459686835356e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.7441620194104916e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,6.570131419384957e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,1.2279392189874675e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0001978453934469,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,8.26455160893014e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.234577692593184e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,6.825288332332911e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,2.226952797069328e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,2.6229133317085952e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,2.199429116862308e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,3.207654736638543e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,8.339112016484311e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,1.2296800919792812e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,8.942547484497655e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0001926390613585,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,8.601575353683824e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,3.887871500697269e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,3.637075679256211e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,8.969862549350224e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.8260906556795816e-06,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,3.027400951243448e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.33373497405711e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.0092476794452592e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,4.4563402709277824e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,4.047398799699706e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,1.668567643338944e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,5.515547032982387e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,4.698601263641559e-06,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,5.854294430330836e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.5835420677222694e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,2.304030299048788e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.2933784889676415e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,5.685297041931795e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,1.3695367109328371e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,4.290701633454336e-06,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,1.869529813215452e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,3.15074407075838e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.0929796152885324e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,2.404042766446158e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,2.7589033352439238e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,7.215853391499852e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.7757195401533915e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.9441507466415176e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.2215496885442562e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,1.3576262202520926e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,3.450075130897682e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,2.5867272972354463e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,6.194002614816291e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,4.525349724048624e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,5.38350624758542e-06,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,7.45031471793327e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,0.037929429306516,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,3.0250905692783524e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,8.751290841019518e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0001975686049,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.4898014513310362e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.7060584783087113e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,6.4854025051218e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0046906055747563,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,3.5732462682376902e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,8.154696580439641e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.6025744059569742e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,5.336036278463713e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,4.107409438186239e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,2.3577219949224617e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,6.8519394582635714e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,6.9557410856186974e-06,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,2.4475581766615674e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,1.15773895277858e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.2391898618257006e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.6267777093544337e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,4.552485946080388e-06,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,6.209066187082954e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,1.1898371976366583e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,1.4865407228753817e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,2.0005938473494093e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,7.891431785506204e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.8340745891652063e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.7669303015537964e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.4794939563383427e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,2.631406817059182e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.1385888780297613e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0001731680223939,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,2.225637570341397e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,2.454981657515919e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,2.0014268895937955e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,0.0013031752553099,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,3.956270062723213e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,2.700537768284572e-06,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,2.6374831440877632e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,6.569839857671683e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.5631406635367556e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,6.918689361275325e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.4854063540389347e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,6.280890843270655e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,4.564292986169223e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,6.544941329172378e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,6.323018067768008e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,2.11612559503983e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.1414689124166986e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,4.190910074370607e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,9.312804232173636e-07,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,7.041657020665366e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0019346820695962,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,6.957648704158996e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,8.908163493101366e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.000102206948346,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,9.555693040101326e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,3.1266585097367664e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0002566837275455,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,0.153396745389004,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,1.9334691396709773e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,7.53818315738151e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,3.128816696587312e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.8211549730129796e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.4365260833464105e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,1.1497157423353898e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,4.833707558570288e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,0.1254737383832445,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,8.586875940586844e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,3.2354172659115267e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0001745996120112,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,3.031610459283292e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,2.9112660781995457e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,1.6766684563285827e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,5.602022437367832e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0374797541196068,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,3.943750245185153e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,3.227560354904541e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.280965019048935e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,5.5985241893619854e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,3.006360645293119e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,4.4624813500605344e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,2.083778171792784e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,0.0002550194157395,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,3.415517509961501e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.4544785586605213e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,5.0868278956903575e-06,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,9.773119866439348e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,1.509203925366366e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,6.214658531053161e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,1.301495362205378e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,8.710071654272993e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,2.990567342421487e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.1384835224380003,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,5.551825762756083e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,3.6604505802264096e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,2.965768165879477e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,3.542679487998564e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,2.533262549826584e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,2.576215072345093e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,1.4618291820356936e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,7.3247107128107455e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,4.38100883885093e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,2.408627895742334e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,8.387629474033378e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,5.55822006504485e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.4573109946571496e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,8.753423193611916e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,8.13257381238437e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.3649860271741082e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,7.918669601266e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0009373171303022,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,9.72434667138554e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,9.439719453284802e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,7.090908534652266e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.1151694259712827,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,2.6483666026795768e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,0.0031428111301162,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,9.184170656187877e-06,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,0.0144124187418889,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,4.4442190790500944e-05,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,4.53040624314476e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,0.1597086420563911,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,8.926086021443406e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,1.1010315148601265e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,3.274682542788217e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,7.956818402840909e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,1.3647139880938213e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,0.0401506272474369,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+yes,2.387610274394561e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,4.594652484833112e-05,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",0
+no,5.194805115069579e-06,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,9.304486094110712e-07,False,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+yes,2.9982905099767064e-06,True,Mixtral,Missing Steps,"Is the reasoning in the generated response incomplete and lacking required information to produce the correct answer? Specifically, does this response contain steps that, if added in, would make for a well-supported chain?",1
+no,0.0040481308346647,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0228334467263366,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0022060211942014,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0017287167975837,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,5.955223277169115e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,2.225637570341397e-05,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0041029524672341,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0035608046106702,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,0.0001079864428859,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,7.990631289791453e-06,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0065221214503962,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0173375829018946,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0073147988762294,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,2.201109887531823e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,0.0001047607152523,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.003667490064716,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0048704532732135,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0083103136199925,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0001035439682775,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0054979414512738,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,4.549484872521597e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0003151385758159,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0076315053357261,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,3.654080158926149e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0102942040143378,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0186844584427003,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.003657664526316,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0062814095956449,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0113006030323238,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,3.815983499124028e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0377200651094575,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,6.181082795584487e-05,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0233985957428347,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0070799996918896,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0121276974911881,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0082211362602172,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0001044798525182,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,3.018826718647813e-05,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0002400927972811,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,6.078775098094511e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0126134080513693,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0020911630481696,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,8.773539704561575e-06,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,6.133969765779269e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+yes,0.0002927464254322,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0152588118891057,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0018240204959585,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.000196741310987,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0182180488086198,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0001750020330081,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0001116890902458,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0041786582227746,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0136093721694403,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0212051168839474,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0001512331186015,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0073252283524808,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,1.237642692033745e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0001592052185217,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0066333076825412,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0035703665505236,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0107254102762978,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0012357386300023,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,2.742412525745313e-05,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+yes,5.067917025154163e-05,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0002399263935403,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0034130919080528,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.03135356263466,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0156720837830581,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0318985729288038,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,0.0002526413226807,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0001611800721319,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0141203127766224,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0002341792670537,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,0.000105283031174,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,0.0003468892300771,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0001101676489751,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,4.407153430488734e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0079190781703328,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0155324334186906,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0082119016729456,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.023710438477664,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,2.0941095553016225e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0021970446003622,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0074387463043738,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0002658302358052,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,8.656126517323965e-05,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,4.148484806004286e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0009470436663204,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0121565771109323,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0098603406535761,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,2.085984121111564e-06,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0087125274278481,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,1.2552387034038812e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0004587334283875,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0049074474362463,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0163695115159809,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0210968685979009,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0002269617741448,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,0.0001192072494182,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,4.517168214114187e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.004695665378855,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0165738544918458,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,7.309983110707438e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0113732522485853,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,7.803347747929736e-06,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0025418780405653,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,0.0001863983421372,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,6.383945203207763e-06,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+yes,0.0001812275763585,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0152927410165437,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0028773202646346,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,4.075431590790442e-06,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0036051738510679,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0134742362676031,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,6.688760497845238e-06,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,2.703982116168759e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0068445535585172,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0101772036156176,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.00633718092454,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,5.0519975445315065e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0080993584767831,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0102118731950436,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,8.143586780617862e-06,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0004605389618474,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0080855401870186,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0040296423114702,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0020720756099569,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0050240996938086,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0003725280037253,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,3.40969843573417e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.005999498896785,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0051938074475301,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,1.9297214240982575e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0044880679537542,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0166570602722412,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0263783304699064,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0142553808222446,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,4.283834871536864e-05,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0001023350094286,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0020397886166906,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0012829267373278,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,0.0263982744021393,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0214035707868972,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,4.4924098429302895e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,4.6114258930349193e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.000171820745874,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,1.053669502162673e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0248215745898811,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+yes,1.4998173120649157e-07,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0087237558449132,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,5.750678978245665e-06,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,5.390855778634199e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,1.5909934727406323e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,0.00014461901215311667,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.000767361473304508,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.0010948971984046138,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.002339768011233829,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,1.8416832135434477e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.00406629116642683,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,0.00020024626963913248,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.005738033006326762,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.010439729048372611,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.001360487528551634,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0033251526361551356,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.005309106131378306,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0028075020312101676,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.003335489054775056,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0001376630818356265,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.007857664981305442,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0015298422165187825,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+yes,0.0013430437164803888,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.004990124601642246,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0021614886123902484,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.010185874531071561,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0006230334202367226,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.00298599353110162,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,8.784000907698005e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.012034139553036014,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,4.942009162406521e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0029121618841585427,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.007212046367813439,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.002591373176156403,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.002424707981548568,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,1.884097483648967e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.01029404202986566,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0035523318788189596,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.003934646235120487,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0008693222036420314,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,4.2161614554422764e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.027879302792749094,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.014961296771217443,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.0051857325840270795,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.005419472742742106,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,2.6644875445444124e-06,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,5.919107353048916e-06,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.006205556368890458,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+yes,2.346837480187884e-05,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,0
+no,0.005561054739647622,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,0.049471000128159026,True,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1
+no,5.3088526400001615e-05,False,Mixtral,Contradiction,Do steps contradict each other or fail to follow a cohesive story?,1

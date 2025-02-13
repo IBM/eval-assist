@@ -1,0 +1,54 @@
+{
+    "name": "TruthfulQA",
+    "description": "TruthfulQA is a dataset to measure whether a language model is truthful in generating answers to questions. The dataset comprises 38 categories, including health, law, finance and politics. The language model has to decide which response is the truthful response.",
+    "link": "https://huggingface.co/datasets/truthfulqa/truthful_qa",
+    "type": "pairwise",
+    "dataset": {
+        "name": "TruthfulQA",
+        "description": ""
+    },
+    "tags": ["Truthfulness"],
+    "criteriaBenchmarks": [
+        {
+            "name": "Truthfulness",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.7",
+                    "results": {
+                        "agreement": 0.743,
+                        "p_bias": 0.018,
+                        "pearson": 0.489
+                    }
+                },
+                {
+                    "evaluator_id": "Llama3-70b",
+                    "laaj_version": "0.0.7",
+                    "results": {
+                        "agreement": 0.853,
+                        "p_bias": 0.013,
+                        "pearson": 0.709
+                    }
+                },
+                {
+                    "evaluator_id": "Mixtral",
+                    "laaj_version": "0.0.7",
+                    "results": {
+                        "agreement": 0.808,
+                        "p_bias": 0.011,
+                        "pearson": 0.617
+                    }
+                },
+                {
+                    "evaluator_id": "Prometheus",
+                    "laaj_version": "0.0.7",
+                    "results": {
+                        "agreement": 0.742,
+                        "p_bias": 0.23,
+                        "pearson": 0.49
+                    }
+                }
+            ]
+        }
+    ]
+}

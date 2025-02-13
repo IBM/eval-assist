@@ -1,0 +1,62 @@
+{
+    "name": "toxic_chat_test",
+    "description": "Toxic chat classification for toxicity and jailbreaking attributes.",
+    "link": "https://huggingface.co/datasets/lmsys/toxic-chat",
+    "type": "rubric",
+    "dataset": {
+        "name": "judgebench-toxic_chat_test",
+        "description": ""
+    },
+    "tags": [
+        "Judgebench",
+        "categorical"
+    ],
+    "criteriaBenchmarks": [
+        {
+            "name": "Toxicity",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.84,
+                        "pearson": -0.192
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0,
+                        "pearson": 0.418
+                    }
+                }
+            ]
+        },
+        {
+            "name": "jailbreaking",
+            "evaluatorBenchmarks": [
+                {
+                    "evaluator_id": "Llama3-8b",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.76,
+                        "pearson": -0.13
+                    }
+                },
+                {
+                    "evaluator_id": "GPT-4o",
+                    "laaj_version": "0.0.10",
+                    "results": {
+                        "agreement": 0,
+                        "p_bias": 0.07,
+                        "pearson": 0.408
+                    }
+                }
+            ]
+        }
+    ]
+}
