@@ -1,12 +1,12 @@
 import json
 import os
-import yaml
 import random
-import pandas as pd
+
+import yaml
 
 
 def load_yaml(filepath):
-    with open(filepath, 'r') as file:
+    with open(filepath, "r") as file:
         data = yaml.safe_load(file)
     return data
 
@@ -17,12 +17,12 @@ def save_to_json(data, filename):
 
 
 def save_to_jsonl(data, filename):
-    dir = filename.rsplit('/', 1)[0]
+    dir = filename.rsplit("/", 1)[0]
     os.makedirs(dir, exist_ok=True)
-    with open(filename, 'w', encoding='utf-8') as f:
+    with open(filename, "w", encoding="utf-8") as f:
         for item in data:
             json_line = json.dumps(item)
-            f.write(json_line + '\n')
+            f.write(json_line + "\n")
 
 
 def load_json_objects(filepath):
@@ -45,7 +45,7 @@ def load_json_objects(filepath):
 
 def load_jsonl(file_path, n=None):
     data = []
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         for line in file:
             try:
                 json_obj = json.loads(line)

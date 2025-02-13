@@ -23,21 +23,36 @@ from prisma.errors import PrismaError
 from prisma.models import StoredUseCase
 from pydantic import BaseModel
 from unitxt.llm_as_judge import (
+    DIRECT_CRITERIA,
+    PAIRWISE_CRITERIA,
     Criteria,
     CriteriaOption,
     CriteriaWithOptions,
     EvaluatorTypeEnum,
-    DIRECT_CRITERIA,
-    PAIRWISE_CRITERIA,
 )
-import uvicorn
-from .const import EXTENDED_EVALUATORS_METADATA, ExtendedEvaluatorNameEnum
-from .api.common import NotebookParams,CriteriaAPI, PairwiseEvaluationRequestModel, PairwiseResponseModel, CriteriaOptionAPI, CriteriaWithOptionsAPI, DirectResponseModel, DirectEvaluationRequestModel, SyntheticExampleGenerationRequest, SyntheticExampleGenerationResponse
+
+from .api.common import (
+    CriteriaAPI,
+    CriteriaOptionAPI,
+    CriteriaWithOptionsAPI,
+    DirectEvaluationRequestModel,
+    DirectResponseModel,
+    NotebookParams,
+    PairwiseEvaluationRequestModel,
+    PairwiseResponseModel,
+    SyntheticExampleGenerationRequest,
+    SyntheticExampleGenerationResponse,
+)
 
 # API type definitions
 from .api.pipelines import EvaluatorMetadataAPI, PipelinesResponseModel
+from .const import EXTENDED_EVALUATORS_METADATA, ExtendedEvaluatorNameEnum
 from .db_client import db
-from .evaluators.unitxt import DirectAssessmentEvaluator, GraniteGuardianEvaluator, PairwiseComparisonEvaluator
+from .evaluators.unitxt import (
+    DirectAssessmentEvaluator,
+    GraniteGuardianEvaluator,
+    PairwiseComparisonEvaluator,
+)
 
 # Logging req/resp
 from .logger import LoggingRoute
@@ -132,7 +147,10 @@ def get_prompt(req: DirectEvaluationRequestModel):
 async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequestModel):
     try:
         if req.type == EvaluatorTypeEnum.DIRECT:
-            if req.evaluator_name in [ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B, ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B]:
+            if req.evaluator_name in [
+                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B,
+                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B,
+            ]:
                 evaluator = GraniteGuardianEvaluator(req.evaluator_name)
             else:
                 evaluator = DirectAssessmentEvaluator(req.evaluator_name)
@@ -333,18 +351,15 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
         filename=f"{params.evaluator_type}_generated_notebook.ipynb",
     )
 
+
 @router.post("/synthetic-examples/", response_model=SyntheticExampleGenerationResponse)
-def download_notebook(
-    # params: SyntheticExampleGenerationRequest
-):
+def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
+    print(params)
     return SyntheticExampleGenerationResponse(
-            systhetic_examples=[
-                    {
-                        'Question': "Synthetically generated content",
-                        'response': "Synthetically generated content"
-                    },
-            ]
-        )
+        systhetic_examples=[
+            {"Question": "Synthetically generated content", "response": "Synthetically generated content"},
+        ]
+    )
 
 
 @app.exception_handler(RequestValidationError)
@@ -353,5 +368,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     logging.error(f"{request}: {exc_str}")
     content = {"status_code": 10422, "message": exc_str, "data": None}
     return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
 
 app.include_router(router)

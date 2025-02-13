@@ -1,23 +1,22 @@
 import json
 import os
-import torch
-from openai import OpenAI
-from transformers import AutoTokenizer, AutoModelForCausalLM
+
 from dotenv import load_dotenv
-from tqdm.contrib.concurrent import thread_map
+from openai import OpenAI
 from tqdm import tqdm
+from tqdm.contrib.concurrent import thread_map
 
 
 class Model:
     def __init__(self, config, generation_type):
         self.config = config
-        experiment_config = config['experiments'][generation_type]
+        experiment_config = config["experiments"][generation_type]
 
-        self.model_config = experiment_config['model-config']
-        self.service = self.model_config['service']
-        self.model_id = self.model_config['model-id']
+        self.model_config = experiment_config["model-config"]
+        self.service = self.model_config["service"]
+        self.model_id = self.model_config["model-id"]
 
-        self.model_mappings = config['defaults']['model-access']['model-mappings']
+        self.model_mappings = config["defaults"]["model-access"]["model-mappings"]
 
         # if self.service == "huggingface":
         #     load_dotenv(dotenv_path="config/hf_access_token.env")
@@ -37,20 +36,19 @@ class Model:
 
             load_dotenv(dotenv_path=".env")  # todo: for some reason this is needed rather than simply load_dotenv()
 
-            rits_api_key = os.getenv('RITS_API_KEY')
-            if self.model_id not in self.model_mappings['rits']:
-                available_models = list(self.model_mappings['rits'].keys())
+            rits_api_key = os.getenv("RITS_API_KEY")
+            if self.model_id not in self.model_mappings["rits"]:
+                available_models = list(self.model_mappings["rits"].keys())
                 raise ValueError(
-                    f"Model '{self.model_id}' not found in RITS mappings; available models: {available_models}")
+                    f"Model '{self.model_id}' not found in RITS mappings; available models: {available_models}"
+                )
 
-            model_info = self.model_mappings['rits'][self.model_id]
-            self.model_name = model_info['model-name']
-            self.num_parallel_requests = model_info.get('num-parallel-requests', 4)
+            model_info = self.model_mappings["rits"][self.model_id]
+            self.model_name = model_info["model-name"]
+            self.num_parallel_requests = model_info.get("num-parallel-requests", 4)
 
             self.model = OpenAI(
-                api_key=rits_api_key,
-                base_url=model_info['endpoint'],
-                default_headers={'RITS_API_KEY': rits_api_key}
+                api_key=rits_api_key, base_url=model_info["endpoint"], default_headers={"RITS_API_KEY": rits_api_key}
             )
 
         else:
@@ -127,11 +125,11 @@ class Model:
             completion = self.model.completions.create(
                 model=self.model_name,
                 prompt=[prompt],
-                max_tokens=generation_params['max_new_tokens'],
-                temperature=generation_params['temperature'],
-                top_p=generation_params['top_p'],
+                max_tokens=generation_params["max_new_tokens"],
+                temperature=generation_params["temperature"],
+                top_p=generation_params["top_p"],
                 stream=False,
-                n=1
+                n=1,
             )
             return completion.choices[0].text.strip()
         except Exception as e:
@@ -141,10 +139,9 @@ class Model:
     def _prepare_prompts(self, system_prompts, queries, indices):
         return [
             self._apply_model_template(
-                system_prompts[i] if system_prompts else "",
-                queries[i],
-                self.model_config['template-type']
-            ) for i in indices
+                system_prompts[i] if system_prompts else "", queries[i], self.model_config["template-type"]
+            )
+            for i in indices
         ]
 
     @staticmethod
@@ -157,17 +154,17 @@ class Model:
             raise ValueError(f"unsupported prompt template category: {template_category}")
 
     def _get_generation_params(self, kwargs):
-        experiment_name = next(iter(self.config['experiments'].keys()))
-        generation_config = self.config['experiments'][experiment_name]['generation-config']
-        task_type = generation_config['task-type']
-        task_params = self.config['defaults']['generation-params'].get(f'{task_type}-params', {})
+        experiment_name = next(iter(self.config["experiments"].keys()))
+        generation_config = self.config["experiments"][experiment_name]["generation-config"]
+        task_type = generation_config["task-type"]
+        task_params = self.config["defaults"]["generation-params"].get(f"{task_type}-params", {})
 
         params = {
-            'temperature': task_params.get('temperature', 0.7),
-            'max_new_tokens': task_params.get('max_new_tokens', 100),
-            'min_new_tokens': task_params.get('min_new_tokens', 10),
-            'top_p': 0.95,
-            'do_sample': True
+            "temperature": task_params.get("temperature", 0.7),
+            "max_new_tokens": task_params.get("max_new_tokens", 100),
+            "min_new_tokens": task_params.get("min_new_tokens", 10),
+            "top_p": 0.95,
+            "do_sample": True,
         }
 
         if kwargs is not None:
@@ -220,7 +217,7 @@ class Model:
 
                 parsed_responses.append({})
 
-            except:
+            except Exception:
                 parsed_responses.append({})
 
         return parsed_responses
