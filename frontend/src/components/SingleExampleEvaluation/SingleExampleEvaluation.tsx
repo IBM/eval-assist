@@ -143,7 +143,16 @@ export const SingleExampleEvaluation = () => {
   const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
   const temporaryIdRef = useRef(uuid())
   const { getCriteria } = useCriteriasContext()
-  const { fetchSystheticExamples } = useGenerateSystheticExamples({})
+
+  // TODO: refactor so that this component receives a test case that cant be null
+  const { fetchSystheticExamples } = useGenerateSystheticExamples({
+    provider: currentUseCase?.evaluator?.provider,
+    credentials: modelProviderCredentials[currentUseCase?.evaluator?.provider as ModelProviderType],
+    evaluatorName: currentUseCase?.evaluator?.name,
+    evaluatorType: currentUseCase?.type,
+    criteria: currentUseCase?.criteria,
+    responseVariableName: currentUseCase?.responseVariableName,
+  })
 
   const responses = useMemo(
     () =>
