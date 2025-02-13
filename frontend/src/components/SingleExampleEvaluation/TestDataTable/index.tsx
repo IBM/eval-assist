@@ -3,7 +3,7 @@ import { returnByPipelineType } from 'src/utils'
 
 import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Button, IconButton, Toggle } from '@carbon/react'
+import { Button, IconButton, InlineLoading, Toggle } from '@carbon/react'
 import { Add, AiGenerate, TrashCan } from '@carbon/react/icons'
 
 import { EditableTag } from '@components/EditableTag'
@@ -21,6 +21,7 @@ import {
   PerResponsePairwiseResult,
   UseCase,
 } from '../../../types'
+import { useToastContext } from '../Providers/ToastProvider'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
 import { TestDataTableRow } from './TestDataTableRow'
 import classes from './index.module.scss'
@@ -44,6 +45,7 @@ interface Props {
   instances: Instance[]
   setInstances: (instances: Instance[]) => void
   fetchSystheticExamples: () => Promise<any>
+  loadingSyntheticExamples: boolean
 }
 
 export const TestDataTable = ({
@@ -59,8 +61,10 @@ export const TestDataTable = ({
   responseVariableName,
   setResponseVariableName,
   fetchSystheticExamples,
+  loadingSyntheticExamples,
 }: Props) => {
   const [explanationOn, setExplanationOn] = useState(type === EvaluationType.DIRECT)
+  const { addToast, removeToast } = useToastContext()
 
   const [expectedResultOn, setExpectedResultOn] = useState(true)
 
@@ -144,6 +148,10 @@ export const TestDataTable = ({
   }
 
   const generateTestData = useCallback(async () => {
+    const generationInProgressToastId = addToast({
+      kind: 'info',
+      title: 'Generating synthetic examples',
+    })
     const syntheticExamples = await fetchSystheticExamples()
     const syntheticExample = syntheticExamples[0]
     let syntheticInstance: Instance = {
@@ -166,8 +174,15 @@ export const TestDataTable = ({
       }
     }
     setInstances([...instances, syntheticInstance])
-  }, [fetchSystheticExamples, instances, responseVariableName, setInstances, type])
-
+    removeToast(generationInProgressToastId)
+    addToast({
+      kind: 'success',
+      title: 'Synthetic examples generated succesfully',
+      caption: `${syntheticExamples.length} example${syntheticExamples.length > 1 ? 's' : ''} ${
+        syntheticExamples.length > 1 ? 'were' : 'was'
+      } generated and added to the test data`,
+    })
+  }, [addToast, fetchSystheticExamples, instances, removeToast, responseVariableName, setInstances, type])
   const addContextVariable = () => {
     setInstances(
       instances.map((instance) => {
@@ -345,9 +360,13 @@ export const TestDataTable = ({
               </Button>
             </div>
             <div className={cx(classes.actionButton)}>
-              <Button kind="tertiary" size="sm" renderIcon={AiGenerate} onClick={generateTestData}>
-                {'Generate test data'}
-              </Button>
+              {loadingSyntheticExamples ? (
+                <InlineLoading description={'Generating...'} status={'active'} />
+              ) : (
+                <Button kind="tertiary" size="sm" renderIcon={AiGenerate} onClick={generateTestData}>
+                  {'Generate test data'}
+                </Button>
+              )}
             </div>
           </div>
         </div>

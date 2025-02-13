@@ -21,11 +21,9 @@ import { StoredUseCase } from '@prisma/client'
 import {
   DirectInstance,
   DirectInstanceResult,
-  DirectResults,
   EvaluationType,
   Evaluator,
   FetchedDirectInstanceResult,
-  FetchedDirectInstanceResultV1,
   FetchedDirectResults,
   FetchedPairwiseInstanceResult,
   FetchedPairwiseResults,
@@ -145,7 +143,7 @@ export const SingleExampleEvaluation = () => {
   const { getCriteria } = useCriteriasContext()
 
   // TODO: refactor so that this component receives a test case that cant be null
-  const { fetchSystheticExamples } = useGenerateSystheticExamples({
+  const { fetchSystheticExamples, loadingSyntheticExamples } = useGenerateSystheticExamples({
     provider: currentUseCase?.evaluator?.provider,
     credentials: modelProviderCredentials[currentUseCase?.evaluator?.provider as ModelProviderType],
     evaluatorName: currentUseCase?.evaluator?.name,
@@ -640,6 +638,7 @@ export const SingleExampleEvaluation = () => {
                 )
               }
               fetchSystheticExamples={fetchSystheticExamples}
+              loadingSyntheticExamples={loadingSyntheticExamples}
             />
             <EvaluateButton
               evaluationRunning={evaluationRunning}

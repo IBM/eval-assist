@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { CSSProperties } from 'react'
+import { CSSProperties, MouseEventHandler } from 'react'
 
 import { Tag } from '@carbon/react'
 
@@ -13,7 +13,7 @@ interface Props {
   size?: 'sm' | 'md' | 'lg'
   name: string
   color: BadgeColor
-  onClick?: (e: UIEvent) => void
+  onClick?: MouseEventHandler
 }
 
 export const TagBadge = ({ style, className, size, name, color, onClick }: Props) => {

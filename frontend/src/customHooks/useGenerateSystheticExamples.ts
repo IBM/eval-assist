@@ -18,6 +18,8 @@ export const useGenerateSystheticExamples = (props: Props) => {
   const { post } = useFetchUtils()
 
   const fetchSystheticExamples = async () => {
+    setLoadingSyntheticExamples(true)
+
     const body = {
       provider: props.provider,
       llm_provider_credentials: props.credentials,
@@ -27,8 +29,9 @@ export const useGenerateSystheticExamples = (props: Props) => {
       response_variable_name: props.responseVariableName,
     }
     const syntheticExamples = (await (await post('synthetic-examples/', body)).json())['systhetic_examples']
+    setLoadingSyntheticExamples(false)
     return syntheticExamples
   }
 
-  return { fetchSystheticExamples }
+  return { fetchSystheticExamples, loadingSyntheticExamples }
 }

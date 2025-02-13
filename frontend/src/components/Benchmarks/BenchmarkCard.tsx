@@ -98,7 +98,7 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
   }, [benchmark.criteriaBenchmarks, selectedCriteriaItems])
 
   const onTagClick = useCallback(
-    (e: UIEvent, tag: string) => {
+    (e: React.MouseEvent<Element, MouseEvent>, tag: string) => {
       e.preventDefault()
       e.stopPropagation()
       setSelectedItems((prevValue) => [...prevValue, tag])

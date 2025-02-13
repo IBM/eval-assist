@@ -83,7 +83,6 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
           renderIcon={Launch}
           kind="tertiary"
           href={getURLFromCriteriaName(criteria.name)}
-          target="_blank"
           rel="noopener noreferrer"
           className={classes.button}
         >
