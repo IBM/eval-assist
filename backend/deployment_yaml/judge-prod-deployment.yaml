@@ -1,0 +1,180 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-judge-ui
+  labels:
+    app: llm-judge-ui
+spec:
+  selector:
+    matchLabels:
+      run: llm-judge-ui
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: llm-judge-ui
+    spec:
+      containers:
+        - name: llm-judge-ui-container
+          image: us.icr.io/research3/llm-judge-ui
+          resources:
+            limits:
+              cpu: 2
+              memory: 2Gi
+            requests:
+              cpu: 2
+              memory: 2Gi
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_BACKEND_API_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: NEXT_PUBLIC_BACKEND_API_HOST
+            - name: NEXTAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: NEXTAUTH_SECRET
+            - name: NEXTAUTH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: NEXTAUTH_URL
+            - name: AUTH_PROVIDER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: AUTH_PROVIDER_ID
+            - name: AUTH_PROVIDER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: AUTH_PROVIDER_NAME
+            - name: AUTH_WELL_KNOWN
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: AUTH_WELL_KNOWN
+            - name: AUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: AUTH_CLIENT_ID
+            - name: AUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: AUTH_CLIENT_SECRET
+      imagePullSecrets:
+        - name: all-icr-io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-judge-ui-service
+spec:
+  type: NodePort
+  selector:
+    run: llm-judge-ui
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-judge-api
+  labels:
+    app: llm-judge-api
+spec:
+  selector:
+    matchLabels:
+      run: llm-judge-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: llm-judge-api
+    spec:
+      containers:
+        - name: llm-judge-api-container
+          image: us.icr.io/research3/llm-judge-api
+          resources:
+            limits:
+              cpu: 2
+              memory: 2Gi
+            requests:
+              cpu: 2
+              memory: 2Gi
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: DATABASE_URL
+            - name: GENAI_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: GENAI_KEY
+            - name: GENAI_API
+              valueFrom:
+                secretKeyRef:
+                  name: llm-judge-secrets
+                  key: GENAI_API
+      imagePullSecrets:
+        - name: all-icr-io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-judge-api-service
+spec:
+  type: NodePort
+  selector:
+    run: llm-judge-api
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/allow-http: 'false'
+    ingress.kubernetes.io/ssl-redirect: 'true'
+    kubernetes.io/ingress.class: f5
+    virtual-server.f5.com/balance: round-robin
+    virtual-server.f5.com/ip: 9.12.246.101
+    virtual-server.f5.com/partition: RIS3-INT-OCP-DAL12
+    virtual-server.f5.com/clientssl: '[ { "bigIpProfile": "/Common/BlueMix" } ]'
+  name: llm-judge-bundled-ingress
+  namespace: llm-judge
+spec:
+  rules:
+  - host: llm-judge.bx.cloud9.ibm.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: llm-judge-ui-service
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  - host: llm-judge-api.bx.cloud9.ibm.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: llm-judge-api-service
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific

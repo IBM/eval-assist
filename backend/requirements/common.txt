@@ -1,0 +1,16 @@
+fastapi==0.103.1
+pydantic==2.6.0
+prisma==0.12.0
+uvicorn==0.29.0
+nest_asyncio>=1.6.0
+python-dotenv
+nbformat
+litellm
+tenacity
+diskcache
+datasets
+langchain
+numpy
+openai
+pandas
+scipy
