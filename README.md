@@ -13,7 +13,15 @@
 * npm
 * Python >= 3.10
 
-### 2. Set up a local database
+### 3. Install the dependencies
+
+The following command will install the frontend and backend dependencies. It will install frontend dependencies using npm. In addition, it will install backend dependencies by creating a virtual environment, activating it and using pip to install the dependencies.
+
+```bash
+npm install
+```
+
+### 2. Set up a local database (optional)
 
 1. Install Rancher following [this steps](https://docs.rancherdesktop.io/getting-started/installation/). You may use any other container managment system that supports docker.
 
@@ -24,14 +32,6 @@
 * Make sure that the `DATABASE_URL` variable in the `.env` file is pointing to the local database you just created.
 
 * Run `npm run prisma:sync`.
-
-### 3. Install the dependencies
-
-The following command will install the frontend and backend dependencies. It will install frontend dependencies using npm. In addition, it will install backend dependencies by creating a virtual environment, activating it and using pip to install the dependencies.
-
-```bash
-npm install
-```
 
 ### 4. Set the environment variables
 
