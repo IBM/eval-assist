@@ -23,17 +23,17 @@ npm install
 
 ### 3. Set the environment variables
 
-Both frontend and backend need a few environment variables to be set.
+Both frontend and backend need a few environment variables to be set in order to work properly.
 
-Creante an `.env` file in the /backend folder with the following entry:
+Creante an `.env` file in the root directory with the following entries:
 
 * DATABASE_URL
-
-Creante an `.env` file in the /frontend folder with the following entry:
 
 * NEXT_PUBLIC_BACKEND_API_HOST
 
 * NEXT_PUBLIC_USE_AUTH
+
+_Note: you can use the content of `env.example` to start with some default values._
 
 ### 4. Run the system
 
