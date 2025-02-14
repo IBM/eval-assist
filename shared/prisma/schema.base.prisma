@@ -1,0 +1,33 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StoredUseCase {
+  id      Int    @id @default(autoincrement())
+  user_id Int
+  content Json
+  name    String
+
+  app_user AppUser @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, name])
+  @@map("stored_use_case")
+}
+
+model AppUser {
+  id               Int             @id @default(autoincrement())
+  email            String          @unique
+  name             String
+  created_at       DateTime        @default(now())
+  
+  stored_use_cases StoredUseCase[]
+
+  @@map("app_user")
+}
+
+model LogRecord {
+  id      Int    @id @default(autoincrement())
+  data Json
+  @@map("log_record")
+}

@@ -110,3 +110,5 @@ venv.bak/
 .m
 
 .litellm_cache/
+
+/prisma/schema.prisma

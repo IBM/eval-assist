@@ -7,7 +7,6 @@ from typing import Union, cast
 
 import nbformat as nbf
 import nest_asyncio
-from dotenv import load_dotenv
 from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -59,7 +58,6 @@ from .logger import LoggingRoute
 from .notebook_generation import generate_direct_notebook, generate_pairwise_notebook
 
 nest_asyncio.apply()
-load_dotenv()
 
 app = FastAPI()
 app.add_middleware(

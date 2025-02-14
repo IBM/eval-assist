@@ -2,12 +2,20 @@
     "name": "eval-assist",
     "private": true,
     "scripts": {
-      "install:backend": "cd backend && python -m venv venv && source venv/bin/activate && pip install -r requirements/dev.txt",
+      "install:backend": "cd backend && python -m venv venv && source venv/bin/activate && pip install --upgrade pip setuptools wheel && pip install -r requirements/dev.txt",
       "install:frontend": "cd frontend && npm install",
       "install": "concurrently \"npm run install:backend\" \"npm run install:frontend\"",
       "dev:backend": "cd backend && source venv/bin/activate && python run.py",
       "dev:frontend": "cd frontend && npm run dev",
-      "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\""
+      "dev": "npm run prisma && concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+      "prisma:prepare:frontend": "rm -f frontend/prisma/schema.prisma && cat frontend/prisma/generator.prisma shared/prisma/schema.base.prisma > frontend/prisma/schema.prisma",
+      "prisma:prepare:backend": "rm -f backend/prisma/schema.prisma && cat backend/prisma/generator.prisma shared/prisma/schema.base.prisma > backend/prisma/schema.prisma",
+      "prisma:prepare": "concurrently \"npm run prisma:prepare:frontend\" \"npm run prisma:prepare:backend\"",
+      "prisma:generate:frontend": "cd frontend && prisma generate",
+      "prisma:generate:backend": "cd backend && prisma generate",
+      "prisma:generate": "concurrently \"npm run prisma:generate:frontend\" \"npm run prisma:generate:backend\"",
+      "prisma:sync": "cd shared/prisma && prisma migrate dev --schema ./schema.base.prisma",
+      "prisma": "npm run prisma:prepare && npm run prisma:generate"
     },
     "devDependencies": {
       "concurrently": "^8.0.0"

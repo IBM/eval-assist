@@ -1,0 +1,5 @@
+// this file will be merged with shared/prisma/schema.base.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}

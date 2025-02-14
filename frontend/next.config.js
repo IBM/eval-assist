@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
+
+const dotenv = require('dotenv');
+const path = require('path');
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 const nextConfig = {
   reactStrictMode: false,
   swcMinify: true,

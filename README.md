@@ -46,3 +46,15 @@ npm run dev
 ### 5. Open EvalAssist
 
 Visit `https://localhost:3000`
+
+## Setting up a local database
+
+1. Install Rancher following [this steps](https://docs.rancherdesktop.io/getting-started/installation/). You may use any other container managment system that supports docker.
+
+2. Run `docker-compose -f shared/localdb/postgres.yml up -d`. This will create and run an empty Postgres database. It's default URL is `postgres://admin:admin@127.0.0.1:5435/eval-assist-local`.
+
+3. Create the tables:
+
+* Make sure that the `DATABASE_URL` variable in the `.env` file is pointing to the local database you just created.
+
+* Run `npm run prisma:sync`.
