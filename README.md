@@ -61,4 +61,4 @@ npm run dev
 
 ### 7. Open EvalAssist
 
-Visit `https://localhost:3000`
+Visit [https://localhost:3000](https://localhost:3000)
