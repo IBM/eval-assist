@@ -31,41 +31,17 @@ const Documentation = () => {
     <>
       <Content>
         <article className={classes['documentation']}>
-          <h3 style={{ marginBottom: '1rem' }}>EvalAssist & LLM-as-a-judge</h3>
+          <h1 style={{ marginBottom: '1rem' }}>Intro to EvalAssist</h1>
           <hr className={classes['horizontal-divider']} />
           <h2>Overview</h2>
           <p>
-            <strong>EvalAssist</strong> is a development environment for LLM-as-a-judge evaluation criteria. We
-            currently support <strong>direct assessment</strong> where evaluation is described in terms of a question
-            (or statement) and a set of predefined answers, and <strong>pairwise comparison</strong> where the
-            evaluation involves selecting the best response from a pair of possible responses. The tool also provides a
-            catalog of example test cases, exhibiting the use of LLM-as-a-judge across a variety of scenarios.
+            <strong>EvalAssist</strong> is an LLM-as-a-Judge framework built on top of the {' '}
+            <Link href="https://www.unitxt.ai/en/latest/docs/introduction.html" target="_blank" rel="noopener noreferrer">
+              UNITXT
+            </Link>{' '} open source evaluation library for large language models. The EvalAssist application provides users with a convenient way of iteratively testing and refining LLM-as-a-judge criteria, and supports both direct (rubric-based) and pairwise assessment paradigms (relation-based), the two most prevalent forms of LLM-as-a-judge evaluations available. EvalAssist is designed to be model-agnostic, i.e. the content to be evaluated can come from any model. EvalAssist supports a rich set of off-the-shelf judge models that can easily be extended. An API key is required to use the pre-defined judge models. Once users are satisfied with their criteria, they can auto-generate a Notebook with UNITXT code to run bulk evaluations with larger data sets based on their criteria definition. EValAssist also includes a catalog of example test cases, exhibiting the use of LLM-as-a-judge across a variety of scenarios. Users can save their own test cases.
           </p>
-          <h2>Get your API Key</h2>
-          <p>
-            You need a BAM api key to use the tool, you can obtain and copy your API key from{' '}
-            <Link href="https://bam.res.ibm.com/">https://bam.res.ibm.com/</Link> under the documentation section (see
-            highlighted portion below)
-            <br />
-            <br />
-            <Image
-              style={{ border: '1px solid gray' }}
-              src="/images/api_key_help.png"
-              alt="Image describing location of API key on BAM page"
-              width="550"
-              height="355"
-            />
-          </p>
-          <h2>Terminology</h2>
-          <p>
-            LLM-as-a-judge evaluations are comprised of a <strong>context</strong>, a{' '}
-            <strong>response to evaluate </strong>
-            and a <strong>criteria definition</strong>. The context provides contextual information to the LLM judge:
-            this could be a prompt, a question in a Q/A evaluation scenario, or a reference document and a question in a
-            RAG Q/A scenario. The response to evaluate is the text that we want the LLM to evaluate, subject to the
-            context. Finally the criteria describes the details of the evaluation itself.
-          </p>
-          <h2>Direct Assessment</h2>
+
+          <h3>Direct Assessment</h3>
           <p>
             Direct assessment is an evaluation paradigmn wherein the LLM chooses one of a set of predefined values from
             an evaluation rubric. This approach can be used to perform likert scale scoring of responses (e.g 1-5) or
@@ -73,102 +49,97 @@ const Documentation = () => {
             comprise of a name, a criteria expression (typically a short statement or question) and a set of predefined
             options with descriptions.
           </p>
-          <h2>Pairwise Comparison</h2>
+
+          <h3>Pairwise Comparison</h3>
           <p>
             Pairwise Comparison is an evaluation paradigm wherein the LLM chooses a preferred response from a pair of
             candidate responses. Exactly two responses are required to run a pairwise comparison in the sandbox.
-            Pairwise Comparison criteria are simpler, requiring only a name and a criteria description.
+            Pairwise Comparison criteria are simpler, requiring only a name and a criteria description. In EvalAssist, pairwise 
+            comparisons are conducted across more than two data points by computing a win rate and ranking the outputs accordingly.
           </p>
 
-          <h2 id="evaluators">Evaluators</h2>
+
+          <h2>Using EvalAssist</h2>
+          <h3>API Keys</h3>
           <p>
-            The sandbox supports the set of LLM evaluators implemented in the{' '}
-            <Link href="https://github.ibm.com/AIExperience/llm-as-a-judge">llm-as-a-judge</Link> toolkit. The current
-            set of supported evaluators:
+          You need at least one API key to use EvalAssist. We support multiple LLM service providers such as WatsonX, RITS (IBM Research Internal), Open AI, and Azure Open AI. You can enter an API key in the API Credentials drop-down in the evaluation form. The screenshot below shows you a test case for "Conciseness" from the Example Catalog.
+            <br />
+            <br />
+            <Image
+              style={{ border: '1px solid gray' }}
+              src="/images/Credentials.png"
+              alt="Image describing location of API key on BAM page"
+              width="800"
+              height="400"
+            />
+          </p>
+          <h3>Running Evaluations</h3>
+          <p>
+          To run LLM-as-a-judge evaluations in EvalAssist, you will need to provide at a minimum the text to evaluate, a definition of a criteria, and your choice of an evaluator LLM. These three mandatory elements and others can be entered, when you create a new test case in EValAsist (Evaluation Sandbox):
           </p>
 
           <UnorderedList>
-            <ListItem>
-              <strong>mistralai/mixtral-8x7b-instruct-v01</strong>
-            </ListItem>
-            <ListItem>
-              <strong>meta-llama/llama-3-8b-instruct</strong>
-            </ListItem>
-            <ListItem>
-              <strong>meta-llama/llama-3-70b-instruct</strong>
-            </ListItem>
-            <ListItem>
-              <strong>kaist-ai/prometheus-8x7b-v2</strong>
-            </ListItem>
+              <ListItem>
+                <strong>Task Context (optional):</strong> The task context provides additional information that may be relevant and needed for the evaluation. This could be, for example, a prompt, a question in a Q/A evaluation scenario, a reference document, or a question in a RAG Q/A scenario. You can create multiple variables to describe this information and refer to them in your criteria definition.
+              </ListItem>
+              <br/>
+              <ListItem>
+                <strong>Evaluation Criteria:</strong>Enter the title and a description of your criteria. For Direct Assessment, you will also need to add options that the LLM can choose from. Each option can also be described in detail which sometimes may make it easier for an LLM to differentiate. The description is optional though. For pairwise comparison, you will only have to provide a criteria which can be used to compare two or more test data items.
+              </ListItem>
+              <br/>
+              <ListItem>
+                <strong>Evaluator:</strong>Choose an evaluator LLM from the list of available providers.
+              </ListItem>
+              <br/>
+              <ListItem>
+                <strong>Test Data:</strong>In the test data section, enter the text you would like to evaluate according the the criteria you defined and the context variables provided. The text to evaluate will often the same as the output of an LLM (response) you want to evluate. Hence, the default name of this variable is called response. Depending on your use case, you may want to change the name of the variable so you can properly refer to it in your criteria description. The text to evaluate could be anything though and doesn't necessarily have to come from another LLM. If you are adding a lot of test data points, it maybe helpful to addan expected rating (or ranking in case of pairwise comparison) so you can see at a glance, which test data points were evaluated correctly (according to your definition). 
+              </ListItem>
           </UnorderedList>
-          <br />
-          <br />
-          <p>
-            Evaluation is implemented using a variety of prompting strategies and analysis of log probabilities of
-            predefined scoring options. At a high level the LLM is first asked to generate an assessment of the response
-            subject to the context and the evaluation criteria. The LLM is then given each of the possible outcomes of
-            the evaluation, and the likelihood of each outcome is calculated via token log probabilities. Finally the
-            assessment is summarized to produce an explanation, and the most likley scoring outcome is selected. We also
-            calculate meta evaluation metrics such as positional bias, to determine how robust is the overall evaluation
-            results. Note that the implementation of the <strong>kaist-ai/prometheus-8x7b-v2</strong> evaluator is
-            different because this LLM is finetuned to produce structured output.
-            <br />
-            <br />
-            Please refer to{' '}
-            <Link href="https://bam.res.ibm.com/docs/models#" target="_blank" rel="noopener noreferrer">
-              BAM documentation
-            </Link>{' '}
-            for guidance on model usage in your context.
+          <br/>
+          <br/>
+          <p> 
+            Once you are satisfied with your criteria and test case, you can save it into your personal test case library.
           </p>
 
-          <h2 id="positional-bias">Positional Bias</h2>
+          <h3>Bulk Evaluations</h3>
+          <p>
+            The sandbox supports iterating over a single criterion with multiple outputs to be evaluated and a single task context for all outputs. Once you are ready to evaluate larger data sets with diverse contexts, you can download a Jupyter Notebook with code auto-generated for use with UNITXT, or you can just simply use Python directly based on the Notebook code to run your evaluation.
+          </p>
+            <Image
+              style={{ border: '1px solid gray' }}
+              src="/images/Download Jupyter Notebook.png"
+              alt="Image describing location of API key on BAM page"
+              width="450"
+              height="200"
+            />
+          <br/>
+          <br/>
+          <h3 id="positional-bias">Positional Bias</h3>
           <p>
             Our evaluators are capable of detecting positional bias. Positional bias occurs when the LLM evaluator is
-            unable to consistently make an evalutaion decision when presented with a set of possible options. This can
-            be detected by changing the order of options presented to the LLM, re-running the evaluation and looking for
-            consistency in the result. Results that exhibit positional bias are uncertain and cannot be trusted. You may
-            see sandbox evaluation results in red, indicating that positional bias has been detected.
+            unable to consistently make an evalutaion decision when presented with a set of possible options.  Results that exhibit positional bias are uncertain and cannot be trusted. You may see sandbox evaluation results in red, indicating that positional bias has been detected.
           </p>
-
-          <h2 id="certainty">Certainty</h2>
-          <p>
-            We also attempt to determine the certainty of evaluator judgements, which can help to determine the quality
-            of an outcome. Certainty is calculated by taking the average probability of the tokens corresponding to a
-            particular judgement. The certainty score is presented in the sandbox UI as a percentage.
-          </p>
-
-          <h2>Tips</h2>
+          <h3>Tips</h3>
           <p>
             Refer to the <strong>response</strong> and any appropriate context variable(s) in your criteria description.
             For instance: <strong>&quot;Is the response coherent with respect to the source document?&quot;</strong>{' '}
-            This helps the LLM to attend to the correct information when making a scoring decision.
+            This helps the evaluator LLM to attend to the correct information when making a scoring decision.
           </p>
 
-          <h2>Exporting criteria & evaluating larger datasets</h2>
+          <h2>Evaluation Methodology</h2>
           <p>
-            You can export criteria from EvalAssist in json format by selecting the JSON tab on the evaluation criteria
-            and copying the json data. We provide a standalone LLM-as-a-judge library that you can use to apply criteria
-            developed in EvalAssist to larger datasets.
-            <br />
-            <br />
-            <Link href="https://github.ibm.com/AIExperience/llm-as-a-judge">
-              https://github.ibm.com/AIExperience/llm-as-a-judge
-            </Link>
+            Evaluation is implemented using a prompt chaining strategy as depicted below. The evaluator LLM is first asked to generate an assessment of the response subject to the context and the evaluation criteria. In a second step the evluator LLM is asked to generate an explanation based on the assessment for each of the options. In the last step, the evaluator LLM is prompted to make a final choice based on the assessment and the options available. As part of this process, we also calculate meta evaluation metrics such as positional bias, to determine how robust is the overall evaluation is. This is detected by changing the order of options presented to the evaluator LLM, re-running the evaluation and looking for
+            consistency in the result.
           </p>
-          <h2>Sponsor Users</h2>
-          <p>
-            We are deeply grateful to the sponsored users listed below, whose invaluable feedback has greatly
-            contributed to refining and enhancing our tools.
-            <br /> <br />
-            Top contributors (in alphabetical order): Andrew R. Freed, Andre Lopes, Bill Murdock, Charley Beller, Connie
-            He, Davidson Siga, Huaiyu Zhu, Michael Choie, Shobhi Varshney, Sonali Rajendra, Yannis Katsis.
-            <br /> <br />
-            If you&apos;re interested in becoming part of our sponsored user program and engaging in our user study to
-            test our tool and offer feedback,{' '}
-            <Link href="https://airtable.com/appBlXR5AJ5v3dHDN/shrtDukPTBiP7VjJd">please fill out this form</Link>. Your
-            input is pivotal in our continuous efforts to enhance our tool, making it more impactful and generating
-            valuable insights for publication.
-          </p>
+
+          <Image
+              style={{ border: '1px solid gray' }}
+              src="/images/Evaluation Methodology.png"
+              alt="Image describing location of API key on BAM page"
+              width="800"
+              height="650"
+            />
+          
         </article>
       </Content>
     </>
