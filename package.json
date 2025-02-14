@@ -15,7 +15,8 @@
       "prisma:generate:backend": "cd backend && prisma generate",
       "prisma:generate": "concurrently \"npm run prisma:generate:frontend\" \"npm run prisma:generate:backend\"",
       "prisma:sync": "cd shared/prisma && prisma migrate dev --schema ./schema.base.prisma",
-      "prisma": "npm run prisma:prepare && npm run prisma:generate"
+      "prisma": "npm run prisma:prepare && npm run prisma:generate",
+      "db": "cd shared/localdb/ && docker-compose -f postgres.yml up -d"
     },
     "devDependencies": {
       "concurrently": "^8.0.0"
