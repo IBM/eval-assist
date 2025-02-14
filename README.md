@@ -23,6 +23,8 @@ npm install
 
 ### 3. Set up a local database (optional)
 
+This step is only required if you are not using a deployed database and you want to deploy your own locally.
+
 1. Install Rancher following [this steps](https://docs.rancherdesktop.io/getting-started/installation/). You may use any other container managment system that supports docker.
 
 2. Run `npm run db`. This will create and run an empty Postgres database. It's default URL is `postgres://admin:admin@127.0.0.1:5432/eval-assist-local`.
@@ -37,19 +39,17 @@ Create an `.env` file in the root directory with the following entries:
 * `NEXT_PUBLIC_BACKEND_API_HOST`
 * `NEXT_PUBLIC_USE_AUTH`
 
-* Make sure that the `DATABASE_URL` variable is pointing to the local database you just created.
-
-_Note: you can use the content of `env.example` to start with some default values:_
+_Note: you can use the content of `.env.example` to start with some default values:_
 
 ```bash
-$ cp .env.example .env
+cp .env.example .env
 ```
 
-### 5. Sync the local database (optional)
+### 5. Sync the local database
 
-1. Create the tables:
+If you are managing the database make sure that it is synchronized with the prisma schema by running the following command:
 
-* Run `npm run prisma:sync`.
+`npm run prisma:sync`
 
 ### 6. Run the system
 
