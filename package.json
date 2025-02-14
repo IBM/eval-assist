@@ -1,6 +1,6 @@
 {
     "name": "eval-assist",
-    "private": true,
+    "private": false,
     "scripts": {
       "install:backend": "cd backend && python -m venv venv && source venv/bin/activate && pip install --upgrade pip setuptools wheel && pip install -r requirements/dev.txt",
       "install:frontend": "cd frontend && npm install",
@@ -14,7 +14,7 @@
       "prisma:generate:frontend": "cd frontend && prisma generate",
       "prisma:generate:backend": "cd backend && prisma generate",
       "prisma:generate": "concurrently \"npm run prisma:generate:frontend\" \"npm run prisma:generate:backend\"",
-      "prisma:sync": "cd shared/prisma && prisma migrate dev --schema ./schema.base.prisma",
+      "prisma:sync": "npm run prisma:prepare:backend && cd backend && prisma migrate dev",
       "prisma": "npm run prisma:prepare && npm run prisma:generate",
       "db": "cd shared/localdb/ && docker-compose -f postgres.yml up -d"
     },
