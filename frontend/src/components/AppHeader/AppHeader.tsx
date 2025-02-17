@@ -32,16 +32,6 @@ export const AppHeader = () => {
 
       <HeaderGlobalBar>
         <HeaderNavigation aria-label="IBM [Platform]">
-          <HeaderMenuItem
-            href=" https://airtable.com/appBlXR5AJ5v3dHDN/shrtDukPTBiP7VjJd"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
-              Feedback
-              <AddComment style={{ marginLeft: '0.5rem' }} size={18} />
-            </div>
-          </HeaderMenuItem>
           <HeaderMenuItem href="/documentation" isActive={router.pathname === '/documentation'}>
             <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
               Documentation
