@@ -24,22 +24,8 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, profile }) {
       if (profile) {
-        // console.log('[nextauth] jwt: profile: ', profile)
         token.name = profile.name
         token.email = profile.emailAddress ?? profile.email
-
-        // from workbench-ui
-        // hook to add data to token before returning:
-
-        // make api request to get roles
-        // const res = await fetch(
-        //   `${process.env.BACKEND_URL}/users?username=${encodeURIComponent(
-        //     profile.emailAddress
-        //   )}`
-        // );
-
-        // const results = await res.json();
-        // token.roles = results[0].roles;
       }
       return token
     },
