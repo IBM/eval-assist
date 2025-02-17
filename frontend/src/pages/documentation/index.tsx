@@ -50,7 +50,7 @@ const Documentation = () => {
             evaluated can come from any model. EvalAssist supports a rich set of off-the-shelf judge models that can
             easily be extended. An API key is required to use the pre-defined judge models. Once users are satisfied
             with their criteria, they can auto-generate a Notebook with UNITXT code to run bulk evaluations with larger
-            data sets based on their criteria definition. EValAssist also includes a catalog of example test cases,
+            data sets based on their criteria definition. EvalAssist also includes a catalog of example test cases,
             exhibiting the use of LLM-as-a-judge across a variety of scenarios. Users can save their own test cases.
           </p>
 
