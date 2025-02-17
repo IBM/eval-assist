@@ -10,8 +10,12 @@ from .db_client import db
 
 
 def log_info(method, path, req_body, res_body, headers, runtime):
-
-    record = {"path": path, "method": method, "timestamp": time.time(), "runtime": runtime}
+    record = {
+        "path": path,
+        "method": method,
+        "timestamp": time.time(),
+        "runtime": runtime,
+    }
 
     if req_body:
         req = json.loads(req_body.decode())
@@ -30,7 +34,6 @@ def log_info(method, path, req_body, res_body, headers, runtime):
 
 
 class LoggingRoute(APIRoute):
-
     def get_route_handler(self) -> Callable:
         original_route_handler = super().get_route_handler()
 

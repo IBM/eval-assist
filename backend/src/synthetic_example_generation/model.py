@@ -33,8 +33,9 @@ class Model:
         #         self.model.resize_token_embeddings(len(self.tokenizer))
 
         if self.service == "rits":
-
-            load_dotenv(dotenv_path=".env")  # todo: for some reason this is needed rather than simply load_dotenv()
+            load_dotenv(
+                dotenv_path=".env"
+            )  # todo: for some reason this is needed rather than simply load_dotenv()
 
             rits_api_key = os.getenv("RITS_API_KEY")
             if self.model_id not in self.model_mappings["rits"]:
@@ -48,7 +49,9 @@ class Model:
             self.num_parallel_requests = model_info.get("num-parallel-requests", 4)
 
             self.model = OpenAI(
-                api_key=rits_api_key, base_url=model_info["endpoint"], default_headers={"RITS_API_KEY": rits_api_key}
+                api_key=rits_api_key,
+                base_url=model_info["endpoint"],
+                default_headers={"RITS_API_KEY": rits_api_key},
             )
 
         else:
@@ -64,7 +67,9 @@ class Model:
 
         with tqdm(total=len(queries), desc="Generating") as pbar:
             while retry_indices and retry_count < max_retries:
-                retry_mapping = {i: original_idx for i, original_idx in enumerate(retry_indices)}
+                retry_mapping = {
+                    i: original_idx for i, original_idx in enumerate(retry_indices)
+                }
 
                 prompts = self._prepare_prompts(system_prompts, queries, retry_indices)
 
@@ -104,14 +109,18 @@ class Model:
                     raise ValueError(f"unknown model service type: {self.service}")
 
                 prev_retry_count = len(retry_indices)
-                retry_indices = self._process_outputs(generation_outputs, responses, retry_mapping)
+                retry_indices = self._process_outputs(
+                    generation_outputs, responses, retry_mapping
+                )
                 successful_generations = prev_retry_count - len(retry_indices)
                 pbar.update(successful_generations)
 
                 retry_count += 1
                 total_attempts += len(prompts)
 
-                success_rate = ((len(queries) - len(retry_indices)) / total_attempts) * 100
+                success_rate = (
+                    (len(queries) - len(retry_indices)) / total_attempts
+                ) * 100
                 pbar.set_description(
                     f"progress: {len(queries) - len(retry_indices)}/{len(queries)} "
                     f"(parsing success rate: {success_rate:.1f}%)"
@@ -139,7 +148,9 @@ class Model:
     def _prepare_prompts(self, system_prompts, queries, indices):
         return [
             self._apply_model_template(
-                system_prompts[i] if system_prompts else "", queries[i], self.model_config["template-type"]
+                system_prompts[i] if system_prompts else "",
+                queries[i],
+                self.model_config["template-type"],
             )
             for i in indices
         ]
@@ -151,13 +162,19 @@ class Model:
         elif template_category == "mistral":
             return f"<s>[INST] {system_prompt}[/INST] </s>[INST] {query} [/INST] "
         else:
-            raise ValueError(f"unsupported prompt template category: {template_category}")
+            raise ValueError(
+                f"unsupported prompt template category: {template_category}"
+            )
 
     def _get_generation_params(self, kwargs):
         experiment_name = next(iter(self.config["experiments"].keys()))
-        generation_config = self.config["experiments"][experiment_name]["generation-config"]
+        generation_config = self.config["experiments"][experiment_name][
+            "generation-config"
+        ]
         task_type = generation_config["task-type"]
-        task_params = self.config["defaults"]["generation-params"].get(f"{task_type}-params", {})
+        task_params = self.config["defaults"]["generation-params"].get(
+            f"{task_type}-params", {}
+        )
 
         params = {
             "temperature": task_params.get("temperature", 0.7),

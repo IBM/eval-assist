@@ -16,7 +16,6 @@ from ibm_watsonx_ai.wml_client_error import (
     CannotSetProjectOrSpace,
     WMLClientError,
 )
-from .benchmark import get_all_benchmarks
 from openai import AuthenticationError
 from prisma.errors import PrismaError
 from prisma.models import StoredUseCase
@@ -45,6 +44,7 @@ from .api.common import (
 
 # API type definitions
 from .api.pipelines import EvaluatorMetadataAPI, PipelinesResponseModel
+from .benchmark import get_all_benchmarks
 from .const import EXTENDED_EVALUATORS_METADATA, ExtendedEvaluatorNameEnum
 from .db_client import db
 from .evaluators.unitxt import (
@@ -104,7 +104,9 @@ async def app_shutdown():
 @router.get("/evaluators/", response_model=PipelinesResponseModel)
 def get_evaluators():
     """Get the list of available pipelines, as supported by llm-as-a-judge library"""
-    evaluators = [EvaluatorMetadataAPI(**e.__dict__) for e in EXTENDED_EVALUATORS_METADATA]
+    evaluators = [
+        EvaluatorMetadataAPI(**e.__dict__) for e in EXTENDED_EVALUATORS_METADATA
+    ]
     # for e in AVAILABLE_EVALUATORS:
     #     if e.metadata.name.value in [EvaluatorNameEnum.GRANITE_GUARDIAN_2B.value, EvaluatorNameEnum.GRANITE_GUARDIAN_8B.value]:
     #         pipelines.extend(EvaluatorMetadataAPI(
@@ -122,11 +124,17 @@ def get_criterias():
             CriteriaWithOptionsAPI(
                 name=c.name,
                 description=c.description,
-                options=[CriteriaOptionAPI(name=o.name, description=o.description) for o in c.options],
+                options=[
+                    CriteriaOptionAPI(name=o.name, description=o.description)
+                    for o in c.options
+                ],
             )
             for c in DIRECT_CRITERIA
         ],
-        "pairwise": [CriteriaAPI(name=c.name, description=c.description) for c in PAIRWISE_CRITERIA],
+        "pairwise": [
+            CriteriaAPI(name=c.name, description=c.description)
+            for c in PAIRWISE_CRITERIA
+        ],
     }
 
 
@@ -141,7 +149,9 @@ def get_prompt(req: DirectEvaluationRequestModel):
     return res
 
 
-@router.post("/evaluate/", response_model=Union[DirectResponseModel, PairwiseResponseModel])
+@router.post(
+    "/evaluate/", response_model=Union[DirectResponseModel, PairwiseResponseModel]
+)
 async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequestModel):
     try:
         if req.type == EvaluatorTypeEnum.DIRECT:
@@ -192,19 +202,28 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
         raise HTTPException(status_code=400, detail=e.error_msg)
     except AuthenticationError:
         traceback.print_exc()
-        raise HTTPException(status_code=400, detail="Invalid OPENAI credentials provided.")
+        raise HTTPException(
+            status_code=400, detail="Invalid OPENAI credentials provided."
+        )
     except CannotSetProjectOrSpace as e:
         traceback.print_exc()
-        raise HTTPException(status_code=400, detail=f"watsonx authentication failed: {e.error_msg}")
+        raise HTTPException(
+            status_code=400, detail=f"watsonx authentication failed: {e.error_msg}"
+        )
     except WMLClientError as e:
         traceback.print_exc()
-        raise HTTPException(status_code=400, detail=f"watsonx authentication failed: {e.error_msg}")
+        raise HTTPException(
+            status_code=400, detail=f"watsonx authentication failed: {e.error_msg}"
+        )
     except AssertionError as e:
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=f"{e}")
     except Exception as e:
         traceback.print_exc()
-        raise HTTPException(status_code=400, detail=e.error_msg if hasattr(e, "error_msg") else "Unknown error.")
+        raise HTTPException(
+            status_code=400,
+            detail=e.error_msg if hasattr(e, "error_msg") else "Unknown error.",
+        )
 
 
 @router.get("/use_case/")
@@ -244,7 +263,6 @@ def put_use_case(request_body: PutUseCaseBody):
         )
 
     else:
-
         name_and_user_exists = db.storedusecase.find_many(
             where={
                 "name": request_body.use_case.name,
@@ -253,7 +271,10 @@ def put_use_case(request_body: PutUseCaseBody):
         )
 
         if name_and_user_exists:
-            raise HTTPException(status_code=409, detail=f"The name '{request_body.use_case.name}' is already in use")
+            raise HTTPException(
+                status_code=409,
+                detail=f"The name '{request_body.use_case.name}' is already in use",
+            )
 
         else:
             res = db.storedusecase.create(
@@ -287,7 +308,12 @@ def create_user_if_not_exist(user: CreateUserPostBody):
     try:
         db_user = db.appuser.find_unique(where={"email": user.email})
         if db_user is None:
-            db_user = db.appuser.create(data={"email": user.email, "name": user.name if user.name is not None else ""})
+            db_user = db.appuser.create(
+                data={
+                    "email": user.email,
+                    "name": user.name if user.name is not None else "",
+                }
+            )
         return db_user
     except PrismaError as pe:
         print(f"Prisma error raised: {pe}")
@@ -355,7 +381,10 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     print(params)
     return SyntheticExampleGenerationResponse(
         systhetic_examples=[
-            {"Question": "Synthetically generated content", "response": "Synthetically generated content"},
+            {
+                "Question": "Synthetically generated content",
+                "response": "Synthetically generated content",
+            },
         ]
     )
 
@@ -365,7 +394,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     exc_str = f"{exc}".replace("\n", " ").replace("   ", " ")
     logging.error(f"{request}: {exc_str}")
     content = {"status_code": 10422, "message": exc_str, "data": None}
-    return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    return JSONResponse(
+        content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+    )
 
 
 app.include_router(router)

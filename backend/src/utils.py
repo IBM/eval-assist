@@ -16,7 +16,9 @@ def log_runtime(function):
         end_time = time.time()
         total_time = round(end_time - start_time, 2)
 
-        print(f"{function.__name__} took {total_time} seconds, {round(total_time/60, 2)} minutes")
+        print(
+            f"{function.__name__} took {total_time} seconds, {round(total_time / 60, 2)} minutes"
+        )
 
         return res
 

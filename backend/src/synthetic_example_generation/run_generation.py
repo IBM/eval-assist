@@ -1,5 +1,4 @@
 from generate import Generator
-
 from utils.data_utils import load_yaml
 
 config = load_yaml("config/config.yaml")

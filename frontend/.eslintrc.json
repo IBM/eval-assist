@@ -1,7 +1,6 @@
 {
   "extends": ["next/core-web-vitals", "plugin:prettier/recommended", "prettier"],
   "rules": {
-    // https://github.com/vercel/next.js/discussions/40269
     "react/no-unknown-property": [
       2,
       {

@@ -14,7 +14,9 @@ class CriteriaModel(BaseModel):
     @validator("description", pre=True, always=True)
     def validate_criteria(cls, description):
         if len(description.strip()) == 0:
-            raise HTTPException(status_code=400, detail="Evaluation criteria is required.")
+            raise HTTPException(
+                status_code=400, detail="Evaluation criteria is required."
+            )
         return description
 
 
@@ -47,7 +49,9 @@ class EvaluationRequestModel(BaseModel):
     @validator("evaluator_name", pre=True, always=True)
     def validate_pipeline(cls, evaluator_name):
         if not evaluator_name:
-            raise HTTPException(status_code=400, detail="A valid pipeline name is required.")
+            raise HTTPException(
+                status_code=400, detail="A valid pipeline name is required."
+            )
         return evaluator_name
 
 
@@ -146,7 +150,9 @@ class RubricCriteriaModel(CriteriaModel):
     @validator("options", pre=True, always=True)
     def validate_options_length(cls, options):
         if len(options) < 2:
-            raise HTTPException(status_code=400, detail="Rubrics require a minimum of 2 options.")
+            raise HTTPException(
+                status_code=400, detail="Rubrics require a minimum of 2 options."
+            )
         return options
 
 

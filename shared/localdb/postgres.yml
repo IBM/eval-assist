@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_DB: eval-assist-db
-      POSTGRES_PASSWORD: admin
+      POSTGRES_PASSWORD: admin # pragma: allowlist secret
     ports:
       - 5432:5432
     networks:

@@ -5,12 +5,16 @@ from .evaluators.unitxt import get_enum_by_value, get_inference_engine_params
 
 
 def generate_direct_notebook(params: NotebookParams):
-
     inference_engine_params = get_inference_engine_params(
-        provider=params.provider, evaluator_name=params.evaluator_name, credentials=params.credentials
+        provider=params.provider,
+        evaluator_name=params.evaluator_name,
+        credentials=params.credentials,
     )
     inference_engine_params_string = ",".join(
-        [f"{k}={repr(v) if isinstance(v, str) else v}" for k, v in inference_engine_params.items()]
+        [
+            f"{k}={repr(v) if isinstance(v, str) else v}"
+            for k, v in inference_engine_params.items()
+        ]
     )
 
     input_fields = {k: "str" for k in params.context_variables[0].keys()}
@@ -46,7 +50,10 @@ df = pd.DataFrame(dataset_rows)
 The criteria in a direct evaluation needs an option map that matches a string to a numerical value. Replace the NaN value of each option with your desire numerical value.
 """
     option_map_string = ", ".join(
-        [f"'{option_name}': float('nan')" for option_name in [option["name"] for option in params.criteria["options"]]]
+        [
+            f"'{option_name}': float('nan')"
+            for option_name in [option["name"] for option in params.criteria["options"]]
+        ]
     )
 
     load_criteria_code = f"""
@@ -104,10 +111,15 @@ print(results.instance_scores)
 
 def generate_pairwise_notebook(params: NotebookParams):
     inference_engine_params = get_inference_engine_params(
-        provider=params.provider, evaluator_name=params.evaluator_name, credentials=params.credentials
+        provider=params.provider,
+        evaluator_name=params.evaluator_name,
+        credentials=params.credentials,
     )
     inference_engine_params_string = ",".join(
-        [f"{k}={repr(v) if isinstance(v, str) else v}" for k, v in inference_engine_params.items()]
+        [
+            f"{k}={repr(v) if isinstance(v, str) else v}"
+            for k, v in inference_engine_params.items()
+        ]
     )
 
     input_fields = {k: "str" for k in params.context_variables[0].keys()}
@@ -136,7 +148,10 @@ _Note: in a pairwise dataset, each instance is composed by a context, a criteria
 """
 
     system_predictions = [
-        {f"system_{i+1}": instance_predictions for i, instance_predictions in enumerate(instance_predictions)}
+        {
+            f"system_{i + 1}": instance_predictions
+            for i, instance_predictions in enumerate(instance_predictions)
+        }
         for instance_predictions in params.predictions
     ]
     load_dataset_code = f"""context_variables = {params.context_variables}

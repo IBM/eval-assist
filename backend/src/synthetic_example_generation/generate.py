@@ -9,20 +9,22 @@ from utils.data_utils import load_jsonl, save_to_jsonl
 
 
 class Generator:
-
     def __init__(self, config, generation_type):
-
         self.config = config
         self.generation_type = generation_type
 
         # configs
         experiment_config = config["experiments"].get(self.generation_type)
         if not experiment_config:
-            raise ValueError(f"no experiment configuration found for task type: {self.generation_type}")
+            raise ValueError(
+                f"no experiment configuration found for task type: {self.generation_type}"
+            )
 
         self.generation_config = experiment_config["generation-config"]
         self.task_type = self.generation_config.get("task-type", "")
-        self.use_liberated_model = self.generation_config.get("use-liberated-model", False)
+        self.use_liberated_model = self.generation_config.get(
+            "use-liberated-model", False
+        )
         self.rubric = self.generation_config.get("rubric", {})
 
         # generation parameters
@@ -44,7 +46,9 @@ class Generator:
         # load source data (for tasks that require it)
         if self.task_type in ["qa", "summarization"]:
             self.num_sources = task_params["num-sources"]
-            self.source_data = load_jsonl(task_params["source-data"], n=self.num_sources)
+            self.source_data = load_jsonl(
+                task_params["source-data"], n=self.num_sources
+            )
 
         # init generator
         if self.task_type == "text":
@@ -61,17 +65,23 @@ class Generator:
         self.model = Model(self.config, generation_type)
 
     def _init_text(self):
-
         # response schema
         response_schemas = [
             ResponseSchema(name="sentence", description="the requested sentence"),
         ]
-        self.output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+        self.output_parser = StructuredOutputParser.from_response_schemas(
+            response_schemas
+        )
         self.format_instructions = self.output_parser.get_format_instructions()
 
         # prompt templates
         self.system_prompt_template = PromptTemplate(
-            input_variables=["dimension", "target", "target_description", "max_new_tokens"],
+            input_variables=[
+                "dimension",
+                "target",
+                "target_description",
+                "max_new_tokens",
+            ],
             template="""You will asked to generate a sentence according to the following requirements:
 Dimension: {dimension}
 Target: {target}
@@ -92,17 +102,23 @@ Important:
         )
 
     def _init_qa(self):
-
         # response schema
         response_schemas = [
             ResponseSchema(name="answer", description="answer to the question"),
         ]
-        self.output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+        self.output_parser = StructuredOutputParser.from_response_schemas(
+            response_schemas
+        )
         self.format_instructions = self.output_parser.get_format_instructions()
 
         # prompt templates
         self.system_prompt_template = PromptTemplate(
-            input_variables=["dimension", "target", "target_description", "max_new_tokens"],
+            input_variables=[
+                "dimension",
+                "target",
+                "target_description",
+                "max_new_tokens",
+            ],
             template="""You will asked to generate an answer to a question according to the following requirements:
 Dimension: {dimension}
 Target: {target}
@@ -123,17 +139,23 @@ Important:
         )
 
     def _init_summarization(self):
-
         # response schema
         response_schemas = [
             ResponseSchema(name="summary", description="summary of the source text"),
         ]
-        self.output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+        self.output_parser = StructuredOutputParser.from_response_schemas(
+            response_schemas
+        )
         self.format_instructions = self.output_parser.get_format_instructions()
 
         # prompt templates
         self.system_prompt_template = PromptTemplate(
-            input_variables=["dimension", "target", "target_description", "max_new_tokens"],
+            input_variables=[
+                "dimension",
+                "target",
+                "target_description",
+                "max_new_tokens",
+            ],
             template="""You will be given some source text and will be asked to generate a summary according to a specific target criteria.
 
 You should generate a summary that matches the following requirements:
@@ -157,10 +179,11 @@ Important:
         )
 
     def generate(self):
-
         system_prompts, queries, metadata = self._format_prompts()
         if self.task_type == "":
-            raise ValueError("please specify a task_type in experiment.generation-config.")
+            raise ValueError(
+                "please specify a task_type in experiment.generation-config."
+            )
 
         # generate responses
         kwargs = {
@@ -172,32 +195,46 @@ Important:
 
         # collect responses with metadata
         generations = [
-            {**metadatum, **response} for metadatum, response in zip(metadata, responses) if isinstance(response, dict)
+            {**metadatum, **response}
+            for metadatum, response in zip(metadata, responses)
+            if isinstance(response, dict)
         ]
 
         # save generations
         save_to_jsonl(
             generations,
-            os.path.join("out", self.task_type, self.generation_type, self.model.model_id, "generations.jsonl"),
+            os.path.join(
+                "out",
+                self.task_type,
+                self.generation_type,
+                self.model.model_id,
+                "generations.jsonl",
+            ),
         )
 
         return generations
 
     def _get_borderline_criteria(self, criteria_dict):
-
         if len(criteria_dict) < 2:
-            raise ValueError("Need to specify at least two criteria to generate borderline case.")
+            raise ValueError(
+                "Need to specify at least two criteria to generate borderline case."
+            )
 
         # response schema
         response_schemas = [
             ResponseSchema(name="name", description="the name of borderline criteria"),
-            ResponseSchema(name="description", description="the description of borderline criteria"),
+            ResponseSchema(
+                name="description", description="the description of borderline criteria"
+            ),
         ]
         output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
         format_instructions = output_parser.get_format_instructions()
 
         # form query
-        criteria_list = [f"{i + 1}. {key}: {value}" for i, (key, value) in enumerate(criteria_dict.items())]
+        criteria_list = [
+            f"{i + 1}. {key}: {value}"
+            for i, (key, value) in enumerate(criteria_dict.items())
+        ]
         criteria_text = "\n".join(criteria_list)
         query = f"Describe a borderline case that lies between these criteria:\n\n{criteria_text}\n\nProvide a natural language description of what it means to be a borderline case among these criteria. Your description should mirror the style and format of the original criteria but describe the subtle ways in which the case partially satisfies multiple criteria while not fully satisfying any single one.\n\n{format_instructions}"
 
@@ -209,15 +246,12 @@ Important:
         return criteria_other
 
     def _format_prompts(self):
-
         system_prompts, queries, metadata = [], [], []
 
         if self.task_type == "text":
-
             system_prompts, queries, metadata = [], [], []
 
             for dimension, criteria_dict in self.rubric.items():
-
                 # add "borderline" category
                 criteria_borderline = self._get_borderline_criteria(criteria_dict)
                 criteria_dict["borderline"] = criteria_borderline["description"]
@@ -247,12 +281,10 @@ Important:
             return system_prompts, queries, metadata
 
         elif self.task_type == "qa":
-
             system_prompts, queries, metadata = [], [], []
 
             for source in self.source_data:
                 for dimension, criteria_dict in self.rubric.items():
-
                     # add "borderline" category
                     criteria_borderline = self._get_borderline_criteria(criteria_dict)
                     criteria_dict["borderline"] = criteria_borderline["description"]
@@ -266,7 +298,9 @@ Important:
                                 max_new_tokens=self.max_new_tokens,
                             )
 
-                            query = self.query_template.format(question=source["question"])
+                            query = self.query_template.format(
+                                question=source["question"]
+                            )
 
                             system_prompts.append(system_prompt)
                             queries.append(query)
@@ -284,10 +318,8 @@ Important:
             return system_prompts, queries, metadata
 
         elif self.task_type == "summarization":
-
             for source in self.source_data:
                 for dimension, criteria_dict in self.rubric.items():
-
                     # add "borderline" category
                     criteria_borderline = self._get_borderline_criteria(criteria_dict)
                     criteria_dict["borderline"] = criteria_borderline["description"]
@@ -301,7 +333,9 @@ Important:
                                 max_new_tokens=self.max_new_tokens,
                             )
 
-                            query = self.query_template.format(original_text=source["text"])
+                            query = self.query_template.format(
+                                original_text=source["text"]
+                            )
 
                             system_prompts.append(system_prompt)
                             queries.append(query)

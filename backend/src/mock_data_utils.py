@@ -2,10 +2,16 @@ import pandas as pd
 
 
 def create_sample_data(
-    context_groups=1, context_groups_len=1, context_group_cols=2, file_name="example", string_len=500
+    context_groups=1,
+    context_groups_len=1,
+    context_group_cols=2,
+    file_name="example",
+    string_len=500,
 ):
     print("Creating csv")
-    print(f"The csv file will have {context_groups * context_groups_len} rows and {context_group_cols + 2} columns")
+    print(
+        f"The csv file will have {context_groups * context_groups_len} rows and {context_group_cols + 2} columns"
+    )
     context_c_text = "a" * string_len
     rows = []
     for i in range(context_groups):
