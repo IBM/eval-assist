@@ -1,5 +1,4 @@
 import { signIn } from 'next-auth/react'
-import Head from 'next/head'
 
 import { Button } from '@carbon/react'
 

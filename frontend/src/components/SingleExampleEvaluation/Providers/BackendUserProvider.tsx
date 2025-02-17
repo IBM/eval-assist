@@ -40,12 +40,15 @@ export const BackendUserProvider = ({ children }: { children: ReactNode }) => {
         })
       } else {
         if (!authenticationEnabled) {
-          setBackendUser({
-            id: -1,
-            name: defaultUserName,
-            email: defaultUserName,
+          const data = { name: defaultUserName, email: defaultUserName }
+          post('user/', data).then((res) => {
+            if (res.ok) {
+              res.json().then((userInfo) => {
+                setBackendUser(userInfo)
+              })
+            }
+            setFetchingBackendUser(false)
           })
-          setFetchingBackendUser(false)
         }
       }
     }
