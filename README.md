@@ -13,6 +13,8 @@
 * npm
 * Python >= 3.10
 
+_Note: In this project, npm is used both as a task manager and as the package manager for the Next.js frontend app._
+
 ### 2. Install the dependencies
 
 The following command will install the frontend and backend dependencies. It will install frontend dependencies using npm. In addition, it will install backend dependencies by creating a virtual environment, activating it and using pip to install the dependencies.
@@ -53,10 +55,10 @@ If you are managing the database make sure that it is synchronized with the pris
 
 ### 6. Run the system
 
-The following command will run both the backend and the frontend concurrently. If you want to run them separately you can use `dev:backend` and `dev:frontend`.
+The following command will run both the backend and the frontend concurrently. If you want to run them separately you can use `start:backend` and `start:frontend`.
 
 ```bash
-npm run dev
+npm start
 ```
 
 ### 7. Open EvalAssist
