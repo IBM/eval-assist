@@ -61,6 +61,8 @@ The following command will run both the backend and the frontend concurrently. I
 npm start
 ```
 
+**Important:** Sensitive data, such as API keys from third-party providers, is transmitted between the frontend and backend and must be encrypted. Ensure proper TLS termination when deploying the system.
+
 ### 7. Open EvalAssist
 
 Visit [https://localhost:3000](https://localhost:3000)
