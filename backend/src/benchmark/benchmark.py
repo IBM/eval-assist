@@ -53,5 +53,6 @@ def get_all_benchmarks():
                     except json.JSONDecodeError as e:
                         print(f"Error reading {file_path}: {e}")
 
-    response = list(merged_benchmarks_dict.values())
-    return response
+    # response = list(merged_benchmarks_dict.values())
+    # return response
+    return []

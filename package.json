@@ -3,30 +3,31 @@
     "private": false,
     "scripts": {
         "prepare": "pre-commit install",
-        "install:backend": "cd backend && python3 -m venv venv && npm run activate-venv && pip install --upgrade pip setuptools wheel && pip install -r requirements/dev.txt && deactivate",
+        "install:backend": "cd backend && python3 -m venv venv && venv/bin/python3 -m pip install --upgrade pip setuptools wheel && venv/bin/python3 -m pip install -r requirements/dev.txt",
         "install:frontend": "cd frontend && npm install",
         "install": "concurrently \"npm run install:backend\" \"npm run install:frontend\"",
-        "start:backend": "cd backend && npm run activate-venv && python3 run.py",
-        "_start:frontend": "dotenv -e .env -- wait-on http-get://$(echo $NEXT_PUBLIC_BACKEND_API_HOST | sed 's/^http:\\/\\///')/health && cd frontend && npm run dev",
+        "start:backend": "cd backend && venv/bin/python3 run.py",
+        "_start:frontend": "wait-on -t 60s http-get://$(echo $NEXT_PUBLIC_BACKEND_API_HOST | sed 's/^http:\\/\\///')/health && cd frontend && npm run dev",
         "start:frontend": "dotenv -e .env -- npm run _start:frontend",
         "start": "npm run prisma && concurrently \"npm run start:backend\" \"npm run start:frontend\"",
-        "prisma:prepare:frontend": "rm -f frontend/prisma/schema.prisma && cat frontend/prisma/generator.prisma shared/prisma/schema.base.prisma > frontend/prisma/schema.prisma",
-        "prisma:prepare:backend": "rm -f backend/prisma/schema.prisma && cat backend/prisma/generator.prisma shared/prisma/schema.base.prisma > backend/prisma/schema.prisma",
+        "prisma:prepare:backend": "node shared/scripts/mergePrisma.js backend",
+        "prisma:prepare:frontend": "node shared/scripts/mergePrisma.js frontend",
         "prisma:prepare": "concurrently \"npm run prisma:prepare:frontend\" \"npm run prisma:prepare:backend\"",
+        "prisma:generate:backend": "cd backend && venv/bin/python3 -m prisma generate",
         "prisma:generate:frontend": "cd frontend && npx prisma generate",
-        "prisma:generate:backend": "cd backend && npm run activate-venv && prisma generate",
         "prisma:generate": "concurrently \"npm run prisma:generate:frontend\" \"npm run prisma:generate:backend\"",
-        "prisma:sync": "source backend/venv/bin/activate && cd shared/prisma && prisma migrate dev --schema schema.base.prisma && deactivate",
-        "activate-venv": "cd backend && source venv/bin/activate",
+        "prisma:sync": "backend/venv/bin/python3 -m prisma migrate dev --schema shared/prisma/schema.base.prisma",
         "prisma": "npm run prisma:prepare && npm run prisma:generate",
         "db": "cd shared/localdb/ && docker-compose -f postgres.yml up -d",
-        "pre-commit:backend": "npm run activate-venv && cd backend && pre-commit run && deactivate",
-        "pre-commit:frontend": "cd frontend && npm run pre-commmit",
-        "pre-commit": "concurrently \"npm run pre-commit:backend npm run pre-commit:frontend\""
+        "pre-commit:backend": "venv/bin/python3/pre-commit run",
+        "pre-commit:frontend": "cd frontend && npm run pre-commit",
+        "pre-commit": "concurrently \"npm run pre-commit:backend\" \"npm run pre-commit:frontend\"",
+        "clean": "rimraf node_modules frontend/node_modules backend/venv backend/prisma/schema.prisma frontend/prisma/schema.prisma"
     },
     "devDependencies": {
         "concurrently": "^8.0.0",
         "dotenv-cli": "^8.0.0",
+        "rimraf": "^6.0.1",
         "wait-on": "^8.0.2"
     }
 }
