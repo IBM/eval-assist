@@ -11,9 +11,9 @@
 ### 1. Install the requirements
 
 * npm
-* Python >= 3.10
+* Python >= 3.10, <3.13
 
-_Note: In this project, npm is used both as a task manager and as the package manager for the Next.js frontend app._
+_Note: In this project, npm is used both as a task manager (used to easily setup the dev environment) and as the package manager for the Next.js frontend app._
 
 ### 2. Install the dependencies
 
@@ -47,9 +47,9 @@ _Note: you can use the content of `.env.example` to start with some default valu
 cp .env.example .env
 ```
 
-### 5. Sync the local database
+### 5. Sync the Prisma schema with the Postgres database _(only if you are its admin)_
 
-If you are managing the database make sure that it is synchronized with the prisma schema by running the following command:
+The following command synchronizes the prisma schema with the database, making sure all the required tables exist.
 
 `npm run prisma:sync`
 
