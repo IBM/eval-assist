@@ -42,7 +42,7 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
     getBenchmarks()
   }, [get])
 
-  if (loadingBenchmarks || benchmarks.length === 0) return <Loading withOverlay />
+  if (loadingBenchmarks) return <Loading withOverlay />
 
   return (
     <BenchmarksContext.Provider
