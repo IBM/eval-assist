@@ -44,7 +44,7 @@ from .api.common import (
 
 # API type definitions
 from .api.pipelines import EvaluatorMetadataAPI, PipelinesResponseModel
-from .benchmark import get_all_benchmarks
+from .benchmark.benchmark import get_all_benchmarks
 from .const import EXTENDED_EVALUATORS_METADATA, ExtendedEvaluatorNameEnum
 from .db_client import db
 from .evaluators.unitxt import (
