@@ -60,6 +60,7 @@ def get_inference_engine_params(
         inference_engine_params["extra_headers"] = {
             "RITS_API_KEY": credentials["api_key"]
         }
+    if provider == ModelProviderEnum.OPENAI:
         model_name = f"openai/{model_name}"
 
     inference_engine_params["model"] = model_name
