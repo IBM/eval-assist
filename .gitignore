@@ -40,3 +40,5 @@ Secrets.yaml
 .vscode
 
 certificates
+
+.python-version
