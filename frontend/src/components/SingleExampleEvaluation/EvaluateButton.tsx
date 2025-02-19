@@ -5,7 +5,7 @@ import { CSSProperties, Dispatch, SetStateAction } from 'react'
 import { Button, InlineLoading, Tooltip } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
-import { ModelProviderType } from '@types'
+import { ModelProviderType, UseCase } from '@types'
 
 import classes from './EvaluateButton.module.scss'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
@@ -17,7 +17,7 @@ interface EvaluateButtonProps {
   setPromptModalOpen: Dispatch<SetStateAction<boolean>>
   style?: CSSProperties
   className?: string
-  currentUseCase: any
+  currentUseCase: UseCase | null
   evaluationFailed: boolean
 }
 
@@ -43,10 +43,10 @@ export const EvaluateButton = ({
             <Tooltip
               label={
                 <p className={`${classes['left-padding']} ${classes['api-key-reminder-text']}`}>
-                  {currentUseCase.evaluator === null
+                  {!currentUseCase?.evaluator
                     ? `No evaluator was selected`
                     : `You need to provide the '${
-                        modelProviderBeautifiedName[currentUseCase.evaluator?.provider as ModelProviderType]
+                        modelProviderBeautifiedName[currentUseCase.evaluator.provider as ModelProviderType]
                       }' credentials in order to run evaluations`}
                 </p>
               }
