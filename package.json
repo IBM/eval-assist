@@ -2,12 +2,12 @@
     "name": "eval-assist",
     "private": false,
     "scripts": {
-        "prepare": "backend/venv/bin/python3 -m pip install pre-commit && pre-commit install",
+        "prepare": "backend/venv/bin/python3 -m pip install pre-commit && backend/venv/bin/pre-commit install",
         "install:backend": "cd backend && python3 -m venv venv && venv/bin/python3 -m pip install --upgrade pip setuptools wheel && venv/bin/python3 -m pip install -r requirements/dev.txt && venv/bin/python3 -m pip freeze > requirements.lock",
         "install:frontend": "cd frontend && npm install",
         "install": "concurrently \"npm run install:backend\" \"npm run install:frontend\"",
         "start:backend": "cd backend && venv/bin/python3 run.py",
-        "_start:frontend": "wait-on -t 60s http-get://$(echo $NEXT_PUBLIC_BACKEND_API_HOST | sed 's/^http:\\/\\///')/health && cd frontend && npm run dev",
+        "_start:frontend": "wait-on -t 120s http-get://$(echo $NEXT_PUBLIC_BACKEND_API_HOST | sed 's/^http:\\/\\///')/health && cd frontend && npm run dev",
         "start:frontend": "dotenv -e .env -- npm run _start:frontend",
         "start": "npm run prisma && concurrently \"npm run start:backend\" \"npm run start:frontend\"",
         "prisma:prepare:backend": "node shared/scripts/mergePrisma.js backend",
@@ -19,7 +19,7 @@
         "prisma:sync": "backend/venv/bin/python3 -m prisma migrate dev --schema shared/prisma/schema.base.prisma",
         "prisma": "npm run prisma:prepare && npm run prisma:generate",
         "db": "cd shared/localdb/ && docker-compose -f postgres.yml up -d",
-        "pre-commit:backend": "backend/venv/bin/python3 -m pre-commit run --all-files",
+        "pre-commit:backend": "backend/venv/bin/pre-commit run --all-files",
         "pre-commit:frontend": "cd frontend && npm run pre-commit",
         "pre-commit": "concurrently \"npm run pre-commit:backend\" \"npm run pre-commit:frontend\"",
         "clean": "rimraf node_modules frontend/node_modules backend/venv backend/prisma/schema.prisma frontend/prisma/schema.prisma"
