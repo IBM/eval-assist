@@ -1,4 +1,4 @@
-import { getEmptyUseCase, returnByPipelineType } from 'src/utils'
+import { getEmptyUseCase, returnByPipelineType, toSnakeCase } from 'src/utils'
 
 import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
 
@@ -61,7 +61,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const criteriaName = useMemo(
-    () => (router.query.criteriaName ? (router.query.criteriaName as string) : null),
+    () => (router.query.criteriaName ? toSnakeCase(router.query.criteriaName as string) : null),
     [router.query.criteriaName],
   )
 

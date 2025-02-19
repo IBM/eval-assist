@@ -18,6 +18,7 @@ export const useGetQueryParamsFromUseCase = () => {
   const getQueryParamsFromUseCase = useCallback(
     (useCase: UseCase, subCatalogName: string | null) => {
       let params: { key: string; value: string }[] = []
+      console.log(useCase)
       if (subCatalogName) {
         params.push({ key: 'subCatalogName', value: subCatalogName })
       }
@@ -30,6 +31,9 @@ export const useGetQueryParamsFromUseCase = () => {
         } else {
           // used when redirected from benchmarks and test case doesnt exist in catalog
           params.push({ key: 'type', value: useCase.type })
+          if (useCase.criteria.name !== '') {
+            params.push({ key: 'criteriaName', value: useCase.criteria.name })
+          }
         }
         if (harmsAndRisksLibraryTestCasesNames.includes(useCase.name)) {
           params.push({ key: 'isRisksAndHarms', value: 'true' })

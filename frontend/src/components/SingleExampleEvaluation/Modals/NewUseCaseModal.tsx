@@ -1,12 +1,13 @@
 import cx from 'classnames'
-import { getEmptyUseCase } from 'src/utils'
+import { capitalizeFirstWord, getEmptyUseCase, returnByPipelineType } from 'src/utils'
 
 import { Dispatch, SetStateAction, useState } from 'react'
 
-import { Layer, Modal } from '@carbon/react'
+import { Layer, Modal, Select, SelectItem } from '@carbon/react'
 
-import { EvaluationType, UseCase } from '../../../types'
+import { Criteria, CriteriaWithOptions, EvaluationType, UseCase } from '../../../types'
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'
+import { useCriteriasContext } from '../Providers/CriteriasProvider'
 import { usePipelineTypesContext } from '../Providers/PipelineTypesProvider'
 import { useToastContext } from '../Providers/ToastProvider'
 import classes from './NewUseCaseModal.module.scss'
@@ -20,16 +21,25 @@ interface Props {
 
 export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromUseCase }: Props) => {
   const [selectedType, setSelectedType] = useState<EvaluationType | null>(null)
+  const [selectedCriteria, setSelectedCriteria] = useState<Criteria | CriteriaWithOptions | null>(null)
 
   const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
 
   const { addToast } = useToastContext()
 
+  const { directCriterias, pairwiseCriterias, getEmptyUseCaseWithCriteria } = useCriteriasContext()
+
   const onSubmit = async () => {
-    if (rubricPipelines !== null && pairwisePipelines !== null) {
+    if (rubricPipelines !== null && pairwisePipelines !== null && selectedType !== null) {
+      let toCreateTestCase: UseCase
+      if (selectedCriteria !== null) {
+        toCreateTestCase = getEmptyUseCaseWithCriteria(selectedCriteria.name, selectedType)
+      } else {
+        toCreateTestCase = getEmptyUseCase(selectedType)
+      }
       updateURLFromUseCase({
         useCase: {
-          ...getEmptyUseCase(selectedType as EvaluationType),
+          ...toCreateTestCase,
           evaluator: selectedType === EvaluationType.DIRECT ? rubricPipelines[0] : pairwisePipelines[0],
         },
         subCatalogName: null,
@@ -81,6 +91,36 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
           <span
             className={classes['danger-text']}
           >{`This action will replace your ongoing work with a blank new test case`}</span>
+        )}
+        {selectedType !== null && (
+          <Select
+            id={'criteria selector'}
+            labelText={
+              <span>
+                {`Select a predefined ${returnByPipelineType(selectedType, 'direct', 'pairwise')} criteria `}
+                <em>{'(Optional)'}</em>
+              </span>
+            }
+            onChange={(e) => {
+              const selected = returnByPipelineType<CriteriaWithOptions[], Criteria[]>(
+                selectedType,
+                directCriterias!,
+                pairwiseCriterias!,
+              ).find((criteria) => criteria.name == e.target.value)
+              if (selected) {
+                setSelectedCriteria(selected)
+              }
+            }}
+          >
+            <SelectItem key={'Empty'} text={'No criteria selected'} value={''} />
+            {returnByPipelineType<CriteriaWithOptions[], Criteria[]>(
+              selectedType,
+              directCriterias!,
+              pairwiseCriterias!,
+            ).map((c, i) => (
+              <SelectItem key={i} text={capitalizeFirstWord(c.name)} value={c.name} />
+            ))}
+          </Select>
         )}
       </Layer>
     </Modal>
