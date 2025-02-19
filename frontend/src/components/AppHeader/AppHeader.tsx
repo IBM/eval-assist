@@ -13,7 +13,7 @@ import {
   HeaderNavigation,
   Theme,
 } from '@carbon/react'
-import { AddComment, Document, Logout, QqPlot } from '@carbon/react/icons'
+import { Document, LogoGithub, Logout, QqPlot } from '@carbon/react/icons'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
 
@@ -42,6 +42,16 @@ export const AppHeader = () => {
             <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
               Benchmarks
               <QqPlot style={{ marginLeft: '0.5rem' }} size={18} />
+            </div>
+          </HeaderMenuItem>
+          <HeaderMenuItem
+            href="https://github.ibm.com/AIExperience/eval-assist"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+              Github
+              <LogoGithub style={{ marginLeft: '0.5rem' }} size={18} />
             </div>
           </HeaderMenuItem>
         </HeaderNavigation>

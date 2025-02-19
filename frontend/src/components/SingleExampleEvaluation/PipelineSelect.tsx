@@ -1,3 +1,5 @@
+import cx from 'classnames'
+import { modelProviderBeautifiedName } from 'src/constants'
 import { getJSONStringWithSortedKeys, returnByPipelineType } from 'src/utils'
 
 import { CSSProperties, useMemo } from 'react'
@@ -5,6 +7,9 @@ import { CSSProperties, useMemo } from 'react'
 import Link from 'next/link'
 
 import { Select, SelectItem, SelectItemGroup, SelectSkeleton } from '@carbon/react'
+import { Warning } from '@carbon/react/icons'
+
+import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 
 import { EvaluationType, Evaluator, ModelProviderCredentials, ModelProviderType } from '../../types'
 import classes from './PipelineSelect.module.scss'
@@ -33,14 +38,19 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
     return pipelines
   }, [graniteGuardianPipelines, isRisksAndHarms, pairwisePipelines, rubricPipelines, type])
 
-  const providerToEvaluators = useMemo(() => {
-    const result: { [key: string]: Evaluator[] } = {}
+  const providerToEvaluators = useMemo<Record<ModelProviderType, Evaluator[]>>(() => {
+    const result: Record<ModelProviderType, Evaluator[]> = {
+      [ModelProviderType.RITS]: [],
+      [ModelProviderType.WATSONX]: [],
+      [ModelProviderType.OPENAI]: [],
+      [ModelProviderType.AZURE_OPENAI]: [],
+    }
 
     filteredPipelines.forEach((p) => {
       if (!(p.provider in result)) {
         result[p.provider] = []
       }
-      result[p.provider].push(p)
+      result[p.provider]!.push(p)
     })
 
     Object.values(result).forEach((pipelines) =>
@@ -68,12 +78,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
     return result
   }, [filteredPipelines])
 
-  const modelProviderBeautifiedName: Record<ModelProviderType, string> = {
-    [ModelProviderType.WATSONX]: 'WatsonX',
-    [ModelProviderType.OPENAI]: 'OpenAI',
-    [ModelProviderType.RITS]: 'RITS',
-    [ModelProviderType.AZURE_OPENAI]: 'Azure OpenAI',
-  }
+  const { getAreRelevantCredentialsProvided } = useModelProviderCredentials()
 
   return (
     <div style={{ marginBottom: '1.5rem' }} className={className}>
@@ -86,11 +91,24 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
           labelText=""
           helperText={
             <div className={classes.helperContent}>
-              <span className={classes.providerFont}>
-                <em>{'Model provider: '}</em>
-                <strong></strong>
-                {`${modelProviderBeautifiedName[selectedPipeline?.provider as ModelProviderType]}`}
-              </span>
+              {selectedPipeline !== null ? (
+                <div className={classes.providerFont}>
+                  <span>
+                    <em>{'Model provider: '}</em>
+                    {`${modelProviderBeautifiedName[selectedPipeline?.provider as ModelProviderType]}`}
+                  </span>
+                  {selectedPipeline !== null && !getAreRelevantCredentialsProvided(selectedPipeline.provider) && (
+                    <span className={cx(classes.credentialsNotProvided)}>
+                      <Warning />
+                      {'Required credentials were not provided'}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className={classes.providerFont}>
+                  {'Provide at least a provider API credentials in order to select an evaluator.'}
+                </div>
+              )}
               <Link rel="noopener noreferrer" target="_blank" href="/documentation/#evaluators">
                 How do evaluators work?
               </Link>
@@ -104,8 +122,13 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
           className={classes.selectReadOnly}
           // readOnly={isRisksAndHarms}
         >
+          {selectedPipeline === null && <SelectItem value={''} text={'No evaluator selected'} />}
           {Object.entries(providerToEvaluators).map(([provider, providerEvaluators]) => (
-            <SelectItemGroup label={modelProviderBeautifiedName[provider as ModelProviderType]} key={provider}>
+            <SelectItemGroup
+              label={modelProviderBeautifiedName[provider as ModelProviderType]}
+              key={provider}
+              disabled={!getAreRelevantCredentialsProvided(provider as ModelProviderType)}
+            >
               {providerEvaluators.map((evaluator, i) => (
                 <SelectItem value={getJSONStringWithSortedKeys(evaluator)} text={evaluator.name} key={i} />
               ))}

@@ -97,14 +97,16 @@ export const returnByPipelineType = <T = any, S = any>(
 
 export const getJSONStringWithSortedKeys = (unsortedObj: any) => {
   const aux = unsortedObj as unknown as { [key: string]: string }
-  return JSON.stringify(
-    Object.keys(aux)
-      .sort()
-      .reduce((obj: { [key: string]: string }, key: string) => {
-        obj[key] = aux[key]
-        return obj
-      }, {}),
-  )
+  return unsortedObj !== null
+    ? JSON.stringify(
+        Object.keys(aux)
+          .sort()
+          .reduce((obj: { [key: string]: string }, key: string) => {
+            obj[key] = aux[key]
+            return obj
+          }, {}),
+      )
+    : ''
 }
 export const scrollToTop = () => {
   window.scrollTo({

@@ -646,13 +646,9 @@ export const SingleExampleEvaluation = () => {
               areRelevantCredentialsProvided={areRelevantCredentialsProvided}
               className={classes['left-padding']}
               setPromptModalOpen={setPromptModalOpen}
+              currentUseCase={currentUseCase}
+              evaluationFailed={evaluationFailed}
             />
-
-            {!areRelevantCredentialsProvided && !evaluationRunning && !evaluationFailed && (
-              <p className={`${classes['left-padding']} ${classes['api-key-reminder-text']}`}>
-                {`You need to provide the ${currentUseCase.evaluator?.provider.toUpperCase()} credentials to run evaluations.`}
-              </p>
-            )}
           </>
         )}
       </div>

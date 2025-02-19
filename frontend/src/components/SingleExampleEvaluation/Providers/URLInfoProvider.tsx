@@ -77,16 +77,23 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
         const ritsCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.RITS)
         const watsonxCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.WATSONX)
         const openaiCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.OPENAI)
+        const azureCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.AZURE_OPENAI)
         const defaultProvider = watsonxCredentialsExist
           ? ModelProviderType.WATSONX
           : ritsCredentialsExist
           ? ModelProviderType.RITS
           : openaiCredentialsExist
           ? ModelProviderType.OPENAI
-          : ModelProviderType.RITS
+          : azureCredentialsExist
+          ? ModelProviderType.AZURE_OPENAI
+          : null
+
+        if (defaultProvider === null) return null
 
         const defaultEvaluatorKeyword =
-          watsonxCredentialsExist || ritsCredentialsExist || !openaiCredentialsExist ? 'llama' : 'gpt'
+          watsonxCredentialsExist || ritsCredentialsExist || (!openaiCredentialsExist && !azureCredentialsExist)
+            ? 'llama'
+            : 'gpt'
         return returnByPipelineType(
           type,
           rubricPipelines.find(
@@ -129,7 +136,6 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     } else if (useCaseType !== null && useCaseId === null && libraryTestCaseName === null) {
       if (criteriaName !== null) {
         pu = getEmptyUseCaseWithCriteria(criteriaName, useCaseType)
-        console.log(pu)
       } else {
         pu = getEmptyUseCase(useCaseType)
       }
