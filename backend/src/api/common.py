@@ -101,7 +101,7 @@ class PairwiseResponseModel(BaseModel):
 class NotebookParams(BaseModel):
     test_case_name: str
     criteria: dict
-    evaluator_name: ExtendedEvaluatorNameEnum
+    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
     provider: ModelProviderEnum
     predictions: list[str | list[str]]
     context_variables: list[dict[str, str]]

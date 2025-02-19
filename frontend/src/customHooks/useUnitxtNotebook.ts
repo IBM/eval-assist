@@ -28,10 +28,32 @@ export const useUnitxtNotebook = ({
   testCaseName,
 }: Props) => {
   const { post } = useFetchUtils()
-  const { addToast } = useToastContext()
+  const { addToast, removeToast } = useToastContext()
 
   const downloadUnitxtNotebook = async () => {
-    if (!testCaseName || !criteria || !evaluatorName || !responses || !contextVariablesList || !provider) return
+    console.log({
+      criteria,
+      evaluatorName,
+      responses,
+      contextVariablesList,
+      provider,
+      credentials,
+      evaluatorType,
+      testCaseName,
+    })
+    if (!evaluatorName) {
+      addToast({
+        kind: 'warning',
+        title: 'Select an evaluator in order to generate a notebook',
+      })
+      return
+    }
+    if (!testCaseName || !criteria || !responses || !contextVariablesList || !provider) return
+    const inProgressToastId = addToast({
+      kind: 'info',
+      title: 'Generating Jupyter notebook...',
+      timeout: 5000,
+    })
     const parsedContextVariablesList = contextVariablesList.map((contextVariables) =>
       contextVariables.reduce((acc, item, index) => ({ ...acc, [item.name]: item.value }), {}),
     )
@@ -64,6 +86,11 @@ export const useUnitxtNotebook = ({
       // Cleanup
       link.remove()
       window.URL.revokeObjectURL(url)
+      removeToast(inProgressToastId)
+      addToast({
+        kind: 'success',
+        title: 'Sample notebook generated succesfully',
+      })
     } catch {
       addToast({
         kind: 'error',
