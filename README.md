@@ -5,7 +5,6 @@
 
 <!-- Not always needed, but a scope helps the user understand in a short sentance like below, why this repo exists -->
 
-
 ## Run EvalAssist locally
 
 ### 1. Install the requirements
@@ -66,3 +65,21 @@ npm start
 ### 7. Open EvalAssist
 
 Visit [https://localhost:3000](https://localhost:3000)
+
+## Commands summary
+
+* **install**:  Installs dependencies for both the backend and frontend in parallel.
+* **install:backend**: Sets up the Python virtual environment and installs backend dependencies.
+* **install:frontend**: Installs frontend dependencies using npm.
+* **start**:  Starts both the backend and frontend, ensuring Prisma is set up first.
+* **start:backend**: Runs the FastAPI backend using the Python virtual environment.
+* **start:frontend**: Waits for the backend to be ready, then starts the Next.js frontend.
+* **prisma**:  Prepares and generates Prisma clients for both backend and frontend.
+* **prisma:prepare**: Merges the Prisma schema for both backend and frontend.
+* **prisma:generate**: Generates Prisma clients for both backend and frontend in parallel.
+* **prisma:sync** : Runs Prisma database migrations using the backend schema.
+* **db**: Starts a local PostgreSQL database using Docker.
+* **pre-commit**: Runs pre-commit hooks for both backend and frontend.
+* **clean**:  Removes dependencies and generated files from both backend and frontend.
+* **clean-backend**: Deletes the backend virtual environment and generated Prisma schema.
+* **clean-frontend**: Removes frontend dependencies and generated Prisma schema.

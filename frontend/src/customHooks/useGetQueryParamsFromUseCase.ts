@@ -18,7 +18,6 @@ export const useGetQueryParamsFromUseCase = () => {
   const getQueryParamsFromUseCase = useCallback(
     (useCase: UseCase, subCatalogName: string | null) => {
       let params: { key: string; value: string }[] = []
-      console.log(useCase)
       if (subCatalogName) {
         params.push({ key: 'subCatalogName', value: subCatalogName })
       }
