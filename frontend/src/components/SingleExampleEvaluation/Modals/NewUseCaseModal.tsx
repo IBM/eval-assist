@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import { capitalizeFirstWord, getEmptyUseCase, returnByPipelineType } from 'src/utils'
 
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useMemo, useState } from 'react'
 
 import { Layer, Modal, Select, SelectItem } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
@@ -62,6 +62,17 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
     setSelectedType(null)
   }
 
+  const sortedCriterias = useMemo(() => {
+    if (selectedType !== null) {
+      return returnByPipelineType<CriteriaWithOptions[], Criteria[]>(
+        selectedType,
+        directCriterias!,
+        pairwiseCriterias!,
+      ).sort((a, b) => a.name.localeCompare(b.name))
+    }
+    return []
+  }, [directCriterias, pairwiseCriterias, selectedType])
+
   return (
     <Modal
       open={open}
@@ -109,11 +120,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
             }}
           >
             <SelectItem key={'Empty'} text={'No criteria selected'} value={''} />
-            {returnByPipelineType<CriteriaWithOptions[], Criteria[]>(
-              selectedType,
-              directCriterias!,
-              pairwiseCriterias!,
-            ).map((c, i) => (
+            {sortedCriterias.map((c, i) => (
               <SelectItem key={i} text={capitalizeFirstWord(c.name)} value={c.name} />
             ))}
           </Select>

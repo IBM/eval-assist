@@ -6,11 +6,13 @@ annotated-types==0.7.0
 anyio==4.8.0
 attrs==25.1.0
 certifi==2025.1.31
+cfgv==3.4.0
 charset-normalizer==3.4.1
 click==8.1.8
 datasets==3.3.2
 dill==0.3.8
 diskcache==5.6.3
+distlib==0.3.9
 distro==1.9.0
 evaluate==0.4.3
 fastapi==0.115.8
@@ -26,6 +28,7 @@ ibm-cos-sdk==2.13.6
 ibm-cos-sdk-core==2.13.6
 ibm-cos-sdk-s3transfer==2.13.6
 ibm_watsonx_ai==1.2.8
+identify==2.6.7
 idna==3.10
 importlib_metadata==8.6.1
 ipadic==1.0.0
@@ -57,6 +60,7 @@ orjson==3.10.15
 packaging==24.2
 pandas==2.1.4
 platformdirs==4.3.6
+pre_commit==4.1.0
 prisma==0.15.0
 propcache==0.3.0
 pyarrow==19.0.1
@@ -92,6 +96,7 @@ tzdata==2025.1
 unitxt @ git+ssh://git@github.com/IBM/unitxt.git@e24eccb756c85e9f538b8964a031726ac425592c
 urllib3==2.3.0
 uvicorn==0.34.0
+virtualenv==20.29.2
 xxhash==3.5.0
 yarl==1.18.3
 zipp==3.21.0
