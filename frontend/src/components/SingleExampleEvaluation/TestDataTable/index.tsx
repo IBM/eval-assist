@@ -3,10 +3,11 @@ import { returnByPipelineType } from 'src/utils'
 
 import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Button, IconButton, InlineLoading, Toggle } from '@carbon/react'
+import { Button, IconButton, InlineLoading, PaginationNav, Toggle } from '@carbon/react'
 import { Add, AiGenerate, TrashCan } from '@carbon/react/icons'
 
 import { EditableTag } from '@components/EditableTag'
+import { usePagination } from '@customHooks/usePagination'
 
 import {
   Criteria,
@@ -63,8 +64,14 @@ export const TestDataTable = ({
   fetchSystheticExamples,
   loadingSyntheticExamples,
 }: Props) => {
+  const instancesPerPage = useMemo(() => 5, [])
   const [explanationOn, setExplanationOn] = useState(type === EvaluationType.DIRECT)
   const { addToast, removeToast } = useToastContext()
+
+  const { currentInstances, currentPage, goToPage, totalPages, goToLastPage } = usePagination({
+    instances,
+    instancesPerPage: instancesPerPage,
+  })
 
   const [expectedResultOn, setExpectedResultOn] = useState(true)
 
@@ -183,6 +190,7 @@ export const TestDataTable = ({
       } generated and added to the test data`,
     })
   }, [addToast, fetchSystheticExamples, instances, removeToast, responseVariableName, setInstances, type])
+
   const addContextVariable = () => {
     setInstances(
       instances.map((instance) => {
@@ -200,17 +208,18 @@ export const TestDataTable = ({
   }
 
   const editContextVariable = (newValue: string, index: number) => {
+    const actualIndex = getActualInstanceIndex(index)
     setInstances(
       instances.map((instance) => {
         return {
           ...instance,
           contextVariables: [
-            ...instance.contextVariables.slice(0, index),
+            ...instance.contextVariables.slice(0, actualIndex),
             {
               name: newValue,
-              value: instance.contextVariables[index].value,
+              value: instance.contextVariables[actualIndex].value,
             },
-            ...instance.contextVariables.slice(index + 1),
+            ...instance.contextVariables.slice(actualIndex + 1),
           ],
         }
       }),
@@ -241,12 +250,40 @@ export const TestDataTable = ({
     [instances, setInstances],
   )
 
+  const getActualInstanceIndex = useCallback(
+    (index: number) => {
+      return currentPage * instancesPerPage + index
+    },
+    [currentPage, instancesPerPage],
+  )
+
   const removeInstance = useCallback(
     (indexToRemove: number) => {
-      setInstances(instances.filter((_, i) => indexToRemove !== i))
+      console.log(getActualInstanceIndex(indexToRemove))
+      setInstances(instances.filter((_, i) => getActualInstanceIndex(indexToRemove) !== i))
     },
-    [instances, setInstances],
+    [getActualInstanceIndex, instances, setInstances],
   )
+
+  const onPageChange = useCallback(
+    (pageIndex: number) => {
+      console.log(pageIndex)
+      goToPage(pageIndex)
+    },
+    [goToPage],
+  )
+
+  const setInstance = useCallback(
+    (instance: Instance, index: number) => {
+      const actualIndex = getActualInstanceIndex(index)
+      setInstances([...instances.slice(0, actualIndex), instance, ...instances.slice(actualIndex + 1)])
+    },
+    [getActualInstanceIndex, instances, setInstances],
+  )
+
+  useEffect(() => {
+    goToLastPage()
+  }, [goToLastPage, instances.length])
 
   return (
     <div style={style} className={className}>
@@ -334,7 +371,7 @@ export const TestDataTable = ({
               </div>
             )}
           </div>
-          {instances.map((instance, i) => (
+          {currentInstances.map((instance, i) => (
             <TestDataTableRow
               key={i}
               explanationOn={explanationOn}
@@ -345,15 +382,27 @@ export const TestDataTable = ({
               criteria={criteria}
               gridClasses={returnByPipelineType(type, directGridClasses, pairwiseGridClasses)}
               instance={instance}
-              setInstance={(instance: Instance) =>
-                setInstances([...instances.slice(0, i), instance, ...instances.slice(i + 1)])
-              }
+              setInstance={(instance) => setInstance(instance, i)}
               readOnly={instances.length === 1 || evaluationRunning}
               removeInstance={() => removeInstance(i)}
               type={type}
             />
           ))}
-          <div className={cx(classes.tableRow, classes.actionButtonsRow)}>
+          {totalPages > 1 && (
+            <div className={cx(classes.tableRow)}>
+              <div className={cx(classes.blockElement, classes.paginationBlock)}>
+                <PaginationNav
+                  itemsShown={currentInstances.length}
+                  page={currentPage}
+                  size="lg"
+                  totalItems={totalPages}
+                  onChange={onPageChange}
+                  aria-disabled={totalPages == 1}
+                />
+              </div>
+            </div>
+          )}
+          <div className={cx(classes.paginationRow, classes.actionButtonsRow)}>
             <div className={cx(classes.actionButton)}>
               <Button kind="tertiary" size="sm" renderIcon={Add} onClick={addEmptyRow}>
                 {'Add row'}

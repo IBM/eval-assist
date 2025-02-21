@@ -333,3 +333,11 @@ $columns-4: 3fr 1fr 1fr 2fr;
   align-items: center;
   gap: 1rem;
 }
+
+.paginationBlock {
+  border-bottom: 1px solid $border-subtle-01;
+  padding-top: 0.25rem;
+  padding-bottom: 0.5rem;
+  display: flex;
+  justify-content: center;
+}
