@@ -4,6 +4,7 @@ import { capitalizeFirstWord, getEmptyUseCase, returnByPipelineType } from 'src/
 import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Layer, Modal, Select, SelectItem } from '@carbon/react'
+import { Warning } from '@carbon/react/icons'
 
 import { Criteria, CriteriaWithOptions, EvaluationType, UseCase } from '../../../types'
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'
@@ -87,11 +88,6 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
             setSelectedType={setSelectedType}
           />
         </div>
-        {changesDetected && (
-          <span
-            className={classes['danger-text']}
-          >{`This action will replace your ongoing work with a blank new test case`}</span>
-        )}
         {selectedType !== null && (
           <Select
             id={'criteria selector'}
@@ -121,6 +117,13 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
               <SelectItem key={i} text={capitalizeFirstWord(c.name)} value={c.name} />
             ))}
           </Select>
+        )}
+        {changesDetected && (
+          <div className={classes['danger-text']}>
+            <Warning />
+
+            {`This action will replace your ongoing work with a blank new test case.`}
+          </div>
         )}
       </Layer>
     </Modal>
