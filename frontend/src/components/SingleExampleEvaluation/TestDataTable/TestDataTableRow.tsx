@@ -102,7 +102,7 @@ export const TestDataTableRow = ({
         () => (criteria as CriteriaWithOptions).options.map((option) => ({ value: option.name, text: option.name })),
 
         () => responses.map((_, i) => ({ text: `Response ${i + 1}`, value: i + 1 })),
-      ),
+      ).filter((option) => option.text !== ''),
     [responses, criteria, type],
   )
 
