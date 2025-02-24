@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import { isInstanceOfCriteriaWithOptions } from 'src/utils'
 
 import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
@@ -113,7 +114,7 @@ export const RubricCriteriaView = ({
                               style={{ width: '95%' }}
                             />
                           ) : (
-                            <h4 style={{ width: '95%' }}>{rubricCriteria.name}</h4>
+                            <h4 style={{ width: '95%' }}>{rubricCriteria.name || 'No name'}</h4>
                           )}
                           {isEditingCriteriaTitle ? (
                             <IconButton onClick={() => setIsEditingCriteriaTitle(false)} kind="ghost" label={'Save'}>
@@ -147,11 +148,17 @@ export const RubricCriteriaView = ({
                         // readOnly={isRisksAndHarms}
                       />
                       {rubricCriteria.options.map((scale, i) => (
-                        <div key={i} className={customClasses.optionsGrid}>
+                        <div
+                          key={i}
+                          className={cx({
+                            [customClasses.optionsGridWithAction]: rubricCriteria.options.length > 2,
+                            [customClasses.optionsGrid]: rubricCriteria.options.length <= 2,
+                          })}
+                        >
                           <TextInput
                             labelText="Option"
                             value={scale.name}
-                            placeholder="Answer"
+                            placeholder="Option"
                             onChange={(e) =>
                               setCriteria({
                                 ...rubricCriteria,
@@ -172,10 +179,10 @@ export const RubricCriteriaView = ({
                             labelText="Description (optional)"
                             toHighlightWords={toHighlightWords}
                             value={scale.description}
-                            className={customClasses.criteriaText}
                             isTextInput={true}
                             isTextArea={false}
                             editorId={`criteria-option-value-${i}`}
+                            placeholder="Option description"
                             onValueChange={(value: string) =>
                               setCriteria({
                                 ...rubricCriteria,
@@ -193,13 +200,13 @@ export const RubricCriteriaView = ({
                               label={'Remove'}
                               size="sm"
                               kind="ghost"
-                              style={{ marginTop: '24px' }}
                               onClick={() =>
                                 setCriteria({
                                   ...rubricCriteria,
                                   options: rubricCriteria.options.filter((s, j) => j !== i),
                                 })
                               }
+                              className={customClasses.trashMargin}
                               id={`criteria-option-delete-${i}`}
                               key={`criteria-option-delete-${i}`}
                             >

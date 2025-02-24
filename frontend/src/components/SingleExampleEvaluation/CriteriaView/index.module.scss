@@ -13,6 +13,18 @@
 .optionsGrid {
   display: grid;
   margin-bottom: 1rem;
-  grid-template-columns: 1fr 6fr 3rem;
+  grid-template-columns: 1fr 6fr;
   gap: 1rem;
+}
+
+.optionsGridWithAction {
+  display: grid;
+  margin-bottom: 1rem;
+  grid-template-columns: 1fr 6fr 2rem;
+  gap: 1rem;
+  align-items: center;
+}
+
+.trashMargin {
+  margin-top: 24px;
 }
