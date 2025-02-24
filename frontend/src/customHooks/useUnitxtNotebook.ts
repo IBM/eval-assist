@@ -48,31 +48,32 @@ export const useUnitxtNotebook = ({
       })
       return
     }
-    if (!testCaseName || !criteria || !responses || !contextVariablesList || !provider) return
+    if (!responses || !contextVariablesList || !provider) return
     const inProgressToastId = addToast({
       kind: 'info',
       title: 'Generating Jupyter notebook...',
       timeout: 5000,
     })
-    const parsedContextVariablesList = contextVariablesList.map((contextVariables) =>
-      contextVariables.reduce((acc, item, index) => ({ ...acc, [item.name]: item.value }), {}),
-    )
     try {
       const response = await post('download-notebook/', {
         criteria,
         evaluator_name: evaluatorName,
-        predictions: responses,
-        context_variables: parsedContextVariablesList,
+        predictions: responses || [],
+        context_variables:
+          contextVariablesList.map((contextVariables) =>
+            contextVariables.reduce((acc, item, index) => ({ ...acc, [item.name]: item.value }), {}),
+          ) || {},
         provider,
-        credentials,
-        evaluator_type: evaluatorType,
-        test_case_name: testCaseName,
+        credentials: credentials || {},
+        evaluator_type: evaluatorType!,
+        test_case_name: testCaseName || '',
       })
 
       if (!response.ok) {
         addToast({
           kind: 'error',
           title: 'Sample notebook download failed',
+          timeout: 5000,
         })
       }
       const notebookBlob = await response.blob()
@@ -90,11 +91,13 @@ export const useUnitxtNotebook = ({
       addToast({
         kind: 'success',
         title: 'Sample notebook generated succesfully',
+        timeout: 5000,
       })
     } catch {
       addToast({
         kind: 'error',
         title: 'Sample notebook download failed',
+        timeout: 5000,
       })
     }
   }

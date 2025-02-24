@@ -1,3 +1,5 @@
+import json
+
 import nbformat as nbf
 
 from .api.common import NotebookParams
@@ -29,7 +31,6 @@ from unitxt.api import evaluate, create_dataset
 from unitxt.inference import LiteLLMInferenceEngine
 from unitxt.llm_as_judge import LLMJudgeDirect, EvaluatorNameEnum, CriteriaWithOptions
 from unitxt.task import Task
-from unitxt.templates import NullTemplate
 import pandas as pd
 import nest_asyncio
 nest_asyncio.apply()
@@ -38,9 +39,9 @@ nest_asyncio.apply()
     load_dataset_md = """### Loading the dataset
 This code block creates a dataset from the context variables and the prediction. It simulates the sceario where the dataset is loaded from a csv file.
 """
-    load_dataset_code = f"""context_variables = {params.context_variables}
-predictions = {params.predictions}
-dataset_rows = [instance_context_variable | {{'prediction': prediction}} for instance_context_variable, prediction in zip(context_variables, predictions)]
+    load_dataset_code = f"""context_variables = {json.dumps(params.context_variables, indent=4)}
+predictions = {json.dumps(params.predictions, indent=4)}
+dataset_rows = [instance_context_variable | {{"prediction": prediction}} for instance_context_variable, prediction in zip(context_variables, predictions)]
 df = pd.DataFrame(dataset_rows)
 # load a csv if data is stored in a csv file
 # df = pd.read_csv(file_path)
@@ -49,16 +50,14 @@ df = pd.DataFrame(dataset_rows)
     load_criteria_md = """### Load the criteria
 The criteria in a direct evaluation needs an option map that matches a string to a numerical value. Replace the NaN value of each option with your desire numerical value.
 """
-    option_map_string = ", ".join(
-        [
-            f"'{option_name}': float('nan')"
-            for option_name in [option["name"] for option in params.criteria["options"]]
-        ]
-    )
+    option_map_string = {
+        option_name: float("nan")
+        for option_name in [option["name"] for option in params.criteria["options"]]
+    }
 
     load_criteria_code = f"""
-criteria = {params.criteria}
-option_map = {{{option_map_string}}}
+criteria = {json.dumps(params.criteria, indent=4)}
+option_map = {json.dumps(option_map_string, indent=4)}
 criteria["option_map"] = option_map
 criteria = CriteriaWithOptions.from_obj(criteria)
 """
@@ -72,20 +71,20 @@ This code block creates the evaluator object of class _LLMJudgeDirect_. It then 
     context_fields={context_fields},
     criteria_field="criteria",
 )
-dataset_content = df.drop(columns=['prediction']).to_dict(orient='records')
+dataset_content = df.drop(columns=["prediction"]).to_dict(orient="records")
 dataset = create_dataset(
     task=Task(
         input_fields={input_fields},
         reference_fields={{}},
         prediction_type=str,
-        default_template=NullTemplate(),
+        default_template="templates.empty",
         metrics=[metric],
     ),
     test_set=dataset_content,
     split="test")
 """
     evaluation_md = "### Evaluate the responses and print the results"
-    evaluation_code = """predictions = df['prediction'].tolist()
+    evaluation_code = """predictions = df["prediction"].tolist()
 results = evaluate(predictions=predictions, data=dataset)
 print("Global Scores:")
 print(results.global_scores)
@@ -127,7 +126,7 @@ def generate_pairwise_notebook(params: NotebookParams):
 
     nb = nbf.v4.new_notebook()
 
-    title = f"# Unitxt pairwise evaluation notebook: {params.test_case_name}\n\nThis notebook was generated automatically from your EvalAssist test case '{params.test_case_name}'. It contains code to evaluate a set of responses using the specified criteria and evaluator. EvalAssist uses [unitxt](https://www.unitxt.ai/en/latest/index.html) to create and run the evaluations. You can find the documentation [here](https://www.unitxt.ai/en/latest/docs/llm_as_judge.html).\n\n"
+    title = f'# Unitxt pairwise evaluation notebook: {params.test_case_name}\n\nThis notebook was generated automatically from your EvalAssist test case "{params.test_case_name}". It contains code to evaluate a set of responses using the specified criteria and evaluator. EvalAssist uses [unitxt](https://www.unitxt.ai/en/latest/index.html) to create and run the evaluations. You can find the documentation [here](https://www.unitxt.ai/en/latest/docs/llm_as_judge.html).\n\n'
     import_md = "### Import the necessary libraries"
     import_code = """
 from typing import List
@@ -135,7 +134,6 @@ from unitxt.api import evaluate, create_dataset
 from unitxt.inference import LiteLLMInferenceEngine
 from unitxt.llm_as_judge import LLMJudgePairwise, EvaluatorNameEnum, Criteria
 from unitxt.task import Task
-from unitxt.templates import NullTemplate
 import pandas as pd
 import nest_asyncio
 nest_asyncio.apply()
@@ -154,8 +152,8 @@ _Note: in a pairwise dataset, each instance is composed by a context, a criteria
         }
         for instance_predictions in params.predictions
     ]
-    load_dataset_code = f"""context_variables = {params.context_variables}
-system_predictions = {system_predictions}
+    load_dataset_code = f"""context_variables = {json.dumps(params.context_variables, indent=4)}
+system_predictions = {json.dumps(system_predictions, indent=4)}
 dataset_rows = [instance_context_variable | instance_predictions for instance_context_variable, instance_predictions in zip(context_variables, system_predictions)]
 df = pd.DataFrame(dataset_rows)
 # load a csv if data is stored in a csv file
@@ -165,7 +163,9 @@ df = pd.DataFrame(dataset_rows)
     load_criteria_md = """### Load the criteria
 The criteria in direct evaluation need an option map that matches a string to a numerical value. This code block creates an option map, but it may not be accurate as it assume equal distribution between 0 and 1 and ascending order.
 """
-    load_criteria_code = f"""criteria = Criteria.from_obj({params.criteria})"""
+    load_criteria_code = (
+        f"""criteria = Criteria.from_obj({json.dumps(params.criteria, indent=4)})"""
+    )
     setup_md = """### Setup the evaluation
 This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables.
 """
@@ -176,20 +176,20 @@ This code block creates the evaluator object of class _LLMJudgeDirect_. It then 
     context_fields={context_fields},
     criteria_field="criteria",
 )
-dataset_content = df.filter(regex=r'^(?!system_)').to_dict(orient='records')
+dataset_content = df.filter(regex=r"^(?!system_)").to_dict(orient="records")
 dataset = create_dataset(
     task=Task(
         input_fields={input_fields},
         reference_fields={{}},
         prediction_type=List[str],
-        default_template=NullTemplate(),
+        default_template="templates.empty",
         metrics=[metric],
     ),
     test_set=dataset_content,
     split="test")
 """
     evaluation_md = "### Evaluate the responses and print the results"
-    evaluation_code = """predictions = df.filter(regex=r'^system_\d+$').values.tolist()
+    evaluation_code = """predictions = df.filter(regex=r"^system_\d+$").values.tolist()
 results = evaluate(predictions=predictions, data=dataset)
 print("Global Scores:")
 print(results.global_scores)
