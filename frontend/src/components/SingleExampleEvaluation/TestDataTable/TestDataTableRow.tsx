@@ -23,13 +23,7 @@ import classes from './index.module.scss'
 interface Props {
   explanationOn: boolean
   expectedResultOn: boolean
-  setSelectedResultDetails: Dispatch<
-    SetStateAction<{
-      result: DirectInstanceResult | PerResponsePairwiseResult | null
-      expectedResult: string
-      responseIndex: string
-    }>
-  >
+  setSelectedInstance: Dispatch<SetStateAction<Instance | null>>
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
   criteria: CriteriaWithOptions | Criteria
@@ -45,7 +39,7 @@ interface Props {
 
 export const TestDataTableRow = ({
   explanationOn,
-  setSelectedResultDetails,
+  setSelectedInstance,
   setResultDetailsModalOpen,
   evaluationRunning,
   criteria,
@@ -128,29 +122,12 @@ export const TestDataTableRow = ({
       }
     }
   }, [instance, type])
-  //   const onResultBlockClick = (i: number) => {
-  //     if (results !== null && results[i] !== undefined) {
-  //       setSelectedResultDetails({
-  //         result: results[i],
-  //         expectedResult: expectedResults !== null ? expectedResults[i] : '',
-  //         responseIndex: `${i + 1}`,
-  //       })
-  //       setResultDetailsModalOpen(true)
-  //     }
-  //   }
-  //   const getResultToDisplay = (i: number) => {
-  //     if (results !== null) {
-  //       return results[i] ? (results[i] as DirectAssessmentResult).option : ''
-  //     }
-  //     return ''
-  //   }
 
-  //   const onRemoveResponse = (i: number) => {
-  //     if (responses.length === 1) return
-  //     setResponses(responses.filter((_, j) => i !== j))
-  //     results !== null && setResults(results.filter((_, j) => i !== j) as UseCase['results'])
-  //     expectedResults !== null && setExpectedResults(expectedResults.filter((_, j) => i !== j))
-  //   }
+  const onResultBlockClick = () => {
+    setSelectedInstance(instance)
+    setResultDetailsModalOpen(true)
+  }
+
   return (
     <>
       <RemovableSection onRemove={() => removeInstance()} readOnly={readOnly}>
@@ -248,7 +225,11 @@ export const TestDataTableRow = ({
                         >{`Agreement: ${result.agreement ? 'Yes' : 'No'}`}</div>
                       )}
                     </div>
-                    <Link style={{ alignSelf: 'flex-end' }} className={classes.resultDetailsAction}>
+                    <Link
+                      style={{ alignSelf: 'flex-end' }}
+                      className={classes.resultDetailsAction}
+                      onClick={onResultBlockClick}
+                    >
                       View Details
                     </Link>
                   </div>

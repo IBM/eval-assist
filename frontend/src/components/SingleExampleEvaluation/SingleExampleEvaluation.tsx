@@ -43,9 +43,9 @@ import layoutClasses from './Layout.module.scss'
 import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
 import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
 import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
+import { InstanceDetailsModal } from './Modals/InstanceDetailsModal'
 import { NewUseCaseModal } from './Modals/NewUseCaseModal'
 import { PromptModal } from './Modals/PromptModal'
-import { ResultDetailsModal } from './Modals/ResultDetailsModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { PipelineSelect } from './PipelineSelect'
@@ -81,11 +81,7 @@ export const SingleExampleEvaluation = () => {
   const [evaluationRunningModalOpen, setEvaluationRunningModalOpen] = useState(false)
   const [promptModalOpen, setPromptModalOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
-  const [selectedResultDetails, setSelectedResultDetails] = useState<{
-    result: DirectInstanceResult | PerResponsePairwiseResult | null
-    expectedResult: string
-    responseIndex: string
-  }>({ result: null, expectedResult: '', responseIndex: '' })
+  const [selectedInstance, setSelectedInstance] = useState<Instance | null>(null)
 
   const { setSidebarTabSelected } = useAppSidebarContext()
   const currentUseCaseString = useMemo<string>(
@@ -629,7 +625,7 @@ export const SingleExampleEvaluation = () => {
               className={classes['left-padding']}
               type={currentUseCase.type}
               evaluationRunning={evaluationRunning}
-              setSelectedResultDetails={setSelectedResultDetails}
+              setSelectedInstance={setSelectedInstance}
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               criteria={currentUseCase.criteria}
               responseVariableName={currentUseCase.responseVariableName}
@@ -706,12 +702,13 @@ export const SingleExampleEvaluation = () => {
             setConfirmationModalOpen={setConfirmationModalOpen}
             changesDetected={changesDetected}
           />
-          <ResultDetailsModal
+          <InstanceDetailsModal
             open={resultDetailsModalOpen}
             setOpen={setResultDetailsModalOpen}
-            selectedResultDetails={selectedResultDetails}
-            setSelectedResultDetails={setSelectedResultDetails}
+            selectedInstance={selectedInstance}
+            setSelectedInstance={setSelectedInstance}
             type={currentUseCase.type}
+            responseVariableName={currentUseCase.responseVariableName}
           />
           <PromptModal
             open={promptModalOpen}

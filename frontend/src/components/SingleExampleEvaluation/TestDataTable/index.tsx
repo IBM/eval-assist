@@ -32,13 +32,7 @@ interface Props {
   className?: string
   type: EvaluationType
   evaluationRunning: boolean
-  setSelectedResultDetails: Dispatch<
-    SetStateAction<{
-      result: DirectInstanceResult | PerResponsePairwiseResult | null
-      expectedResult: string
-      responseIndex: string
-    }>
-  >
+  setSelectedInstance: Dispatch<SetStateAction<Instance | null>>
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   criteria: CriteriaWithOptions | Criteria
   responseVariableName: string
@@ -60,7 +54,7 @@ export const TestDataTable = ({
   setInstances,
   type,
   evaluationRunning,
-  setSelectedResultDetails,
+  setSelectedInstance,
   setResultDetailsModalOpen,
   criteria,
   responseVariableName,
@@ -203,6 +197,7 @@ export const TestDataTable = ({
       caption: `${result.syntheticExamples.length} example${result.syntheticExamples.length > 1 ? 's' : ''} ${
         result.syntheticExamples.length > 1 ? 'were' : 'was'
       } generated and added to the test data`,
+      timeout: 5000,
     })
   }, [addToast, fetchSystheticExamples, instances, removeToast, responseVariableName, setInstances, type])
 
@@ -391,7 +386,7 @@ export const TestDataTable = ({
               key={i}
               explanationOn={explanationOn}
               expectedResultOn={expectedResultOn}
-              setSelectedResultDetails={setSelectedResultDetails}
+              setSelectedInstance={setSelectedInstance}
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               evaluationRunning={evaluationRunning}
               criteria={criteria}
