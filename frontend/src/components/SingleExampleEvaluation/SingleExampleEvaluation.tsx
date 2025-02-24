@@ -150,6 +150,7 @@ export const SingleExampleEvaluation = () => {
     evaluatorType: currentUseCase?.type,
     criteria: currentUseCase?.criteria,
     responseVariableName: currentUseCase?.responseVariableName,
+    contextVariableNames: currentUseCase?.instances[0]?.contextVariables.map((c) => c.name) || [],
   })
 
   const responses = useMemo(

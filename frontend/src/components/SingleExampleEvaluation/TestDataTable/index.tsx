@@ -45,7 +45,11 @@ interface Props {
   setResponseVariableName: (newValue: string) => void
   instances: Instance[]
   setInstances: (instances: Instance[]) => void
-  fetchSystheticExamples: () => Promise<any>
+  fetchSystheticExamples: () => Promise<{
+    syntheticExamples: any
+    failed: boolean
+    errorMessage: string
+  }>
   loadingSyntheticExamples: boolean
 }
 
@@ -159,8 +163,18 @@ export const TestDataTable = ({
       kind: 'info',
       title: 'Generating synthetic examples',
     })
-    const syntheticExamples = await fetchSystheticExamples()
-    const syntheticExample = syntheticExamples[0]
+    const result = await fetchSystheticExamples()
+
+    if (result.failed) {
+      addToast({
+        kind: 'error',
+        title: 'Evaluation failed',
+        subtitle: result.errorMessage,
+        timeout: 5000,
+      })
+      return
+    }
+    const syntheticExample = result.syntheticExamples[0]
     let syntheticInstance: Instance = {
       contextVariables: instances[0].contextVariables.map((contextVariable) => ({
         name: contextVariable.name,
@@ -169,6 +183,7 @@ export const TestDataTable = ({
       expectedResult: '',
       result: null,
     }
+    console.log(syntheticInstance)
     if (type === EvaluationType.DIRECT) {
       ;(syntheticInstance as DirectInstance) = {
         ...syntheticInstance,
@@ -185,8 +200,8 @@ export const TestDataTable = ({
     addToast({
       kind: 'success',
       title: 'Synthetic examples generated succesfully',
-      caption: `${syntheticExamples.length} example${syntheticExamples.length > 1 ? 's' : ''} ${
-        syntheticExamples.length > 1 ? 'were' : 'was'
+      caption: `${result.syntheticExamples.length} example${result.syntheticExamples.length > 1 ? 's' : ''} ${
+        result.syntheticExamples.length > 1 ? 'were' : 'was'
       } generated and added to the test data`,
     })
   }, [addToast, fetchSystheticExamples, instances, removeToast, responseVariableName, setInstances, type])

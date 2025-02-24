@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import HTTPException
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, RootModel, validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
 
 from ..const import ExtendedEvaluatorNameEnum
@@ -127,10 +127,11 @@ class SyntheticExampleGenerationRequest(BaseModel):
     type: EvaluatorTypeEnum
     criteria: CriteriaWithOptionsAPI | PairwiseCriteriaModel
     response_variable_name: str
+    context_variables_names: list[str]
 
 
-class SyntheticExampleGenerationResponse(BaseModel):
-    systhetic_examples: list[dict[str, str]]
+class SyntheticExampleGenerationResponse(RootModel):
+    root: list[dict[str, str]]
 
 
 class RubricOptionModel(BaseModel):

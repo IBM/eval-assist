@@ -11,6 +11,7 @@ interface Props {
   evaluatorType?: EvaluationType
   criteria?: CriteriaWithOptions | Criteria
   responseVariableName?: string
+  contextVariableNames: string[]
 }
 
 export const useGenerateSystheticExamples = (props: Props) => {
@@ -27,10 +28,35 @@ export const useGenerateSystheticExamples = (props: Props) => {
       type: props.evaluatorType,
       criteria: props.criteria,
       response_variable_name: props.responseVariableName,
+      context_variables_names: props.contextVariableNames,
     }
-    const syntheticExamples = (await (await post('synthetic-examples/', body)).json())['systhetic_examples']
+
+    const response = await post('synthetic-examples/', body)
+
+    if (!response.ok) {
+      const error = (await response.json()) as {
+        detail: string
+      }
+
+      const errorMessage =
+        typeof error.detail === 'string'
+          ? error.detail
+          : `Something went wrong with the evaluation (${(error.detail as { type: string; msg: string }[])[0].type}: ${
+              (error.detail as { type: string; msg: string }[])[0].msg
+            })`
+
+      return {
+        syntheticExamples: [],
+        failed: true,
+        errorMessage,
+      }
+    }
+
+    const syntheticExamples = await response.json()
+
     setLoadingSyntheticExamples(false)
-    return syntheticExamples
+
+    return { syntheticExamples, failed: false, errorMessage: '' }
   }
 
   return { fetchSystheticExamples, loadingSyntheticExamples }

@@ -379,14 +379,9 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
 @router.post("/synthetic-examples/", response_model=SyntheticExampleGenerationResponse)
 def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     print(params)
-    return SyntheticExampleGenerationResponse(
-        systhetic_examples=[
-            {
-                "Question": "Synthetically generated content",
-                "response": "Synthetically generated content",
-            },
-        ]
-    )
+    mocked_response = {c: "mocked" for c in params.context_variables_names}
+    mocked_response[params.response_variable_name] = "mocked"
+    return SyntheticExampleGenerationResponse([mocked_response])
 
 
 @app.exception_handler(RequestValidationError)
