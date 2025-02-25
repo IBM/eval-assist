@@ -319,7 +319,7 @@ export const useTestCaseLibrary = () => {
             ],
             response:
               'On most days, the weather is warm and humid, with temperatures often soaring into the high 80s and low 90s Fahrenheit (around 31-34°C). The dense foliage of the jungle acts as a natural air conditioner, keeping the temperature relatively stable and comfortable for the inhabitants.',
-            expectedResult: 'Yes',
+            expectedResult: 'Bad',
             result: null,
           } as DirectInstance,
           {
