@@ -190,13 +190,15 @@ export const TestDataTableRow = ({
               </div>
             )}
 
-            {result !== null && !evaluationRunning && (
+            {result !== null && !evaluationRunning ? (
               <>
                 <div
-                  className={cx(classes.blockElement, classes.resultBlock, {
-                    // [classes.resultBlockPointerCursor]: results[i] !== undefined,
-                    // [classes.resultBlockHover]: results[i] !== undefined,
-                  })}
+                  className={cx(
+                    classes.blockElement,
+                    classes.resultBlock,
+                    classes.resultBlockPointerCursor,
+                    classes.resultBlockHover,
+                  )}
                   //   onClick={() => onResultBlockClick(i)}
                   tabIndex={-1}
                 >
@@ -248,6 +250,15 @@ export const TestDataTableRow = ({
                     onBlur={setInactive}
                     className={cx(classes.blockElement, classes.resultBlockDefaultCursor, classes.explanationBlock)}
                     tabIndex={-1}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1} />
+                {type === EvaluationType.DIRECT && explanationOn && (
+                  <div
+                    className={cx(classes.blockElement, classes.resultBlockDefaultCursor, classes.explanationBlock)}
                   />
                 )}
               </>
