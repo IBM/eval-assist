@@ -58,7 +58,7 @@ export const TestDataTable = ({
   fetchSystheticExamples,
   loadingSyntheticExamples,
 }: Props) => {
-  const instancesPerPage = useMemo(() => 3, [])
+  const instancesPerPage = useMemo(() => 5, [])
   const [explanationOn, setExplanationOn] = useState(type === EvaluationType.DIRECT)
   const { addToast, removeToast } = useToastContext()
 
