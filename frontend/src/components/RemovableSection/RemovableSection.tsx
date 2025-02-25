@@ -27,7 +27,7 @@ export default function RemovableSection({ onRemove, onExpand, onDuplicate, remo
       })}
 
       <div className={cx(classes.actionButtonsContainer)}>
-        <Tooltip label="Duplicate" align="left">
+        <Tooltip label="Duplicate" align="top">
           <button
             aria-label="Duplicate"
             className={cx(classes.actionButton, {
@@ -52,7 +52,7 @@ export default function RemovableSection({ onRemove, onExpand, onDuplicate, remo
           </button>
         </Tooltip>
         {removeEnabled && (
-          <Tooltip label="Remove" align="left">
+          <Tooltip label="Remove" align="bottom">
             <button
               aria-label="Remove"
               className={cx(classes.actionButton, {

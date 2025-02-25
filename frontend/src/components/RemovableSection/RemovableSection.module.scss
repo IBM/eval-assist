@@ -34,12 +34,13 @@
 .actionButtonsContainer {
   position: absolute;
   top: 0;
-  left: -35px;
+  left: -27px;
   display: flex;
   flex-direction: column;
   height: 100%;
   justify-content: space-evenly;
   opacity: 0;
+  transition: opacity $duration-slow-01;
 
   &.active {
     opacity: 1;
@@ -55,6 +56,7 @@
   z-index: 2;
   cursor: pointer;
   transition: opacity $duration-fast-02;
+  padding: 0;
   svg {
     fill: $link-primary;
   }
