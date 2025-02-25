@@ -36,6 +36,7 @@ interface Props {
   removeInstance: () => void
   type: EvaluationType
   addInstance: (instance: Instance) => void
+  resultsAvailable: boolean
 }
 
 export const TestDataTableRow = ({
@@ -51,7 +52,9 @@ export const TestDataTableRow = ({
   setInstance,
   addInstance,
   removeInstance,
+
   type,
+  resultsAvailable,
 }: Props) => {
   const responses = useMemo(() => {
     return returnByPipelineType(type, [(instance as DirectInstance).response], (instance as PairwiseInstance).responses)
@@ -257,7 +260,7 @@ export const TestDataTableRow = ({
                   />
                 )}
               </>
-            ) : (
+            ) : resultsAvailable ? (
               <>
                 <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1} />
                 {type === EvaluationType.DIRECT && explanationOn && (
@@ -266,7 +269,7 @@ export const TestDataTableRow = ({
                   />
                 )}
               </>
-            )}
+            ) : null}
           </div>
         )}
       </RemovableSection>

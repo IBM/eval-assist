@@ -13,14 +13,10 @@ import {
   Criteria,
   CriteriaWithOptions,
   DirectInstance,
-  DirectInstanceResult,
   EvaluationType,
   Instance,
   PairwiseInstance,
-  PairwiseInstanceResult,
   PairwiseInstanceResultV1,
-  PerResponsePairwiseResult,
-  UseCase,
 } from '../../../types'
 import { useToastContext } from '../Providers/ToastProvider'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
@@ -401,6 +397,7 @@ export const TestDataTable = ({
               removeInstance={() => removeInstance(i)}
               type={type}
               addInstance={addInstance}
+              resultsAvailable={resultsAvailable}
             />
           ))}
           {totalPages > 1 && (
