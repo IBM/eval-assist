@@ -2,43 +2,70 @@ import cx from 'classnames'
 
 import { useState } from 'react'
 
-import { CloseFilled } from '@carbon/react/icons'
+import { Tooltip } from '@carbon/react'
+import { Maximize, Replicate, TrashCan } from '@carbon/react/icons'
 
 import classes from './RemovableSection.module.scss'
 
 interface Props {
   onRemove: () => void
-  readOnly?: boolean
+  onExpand: () => void
+  onDuplicate: () => void
+  removeEnabled?: boolean
   children: (arg: { setActive: () => void; setInactive: () => void }) => JSX.Element
 }
 
-export default function RemovableSection({ onRemove, readOnly, children }: Props) {
+export default function RemovableSection({ onRemove, onExpand, onDuplicate, removeEnabled, children }: Props) {
   const [active, setActive] = useState(false)
 
   return (
-    <div
-      className={cx(classes.container, {
-        [classes.active]: !active,
-      })}
-    >
+    <div className={cx(classes.container)}>
       <div className={classes.outline} />
       {children({
         setActive: () => setActive(true),
         setInactive: () => setActive(false),
       })}
 
-      {!readOnly && (
-        <button
-          aria-label="Remove"
-          className={cx(classes.removeBtn, {
-            [classes.active]: active,
-          })}
-          onClick={onRemove}
-          tabIndex={-1}
-        >
-          <CloseFilled />
-        </button>
-      )}
+      <div className={cx(classes.actionButtonsContainer)}>
+        <Tooltip label="Duplicate" align="left">
+          <button
+            aria-label="Duplicate"
+            className={cx(classes.actionButton, {
+              [classes.active]: active,
+            })}
+            onClick={onDuplicate}
+            tabIndex={-1}
+          >
+            <Replicate />
+          </button>
+        </Tooltip>
+        <Tooltip label="See details" align="left">
+          <button
+            aria-label="See details"
+            className={cx(classes.actionButton, {
+              [classes.active]: active,
+            })}
+            onClick={onExpand}
+            tabIndex={-1}
+          >
+            <Maximize />
+          </button>
+        </Tooltip>
+        {removeEnabled && (
+          <Tooltip label="Remove" align="left">
+            <button
+              aria-label="Remove"
+              className={cx(classes.actionButton, {
+                [classes.active]: active,
+              })}
+              onClick={onRemove}
+              tabIndex={-1}
+            >
+              <TrashCan />
+            </button>
+          </Tooltip>
+        )}
+      </div>
     </div>
   )
 }

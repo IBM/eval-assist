@@ -45,6 +45,7 @@ export const useGenerateSystheticExamples = (props: Props) => {
               (error.detail as { type: string; msg: string }[])[0].msg
             })`
 
+      setLoadingSyntheticExamples(false)
       return {
         syntheticExamples: [],
         failed: true,

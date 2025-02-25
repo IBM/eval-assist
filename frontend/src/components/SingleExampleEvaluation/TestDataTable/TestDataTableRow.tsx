@@ -35,6 +35,7 @@ interface Props {
   readOnly: boolean
   removeInstance: () => void
   type: EvaluationType
+  addInstance: (instance: Instance) => void
 }
 
 export const TestDataTableRow = ({
@@ -48,6 +49,7 @@ export const TestDataTableRow = ({
   readOnly,
   instance,
   setInstance,
+  addInstance,
   removeInstance,
   type,
 }: Props) => {
@@ -123,14 +125,23 @@ export const TestDataTableRow = ({
     }
   }, [instance, type])
 
-  const onResultBlockClick = () => {
+  const onExpandInstance = () => {
     setSelectedInstance(instance)
     setResultDetailsModalOpen(true)
   }
 
+  const onDuplicateInstance = () => {
+    addInstance({ ...instance })
+  }
+
   return (
     <>
-      <RemovableSection onRemove={() => removeInstance()} readOnly={readOnly}>
+      <RemovableSection
+        onRemove={() => removeInstance()}
+        onExpand={() => onExpandInstance()}
+        onDuplicate={() => onDuplicateInstance()}
+        removeEnabled={!readOnly}
+      >
         {({ setActive, setInactive }) => (
           <div
             className={cx(classes.tableRow, classes.responsesRow, {
@@ -227,13 +238,6 @@ export const TestDataTableRow = ({
                         >{`Agreement: ${result.agreement ? 'Yes' : 'No'}`}</div>
                       )}
                     </div>
-                    <Link
-                      style={{ alignSelf: 'flex-end' }}
-                      className={classes.resultDetailsAction}
-                      onClick={onResultBlockClick}
-                    >
-                      View Details
-                    </Link>
                   </div>
                 </div>
 

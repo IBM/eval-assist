@@ -62,7 +62,7 @@ export const TestDataTable = ({
   fetchSystheticExamples,
   loadingSyntheticExamples,
 }: Props) => {
-  const instancesPerPage = useMemo(() => 5, [])
+  const instancesPerPage = useMemo(() => 3, [])
   const [explanationOn, setExplanationOn] = useState(type === EvaluationType.DIRECT)
   const { addToast, removeToast } = useToastContext()
 
@@ -152,12 +152,17 @@ export const TestDataTable = ({
     setInstances([...instances, newEmptyInstance])
   }
 
+  const addInstance = (instance: Instance) => {
+    setInstances([...instances, instance])
+  }
+
   const generateTestData = useCallback(async () => {
     const generationInProgressToastId = addToast({
       kind: 'info',
       title: 'Generating synthetic examples',
     })
     const result = await fetchSystheticExamples()
+    removeToast(generationInProgressToastId)
 
     if (result.failed) {
       addToast({
@@ -177,7 +182,7 @@ export const TestDataTable = ({
       expectedResult: '',
       result: null,
     }
-    console.log(syntheticInstance)
+
     if (type === EvaluationType.DIRECT) {
       ;(syntheticInstance as DirectInstance) = {
         ...syntheticInstance,
@@ -190,7 +195,6 @@ export const TestDataTable = ({
       }
     }
     setInstances([...instances, syntheticInstance])
-    removeToast(generationInProgressToastId)
     addToast({
       kind: 'success',
       title: 'Synthetic examples generated succesfully',
@@ -396,6 +400,7 @@ export const TestDataTable = ({
               readOnly={instances.length === 1 || evaluationRunning}
               removeInstance={() => removeInstance(i)}
               type={type}
+              addInstance={addInstance}
             />
           ))}
           {totalPages > 1 && (

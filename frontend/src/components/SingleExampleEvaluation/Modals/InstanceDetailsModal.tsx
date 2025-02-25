@@ -52,28 +52,27 @@ export const InstanceDetailsModal = ({
   //   }
   //   return pb
   // }, [selectedInstance, type])
-
   return (
     selectedInstance !== null && (
       <Modal open={open} onRequestClose={onClose} passiveModal size="sm" modalHeading={`Instance details`}>
         <Layer style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '1rem' }}>
           {selectedInstance.contextVariables.map((contectVariable, i) => (
             <>
-              <p>
+              <p key={`${i}_0`}>
                 <strong>{`${toTitleCase(contectVariable.name)}:`}</strong>
               </p>
-              <p>{contectVariable.value}</p>
+              <p key={`${i}_1`}>{contectVariable.value}</p>
             </>
           ))}
+          <p>
+            <strong>{toTitleCase(responseVariableName)}</strong>
+          </p>
+          <p>{(selectedInstance as DirectInstance).response}</p>
+
           {selectedInstance.result && (
             <>
               {type === EvaluationType.DIRECT && (
                 <>
-                  <p>
-                    <strong>{toTitleCase(responseVariableName)}</strong>
-                  </p>
-                  <p>{(selectedInstance as DirectInstance).response}</p>
-
                   {selectedInstance.expectedResult !== '' && (
                     <>
                       <p>

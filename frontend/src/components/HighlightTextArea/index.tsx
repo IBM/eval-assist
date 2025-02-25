@@ -14,6 +14,8 @@ interface Props extends TextInputProps {
   isTextInput?: boolean
   editorId: string
   onValueChange: (value: string) => void
+  growToContent?: boolean
+  editable?: boolean
 }
 
 export const HighlightTextArea = memo(function HighlightTextArea({
@@ -25,6 +27,8 @@ export const HighlightTextArea = memo(function HighlightTextArea({
   isTextArea = false,
   isTextInput = false,
   editorId,
+  growToContent = false,
+  editable = true,
   onValueChange,
 }: Props) {
   return (
@@ -37,6 +41,8 @@ export const HighlightTextArea = memo(function HighlightTextArea({
         editorId={editorId}
         value={value}
         onValueChange={onValueChange}
+        growToContent={growToContent}
+        editable={editable}
       />
     </CarbonWrapper>
   )

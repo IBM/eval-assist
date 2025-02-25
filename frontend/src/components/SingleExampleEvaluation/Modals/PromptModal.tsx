@@ -141,6 +141,8 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
               }}
               id={''}
               labelText={undefined}
+              growToContent={true}
+              editable={false}
             />
           </div>
         )}

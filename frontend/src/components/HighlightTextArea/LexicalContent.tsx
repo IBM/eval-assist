@@ -31,6 +31,8 @@ interface Props {
   value: TextInputProps['value']
   editorId: string
   onValueChange: (value: string) => void
+  growToContent?: boolean
+  editable?: boolean
 }
 
 const LexicalErrorBoundary: React.FC<{ children: JSX.Element; onError: (error: Error) => void }> = ({ children }) => {
@@ -45,6 +47,8 @@ export const LexicalContent = ({
   editorId,
   value,
   onValueChange,
+  growToContent,
+  editable,
 }: Props) => {
   const editor = useEditor(editorId)
 
@@ -94,6 +98,7 @@ export const LexicalContent = ({
             className={cx('cds--text-input', classes.contentEditable, {
               [classes.textAreaLikeOuter]: isTextArea,
               [classes.textInputLike]: isTextInput,
+              [classes.growToContent]: growToContent,
             })}
             aria-placeholder={placeholder || ''}
             placeholder={<div className={classes.placeholder}>{placeholder || ''}</div>}
@@ -105,12 +110,14 @@ export const LexicalContent = ({
       {isTextInput && <NoEnterPlugin />}
       <HistoryPlugin />
       <MultipleEditorStorePlugin id={editorId} />
-      <OnChangePlugin
-        ignoreSelectionChange
-        onChange={(editorState: EditorState) => {
-          _onChange(editorState)
-        }}
-      />
+      {editable && (
+        <OnChangePlugin
+          ignoreSelectionChange
+          onChange={(editorState: EditorState) => {
+            _onChange(editorState)
+          }}
+        />
+      )}
     </LexicalComposer>
   )
 }

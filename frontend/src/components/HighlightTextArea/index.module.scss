@@ -20,6 +20,10 @@
   padding-top: 0.6rem;
 }
 
+.growToContent {
+  height: auto !important;
+}
+
 .paragraph {
   @include type-style('body-short-01');
   overflow: hidden;
