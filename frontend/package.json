@@ -1,7 +1,10 @@
 {
   "name": "eval-assist",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "engines": {
+    "node": ">20"
+  },
   "scripts": {
     "dev": "next dev",
     "dev:https": "next dev --experimental-https",

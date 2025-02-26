@@ -1,6 +1,9 @@
 {
     "name": "eval-assist",
     "private": false,
+    "engines": {
+        "node": ">20"
+    },
     "scripts": {
         "prepare": "backend/venv/bin/python3 -m pip install pre-commit && backend/venv/bin/python3 -m pre_commit install",
         "install:backend": "npm run check:python && cd backend && python3 -m venv venv && venv/bin/python3 -m pip install --upgrade pip setuptools wheel && venv/bin/python3 -m pip install -r requirements/dev.txt",
@@ -13,7 +16,7 @@
         "prisma:prepare:backend": "node shared/scripts/mergePrisma.js backend",
         "prisma:prepare:frontend": "node shared/scripts/mergePrisma.js frontend",
         "prisma:prepare": "concurrently \"npm run prisma:prepare:frontend\" \"npm run prisma:prepare:backend\"",
-        "prisma:generate:backend": "cd backend && venv/bin/python3 -m prisma generate",
+        "prisma:generate:backend": "cd backend && source venv/bin/activate && venv/bin/prisma generate",
         "prisma:generate:frontend": "cd frontend && npx prisma generate",
         "prisma:generate": "npm run prisma:generate:frontend && npm run prisma:generate:backend",
         "prisma:sync": "backend/venv/bin/python3 -m prisma migrate dev --schema shared/prisma/schema.base.prisma",
