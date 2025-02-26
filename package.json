@@ -2,7 +2,7 @@
     "name": "eval-assist",
     "private": false,
     "scripts": {
-        "prepare": "backend/venv/bin/python3 -m pip install pre-commit && backend/venv/bin/python3 -m pre-commit install",
+        "prepare": "backend/venv/bin/python3 -m pip install pre-commit && backend/venv/bin/python3 -m pre_commit install",
         "install:backend": "npm run check:python && cd backend && python3 -m venv venv && venv/bin/python3 -m pip install --upgrade pip setuptools wheel && venv/bin/python3 -m pip install -r requirements/dev.txt",
         "install:frontend": "cd frontend && npm install",
         "install": "concurrently --kill-others-on-fail \"npm run install:backend\" \"npm run install:frontend\"",
@@ -19,7 +19,7 @@
         "prisma:sync": "backend/venv/bin/python3 -m prisma migrate dev --schema shared/prisma/schema.base.prisma",
         "prisma": "npm run prisma:prepare && npm run prisma:generate",
         "db": "cd shared/localdb/ && docker-compose -f postgres.yml up -d",
-        "pre-commit:backend": "backend/venv/bin/python3 -m pre-commit run --all-files",
+        "pre-commit:backend": "backend/venv/bin/python3 -m pre_commit run --all-files",
         "pre-commit:frontend": "cd frontend && npm run pre-commit",
         "pre-commit": "concurrently \"npm run pre-commit:backend\" \"npm run pre-commit:frontend\"",
         "clean:frontend": "rimraf frontend/node_modules frontend/prisma/schema.prisma",
