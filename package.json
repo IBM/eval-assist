@@ -6,7 +6,7 @@
     },
     "scripts": {
         "prepare": "npm run activate-venv && cd backend && python3 -m pip install pre-commit && python3 -m pre_commit install",
-        "install:backend": "npm run check:python && cd backend && python3 -m venv venv && npm run activate-venv && python3 -m pip install --upgrade pip setuptools wheel && python3 -m pip install -r requirements/dev.txt",
+        "install:backend": "npm run check:python && python3 -m venv backend/venv && npm run activate-venv && pip3 install --upgrade pip setuptools wheel && pip3 install -r backend/requirements.txt",
         "install:frontend": "cd frontend && npm install",
         "install": "concurrently --kill-others-on-fail \"npm run install:backend\" \"npm run install:frontend\"",
         "start:backend": "npm run activate-venv && python3 backend/run.py",
