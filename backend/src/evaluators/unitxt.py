@@ -3,11 +3,7 @@ from typing import Any, List, cast
 
 from unitxt.api import evaluate, load_dataset
 from unitxt.blocks import Task, TaskCard
-from unitxt.inference import (
-    LiteLLMInferenceEngine,
-    RITSInferenceEngine,
-    WMLInferenceEngineGeneration,
-)
+from unitxt.inference import WMLInferenceEngineGeneration
 from unitxt.llm_as_judge import (
     Criteria,
     CriteriaWithOptions,
@@ -19,54 +15,15 @@ from unitxt.llm_as_judge import (
     LoadCriteriaWithOptions,
     ModelProviderEnum,
     get_evaluator_metadata,
-    rename_model_if_required,
 )
 from unitxt.loaders import LoadFromDictionary
 from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
+from backend.src.utils import get_litellm_inference_engine
+
 from ..api.common import Instance
 from ..const import EXTENDED_EVALUATOR_TO_MODEL_ID, ExtendedEvaluatorNameEnum
-
-
-def get_inference_engine_params(
-    credentials: dict,
-    provider: ModelProviderEnum,
-    evaluator_name: EvaluatorNameEnum,
-):
-    inference_engine_params = {
-        "max_tokens": 1024,
-        "seed": 42,
-        "credentials": credentials,
-        "max_requests_per_second": 10,
-    }
-
-    model_name = rename_model_if_required(
-        EXTENDED_EVALUATOR_TO_MODEL_ID[evaluator_name], provider
-    )
-
-    if provider == ModelProviderEnum.WATSONX:
-        model_name = "watsonx/" + model_name
-
-    if provider == ModelProviderEnum.AZURE_OPENAI:
-        inference_engine_params["credentials"]["api_base"] = (
-            f"https://eteopenai.azure-api.net/openai/deployments/{model_name}/chat/completions?api-version=2024-08-01-preview"
-        )
-        model_name = "azure/" + model_name
-    if provider == ModelProviderEnum.RITS:
-        inference_engine_params["credentials"]["api_base"] = (
-            RITSInferenceEngine.get_base_url_from_model_name(model_name) + "/v1"
-        )
-        inference_engine_params["extra_headers"] = {
-            "RITS_API_KEY": credentials["api_key"]
-        }
-
-    if provider == ModelProviderEnum.OPENAI or provider == ModelProviderEnum.RITS:
-        model_name = f"openai/{model_name}"
-
-    inference_engine_params["model"] = model_name
-
-    return inference_engine_params
 
 
 def get_enum_by_value(value: str) -> EvaluatorNameEnum:
@@ -104,10 +61,9 @@ class Evaluator(ABC):
         provider: ModelProviderEnum,
         credentials: dict[str, str],
     ):
-        inference_engine_params = get_inference_engine_params(
+        inference_engine = get_litellm_inference_engine(
             credentials, provider, self.evaluator.name
         )
-        inference_engine = LiteLLMInferenceEngine(**inference_engine_params)
         context_variables_list = [instance.context_variables for instance in instances]
         evalutor_params = {
             "inference_engine": inference_engine,
