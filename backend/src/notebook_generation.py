@@ -3,7 +3,7 @@ import json
 import nbformat as nbf
 
 from .api.common import NotebookParams
-from .evaluators.unitxt import get_enum_by_value, get_inference_engine_params
+from .utils import get_enum_by_value, get_inference_engine_params
 
 
 def generate_direct_notebook(params: NotebookParams):

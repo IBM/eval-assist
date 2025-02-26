@@ -1,11 +1,7 @@
 import functools
 import time
 
-from unitxt.inference import (
-    InferenceEngine,
-    LiteLLMInferenceEngine,
-    RITSInferenceEngine,
-)
+from unitxt.inference import LiteLLMInferenceEngine, RITSInferenceEngine
 from unitxt.llm_as_judge import (
     EvaluatorNameEnum,
     EvaluatorTypeEnum,
@@ -13,11 +9,7 @@ from unitxt.llm_as_judge import (
     rename_model_if_required,
 )
 
-from backend.src.const import EXTENDED_EVALUATOR_TO_MODEL_ID
-
-"""
-    Usage: wrap a function call with the log_runtime function to log its runtime
-"""
+from .const import EXTENDED_EVALUATOR_TO_MODEL_ID
 
 
 def get_inference_engine_params(
@@ -71,8 +63,16 @@ def get_litellm_inference_engine(
     return LiteLLMInferenceEngine(**inference_engine_params)
 
 
-def call_inference_engine(inference_engine: InferenceEngine, instances: str):
-    return inference_engine.infer([{"source": instance} for instance in instances])
+def get_enum_by_value(value: str) -> EvaluatorNameEnum:
+    for enum_member in EvaluatorNameEnum:
+        if enum_member.value == value:
+            return enum_member
+    raise ValueError(f"No matching enum found for value: {value}")
+
+
+"""
+    Usage: wrap a function call with the log_runtime function to log its runtime
+"""
 
 
 def log_runtime(function):

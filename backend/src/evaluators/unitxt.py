@@ -20,17 +20,9 @@ from unitxt.loaders import LoadFromDictionary
 from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
-from backend.src.utils import get_litellm_inference_engine
-
 from ..api.common import Instance
 from ..const import EXTENDED_EVALUATOR_TO_MODEL_ID, ExtendedEvaluatorNameEnum
-
-
-def get_enum_by_value(value: str) -> EvaluatorNameEnum:
-    for enum_member in EvaluatorNameEnum:
-        if enum_member.value == value:
-            return enum_member
-    raise ValueError(f"No matching enum found for value: {value}")
+from ..utils import get_litellm_inference_engine
 
 
 class Evaluator(ABC):

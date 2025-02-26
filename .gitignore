@@ -42,3 +42,5 @@ Secrets.yaml
 certificates
 
 .python-version
+
+.litellm_cache/
