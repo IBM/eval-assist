@@ -5,6 +5,17 @@
 
 <!-- Not always needed, but a scope helps the user understand in a short sentance like below, why this repo exists -->
 
+EvalAssist is an LLM-as-a-Judge framework built on top of the [UNITXT](https://www.unitxt.ai/en/latest/docs/introduction.html)
+open source evaluation library for large language models. The EvalAssist application provides users with a
+convenient way of iteratively testing and refining LLM-as-a-judge criteria, and supports both direct
+(rubric-based) and pairwise assessment paradigms (relation-based), the two most prevalent forms of
+LLM-as-a-judge evaluations available. EvalAssist is designed to be model-agnostic, i.e. the content to be
+evaluated can come from any model. EvalAssist supports a rich set of off-the-shelf judge models that can
+easily be extended. An API key is required to use the pre-defined judge models. Once users are satisfied
+with their criteria, they can auto-generate a Notebook with UNITXT code to run bulk evaluations with larger
+data sets based on their criteria definition. EvalAssist also includes a catalog of example test cases,
+exhibiting the use of LLM-as-a-judge across a variety of scenarios. Users can save their own test cases.
+
 ## Run EvalAssist locally
 
 ### 1. Install the requirements
@@ -16,7 +27,7 @@ _Note: In this project, npm is used both as a task manager (used to easily setup
 
 ### 2. Install the dependencies
 
-The following command will install the frontend and backend dependencies. It will install frontend dependencies using npm. In addition, it will install backend dependencies by creating a virtual environment, activating it and using pip to install the dependencies.
+The following command will install the frontend and backend dependencies. It will install the frontend dependencies using npm. In addition, it will install the backend dependencies by creating a virtual environment (`venv`), activating it and using pip to install the dependencies.
 
 ```bash
 npm install

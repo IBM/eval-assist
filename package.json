@@ -16,7 +16,7 @@
         "prisma:prepare:backend": "node shared/scripts/mergePrisma.js backend",
         "prisma:prepare:frontend": "node shared/scripts/mergePrisma.js frontend",
         "prisma:prepare": "concurrently \"npm run prisma:prepare:frontend\" \"npm run prisma:prepare:backend\"",
-        "prisma:generate:backend": "cd backend && source venv/bin/activate && venv/bin/prisma generate",
+        "prisma:generate:backend": "cd backend && source venv/bin/activate && venv/bin/python3 -m prisma generate && source deactivate",
         "prisma:generate:frontend": "cd frontend && npx prisma generate",
         "prisma:generate": "npm run prisma:generate:frontend && npm run prisma:generate:backend",
         "prisma:sync": "backend/venv/bin/python3 -m prisma migrate dev --schema shared/prisma/schema.base.prisma",
