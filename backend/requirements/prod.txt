@@ -1,3 +1,0 @@
-# For travis build
--r common.txt
-unitxt @ git+https://github.com/IBM/unitxt.git

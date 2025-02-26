@@ -1,2 +1,0 @@
--r common.txt
-unitxt @ git+ssh://git@github.com/IBM/unitxt.git
