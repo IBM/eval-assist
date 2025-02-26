@@ -2,7 +2,7 @@ const { exec } = require("child_process");
 const isWindows = process.platform.startsWith("win");
 
 const command = isWindows
-  ? "backend\\venv\\Scripts\\activate"
+  ? "venv\\backend\\venv\\bin\\activate.bat"
   : "source backend/venv/bin/activate";
 
 const shell = isWindows ? "cmd.exe" : "/bin/sh";
