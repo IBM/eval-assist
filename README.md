@@ -36,9 +36,9 @@ Both frontend and backend need a few environment variables to be set in order to
 
 Create an `.env` file in the root directory with the following entries:
 
-* `DATABASE_URL`
-* `NEXT_PUBLIC_BACKEND_API_HOST`
-* `NEXT_PUBLIC_USE_AUTH`
+* `DATABASE_URL`: the URL of the database
+* `NEXT_PUBLIC_BACKEND_API_HOST`: the URL of the backend FastAPI app
+* `NEXT_PUBLIC_USE_AUTH`: whether to use authentication or not. Authentication is performed through IBMId Oauth, but other methods can be added/contributed.
 
 _Note: you can use the content of `.env.example` to start with some default values:_
 
@@ -64,7 +64,7 @@ npm start
 
 ### 7. Open EvalAssist
 
-Visit [https://localhost:3000](https://localhost:3000)
+Visit [http://localhost:3000](https://localhost:3000)
 
 ## Commands summary
 
