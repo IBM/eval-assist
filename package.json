@@ -26,7 +26,7 @@
         "clean:backend": "rimraf backend/venv backend/prisma/schema.prisma ",
         "clean": "concurrently \"npm run clean:frontend\" \"npm run clean:backend\" && rimraf node_modules",
         "check:python": "python3 shared/scripts/check_python_version.py",
-        "freeze:deps:backend": "venv/bin/python3 -m pip freeze > requirements.lock"
+        "freeze-deps:backend": "cd backend && venv/bin/python3 -m pip freeze > requirements.lock"
     },
     "devDependencies": {
         "concurrently": "^8.2.2",
