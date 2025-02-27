@@ -1,9 +1,10 @@
+import os
 from abc import ABC
 from typing import Any, List, cast
 
 from unitxt.api import evaluate, load_dataset
 from unitxt.blocks import Task, TaskCard
-from unitxt.inference import WMLInferenceEngineGeneration
+from unitxt.inference import HFAutoModelInferenceEngine, WMLInferenceEngineGeneration
 from unitxt.llm_as_judge import (
     Criteria,
     CriteriaWithOptions,
@@ -292,14 +293,27 @@ class GraniteGuardianEvaluator(ABC):
             )
         )
 
+        model_name = EXTENDED_EVALUATOR_TO_MODEL_ID[self.evaluator_name]
+
+        inference_engine = (
+            HFAutoModelInferenceEngine(
+                model_name="ibm-granite/granite-guardian-3.1-2b",
+                max_new_tokens=20,
+                device="cpu",
+                low_cpu_mem_usage=False,
+            )
+            if os.environ.get("USE_HF_GRANITE_GUARDIAN")
+            else WMLInferenceEngineGeneration(
+                **granite_guardian_class.wml_params,
+                model_name=model_name,
+                credentials=credentials,
+            )
+        )
+
         metric = granite_guardian_class(
             risk_name=risk_name,
             **self.field_map,
-            inference_engine=WMLInferenceEngineGeneration(
-                **granite_guardian_class.wml_params,
-                model_name=EXTENDED_EVALUATOR_TO_MODEL_ID[self.evaluator_name],
-                credentials=credentials,
-            ),
+            inference_engine=inference_engine,
         )
 
         data = {"test": context_variables_list}
