@@ -44,6 +44,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
       [ModelProviderType.WATSONX]: [],
       [ModelProviderType.OPENAI]: [],
       [ModelProviderType.AZURE_OPENAI]: [],
+      [ModelProviderType.LOCAL_HF]: [],
     }
 
     filteredPipelines.forEach((p) => {
@@ -75,6 +76,14 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
         return splitComparison
       }),
     )
+
+    // Remove provider entries that doesn't have any evaluators
+    Object.entries(result).forEach(([provider, evaluators]) => {
+      if (evaluators.length === 0) {
+        delete result[provider as ModelProviderType]
+      }
+    })
+
     return result
   }, [filteredPipelines])
 

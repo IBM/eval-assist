@@ -9,4 +9,5 @@ export const modelProviderBeautifiedName: Record<ModelProviderType, string> = {
   [ModelProviderType.OPENAI]: 'OpenAI',
   [ModelProviderType.RITS]: 'RITS',
   [ModelProviderType.AZURE_OPENAI]: 'Azure OpenAI',
+  [ModelProviderType.LOCAL_HF]: 'Local HF',
 }

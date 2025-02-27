@@ -192,6 +192,7 @@ export enum ModelProviderType {
   OPENAI = 'openai',
   RITS = 'rits',
   AZURE_OPENAI = 'azure_openai',
+  LOCAL_HF = 'local_hf',
 }
 
 export interface Evaluator {
@@ -302,4 +303,5 @@ export type ModelProviderCredentials = {
   azure_openai: {
     api_key: string
   }
+  local_hf: {}
 }

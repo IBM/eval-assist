@@ -14,6 +14,7 @@ export const useModelProviderCredentials = () => {
       [ModelProviderType.OPENAI]: { api_key: '' },
       [ModelProviderType.RITS]: { api_key: '' },
       [ModelProviderType.AZURE_OPENAI]: { api_key: '' },
+      [ModelProviderType.LOCAL_HF]: {},
     }),
     [],
   )

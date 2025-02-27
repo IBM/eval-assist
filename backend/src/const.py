@@ -26,18 +26,18 @@ EXTENDED_EVALUATOR_TO_MODEL_ID = {
 EXTENDED_EVALUATORS_METADATA = EVALUATORS_METADATA + [
     EvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B,
-        [ModelProviderEnum.WATSONX],
+        [ModelProviderEnum.WATSONX, ModelProviderEnum.LOCAL_HF],
     ),
     EvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B,
-        [ModelProviderEnum.WATSONX],
+        [ModelProviderEnum.WATSONX, ModelProviderEnum.LOCAL_HF],
     ),
     EvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B,
-        [ModelProviderEnum.WATSONX],
+        [ModelProviderEnum.WATSONX, ModelProviderEnum.LOCAL_HF],
     ),
     EvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B,
-        [ModelProviderEnum.WATSONX],
+        [ModelProviderEnum.WATSONX, ModelProviderEnum.LOCAL_HF],
     ),
 ]
