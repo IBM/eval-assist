@@ -16,6 +16,7 @@ from ibm_watsonx_ai.wml_client_error import (
     CannotSetProjectOrSpace,
     WMLClientError,
 )
+from langchain_core.exceptions import OutputParserException
 from openai import AuthenticationError
 from prisma.errors import PrismaError
 from prisma.models import StoredUseCase
@@ -383,8 +384,6 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
 
 @router.post("/synthetic-examples/", response_model=SyntheticExampleGenerationResponse)
 def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
-    print(params)
-
     # populate config
     model_config = {
         "provider": params.provider,
@@ -405,7 +404,13 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
 
     # initialize generator and generate response
     generator = Generator(config)
-    response = generator.generate()
+    try:
+        response = generator.generate()
+    except OutputParserException as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{params.evaluator_name.value} was unable to generate an appropriate synthetic example",
+        ) from e
 
     return SyntheticExampleGenerationResponse([response])
 
