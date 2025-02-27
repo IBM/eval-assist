@@ -405,9 +405,7 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
 
     # initialize generator and generate response
     generator = Generator(config)
-    responses = generator.generate()
-
-    response = responses[-1]  # only extract example for borderline criterion
+    response = generator.generate()
 
     return SyntheticExampleGenerationResponse([response])
 
