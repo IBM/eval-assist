@@ -18,9 +18,19 @@ interface Props {
   style?: CSSProperties
   className?: string
   color: BadgeColor
+  isEditable?: boolean
 }
 
-export const EditableTag = ({ value, onChange, setActive, setInactive, i, color, className }: Props) => {
+export const EditableTag = ({
+  value,
+  onChange,
+  setActive,
+  setInactive,
+  i,
+  color,
+  className,
+  isEditable = true,
+}: Props) => {
   const [isEditing, setIsEditing] = useState(value === '')
   const inputRef = useRef(null)
 
@@ -58,9 +68,11 @@ export const EditableTag = ({ value, onChange, setActive, setInactive, i, color,
             <Tag type={color} size={'sm'} className={cx(classes.tag)}>
               {value}
             </Tag>
-            <IconButton kind={'ghost'} label={'Edit'} onClick={() => setIsEditing(true)}>
-              <Edit />
-            </IconButton>
+            {isEditable && (
+              <IconButton kind={'ghost'} label={'Edit'} onClick={() => setIsEditing(true)}>
+                <Edit />
+              </IconButton>
+            )}
           </>
         )}
       </div>

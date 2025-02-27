@@ -342,6 +342,7 @@ export const TestDataTable = ({
                     value={reponseName}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setResponseVariableName(e.target.value)}
                     color="blue"
+                    isEditable={type === EvaluationType.DIRECT}
                   />
                   {type == EvaluationType.PAIRWISE && (instances[0] as PairwiseInstance).responses.length > 2 && (
                     <IconButton kind={'ghost'} label={'Remove'} onClick={() => removePairwiseResponse(i)}>
