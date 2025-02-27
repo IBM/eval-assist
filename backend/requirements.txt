@@ -16,6 +16,6 @@ pandas
 scipy
 ibm_watsonx_ai
 openai
-transformers
+transformers>=4.48.0
 torch
 unitxt
