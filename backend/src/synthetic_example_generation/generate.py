@@ -205,7 +205,9 @@ class Generator:
             for system_prompt, query in zip(system_prompts, queries)
         ]  # todo: try to pass in separate system prompt and query (for now just concatenate)
         # todo: fix
-        responses = self.inference_engine.infer([{"source": prompts}])
+        responses = self.inference_engine.infer(
+            [{"source": prompt} for prompt in prompts]
+        )
 
         return responses
 
