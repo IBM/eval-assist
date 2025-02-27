@@ -4,6 +4,7 @@ import { getOrdinalSuffix, toPercentage, toTitleCase } from 'src/utils'
 import { Dispatch, SetStateAction, useMemo } from 'react'
 
 import { Layer, Link, ListItem, Modal, UnorderedList } from '@carbon/react'
+import { ArrowRight } from '@carbon/react/icons'
 
 import {
   DirectInstance,
@@ -121,9 +122,16 @@ export const InstanceDetailsModal = ({
                   )}
 
                   <p>
-                    <strong>{'Ranking: '}</strong>
+                    <strong>{'Instance ranking: '}</strong>
                   </p>
-                  <UnorderedList>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr 10fr',
+                      justifyItems: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
                     {Object.keys(selectedInstance.result as PairwiseInstanceResult)
                       .sort(
                         (key1, key2) =>
@@ -131,17 +139,19 @@ export const InstanceDetailsModal = ({
                           (selectedInstance.result as PairwiseInstanceResult)[key2].ranking,
                       )
                       .map((key, i) => (
-                        <ListItem key={i}>
-                          <p>
-                            {`${(selectedInstance.result as PairwiseInstanceResult)[key].ranking}${getOrdinalSuffix(
-                              (selectedInstance.result as PairwiseInstanceResult)[key].ranking,
-                            )}: ${toTitleCase(responseVariableName)} ${i + 1} (Winrate: ${toPercentage(
+                        <>
+                          <p>{`- ${(selectedInstance.result as PairwiseInstanceResult)[key].ranking}${getOrdinalSuffix(
+                            (selectedInstance.result as PairwiseInstanceResult)[key].ranking,
+                          )}`}</p>
+                          <ArrowRight size={16} />
+                          <p style={{ justifySelf: 'start' }}>
+                            {` ${toTitleCase(responseVariableName)} ${key} (Winrate: ${toPercentage(
                               (selectedInstance.result as PairwiseInstanceResult)[key].winrate,
                             )})`}
                           </p>
-                        </ListItem>
+                        </>
                       ))}
-                  </UnorderedList>
+                  </div>
                 </>
               )}
             </>
