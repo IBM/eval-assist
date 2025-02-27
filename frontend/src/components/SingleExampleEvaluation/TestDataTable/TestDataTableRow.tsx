@@ -1,9 +1,10 @@
 import cx from 'classnames'
-import { returnByPipelineType } from 'src/utils'
+import { returnByPipelineType, toTitleCase } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 
-import { Link, Select, SelectItem } from '@carbon/react'
+import { Link, Select, SelectItem, Tooltip } from '@carbon/react'
+import { Trophy } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
@@ -15,6 +16,7 @@ import {
   EvaluationType,
   Instance,
   PairwiseInstance,
+  PairwiseInstanceResult,
   PerResponsePairwiseResult,
 } from '../../../types'
 import RemovableSection from '../../RemovableSection/RemovableSection'
@@ -37,6 +39,7 @@ interface Props {
   type: EvaluationType
   addInstance: (instance: Instance) => void
   resultsAvailable: boolean
+  responseVariableName: string
 }
 
 export const TestDataTableRow = ({
@@ -52,7 +55,7 @@ export const TestDataTableRow = ({
   setInstance,
   addInstance,
   removeInstance,
-
+  responseVariableName,
   type,
   resultsAvailable,
 }: Props) => {
@@ -100,9 +103,9 @@ export const TestDataTableRow = ({
         type,
         () => (criteria as CriteriaWithOptions).options.map((option) => ({ value: option.name, text: option.name })),
 
-        () => responses.map((_, i) => ({ text: `Response ${i + 1}`, value: i + 1 })),
+        () => responses.map((_, i) => ({ text: `${toTitleCase(responseVariableName)} ${i + 1}`, value: i + 1 })),
       ).filter((option) => option.text !== ''),
-    [responses, criteria, type],
+    [type, criteria, responses, responseVariableName],
   )
 
   const result = useMemo<{ result: string; positionalBias: boolean; agreement: boolean } | null>(() => {
@@ -137,6 +140,13 @@ export const TestDataTableRow = ({
     addInstance({ ...instance })
   }
 
+  const pairwiseWinnerIndex = useMemo(() => {
+    if (instance.result === null || type !== EvaluationType.PAIRWISE) return null
+    return Object.values(instance.result as PairwiseInstanceResult)
+      .map((r) => r.ranking)
+      .indexOf(1)
+  }, [instance.result, type])
+
   return (
     <>
       <RemovableSection
@@ -154,17 +164,39 @@ export const TestDataTableRow = ({
             {/* Response */}
             <div className={cx(classes.tableRowSection)}>
               {responses.map((response, i) => (
-                <FlexTextArea
-                  onChange={(e) => setResponse(e.target.value, i)}
-                  value={response}
-                  id="text-area-model-output"
-                  labelText={''}
-                  placeholder="The text to evaluate"
-                  key={i}
-                  onFocus={setActive}
-                  onBlur={setInactive}
-                  className={cx(classes.blockElement)}
-                />
+                <div key={i} style={{ position: 'relative', height: '100%' }}>
+                  {!evaluationRunning && i === pairwiseWinnerIndex && (
+                    <Tooltip
+                      label={'Winner'}
+                      style={{
+                        position: 'absolute',
+                        top: '0',
+                        left: '0',
+                        zIndex: 4,
+                      }}
+                    >
+                      <div
+                        style={{
+                          opacity: '0.5',
+                        }}
+                      >
+                        <Trophy />
+                      </div>
+                    </Tooltip>
+                  )}
+
+                  <FlexTextArea
+                    onChange={(e) => setResponse(e.target.value, i)}
+                    value={response}
+                    id="text-area-model-output"
+                    labelText={''}
+                    placeholder="The text to evaluate"
+                    key={i}
+                    onFocus={setActive}
+                    onBlur={setInactive}
+                    className={cx(classes.blockElement)}
+                  />
+                </div>
               ))}
               {instance.contextVariables.map((contextVariable, i) => (
                 <FlexTextArea
@@ -206,16 +238,7 @@ export const TestDataTableRow = ({
 
             {result !== null && !evaluationRunning ? (
               <>
-                <div
-                  className={cx(
-                    classes.blockElement,
-                    classes.resultBlock,
-                    classes.resultBlockPointerCursor,
-                    classes.resultBlockHover,
-                  )}
-                  //   onClick={() => onResultBlockClick(i)}
-                  tabIndex={-1}
-                >
+                <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1}>
                   <div className={classes.resultBlockOuter}>
                     <div className={classes.resultBlockInner}>
                       <div
