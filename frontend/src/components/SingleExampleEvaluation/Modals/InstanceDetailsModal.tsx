@@ -10,10 +10,11 @@ import {
   DirectInstanceResult,
   EvaluationType,
   Instance,
+  PairwiseInstance,
   PairwiseInstanceResult,
   PerResponsePairwiseResult,
 } from '../../../types'
-import classes from './ResultDetailsModal.module.scss'
+import classes from './InstanceDetailsModal.module.scss'
 
 interface Props {
   open: boolean
@@ -55,7 +56,7 @@ export const InstanceDetailsModal = ({
   return (
     selectedInstance !== null && (
       <Modal open={open} onRequestClose={onClose} passiveModal size="sm" modalHeading={`Instance details`}>
-        <Layer style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '1rem' }}>
+        <Layer className={cx(classes.gridTemplate)}>
           {selectedInstance.contextVariables.map((contectVariable, i) => (
             <>
               <p key={`${i}_0`}>
@@ -64,10 +65,24 @@ export const InstanceDetailsModal = ({
               <p key={`${i}_1`}>{contectVariable.value}</p>
             </>
           ))}
-          <p>
-            <strong>{toTitleCase(responseVariableName)}</strong>
-          </p>
-          <p>{(selectedInstance as DirectInstance).response}</p>
+          {type === EvaluationType.DIRECT && (
+            <>
+              <p>
+                <strong>{toTitleCase(responseVariableName)}</strong>
+              </p>
+              <p>{(selectedInstance as DirectInstance).response}</p>
+            </>
+          )}
+
+          {type === EvaluationType.PAIRWISE &&
+            (selectedInstance as PairwiseInstance).responses.map((response, i) => (
+              <>
+                <p>
+                  <strong>{`${toTitleCase(responseVariableName)} ${i + 1}`}</strong>
+                </p>
+                <p>{response}</p>
+              </>
+            ))}
 
           {selectedInstance.result && (
             <>
@@ -86,127 +101,47 @@ export const InstanceDetailsModal = ({
                     <strong>{'Result: '}</strong>
                   </p>
                   <p>{(selectedInstance.result as DirectInstanceResult).option}</p>
-                  {/* <p style={{ marginBottom: '0.5rem' }}>
-                    <strong>Positional bias:</strong>{' '}
-                    <span
-                      className={cx({
-                        [classes['positional-bias-error']]: selectedInstance.result.positionalBias,
-                      })}
-                    >
-                      {positionalBiasString}
-                    </span>
-                    <Link
-                      className={classes['positional-bias-link']}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      href={'/documentation/#positional-bias'}
-                    >
-                      {'(What is this?)'}
-                    </Link>
-                  </p> */}
+
                   <p>
                     <strong>Explanation:</strong>
                   </p>
                   <p>{(selectedInstance.result as DirectInstanceResult).summary}</p>
-                  {/* {selectedInstance.result.certainty && (
-                <p style={{ marginBottom: '0.5rem' }}>
-                  {' '}
-                  <strong>Certainty:</strong> {toPercentage((selectedInstance.result as RubricResult).certainty)}{' '}
-                  <Link
-                    className={classes['positional-bias-link']}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href={'/documentation/#certainty'}
-                  >
-                    {'(What is this?)'}
-                  </Link>
-                </p>
-              )} */}
                 </>
               )}
 
               {type === EvaluationType.PAIRWISE && (
                 <>
-                  {/* <p style={{ marginBottom: '0.5rem' }}>
-                    <strong>{'Ranking: '}</strong>
-                    {`${(selectedInstance.result as PairwiseInstanceResult).ranking}${getOrdinalSuffix(
-                      (selectedInstance.result as PairwiseInstanceResult).ranking,
-                    )}`}
-                  </p> */}
                   {selectedInstance.expectedResult !== '' && (
-                    <p>
-                      <strong>{'Expected ranking: '}</strong>
-                      {`${selectedInstance.expectedResult}${getOrdinalSuffix(
-                        +selectedInstance.expectedResult as number,
-                      )}`}
-                    </p>
+                    <>
+                      <p>
+                        <strong>{'Expected result: '}</strong>
+                      </p>
+                      <p>{`${toTitleCase(responseVariableName)} ${selectedInstance.expectedResult}`}</p>
+                    </>
                   )}
-                  {/* <p style={{ marginBottom: '0.5rem' }}>
-                    <strong>Win rate:</strong>{' '}
-                    {toPercentage((selectedInstance.result as PerResponsePairwiseResult).winrate)}
-                  </p> */}
-                  {/* {selectedInstance.result.certainty && (
-                <p style={{ marginBottom: '0.5rem' }}>
-                  {' '}
-                  <strong>Certainty:</strong>{' '}
-                  {(selectedInstance.result as PerResponsePairwiseResult).certainty
-                    .map((c) => toPercentage(c))
-                    .join(', ')}{' '}
-                  <Link
-                    className={classes['positional-bias-link']}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href={'/documentation/#certainty'}
-                  >
-                    {'(What is this?)'}
-                  </Link>
-                </p>
-              )} */}
-                  {/* <p style={{ marginBottom: '0.5rem' }}>
-                    <strong>{'Positional bias: '}</strong>
-                    <span
-                      className={cx({
-                        [classes['positional-bias-error']]: (
-                          selectedInstance.result as PerResponsePairwiseResult
-                        ).positionalBias.some((pBias) => pBias === true),
-                      })}
-                    >
-                      {positionalBiasString}
-                    </span>
-                    <Link
-                      className={classes['positional-bias-link']}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                      href={'/documentation/#positional-bias'}
-                    >
-                      {'(What is this?)'}
-                    </Link>
-                  </p> */}
-                  <div>
-                    <p>
-                      <strong>Explanations:</strong>
-                    </p>
 
-                    {/* <UnorderedList>
-                      {Object.values((selectedInstance.result as PerResponsePairwiseResult).summaries).map(
-                        (explanation, i) => (
-                          <ListItem key={i}>
-                            <>
-                              <p key={i} className={classes.explanation}>
-                                <strong>
-                                  {`Against response ${
-                                    (selectedInstance.result as PerResponsePairwiseResult).comparedTo[i]
-                                  }: `}
-                                </strong>
-                                {explanation}
-                              </p>
-                              <br />
-                            </>
-                          </ListItem>
-                        ),
-                      )}
-                    </UnorderedList> */}
-                  </div>
+                  <p>
+                    <strong>{'Ranking: '}</strong>
+                  </p>
+                  <UnorderedList>
+                    {Object.keys(selectedInstance.result as PairwiseInstanceResult)
+                      .sort(
+                        (key1, key2) =>
+                          (selectedInstance.result as PairwiseInstanceResult)[key1].ranking -
+                          (selectedInstance.result as PairwiseInstanceResult)[key2].ranking,
+                      )
+                      .map((key, i) => (
+                        <ListItem key={i}>
+                          <p>
+                            {`${(selectedInstance.result as PairwiseInstanceResult)[key].ranking}${getOrdinalSuffix(
+                              (selectedInstance.result as PairwiseInstanceResult)[key].ranking,
+                            )}: ${toTitleCase(responseVariableName)} ${i + 1} (Winrate: ${toPercentage(
+                              (selectedInstance.result as PairwiseInstanceResult)[key].winrate,
+                            )})`}
+                          </p>
+                        </ListItem>
+                      ))}
+                  </UnorderedList>
                 </>
               )}
             </>

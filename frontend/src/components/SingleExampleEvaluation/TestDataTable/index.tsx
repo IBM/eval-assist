@@ -398,6 +398,7 @@ export const TestDataTable = ({
               type={type}
               addInstance={addInstance}
               resultsAvailable={resultsAvailable}
+              responseVariableName={responseVariableName}
             />
           ))}
           {totalPages > 1 && (
@@ -434,7 +435,7 @@ export const TestDataTable = ({
       </div>
       {!evaluationRunning && resultsAvailable && noPositionalBias ? (
         <p style={{ marginTop: '0.5rem' }} className={classes.softText}>
-          {'No positional bias was detected in any of the responses.'}
+          {'No positional bias was detected in any of the instances.'}
         </p>
       ) : null}
       <div className={classes.toggles}>

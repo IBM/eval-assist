@@ -11,3 +11,9 @@
 .explanation {
   white-space: break-spaces;
 }
+
+.gridTemplate {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  gap: 1rem;
+}
