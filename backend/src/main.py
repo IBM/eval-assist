@@ -57,6 +57,9 @@ from .evaluators.unitxt import (
 from .logger import LoggingRoute
 from .notebook_generation import generate_direct_notebook, generate_pairwise_notebook
 
+# Synthetic
+from .synthetic_example_generation.generate import Generator
+
 nest_asyncio.apply()
 
 app = FastAPI()
@@ -381,9 +384,38 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
 @router.post("/synthetic-examples/", response_model=SyntheticExampleGenerationResponse)
 def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     print(params)
-    mocked_response = {c: "mocked" for c in params.context_variables_names}
-    mocked_response[params.response_variable_name] = "mocked"
-    return SyntheticExampleGenerationResponse([mocked_response])
+
+    # populate config
+    model_config = {
+        "provider": params.provider,
+        "llm_provider_credentials": params.llm_provider_credentials,
+        "evaluator_name": params.evaluator_name,
+    }
+    generation_config = {
+        "context": params.context_variables_names,
+        "criteria": params.criteria,
+        "gen_params": {
+            "num_generations_per_criteria": 1,
+            "min_new_tokens": 1,
+            "max_new_tokens": 200,
+            "temperature": 0.7,
+        },
+    }
+    config = {"model": model_config, "generation": generation_config}
+
+    # initialize generator and generate response
+    generator = Generator(config)
+    responses = generator.generate()
+
+    response = responses[-1]  # only extract example for borderline criterion
+
+    return SyntheticExampleGenerationResponse([response])
+
+    # mocked_response = {c: "mocked" for c in params.context_variables_names}
+    # mocked_response[params.response_variable_name] = "mocked"
+    # mocked_response = {
+    #   "response": "mocked"
+    # }
 
 
 @app.exception_handler(RequestValidationError)

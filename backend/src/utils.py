@@ -9,7 +9,6 @@ from unitxt.inference import (
 )
 from unitxt.llm_as_judge import (
     EvaluatorNameEnum,
-    EvaluatorTypeEnum,
     ModelProviderEnum,
     rename_model_if_required,
 )
@@ -68,7 +67,7 @@ def get_inference_engine_params(
 def get_litellm_inference_engine(
     credentials: dict[str, str],
     provider: ModelProviderEnum,
-    evaluator_name: EvaluatorTypeEnum,
+    evaluator_name: EvaluatorNameEnum,
     custom_params: dict = None,
 ):
     inference_engine_params = get_inference_engine_params(
@@ -112,7 +111,7 @@ def get_enum_by_value(value: str) -> EvaluatorNameEnum:
 def get_inference_engine(
     credentials: dict[str, str],
     provider: ModelProviderEnum,
-    evaluator_name: EvaluatorTypeEnum,
+    evaluator_name: EvaluatorNameEnum,
     custom_params: dict = None,
 ):
     if provider == ModelProviderEnum.LOCAL_HF:
