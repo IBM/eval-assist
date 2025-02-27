@@ -44,3 +44,5 @@ certificates
 .python-version
 
 .litellm_cache/
+
+.idea/*

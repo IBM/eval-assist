@@ -155,7 +155,7 @@ export const TestDataTable = ({
   const generateTestData = useCallback(async () => {
     const generationInProgressToastId = addToast({
       kind: 'info',
-      title: 'Generating synthetic examples',
+      title: 'Generating synthetic examples...',
     })
     const result = await fetchSystheticExamples()
     removeToast(generationInProgressToastId)
