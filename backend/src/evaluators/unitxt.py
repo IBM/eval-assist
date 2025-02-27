@@ -292,20 +292,17 @@ class GraniteGuardianEvaluator(ABC):
                 risk_name=risk_name, field_map=self.field_map, input_fields=input_fields
             )
         )
-
-        model_name = EXTENDED_EVALUATOR_TO_MODEL_ID[self.evaluator_name]
-
+        print(self.convert_model_name_wx_to_hf(self.evaluator_name))
         inference_engine = (
             HFAutoModelInferenceEngine(
-                model_name="ibm-granite/granite-guardian-3.1-2b",
+                model_name=self.convert_model_name_wx_to_hf(self.evaluator_name),
                 max_new_tokens=20,
                 device="cpu",
-                low_cpu_mem_usage=False,
             )
             if os.environ.get("USE_HF_GRANITE_GUARDIAN")
             else WMLInferenceEngineGeneration(
                 **granite_guardian_class.wml_params,
-                model_name=model_name,
+                model_name=EXTENDED_EVALUATOR_TO_MODEL_ID[self.evaluator_name],
                 credentials=credentials,
             )
         )
@@ -366,3 +363,17 @@ class GraniteGuardianEvaluator(ABC):
 
     def getEvaluatorClass(self, risk_type: RiskType) -> GraniteGuardianBase:
         return RISK_TYPE_TO_CLASS[risk_type]
+
+    def convert_model_name_wx_to_hf(self, wx_model_name):
+        model_map = {
+            ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B: "ibm-granite/granite-guardian-3.1-2b",
+            ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "ibm-granite/granite-guardian-3.1-8b",
+            ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B: "ibm-granite/granite-guardian-3.2-3b-a800m",
+            ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B: "ibm-granite/granite-guardian-3.2-5b",
+        }
+        try:
+            return model_map[wx_model_name]
+        except KeyError:
+            raise ValueError(
+                f"Model name {wx_model_name} not found in the conversion map."
+            )

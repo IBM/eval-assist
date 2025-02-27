@@ -158,6 +158,8 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
             if req.evaluator_name in [
                 ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B,
                 ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B,
+                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B,
+                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B,
             ]:
                 evaluator = GraniteGuardianEvaluator(req.evaluator_name)
             else:
