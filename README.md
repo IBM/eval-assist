@@ -35,11 +35,13 @@ npm install
 
 ### 3. Set up a local database (optional)
 
-This step is only required if you are not using a deployed database and you want to deploy your own locally.
+This step is only nencessary if you are not using an already deployed database and you want to deploy your own database locally.
 
 1. Install Rancher following [this steps](https://docs.rancherdesktop.io/getting-started/installation/). You may use any other container managment system that supports docker.
 
-2. Run `npm run db`. This will create and run an empty Postgres database. It's default URL is `postgres://admin:admin@127.0.0.1:5432/eval-assist-local`.
+2. Install docker compose.
+
+3. Run `npm run db`. This will create and run an empty Postgres database. It's default URL is `postgres://admin:admin@127.0.0.1:5432/eval-assist-db`.
 
 ### 4. Set the environment variables
 
