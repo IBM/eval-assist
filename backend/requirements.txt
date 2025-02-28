@@ -18,4 +18,5 @@ ibm_watsonx_ai
 openai
 transformers>=4.48.0
 torch
+accelerate
 unitxt
