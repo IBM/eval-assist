@@ -283,7 +283,7 @@ export const SingleExampleEvaluation = () => {
             const instanceResult: DirectInstanceResult = {
               option: fetchedInstanceResult.option,
               positionalBiasOption: fetchedInstanceResult.positional_bias_option,
-              summary: fetchedInstanceResult.summary,
+              explanation: fetchedInstanceResult.explanation,
               positionalBias: fetchedInstanceResult.positional_bias,
               certainty: fetchedInstanceResult.certainty,
             }
@@ -616,9 +616,15 @@ export const SingleExampleEvaluation = () => {
             <TestDataTable
               instances={currentUseCase.instances}
               setInstances={(instances) =>
-                setCurrentUseCase({
-                  ...currentUseCase,
-                  instances,
+                setCurrentUseCase((previousCurrentUseCase) => {
+                  if (previousCurrentUseCase !== null) {
+                    return {
+                      ...previousCurrentUseCase,
+                      instances,
+                    }
+                  } else {
+                    return null
+                  }
                 })
               }
               style={{ marginBottom: '1rem' }}

@@ -19,7 +19,7 @@ from unitxt.loaders import LoadFromDictionary
 from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
-from ..api.common import Instance
+from ..api.common import DirectPositionalBias, DirectResultModel, Instance
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 from ..utils import get_inference_engine
 
@@ -101,21 +101,30 @@ class DirectAssessmentEvaluator(Evaluator):
     def get_evaluator_klass(self):
         return LLMJudgeDirect
 
-    def parse_results(self, dataset):
+    def parse_results(self, dataset) -> list[DirectResultModel]:
         results = []
         prefix = dataset[0]["score"]["instance"]["score_name"]
         for instance in dataset:
             instance_score = instance["score"]["instance"]
+            print(instance_score.keys())
+            positional_bias = DirectPositionalBias(
+                detected=instance_score[f"{prefix}_positional_bias"],
+            )
+            if positional_bias.detected:
+                positional_bias.option = instance_score[
+                    f"{prefix}_positional_bias_selected_option"
+                ]
+                positional_bias.explanation = ""
+                #     instance_score[
+                #     f"{prefix}_positional_bias_summary"
+                # ]
 
             results.append(
-                {
-                    "option": instance_score[f"{prefix}_selected_option"],
-                    "summary": instance_score[f"{prefix}_summary"],
-                    "positional_bias": instance_score[f"{prefix}_positional_bias"],
-                    "positional_bias_option": instance_score[
-                        f"{prefix}_positional_bias_selected_option"
-                    ],
-                }
+                DirectResultModel(
+                    option=instance_score[f"{prefix}_selected_option"],
+                    explanation=instance_score[f"{prefix}_summary"],
+                    positional_bias=positional_bias,
+                )
             )
         return results
 

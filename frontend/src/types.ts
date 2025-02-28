@@ -12,7 +12,16 @@ export interface DirectInstanceResultV1 extends Omit<DirectInstanceResultV0, 'ce
   summary: string
 }
 
-export type DirectInstanceResult = DirectInstanceResultV1
+export interface DirectInstanceResultV2 extends Omit<DirectInstanceResultV1, 'positionalBias' | 'summary'> {
+  positionalBias: {
+    detected: boolean
+    option: string
+    explanation: string
+  }
+  explanation: string
+}
+
+export type DirectInstanceResult = DirectInstanceResultV2
 
 export interface PerResponsePairwiseResultV0 {
   contestResults: boolean[]
@@ -60,11 +69,23 @@ export interface FetchedDirectInstanceResultV1
   certainty?: number
 }
 
-export type FetchedDirectInstanceResult = FetchedDirectInstanceResultV1
+export interface FetchedDirectInstanceResultV2
+  extends Omit<FetchedDirectInstanceResultV1, 'positional_bias' | 'summary'> {
+  explanation: string
+  positional_bias: {
+    detected: boolean
+    option: string
+    explanation: string
+  }
+  certainty?: number
+}
+
+export type FetchedDirectInstanceResult = FetchedDirectInstanceResultV2
 
 export type FetchedDirectResultsV0 = FetchedDirectInstanceResultV0[]
 export type FetchedDirectResultsV1 = FetchedDirectInstanceResultV1[]
-export type FetchedDirectResults = FetchedDirectResultsV1
+export type FetchedDirectResultsV2 = FetchedDirectInstanceResultV2[]
+export type FetchedDirectResults = FetchedDirectResultsV2
 
 export type DirectResultsV0 = DirectInstanceResultV0[]
 export type DirectResultsV1 = DirectInstanceResultV1[]
@@ -135,7 +156,7 @@ export type Option = OptionV1
 export type Instance = {
   contextVariables: ContextVariableV1[]
   expectedResult: string
-  result: DirectInstanceResultV1 | PairwiseInstanceResultV1 | null
+  result: DirectInstanceResult | PairwiseInstanceResult | null
 }
 
 export interface DirectInstance extends Instance {

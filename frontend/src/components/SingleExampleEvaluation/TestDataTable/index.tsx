@@ -13,6 +13,7 @@ import {
   Criteria,
   CriteriaWithOptions,
   DirectInstance,
+  DirectInstanceResult,
   EvaluationType,
   Instance,
   PairwiseInstance,
@@ -118,7 +119,9 @@ export const TestDataTable = ({
   const noPositionalBias = useMemo(() => {
     if (!resultsAvailable) return
     return type === EvaluationType.DIRECT
-      ? (instances as DirectInstance[])?.every((instance) => instance.result?.positionalBias == false)
+      ? (instances as DirectInstance[])?.every(
+          (instance) => (instance.result as DirectInstanceResult)?.positionalBias.detected == false,
+        )
       : (instances as PairwiseInstance[])?.every(
           (instance) =>
             instance.result === null ||
@@ -269,7 +272,6 @@ export const TestDataTable = ({
 
   const removeInstance = useCallback(
     (indexToRemove: number) => {
-      console.log(getActualInstanceIndex(indexToRemove))
       setInstances(instances.filter((_, i) => getActualInstanceIndex(indexToRemove) !== i))
     },
     [getActualInstanceIndex, instances, setInstances],

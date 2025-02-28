@@ -106,7 +106,20 @@ export const InstanceDetailsModal = ({
                   <p>
                     <strong>Explanation:</strong>
                   </p>
-                  <p>{(selectedInstance.result as DirectInstanceResult).summary}</p>
+                  <p>{(selectedInstance.result as DirectInstanceResult).explanation}</p>
+                  {(selectedInstance.result as DirectInstanceResult).positionalBias.detected && (
+                    <>
+                      <p>
+                        <strong>{'Positional bias result: '}</strong>
+                      </p>
+                      <p>{(selectedInstance.result as DirectInstanceResult).positionalBias.option}</p>
+
+                      <p>
+                        <strong>{'Positional bias explanation:'}</strong>
+                      </p>
+                      <p>{(selectedInstance.result as DirectInstanceResult).positionalBias.explanation}</p>
+                    </>
+                  )}
                 </>
               )}
 

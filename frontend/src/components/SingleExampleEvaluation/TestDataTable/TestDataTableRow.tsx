@@ -115,7 +115,7 @@ export const TestDataTableRow = ({
       if (!result) return null
       return {
         result: (result as DirectInstanceResult).option,
-        positionalBias: result.positionalBias,
+        positionalBias: result.positionalBias.detected,
         agreement: result.option === directInstance.expectedResult,
       }
     } else {
@@ -271,7 +271,7 @@ export const TestDataTableRow = ({
                 {type === EvaluationType.DIRECT && explanationOn && (
                   <FlexTextArea
                     readOnly
-                    value={(instance.result as DirectInstanceResult)?.summary || undefined}
+                    value={(instance.result as DirectInstanceResult)?.explanation || undefined}
                     labelText={''}
                     placeholder=""
                     // key={`rubric_${i}`}

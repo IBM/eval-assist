@@ -177,11 +177,16 @@ class DirectEvaluationRequestModel(EvaluationRequestModel):
     #     return responses
 
 
+class DirectPositionalBias(BaseModel):
+    detected: bool
+    option: str = ""
+    explanation: str = ""
+
+
 class DirectResultModel(BaseModel):
     option: str
-    summary: str
-    positional_bias: bool | None = None
-    positional_bias_option: str | None = None
+    explanation: str
+    positional_bias: DirectPositionalBias
 
 
 class DirectResponseModel(BaseModel):
