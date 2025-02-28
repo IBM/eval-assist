@@ -19,4 +19,4 @@ openai
 transformers>=4.48.0
 torch
 accelerate
-unitxt
+unitxt>=1.19.0
