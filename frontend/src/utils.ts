@@ -138,7 +138,6 @@ export const stringifyQueryParams = (
 export const fromLexicalToString = () => {}
 
 export const fromStringToLexicalFormat = () => {}
-
 /**
  * Returns the suffix of a number in its ordinal form
  **/

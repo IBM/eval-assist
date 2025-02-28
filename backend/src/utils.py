@@ -13,7 +13,11 @@ from unitxt.llm_as_judge import (
     rename_model_if_required,
 )
 
-from .const import EXTENDED_EVALUATOR_TO_MODEL_ID, ExtendedEvaluatorNameEnum
+from .const import (
+    EXTENDED_EVALUATOR_TO_MODEL_ID,
+    ExtendedEvaluatorNameEnum,
+    ExtendedModelProviderEnum,
+)
 
 
 def get_local_hf_inference_engine_params(evaluator_name: EvaluatorNameEnum):
@@ -114,7 +118,7 @@ def get_inference_engine(
     evaluator_name: EvaluatorNameEnum,
     custom_params: dict = None,
 ):
-    if provider == ModelProviderEnum.LOCAL_HF:
+    if provider == ExtendedModelProviderEnum.LOCAL_HF:
         return get_hf_inference_engine(evaluator_name, custom_params)
     return get_litellm_inference_engine(
         credentials, provider, evaluator_name, custom_params

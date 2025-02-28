@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel, RootModel, validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
 
-from ..const import ExtendedEvaluatorNameEnum
+from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 
 
 class CriteriaModel(BaseModel):
@@ -27,7 +27,7 @@ class Instance(BaseModel):
 
 
 class EvaluationRequestModel(BaseModel):
-    provider: ModelProviderEnum
+    provider: ModelProviderEnum | ExtendedModelProviderEnum
     llm_provider_credentials: dict[str, str]
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
     type: EvaluatorTypeEnum

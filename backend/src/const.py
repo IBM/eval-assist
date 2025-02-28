@@ -1,9 +1,12 @@
 from enum import Enum
 
+from unitxt.inference import HFAutoModelInferenceEngine
 from unitxt.llm_as_judge import (
     EVALUATOR_TO_MODEL_ID,
     EVALUATORS_METADATA,
+    INFERENCE_ENGINE_NAME_TO_CLASS,
     EvaluatorMetadata,
+    EvaluatorNameEnum,
     ModelProviderEnum,
 )
 
@@ -17,27 +20,45 @@ class ExtendedEvaluatorNameEnum(Enum):
     GRANITE_GUARDIAN3_2_5B = "Granite Guardian 3.2 5B"
 
 
+class ExtendedModelProviderEnum(str, Enum):
+    LOCAL_HF = "local_hf"
+
+
+EXTENDED_INFERENCE_ENGINE_NAME_TO_CLASS = {
+    **INFERENCE_ENGINE_NAME_TO_CLASS,
+    ExtendedModelProviderEnum.LOCAL_HF: HFAutoModelInferenceEngine,
+}
+
 EXTENDED_EVALUATOR_TO_MODEL_ID = {
     **EVALUATOR_TO_MODEL_ID,
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B: "ibm/granite-guardian-3-2b",
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "ibm/granite-guardian-3-8b",
 }
 
-EXTENDED_EVALUATORS_METADATA = EVALUATORS_METADATA + [
-    EvaluatorMetadata(
+
+class ExtendedEvaluatorMetadata(EvaluatorMetadata):
+    name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
+    providers: list[ModelProviderEnum | ExtendedModelProviderEnum]
+
+    def __init__(self, name, providers: ModelProviderEnum | ExtendedModelProviderEnum):
+        super().__init__(name, providers)
+
+
+EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = EVALUATORS_METADATA + [
+    ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B,
-        [ModelProviderEnum.WATSONX, ModelProviderEnum.LOCAL_HF],
+        [ModelProviderEnum.WATSONX, ExtendedModelProviderEnum.LOCAL_HF],
     ),
-    EvaluatorMetadata(
+    ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B,
-        [ModelProviderEnum.WATSONX, ModelProviderEnum.LOCAL_HF],
+        [ModelProviderEnum.WATSONX, ExtendedModelProviderEnum.LOCAL_HF],
     ),
-    EvaluatorMetadata(
+    ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B,
-        [ModelProviderEnum.WATSONX, ModelProviderEnum.LOCAL_HF],
+        [ExtendedModelProviderEnum.LOCAL_HF],
     ),
-    EvaluatorMetadata(
+    ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B,
-        [ModelProviderEnum.WATSONX, ModelProviderEnum.LOCAL_HF],
+        [ExtendedModelProviderEnum.LOCAL_HF],
     ),
 ]

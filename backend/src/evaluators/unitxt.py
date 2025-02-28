@@ -20,7 +20,7 @@ from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
 from ..api.common import Instance
-from ..const import ExtendedEvaluatorNameEnum
+from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 from ..utils import get_inference_engine
 
 
@@ -306,7 +306,7 @@ class GraniteGuardianEvaluator(ABC):
                 "project_id": credentials["project_id"],
                 "url": credentials["api_base"],
             }
-        elif provider == ModelProviderEnum.LOCAL_HF:
+        elif provider == ExtendedModelProviderEnum.LOCAL_HF:
             custom_params = {"max_new_tokens": 20, "device": "cpu"}
 
         inference_engine = get_inference_engine(

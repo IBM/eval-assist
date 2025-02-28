@@ -44,7 +44,7 @@ from .api.common import (
 )
 
 # API type definitions
-from .api.pipelines import EvaluatorMetadataAPI, PipelinesResponseModel
+from .api.pipelines import EvaluatorMetadataAPI, EvaluatorsResponseModel
 from .benchmark.benchmark import get_all_benchmarks
 from .const import EXTENDED_EVALUATORS_METADATA, ExtendedEvaluatorNameEnum
 from .db_client import db
@@ -105,19 +105,13 @@ async def app_shutdown():
     db.disconnect()
 
 
-@router.get("/evaluators/", response_model=PipelinesResponseModel)
+@router.get("/evaluators/", response_model=EvaluatorsResponseModel)
 def get_evaluators():
     """Get the list of available pipelines, as supported by llm-as-a-judge library"""
     evaluators = [
         EvaluatorMetadataAPI(**e.__dict__) for e in EXTENDED_EVALUATORS_METADATA
     ]
-    # for e in AVAILABLE_EVALUATORS:
-    #     if e.metadata.name.value in [EvaluatorNameEnum.GRANITE_GUARDIAN_2B.value, EvaluatorNameEnum.GRANITE_GUARDIAN_8B.value]:
-    #         pipelines.extend(EvaluatorMetadataAPI(
-    #             name=e.metadata.name.value,
-    #             option_selection_strategy=OptionSelectionStrategyEnum.PARSE_OUTPUT_TEXT.value,
-    #             providers=['watsonx']))
-    return PipelinesResponseModel(evaluators=evaluators)
+    return EvaluatorsResponseModel(evaluators=evaluators)
 
 
 @router.get("/criterias/")
