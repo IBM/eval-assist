@@ -447,9 +447,12 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
         "custom_model_name": custom_model_name,
     }
     generation_config = {
-        "context": params.context_variables_names,
-        "response_variable_name": params.response_variable_name,
+        "response_name": params.response_variable_name,
+        "context_names": params.context_variables_names,
         "criteria": params.criteria,
+        # "task-type": params.task_type,
+        # "persona": params.persona,
+        # "domain": params.domain,
         "gen_params": {
             "num_generations_per_criteria": 1,
             "min_new_tokens": 1,
@@ -462,14 +465,18 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     # initialize generator and generate response
     generator = Generator(config)
     try:
-        response = generator.generate()
+        response, context = generator.generate()
     except OutputParserException as e:
         raise HTTPException(
             status_code=400,
             detail=f"{params.evaluator_name} was unable to generate an appropriate synthetic example",
         ) from e
 
-    return SyntheticExampleGenerationResponse([response])
+    # print(f"RESPONSE: {response}")
+    #
+    # print(f"CONTEXT: {context}")
+
+    return SyntheticExampleGenerationResponse([{**response, **context}])
 
 
 @app.exception_handler(RequestValidationError)
