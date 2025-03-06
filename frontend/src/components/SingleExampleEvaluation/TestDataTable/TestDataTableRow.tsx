@@ -109,7 +109,7 @@ export const TestDataTableRow = ({
   )
 
   const positionalBiasDetected = useMemo(() => {
-    if (instance === null) return false
+    if (instance.result === null) return false
     return returnByPipelineType(
       type,
       () => (instance.result as DirectInstanceResult).positionalBias.detected,
