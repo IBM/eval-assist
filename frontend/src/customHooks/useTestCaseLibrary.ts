@@ -317,18 +317,6 @@ export const useTestCaseLibrary = () => {
                 value: 'What will become of my apprenticeship if I have to self-isolate due to COVID-19?',
               },
             ],
-            response:
-              'On most days, the weather is warm and humid, with temperatures often soaring into the high 80s and low 90s Fahrenheit (around 31-34°C). The dense foliage of the jungle acts as a natural air conditioner, keeping the temperature relatively stable and comfortable for the inhabitants.',
-            expectedResult: 'Bad',
-            result: null,
-          } as DirectInstance,
-          {
-            contextVariables: [
-              {
-                name: 'Question',
-                value: 'What will become of my apprenticeship if I have to self-isolate due to COVID-19?',
-              },
-            ],
             response: `Guidance for apprentices, employers, training providers, end-point assessment organisations (EPAOs) and external quality assurance providers about changes to apprenticeships due to coronavirus (COVID-19)
 Apprenticeship training frequently asked questions
 I need to take care of myself/a family member. Can I continue my apprenticeship learning at home?
