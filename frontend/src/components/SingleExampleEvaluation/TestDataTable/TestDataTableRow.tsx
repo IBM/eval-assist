@@ -108,6 +108,18 @@ export const TestDataTableRow = ({
     [type, criteria, responses, responseVariableName],
   )
 
+  const positionalBiasDetected = useMemo(() => {
+    if (instance === null) return false
+    return returnByPipelineType(
+      type,
+      () => (instance.result as DirectInstanceResult).positionalBias.detected,
+      () =>
+        Object.values(instance.result as PairwiseInstanceResult).some((instance) =>
+          instance.positionalBias.some((pb) => pb),
+        ),
+    )
+  }, [instance, type])
+
   const result = useMemo<{ result: string; positionalBias: boolean; agreement: boolean } | null>(() => {
     if (type == EvaluationType.DIRECT) {
       const directInstance = instance as DirectInstance
@@ -115,7 +127,7 @@ export const TestDataTableRow = ({
       if (!result) return null
       return {
         result: (result as DirectInstanceResult).option,
-        positionalBias: result.positionalBias.detected,
+        positionalBias: positionalBiasDetected,
         agreement: result.option === directInstance.expectedResult,
       }
     } else {
@@ -125,11 +137,11 @@ export const TestDataTableRow = ({
       const winner = `Response ${winnerIndex + 1}`
       return {
         result: winner,
-        positionalBias: false,
+        positionalBias: positionalBiasDetected,
         agreement: `${winnerIndex + 1}` === instance.expectedResult,
       }
     }
-  }, [instance, type])
+  }, [instance, positionalBiasDetected, type])
 
   const onExpandInstance = () => {
     setSelectedInstance(instance)

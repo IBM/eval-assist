@@ -194,7 +194,7 @@ export const InstanceDetailsModal = ({
                           {positionalBiasDetected ? 'Detected' : 'Not detected'}
                         </p>
                         <p key={'instance-per-response-title'}>
-                          <strong>{'Per response results: '}</strong>
+                          <strong>{`Per ${responseVariableName.toLocaleLowerCase()} results: `}</strong>
                         </p>
                         <Accordion className={classes.accordionFullWidth}>
                           {Object.entries(selectedInstance.result as PairwiseInstanceResult).map(
