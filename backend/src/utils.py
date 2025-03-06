@@ -37,7 +37,7 @@ def get_inference_engine_params(
         "max_tokens": 1024,
         "seed": 42,
         "credentials": credentials,
-        "max_requests_per_second": 10,
+        "max_requests_per_second": 8,
     }
 
     model_name = rename_model_if_required(
