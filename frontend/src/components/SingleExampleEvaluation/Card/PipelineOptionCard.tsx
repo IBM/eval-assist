@@ -11,13 +11,10 @@ import classes from './PipelineOptionCard.module.scss'
 interface PipelineOptionCardProps {
   type: EvaluationType
   selectedType: EvaluationType | null
-  setSelectedType: Dispatch<SetStateAction<EvaluationType | null>>
+  onClick?: () => void
 }
 
-export const PipelineOptionCard = ({ type, selectedType, setSelectedType }: PipelineOptionCardProps) => {
-  const onClick = () => {
-    setSelectedType(type)
-  }
+export const PipelineOptionCard = ({ type, selectedType, onClick }: PipelineOptionCardProps) => {
 
   return (
     <Card

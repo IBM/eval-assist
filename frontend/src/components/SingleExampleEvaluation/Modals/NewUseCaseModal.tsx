@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import { capitalizeFirstWord, getEmptyUseCase, returnByPipelineType } from 'src/utils'
 
-import { Dispatch, SetStateAction, useMemo, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
 
 import { Layer, Modal, Select, SelectItem } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
@@ -73,6 +73,27 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
     return []
   }, [directCriterias, pairwiseCriterias, selectedType])
 
+  const onSelectedCriteriaChange = useCallback(
+    (e: { target: { value: string } }) => {
+      if (selectedType === null) return
+      if (selectedCriteria === null) setSelectedCriteria(null)
+      const selected = returnByPipelineType<CriteriaWithOptions[], Criteria[]>(
+        selectedType,
+        directCriterias!,
+        pairwiseCriterias!,
+      ).find((criteria) => criteria.name == e.target.value)
+      if (selected) {
+        setSelectedCriteria(selected)
+      }
+    },
+    [directCriterias, pairwiseCriterias, selectedCriteria, selectedType],
+  )
+
+  const onSelectedTypeChange = useCallback((selectedType: EvaluationType | null) => {
+    setSelectedCriteria(null)
+    setSelectedType(selectedType)
+  }, [])
+
   return (
     <Modal
       open={open}
@@ -91,12 +112,12 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
           <PipelineOptionCard
             type={EvaluationType.DIRECT}
             selectedType={selectedType}
-            setSelectedType={setSelectedType}
+            onClick={() => onSelectedTypeChange(EvaluationType.DIRECT)}
           />
           <PipelineOptionCard
             type={EvaluationType.PAIRWISE}
             selectedType={selectedType}
-            setSelectedType={setSelectedType}
+            onClick={() => onSelectedTypeChange(EvaluationType.PAIRWISE)}
           />
         </div>
         {selectedType !== null && (
@@ -108,18 +129,10 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
                 <em>{'(Optional)'}</em>
               </span>
             }
-            onChange={(e) => {
-              const selected = returnByPipelineType<CriteriaWithOptions[], Criteria[]>(
-                selectedType,
-                directCriterias!,
-                pairwiseCriterias!,
-              ).find((criteria) => criteria.name == e.target.value)
-              if (selected) {
-                setSelectedCriteria(selected)
-              }
-            }}
+            onChange={onSelectedCriteriaChange}
+            value={selectedCriteria?.name || ''}
           >
-            <SelectItem key={'Empty'} text={'No criteria selected'} value={''} />
+            <SelectItem key={'Empty'} text={''} value={''} />
             {sortedCriterias.map((c, i) => (
               <SelectItem key={i} text={capitalizeFirstWord(c.name)} value={c.name} />
             ))}
