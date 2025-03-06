@@ -4,7 +4,7 @@
   color: $link-inverse;
 }
 
-.positional-bias-error {
+.errorText {
   color: $text-error;
 }
 
@@ -16,4 +16,8 @@
   display: grid;
   grid-template-columns: 1fr 4fr;
   gap: 1rem;
+}
+
+.accordionFullWidth :global .cds--accordion__content {
+  -webkit-padding-end: 5%;
 }

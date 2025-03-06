@@ -1,10 +1,10 @@
 import cx from 'classnames'
-import { getOrdinalSuffix, toPercentage, toTitleCase } from 'src/utils'
+import { getOrdinalSuffix, returnByPipelineType, toPercentage, toTitleCase } from 'src/utils'
 
 import { Dispatch, Fragment, SetStateAction, useMemo } from 'react'
 
-import { Accordion, AccordionItem, Layer, Link, ListItem, Modal, UnorderedList } from '@carbon/react'
-import { ArrowRight } from '@carbon/react/icons'
+import { Accordion, AccordionItem, Layer, Link, ListItem, Modal, Tooltip, UnorderedList } from '@carbon/react'
+import { ArrowRight, Warning, WarningAlt } from '@carbon/react/icons'
 
 import {
   DirectInstance,
@@ -39,26 +39,23 @@ export const InstanceDetailsModal = ({
     setSelectedInstance(null)
   }
 
-  // const positionalBiasString = useMemo(() => {
-  //   if (selectedInstance === null) return null
+  const positionalBiasDetected = useMemo(() => {
+    if (selectedInstance === null) return null
+    return returnByPipelineType(
+      type,
+      () => (selectedInstance.result as DirectInstanceResult).positionalBias.detected,
+      () =>
+        Object.values(selectedInstance.result as PairwiseInstanceResult).some((instance) =>
+          instance.positionalBias.some((pb) => pb),
+        ),
+    )
+  }, [selectedInstance, type])
 
-  //   let pb: string
-  //   if (type === EvaluationType.DIRECT) {
-  //     pb = `${(selectedInstance.result as DirectInstanceResult)?.positionalBias}`
-  //   } else {
-  //     pb = `${(selectedInstance.result as PerResponsePairwiseResult).positionalBias.some((pBias) => pBias === true)}`
-  //   }
-  //   pb = pb.charAt(0).toUpperCase() + pb.slice(1) + ' '
-  //   if (type === EvaluationType.DIRECT && (selectedInstance.result as DirectInstanceResult)?.positionalBias) {
-  //     pb += `/ '${(selectedInstance.result as DirectInstanceResult).positionalBiasOption}' was selected `
-  //   }
-  //   return pb
-  // }, [selectedInstance, type])
   return (
     selectedInstance !== null && (
       <Modal open={open} onRequestClose={onClose} passiveModal size="lg" modalHeading={`Instance details`}>
         <Layer>
-          <Accordion>
+          <Accordion className={classes.accordionFullWidth}>
             <AccordionItem title="Test data" open key={'test-data'}>
               <div className={cx(classes.gridTemplate)}>
                 {selectedInstance.contextVariables.map((contectVariable, i) => (
@@ -113,10 +110,20 @@ export const InstanceDetailsModal = ({
                           <strong>Explanation:</strong>
                         </p>
                         <p>{(selectedInstance.result as DirectInstanceResult).explanation}</p>
+                        <p>
+                          <strong>{'Positional bias:'}</strong>
+                        </p>
+                        <p
+                          className={cx({
+                            [classes.errorText]: positionalBiasDetected,
+                          })}
+                        >
+                          {positionalBiasDetected ? 'Detected' : 'Not detected'}
+                        </p>
                         {(selectedInstance.result as DirectInstanceResult).positionalBias.detected && (
                           <>
                             <p>
-                              <strong>{'Positional bias result: '}</strong>
+                              <strong>{'Positional bias result:'}</strong>
                             </p>
                             <p>{(selectedInstance.result as DirectInstanceResult).positionalBias.option}</p>
 
@@ -134,7 +141,7 @@ export const InstanceDetailsModal = ({
                         {selectedInstance.expectedResult !== '' && (
                           <Fragment key={`expected-results`}>
                             <p key={'expected-result-title'}>
-                              <strong>{'Expected result: '}</strong>
+                              <strong>{'Expected winner: '}</strong>
                             </p>
                             <p key={'expected-result-value'}>{`${toTitleCase(responseVariableName)} ${
                               selectedInstance.expectedResult
@@ -148,7 +155,7 @@ export const InstanceDetailsModal = ({
                         <div
                           style={{
                             display: 'grid',
-                            gridTemplateColumns: '1fr 1fr 10fr',
+                            gridTemplateColumns: '2fr 1fr 10fr',
                             justifyItems: 'center',
                             alignItems: 'center',
                           }}
@@ -162,13 +169,13 @@ export const InstanceDetailsModal = ({
                             )
                             .map((key, i) => (
                               <Fragment key={`results-${i}`}>
-                                <p key={`ranking-rank-${i}`}>{`- ${
+                                <p style={{ justifySelf: 'start' }}>{`- ${
                                   (selectedInstance.result as PairwiseInstanceResult)[key].ranking
                                 }${getOrdinalSuffix(
                                   (selectedInstance.result as PairwiseInstanceResult)[key].ranking,
-                                )}`}</p>
-                                <ArrowRight size={16} key={`ranking-arrow-${i}`} />
-                                <p style={{ justifySelf: 'start' }} key={`ranking-response-${i}`}>
+                                )} place`}</p>
+                                <ArrowRight style={{ justifySelf: 'start' }} size={16} />
+                                <p style={{ justifySelf: 'start' }}>
                                   {` ${toTitleCase(responseVariableName)} ${key} (Winrate: ${toPercentage(
                                     (selectedInstance.result as PairwiseInstanceResult)[key].winrate,
                                   )})`}
@@ -176,6 +183,74 @@ export const InstanceDetailsModal = ({
                               </Fragment>
                             ))}
                         </div>
+                        <p>
+                          <strong>{'Positional bias:'}</strong>
+                        </p>
+                        <p
+                          className={cx({
+                            [classes.errorText]: positionalBiasDetected,
+                          })}
+                        >
+                          {positionalBiasDetected ? 'Detected' : 'Not detected'}
+                        </p>
+                        <p key={'instance-per-response-title'}>
+                          <strong>{'Per response results: '}</strong>
+                        </p>
+                        <Accordion className={classes.accordionFullWidth}>
+                          {Object.entries(selectedInstance.result as PairwiseInstanceResult).map(
+                            ([key, responseResults], j) => (
+                              <AccordionItem title={`${toTitleCase(responseVariableName)} ${key}`} key={j}>
+                                <div className={cx(classes.gridTemplate)}>
+                                  <p>
+                                    <strong>{'Ranking: '}</strong>
+                                  </p>
+                                  <p>{`${responseResults.ranking}${getOrdinalSuffix(responseResults.ranking)}`}</p>
+                                  <p>
+                                    <strong>{'Winrate: '}</strong>
+                                  </p>
+                                  <p>{toPercentage(responseResults.winrate)}</p>
+                                  {/* <p>
+                                    <strong>{'Positional bias:'}</strong>
+                                  </p>
+                                  <p
+                                    className={cx({
+                                      [classes.errorText]: responseResults.positionalBias.some((pb) => pb),
+                                    })}
+                                  >
+                                    {responseResults.positionalBias.some((pb) => pb) ? 'Detected' : 'Not detected'}
+                                  </p> */}
+                                  <p>
+                                    <strong>{'Contest results: '}</strong>
+                                  </p>
+                                  <UnorderedList>
+                                    {Object.values(responseResults.summaries).map((explanation, i) => (
+                                      <ListItem key={i}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                          <div>
+                                            <p key={i} className={classes.explanation}>
+                                              <strong>{`${
+                                                responseResults.contestResults[i] ? 'Won' : 'Lost'
+                                              } against response ${responseResults.comparedTo[i]}: `}</strong>
+                                              {explanation}
+                                            </p>
+                                            <br />
+                                          </div>
+                                          {responseResults.positionalBias[i] && (
+                                            <Tooltip label={'Positional bias detected'}>
+                                              <div className={classes.errorText}>
+                                                <Warning />
+                                              </div>
+                                            </Tooltip>
+                                          )}
+                                        </div>
+                                      </ListItem>
+                                    ))}
+                                  </UnorderedList>
+                                </div>
+                              </AccordionItem>
+                            ),
+                          )}
+                        </Accordion>
                       </>
                     )}
                   </>
