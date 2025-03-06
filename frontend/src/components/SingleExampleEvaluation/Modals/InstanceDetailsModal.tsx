@@ -40,7 +40,7 @@ export const InstanceDetailsModal = ({
   }
 
   const positionalBiasDetected = useMemo(() => {
-    if (selectedInstance === null) return null
+    if (selectedInstance === null || selectedInstance.result === null) return null
     return returnByPipelineType(
       type,
       () => (selectedInstance.result as DirectInstanceResult).positionalBias.detected,
