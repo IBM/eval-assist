@@ -106,7 +106,6 @@ class DirectAssessmentEvaluator(Evaluator):
         prefix = dataset[0]["score"]["instance"]["score_name"]
         for instance in dataset:
             instance_score = instance["score"]["instance"]
-            print(instance_score.keys())
             positional_bias = DirectPositionalBias(
                 detected=instance_score[f"{prefix}_positional_bias"],
             )
