@@ -60,7 +60,7 @@ export const TestDataTable = ({
   loadingSyntheticExamples,
 }: Props) => {
   const instancesPerPage = useMemo(() => 5, [])
-  const [explanationOn, setExplanationOn] = useState(type === EvaluationType.DIRECT)
+  const [explanationOn, setExplanationOn] = useState(false)
   const { addToast, removeToast } = useToastContext()
 
   const { currentInstances, currentPage, goToPage, totalPages, goToLastPage } = usePagination({
@@ -326,7 +326,9 @@ export const TestDataTable = ({
             )}
             {resultsAvailable && !evaluationRunning && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
-                <strong className={classes.headerTypography}>{'Result'}</strong>
+                <strong className={classes.headerTypography}>
+                  {returnByPipelineType(type, 'Generated result', 'Generated winner')}
+                </strong>
               </div>
             )}
           </div>
@@ -374,9 +376,7 @@ export const TestDataTable = ({
               </div>
             )}
             {resultsAvailable && !evaluationRunning && (
-              <div className={cx(classes.blockElement, classes.subHeaderBlock)}>
-                <strong className={classes.headerTypography}>{returnByPipelineType(type, 'Option', 'Winner')}</strong>
-              </div>
+              <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>
             )}
             {resultsAvailable && !evaluationRunning && explanationOn && type === EvaluationType.DIRECT && (
               <div className={cx(classes.blockElement, classes.subHeaderBlock)}>
@@ -451,7 +451,7 @@ export const TestDataTable = ({
           id="toggle-expected-result"
           className={classes.toggle}
         />
-        {resultsAvailable && !evaluationRunning && type === EvaluationType.DIRECT && (
+        {/* {resultsAvailable && !evaluationRunning && type === EvaluationType.DIRECT && (
           <Toggle
             labelText={'Show Explanation'}
             toggled={explanationOn}
@@ -461,7 +461,7 @@ export const TestDataTable = ({
             id="toggle-explanation"
             className={classes.toggle}
           />
-        )}
+        )} */}
       </div>
     </div>
   )
