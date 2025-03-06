@@ -21,7 +21,7 @@
         "prisma:generate": "npm run prisma:generate:frontend && npm run prisma:generate:backend",
         "prisma:sync": ". backend/venv/bin/activate && python3 -m prisma migrate dev --schema shared/prisma/schema.base.prisma",
         "prisma": "npm run prisma:prepare && npm run prisma:generate",
-        "db": "cd shared/localdb/ && docker-compose -f postgres.yml up -d",
+        "db": "cd shared/localdb/ && docker compose -f postgres.yml up -d",
         "pre-commit:backend": ". backend/venv/bin/activate && python3 -m pre_commit run --all-files",
         "pre-commit:frontend": "cd frontend && npm run pre-commit",
         "pre-commit": "concurrently \"npm run pre-commit:backend\" \"npm run pre-commit:frontend\"",
