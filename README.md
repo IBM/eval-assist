@@ -5,14 +5,14 @@
 
 <!-- Not always needed, but a scope helps the user understand in a short sentance like below, why this repo exists -->
 
-EvalAssist is an LLM-as-a-Judge framework built on top of the [UNITXT](https://www.unitxt.ai/en/latest/docs/introduction.html)
+EvalAssist is an LLM-as-a-Judge framework built on top of the [Unitxt](https://www.unitxt.ai/en/latest/docs/introduction.html)
 open source evaluation library for large language models. The EvalAssist application provides users with a
 convenient way of iteratively testing and refining LLM-as-a-judge criteria, and supports both direct
 (rubric-based) and pairwise assessment paradigms (relation-based), the two most prevalent forms of
 LLM-as-a-judge evaluations available. EvalAssist is designed to be model-agnostic, i.e. the content to be
 evaluated can come from any model. EvalAssist supports a rich set of off-the-shelf judge models that can
 easily be extended. An API key is required to use the pre-defined judge models. Once users are satisfied
-with their criteria, they can auto-generate a Notebook with UNITXT code to run bulk evaluations with larger
+with their criteria, they can auto-generate a Notebook with Unitxt code to run bulk evaluations with larger
 data sets based on their criteria definition. EvalAssist also includes a catalog of example test cases,
 exhibiting the use of LLM-as-a-judge across a variety of scenarios. Users can save their own test cases.
 
