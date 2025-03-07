@@ -3,11 +3,11 @@ import json
 import nbformat as nbf
 
 from .api.common import NotebookParams
-from .utils import get_enum_by_value, get_inference_engine_params
+from .utils import get_enum_by_value, get_litellm_inference_engine_params
 
 
 def generate_direct_notebook(params: NotebookParams):
-    inference_engine_params = get_inference_engine_params(
+    inference_engine_params = get_litellm_inference_engine_params(
         provider=params.provider,
         evaluator_name=params.evaluator_name,
         credentials=params.credentials,
@@ -109,7 +109,7 @@ print(results.instance_scores)
 
 
 def generate_pairwise_notebook(params: NotebookParams):
-    inference_engine_params = get_inference_engine_params(
+    inference_engine_params = get_litellm_inference_engine_params(
         provider=params.provider,
         evaluator_name=params.evaluator_name,
         credentials=params.credentials,

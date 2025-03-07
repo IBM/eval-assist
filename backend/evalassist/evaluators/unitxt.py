@@ -242,6 +242,10 @@ class GraniteGuardianEvaluator(ABC):
             positional_bias = DirectPositionalBias(
                 detected=False, option="", explanation=""
             )
+            selected_option = instance_score[f"{risk_name}_label"]
+
+            if selected_option is None:
+                raise ValueError("Granite Guardian evaluation failed")
 
             results.append(
                 DirectResultModel(
@@ -299,23 +303,11 @@ class GraniteGuardianEvaluator(ABC):
                 risk_name=risk_name, field_map=self.field_map, input_fields=input_fields
             )
         )
-        # inference_engine = (
-        #     HFAutoModelInferenceEngine(
-        #         model_name=self.convert_model_name_wx_to_hf(self.evaluator_name),
-        #         max_new_tokens=20,
-        #         device="cpu",
-        #     )
-        #     if os.environ.get("USE_HF_GRANITE_GUARDIAN")
-        #     else WMLInferenceEngineGeneration(
-        #         **granite_guardian_class.wml_params,
-        #         model_name=EXTENDED_EVALUATOR_TO_MODEL_ID[self.evaluator_name],
-        #         credentials=credentials,
-        #     )
-        # )
+
         custom_params = {}
         parsed_credentials = {}
         if provider == ModelProviderEnum.WATSONX:
-            custom_params = {"max_tokens": 20}
+            custom_params = GraniteGuardianBase.wml_params
             parsed_credentials = {
                 "api_key": credentials["api_key"],
                 "project_id": credentials["project_id"],
@@ -352,9 +344,6 @@ class GraniteGuardianEvaluator(ABC):
         result = self.parse_results(
             evaluated_dataset, instances[0].prediction_variable_name
         )
-
-        if result[0].option is None:
-            raise ValueError("Granite Guardian evaluation failed")
         return result
 
     def infer_risk_type(

@@ -6,6 +6,7 @@ from unitxt.inference import (
     HFAutoModelInferenceEngine,
     LiteLLMInferenceEngine,
     RITSInferenceEngine,
+    WMLInferenceEngineGeneration,
 )
 from unitxt.llm_as_judge import (
     EvaluatorNameEnum,
@@ -20,7 +21,29 @@ from .const import (
 )
 
 logger = logging.getLogger(__name__)
-print(f"logger name is: {__name__}")
+
+
+def convert_model_name_wx_to_hf(wx_model_name):
+    model_map = {
+        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B: "ibm-granite/granite-guardian-3.1-2b",
+        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "ibm-granite/granite-guardian-3.1-8b",
+        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B: "ibm-granite/granite-guardian-3.2-3b-a800m",
+        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B: "ibm-granite/granite-guardian-3.2-5b",
+    }
+    try:
+        return model_map[wx_model_name]
+    except KeyError:
+        raise ValueError(f"Model name {wx_model_name} not found in the conversion map.")
+
+
+def get_enum_by_value(value: str) -> EvaluatorNameEnum:
+    for enum_member in EvaluatorNameEnum:
+        if enum_member.value == value:
+            return enum_member
+    raise ValueError(f"No matching enum found for value: {value}")
+
+
+preloaded_hf_models = {}
 
 
 def get_local_hf_inference_engine_params(evaluator_name: EvaluatorNameEnum):
@@ -31,7 +54,7 @@ def get_local_hf_inference_engine_params(evaluator_name: EvaluatorNameEnum):
     }
 
 
-def get_inference_engine_params(
+def get_litellm_inference_engine_params(
     credentials: dict,
     provider: ModelProviderEnum,
     evaluator_name: EvaluatorNameEnum,
@@ -77,28 +100,12 @@ def get_litellm_inference_engine(
     evaluator_name: EvaluatorNameEnum,
     custom_params: dict = None,
 ):
-    inference_engine_params = get_inference_engine_params(
+    inference_engine_params = get_litellm_inference_engine_params(
         credentials, provider, evaluator_name
     )
-    if custom_params:
+    if custom_params is not None:
         inference_engine_params.update(custom_params)
     return LiteLLMInferenceEngine(**inference_engine_params)
-
-
-def convert_model_name_wx_to_hf(wx_model_name):
-    model_map = {
-        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B: "ibm-granite/granite-guardian-3.1-2b",
-        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "ibm-granite/granite-guardian-3.1-8b",
-        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B: "ibm-granite/granite-guardian-3.2-3b-a800m",
-        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B: "ibm-granite/granite-guardian-3.2-5b",
-    }
-    try:
-        return model_map[wx_model_name]
-    except KeyError:
-        raise ValueError(f"Model name {wx_model_name} not found in the conversion map.")
-
-
-preloaded_hf_models = {}
 
 
 def get_hf_inference_engine(
@@ -119,11 +126,22 @@ def get_hf_inference_engine(
         return hf_model
 
 
-def get_enum_by_value(value: str) -> EvaluatorNameEnum:
-    for enum_member in EvaluatorNameEnum:
-        if enum_member.value == value:
-            return enum_member
-    raise ValueError(f"No matching enum found for value: {value}")
+def get_watsonx_inference_engine(
+    credentials: dict[str, str],
+    provider: ModelProviderEnum,
+    evaluator_name: EvaluatorNameEnum,
+    custom_params: dict = None,
+):
+    inference_engine_params = {
+        "max_new_tokens": 1024,
+        "credentials": credentials,
+        "model_name": rename_model_if_required(
+            EXTENDED_EVALUATOR_TO_MODEL_ID[evaluator_name], provider
+        ),
+    }
+    if custom_params is not None:
+        inference_engine_params.update(custom_params)
+    return WMLInferenceEngineGeneration(**inference_engine_params)
 
 
 def get_inference_engine(
@@ -134,6 +152,12 @@ def get_inference_engine(
 ):
     if provider == ExtendedModelProviderEnum.LOCAL_HF:
         return get_hf_inference_engine(evaluator_name, custom_params)
+    if provider == ModelProviderEnum.WATSONX and evaluator_name.value in [
+        e.value for e in ExtendedEvaluatorNameEnum
+    ]:
+        return get_watsonx_inference_engine(
+            credentials, provider, evaluator_name, custom_params
+        )
     return get_litellm_inference_engine(
         credentials, provider, evaluator_name, custom_params
     )
