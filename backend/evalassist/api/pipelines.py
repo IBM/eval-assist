@@ -1,10 +1,12 @@
 from pydantic import BaseModel
+from unitxt.llm_as_judge import EvaluatorNameEnum, ModelProviderEnum
 
-from ..const import ExtendedEvaluatorMetadata
+from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 
 
-class EvaluatorMetadataAPI(BaseModel, ExtendedEvaluatorMetadata):
-    pass
+class EvaluatorMetadataAPI(BaseModel):
+    name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+    providers: list[ModelProviderEnum | ExtendedModelProviderEnum]
 
 
 class EvaluatorsResponseModel(BaseModel):

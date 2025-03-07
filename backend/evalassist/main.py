@@ -31,6 +31,8 @@ from unitxt.llm_as_judge import (
     EvaluatorTypeEnum,
 )
 
+from backend.evalassist.utils import get_custom_models
+
 from .api.common import (
     CriteriaAPI,
     CriteriaOptionAPI,
@@ -114,6 +116,13 @@ def get_evaluators():
     evaluators = [
         EvaluatorMetadataAPI(**e.__dict__) for e in EXTENDED_EVALUATORS_METADATA
     ]
+    custom_models = get_custom_models()
+    for custom_model in custom_models:
+        evaluators.append(
+            EvaluatorMetadataAPI(
+                name=custom_model["name"], providers=custom_model["providers"]
+            )
+        )
     return EvaluatorsResponseModel(evaluators=evaluators)
 
 

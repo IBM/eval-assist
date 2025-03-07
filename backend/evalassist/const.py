@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 
 from unitxt.inference import HFAutoModelInferenceEngine
 from unitxt.llm_as_judge import (
@@ -18,6 +19,7 @@ class ExtendedEvaluatorNameEnum(Enum):
     GRANITE_GUARDIAN3_1_8B = "Granite Guardian 3.1 8B"
     GRANITE_GUARDIAN3_2_3B = "Granite Guardian 3.2 3B"
     GRANITE_GUARDIAN3_2_5B = "Granite Guardian 3.2 5B"
+    CUSTOM = "custom"
 
 
 class ExtendedModelProviderEnum(str, Enum):
@@ -37,11 +39,21 @@ EXTENDED_EVALUATOR_TO_MODEL_ID = {
 
 
 class ExtendedEvaluatorMetadata(EvaluatorMetadata):
-    name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
+    name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+    custom_model_name: Optional[str]
+    custom_model_path: Optional[str]
     providers: list[ModelProviderEnum | ExtendedModelProviderEnum]
 
-    def __init__(self, name, providers: ModelProviderEnum | ExtendedModelProviderEnum):
+    def __init__(
+        self,
+        name,
+        providers: ModelProviderEnum | ExtendedModelProviderEnum,
+        custom_model_name: Optional[str] = None,
+        custom_model_path: Optional[str] = None,
+    ):
         super().__init__(name, providers)
+        self.custom_model_name = custom_model_name
+        self.custom_model_path = custom_model_path
 
 
 EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = EVALUATORS_METADATA + [
