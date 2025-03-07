@@ -30,12 +30,15 @@ def get_custom_models():
     json_path = os.path.join(base_path, "..", "custom_models.json")
     if not os.path.exists(json_path):
         json_path = os.path.join(base_path, "..", "..", "custom_models.json")
-    with open(json_path, "r", encoding="utf-8") as file:
-        try:
-            custom_models = json.load(file)
-            return custom_models
-        except Exception:
-            raise ValueError("The custom_models json format is wrong")
+    if os.path.exists(json_path):
+        with open(json_path, "r", encoding="utf-8") as file:
+            try:
+                custom_models = json.load(file)
+                return custom_models
+            except Exception:
+                raise ValueError("The custom_models json format is wrong")
+    else:
+        return []
 
 
 def convert_model_name_wx_to_hf(wx_model_name):
