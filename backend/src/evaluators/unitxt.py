@@ -226,7 +226,9 @@ class GraniteGuardianEvaluator(ABC):
             for context_variables in context_variables_list
         ]
 
-    def parse_results(self, dataset, response_variable_name: str):
+    def parse_results(
+        self, dataset, response_variable_name: str
+    ) -> list[DirectResultModel]:
         results = []
         for instance in dataset:
             risk_name: str = instance["score"]["instance"]["score_name"]
@@ -236,12 +238,17 @@ class GraniteGuardianEvaluator(ABC):
                 risk_name.lower().replace(" ", "_"),
             )
 
+            instance_score = instance["score"]["instance"]
+            positional_bias = DirectPositionalBias(
+                detected=False, option="", explanation=""
+            )
+
             results.append(
-                {
-                    "summary": explanation,
-                    "certainty": instance_score[f"{risk_name}_certainty"],
-                    "option": instance_score[f"{risk_name}_label"],
-                }
+                DirectResultModel(
+                    option=instance_score[f"{risk_name}_label"],
+                    explanation=explanation,
+                    positional_bias=positional_bias,
+                )
             )
         return results
 
@@ -346,7 +353,7 @@ class GraniteGuardianEvaluator(ABC):
             evaluated_dataset, instances[0].prediction_variable_name
         )
 
-        if result[0]["option"] is None:
+        if result[0].option is None:
             raise ValueError("Granite Guardian evaluation failed")
         return result
 
