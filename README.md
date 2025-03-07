@@ -18,14 +18,24 @@ exhibiting the use of LLM-as-a-judge across a variety of scenarios. Users can sa
 
 ## Run EvalAssist locally
 
-### 1. Install the requirements
+### 1. Clone the repository
+
+Start by cloning the repository to your local machine using Git:
+
+```bash
+git clone https://github.ibm.com/AIExperience/eval-assist.git 
+# or via ssh: git clone git@github.ibm.com:AIExperience/eval-assist.git
+cd eval-assist
+```
+
+### 2. Install the requirements
 
 * Node > 20 (install [here](https://nodejs.org/en/download))
 * Python >= 3.10, <3.13
 
 _Note: In this project, npm is used both as a task manager (used to easily setup the dev environment) and as the package manager for the Next.js frontend app._
 
-### 2. Install the dependencies
+### 3. Install the dependencies
 
 The following command will install the frontend and backend dependencies. It will install the frontend dependencies using npm. In addition, it will install the backend dependencies by creating a virtual environment (`venv`), activating it and using pip to install the dependencies.
 
@@ -33,7 +43,7 @@ The following command will install the frontend and backend dependencies. It wil
 npm install
 ```
 
-### 3. Set up a local database (optional)
+### 4. Set up a local database (optional)
 
 This step is only nencessary if you are not using an already deployed database and you want to deploy your own database locally.
 
@@ -43,7 +53,7 @@ This step is only nencessary if you are not using an already deployed database a
 
 3. Run `npm run db`. This will create and run an empty Postgres database. It's default URL is `postgres://admin:admin@127.0.0.1:5432/eval-assist-db`.
 
-### 4. Set the environment variables
+### 5. Set the environment variables
 
 Both frontend and backend need a few environment variables to be set in order to work properly.
 
@@ -59,13 +69,13 @@ _Note: you can use the content of `.env.example` to start with some default valu
 cp .env.example .env
 ```
 
-### 5. Sync the Prisma schema with the Postgres database _(only if you are its admin)_
+### 6. Sync the Prisma schema with the Postgres database _(only if you are its admin)_
 
 The following command synchronizes the prisma schema with the database, making sure all the required tables exist.
 
 `npm run prisma:sync`
 
-### 6. Run the system
+### 7. Run the system
 
 The following command will run both the backend and the frontend concurrently. If you want to run them separately you can use `start:backend` and `start:frontend`.
 
@@ -75,7 +85,7 @@ npm start
 
 **Important:** Sensitive data, such as API keys from third-party providers, is transmitted between the frontend and backend and must be encrypted. Ensure proper TLS termination when deploying the system.
 
-### 7. Open EvalAssist
+### 8. Open EvalAssist
 
 Visit [http://localhost:3000](https://localhost:3000)
 
