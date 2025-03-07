@@ -1,5 +1,6 @@
 import json
 import logging
+import logging.handlers
 import os
 import traceback
 import uuid
@@ -61,6 +62,9 @@ from .notebook_generation import generate_direct_notebook, generate_pairwise_not
 # Synthetic
 from .synthetic_example_generation.generate import Generator
 
+logger = logging.getLogger(__name__)
+logger = logger.setLevel(logging.DEBUG)
+print(f"logger name is: {__name__}")
 nest_asyncio.apply()
 
 app = FastAPI()
@@ -332,11 +336,11 @@ def cleanup_file(filepath: str):
     """Safely remove a file after it has been served."""
     try:
         os.remove(filepath)
-        logging.debug(f"Deleted file: {filepath}")
+        logger.debug(f"Deleted file: {filepath}")
     except FileNotFoundError:
-        logging.debug(f"File not found for deletion: {filepath}")
+        logger.debug(f"File not found for deletion: {filepath}")
     except Exception as e:
-        logging.debug(f"Error deleting file: {filepath}, {e}")
+        logger.debug(f"Error deleting file: {filepath}, {e}")
 
 
 @router.post("/download-notebook/")

@@ -19,6 +19,9 @@ from .const import (
     ExtendedModelProviderEnum,
 )
 
+logger = logging.getLogger(__name__)
+print(f"logger name is: {__name__}")
+
 
 def get_local_hf_inference_engine_params(evaluator_name: EvaluatorNameEnum):
     return {
@@ -95,14 +98,25 @@ def convert_model_name_wx_to_hf(wx_model_name):
         raise ValueError(f"Model name {wx_model_name} not found in the conversion map.")
 
 
+preloaded_hf_models = {}
+
+
 def get_hf_inference_engine(
     evaluator_name: ExtendedEvaluatorNameEnum,
     custom_params: dict = None,
 ):
-    params = get_local_hf_inference_engine_params(evaluator_name)
-    if custom_params:
-        params.update(custom_params)
-    return HFAutoModelInferenceEngine(**params)
+    global preloaded_hf_models
+    if evaluator_name in preloaded_hf_models:
+        logger.debug(f"Using preloaded HF model {evaluator_name.value}")
+        return preloaded_hf_models[evaluator_name]
+    else:
+        logger.debug(f"Loading model {evaluator_name.name}")
+        params = get_local_hf_inference_engine_params(evaluator_name)
+        if custom_params is not None:
+            params.update(custom_params)
+        hf_model = HFAutoModelInferenceEngine(**params)
+        preloaded_hf_models[evaluator_name] = hf_model
+        return hf_model
 
 
 def get_enum_by_value(value: str) -> EvaluatorNameEnum:
@@ -139,7 +153,7 @@ def log_runtime(function):
         end_time = time.time()
         total_time = round(end_time - start_time, 2)
 
-        logging.debug(
+        logger.debug(
             f"{function.__name__} took {total_time} seconds, {round(total_time / 60, 2)} minutes"
         )
 
