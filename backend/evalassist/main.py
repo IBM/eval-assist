@@ -64,7 +64,6 @@ from .synthetic_example_generation.generate import Generator
 
 logger = logging.getLogger(__name__)
 logger = logger.setLevel(logging.DEBUG)
-print(f"logger name is: {__name__}")
 nest_asyncio.apply()
 
 app = FastAPI()
@@ -200,6 +199,7 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
 
     except ValueError as e:
         traceback.print_exc()
+
         raise HTTPException(status_code=400, detail=str(e))
     except ApiRequestFailure as e:
         traceback.print_exc()
