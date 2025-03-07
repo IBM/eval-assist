@@ -9,7 +9,7 @@ from .utils import get_enum_by_value, get_litellm_inference_engine_params
 def generate_direct_notebook(params: NotebookParams):
     inference_engine_params = get_litellm_inference_engine_params(
         provider=params.provider,
-        evaluator_name=params.evaluator_name,
+        model_name=params.evaluator_name,
         credentials=params.credentials,
     )
     inference_engine_params_string = ",".join(
@@ -111,7 +111,7 @@ print(results.instance_scores)
 def generate_pairwise_notebook(params: NotebookParams):
     inference_engine_params = get_litellm_inference_engine_params(
         provider=params.provider,
-        evaluator_name=params.evaluator_name,
+        model_name=params.evaluator_name,
         credentials=params.credentials,
     )
     inference_engine_params_string = ",".join(

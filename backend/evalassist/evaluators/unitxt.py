@@ -6,6 +6,7 @@ from unitxt.blocks import Task, TaskCard
 from unitxt.llm_as_judge import (
     Criteria,
     CriteriaWithOptions,
+    EvaluatorMetadata,
     EvaluatorNameEnum,
     EvaluatorTypeEnum,
     LLMJudgeDirect,
@@ -14,21 +15,76 @@ from unitxt.llm_as_judge import (
     LoadCriteriaWithOptions,
     ModelProviderEnum,
     get_evaluator_metadata,
+    rename_model_if_required,
 )
 from unitxt.loaders import LoadFromDictionary
 from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
 from ..api.common import DirectPositionalBias, DirectResultModel, Instance
-from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
-from ..utils import get_inference_engine
+from ..const import (
+    EXTENDED_EVALUATOR_TO_MODEL_ID,
+    EXTENDED_EVALUATORS_METADATA,
+    ExtendedEvaluatorMetadata,
+    ExtendedEvaluatorNameEnum,
+    ExtendedModelProviderEnum,
+)
+from ..utils import get_custom_models, get_inference_engine
+
+
+def get_evaluator_metadata_wrapper(
+    name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
+) -> (
+    EvaluatorMetadata | ExtendedEvaluatorMetadata
+):  # , evaluator_type: EvaluatorTypeEnum) -> EvaluatorMetadata:
+    if isinstance(name, EvaluatorNameEnum):
+        return get_evaluator_metadata(name)
+    elif isinstance(name, ExtendedEvaluatorNameEnum):
+        evaluator_search = [
+            e for e in EXTENDED_EVALUATORS_METADATA if e.name == name
+        ]  # and e.evaluator_type == evaluator_type]
+        if len(evaluator_search) == 0:
+            # raise ValueError(f'A {evaluator_type} evaluator with id {name} does not exist.')
+            raise ValueError(f"An evaluator with id {name} does not exist.")
+        if len(evaluator_search) > 1:
+            # raise ValueError(f'A {evaluator_type} evaluator with id {name} matched several models.')
+            raise ValueError(f"An evaluator with id {name} matched several models.")
+        return evaluator_search[0]
+    elif isinstance(name, str):
+        if name is None:
+            raise ValueError(
+                "If the evaluator is CUSTOM, a custom_model_name must be provided"
+            )
+
+        custom_models = get_custom_models()
+        if name not in [custom_model["name"] for custom_model in custom_models]:
+            raise ValueError("The specified custom model was not found")
+
+        custom_model = [
+            custom_model
+            for custom_model in custom_models
+            if custom_model["name"] == name
+        ][0]
+        return ExtendedEvaluatorMetadata(
+            name=ExtendedEvaluatorNameEnum.CUSTOM,
+            custom_model_name=custom_model["name"],
+            custom_model_path=custom_model["path"],
+            providers=[
+                ExtendedModelProviderEnum(p)
+                if p in ExtendedModelProviderEnum
+                else ModelProviderEnum(p)
+                for p in custom_model["providers"]
+            ],
+        )
 
 
 class Evaluator(ABC):
     evaluator_type: EvaluatorTypeEnum
 
-    def __init__(self, name: EvaluatorNameEnum):
-        self.evaluator = get_evaluator_metadata(name)
+    def __init__(
+        self, evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+    ):
+        self.evaluator_metadata = get_evaluator_metadata_wrapper(evaluator_name)
 
     def get_preprocess_steps(self):
         raise NotImplementedError("This method must be implemented.")
@@ -52,13 +108,20 @@ class Evaluator(ABC):
         provider: ModelProviderEnum,
         credentials: dict[str, str],
     ):
-        inference_engine = get_inference_engine(
-            credentials, provider, self.evaluator.name
+        model_name = rename_model_if_required(
+            self.evaluator_metadata.custom_model_path
+            if self.evaluator_metadata.custom_model_name is not None
+            else EXTENDED_EVALUATOR_TO_MODEL_ID[self.evaluator_metadata.name],
+            provider,
         )
+
+        inference_engine = get_inference_engine(credentials, provider, model_name)
+
         context_variables_list = [instance.context_variables for instance in instances]
+
         evalutor_params = {
             "inference_engine": inference_engine,
-            "evaluator_name": self.evaluator.name.name,
+            "evaluator_name": None,
             "context_fields": list(context_variables_list[0].keys()),
             "criteria_field": "criteria",
         }
@@ -88,8 +151,10 @@ class Evaluator(ABC):
 
 
 class DirectAssessmentEvaluator(Evaluator):
-    def __init__(self, name: EvaluatorNameEnum):
-        super().__init__(name)
+    def __init__(
+        self, evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+    ):
+        super().__init__(evaluator_name)
         self.evaluator_type = EvaluatorTypeEnum.DIRECT
 
     def get_preprocess_steps(self):

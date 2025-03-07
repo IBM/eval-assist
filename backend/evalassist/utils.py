@@ -1,5 +1,7 @@
 import functools
+import json
 import logging
+import os
 import time
 
 from unitxt.inference import (
@@ -23,6 +25,19 @@ from .const import (
 logger = logging.getLogger(__name__)
 
 
+def get_custom_models():
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(base_path, "..", "custom_models.json")
+    if not os.path.exists(json_path):
+        json_path = os.path.join(base_path, "..", "..", "custom_models.json")
+    with open(json_path, "r", encoding="utf-8") as file:
+        try:
+            custom_models = json.load(file)
+            return custom_models
+        except Exception:
+            raise ValueError("The custom_models json format is wrong")
+
+
 def convert_model_name_wx_to_hf(wx_model_name):
     model_map = {
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B: "ibm-granite/granite-guardian-3.1-2b",
@@ -33,7 +48,8 @@ def convert_model_name_wx_to_hf(wx_model_name):
     try:
         return model_map[wx_model_name]
     except KeyError:
-        raise ValueError(f"Model name {wx_model_name} not found in the conversion map.")
+        logger.warning(f"Model name {wx_model_name} not found in the conversion map.")
+        return wx_model_name
 
 
 def get_enum_by_value(value: str) -> EvaluatorNameEnum:
@@ -46,7 +62,9 @@ def get_enum_by_value(value: str) -> EvaluatorNameEnum:
 preloaded_hf_models = {}
 
 
-def get_local_hf_inference_engine_params(evaluator_name: EvaluatorNameEnum):
+def get_local_hf_inference_engine_params(
+    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str,
+):
     return {
         "model_name": convert_model_name_wx_to_hf(evaluator_name),
         "max_new_tokens": 20,
@@ -57,7 +75,7 @@ def get_local_hf_inference_engine_params(evaluator_name: EvaluatorNameEnum):
 def get_litellm_inference_engine_params(
     credentials: dict,
     provider: ModelProviderEnum,
-    evaluator_name: EvaluatorNameEnum,
+    model_name: EvaluatorNameEnum,
 ):
     inference_engine_params = {
         "max_tokens": 1024,
@@ -65,10 +83,6 @@ def get_litellm_inference_engine_params(
         "credentials": credentials,
         "max_requests_per_second": 8,
     }
-
-    model_name = rename_model_if_required(
-        EXTENDED_EVALUATOR_TO_MODEL_ID[evaluator_name], provider
-    )
 
     if provider == ModelProviderEnum.WATSONX:
         model_name = "watsonx/" + model_name
@@ -109,7 +123,7 @@ def get_litellm_inference_engine(
 
 
 def get_hf_inference_engine(
-    evaluator_name: ExtendedEvaluatorNameEnum,
+    evaluator_name: ExtendedEvaluatorNameEnum | str,
     custom_params: dict = None,
 ):
     global preloaded_hf_models
@@ -117,7 +131,7 @@ def get_hf_inference_engine(
         logger.debug(f"Using preloaded HF model {evaluator_name.value}")
         return preloaded_hf_models[evaluator_name]
     else:
-        logger.debug(f"Loading model {evaluator_name.name}")
+        logger.debug(f"Loading model {evaluator_name}")
         params = get_local_hf_inference_engine_params(evaluator_name)
         if custom_params is not None:
             params.update(custom_params)
@@ -147,19 +161,19 @@ def get_watsonx_inference_engine(
 def get_inference_engine(
     credentials: dict[str, str],
     provider: ModelProviderEnum,
-    evaluator_name: EvaluatorNameEnum,
+    model_name: str,
     custom_params: dict = None,
 ):
     if provider == ExtendedModelProviderEnum.LOCAL_HF:
-        return get_hf_inference_engine(evaluator_name, custom_params)
-    if provider == ModelProviderEnum.WATSONX and evaluator_name.value in [
+        return get_hf_inference_engine(model_name, custom_params)
+    if provider == ModelProviderEnum.WATSONX and model_name.value in [
         e.value for e in ExtendedEvaluatorNameEnum
     ]:
         return get_watsonx_inference_engine(
-            credentials, provider, evaluator_name, custom_params
+            credentials, provider, model_name, custom_params
         )
     return get_litellm_inference_engine(
-        credentials, provider, evaluator_name, custom_params
+        credentials, provider, model_name, custom_params
     )
 
 
