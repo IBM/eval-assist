@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction, useCallback } from 'react'
 import { ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 import { AiLabel } from '@carbon/react/icons'
 
+import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { EvaluationType, Evaluator } from '@types'
 
 import { PipelineSelect } from '../PipelineSelect'
@@ -41,8 +42,9 @@ export const SyntheticGenerationModal = ({
           }}
         >
           This process will create a sysnthetically generated example and it will be added to the Test Data table. The
-          generated example is intended to be a borderline case, meaning that neither of the options criteria can be
-          accuratelly be used to label it. Use it to help you iterate and improve your criteria definition.
+          generated example is intended to be a <strong>borderline example</strong>, meaning that neither of the options
+          criteria can be accuratelly be used to label it. Use it to help you iterate and improve your criteria
+          definition.
         </p>
 
         <PipelineSelect
