@@ -37,11 +37,6 @@ interface Props {
   setResponseVariableName: (newValue: string) => void
   currentTestCase: UseCase
   setInstances: (instances: Instance[]) => void
-  fetchSystheticExamples: () => Promise<{
-    syntheticExamples: any
-    failed: boolean
-    errorMessage: string
-  }>
   loadingSyntheticExamples: boolean
   setSysntheticGenerationModalOpen: Dispatch<SetStateAction<boolean>>
 }
@@ -57,7 +52,6 @@ export const TestDataTable = ({
   criteria,
   responseVariableName,
   setResponseVariableName,
-  fetchSystheticExamples,
   loadingSyntheticExamples,
   setSysntheticGenerationModalOpen,
   currentTestCase,

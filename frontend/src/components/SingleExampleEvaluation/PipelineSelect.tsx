@@ -4,14 +4,12 @@ import { getJSONStringWithSortedKeys, returnByPipelineType } from 'src/utils'
 
 import { CSSProperties, useMemo } from 'react'
 
-import Link from 'next/link'
-
 import { Select, SelectItem, SelectItemGroup, SelectSkeleton } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 
-import { EvaluationType, Evaluator, ModelProviderCredentials, ModelProviderType } from '../../types'
+import { EvaluationType, Evaluator, ModelProviderType } from '../../types'
 import classes from './PipelineSelect.module.scss'
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
@@ -129,7 +127,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
           className={classes.selectReadOnly}
           // readOnly={isRisksAndHarms}
         >
-          {selectedPipeline === null && <SelectItem value={''} text={'No evaluator selected'} />}
+          {selectedPipeline === null && <SelectItem value={''} text={`No evaluator selected`} />}
           {Object.entries(providerToEvaluators).map(([provider, providerEvaluators]) => (
             <SelectItemGroup
               label={modelProviderBeautifiedName[provider as ModelProviderType]}

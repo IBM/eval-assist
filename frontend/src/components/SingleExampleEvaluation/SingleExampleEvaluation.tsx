@@ -159,10 +159,7 @@ export const SingleExampleEvaluation = () => {
     })
 
   // TODO: refactor so that this component receives a test case that cant be null
-  const { fetchSystheticExamples, loadingSyntheticExamples, generateTestData } = useGenerateSystheticExamples({
-    provider: currentTestCase?.evaluator?.provider,
-    credentials: modelProviderCredentials[currentTestCase?.evaluator?.provider as ModelProviderType],
-    evaluatorName: currentTestCase?.evaluator?.name,
+  const { loadingSyntheticExamples, generateTestData } = useGenerateSystheticExamples({
     evaluatorType: currentTestCase?.type,
     criteria: currentTestCase?.criteria,
     responseVariableName: currentTestCase?.responseVariableName,
@@ -653,7 +650,6 @@ export const SingleExampleEvaluation = () => {
                   previousCurrentUseCase !== null ? { ...previousCurrentUseCase, responseVariableName } : null,
                 )
               }
-              fetchSystheticExamples={fetchSystheticExamples}
               loadingSyntheticExamples={loadingSyntheticExamples}
               setSysntheticGenerationModalOpen={setSysntheticGenerationModalOpen}
             />
@@ -742,7 +738,13 @@ export const SingleExampleEvaluation = () => {
             modelForSyntheticGeneration={modelForSyntheticGeneration}
             setModelForSyntheticGeneration={setModelForSyntheticGeneration}
             type={currentTestCase.type}
-            generateTestData={generateTestData}
+            generateTestData={() =>
+              generateTestData({
+                credentials: modelProviderCredentials[modelForSyntheticGeneration?.provider as ModelProviderType],
+                evaluatorName: modelForSyntheticGeneration?.name!,
+                provider: modelForSyntheticGeneration?.provider!,
+              })
+            }
           />
         </>
       )}
