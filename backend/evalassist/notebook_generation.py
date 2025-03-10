@@ -3,7 +3,7 @@ import json
 import nbformat as nbf
 
 from .api.common import NotebookParams
-from .utils import get_enum_by_value, get_litellm_inference_engine_params
+from .utils import get_litellm_inference_engine_params
 
 
 def generate_direct_notebook(params: NotebookParams):
@@ -65,7 +65,7 @@ criteria = CriteriaWithOptions.from_obj(criteria)
 This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables.
 """
     setup_code = f"""metric = LLMJudgeDirect(
-    evaluator_name={f"EvaluatorNameEnum.{get_enum_by_value(params.evaluator_name).name}.name"},
+    evaluator_name={params.evaluator_name},
     inference_engine=LiteLLMInferenceEngine({inference_engine_params_string}),
     criteria=criteria,
     context_fields={context_fields},
@@ -170,7 +170,7 @@ The criteria in direct evaluation need an option map that matches a string to a 
 This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables.
 """
     setup_code = f"""metric = LLMJudgePairwise(
-    evaluator_name={f"EvaluatorNameEnum.{get_enum_by_value(params.evaluator_name).name}.name"},
+    evaluator_name={params.evaluator_name},
     inference_engine=LiteLLMInferenceEngine({inference_engine_params_string}),
     criteria=criteria,
     context_fields={context_fields},
