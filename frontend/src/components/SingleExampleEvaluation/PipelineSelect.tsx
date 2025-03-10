@@ -102,7 +102,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
               {selectedPipeline !== null ? (
                 <div className={classes.providerFont}>
                   <span>
-                    <em>{'Model provider: '}</em>
+                    {'Model provider: '}
                     {`${modelProviderBeautifiedName[selectedPipeline?.provider as ModelProviderType]}`}
                   </span>
                   {selectedPipeline !== null && !getAreRelevantCredentialsProvided(selectedPipeline.provider) && (
@@ -112,10 +112,14 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
                     </span>
                   )}
                 </div>
-              ) : (
+              ) : Object.keys(providerToEvaluators).every(
+                  (provider) => !getAreRelevantCredentialsProvided(provider as ModelProviderType),
+                ) ? (
                 <div className={classes.providerFont}>
                   {'Provide at least a provider API credentials in order to select an evaluator.'}
                 </div>
+              ) : (
+                <div className={classes.providerFont}>{'Select an evaluator'}</div>
               )}
             </div>
           }
