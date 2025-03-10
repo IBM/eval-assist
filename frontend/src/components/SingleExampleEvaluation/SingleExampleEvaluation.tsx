@@ -15,7 +15,7 @@ import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFrom
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
-import { useUnitxtNotebookGeneration } from '@customHooks/useUnitxtNotebook'
+import { useUnitxtNotebookGeneration } from '@customHooks/useUnitxtNotebookGeneration'
 import { StoredUseCase } from '@prisma/client'
 
 import {
@@ -182,14 +182,16 @@ export const SingleExampleEvaluation = () => {
   )
 
   const { downloadUnitxtNotebook } = useUnitxtNotebookGeneration({
-    testCaseName: currentTestCase?.name,
-    criteria: currentTestCase?.criteria,
-    evaluatorName: currentTestCase?.evaluator?.name,
+    testCaseName: currentTestCase?.name!,
+    criteria: currentTestCase?.criteria!,
+    evaluatorName: currentTestCase?.evaluator?.name || null,
     responses,
-    contextVariablesList: currentTestCase?.instances.map((instance) => instance.contextVariables),
+    contextVariablesList: currentTestCase?.instances.map((instance) => instance.contextVariables)!,
     provider: currentTestCase?.evaluator?.provider,
-    credentials: modelProviderCredentials[currentTestCase?.evaluator?.provider || ModelProviderType.RITS],
-    evaluatorType: currentTestCase?.type,
+    credential_keys: Object.keys(
+      modelProviderCredentials[currentTestCase?.evaluator?.provider || ModelProviderType.RITS],
+    ),
+    evaluatorType: currentTestCase?.type!,
   })
 
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
