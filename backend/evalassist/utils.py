@@ -66,9 +66,6 @@ def get_enum_by_value(value: str, enum: Enum) -> Enum:
     return None
 
 
-preloaded_hf_models = {}
-
-
 def get_local_hf_inference_engine_params(
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str,
 ):
@@ -127,6 +124,9 @@ def get_litellm_inference_engine(
     if custom_params is not None:
         inference_engine_params.update(custom_params)
     return LiteLLMInferenceEngine(**inference_engine_params)
+
+
+preloaded_hf_models = {}
 
 
 def get_hf_inference_engine(

@@ -1,16 +1,20 @@
+import json
+
+# from model import Model
+# from _archive.liberated_model import LiberatedModel
+# from utils.data_utils import load_jsonl, save_to_jsonl
+import logging
 from textwrap import dedent
 
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts import PromptTemplate
-from unitxt.llm_as_judge import rename_model_if_required
+from unitxt.llm_as_judge import CriteriaWithOptions, rename_model_if_required
 
 from backend.evalassist.const import EXTENDED_EVALUATOR_TO_MODEL_ID
 
 from ..utils import get_evaluator_metadata_wrapper, get_inference_engine
 
-# from model import Model
-# from _archive.liberated_model import LiberatedModel
-# from utils.data_utils import load_jsonl, save_to_jsonl
+logger = logging.getLogger(__name__)
 
 
 class Generator:
@@ -102,6 +106,9 @@ class Generator:
         responses = self.inference_engine.infer(
             [{"source": prompt} for prompt in prompts]
         )
+        logger.debug(
+            f"The generated unparsed examples are:\n{json.dumps(responses, indent=2)}"
+        )
 
         # parse the last response (the borderline case)
         parsed_response = self.output_parser.parse(responses[-1])
@@ -111,7 +118,7 @@ class Generator:
     def _format_prompts(self):
         system_prompts, queries, metadata = [], [], []
 
-        criteria = self.generation_config["criteria"]
+        criteria: CriteriaWithOptions = self.generation_config["criteria"]
         criteria_dict = {option.name: option.description for option in criteria.options}
         criteria_borderline = self._get_borderline_criteria(criteria)
         criteria_dict[criteria_borderline["name"]] = criteria_borderline["description"]
@@ -142,7 +149,7 @@ class Generator:
 
         return system_prompts, queries, metadata
 
-    def _get_borderline_criteria(self, criteria):
+    def _get_borderline_criteria(self, criteria: CriteriaWithOptions):
         # criteria_name = criteria.name
 
         criteria_options = criteria.options
@@ -170,9 +177,9 @@ class Generator:
         ]
         criteria_text = "\n".join(criteria_list)
         query = f"Describe a borderline case that lies between these criteria:\n\n{criteria_text}\n\nProvide a natural language description of what it means to be a borderline case among these criteria. Your description should mirror the style and format of the original criteria but describe the subtle ways in which the case partially satisfies multiple criteria while not fully satisfying any single one.\n\n{criteria_format_instructions}"
-        print(query)
+        logger.debug(f"The query is:\n{query}")
         criteria_other = self.inference_engine.infer([{"source": query}])[0]
-
+        logger.debug(f"The unparsed borderline criteria is:\n{criteria_other}")
         criteria_other_parsed = criteria_output_parser.parse(criteria_other)
 
         return criteria_other_parsed
