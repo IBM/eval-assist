@@ -107,6 +107,7 @@ class NotebookParams(BaseModel):
     context_variables: list[dict[str, str]]
     credentials: dict[str, str]
     evaluator_type: EvaluatorTypeEnum
+    model_name: Optional[str] = None
 
 
 class CriteriaOptionAPI(BaseModel):
