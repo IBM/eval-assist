@@ -56,7 +56,9 @@ class ExtendedEvaluatorMetadata(EvaluatorMetadata):
         self.custom_model_path = custom_model_path
 
 
-EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = EVALUATORS_METADATA + [
+EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = [
+    ExtendedEvaluatorMetadata(e.name, e.providers) for e in EVALUATORS_METADATA
+] + [
     ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B,
         [ModelProviderEnum.WATSONX, ExtendedModelProviderEnum.LOCAL_HF],

@@ -18,6 +18,7 @@ import {
   Instance,
   PairwiseInstance,
   PairwiseInstanceResultV1,
+  UseCase,
 } from '../../../types'
 import { useToastContext } from '../Providers/ToastProvider'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
@@ -34,7 +35,7 @@ interface Props {
   criteria: CriteriaWithOptions | Criteria
   responseVariableName: string
   setResponseVariableName: (newValue: string) => void
-  instances: Instance[]
+  currentTestCase: UseCase
   setInstances: (instances: Instance[]) => void
   fetchSystheticExamples: () => Promise<{
     syntheticExamples: any
@@ -42,12 +43,12 @@ interface Props {
     errorMessage: string
   }>
   loadingSyntheticExamples: boolean
+  setSysntheticGenerationModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export const TestDataTable = ({
   style,
   className,
-  instances,
   setInstances,
   type,
   evaluationRunning,
@@ -58,11 +59,12 @@ export const TestDataTable = ({
   setResponseVariableName,
   fetchSystheticExamples,
   loadingSyntheticExamples,
+  setSysntheticGenerationModalOpen,
+  currentTestCase,
 }: Props) => {
   const instancesPerPage = useMemo(() => 5, [])
   const [explanationOn, setExplanationOn] = useState(false)
-  const { addToast, removeToast } = useToastContext()
-
+  const instances = useMemo(() => currentTestCase.instances, [currentTestCase.instances])
   const { currentInstances, currentPage, goToPage, totalPages, goToLastPage } = usePagination({
     instances,
     instancesPerPage: instancesPerPage,
@@ -154,55 +156,6 @@ export const TestDataTable = ({
   const addInstance = (instance: Instance) => {
     setInstances([...instances, instance])
   }
-
-  const generateTestData = useCallback(async () => {
-    const generationInProgressToastId = addToast({
-      kind: 'info',
-      title: 'Generating synthetic examples...',
-    })
-    const result = await fetchSystheticExamples()
-    removeToast(generationInProgressToastId)
-
-    if (result.failed) {
-      addToast({
-        kind: 'error',
-        title: 'Evaluation failed',
-        subtitle: result.errorMessage,
-        timeout: 5000,
-      })
-      return
-    }
-    const syntheticExample = result.syntheticExamples[0]
-    let syntheticInstance: Instance = {
-      contextVariables: instances[0].contextVariables.map((contextVariable) => ({
-        name: contextVariable.name,
-        value: syntheticExample[contextVariable.name],
-      })),
-      expectedResult: '',
-      result: null,
-    }
-
-    if (type === EvaluationType.DIRECT) {
-      ;(syntheticInstance as DirectInstance) = {
-        ...syntheticInstance,
-        response: syntheticExample[responseVariableName],
-      }
-    } else {
-      ;(syntheticInstance as PairwiseInstance) = {
-        ...syntheticInstance,
-        responses: (instances[0] as PairwiseInstance).responses.map((_) => ''),
-      }
-    }
-    setInstances([...instances, syntheticInstance])
-    addToast({
-      kind: 'success',
-      title: 'Synthetic examples generated succesfully',
-      caption: `${result.syntheticExamples.length} example${result.syntheticExamples.length > 1 ? 's' : ''} ${
-        result.syntheticExamples.length > 1 ? 'were' : 'was'
-      } generated and added to the test data`,
-      timeout: 5000,
-    })
-  }, [addToast, fetchSystheticExamples, instances, removeToast, responseVariableName, setInstances, type])
 
   const addContextVariable = () => {
     setInstances(
@@ -428,7 +381,12 @@ export const TestDataTable = ({
               {loadingSyntheticExamples ? (
                 <InlineLoading description={'Generating...'} status={'active'} />
               ) : (
-                <Button kind="tertiary" size="sm" renderIcon={AiGenerate} onClick={generateTestData}>
+                <Button
+                  kind="tertiary"
+                  size="sm"
+                  renderIcon={AiGenerate}
+                  onClick={() => setSysntheticGenerationModalOpen(true)}
+                >
                   {'Generate test data'}
                 </Button>
               )}

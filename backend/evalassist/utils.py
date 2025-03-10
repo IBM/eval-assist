@@ -3,7 +3,9 @@ import json
 import logging
 import os
 import time
+from enum import Enum
 
+import torch
 from unitxt.inference import (
     HFAutoModelInferenceEngine,
     LiteLLMInferenceEngine,
@@ -18,6 +20,8 @@ from unitxt.llm_as_judge import (
 
 from .const import (
     EXTENDED_EVALUATOR_TO_MODEL_ID,
+    EXTENDED_EVALUATORS_METADATA,
+    ExtendedEvaluatorMetadata,
     ExtendedEvaluatorNameEnum,
     ExtendedModelProviderEnum,
 )
@@ -55,11 +59,11 @@ def convert_model_name_wx_to_hf(wx_model_name):
         return wx_model_name
 
 
-def get_enum_by_value(value: str) -> EvaluatorNameEnum:
-    for enum_member in EvaluatorNameEnum:
+def get_enum_by_value(value: str, enum: Enum) -> Enum:
+    for enum_member in enum:
         if enum_member.value == value:
             return enum_member
-    raise ValueError(f"No matching enum found for value: {value}")
+    return None
 
 
 preloaded_hf_models = {}
@@ -131,7 +135,7 @@ def get_hf_inference_engine(
 ):
     global preloaded_hf_models
     if evaluator_name in preloaded_hf_models:
-        logger.debug(f"Using preloaded HF model {evaluator_name.value}")
+        logger.debug(f"Using preloaded HF model {evaluator_name}")
         return preloaded_hf_models[evaluator_name]
     else:
         logger.debug(f"Loading model {evaluator_name}")
@@ -169,15 +173,68 @@ def get_inference_engine(
 ):
     if provider == ExtendedModelProviderEnum.LOCAL_HF:
         return get_hf_inference_engine(model_name, custom_params)
-    if provider == ModelProviderEnum.WATSONX and model_name.value in [
-        e.value for e in ExtendedEvaluatorNameEnum
-    ]:
+    if (
+        provider == ModelProviderEnum.WATSONX
+        and get_enum_by_value(model_name, ExtendedEvaluatorNameEnum) is not None
+    ):
         return get_watsonx_inference_engine(
             credentials, provider, model_name, custom_params
         )
     return get_litellm_inference_engine(
         credentials, provider, model_name, custom_params
     )
+
+
+def get_evaluator_metadata_wrapper(
+    name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str,
+) -> ExtendedEvaluatorMetadata:
+    if (
+        get_enum_by_value(name, EvaluatorNameEnum) is not None
+        or get_enum_by_value(name, ExtendedEvaluatorNameEnum) is not None
+    ):
+        evaluator_search = [
+            e for e in EXTENDED_EVALUATORS_METADATA if e.name == name
+        ]  # and e.evaluator_type == evaluator_type]
+        if len(evaluator_search) == 0:
+            # raise ValueError(f'A {evaluator_type} evaluator with id {name} does not exist.')
+            raise ValueError(f"An evaluator with id {name} does not exist.")
+        if len(evaluator_search) > 1:
+            # raise ValueError(f'A {evaluator_type} evaluator with id {name} matched several models.')
+            raise ValueError(f"An evaluator with id {name} matched several models.")
+        return evaluator_search[0]
+    else:
+        custom_models = get_custom_models()
+        if name not in [custom_model["name"] for custom_model in custom_models]:
+            raise ValueError("The specified custom model was not found")
+
+        custom_model = [
+            custom_model
+            for custom_model in custom_models
+            if custom_model["name"] == name
+        ][0]
+        return ExtendedEvaluatorMetadata(
+            name=ExtendedEvaluatorNameEnum.CUSTOM,
+            custom_model_name=custom_model["name"],
+            custom_model_path=custom_model["path"],
+            providers=[
+                ExtendedModelProviderEnum(p)
+                if p in ExtendedModelProviderEnum
+                else ModelProviderEnum(p)
+                for p in custom_model["providers"]
+            ],
+        )
+
+
+def get_default_torch_devide(avoid_mps: bool = False):
+    result = (
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps"
+        if torch.backends.mps.is_available() and not avoid_mps
+        else "cpu"
+    )
+    logger.debug(f"Using {result} as the torch device")
+    return result
 
 
 def log_runtime(function):
