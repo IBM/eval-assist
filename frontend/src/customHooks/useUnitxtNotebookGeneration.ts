@@ -1,5 +1,3 @@
-import { returnByPipelineType } from 'src/utils'
-
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 
 import { DirectInstance, EvaluationType, Instance, PairwiseInstance, UseCase } from '../types'
@@ -17,7 +15,7 @@ interface Props {
   credentials: { [key: string]: string } | undefined
   evaluatorType: EvaluationType | undefined
 }
-export const useUnitxtNotebook = ({
+export const useUnitxtNotebookGeneration = ({
   criteria,
   evaluatorName,
   responses,

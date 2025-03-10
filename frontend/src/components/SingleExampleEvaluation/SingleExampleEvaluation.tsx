@@ -15,7 +15,7 @@ import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFrom
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
-import { useUnitxtNotebook } from '@customHooks/useUnitxtNotebook'
+import { useUnitxtNotebookGeneration } from '@customHooks/useUnitxtNotebook'
 import { StoredUseCase } from '@prisma/client'
 
 import {
@@ -181,7 +181,7 @@ export const SingleExampleEvaluation = () => {
     [currentTestCase?.instances, currentTestCase?.type, noUseCaseSelected],
   )
 
-  const { downloadUnitxtNotebook } = useUnitxtNotebook({
+  const { downloadUnitxtNotebook } = useUnitxtNotebookGeneration({
     testCaseName: currentTestCase?.name,
     criteria: currentTestCase?.criteria,
     evaluatorName: currentTestCase?.evaluator?.name,
