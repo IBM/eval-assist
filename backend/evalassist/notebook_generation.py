@@ -9,14 +9,8 @@ from .utils import get_litellm_inference_engine_params
 def generate_direct_notebook(params: NotebookParams):
     inference_engine_params = get_litellm_inference_engine_params(
         provider=params.provider,
-        model_name=params.evaluator_name,
+        model_name=params.model_name,
         credentials=params.credentials,
-    )
-    inference_engine_params_string = ",".join(
-        [
-            f"{k}={repr(v) if isinstance(v, str) else v}"
-            for k, v in inference_engine_params.items()
-        ]
     )
 
     input_fields = {k: "str" for k in params.context_variables[0].keys()}
@@ -65,8 +59,8 @@ criteria = CriteriaWithOptions.from_obj(criteria)
 This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables.
 """
     setup_code = f"""metric = LLMJudgeDirect(
-    evaluator_name={params.evaluator_name},
-    inference_engine=LiteLLMInferenceEngine({inference_engine_params_string}),
+    evaluator_name=EvaluatorNameEnum.GRANITE3_1_2B.name # harcoded, to be fixed,
+    inference_engine=LiteLLMInferenceEngine(**{json.dumps(inference_engine_params, indent=4)}),
     criteria=criteria,
     context_fields={context_fields},
     criteria_field="criteria",
@@ -111,14 +105,8 @@ print(results.instance_scores)
 def generate_pairwise_notebook(params: NotebookParams):
     inference_engine_params = get_litellm_inference_engine_params(
         provider=params.provider,
-        model_name=params.evaluator_name,
+        model_name=params.model_name,
         credentials=params.credentials,
-    )
-    inference_engine_params_string = ",".join(
-        [
-            f"{k}={repr(v) if isinstance(v, str) else v}"
-            for k, v in inference_engine_params.items()
-        ]
     )
 
     input_fields = {k: "str" for k in params.context_variables[0].keys()}
@@ -170,8 +158,8 @@ The criteria in direct evaluation need an option map that matches a string to a 
 This code block creates the evaluator object of class _LLMJudgeDirect_. It then creates a dataset object from the context variables.
 """
     setup_code = f"""metric = LLMJudgePairwise(
-    evaluator_name={params.evaluator_name},
-    inference_engine=LiteLLMInferenceEngine({inference_engine_params_string}),
+    evaluator_name=EvaluatorNameEnum.GRANITE3_1_2B.name # harcoded, to be fixed,
+    inference_engine=LiteLLMInferenceEngine(**{json.dumps(inference_engine_params, indent=4)}),
     criteria=criteria,
     context_fields={context_fields},
     criteria_field="criteria",

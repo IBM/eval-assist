@@ -13,22 +13,18 @@ from unitxt.llm_as_judge import (
     LoadCriteria,
     LoadCriteriaWithOptions,
     ModelProviderEnum,
-    rename_model_if_required,
 )
 from unitxt.loaders import LoadFromDictionary
 from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
 from ..api.common import DirectPositionalBias, DirectResultModel, Instance
-from ..const import (
-    EXTENDED_EVALUATOR_TO_MODEL_ID,
-    ExtendedEvaluatorNameEnum,
-    ExtendedModelProviderEnum,
-)
+from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 from ..utils import (
     get_default_torch_devide,
     get_evaluator_metadata_wrapper,
     get_inference_engine,
+    get_parsed_model_name,
 )
 
 
@@ -62,10 +58,9 @@ class Evaluator(ABC):
         provider: ModelProviderEnum,
         credentials: dict[str, str],
     ):
-        model_name = rename_model_if_required(
-            self.evaluator_metadata.custom_model_path
-            if self.evaluator_metadata.custom_model_name is not None
-            else EXTENDED_EVALUATOR_TO_MODEL_ID[self.evaluator_metadata.name],
+        model_name = get_parsed_model_name(
+            self.evaluator_metadata.custom_model_path,
+            self.evaluator_metadata.name,
             provider,
         )
 

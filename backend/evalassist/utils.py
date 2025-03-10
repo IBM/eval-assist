@@ -4,6 +4,7 @@ import logging
 import os
 import time
 from enum import Enum
+from typing import Optional
 
 import torch
 from unitxt.inference import (
@@ -79,7 +80,7 @@ def get_local_hf_inference_engine_params(
 def get_litellm_inference_engine_params(
     credentials: dict,
     provider: ModelProviderEnum,
-    model_name: EvaluatorNameEnum,
+    model_name: str,
 ):
     inference_engine_params = {
         "max_tokens": 1024,
@@ -121,6 +122,9 @@ def get_litellm_inference_engine(
     inference_engine_params = get_litellm_inference_engine_params(
         credentials, provider, evaluator_name
     )
+    import json
+
+    print(json.dumps(inference_engine_params, indent=4))
     if custom_params is not None:
         inference_engine_params.update(custom_params)
     return LiteLLMInferenceEngine(**inference_engine_params)
@@ -182,6 +186,17 @@ def get_inference_engine(
         )
     return get_litellm_inference_engine(
         credentials, provider, model_name, custom_params
+    )
+
+
+def get_parsed_model_name(
+    custom_model_path: Optional[str], model_name: str, provider: ModelProviderEnum
+):
+    return rename_model_if_required(
+        custom_model_path
+        if custom_model_path is not None
+        else EXTENDED_EVALUATOR_TO_MODEL_ID[model_name],
+        provider,
     )
 
 

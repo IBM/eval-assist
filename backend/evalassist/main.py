@@ -31,7 +31,11 @@ from unitxt.llm_as_judge import (
     EvaluatorTypeEnum,
 )
 
-from backend.evalassist.utils import get_custom_models
+from backend.evalassist.utils import (
+    get_custom_models,
+    get_evaluator_metadata_wrapper,
+    get_parsed_model_name,
+)
 
 from .api.common import (
     CriteriaAPI,
@@ -343,6 +347,7 @@ def get_benchmarks():
 
 def cleanup_file(filepath: str):
     """Safely remove a file after it has been served."""
+    logger = logging.getLogger(__name__)
     try:
         os.remove(filepath)
         logger.debug(f"Deleted file: {filepath}")
@@ -362,7 +367,11 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
         or not hasattr(params, "context_variables")
     ):
         raise HTTPException(status_code=400, detail="Missing required fields")
-
+    evaluator_metadata = get_evaluator_metadata_wrapper(params.evaluator_name)
+    model_name = get_parsed_model_name(
+        evaluator_metadata.custom_model_path, evaluator_metadata.name, params.provider
+    )
+    params.model_name = model_name
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
         nb = generate_direct_notebook(params)
     else:
