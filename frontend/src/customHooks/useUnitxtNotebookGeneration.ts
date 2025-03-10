@@ -4,16 +4,16 @@ import { DirectInstance, EvaluationType, Instance, PairwiseInstance, UseCase } f
 import { useFetchUtils } from './useFetchUtils'
 
 interface Props {
-  testCaseName: UseCase['name'] | undefined
-  criteria: UseCase['criteria'] | undefined
-  evaluatorName: string | undefined
-  responses: DirectInstance['response'][] | PairwiseInstance['responses'][] | undefined
-  contextVariablesList: Instance['contextVariables'][] | undefined
+  testCaseName: UseCase['name']
+  criteria: UseCase['criteria']
+  evaluatorName: string | null
+  responses: DirectInstance['response'][] | PairwiseInstance['responses'][]
+  contextVariablesList: Instance['contextVariables'][]
   // @ts-ignore
   // tslint says UseCase['evaluator'] can be null, but it can't be null
-  provider: UseCase['evaluator']['provider'] | undefined
-  credentials: { [key: string]: string } | undefined
-  evaluatorType: EvaluationType | undefined
+  provider: UseCase['evaluator']['provider']
+  credential_keys: string[]
+  evaluatorType: EvaluationType
 }
 export const useUnitxtNotebookGeneration = ({
   criteria,
@@ -21,7 +21,7 @@ export const useUnitxtNotebookGeneration = ({
   responses,
   contextVariablesList,
   provider,
-  credentials,
+  credential_keys,
   evaluatorType,
   testCaseName,
 }: Props) => {
@@ -29,16 +29,6 @@ export const useUnitxtNotebookGeneration = ({
   const { addToast, removeToast } = useToastContext()
 
   const downloadUnitxtNotebook = async () => {
-    console.log({
-      criteria,
-      evaluatorName,
-      responses,
-      contextVariablesList,
-      provider,
-      credentials,
-      evaluatorType,
-      testCaseName,
-    })
     if (!evaluatorName) {
       addToast({
         kind: 'warning',
@@ -46,7 +36,6 @@ export const useUnitxtNotebookGeneration = ({
       })
       return
     }
-    if (!responses || !contextVariablesList || !provider) return
     const inProgressToastId = addToast({
       kind: 'info',
       title: 'Generating Jupyter notebook...',
@@ -62,7 +51,7 @@ export const useUnitxtNotebookGeneration = ({
             contextVariables.reduce((acc, item, index) => ({ ...acc, [item.name]: item.value }), {}),
           ) || {},
         provider,
-        credentials: credentials || {},
+        credentials: credential_keys.reduce((acc, item, index) => ({ ...acc, [item]: '' }), {}),
         evaluator_type: evaluatorType!,
         test_case_name: testCaseName || '',
       })
