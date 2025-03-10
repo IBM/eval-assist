@@ -6,7 +6,6 @@ from unitxt.blocks import Task, TaskCard
 from unitxt.llm_as_judge import (
     Criteria,
     CriteriaWithOptions,
-    EvaluatorMetadata,
     EvaluatorNameEnum,
     EvaluatorTypeEnum,
     LLMJudgeDirect,
@@ -14,7 +13,6 @@ from unitxt.llm_as_judge import (
     LoadCriteria,
     LoadCriteriaWithOptions,
     ModelProviderEnum,
-    get_evaluator_metadata,
     rename_model_if_required,
 )
 from unitxt.loaders import LoadFromDictionary
@@ -24,58 +22,14 @@ from unitxt.templates import NullTemplate
 from ..api.common import DirectPositionalBias, DirectResultModel, Instance
 from ..const import (
     EXTENDED_EVALUATOR_TO_MODEL_ID,
-    EXTENDED_EVALUATORS_METADATA,
-    ExtendedEvaluatorMetadata,
     ExtendedEvaluatorNameEnum,
     ExtendedModelProviderEnum,
 )
-from ..utils import get_custom_models, get_inference_engine
-
-
-def get_evaluator_metadata_wrapper(
-    name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
-) -> (
-    EvaluatorMetadata | ExtendedEvaluatorMetadata
-):  # , evaluator_type: EvaluatorTypeEnum) -> EvaluatorMetadata:
-    if isinstance(name, EvaluatorNameEnum):
-        return get_evaluator_metadata(name)
-    elif isinstance(name, ExtendedEvaluatorNameEnum):
-        evaluator_search = [
-            e for e in EXTENDED_EVALUATORS_METADATA if e.name == name
-        ]  # and e.evaluator_type == evaluator_type]
-        if len(evaluator_search) == 0:
-            # raise ValueError(f'A {evaluator_type} evaluator with id {name} does not exist.')
-            raise ValueError(f"An evaluator with id {name} does not exist.")
-        if len(evaluator_search) > 1:
-            # raise ValueError(f'A {evaluator_type} evaluator with id {name} matched several models.')
-            raise ValueError(f"An evaluator with id {name} matched several models.")
-        return evaluator_search[0]
-    elif isinstance(name, str):
-        if name is None:
-            raise ValueError(
-                "If the evaluator is CUSTOM, a custom_model_name must be provided"
-            )
-
-        custom_models = get_custom_models()
-        if name not in [custom_model["name"] for custom_model in custom_models]:
-            raise ValueError("The specified custom model was not found")
-
-        custom_model = [
-            custom_model
-            for custom_model in custom_models
-            if custom_model["name"] == name
-        ][0]
-        return ExtendedEvaluatorMetadata(
-            name=ExtendedEvaluatorNameEnum.CUSTOM,
-            custom_model_name=custom_model["name"],
-            custom_model_path=custom_model["path"],
-            providers=[
-                ExtendedModelProviderEnum(p)
-                if p in ExtendedModelProviderEnum
-                else ModelProviderEnum(p)
-                for p in custom_model["providers"]
-            ],
-        )
+from ..utils import (
+    get_default_torch_devide,
+    get_evaluator_metadata_wrapper,
+    get_inference_engine,
+)
 
 
 class Evaluator(ABC):
@@ -121,7 +75,7 @@ class Evaluator(ABC):
 
         evalutor_params = {
             "inference_engine": inference_engine,
-            "evaluator_name": None,
+            "evaluator_name": EvaluatorNameEnum.GRANITE3_2B.name,  # TODO: allow for name to be more flexible
             "context_fields": list(context_variables_list[0].keys()),
             "criteria_field": "criteria",
         }
@@ -379,7 +333,16 @@ class GraniteGuardianEvaluator(ABC):
                 "url": credentials["api_base"],
             }
         elif provider == ExtendedModelProviderEnum.LOCAL_HF:
-            custom_params = {"max_new_tokens": 20, "device": "cpu"}
+            avoid_mps = self.evaluator_name not in [
+                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B,
+                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B,
+                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B,
+                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B,
+            ]
+            custom_params = {
+                "max_new_tokens": 20,
+                "device": get_default_torch_devide(avoid_mps),
+            }
 
         inference_engine = get_inference_engine(
             parsed_credentials, provider, self.evaluator_name, custom_params

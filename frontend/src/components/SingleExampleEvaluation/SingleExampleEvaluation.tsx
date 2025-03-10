@@ -48,6 +48,7 @@ import { NewUseCaseModal } from './Modals/NewUseCaseModal'
 import { PromptModal } from './Modals/PromptModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
+import { SyntheticGenerationModal } from './Modals/SyntheticGenerationModal'
 import { PipelineSelect } from './PipelineSelect'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
 import { useCriteriasContext } from './Providers/CriteriasProvider'
@@ -59,7 +60,7 @@ import { UseCaseOptions } from './UseCaseOptions'
 
 export const SingleExampleEvaluation = () => {
   const { preloadedUseCase } = useURLInfoContext()
-  const [currentUseCase, setCurrentUseCase] = useState(preloadedUseCase)
+  const [currentTestCase, setCurrentTestCase] = useState(preloadedUseCase)
   const { userUseCases, setUserUseCases } = useUserUseCasesContext()
   // we are ignoring client side rendering to be able to use useSessionStorage
   const showingTestCase = useMemo<boolean>(() => preloadedUseCase !== null, [preloadedUseCase])
@@ -68,7 +69,7 @@ export const SingleExampleEvaluation = () => {
   )
 
   // if the usecase doesnt have an id, it means it hasn't been stored
-  const isUseCaseSaved = useMemo(() => currentUseCase !== null && currentUseCase.id !== null, [currentUseCase])
+  const isUseCaseSaved = useMemo(() => currentTestCase !== null && currentTestCase.id !== null, [currentTestCase])
   const [evaluationFailed, setEvaluationFailed] = useState(false)
   const [evaluationRunning, setEvaluationRunning] = useState(false)
 
@@ -80,13 +81,15 @@ export const SingleExampleEvaluation = () => {
   const [resultDetailsModalOpen, setResultDetailsModalOpen] = useState(false)
   const [evaluationRunningModalOpen, setEvaluationRunningModalOpen] = useState(false)
   const [promptModalOpen, setPromptModalOpen] = useState(false)
+  const [sysntheticGenerationModalOpen, setSysntheticGenerationModalOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [selectedInstance, setSelectedInstance] = useState<Instance | null>(null)
+  const [modelForSyntheticGeneration, setModelForSyntheticGeneration] = useState<Evaluator | null>(null)
 
   const { setSidebarTabSelected } = useAppSidebarContext()
   const currentUseCaseString = useMemo<string>(
-    () => (currentUseCase !== null && showingTestCase ? getJSONStringWithSortedKeys(currentUseCase) : ''),
-    [showingTestCase, currentUseCase],
+    () => (currentTestCase !== null && showingTestCase ? getJSONStringWithSortedKeys(currentTestCase) : ''),
+    [showingTestCase, currentTestCase],
   )
 
   const [lastSavedUseCaseString, setLastSavedUseCaseString] = useState<string>(currentUseCaseString)
@@ -98,30 +101,30 @@ export const SingleExampleEvaluation = () => {
     [showingTestCase, lastSavedUseCaseString, currentUseCaseString, isRisksAndHarms],
   )
 
-  const noUseCaseSelected = useMemo(() => currentUseCase === null, [currentUseCase])
+  const noUseCaseSelected = useMemo(() => currentTestCase === null, [currentTestCase])
 
   const responseVariableName = useMemo(
-    () => (noUseCaseSelected ? '' : (currentUseCase as UseCase).responseVariableName),
-    [currentUseCase, noUseCaseSelected],
+    () => (noUseCaseSelected ? '' : (currentTestCase as UseCase).responseVariableName),
+    [currentTestCase, noUseCaseSelected],
   )
   const toHighlightWords = useMemo(() => {
     return !noUseCaseSelected
       ? {
-          contextVariables: currentUseCase?.instances[0]?.contextVariables.map((c) => c.name) || [],
+          contextVariables: currentTestCase?.instances[0]?.contextVariables.map((c) => c.name) || [],
           responseVariableName,
         }
       : {
           contextVariables: [],
           responseVariableName: '',
         }
-  }, [currentUseCase?.instances, noUseCaseSelected, responseVariableName])
+  }, [currentTestCase?.instances, noUseCaseSelected, responseVariableName])
 
   const { modelProviderCredentials, setModelProviderCredentials, getAreRelevantCredentialsProvided } =
     useModelProviderCredentials()
 
   const areRelevantCredentialsProvided = useMemo(
-    () => getAreRelevantCredentialsProvided(currentUseCase?.evaluator?.provider || ModelProviderType.RITS),
-    [currentUseCase?.evaluator?.provider, getAreRelevantCredentialsProvided],
+    () => getAreRelevantCredentialsProvided(currentTestCase?.evaluator?.provider || ModelProviderType.RITS),
+    [currentTestCase?.evaluator?.provider, getAreRelevantCredentialsProvided],
   )
 
   const popoverRef = useRef<HTMLDivElement>()
@@ -138,15 +141,35 @@ export const SingleExampleEvaluation = () => {
   const temporaryIdRef = useRef(uuid())
   const { getCriteria } = useCriteriasContext()
 
+  const contextVariableNames = useMemo(
+    () => currentTestCase?.instances[0]?.contextVariables.map((c) => c.name) || [],
+    [currentTestCase?.instances],
+  )
+
+  const setInstances = (instances: Instance[]) =>
+    setCurrentTestCase((previousCurrentUseCase) => {
+      if (previousCurrentUseCase !== null) {
+        return {
+          ...previousCurrentUseCase,
+          instances,
+        }
+      } else {
+        return null
+      }
+    })
+
   // TODO: refactor so that this component receives a test case that cant be null
-  const { fetchSystheticExamples, loadingSyntheticExamples } = useGenerateSystheticExamples({
-    provider: currentUseCase?.evaluator?.provider,
-    credentials: modelProviderCredentials[currentUseCase?.evaluator?.provider as ModelProviderType],
-    evaluatorName: currentUseCase?.evaluator?.name,
-    evaluatorType: currentUseCase?.type,
-    criteria: currentUseCase?.criteria,
-    responseVariableName: currentUseCase?.responseVariableName,
-    contextVariableNames: currentUseCase?.instances[0]?.contextVariables.map((c) => c.name) || [],
+  const { fetchSystheticExamples, loadingSyntheticExamples, generateTestData } = useGenerateSystheticExamples({
+    provider: currentTestCase?.evaluator?.provider,
+    credentials: modelProviderCredentials[currentTestCase?.evaluator?.provider as ModelProviderType],
+    evaluatorName: currentTestCase?.evaluator?.name,
+    evaluatorType: currentTestCase?.type,
+    criteria: currentTestCase?.criteria,
+    responseVariableName: currentTestCase?.responseVariableName,
+    contextVariableNames: contextVariableNames,
+    instances: currentTestCase?.instances!,
+    setInstances: setInstances,
+    type: currentTestCase?.type!,
   })
 
   const responses = useMemo(
@@ -154,28 +177,28 @@ export const SingleExampleEvaluation = () => {
       noUseCaseSelected
         ? []
         : returnByPipelineType(
-            currentUseCase?.type || EvaluationType.DIRECT, // right-side will never happen
-            (currentUseCase?.instances as DirectInstance[]).map((instance) => instance.response),
-            (currentUseCase?.instances as PairwiseInstance[]).map((instance) => instance.responses),
+            currentTestCase?.type || EvaluationType.DIRECT, // right-side will never happen
+            (currentTestCase?.instances as DirectInstance[]).map((instance) => instance.response),
+            (currentTestCase?.instances as PairwiseInstance[]).map((instance) => instance.responses),
           ),
-    [currentUseCase?.instances, currentUseCase?.type, noUseCaseSelected],
+    [currentTestCase?.instances, currentTestCase?.type, noUseCaseSelected],
   )
 
   const { downloadUnitxtNotebook } = useUnitxtNotebook({
-    testCaseName: currentUseCase?.name,
-    criteria: currentUseCase?.criteria,
-    evaluatorName: currentUseCase?.evaluator?.name,
+    testCaseName: currentTestCase?.name,
+    criteria: currentTestCase?.criteria,
+    evaluatorName: currentTestCase?.evaluator?.name,
     responses,
-    contextVariablesList: currentUseCase?.instances.map((instance) => instance.contextVariables),
-    provider: currentUseCase?.evaluator?.provider,
-    credentials: modelProviderCredentials[currentUseCase?.evaluator?.provider || ModelProviderType.RITS],
-    evaluatorType: currentUseCase?.type,
+    contextVariablesList: currentTestCase?.instances.map((instance) => instance.contextVariables),
+    provider: currentTestCase?.evaluator?.provider,
+    credentials: modelProviderCredentials[currentTestCase?.evaluator?.provider || ModelProviderType.RITS],
+    evaluatorType: currentTestCase?.type,
   })
 
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
 
   const runEvaluation = useCallback(async () => {
-    if (currentUseCase === null) return
+    if (currentTestCase === null) return
     setEvaluationFailed(false)
     setEvaluationRunning(true)
     const inProgressEvalToastId = addToast({
@@ -187,11 +210,11 @@ export const SingleExampleEvaluation = () => {
     // was changed during the evaluation request
     const temporaryIdSnapshot = temporaryIdRef.current
     let response
-    const parsedCriteria = { ...currentUseCase.criteria }
+    const parsedCriteria = { ...currentTestCase.criteria }
     if (isRisksAndHarms) {
       // check if criteria description changed and criteria name didn't
-      const harmsAndRiskCriteria = getCriteria(toSnakeCase(currentUseCase.criteria.name), EvaluationType.DIRECT)
-      if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.description !== currentUseCase.criteria.description) {
+      const harmsAndRiskCriteria = getCriteria(toSnakeCase(currentTestCase.criteria.name), EvaluationType.DIRECT)
+      if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.description !== currentTestCase.criteria.description) {
         // the tokenizer of granite guardian will complain if we send a predefined criteria name
         // with a custom description.
         removeToast(inProgressEvalToastId)
@@ -206,26 +229,26 @@ export const SingleExampleEvaluation = () => {
       }
     }
     let body: any = {
-      instances: currentUseCase.instances.map((instance) => ({
+      instances: currentTestCase.instances.map((instance) => ({
         context_variables: instance.contextVariables.reduce(
           (acc, item, index) => ({ ...acc, [item.name]: item.value }),
           {},
         ),
         prediction: returnByPipelineType(
-          currentUseCase.type,
+          currentTestCase.type,
           (instance as DirectInstance).response,
           (instance as PairwiseInstance).responses,
         ),
-        prediction_variable_name: currentUseCase.responseVariableName,
+        prediction_variable_name: currentTestCase.responseVariableName,
       })),
-      evaluator_name: currentUseCase.evaluator?.name,
-      provider: currentUseCase.evaluator?.provider,
+      evaluator_name: currentTestCase.evaluator?.name,
+      provider: currentTestCase.evaluator?.provider,
       criteria: parsedCriteria,
-      type: currentUseCase.type,
-      response_variable_name: currentUseCase.responseVariableName,
+      type: currentTestCase.type,
+      response_variable_name: currentTestCase.responseVariableName,
     }
     body['llm_provider_credentials'] = {
-      ...modelProviderCredentials[currentUseCase.evaluator?.provider || ModelProviderType.RITS],
+      ...modelProviderCredentials[currentTestCase.evaluator?.provider || ModelProviderType.RITS],
     }
 
     // changing api_key to apikey this way for backward compatibility
@@ -276,8 +299,8 @@ export const SingleExampleEvaluation = () => {
         timeout: 5000,
       })
       let instancesWithResults: Instance[]
-      if (currentUseCase.type === EvaluationType.DIRECT) {
-        instancesWithResults = currentUseCase.instances.map((instance) => ({ ...instance } as DirectInstance))
+      if (currentTestCase.type === EvaluationType.DIRECT) {
+        instancesWithResults = currentTestCase.instances.map((instance) => ({ ...instance } as DirectInstance))
         ;(responseBody.results as FetchedDirectResults).forEach(
           (fetchedInstanceResult: FetchedDirectInstanceResult, i) => {
             const instanceResult: DirectInstanceResult = {
@@ -291,7 +314,7 @@ export const SingleExampleEvaluation = () => {
           },
         )
       } else {
-        instancesWithResults = currentUseCase.instances.map((instance) => ({ ...instance } as PairwiseInstance))
+        instancesWithResults = currentTestCase.instances.map((instance) => ({ ...instance } as PairwiseInstance))
         ;(responseBody.results as FetchedPairwiseResults).forEach(
           (fetchedInstanceResult: FetchedPairwiseInstanceResult, i) => {
             let instanceResult: PairwiseInstanceResult = {}
@@ -311,7 +334,7 @@ export const SingleExampleEvaluation = () => {
           },
         )
       }
-      setCurrentUseCase((previousCurrentUseCase) => {
+      setCurrentTestCase((previousCurrentUseCase) => {
         if (previousCurrentUseCase !== null) {
           return {
             ...previousCurrentUseCase,
@@ -326,7 +349,7 @@ export const SingleExampleEvaluation = () => {
     }
   }, [
     addToast,
-    currentUseCase,
+    currentTestCase,
     getCriteria,
     isEqualToCurrentTemporaryId,
     isRisksAndHarms,
@@ -369,21 +392,21 @@ export const SingleExampleEvaluation = () => {
   )
 
   const onSave = useCallback(async () => {
-    if (currentUseCase === null) return
+    if (currentTestCase === null) return
     const savedUseCase: StoredUseCase = await (
       await put('use_case/', {
         use_case: {
-          name: currentUseCase.name,
+          name: currentTestCase.name,
           content: JSON.stringify({
-            instances: currentUseCase.instances,
-            criteria: currentUseCase.criteria,
-            type: currentUseCase.type,
-            evaluator: currentUseCase.evaluator,
-            responseVariableName: currentUseCase.responseVariableName,
+            instances: currentTestCase.instances,
+            criteria: currentTestCase.criteria,
+            type: currentTestCase.type,
+            evaluator: currentTestCase.evaluator,
+            responseVariableName: currentTestCase.responseVariableName,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
           }),
           user_id: -1,
-          id: currentUseCase.id,
+          id: currentTestCase.id,
         } as StoredUseCase,
         user: getUserName(),
       })
@@ -391,9 +414,9 @@ export const SingleExampleEvaluation = () => {
 
     const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as UseCase
 
-    setCurrentUseCase(parsedSavedUseCase)
+    setCurrentTestCase(parsedSavedUseCase)
     // update use case in the use cases list
-    const i = userUseCases.findIndex((useCase) => useCase.id === currentUseCase.id)
+    const i = userUseCases.findIndex((useCase) => useCase.id === currentTestCase.id)
     setUserUseCases([...userUseCases.slice(0, i), parsedSavedUseCase, ...userUseCases.slice(i + 1)])
 
     // update lastSavedUseCase
@@ -408,7 +431,7 @@ export const SingleExampleEvaluation = () => {
   }, [
     CURRENT_FORMAT_VERSION,
     addToast,
-    currentUseCase,
+    currentTestCase,
     currentUseCaseString,
     getUserName,
     parseFetchedUseCase,
@@ -419,17 +442,17 @@ export const SingleExampleEvaluation = () => {
 
   const onSaveAs = useCallback(
     async (name: string, fromUseCase?: UseCase) => {
-      if (currentUseCase === null) return false
-      const toSaveUseCase = fromUseCase ?? currentUseCase
+      if (currentTestCase === null) return false
+      const toSaveUseCase = fromUseCase ?? currentTestCase
       const res = await put('use_case/', {
         use_case: {
           name: name,
           content: JSON.stringify({
-            instances: currentUseCase.instances,
+            instances: currentTestCase.instances,
             criteria: toSaveUseCase.criteria,
             type: toSaveUseCase.type,
             pipeline: toSaveUseCase.evaluator,
-            responseVariableName: currentUseCase.responseVariableName,
+            responseVariableName: currentTestCase.responseVariableName,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
           }),
           user_id: -1,
@@ -475,7 +498,7 @@ export const SingleExampleEvaluation = () => {
     [
       CURRENT_FORMAT_VERSION,
       addToast,
-      currentUseCase,
+      currentTestCase,
       getUserName,
       parseFetchedUseCase,
       put,
@@ -489,26 +512,26 @@ export const SingleExampleEvaluation = () => {
 
   useSaveShortcut({ onSave, isUseCaseSaved, changesDetected, setSaveUseCaseModalOpen })
 
-  const onSetSelectedPipeline = async (evaluator: Evaluator | null) => {
-    if (currentUseCase === null) return
-    setCurrentUseCase({
-      ...currentUseCase,
+  const onSetSelectedPipeline = (evaluator: Evaluator | null) => {
+    if (currentTestCase === null) return
+    setCurrentTestCase({
+      ...currentTestCase,
       evaluator,
     })
   }
 
   const onDeleteUseCase = async () => {
-    if (currentUseCase === null) return
-    await deleteCustom('use_case/', { use_case_id: currentUseCase.id })
+    if (currentTestCase === null) return
+    await deleteCustom('use_case/', { use_case_id: currentTestCase.id })
 
     // notify the user
     addToast({
       kind: 'success',
-      title: `Deleted use case '${currentUseCase.name}'`,
+      title: `Deleted use case '${currentTestCase.name}'`,
       timeout: 5000,
     })
 
-    setUserUseCases(userUseCases.filter((u) => u.id !== currentUseCase.id))
+    setUserUseCases(userUseCases.filter((u) => u.id !== currentTestCase.id))
     changeUseCaseURL(null)
   }
 
@@ -516,11 +539,11 @@ export const SingleExampleEvaluation = () => {
   useEffect(() => {
     if (preloadedUseCase !== null) {
       setUseCaseSelected(null)
-      setCurrentUseCase({ ...preloadedUseCase })
+      setCurrentTestCase({ ...preloadedUseCase })
       setLastSavedUseCaseString(getJSONStringWithSortedKeys(preloadedUseCase))
       temporaryIdRef.current = uuid()
     } else {
-      setCurrentUseCase(null)
+      setCurrentTestCase(null)
     }
   }, [preloadedUseCase])
 
@@ -536,7 +559,7 @@ export const SingleExampleEvaluation = () => {
         setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
       />
       <div className={cx(layoutClasses['main-content'], classes.body)}>
-        {currentUseCase === null ? (
+        {currentTestCase === null ? (
           <Landing setNewUseCaseModalOpen={setNewUseCaseModalOpen} updateURLFromUseCase={updateURLFromUseCase} />
         ) : (
           <>
@@ -566,12 +589,12 @@ export const SingleExampleEvaluation = () => {
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
               isUseCaseSaved={isUseCaseSaved}
-              useCaseName={currentUseCase.name}
+              useCaseName={currentTestCase.name}
               changesDetected={changesDetected}
-              type={currentUseCase.type}
+              type={currentTestCase.type}
               onSave={onSave}
               setUseCaseName={(name) =>
-                setCurrentUseCase((previousCurrentUseCase) =>
+                setCurrentTestCase((previousCurrentUseCase) =>
                   previousCurrentUseCase !== null ? { ...previousCurrentUseCase, name } : null,
                 )
               }
@@ -591,22 +614,23 @@ export const SingleExampleEvaluation = () => {
               style={{ marginBottom: '1rem' }}
             /> */}
             <CriteriaView
-              criteria={currentUseCase.criteria}
+              criteria={currentTestCase.criteria}
               setCriteria={(criteria) =>
-                setCurrentUseCase((previousCurrentUseCase) =>
+                setCurrentTestCase((previousCurrentUseCase) =>
                   previousCurrentUseCase !== null ? { ...previousCurrentUseCase, criteria } : null,
                 )
               }
               toHighlightWords={toHighlightWords}
-              type={currentUseCase.type}
+              type={currentTestCase.type}
               temporaryId={temporaryIdRef.current}
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
             />
             <PipelineSelect
-              type={currentUseCase.type}
-              selectedPipeline={currentUseCase.evaluator}
+              type={currentTestCase.type}
+              selectedPipeline={currentTestCase.evaluator}
               setSelectedPipeline={onSetSelectedPipeline}
+              title={'Evaluator'}
               style={{ marginBottom: '2rem' }}
               className={classes['left-padding']}
             />
@@ -614,34 +638,24 @@ export const SingleExampleEvaluation = () => {
               <strong>Test data</strong>
             </div>
             <TestDataTable
-              instances={currentUseCase.instances}
-              setInstances={(instances) =>
-                setCurrentUseCase((previousCurrentUseCase) => {
-                  if (previousCurrentUseCase !== null) {
-                    return {
-                      ...previousCurrentUseCase,
-                      instances,
-                    }
-                  } else {
-                    return null
-                  }
-                })
-              }
+              currentTestCase={currentTestCase}
+              setInstances={setInstances}
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
-              type={currentUseCase.type}
+              type={currentTestCase.type}
               evaluationRunning={evaluationRunning}
               setSelectedInstance={setSelectedInstance}
               setResultDetailsModalOpen={setResultDetailsModalOpen}
-              criteria={currentUseCase.criteria}
-              responseVariableName={currentUseCase.responseVariableName}
+              criteria={currentTestCase.criteria}
+              responseVariableName={currentTestCase.responseVariableName}
               setResponseVariableName={(responseVariableName) =>
-                setCurrentUseCase((previousCurrentUseCase) =>
+                setCurrentTestCase((previousCurrentUseCase) =>
                   previousCurrentUseCase !== null ? { ...previousCurrentUseCase, responseVariableName } : null,
                 )
               }
               fetchSystheticExamples={fetchSystheticExamples}
               loadingSyntheticExamples={loadingSyntheticExamples}
+              setSysntheticGenerationModalOpen={setSysntheticGenerationModalOpen}
             />
             <EvaluateButton
               evaluationRunning={evaluationRunning}
@@ -649,7 +663,7 @@ export const SingleExampleEvaluation = () => {
               areRelevantCredentialsProvided={areRelevantCredentialsProvided}
               className={classes['left-padding']}
               setPromptModalOpen={setPromptModalOpen}
-              currentUseCase={currentUseCase}
+              currentUseCase={currentTestCase}
               evaluationFailed={evaluationFailed}
             />
           </>
@@ -661,14 +675,14 @@ export const SingleExampleEvaluation = () => {
         changesDetected={changesDetected}
         updateURLFromUseCase={updateURLFromUseCase}
       />
-      {currentUseCase !== null && (
+      {currentTestCase !== null && (
         <>
           <SwitchUseCaseModal
             updateURLFromUseCase={updateURLFromUseCase}
             open={confirmationModalOpen}
             setOpen={setConfirmationModalOpen}
             selectedUseCase={useCaseSelected}
-            currentUseCase={currentUseCase}
+            currentUseCase={currentTestCase}
             onSave={onSave}
             setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
             evaluationRunning={evaluationRunning}
@@ -676,7 +690,7 @@ export const SingleExampleEvaluation = () => {
             setLibraryUseCaseSelected={setUseCaseSelected}
           />
           <SaveAsUseCaseModal
-            type={currentUseCase.type}
+            type={currentTestCase.type}
             open={saveUseCaseModalOpen}
             setOpen={setSaveUseCaseModalOpen}
             onSaveAs={onSaveAs}
@@ -686,14 +700,14 @@ export const SingleExampleEvaluation = () => {
             open={deleteUseCaseModalOpen}
             setOpen={setDeleteUseCaseModalOpen}
             onDeleteUseCase={onDeleteUseCase}
-            useCaseName={currentUseCase.name}
+            useCaseName={currentTestCase.name}
           />
           <EditUseCaseNameModal
             open={editNameModalOpen}
             setOpen={setEditNameModalOpen}
-            name={currentUseCase.name}
+            name={currentTestCase.name}
             setName={(name) =>
-              setCurrentUseCase((previousCurrentUseCase) =>
+              setCurrentTestCase((previousCurrentUseCase) =>
                 previousCurrentUseCase !== null ? { ...previousCurrentUseCase, name } : null,
               )
             }
@@ -713,14 +727,22 @@ export const SingleExampleEvaluation = () => {
             setOpen={setResultDetailsModalOpen}
             selectedInstance={selectedInstance}
             setSelectedInstance={setSelectedInstance}
-            type={currentUseCase.type}
-            responseVariableName={currentUseCase.responseVariableName}
+            type={currentTestCase.type}
+            responseVariableName={currentTestCase.responseVariableName}
           />
           <PromptModal
             open={promptModalOpen}
             setOpen={setPromptModalOpen}
-            currentUseCase={currentUseCase}
+            currentUseCase={currentTestCase}
             modelProviderCredentials={modelProviderCredentials}
+          />
+          <SyntheticGenerationModal
+            open={sysntheticGenerationModalOpen}
+            setOpen={setSysntheticGenerationModalOpen}
+            modelForSyntheticGeneration={modelForSyntheticGeneration}
+            setModelForSyntheticGeneration={setModelForSyntheticGeneration}
+            type={currentTestCase.type}
+            generateTestData={generateTestData}
           />
         </>
       )}

@@ -121,9 +121,9 @@ class CriteriaWithOptionsAPI(BaseModel):
 
 
 class SyntheticExampleGenerationRequest(BaseModel):
-    provider: ModelProviderEnum
+    provider: ModelProviderEnum | ExtendedModelProviderEnum
     llm_provider_credentials: dict[str, str]
-    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
+    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
     type: EvaluatorTypeEnum
     criteria: CriteriaWithOptionsAPI | PairwiseCriteriaModel
     response_variable_name: str

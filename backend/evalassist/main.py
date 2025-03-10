@@ -416,7 +416,7 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     except OutputParserException as e:
         raise HTTPException(
             status_code=400,
-            detail=f"{params.evaluator_name.value} was unable to generate an appropriate synthetic example",
+            detail=f"{params.evaluator_name} was unable to generate an appropriate synthetic example",
         ) from e
 
     return SyntheticExampleGenerationResponse([response])

@@ -21,10 +21,11 @@ interface Props {
   style?: CSSProperties
   className?: string
   selectedPipeline: Evaluator | null
-  setSelectedPipeline: (pipeline: Evaluator | null) => Promise<void>
+  setSelectedPipeline: (pipeline: Evaluator | null) => void
+  title: string
 }
 
-export const PipelineSelect = ({ style, className, selectedPipeline, setSelectedPipeline, type }: Props) => {
+export const PipelineSelect = ({ style, className, selectedPipeline, setSelectedPipeline, type, title }: Props) => {
   const { rubricPipelines, pairwisePipelines, graniteGuardianPipelines, loadingPipelines } = usePipelineTypesContext()
   const { isRisksAndHarms } = useURLInfoContext()
 
@@ -91,7 +92,7 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
 
   return (
     <div style={{ marginBottom: '1.5rem' }} className={className}>
-      <span className={classes['toggle-span']}>Evaluator</span>
+      <span className={classes['toggle-span']}>{title}</span>
       {loadingPipelines || rubricPipelines === null || pairwisePipelines === null ? (
         <SelectSkeleton />
       ) : (
@@ -118,9 +119,6 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
                   {'Provide at least a provider API credentials in order to select an evaluator.'}
                 </div>
               )}
-              <Link rel="noopener noreferrer" target="_blank" href="/documentation/#evaluators">
-                How do evaluators work?
-              </Link>
             </div>
           }
           value={getJSONStringWithSortedKeys(selectedPipeline) || ''}
