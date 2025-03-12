@@ -39,8 +39,9 @@ class Generator:
             # response only, no context
 
             # response schema
+            response_variable_name = self.generation_config["response_variable_name"]
             response_schemas = [
-                ResponseSchema(name="response", description="the requested response"),
+                ResponseSchema(name=response_variable_name, description=f"the requested {response_variable_name}"),
             ]
             self.output_parser = StructuredOutputParser.from_response_schemas(
                 response_schemas
