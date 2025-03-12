@@ -7,17 +7,19 @@ import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { EvaluationType, Evaluator, FetchedEvaluator } from '../../../types'
 
 interface PipelineContextValue {
-  rubricPipelines: Evaluator[] | null
-  pairwisePipelines: Evaluator[] | null
-  graniteGuardianPipelines: Evaluator[] | null
-  loadingPipelines: boolean
+  directEvaluators: Evaluator[] | null
+  pairwiseEvaluators: Evaluator[] | null
+  graniteGuardianEvaluators: Evaluator[] | null
+  nonGraniteGuardianEvaluators: Evaluator[] | null
+  loadingEvaluators: boolean
 }
 
 const PipelineTypesContext = createContext<PipelineContextValue>({
-  rubricPipelines: null,
-  pairwisePipelines: null,
-  graniteGuardianPipelines: null,
-  loadingPipelines: false,
+  directEvaluators: null,
+  pairwiseEvaluators: null,
+  graniteGuardianEvaluators: null,
+  nonGraniteGuardianEvaluators: null,
+  loadingEvaluators: false,
 })
 
 export const usePipelineTypesContext = () => {
@@ -25,30 +27,35 @@ export const usePipelineTypesContext = () => {
 }
 
 export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => {
-  const [evaluators, setPipelines] = useState<Evaluator[] | null>(null)
-  const [loadingPipelines, setLoadingPipelines] = useState(false)
+  const [evaluators, setEvaluators] = useState<Evaluator[] | null>(null)
+  const [loadingEvaluators, setLoadingEvaluators] = useState(false)
   const { get } = useFetchUtils()
 
-  const rubricPipelines = useMemo(
+  const directEvaluators = useMemo(
     () => evaluators?.filter((p) => p.type === EvaluationType.DIRECT) ?? null,
     [evaluators],
   )
 
-  const pairwisePipelines = useMemo(
+  const pairwiseEvaluators = useMemo(
     () => evaluators?.filter((p) => p.type === EvaluationType.PAIRWISE) ?? null,
     [evaluators],
   )
-  const graniteGuardianPipelines = useMemo(
-    () => rubricPipelines?.filter((p) => p.name.startsWith('Granite Guardian')) || null,
-    [rubricPipelines],
+  const graniteGuardianEvaluators = useMemo(
+    () => directEvaluators?.filter((p) => p.name.startsWith('Granite Guardian')) || null,
+    [directEvaluators],
+  )
+
+  const nonGraniteGuardianEvaluators = useMemo(
+    () => directEvaluators?.filter((p) => !p.name.startsWith('Granite Guardian')) || null,
+    [directEvaluators],
   )
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoadingPipelines(true)
+      setLoadingEvaluators(true)
       const response = await get('evaluators/')
       const data = await response.json()
-      setLoadingPipelines(false)
+      setLoadingEvaluators(false)
       let evaluators: Evaluator[] = []
       data.evaluators.forEach((evaluator: FetchedEvaluator) => {
         evaluator.providers.forEach((provider) => {
@@ -60,20 +67,21 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
           })
         })
       })
-      setPipelines(evaluators)
+      setEvaluators(evaluators)
     }
     fetchData()
   }, [get])
 
-  if (loadingPipelines || evaluators === null) return <Loading withOverlay />
+  if (loadingEvaluators || evaluators === null) return <Loading withOverlay />
 
   return (
     <PipelineTypesContext.Provider
       value={{
-        rubricPipelines,
-        pairwisePipelines,
-        graniteGuardianPipelines,
-        loadingPipelines,
+        directEvaluators,
+        pairwiseEvaluators,
+        graniteGuardianEvaluators,
+        nonGraniteGuardianEvaluators,
+        loadingEvaluators,
       }}
     >
       {children}

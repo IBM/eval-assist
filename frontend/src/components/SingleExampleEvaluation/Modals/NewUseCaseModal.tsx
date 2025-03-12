@@ -24,14 +24,14 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
   const [selectedType, setSelectedType] = useState<EvaluationType | null>(null)
   const [selectedCriteria, setSelectedCriteria] = useState<Criteria | CriteriaWithOptions | null>(null)
 
-  const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
+  const { directEvaluators, pairwiseEvaluators } = usePipelineTypesContext()
 
   const { addToast } = useToastContext()
 
   const { directCriterias, pairwiseCriterias, getEmptyUseCaseWithCriteria } = useCriteriasContext()
 
   const onSubmit = async () => {
-    if (rubricPipelines !== null && pairwisePipelines !== null && selectedType !== null) {
+    if (directEvaluators !== null && pairwiseEvaluators !== null && selectedType !== null) {
       let toCreateTestCase: UseCase
       if (selectedCriteria !== null) {
         toCreateTestCase = getEmptyUseCaseWithCriteria(selectedCriteria.name, selectedType)
@@ -41,7 +41,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
       updateURLFromUseCase({
         useCase: {
           ...toCreateTestCase,
-          evaluator: selectedType === EvaluationType.DIRECT ? rubricPipelines[0] : pairwisePipelines[0],
+          evaluator: selectedType === EvaluationType.DIRECT ? directEvaluators[0] : pairwiseEvaluators[0],
         },
         subCatalogName: null,
       })

@@ -148,8 +148,12 @@ class DirectAssessmentEvaluator(Evaluator):
 
 
 class PairwiseComparisonEvaluator(Evaluator):
-    def __init__(self, name: EvaluatorNameEnum):
-        super().__init__(name)
+    def __init__(
+            self,
+            evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
+            custom_model_name: Optional[str] = None,
+        ):        
+        super().__init__(evaluator_name, custom_model_name)
         self.evaluator_type = EvaluatorTypeEnum.PAIRWISE
 
     def get_preprocess_steps(self):
@@ -338,7 +342,6 @@ class GraniteGuardianEvaluator(ABC):
             **self.field_map,
             inference_engine=inference_engine,
         )
-
         data = {"test": context_variables_list}
 
         card = TaskCard(
@@ -353,7 +356,7 @@ class GraniteGuardianEvaluator(ABC):
         )
 
         dataset = load_dataset(card=card, split="test")
-        evaluated_dataset = evaluate(predictions=[0.0 for _ in data], data=dataset)
+        evaluated_dataset = evaluate(predictions=[0.0 for _ in dataset], data=dataset)
         result = self.parse_results(
             evaluated_dataset, instances[0].prediction_variable_name
         )

@@ -5,10 +5,10 @@ import { Dispatch, SetStateAction, useCallback } from 'react'
 import { ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 import { AiLabel } from '@carbon/react/icons'
 
-import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { EvaluationType, Evaluator } from '@types'
 
 import { PipelineSelect } from '../PipelineSelect'
+import { usePipelineTypesContext } from '../Providers/PipelineTypesProvider'
 
 interface Props {
   open: boolean
@@ -32,6 +32,8 @@ export const SyntheticGenerationModal = ({
     generateTestData()
   }, [generateTestData, setOpen])
 
+  const { nonGraniteGuardianEvaluators } = usePipelineTypesContext()
+
   return (
     <ComposedModal open={open} onClose={() => setOpen(false)} decorator={<AiLabel size={32} />}>
       <ModalHeader title="Generate synthetic example" />
@@ -49,11 +51,11 @@ export const SyntheticGenerationModal = ({
 
         <PipelineSelect
           type={type}
-          selectedPipeline={modelForSyntheticGeneration}
-          setSelectedPipeline={setModelForSyntheticGeneration}
+          selectedEvaluator={modelForSyntheticGeneration}
+          setSelectedEvaluator={setModelForSyntheticGeneration}
+          evaluatorOptions={nonGraniteGuardianEvaluators || []}
           style={{ marginBottom: '2rem' }}
           title={'Model for synthetic generation'}
-          //   className={classes['left-padding']}
         />
       </ModalBody>
 

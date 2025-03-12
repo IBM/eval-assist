@@ -388,6 +388,7 @@ export const TestDataTable = ({
                     onClick={() =>
                       modelForSyntheticGeneration === null ? setSysntheticGenerationModalOpen(true) : generateTestData()
                     }
+                    disabled={type == EvaluationType.PAIRWISE}
                   >
                     {'Generate test data'}
                   </Button>
@@ -396,6 +397,7 @@ export const TestDataTable = ({
                     label={'Configure'}
                     size="sm"
                     onClick={() => setSysntheticGenerationModalOpen(true)}
+                    disabled={type == EvaluationType.PAIRWISE}
                   >
                     <SettingsAdjust />
                   </IconButton>

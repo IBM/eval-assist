@@ -52,6 +52,7 @@ import { SyntheticGenerationModal } from './Modals/SyntheticGenerationModal'
 import { PipelineSelect } from './PipelineSelect'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
 import { useCriteriasContext } from './Providers/CriteriasProvider'
+import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
 import { useUserUseCasesContext } from './Providers/UserUseCasesProvider'
 import classes from './SingleExampleEvaluation.module.scss'
@@ -67,6 +68,7 @@ export const SingleExampleEvaluation = () => {
   const [useCaseSelected, setUseCaseSelected] = useState<{ useCase: UseCase; subCatalogName: string | null } | null>(
     null,
   )
+  const { isRisksAndHarms } = useURLInfoContext()
 
   // if the usecase doesnt have an id, it means it hasn't been stored
   const isUseCaseSaved = useMemo(() => currentTestCase !== null && currentTestCase.id !== null, [currentTestCase])
@@ -94,8 +96,6 @@ export const SingleExampleEvaluation = () => {
 
   const [lastSavedUseCaseString, setLastSavedUseCaseString] = useState<string>(currentUseCaseString)
 
-  const { isRisksAndHarms } = useURLInfoContext()
-
   const changesDetected = useMemo(
     () => showingTestCase && lastSavedUseCaseString !== currentUseCaseString && !isRisksAndHarms,
     [showingTestCase, lastSavedUseCaseString, currentUseCaseString, isRisksAndHarms],
@@ -121,6 +121,8 @@ export const SingleExampleEvaluation = () => {
 
   const { modelProviderCredentials, setModelProviderCredentials, getAreRelevantCredentialsProvided } =
     useModelProviderCredentials()
+
+  const { nonGraniteGuardianEvaluators, graniteGuardianEvaluators } = usePipelineTypesContext()
 
   const areRelevantCredentialsProvided = useMemo(
     () => getAreRelevantCredentialsProvided(currentTestCase?.evaluator?.provider || ModelProviderType.RITS),
@@ -627,8 +629,9 @@ export const SingleExampleEvaluation = () => {
             />
             <PipelineSelect
               type={currentTestCase.type}
-              selectedPipeline={currentTestCase.evaluator}
-              setSelectedPipeline={onSetSelectedPipeline}
+              selectedEvaluator={currentTestCase.evaluator}
+              setSelectedEvaluator={onSetSelectedPipeline}
+              evaluatorOptions={isRisksAndHarms ? graniteGuardianEvaluators || [] : nonGraniteGuardianEvaluators || []}
               title={'Evaluator'}
               style={{ marginBottom: '2rem' }}
               className={classes['left-padding']}
