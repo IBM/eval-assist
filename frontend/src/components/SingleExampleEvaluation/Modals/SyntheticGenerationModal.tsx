@@ -57,7 +57,12 @@ export const SyntheticGenerationModal = ({
         />
       </ModalBody>
 
-      <ModalFooter primaryButtonText="Generate" secondaryButtonText="Cancel" onRequestSubmit={onRequestSubmit}>
+      <ModalFooter
+        primaryButtonText="Generate"
+        secondaryButtonText="Cancel"
+        onRequestSubmit={onRequestSubmit}
+        primaryButtonDisabled={modelForSyntheticGeneration === null}
+      >
         <></>
       </ModalFooter>
     </ComposedModal>

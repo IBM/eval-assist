@@ -341,3 +341,8 @@ $columns-4: 3fr 1fr 1fr 2fr;
   display: flex;
   justify-content: center;
 }
+
+.syntheticButtons {
+  display: flex;
+  flex-direction: row;
+}
