@@ -34,7 +34,8 @@ from unitxt.llm_as_judge import (
 from backend.evalassist.utils import (
     get_custom_models,
     get_evaluator_metadata_wrapper,
-    get_parsed_model_name,
+    get_model_name_from_evaluator,
+    init_evaluator_name,
 )
 
 from .api.common import (
@@ -53,7 +54,7 @@ from .api.common import (
 # API type definitions
 from .api.pipelines import EvaluatorMetadataAPI, EvaluatorsResponseModel
 from .benchmark.benchmark import get_all_benchmarks
-from .const import EXTENDED_EVALUATORS_METADATA, ExtendedEvaluatorNameEnum
+from .const import EXTENDED_EVALUATORS_METADATA
 from .db_client import db
 from .evaluators.unitxt import (
     DirectAssessmentEvaluator,
@@ -167,17 +168,13 @@ def get_prompt(req: DirectEvaluationRequestModel):
     "/evaluate/", response_model=Union[DirectResponseModel, PairwiseResponseModel]
 )
 async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequestModel):
+    evaluator_name, custom_model_name = init_evaluator_name(req.evaluator_name)
     try:
         if req.type == EvaluatorTypeEnum.DIRECT:
-            if req.evaluator_name in [
-                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B,
-                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B,
-                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B,
-                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B,
-            ]:
-                evaluator = GraniteGuardianEvaluator(req.evaluator_name)
+            if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
+                evaluator = GraniteGuardianEvaluator(evaluator_name)
             else:
-                evaluator = DirectAssessmentEvaluator(req.evaluator_name)
+                evaluator = DirectAssessmentEvaluator(evaluator_name, custom_model_name)
             criteria = (
                 CriteriaWithOptions(
                     name=req.criteria.name,
@@ -191,7 +188,7 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
                 else req.criteria
             )
         else:
-            evaluator = PairwiseComparisonEvaluator(req.evaluator_name)
+            evaluator = PairwiseComparisonEvaluator(evaluator_name, custom_model_name)
             criteria = (
                 Criteria(name=req.criteria.name, description=req.criteria.description)
                 if not isinstance(req.criteria, str)
@@ -368,7 +365,7 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
     ):
         raise HTTPException(status_code=400, detail="Missing required fields")
     evaluator_metadata = get_evaluator_metadata_wrapper(params.evaluator_name)
-    model_name = get_parsed_model_name(
+    model_name = get_model_name_from_evaluator(
         evaluator_metadata.custom_model_path, evaluator_metadata.name, params.provider
     )
     params.model_name = model_name
@@ -401,10 +398,12 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
 @router.post("/synthetic-examples/", response_model=SyntheticExampleGenerationResponse)
 def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     # populate config
+    evaluator_name, custom_model_name = init_evaluator_name(params.evaluator_name)
     model_config = {
         "provider": params.provider,
         "llm_provider_credentials": params.llm_provider_credentials,
-        "evaluator_name": params.evaluator_name,
+        "evaluator_name": evaluator_name,
+        "custom_model_name": custom_model_name,
     }
     generation_config = {
         "context": params.context_variables_names,

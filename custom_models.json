@@ -1,0 +1,30 @@
+[
+    {
+        "name": "Granite3.1-2b no safety",
+        "path": "/Users/martinsantillancooper/Documents/dmf_models/dmf_models/granite-3.1-2b-sft-nosafety-r241212a",
+        "providers": [
+            "local_hf"
+        ]
+    },
+    {
+        "name": "Granite3.1-8b no safety",
+        "path": "/Users/martinsantillancooper/Documents/dmf_models/dmf_models/granite-3.1-8b-sft-nosafety-r241212a",
+        "providers": [
+            "local_hf"
+        ]
+    },
+    {
+        "name": "DeepSeek-R1-Distill-Qwen-1.5B",
+        "path": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        "providers": [
+            "local_hf"
+        ]
+    },
+    {
+        "name": "DeepSeek-R1-Distill-Llama-8B",
+        "path": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+        "providers": [
+            "local_hf"
+        ]
+    }
+]
