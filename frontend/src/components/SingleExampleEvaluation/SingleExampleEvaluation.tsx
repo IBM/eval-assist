@@ -654,6 +654,14 @@ export const SingleExampleEvaluation = () => {
               }
               loadingSyntheticExamples={loadingSyntheticExamples}
               setSysntheticGenerationModalOpen={setSysntheticGenerationModalOpen}
+              generateTestData={() =>
+                generateTestData({
+                  credentials: modelProviderCredentials[modelForSyntheticGeneration?.provider as ModelProviderType],
+                  evaluatorName: modelForSyntheticGeneration?.name!,
+                  provider: modelForSyntheticGeneration?.provider!,
+                })
+              }
+              modelForSyntheticGeneration={modelForSyntheticGeneration}
             />
             <EvaluateButton
               evaluationRunning={evaluationRunning}

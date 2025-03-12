@@ -4,7 +4,7 @@ import { returnByPipelineType } from 'src/utils'
 import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button, IconButton, InlineLoading, PaginationNav, Toggle } from '@carbon/react'
-import { Add, AiGenerate, TrashCan } from '@carbon/react/icons'
+import { Add, AiGenerate, Save, SettingsAdjust, TrashCan } from '@carbon/react/icons'
 
 import { EditableTag } from '@components/EditableTag'
 import { usePagination } from '@customHooks/usePagination'
@@ -15,6 +15,7 @@ import {
   DirectInstance,
   DirectInstanceResult,
   EvaluationType,
+  Evaluator,
   Instance,
   PairwiseInstance,
   PairwiseInstanceResultV1,
@@ -39,6 +40,8 @@ interface Props {
   setInstances: (instances: Instance[]) => void
   loadingSyntheticExamples: boolean
   setSysntheticGenerationModalOpen: Dispatch<SetStateAction<boolean>>
+  generateTestData: () => Promise<void>
+  modelForSyntheticGeneration: Evaluator | null
 }
 
 export const TestDataTable = ({
@@ -55,6 +58,8 @@ export const TestDataTable = ({
   loadingSyntheticExamples,
   setSysntheticGenerationModalOpen,
   currentTestCase,
+  generateTestData,
+  modelForSyntheticGeneration,
 }: Props) => {
   const instancesPerPage = useMemo(() => 5, [])
   const [explanationOn, setExplanationOn] = useState(false)
@@ -375,14 +380,26 @@ export const TestDataTable = ({
               {loadingSyntheticExamples ? (
                 <InlineLoading description={'Generating...'} status={'active'} />
               ) : (
-                <Button
-                  kind="tertiary"
-                  size="sm"
-                  renderIcon={AiGenerate}
-                  onClick={() => setSysntheticGenerationModalOpen(true)}
-                >
-                  {'Generate test data'}
-                </Button>
+                <div className={classes.syntheticButtons}>
+                  <Button
+                    kind="tertiary"
+                    size="sm"
+                    renderIcon={AiGenerate}
+                    onClick={() =>
+                      modelForSyntheticGeneration === null ? setSysntheticGenerationModalOpen(true) : generateTestData()
+                    }
+                  >
+                    {'Generate test data'}
+                  </Button>
+                  <IconButton
+                    kind={'tertiary'}
+                    label={'Configure'}
+                    size="sm"
+                    onClick={() => setSysntheticGenerationModalOpen(true)}
+                  >
+                    <SettingsAdjust />
+                  </IconButton>
+                </div>
               )}
             </div>
           </div>
