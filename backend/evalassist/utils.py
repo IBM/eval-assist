@@ -6,11 +6,12 @@ import time
 from enum import Enum
 from typing import Optional
 
-import torch
+from torch import device
 from unitxt.inference import (
     HFAutoModelInferenceEngine,
     LiteLLMInferenceEngine,
     RITSInferenceEngine,
+    TorchDeviceMixin,
     WMLInferenceEngineGeneration,
 )
 from unitxt.llm_as_judge import (
@@ -68,11 +69,11 @@ def get_enum_by_value(value: str, enum: Enum) -> Enum:
 
 
 def get_local_hf_inference_engine_params(
-    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str,
+    model_name: str,
 ):
     return {
-        "model_name": convert_model_name_wx_to_hf(evaluator_name),
-        "max_new_tokens": 20,
+        "model_name": convert_model_name_wx_to_hf(model_name),
+        "max_new_tokens": 1024,
         "device": "cpu",
     }
 
@@ -154,15 +155,13 @@ def get_hf_inference_engine(
 def get_watsonx_inference_engine(
     credentials: dict[str, str],
     provider: ModelProviderEnum,
-    evaluator_name: EvaluatorNameEnum,
+    model_name: EvaluatorNameEnum,
     custom_params: dict = None,
 ):
     inference_engine_params = {
         "max_new_tokens": 1024,
         "credentials": credentials,
-        "model_name": rename_model_if_required(
-            EXTENDED_EVALUATOR_TO_MODEL_ID[evaluator_name], provider
-        ),
+        "model_name": model_name,
     }
     if custom_params is not None:
         inference_engine_params.update(custom_params)
@@ -171,7 +170,7 @@ def get_watsonx_inference_engine(
 
 def get_inference_engine(
     credentials: dict[str, str],
-    provider: ModelProviderEnum,
+    provider: ModelProviderEnum | ExtendedModelProviderEnum,
     model_name: str,
     custom_params: dict = None,
 ):
@@ -179,7 +178,7 @@ def get_inference_engine(
         return get_hf_inference_engine(model_name, custom_params)
     if (
         provider == ModelProviderEnum.WATSONX
-        and get_enum_by_value(model_name, ExtendedEvaluatorNameEnum) is not None
+        and 'granite-guardian' in model_name
     ):
         return get_watsonx_inference_engine(
             credentials, provider, model_name, custom_params
@@ -189,46 +188,52 @@ def get_inference_engine(
     )
 
 
-def get_parsed_model_name(
-    custom_model_path: Optional[str], model_name: str, provider: ModelProviderEnum
-):
-    return rename_model_if_required(
-        custom_model_path
-        if custom_model_path is not None
-        else EXTENDED_EVALUATOR_TO_MODEL_ID[model_name],
-        provider,
+
+def get_model_name_from_evaluator(
+    evaluator_metadata: ExtendedEvaluatorMetadata,
+    provider: str,
+) -> str:
+    model_name = EXTENDED_EVALUATOR_TO_MODEL_ID.get(evaluator_metadata.name, None)
+    return (
+        evaluator_metadata.custom_model_path
+        if evaluator_metadata.custom_model_path is not None
+        else model_name
     )
 
 
 def get_evaluator_metadata_wrapper(
-    name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str,
+    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
+    custom_model_name: Optional[str] = None,
 ) -> ExtendedEvaluatorMetadata:
-    if (
-        get_enum_by_value(name, EvaluatorNameEnum) is not None
-        or get_enum_by_value(name, ExtendedEvaluatorNameEnum) is not None
-    ):
+    if evaluator_name.name != ExtendedEvaluatorNameEnum.CUSTOM.name:
         evaluator_search = [
-            e for e in EXTENDED_EVALUATORS_METADATA if e.name == name
+            e
+            for e in EXTENDED_EVALUATORS_METADATA
+            if e.name.name == evaluator_name.name
         ]  # and e.evaluator_type == evaluator_type]
         if len(evaluator_search) == 0:
             # raise ValueError(f'A {evaluator_type} evaluator with id {name} does not exist.')
-            raise ValueError(f"An evaluator with id {name} does not exist.")
+            raise ValueError(f"An evaluator with id {evaluator_name} does not exist.")
         if len(evaluator_search) > 1:
             # raise ValueError(f'A {evaluator_type} evaluator with id {name} matched several models.')
-            raise ValueError(f"An evaluator with id {name} matched several models.")
+            raise ValueError(
+                f"An evaluator with id {evaluator_name} matched several models."
+            )
         return evaluator_search[0]
     else:
         custom_models = get_custom_models()
-        if name not in [custom_model["name"] for custom_model in custom_models]:
+        if custom_model_name not in [
+            custom_model["name"] for custom_model in custom_models
+        ]:
             raise ValueError("The specified custom model was not found")
 
         custom_model = [
             custom_model
             for custom_model in custom_models
-            if custom_model["name"] == name
+            if custom_model["name"] == custom_model_name
         ][0]
         return ExtendedEvaluatorMetadata(
-            name=ExtendedEvaluatorNameEnum.CUSTOM,
+            name=evaluator_name,
             custom_model_name=custom_model["name"],
             custom_model_path=custom_model["path"],
             providers=[
@@ -240,16 +245,25 @@ def get_evaluator_metadata_wrapper(
         )
 
 
-def get_default_torch_devide(avoid_mps: bool = False):
-    result = (
-        "cuda"
-        if torch.cuda.is_available()
-        else "mps"
-        if torch.backends.mps.is_available() and not avoid_mps
-        else "cpu"
-    )
-    logger.debug(f"Using {result} as the torch device")
-    return result
+def get_default_torch_devide(avoid_mps: bool = False) -> device:
+    return TorchDeviceMixin().get_device()
+
+
+def init_evaluator_name(
+    evaluator_name: str,
+) -> tuple[ExtendedEvaluatorNameEnum, Optional[str]]:
+    evaluator_name_as_enum = get_enum_by_value(evaluator_name, EvaluatorNameEnum)
+    if evaluator_name_as_enum is None:
+        evaluator_name_as_enum = get_enum_by_value(
+            evaluator_name, ExtendedEvaluatorNameEnum
+        )
+    custom_model_name = None
+    if evaluator_name_as_enum is not None:
+        return (evaluator_name_as_enum, None)
+
+    custom_model_name = evaluator_name
+    evaluator_name = ExtendedEvaluatorNameEnum.CUSTOM
+    return (evaluator_name, custom_model_name)
 
 
 def log_runtime(function):

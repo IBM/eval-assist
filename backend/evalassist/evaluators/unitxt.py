@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, List, cast
+from typing import Any, List, Optional, cast
 
 from unitxt.api import evaluate, load_dataset
 from unitxt.blocks import Task, TaskCard
@@ -24,7 +24,7 @@ from ..utils import (
     get_default_torch_devide,
     get_evaluator_metadata_wrapper,
     get_inference_engine,
-    get_parsed_model_name,
+    get_model_name_from_evaluator,
 )
 
 
@@ -32,9 +32,13 @@ class Evaluator(ABC):
     evaluator_type: EvaluatorTypeEnum
 
     def __init__(
-        self, evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+        self,
+        evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
+        custom_model_name: Optional[str] = None,
     ):
-        self.evaluator_metadata = get_evaluator_metadata_wrapper(evaluator_name)
+        self.evaluator_metadata = get_evaluator_metadata_wrapper(
+            evaluator_name, custom_model_name
+        )
 
     def get_preprocess_steps(self):
         raise NotImplementedError("This method must be implemented.")
@@ -55,12 +59,11 @@ class Evaluator(ABC):
         self,
         instances: list[Instance],
         criteria: Criteria | CriteriaWithOptions,
-        provider: ModelProviderEnum,
+        provider: ModelProviderEnum | ExtendedModelProviderEnum,
         credentials: dict[str, str],
     ):
-        model_name = get_parsed_model_name(
-            self.evaluator_metadata.custom_model_path,
-            self.evaluator_metadata.name,
+        model_name = get_model_name_from_evaluator(
+            self.evaluator_metadata,
             provider,
         )
 
@@ -101,9 +104,11 @@ class Evaluator(ABC):
 
 class DirectAssessmentEvaluator(Evaluator):
     def __init__(
-        self, evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+        self,
+        evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
+        custom_model_name: Optional[str] = None,
     ):
-        super().__init__(evaluator_name)
+        super().__init__(evaluator_name, custom_model_name)
         self.evaluator_type = EvaluatorTypeEnum.DIRECT
 
     def get_preprocess_steps(self):
@@ -319,28 +324,13 @@ class GraniteGuardianEvaluator(ABC):
         )
 
         custom_params = {}
-        parsed_credentials = {}
-        if provider == ModelProviderEnum.WATSONX:
-            custom_params = GraniteGuardianBase.wml_params
-            parsed_credentials = {
-                "api_key": credentials["api_key"],
-                "project_id": credentials["project_id"],
-                "url": credentials["api_base"],
-            }
-        elif provider == ExtendedModelProviderEnum.LOCAL_HF:
-            avoid_mps = self.evaluator_name not in [
-                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B,
-                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B,
-                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B,
-                ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B,
-            ]
-            custom_params = {
-                "max_new_tokens": 20,
-                "device": get_default_torch_devide(avoid_mps),
-            }
-
+        self.evaluator_metadata = get_evaluator_metadata_wrapper(self.evaluator_name)
+        model_name = get_model_name_from_evaluator(
+            self.evaluator_metadata,
+            provider,
+        )
         inference_engine = get_inference_engine(
-            parsed_credentials, provider, self.evaluator_name, custom_params
+            credentials, provider, model_name, custom_params
         )
 
         metric = granite_guardian_class(

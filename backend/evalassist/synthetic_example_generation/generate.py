@@ -12,7 +12,11 @@ from unitxt.llm_as_judge import CriteriaWithOptions, rename_model_if_required
 
 from backend.evalassist.const import EXTENDED_EVALUATOR_TO_MODEL_ID
 
-from ..utils import get_evaluator_metadata_wrapper, get_inference_engine
+from ..utils import (
+    get_evaluator_metadata_wrapper,
+    get_inference_engine,
+    get_model_name_from_evaluator,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -73,15 +77,11 @@ class Generator:
 
             # intialize model
             evaluator_metadata = get_evaluator_metadata_wrapper(
-                self.model_config["evaluator_name"]
+                self.model_config["evaluator_name"],
+                self.model_config["custom_model_name"],
             )
-
-            model_name = rename_model_if_required(
-                evaluator_metadata.custom_model_path
-                if evaluator_metadata.custom_model_name is not None
-                else EXTENDED_EVALUATOR_TO_MODEL_ID[
-                    self.model_config["evaluator_name"]
-                ],
+            model_name = get_model_name_from_evaluator(
+                evaluator_metadata,
                 self.model_config["provider"],
             )
             self.inference_engine = get_inference_engine(
@@ -89,11 +89,6 @@ class Generator:
                 self.model_config["provider"],
                 model_name,
             )
-            # self.inference_engine = get_litellm_inference_engine(
-            #     credentials=self.model_config["llm_provider_credentials"],
-            #     provider=self.model_config["provider"],
-            #     evaluator_name=self.model_config["evaluator_name"],
-            # )
 
     def generate(self):
         # form prompts using criteria

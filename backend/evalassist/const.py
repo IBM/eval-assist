@@ -39,7 +39,7 @@ EXTENDED_EVALUATOR_TO_MODEL_ID = {
 
 
 class ExtendedEvaluatorMetadata(EvaluatorMetadata):
-    name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+    name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
     custom_model_name: Optional[str]
     custom_model_path: Optional[str]
     providers: list[ModelProviderEnum | ExtendedModelProviderEnum]
