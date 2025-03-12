@@ -39,7 +39,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   const { getEmptyUseCaseWithCriteria } = useCriteriasContext()
   const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
   const { userUseCases } = useUserUseCasesContext()
-  const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
+  const { directEvaluators, pairwiseEvaluators } = usePipelineTypesContext()
   const { getAreRelevantCredentialsProvided } = useModelProviderCredentials()
 
   const useCaseId = useMemo(() => (router.query.id ? +router.query.id : null), [router.query.id])
@@ -67,12 +67,12 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
 
   const getDefaultEvaluator = useCallback(
     (type: EvaluationType) => {
-      if (rubricPipelines === null || pairwisePipelines === null || type === null) {
+      if (directEvaluators === null || pairwiseEvaluators === null || type === null) {
         // won't happen!
         return null
       }
       if (isRisksAndHarms) {
-        return rubricPipelines.find((p) => p.name.toLocaleLowerCase().includes('granite guardian')) as Evaluator
+        return directEvaluators.find((p) => p.name.toLocaleLowerCase().includes('granite guardian')) as Evaluator
       } else {
         const ritsCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.RITS)
         const watsonxCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.WATSONX)
@@ -96,10 +96,10 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
             : 'gpt'
         return returnByPipelineType(
           type,
-          rubricPipelines.find(
+          directEvaluators.find(
             (p) => p.name.toLowerCase().includes(defaultEvaluatorKeyword) && p.provider === defaultProvider,
           ) as Evaluator,
-          pairwisePipelines.find(
+          pairwiseEvaluators.find(
             (p) => p.name.toLowerCase().includes(defaultEvaluatorKeyword) && p.provider === defaultProvider,
           ) as Evaluator,
         )
@@ -111,8 +111,8 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
       // change if the used sets adds credentials for a new provider
       // getAreRelevantCredentialsProvided,
       isRisksAndHarms,
-      pairwisePipelines,
-      rubricPipelines,
+      pairwiseEvaluators,
+      directEvaluators,
       useCaseType,
     ],
   )

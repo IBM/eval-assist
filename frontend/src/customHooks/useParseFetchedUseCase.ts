@@ -38,7 +38,7 @@ import {
 // fetched use case is v3 and current is v4
 // parseFetchedUseCaseV3 -> parseFetchedUseCaseV3toV4
 export const useParseFetchedUseCase = () => {
-  const { rubricPipelines, pairwisePipelines } = usePipelineTypesContext()
+  const { directEvaluators, pairwiseEvaluators } = usePipelineTypesContext()
 
   const parseDirectAssessmentResultsV0ToV1 = useCallback((results: DirectResultsV0): DirectResultsV1 | null => {
     return (
@@ -165,14 +165,14 @@ export const useParseFetchedUseCase = () => {
       // so casting them to Pipeline[] is safe
       pipeline:
         (
-          returnByPipelineType<typeof rubricPipelines, typeof pairwisePipelines>(
+          returnByPipelineType<typeof directEvaluators, typeof pairwiseEvaluators>(
             fetchedUseCase.type,
-            rubricPipelines,
-            pairwisePipelines,
+            directEvaluators,
+            pairwiseEvaluators,
           ) as Evaluator[]
         ).find((pipeline) => pipeline.name === fetchedUseCase.pipeline) ?? null,
     }),
-    [pairwisePipelines, rubricPipelines],
+    [pairwiseEvaluators, directEvaluators],
   )
 
   /*

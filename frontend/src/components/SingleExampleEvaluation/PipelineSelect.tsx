@@ -18,25 +18,23 @@ interface Props {
   type: EvaluationType
   style?: CSSProperties
   className?: string
-  selectedPipeline: Evaluator | null
-  setSelectedPipeline: (pipeline: Evaluator | null) => void
+  selectedEvaluator: Evaluator | null
+  setSelectedEvaluator: (pipeline: Evaluator | null) => void
   title: string
+  evaluatorOptions: Evaluator[]
 }
 
-export const PipelineSelect = ({ style, className, selectedPipeline, setSelectedPipeline, type, title }: Props) => {
-  const { rubricPipelines, pairwisePipelines, graniteGuardianPipelines, loadingPipelines } = usePipelineTypesContext()
+export const PipelineSelect = ({
+  style,
+  className,
+  selectedEvaluator,
+  setSelectedEvaluator,
+  type,
+  title,
+  evaluatorOptions,
+}: Props) => {
+  const { loadingEvaluators, directEvaluators, pairwiseEvaluators } = usePipelineTypesContext()
   const { isRisksAndHarms } = useURLInfoContext()
-
-  const filteredPipelines = useMemo(() => {
-    let pipelines = returnByPipelineType(type, rubricPipelines, pairwisePipelines) as Evaluator[]
-    if (!isRisksAndHarms) {
-      pipelines = pipelines.filter((p) => !p.name.startsWith('Granite Guardian'))
-    } else {
-      pipelines = graniteGuardianPipelines || []
-    }
-    return pipelines
-  }, [graniteGuardianPipelines, isRisksAndHarms, pairwisePipelines, rubricPipelines, type])
-
   const providerToEvaluators = useMemo<Record<ModelProviderType, Evaluator[]>>(() => {
     const result: Record<ModelProviderType, Evaluator[]> = {
       [ModelProviderType.RITS]: [],
@@ -45,8 +43,9 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
       [ModelProviderType.AZURE_OPENAI]: [],
       [ModelProviderType.LOCAL_HF]: [],
     }
+    if (evaluatorOptions === null) return result
 
-    filteredPipelines.forEach((p) => {
+    evaluatorOptions.forEach((p) => {
       if (!(p.provider in result)) {
         result[p.provider] = []
       }
@@ -84,14 +83,14 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
     })
 
     return result
-  }, [filteredPipelines])
+  }, [evaluatorOptions])
 
   const { getAreRelevantCredentialsProvided } = useModelProviderCredentials()
 
   return (
     <div style={{ marginBottom: '1.5rem' }} className={className}>
       <span className={classes['toggle-span']}>{title}</span>
-      {loadingPipelines || rubricPipelines === null || pairwisePipelines === null ? (
+      {loadingEvaluators || directEvaluators === null || pairwiseEvaluators === null ? (
         <SelectSkeleton />
       ) : (
         <Select
@@ -99,13 +98,13 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
           labelText=""
           helperText={
             <div className={classes.helperContent}>
-              {selectedPipeline !== null ? (
+              {selectedEvaluator !== null ? (
                 <div className={classes.providerFont}>
                   <span>
                     {'Model provider: '}
-                    {`${modelProviderBeautifiedName[selectedPipeline?.provider as ModelProviderType]}`}
+                    {`${modelProviderBeautifiedName[selectedEvaluator?.provider as ModelProviderType]}`}
                   </span>
-                  {selectedPipeline !== null && !getAreRelevantCredentialsProvided(selectedPipeline.provider) && (
+                  {selectedEvaluator !== null && !getAreRelevantCredentialsProvided(selectedEvaluator.provider) && (
                     <span className={cx(classes.credentialsNotProvided)}>
                       <Warning />
                       {'Required credentials were not provided'}
@@ -123,15 +122,15 @@ export const PipelineSelect = ({ style, className, selectedPipeline, setSelected
               )}
             </div>
           }
-          value={getJSONStringWithSortedKeys(selectedPipeline) || ''}
+          value={getJSONStringWithSortedKeys(selectedEvaluator) || ''}
           onChange={(e) => {
             const selectedPipeline = JSON.parse(e.target.value)
-            setSelectedPipeline(selectedPipeline)
+            setSelectedEvaluator(selectedPipeline)
           }}
           className={classes.selectReadOnly}
           // readOnly={isRisksAndHarms}
         >
-          {selectedPipeline === null && <SelectItem value={''} text={`No evaluator selected`} />}
+          {selectedEvaluator === null && <SelectItem value={''} text={`No evaluator selected`} />}
           {Object.entries(providerToEvaluators).map(([provider, providerEvaluators]) => (
             <SelectItemGroup
               label={modelProviderBeautifiedName[provider as ModelProviderType]}

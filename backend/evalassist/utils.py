@@ -49,10 +49,8 @@ def get_custom_models():
 
 def convert_model_name_wx_to_hf(wx_model_name):
     model_map = {
-        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B: "ibm-granite/granite-guardian-3.1-2b",
-        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "ibm-granite/granite-guardian-3.1-8b",
-        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B: "ibm-granite/granite-guardian-3.2-3b-a800m",
-        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B: "ibm-granite/granite-guardian-3.2-5b",
+        "ibm/granite-guardian-3-2b": "ibm-granite/granite-guardian-3.1-2b",
+        "ibm/granite-guardian-3-8b": "ibm-granite/granite-guardian-3.1-8b",
     }
     try:
         return model_map[wx_model_name]
@@ -74,7 +72,7 @@ def get_local_hf_inference_engine_params(
     return {
         "model_name": convert_model_name_wx_to_hf(model_name),
         "max_new_tokens": 1024,
-        "device": "cpu",
+        "device": get_default_torch_devide(),
     }
 
 
@@ -117,15 +115,13 @@ def get_litellm_inference_engine_params(
 def get_litellm_inference_engine(
     credentials: dict[str, str],
     provider: ModelProviderEnum,
-    evaluator_name: EvaluatorNameEnum,
+    model_name: EvaluatorNameEnum,
     custom_params: dict = None,
 ):
     inference_engine_params = get_litellm_inference_engine_params(
-        credentials, provider, evaluator_name
+        credentials, provider, model_name
     )
-    import json
 
-    print(json.dumps(inference_engine_params, indent=4))
     if custom_params is not None:
         inference_engine_params.update(custom_params)
     return LiteLLMInferenceEngine(**inference_engine_params)
@@ -135,20 +131,20 @@ preloaded_hf_models = {}
 
 
 def get_hf_inference_engine(
-    evaluator_name: ExtendedEvaluatorNameEnum | str,
+    model_name: str,
     custom_params: dict = None,
 ):
     global preloaded_hf_models
-    if evaluator_name in preloaded_hf_models:
-        logger.debug(f"Using preloaded HF model {evaluator_name}")
-        return preloaded_hf_models[evaluator_name]
+    if model_name in preloaded_hf_models:
+        logger.debug(f"Using preloaded HF model {model_name}")
+        return preloaded_hf_models[model_name]
     else:
-        logger.debug(f"Loading model {evaluator_name}")
-        params = get_local_hf_inference_engine_params(evaluator_name)
+        logger.debug(f"Loading model {model_name}")
+        params = get_local_hf_inference_engine_params(model_name)
         if custom_params is not None:
             params.update(custom_params)
         hf_model = HFAutoModelInferenceEngine(**params)
-        preloaded_hf_models[evaluator_name] = hf_model
+        preloaded_hf_models[model_name] = hf_model
         return hf_model
 
 
@@ -160,7 +156,11 @@ def get_watsonx_inference_engine(
 ):
     inference_engine_params = {
         "max_new_tokens": 1024,
-        "credentials": credentials,
+        "credentials": {
+            "api_key": credentials["api_key"],
+            "project_id": credentials["project_id"],
+            "url": credentials["api_base"],
+        },
         "model_name": model_name,
     }
     if custom_params is not None:
@@ -246,7 +246,7 @@ def get_evaluator_metadata_wrapper(
 
 
 def get_default_torch_devide(avoid_mps: bool = False) -> device:
-    return TorchDeviceMixin().get_device()
+    return TorchDeviceMixin().get_device_id()
 
 
 def init_evaluator_name(

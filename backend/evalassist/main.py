@@ -407,6 +407,7 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     }
     generation_config = {
         "context": params.context_variables_names,
+        "response_variable_name": params.response_variable_name,
         "criteria": params.criteria,
         "gen_params": {
             "num_generations_per_criteria": 1,
