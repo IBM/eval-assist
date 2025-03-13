@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import { getOrdinalSuffix, returnByPipelineType, toPercentage, toTitleCase } from 'src/utils'
 
-import { Dispatch, Fragment, SetStateAction, useMemo } from 'react'
+import { Dispatch, Fragment, SetStateAction, useEffect, useMemo, useState } from 'react'
 
 import { Accordion, AccordionItem, Layer, Link, ListItem, Modal, Tooltip, UnorderedList } from '@carbon/react'
 import { ArrowRight, Warning, WarningAlt } from '@carbon/react/icons'
@@ -50,6 +50,15 @@ export const InstanceDetailsModal = ({
         ),
     )
   }, [selectedInstance, type])
+
+  const [openedPerReponseResults, setOpenedPerReponseResults] = useState<boolean[]>([])
+
+  useEffect(() => {
+    if (selectedInstance === null || type === EvaluationType.DIRECT || !selectedInstance.result)
+      return setOpenedPerReponseResults([])
+    setOpenedPerReponseResults(Object.keys(selectedInstance.result as PairwiseInstanceResult).map((_) => false))
+  }, [selectedInstance, type])
+  console.log(openedPerReponseResults)
 
   return (
     selectedInstance !== null && (
@@ -199,7 +208,18 @@ export const InstanceDetailsModal = ({
                         <Accordion className={classes.accordionFullWidth}>
                           {Object.entries(selectedInstance.result as PairwiseInstanceResult).map(
                             ([key, responseResults], j) => (
-                              <AccordionItem title={`${toTitleCase(responseVariableName)} ${key}`} key={j}>
+                              <AccordionItem
+                                title={`${toTitleCase(responseVariableName)} ${key}`}
+                                key={j}
+                                open={openedPerReponseResults[j]}
+                                onClick={() => {
+                                  setOpenedPerReponseResults([
+                                    ...openedPerReponseResults.slice(0, j).map(() => false),
+                                    !!!openedPerReponseResults[j],
+                                    ...openedPerReponseResults.slice(j + 1).map(() => false),
+                                  ])
+                                }}
+                              >
                                 <div className={cx(classes.gridTemplate)}>
                                   <p>
                                     <strong>{'Ranking: '}</strong>
