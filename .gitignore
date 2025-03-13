@@ -46,3 +46,5 @@ certificates
 .litellm_cache/
 
 .idea/*
+
+inference_engine_cache
