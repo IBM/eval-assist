@@ -20,3 +20,4 @@ transformers>=4.48.0
 torch
 accelerate
 unitxt>=1.19.0
+nbconvert

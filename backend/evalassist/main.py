@@ -64,7 +64,7 @@ from .evaluators.unitxt import (
 
 # Logging req/resp
 from .logger import LoggingRoute
-from .notebook_generation import generate_direct_notebook, generate_pairwise_notebook
+from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
 
 # Synthetic
 from .synthetic_example_generation.generate import Generator
@@ -364,34 +364,38 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
         or not hasattr(params, "context_variables")
     ):
         raise HTTPException(status_code=400, detail="Missing required fields")
-    evaluator_metadata = get_evaluator_metadata_wrapper(params.evaluator_name)
+    evaluator_name, custom_model_name = init_evaluator_name(params.evaluator_name)
+    evaluator_metadata = get_evaluator_metadata_wrapper(evaluator_name, custom_model_name)
     model_name = get_model_name_from_evaluator(
-        evaluator_metadata.custom_model_path, evaluator_metadata.name, params.provider
+        evaluator_metadata, params.provider
     )
     params.model_name = model_name
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
-        nb = generate_direct_notebook(params)
+        nb = DirectEvaluationNotebook(params).generate_notebook()
     else:
-        nb = generate_pairwise_notebook(params)
-
-    # Define file path
-    if not os.path.exists("generated_notebooks"):
-        os.mkdir("generated_notebooks")
-    root_folder = "generated_notebooks"
+        nb = PairwiseEvaluationNotebook(params).generate_notebook()
+    from nbconvert import PythonExporter
+    if params.plain_python_script:
+        script, _  = PythonExporter().from_notebook_node(nb)
+    result_content_file = nb if not params.plain_python_script else script
+    root_folder = "generated_code"
     if not os.path.exists(os.path.join(root_folder)):
         os.mkdir(os.path.join(root_folder))
+    file_format = {'ipynb' if not params.plain_python_script else 'py'}
+    file_path = os.path.join(root_folder, f"{uuid.uuid4().hex}.{file_format}")
 
-    notebook_path = os.path.join(root_folder, f"{uuid.uuid4().hex}.ipynb")
+    with open(file_path, "w") as f:
+        if params.plain_python_script:
+            f.write(result_content_file)
+        else:
+            nbf.write(result_content_file, f)
 
-    with open(notebook_path, "w") as f:
-        nbf.write(nb, f)
-
-    background_tasks.add_task(cleanup_file, notebook_path)
-
+    background_tasks.add_task(cleanup_file, file_path)
+    media_type = "application/x-ipynb+json" if not params.plain_python_script else 'text/x-python'
     return FileResponse(
-        notebook_path,
-        media_type="application/x-ipynb+json",
-        filename=f"{params.evaluator_type}_generated_notebook.ipynb",
+        file_path,
+        media_type=media_type,
+        filename=f"{params.evaluator_type}_generated_{'notebook' if not params.plain_python_script else 'script'}.{file_format}",
     )
 
 

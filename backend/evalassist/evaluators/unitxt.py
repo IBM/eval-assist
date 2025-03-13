@@ -133,9 +133,6 @@ class DirectAssessmentEvaluator(Evaluator):
                     f"{prefix}_positional_bias_selected_option"
                 ]
                 positional_bias.explanation = ""
-                #     instance_score[
-                #     f"{prefix}_positional_bias_summary"
-                # ]
 
             results.append(
                 DirectResultModel(

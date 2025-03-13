@@ -24,6 +24,7 @@ interface UseCaseOptionsProps {
   setEditNameModalOpen: Dispatch<SetStateAction<boolean>>
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   downloadUnitxtNotebook: () => Promise<void>
+  setSampleCodeTypeModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export const UseCaseOptions = ({
@@ -39,6 +40,7 @@ export const UseCaseOptions = ({
   setDeleteUseCaseModalOpen,
   setEditNameModalOpen,
   downloadUnitxtNotebook,
+  setSampleCodeTypeModalOpen,
 }: UseCaseOptionsProps) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
   const { isRisksAndHarms } = useURLInfoContext()
@@ -114,8 +116,13 @@ export const UseCaseOptions = ({
         {'Delete Test Case'}
       </Button>
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
-      <Button disabled={isRisksAndHarms} kind="ghost" renderIcon={Download} onClick={downloadUnitxtNotebook}>
-        {'Jupyter notebook'}
+      <Button
+        disabled={isRisksAndHarms}
+        kind="ghost"
+        renderIcon={Download}
+        onClick={() => setSampleCodeTypeModalOpen(true)}
+      >
+        {'Sample code'}
       </Button>
     </div>
   )

@@ -15,7 +15,7 @@ import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFrom
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
-import { useUnitxtNotebookGeneration } from '@customHooks/useUnitxtNotebookGeneration'
+import { useUnitxtCodeGeneration } from '@customHooks/useUnitxtNotebookGeneration'
 import { StoredUseCase } from '@prisma/client'
 
 import {
@@ -40,6 +40,7 @@ import { CriteriaView } from './CriteriaView'
 import { EvaluateButton } from './EvaluateButton'
 import { Landing } from './Landing'
 import layoutClasses from './Layout.module.scss'
+import { ChooseCodeGenerationType } from './Modals/ChooseCodeGenerationType'
 import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
 import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
 import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
@@ -84,6 +85,7 @@ export const SingleExampleEvaluation = () => {
   const [evaluationRunningModalOpen, setEvaluationRunningModalOpen] = useState(false)
   const [promptModalOpen, setPromptModalOpen] = useState(false)
   const [sysntheticGenerationModalOpen, setSysntheticGenerationModalOpen] = useState(false)
+  const [sampleCodeTypeModalOpen, setSampleCodeTypeModalOpen] = useState(false)
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [selectedInstance, setSelectedInstance] = useState<Instance | null>(null)
   const [modelForSyntheticGeneration, setModelForSyntheticGeneration] = useState<Evaluator | null>(null)
@@ -183,7 +185,7 @@ export const SingleExampleEvaluation = () => {
     [currentTestCase?.instances, currentTestCase?.type, noUseCaseSelected],
   )
 
-  const { downloadUnitxtNotebook } = useUnitxtNotebookGeneration({
+  const { downloadUnitxtCode } = useUnitxtCodeGeneration({
     testCaseName: currentTestCase?.name!,
     criteria: currentTestCase?.criteria!,
     evaluatorName: currentTestCase?.evaluator?.name || null,
@@ -603,7 +605,8 @@ export const SingleExampleEvaluation = () => {
               setDeleteUseCaseModalOpen={setDeleteUseCaseModalOpen}
               setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
               setEditNameModalOpen={setEditNameModalOpen}
-              downloadUnitxtNotebook={downloadUnitxtNotebook}
+              downloadUnitxtNotebook={() => downloadUnitxtCode({ downloadAsScript: false })}
+              setSampleCodeTypeModalOpen={setSampleCodeTypeModalOpen}
             />
             {/* <ContextVariables
               contextVariables={currentUseCase.contextVariables}
@@ -758,6 +761,11 @@ export const SingleExampleEvaluation = () => {
                 provider: modelForSyntheticGeneration?.provider!,
               })
             }
+          />
+          <ChooseCodeGenerationType
+            open={sampleCodeTypeModalOpen}
+            setOpen={setSampleCodeTypeModalOpen}
+            downloadUnitxtCode={downloadUnitxtCode}
           />
         </>
       )}
