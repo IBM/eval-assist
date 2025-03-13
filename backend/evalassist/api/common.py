@@ -108,6 +108,7 @@ class NotebookParams(BaseModel):
     credentials: dict[str, str]
     evaluator_type: EvaluatorTypeEnum
     model_name: Optional[str] = None
+    plain_python_script: bool
 
 
 class CriteriaOptionAPI(BaseModel):

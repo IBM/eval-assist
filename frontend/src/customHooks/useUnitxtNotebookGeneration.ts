@@ -15,7 +15,7 @@ interface Props {
   credential_keys: string[]
   evaluatorType: EvaluationType
 }
-export const useUnitxtNotebookGeneration = ({
+export const useUnitxtCodeGeneration = ({
   criteria,
   evaluatorName,
   responses,
@@ -28,7 +28,7 @@ export const useUnitxtNotebookGeneration = ({
   const { post } = useFetchUtils()
   const { addToast, removeToast } = useToastContext()
 
-  const downloadUnitxtNotebook = async () => {
+  const downloadUnitxtCode = async ({ downloadAsScript }: { downloadAsScript: boolean }) => {
     if (!evaluatorName) {
       addToast({
         kind: 'warning',
@@ -54,6 +54,7 @@ export const useUnitxtNotebookGeneration = ({
         credentials: credential_keys.reduce((acc, item, index) => ({ ...acc, [item]: '' }), {}),
         evaluator_type: evaluatorType!,
         test_case_name: testCaseName || '',
+        plain_python_script: downloadAsScript,
       })
 
       if (!response.ok) {
@@ -67,7 +68,7 @@ export const useUnitxtNotebookGeneration = ({
       const url = window.URL.createObjectURL(notebookBlob)
       const link = document.createElement('a')
       link.href = url
-      link.download = 'generated_notebook.ipynb'
+      link.download = downloadAsScript ? 'generated_script.py' : 'generated_notebook.ipynb'
       document.body.appendChild(link)
       link.click()
 
@@ -90,6 +91,6 @@ export const useUnitxtNotebookGeneration = ({
   }
 
   return {
-    downloadUnitxtNotebook,
+    downloadUnitxtCode: downloadUnitxtCode,
   }
 }
