@@ -58,7 +58,6 @@ export const InstanceDetailsModal = ({
       return setOpenedPerReponseResults([])
     setOpenedPerReponseResults(Object.keys(selectedInstance.result as PairwiseInstanceResult).map((_) => false))
   }, [selectedInstance, type])
-  console.log(openedPerReponseResults)
 
   return (
     selectedInstance !== null && (

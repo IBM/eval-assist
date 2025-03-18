@@ -21,7 +21,6 @@ from unitxt.templates import NullTemplate
 from ..api.common import DirectPositionalBias, DirectResultModel, Instance
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 from ..utils import (
-    get_default_torch_devide,
     get_evaluator_metadata_wrapper,
     get_inference_engine,
     get_model_name_from_evaluator,

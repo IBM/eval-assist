@@ -3,7 +3,7 @@ from typing import Literal
 import nbformat as nbf
 from abc import ABC, abstractmethod
 from .api.common import NotebookParams
-from .utils import get_litellm_inference_engine_params
+from .utils import get_cross_inference_engine
 
 class Cell:
     type: Literal["code", "md"]
@@ -17,7 +17,7 @@ class Cell:
 class EvaluationNotebookGenerator(ABC):
     def __init__(self, params: NotebookParams):
         self.params = params
-        self.inference_engine_params = get_litellm_inference_engine_params(
+        self.inference_engine_params = get_cross_inference_engine(
             credentials=params.credentials,
             provider=params.provider,
             model_name=params.model_name,

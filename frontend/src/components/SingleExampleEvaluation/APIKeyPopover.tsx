@@ -182,11 +182,11 @@ export const APIKeyPopover = ({
                   ref={apiKeyInputRef}
                   id={'openai-api-key-input'}
                   labelText=""
-                  value={modelProviderCrentials.azure_openai.api_key}
+                  value={modelProviderCrentials.azure.api_key}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setModelProviderCredentials({
                       ...modelProviderCrentials,
-                      azure_openai: { api_key: e.target.value },
+                      azure: { api_key: e.target.value },
                     })
                   }
                   autoComplete="off"

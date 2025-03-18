@@ -212,7 +212,7 @@ export enum ModelProviderType {
   WATSONX = 'watsonx',
   OPENAI = 'openai',
   RITS = 'rits',
-  AZURE_OPENAI = 'azure_openai',
+  AZURE_OPENAI = 'azure',
   LOCAL_HF = 'local_hf',
 }
 
@@ -321,7 +321,7 @@ export type ModelProviderCredentials = {
   rits: {
     api_key: string
   }
-  azure_openai: {
+  azure: {
     api_key: string
   }
   local_hf: {}

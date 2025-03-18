@@ -92,8 +92,8 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
 
         const defaultEvaluatorKeyword =
           watsonxCredentialsExist || ritsCredentialsExist || (!openaiCredentialsExist && !azureCredentialsExist)
-            ? 'llama'
-            : 'gpt'
+            ? 'llama3.3'
+            : 'gpt-4o'
         return returnByPipelineType(
           type,
           directEvaluators.find(
