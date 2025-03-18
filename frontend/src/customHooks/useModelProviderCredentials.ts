@@ -37,8 +37,8 @@ export const useModelProviderCredentials = () => {
       delete parsedCredentials['bam']
     }
 
-    if (!parsedCredentials.azure_openai) {
-      parsedCredentials['azure_openai'] = { api_key: '' }
+    if (!parsedCredentials.azure) {
+      parsedCredentials['azure'] = { api_key: '' }
     }
 
     // watsonx key was apikey before, so we adapt it to api_key

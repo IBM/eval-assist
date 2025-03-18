@@ -8,17 +8,13 @@ from typing import Optional
 
 from torch import device
 from unitxt.inference import (
+    CrossProviderInferenceEngine,
     HFAutoModelInferenceEngine,
-    LiteLLMInferenceEngine,
     RITSInferenceEngine,
     TorchDeviceMixin,
     WMLInferenceEngineGeneration,
 )
-from unitxt.llm_as_judge import (
-    EvaluatorNameEnum,
-    ModelProviderEnum,
-    rename_model_if_required,
-)
+from unitxt.llm_as_judge import EvaluatorNameEnum, ModelProviderEnum
 
 from .const import (
     EXTENDED_EVALUATOR_TO_MODEL_ID,
@@ -55,7 +51,6 @@ def convert_model_name_wx_to_hf(wx_model_name):
     try:
         return model_map[wx_model_name]
     except KeyError:
-        logger.warning(f"Model name {wx_model_name} not found in the conversion map.")
         return wx_model_name
 
 
@@ -76,55 +71,70 @@ def get_local_hf_inference_engine_params(
     }
 
 
-def get_litellm_inference_engine_params(
+def get_cross_inference_engine_params(
     credentials: dict,
     provider: ModelProviderEnum,
     model_name: str,
 ):
+    provider_specific_args = {}
     inference_engine_params = {
         "max_tokens": 1024,
         "seed": 42,
         "credentials": credentials,
-        "max_requests_per_second": 8,
     }
-
-    if provider == ModelProviderEnum.WATSONX:
-        model_name = "watsonx/" + model_name
+    if provider == ModelProviderEnum.RITS:
+        inference_engine_params["credentials"]["api_base"] = (
+            RITSInferenceEngine.get_base_url_from_model_name(model_name) + "/v1"
+        )
+        # inference_engine_params["extra_headers"] = {
+        #     "RITS_API_KEY": credentials["api_key"]
+        # }
+    elif provider == ModelProviderEnum.WATSONX:
+        provider_specific_args["max_requests_per_second"] = 8
 
     if provider == ModelProviderEnum.AZURE_OPENAI:
         inference_engine_params["credentials"]["api_base"] = (
             f"https://eteopenai.azure-api.net/openai/deployments/{model_name}/chat/completions?api-version=2024-08-01-preview"
         )
-        model_name = "azure/" + model_name
-    if provider == ModelProviderEnum.RITS:
-        inference_engine_params["credentials"]["api_base"] = (
-            RITSInferenceEngine.get_base_url_from_model_name(model_name) + "/v1"
-        )
-        inference_engine_params["extra_headers"] = {
-            "RITS_API_KEY": credentials["api_key"]
-        }
-
-    if provider == ModelProviderEnum.OPENAI or provider == ModelProviderEnum.RITS:
-        model_name = f"openai/{model_name}"
 
     inference_engine_params["model"] = model_name
-
+    inference_engine_params["provider"] = provider.value
+    inference_engine_params["credentials"] = credentials
     return inference_engine_params
 
 
-def get_litellm_inference_engine(
+def get_cross_inference_engine(
     credentials: dict[str, str],
     provider: ModelProviderEnum,
     model_name: EvaluatorNameEnum,
     custom_params: dict = None,
 ):
-    inference_engine_params = get_litellm_inference_engine_params(
+    inference_engine_params = get_cross_inference_engine_params(
         credentials, provider, model_name
     )
-
     if custom_params is not None:
         inference_engine_params.update(custom_params)
-    return LiteLLMInferenceEngine(**inference_engine_params)
+    return CrossProviderInferenceEngine(**inference_engine_params)
+
+
+def get_watsonx_inference_engine(
+    credentials: dict[str, str],
+    provider: ModelProviderEnum,
+    model_name: EvaluatorNameEnum,
+    custom_params: dict = None,
+):
+    inference_engine_params = {
+        "max_new_tokens": 1024,
+        "credentials": {
+            "api_key": credentials["api_key"],
+            "project_id": credentials["project_id"],
+            "url": credentials["api_base"],
+        },
+        "model_name": model_name,
+    }
+    if custom_params is not None:
+        inference_engine_params.update(custom_params)
+    return WMLInferenceEngineGeneration(**inference_engine_params)
 
 
 preloaded_hf_models = {}
@@ -148,45 +158,19 @@ def get_hf_inference_engine(
         return hf_model
 
 
-def get_watsonx_inference_engine(
-    credentials: dict[str, str],
-    provider: ModelProviderEnum,
-    model_name: EvaluatorNameEnum,
-    custom_params: dict = None,
-):
-    inference_engine_params = {
-        "max_new_tokens": 1024,
-        "credentials": {
-            "api_key": credentials["api_key"],
-            "project_id": credentials["project_id"],
-            "url": credentials["api_base"],
-        },
-        "model_name": model_name,
-    }
-    if custom_params is not None:
-        inference_engine_params.update(custom_params)
-    return WMLInferenceEngineGeneration(**inference_engine_params)
-
-
 def get_inference_engine(
     credentials: dict[str, str],
     provider: ModelProviderEnum | ExtendedModelProviderEnum,
     model_name: str,
     custom_params: dict = None,
 ):
-    if provider == ExtendedModelProviderEnum.LOCAL_HF:
-        return get_hf_inference_engine(model_name, custom_params)
-    if (
-        provider == ModelProviderEnum.WATSONX
-        and 'granite-guardian' in model_name
-    ):
+    # if provider == ExtendedModelProviderEnum.LOCAL_HF:
+    #     return get_hf_inference_engine(model_name, custom_params)
+    if provider == ModelProviderEnum.WATSONX and "granite-guardian" in model_name:
         return get_watsonx_inference_engine(
             credentials, provider, model_name, custom_params
         )
-    return get_litellm_inference_engine(
-        credentials, provider, model_name, custom_params
-    )
-
+    return get_cross_inference_engine(credentials, provider, model_name, custom_params)
 
 
 def get_model_name_from_evaluator(

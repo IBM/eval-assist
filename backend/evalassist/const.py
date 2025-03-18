@@ -5,7 +5,6 @@ from unitxt.inference import HFAutoModelInferenceEngine
 from unitxt.llm_as_judge import (
     EVALUATOR_TO_MODEL_ID,
     EVALUATORS_METADATA,
-    INFERENCE_ENGINE_NAME_TO_CLASS,
     EvaluatorMetadata,
     EvaluatorNameEnum,
     ModelProviderEnum,
@@ -27,7 +26,6 @@ class ExtendedModelProviderEnum(str, Enum):
 
 
 EXTENDED_INFERENCE_ENGINE_NAME_TO_CLASS = {
-    **INFERENCE_ENGINE_NAME_TO_CLASS,
     ExtendedModelProviderEnum.LOCAL_HF: HFAutoModelInferenceEngine,
 }
 

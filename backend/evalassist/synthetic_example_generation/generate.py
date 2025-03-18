@@ -8,9 +8,7 @@ from textwrap import dedent
 
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts import PromptTemplate
-from unitxt.llm_as_judge import CriteriaWithOptions, rename_model_if_required
-
-from backend.evalassist.const import EXTENDED_EVALUATOR_TO_MODEL_ID
+from unitxt.llm_as_judge import CriteriaWithOptions
 
 from ..utils import (
     get_evaluator_metadata_wrapper,
