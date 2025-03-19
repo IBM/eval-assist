@@ -76,6 +76,7 @@ class Evaluator(ABC):
             "evaluator_name": EvaluatorNameEnum.GRANITE3_2B.name,  # TODO: allow for name to be more flexible
             "context_fields": list(context_variables_list[0].keys()),
             "criteria_field": "criteria",
+            "generate_summaries": True,
         }
 
         input_fields = {
