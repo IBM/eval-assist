@@ -74,7 +74,6 @@ export const useModelProviderCredentials = () => {
     }
     setInitializedModelProviderCredentials(true)
   }, [defaultCredentialStorage, modelProviderCredentials, setModelProviderCredentials])
-
   const getAreRelevantCredentialsProvided = useCallback(
     (provider: ModelProviderType): boolean => {
       return Object.values(modelProviderCredentials[provider]).every((key) => key !== '')

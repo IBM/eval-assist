@@ -110,8 +110,6 @@ export const useGenerateSystheticExamples = (props: Props) => {
         return
       }
       const syntheticExample = result.syntheticExamples[0]
-      console.log(syntheticExample)
-      console.log(props.responseVariableName)
       let syntheticInstance: Instance = {
         contextVariables: props.contextVariableNames.map((contextVariableName) => ({
           name: contextVariableName,
@@ -120,8 +118,6 @@ export const useGenerateSystheticExamples = (props: Props) => {
         expectedResult: '',
         result: null,
       }
-
-      console.log(syntheticInstance)
 
       if (props.type === EvaluationType.DIRECT) {
         ;(syntheticInstance as DirectInstance) = {

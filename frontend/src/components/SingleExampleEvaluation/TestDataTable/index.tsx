@@ -231,7 +231,6 @@ export const TestDataTable = ({
 
   const onPageChange = useCallback(
     (pageIndex: number) => {
-      console.log(pageIndex)
       goToPage(pageIndex)
     },
     [goToPage],
