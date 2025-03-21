@@ -68,14 +68,14 @@ export const AppSidenavNew = ({
             kind="ghost"
             size="lg"
             className={cx(classes.itemBtn, {
-              [classes.selected]: selected === 'library_use_cases',
+              [classes.selected]: selected === 'library_test_cases',
             })}
-            id={`${id}-tab__library_use_cases`}
+            id={`${id}-tab__library_test_cases`}
             role="tab"
-            aria-selected={selected === 'library_use_cases'}
-            aria-controls={`${id}-tabpanel__library_use_cases`}
+            aria-selected={selected === 'library_test_cases'}
+            aria-controls={`${id}-tabpanel__library_test_cases`}
             onClick={() => {
-              setSelected((selected) => (selected === 'library_use_cases' ? null : 'library_use_cases'))
+              setSelected((selected) => (selected === 'library_test_cases' ? null : 'library_test_cases'))
             }}
           >
             <Categories size={20} />
@@ -108,14 +108,14 @@ export const AppSidenavNew = ({
             kind="ghost"
             size="lg"
             className={cx(classes.itemBtn, {
-              [classes.selected]: selected === 'user_use_cases',
+              [classes.selected]: selected === 'user_test_cases',
             })}
-            id={`${id}-tab__user_use_cases`}
+            id={`${id}-tab__user_test_cases`}
             role="tab"
-            aria-selected={selected === 'user_use_cases'}
-            aria-controls={`${id}-tabpanel__user_use_cases`}
+            aria-selected={selected === 'user_test_cases'}
+            aria-controls={`${id}-tabpanel__user_test_cases`}
             onClick={() => {
-              setSelected((selected) => (selected === 'user_use_cases' ? null : 'user_use_cases'))
+              setSelected((selected) => (selected === 'user_test_cases' ? null : 'user_test_cases'))
             }}
           >
             <WatsonHealthSaveAnnotation size={20} />
@@ -126,10 +126,10 @@ export const AppSidenavNew = ({
         role="tabpanel"
         className={classes.panel}
         id={`${id}-tabpanel__example_catalog`}
-        hidden={selected !== 'library_use_cases'}
+        hidden={selected !== 'library_test_cases'}
         tabIndex={-1}
       >
-        {selected === 'library_use_cases' && (
+        {selected === 'library_test_cases' && (
           <ExampleCatalogPanel
             onUseCaseClick={onUseCaseClick}
             onClose={() => {
@@ -141,11 +141,11 @@ export const AppSidenavNew = ({
       <div
         role="tabpanel"
         className={classes.panel}
-        id={`${id}-tabpanel__user_use_cases`}
-        hidden={selected !== 'user_use_cases'}
+        id={`${id}-tabpanel__user_test_cases`}
+        hidden={selected !== 'user_test_cases'}
         tabIndex={-1}
       >
-        {selected === 'user_use_cases' && (
+        {selected === 'user_test_cases' && (
           <SavedTestCasesPanel
             onUseCaseClick={onUseCaseClick}
             onClose={() => {

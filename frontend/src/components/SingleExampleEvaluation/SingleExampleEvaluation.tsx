@@ -397,8 +397,8 @@ export const SingleExampleEvaluation = () => {
   const onSave = useCallback(async () => {
     if (currentTestCase === null) return
     const savedUseCase: StoredUseCase = await (
-      await put('use_case/', {
-        use_case: {
+      await put('test_case/', {
+        test_case: {
           name: currentTestCase.name,
           content: JSON.stringify({
             instances: currentTestCase.instances,
@@ -447,8 +447,8 @@ export const SingleExampleEvaluation = () => {
     async (name: string, fromUseCase?: UseCase) => {
       if (currentTestCase === null) return false
       const toSaveUseCase = fromUseCase ?? currentTestCase
-      const res = await put('use_case/', {
-        use_case: {
+      const res = await put('test_case/', {
+        test_case: {
           name: name,
           content: JSON.stringify({
             instances: currentTestCase.instances,
@@ -483,7 +483,7 @@ export const SingleExampleEvaluation = () => {
         // a rediction will be done to that selected test casen
         if (useCaseSelected === null) {
           updateURLFromUseCase({ useCase: parsedSavedUseCase, subCatalogName: null })
-          setSidebarTabSelected('user_use_cases')
+          setSidebarTabSelected('user_test_cases')
         } else {
           updateURLFromUseCase(useCaseSelected)
         }
@@ -525,7 +525,7 @@ export const SingleExampleEvaluation = () => {
 
   const onDeleteUseCase = async () => {
     if (currentTestCase === null) return
-    await deleteCustom('use_case/', { use_case_id: currentTestCase.id })
+    await deleteCustom('test_case/', { test_case_id: currentTestCase.id })
 
     // notify the user
     addToast({

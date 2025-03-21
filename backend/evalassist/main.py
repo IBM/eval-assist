@@ -1,4 +1,3 @@
-import json
 import logging
 import logging.handlers
 import os
@@ -240,46 +239,47 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
         )
 
 
-@router.get("/use_case/")
-def get_use_cases(user: str):
-    use_cases = db.storedusecase.find_many(where={"app_user": {"email": user}})
-    return use_cases
+@router.get("/test_case/")
+def get_test_cases(user: str):
+    test_cases = db.storedusecase.find_many(where={"app_user": {"email": user}})
+    return test_cases
 
 
-@router.get("/use_case/{use_case_id}/")
-def get_use_case(use_case_id: int, user: str):
-    return db.storedusecase.find_unique(where={"id": use_case_id})
+@router.get("/test_case/{test_case_id}/")
+def get_test_case(test_case_id: int, user: str):
+    test_case = db.storedusecase.find_unique(where={"id": test_case_id})
+    return test_case
 
 
 class PutUseCaseBody(BaseModel):
     user: str
-    use_case: StoredUseCase
+    test_case: StoredUseCase
 
 
-@router.put("/use_case/")
-def put_use_case(request_body: PutUseCaseBody):
+@router.put("/test_case/")
+def put_test_case(request_body: PutUseCaseBody):
     user = db.appuser.find_unique(where={"email": request_body.user})
 
     found = db.storedusecase.find_unique(
         where={
-            "id": request_body.use_case.id,
+            "id": request_body.test_case.id,
             "user_id": user.id,
         }
     )
 
     if found:
         res = db.storedusecase.update(
-            where={"id": request_body.use_case.id},
+            where={"id": request_body.test_case.id},
             data={
-                "name": request_body.use_case.name,
-                "content": json.dumps(request_body.use_case.content),
+                "name": request_body.test_case.name,
+                "content": request_body.test_case.content,
             },
         )
 
     else:
         name_and_user_exists = db.storedusecase.find_many(
             where={
-                "name": request_body.use_case.name,
+                "name": request_body.test_case.name,
                 "user_id": user.id,
             }
         )
@@ -287,14 +287,14 @@ def put_use_case(request_body: PutUseCaseBody):
         if name_and_user_exists:
             raise HTTPException(
                 status_code=409,
-                detail=f"The name '{request_body.use_case.name}' is already in use",
+                detail=f"The name '{request_body.test_case.name}' is already in use",
             )
 
         else:
             res = db.storedusecase.create(
                 data={
-                    "name": request_body.use_case.name,
-                    "content": json.dumps(request_body.use_case.content),
+                    "name": request_body.test_case.name,
+                    "content": request_body.test_case.content,
                     "user_id": user.id,
                 }
             )
@@ -303,12 +303,12 @@ def put_use_case(request_body: PutUseCaseBody):
 
 
 class DeleteUseCaseBody(BaseModel):
-    use_case_id: int
+    test_case_id: int
 
 
-@router.delete("/use_case/")
-def delete_use_case(request_body: DeleteUseCaseBody):
-    res = db.storedusecase.delete(where={"id": request_body.use_case_id})
+@router.delete("/test_case/")
+def delete_test_case(request_body: DeleteUseCaseBody):
+    res = db.storedusecase.delete(where={"id": request_body.test_case_id})
     return res
 
 
@@ -365,23 +365,24 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
     ):
         raise HTTPException(status_code=400, detail="Missing required fields")
     evaluator_name, custom_model_name = init_evaluator_name(params.evaluator_name)
-    evaluator_metadata = get_evaluator_metadata_wrapper(evaluator_name, custom_model_name)
-    model_name = get_model_name_from_evaluator(
-        evaluator_metadata, params.provider
+    evaluator_metadata = get_evaluator_metadata_wrapper(
+        evaluator_name, custom_model_name
     )
+    model_name = get_model_name_from_evaluator(evaluator_metadata, params.provider)
     params.model_name = model_name
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
         nb = DirectEvaluationNotebook(params).generate_notebook()
     else:
         nb = PairwiseEvaluationNotebook(params).generate_notebook()
     from nbconvert import PythonExporter
+
     if params.plain_python_script:
-        script, _  = PythonExporter().from_notebook_node(nb)
+        script, _ = PythonExporter().from_notebook_node(nb)
     result_content_file = nb if not params.plain_python_script else script
     root_folder = "generated_code"
     if not os.path.exists(os.path.join(root_folder)):
         os.mkdir(os.path.join(root_folder))
-    file_format = {'ipynb' if not params.plain_python_script else 'py'}
+    file_format = {"ipynb" if not params.plain_python_script else "py"}
     file_path = os.path.join(root_folder, f"{uuid.uuid4().hex}.{file_format}")
 
     with open(file_path, "w") as f:
@@ -391,7 +392,11 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
             nbf.write(result_content_file, f)
 
     background_tasks.add_task(cleanup_file, file_path)
-    media_type = "application/x-ipynb+json" if not params.plain_python_script else 'text/x-python'
+    media_type = (
+        "application/x-ipynb+json"
+        if not params.plain_python_script
+        else "text/x-python"
+    )
     return FileResponse(
         file_path,
         media_type=media_type,

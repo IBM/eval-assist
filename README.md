@@ -43,23 +43,12 @@ The following command will install the frontend and backend dependencies. It wil
 npm install
 ```
 
-### 4. Set up a local database (optional)
-
-This step is only nencessary if you are not using an already deployed database and you want to deploy your own database locally.
-
-1. Install Rancher following [this steps](https://docs.rancherdesktop.io/getting-started/installation/). You may use any other container managment system that supports docker.
-
-2. Install docker compose.
-
-3. Run `npm run db`. This will create and run an empty Postgres database. It's default URL is `postgres://admin:admin@127.0.0.1:5432/eval-assist-db`.
-
-### 5. Set the environment variables
+### 4. Set the environment variables
 
 Both frontend and backend need a few environment variables to be set in order to work properly.
 
 Create an `.env` file in the root directory with the following entries:
 
-* `DATABASE_URL`: the URL of the database
 * `NEXT_PUBLIC_BACKEND_API_HOST`: the URL of the backend FastAPI app
 * `NEXT_PUBLIC_USE_AUTH`: whether to use authentication or not. Authentication is performed through IBMId Oauth, but other methods can be added/contributed.
 
@@ -69,13 +58,7 @@ _Note: you can use the content of `.env.example` to start with some default valu
 cp .env.example .env
 ```
 
-### 6. Sync the Prisma schema with the Postgres database _(only if you are its admin)_
-
-The following command synchronizes the prisma schema with the database, making sure all the required tables exist.
-
-`npm run prisma:sync`
-
-### 7. Run the system
+### 5. Run the system
 
 The following command will run both the backend and the frontend concurrently. If you want to run them separately you can use `start:backend` and `start:frontend`.
 
@@ -85,7 +68,7 @@ npm start
 
 **Important:** Sensitive data, such as API keys from third-party providers, is transmitted between the frontend and backend and must be encrypted. Ensure proper TLS termination when deploying the system.
 
-### 8. Open EvalAssist
+### 6. Open EvalAssist
 
 Visit [http://localhost:3000](https://localhost:3000)
 

@@ -48,3 +48,5 @@ certificates
 .idea/*
 
 inference_engine_cache
+
+dev.db
