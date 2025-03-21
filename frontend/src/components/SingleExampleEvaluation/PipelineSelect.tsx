@@ -49,7 +49,7 @@ export const PipelineSelect = ({
       if (!(p.provider in result)) {
         result[p.provider] = []
       }
-      result[p.provider]!.push(p)
+      result[p.provider].push(p)
     })
 
     Object.values(result).forEach((pipelines) =>

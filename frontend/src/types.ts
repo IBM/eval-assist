@@ -210,7 +210,7 @@ export enum EvaluationType {
 
 export enum ModelProviderType {
   WATSONX = 'watsonx',
-  OPENAI = 'openai',
+  OPENAI = 'open-ai',
   RITS = 'rits',
   AZURE_OPENAI = 'azure',
   LOCAL_HF = 'local_hf',
@@ -315,7 +315,7 @@ export type ModelProviderCredentials = {
     project_id: string
     api_base: string
   }
-  openai: {
+  'open-ai': {
     api_key: string
   }
   rits: {
