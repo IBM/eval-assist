@@ -1,33 +1,34 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:../../dev.db"
 }
 
 model StoredUseCase {
   id      Int    @id @default(autoincrement())
   user_id Int
-  content Json
+  content String
   name    String
 
   app_user AppUser @relation(fields: [user_id], references: [id])
 
   @@unique([user_id, name])
-  @@map("stored_use_case")
+  @@map("stored_test_case")
 }
 
 model AppUser {
-  id               Int             @id @default(autoincrement())
-  email            String          @unique
-  name             String
-  created_at       DateTime        @default(now())
-  
-  stored_use_cases StoredUseCase[]
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  name       String
+  created_at DateTime @default(now())
+
+  stored_test_cases StoredUseCase[]
 
   @@map("app_user")
 }
 
 model LogRecord {
-  id      Int    @id @default(autoincrement())
-  data Json
+  id   Int    @id @default(autoincrement())
+  data String
+
   @@map("log_record")
 }

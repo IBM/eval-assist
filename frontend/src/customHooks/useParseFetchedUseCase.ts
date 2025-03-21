@@ -276,7 +276,7 @@ export const useParseFetchedUseCase = () => {
   const parseFetchedUseCase = useCallback(
     (fetchedUseCase: StoredUseCase): UseCase | null => {
       const toParseObj: Record<string, any> = {
-        ...(fetchedUseCase.content as Record<string, any>),
+        ...JSON.parse(fetchedUseCase.content),
         id: fetchedUseCase.id,
         name: fetchedUseCase.name,
       }

@@ -33,7 +33,7 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
   }
 
   const openTestCasesLibrary = () => {
-    setSidebarTabSelected('library_use_cases')
+    setSidebarTabSelected('library_test_cases')
   }
 
   const openRisksAndHarms = () => {
