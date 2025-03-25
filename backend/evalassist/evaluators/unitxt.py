@@ -72,7 +72,6 @@ class Evaluator(ABC):
 
         evalutor_params = {
             "inference_engine": inference_engine,
-            "evaluator_name": EvaluatorNameEnum.GRANITE3_2B.name,  # TODO: allow for name to be more flexible
             "context_fields": list(context_variables_list[0].keys()),
             "criteria_field": "criteria",
             "generate_summaries": True,
@@ -132,8 +131,9 @@ class DirectAssessmentEvaluator(Evaluator):
                 positional_bias.option = instance_score[
                     f"{prefix}_positional_bias_selected_option"
                 ]
-                positional_bias.explanation = instance_score[f"{prefix}_positional_bias_summary"]
-
+                positional_bias.explanation = instance_score[
+                    f"{prefix}_positional_bias_summary"
+                ]
 
             results.append(
                 DirectResultModel(
@@ -147,10 +147,10 @@ class DirectAssessmentEvaluator(Evaluator):
 
 class PairwiseComparisonEvaluator(Evaluator):
     def __init__(
-            self,
-            evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
-            custom_model_name: Optional[str] = None,
-        ):        
+        self,
+        evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
+        custom_model_name: Optional[str] = None,
+    ):
         super().__init__(evaluator_name, custom_model_name)
         self.evaluator_type = EvaluatorTypeEnum.PAIRWISE
 
