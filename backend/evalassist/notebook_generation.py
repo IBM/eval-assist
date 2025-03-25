@@ -281,6 +281,7 @@ This code block creates the evaluator object of class _LLMJudgePairwise_. It the
         return """predictions = df.filter(regex=r"^system_\d+$").values.tolist()
 results = evaluate(predictions=predictions, data=dataset)
 per_instance_scores = []
+winners = []
 for i, result in enumerate(results):
     instance_scores = result['score']['instance']
     summary = {
