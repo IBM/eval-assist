@@ -32,11 +32,6 @@ export const APIKeyPopover = ({
     if (popoverOpen && apiKeyInputRef.current !== null) (apiKeyInputRef as any).current.focus()
   }, [popoverOpen])
 
-  const areModelProviderCredentialProvided = useCallback(
-    (credentials: { [key: string]: string }) => Object.values(credentials).every((v) => v !== ''),
-    [],
-  )
-
   return (
     <Popover open={popoverOpen} align="bottom-end" isTabTip onRequestClose={() => setPopoverOpen(false)}>
       <Button
@@ -148,11 +143,11 @@ export const APIKeyPopover = ({
                   ref={apiKeyInputRef}
                   id={'openai-api-key-input'}
                   labelText=""
-                  value={modelProviderCrentials.openai.api_key}
+                  value={modelProviderCrentials['open-ai'].api_key}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setModelProviderCredentials({
                       ...modelProviderCrentials,
-                      openai: { api_key: e.target.value },
+                      ['open-ai']: { api_key: e.target.value },
                     })
                   }
                   autoComplete="off"
