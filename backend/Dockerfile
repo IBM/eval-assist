@@ -9,4 +9,4 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 RUN prisma generate
 RUN prisma migrate deploy
 EXPOSE 8000
-CMD ["uvicorn", "evalassist.main:app", "--workers", "4", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "evalassist.main:app", "--workers", "1", "--host", "0.0.0.0", "--port", "8000"]
