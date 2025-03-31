@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 
-const dotenv = require('dotenv');
-const path = require('path');
+const dotenv = require('dotenv')
+const path = require('path')
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
 const nextConfig = {
   reactStrictMode: false,
@@ -14,6 +14,10 @@ const nextConfig = {
   poweredByHeader: false,
   output: 'standalone',
   trailingSlash: true,
+  env: {
+    NEXT_PUBLIC_BACKEND_API_HOST: process.env.NEXT_PUBLIC_BACKEND_API_HOST,
+    NEXT_PUBLIC_USE_AUTH: process.env.NEXT_PUBLIC_USE_AUTH,
+  },
   async headers() {
     return [
       {
