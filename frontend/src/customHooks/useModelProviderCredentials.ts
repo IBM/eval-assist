@@ -37,6 +37,7 @@ export const useModelProviderCredentials = () => {
       delete parsedCredentials['bam']
     }
 
+    // add azure key if the storage was already initialized
     if (!parsedCredentials.azure) {
       parsedCredentials['azure'] = { api_key: '' }
     }
@@ -69,15 +70,27 @@ export const useModelProviderCredentials = () => {
       delete aux['url']
       parsedCredentials['watsonx'] = aux
     }
+
+    // openai was renamed to open-ai
+    if (!!!parsedCredentials['open-ai']) {
+      // @ts-ignore
+      if (parsedCredentials['openai']) {
+        // @ts-ignore
+        parsedCredentials['open-ai'] = { ...parsedCredentials['openai'] }
+        // @ts-ignore
+        delete parsedCredentials['openai']
+      }
+    }
+
     if (getJSONStringWithSortedKeys(modelProviderCredentials) !== getJSONStringWithSortedKeys(parsedCredentials)) {
       setModelProviderCredentials(parsedCredentials)
     }
     setInitializedModelProviderCredentials(true)
   }, [defaultCredentialStorage, modelProviderCredentials, setModelProviderCredentials])
   const getAreRelevantCredentialsProvided = useCallback(
-    (provider: ModelProviderType): boolean => {
-      return Object.values(modelProviderCredentials[provider]).every((key) => key !== '')
-    },
+    (provider: ModelProviderType): boolean =>
+      modelProviderCredentials[provider] &&
+      Object.values(modelProviderCredentials[provider]).every((key) => key !== ''),
     [modelProviderCredentials],
   )
 
