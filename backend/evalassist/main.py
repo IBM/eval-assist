@@ -30,13 +30,6 @@ from unitxt.llm_as_judge import (
     EvaluatorTypeEnum,
 )
 
-from backend.evalassist.utils import (
-    get_custom_models,
-    get_evaluator_metadata_wrapper,
-    get_model_name_from_evaluator,
-    init_evaluator_name,
-)
-
 from .api.common import (
     CriteriaAPI,
     CriteriaOptionAPI,
@@ -67,6 +60,12 @@ from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNot
 
 # Synthetic
 from .synthetic_example_generation.generate import Generator
+from .utils import (
+    get_custom_models,
+    get_evaluator_metadata_wrapper,
+    get_model_name_from_evaluator,
+    init_evaluator_name,
+)
 
 logger = logging.getLogger(__name__)
 logger = logger.setLevel(logging.DEBUG)

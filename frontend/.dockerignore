@@ -34,19 +34,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-.env
-Secrets.yaml
-.vscode
-
-certificates
-
-.python-version
-
-.litellm_cache/
-
-.idea/*
-
-inference_engine_cache
-
-**/dev.db
