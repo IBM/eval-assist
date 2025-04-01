@@ -164,8 +164,8 @@ def get_inference_engine(
     model_name: str,
     custom_params: dict = None,
 ):
-    # if provider == ExtendedModelProviderEnum.LOCAL_HF:
-    #     return get_hf_inference_engine(model_name, custom_params)
+    if provider == ExtendedModelProviderEnum.LOCAL_HF:
+        return get_hf_inference_engine(model_name, custom_params)
     if provider == ModelProviderEnum.WATSONX and "granite-guardian" in model_name:
         return get_watsonx_inference_engine(
             credentials, provider, model_name, custom_params
