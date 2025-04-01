@@ -280,7 +280,7 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "true"
     kubernetes.io/ingress.class: f5
     virtual-server.f5.com/balance: round-robin
-    virtual-server.f5.com/ip: 9.12.246.102
+    virtual-server.f5.com/ip: 9.12.246.105
     virtual-server.f5.com/partition: RIS3-INT-OCP-DAL12
     virtual-server.f5.com/clientssl: '[ { "bigIpProfile": "/Common/BlueMix" } ]'
   name: ${K8S_NAME}
