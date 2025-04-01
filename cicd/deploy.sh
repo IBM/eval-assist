@@ -130,7 +130,7 @@ fi
 echo "${KUBERNETES_SERVICE_ACCOUNT_NAME} serviceAccount:"
 kubectl get serviceaccount ${KUBERNETES_SERVICE_ACCOUNT_NAME} --namespace ${CLUSTER_NAMESPACE} -o yaml
 echo -e "Namespace ${CLUSTER_NAMESPACE} authorizing with private image registry using patched ${KUBERNETES_SERVICE_ACCOUNT_NAME} serviceAccount"
-K8S_NAME="eval-assist"
+K8S_NAME=${CLUSTER_NAMESPACE}
 BACKEND_K8S_NAME="${K8S_NAME}-backend"
 FRONTEND_K8S_NAME="${K8S_NAME}-frontend"
 
@@ -161,7 +161,7 @@ spec:
               cpu: 4
               memory: 2Gi
             requests:
-              cpu: 1
+              cpu: 2
               memory: 2Gi
           ports:
             - containerPort: 3000
@@ -169,37 +169,37 @@ spec:
             - name: NEXTAUTH_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: llm-judge-secrets
+                  name: ${K8S_NAME}-secrets
                   key: NEXTAUTH_SECRET
             - name: NEXTAUTH_URL
               valueFrom:
                 secretKeyRef:
-                  name: llm-judge-secrets
+                  name: ${K8S_NAME}-secrets
                   key: NEXTAUTH_URL
             - name: AUTH_PROVIDER_ID
               valueFrom:
                 secretKeyRef:
-                  name: llm-judge-secrets
+                  name: ${K8S_NAME}-secrets
                   key: AUTH_PROVIDER_ID
             - name: AUTH_PROVIDER_NAME
               valueFrom:
                 secretKeyRef:
-                  name: llm-judge-secrets
+                  name: ${K8S_NAME}-secrets
                   key: AUTH_PROVIDER_NAME
             - name: AUTH_WELL_KNOWN
               valueFrom:
                 secretKeyRef:
-                  name: llm-judge-secrets
+                  name: ${K8S_NAME}-secrets
                   key: AUTH_WELL_KNOWN
             - name: AUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: llm-judge-secrets
+                  name: ${K8S_NAME}-secrets
                   key: AUTH_CLIENT_ID
             - name: AUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: llm-judge-secrets
+                  name: ${K8S_NAME}-secrets
                   key: AUTH_CLIENT_SECRET
       imagePullSecrets:
         - name: all-icr-io
@@ -228,18 +228,18 @@ spec:
             - containerPort: 8000
           resources:
             limits:
-              cpu: 8
-              memory: 2Gi
+              cpu: 4
+              memory: 8Gi
             requests:
               cpu: 1
-              memory: 2Gi
+              memory: 4Gi
           volumeMounts:
-            - name: llm-judge-dev-volume
+            - name: eval-assist-volume
               mountPath: /app/prisma/db
       volumes:
-        - name: llm-judge-dev-volume
+        - name: eval-assist-volume
           persistentVolumeClaim:
-            claimName: llm-judge-dev-volume
+            claimName: eval-assist-volume
 ---
 apiVersion: v1
 kind: Service
@@ -287,7 +287,7 @@ metadata:
   namespace: ${CLUSTER_NAMESPACE}
 spec:
   rules:
-    - host: llm-judge-dev-api.bx.cloud9.ibm.com
+    - host: ${CLUSTER_NAMESPACE}-api.bx.cloud9.ibm.com
       http:
         paths:
           - backend:
@@ -297,7 +297,7 @@ spec:
                   number: 80
             path: /
             pathType: ImplementationSpecific
-    - host: llm-judge-dev.bx.cloud9.ibm.com
+    - host: ${CLUSTER_NAMESPACE}.bx.cloud9.ibm.com
       http:
         paths:
         - backend:
