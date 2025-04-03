@@ -3,7 +3,7 @@ import logging.handlers
 import os
 import traceback
 import uuid
-from typing import Union, cast
+from typing import Optional, Union, cast
 
 import nbformat as nbf
 import nest_asyncio
@@ -30,6 +30,7 @@ from unitxt.llm_as_judge import (
     EvaluatorTypeEnum,
 )
 
+from . import root_pkg_logger
 from .api.common import (
     CriteriaAPI,
     CriteriaOptionAPI,
@@ -67,8 +68,6 @@ from .utils import (
     init_evaluator_name,
 )
 
-logger = logging.getLogger(__name__)
-logger = logger.setLevel(logging.DEBUG)
 nest_asyncio.apply()
 
 app = FastAPI()
@@ -313,13 +312,14 @@ def delete_test_case(request_body: DeleteUseCaseBody):
 
 class CreateUserPostBody(BaseModel):
     email: str
-    name: str | None = None
+    name: Optional[str] = None
 
 
 @router.post("/user/")
 def create_user_if_not_exist(user: CreateUserPostBody):
     try:
         db_user = db.appuser.find_unique(where={"email": user.email})
+        root_pkg_logger.debug(f"Found user:\n{db_user}")
         if db_user is None:
             db_user = db.appuser.create(
                 data={
@@ -327,9 +327,10 @@ def create_user_if_not_exist(user: CreateUserPostBody):
                     "name": user.name if user.name is not None else "",
                 }
             )
+            root_pkg_logger.debug(f"User not found. Created user:\n{db_user}")
         return db_user
     except PrismaError as pe:
-        print(f"Prisma error raised: {pe}")
+        root_pkg_logger.error(f"Prisma error raised: {pe}")
         return None
 
 
@@ -343,14 +344,13 @@ def get_benchmarks():
 
 def cleanup_file(filepath: str):
     """Safely remove a file after it has been served."""
-    logger = logging.getLogger(__name__)
     try:
         os.remove(filepath)
-        logger.debug(f"Deleted file: {filepath}")
+        root_pkg_logger.debug(f"Deleted file: {filepath}")
     except FileNotFoundError:
-        logger.debug(f"File not found for deletion: {filepath}")
+        root_pkg_logger.debug(f"File not found for deletion: {filepath}")
     except Exception as e:
-        logger.debug(f"Error deleting file: {filepath}, {e}")
+        root_pkg_logger.debug(f"Error deleting file: {filepath}, {e}")
 
 
 @router.post("/download-notebook/")

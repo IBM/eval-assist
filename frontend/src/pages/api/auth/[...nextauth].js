@@ -20,6 +20,13 @@ export default NextAuth({
       clientId: process.env.APPID_CLIENT_ID,
       clientSecret: process.env.APPID_CLIENT_SECRET,
       issuer: process.env.APPID_ISSUER,
+      profile(profile) {
+        return {
+          id: profile.emailAddress ?? profile.email,
+          name: profile.name,
+          email: profile.emailAddress ?? profile.email,
+        }
+      },
     }),
   ],
 })

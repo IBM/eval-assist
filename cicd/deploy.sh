@@ -166,6 +166,21 @@ spec:
           ports:
             - containerPort: 3000
           env:
+            - name: APPID_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ${K8S_NAME}-secret
+                  key: APPID_CLIENT_ID
+            - name: APPID_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ${K8S_NAME}-secret
+                  key: APPID_CLIENT_SECRET
+            - name: APPID_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: ${K8S_NAME}-secret
+                  key: APPID_ISSUER
             - name: NEXTAUTH_SECRET
               valueFrom:
                 secretKeyRef:
@@ -176,31 +191,6 @@ spec:
                 secretKeyRef:
                   name: ${K8S_NAME}-secret
                   key: NEXTAUTH_URL
-            - name: AUTH_PROVIDER_ID
-              valueFrom:
-                secretKeyRef:
-                  name: ${K8S_NAME}-secret
-                  key: AUTH_PROVIDER_ID
-            - name: AUTH_PROVIDER_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: ${K8S_NAME}-secret
-                  key: AUTH_PROVIDER_NAME
-            - name: AUTH_WELL_KNOWN
-              valueFrom:
-                secretKeyRef:
-                  name: ${K8S_NAME}-secret
-                  key: AUTH_WELL_KNOWN
-            - name: AUTH_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: ${K8S_NAME}-secret
-                  key: AUTH_CLIENT_ID
-            - name: AUTH_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: ${K8S_NAME}-secret
-                  key: AUTH_CLIENT_SECRET
       imagePullSecrets:
         - name: all-icr-io
 ---
