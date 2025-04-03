@@ -1,42 +1,25 @@
 import NextAuth from 'next-auth'
+import Auth0 from 'next-auth/providers/auth0'
 
-export const authOptions = {
+// import GoogleProvider from 'next-auth/providers/google'
+
+export default NextAuth({
   providers: [
-    {
-      id: process.env.AUTH_PROVIDER_ID,
-      name: process.env.AUTH_PROVIDER_NAME,
-      type: 'oauth',
-      clientId: process.env.AUTH_CLIENT_ID,
-      clientSecret: process.env.AUTH_CLIENT_SECRET,
-      wellKnown: process.env.AUTH_WELL_KNOWN,
-      idToken: true,
-      // checks: ['none'], // use this to prevent prepriam from throwing weird errors
-      profile(profile) {
-        // console.log('provider profile: ', profile)
-        return {
-          id: profile.uniqueSecurityName,
-          name: profile.name,
-          email: profile.emailAddress ?? profile.email,
-        }
-      },
-    },
+    // GoogleProvider({
+    //   clientId: process.env.GOOGLE_CLIENT_ID,
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    //   callbacks: {
+    //     async redirect({ url, baseUrl }) {
+    //       return baseUrl
+    //     },
+    //   },
+    // }),
+    Auth0({
+      id: 'IBMid',
+      name: 'IBMid',
+      clientId: process.env.APPID_CLIENT_ID,
+      clientSecret: process.env.APPID_CLIENT_SECRET,
+      issuer: process.env.APPID_ISSUER,
+    }),
   ],
-  callbacks: {
-    async jwt({ token, profile }) {
-      if (profile) {
-        token.name = profile.name
-        token.email = profile.emailAddress ?? profile.email
-      }
-      return token
-    },
-
-    async session({ session, token }) {
-      // session.user.roles = token.roles;
-      session.user.name = token.name
-      session.user.email = token.email
-      return session
-    },
-  },
-}
-
-export default NextAuth(authOptions)
+})

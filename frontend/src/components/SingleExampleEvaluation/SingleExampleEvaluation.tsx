@@ -31,7 +31,6 @@ import {
   ModelProviderType,
   PairwiseInstance,
   PairwiseInstanceResult,
-  PerResponsePairwiseResult,
   UseCase,
 } from '../../types'
 import { APIKeyPopover } from './APIKeyPopover'
