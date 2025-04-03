@@ -1,7 +1,6 @@
 import { PLATFORM_NAME } from 'src/constants'
 
 import { signOut } from 'next-auth/react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import {
@@ -21,7 +20,7 @@ import classes from './AppHeader.module.scss'
 
 export const AppHeader = () => {
   const title = `IBM ${PLATFORM_NAME}`
-  const { authenticationEnabled } = useAuthentication()
+  const { authenticationEnabled, isAuthenticated } = useAuthentication()
   const router = useRouter()
 
   return (
@@ -56,7 +55,7 @@ export const AppHeader = () => {
           </HeaderMenuItem>
         </HeaderNavigation>
 
-        {authenticationEnabled && (
+        {authenticationEnabled && isAuthenticated && (
           <HeaderGlobalAction aria-label="Logout" onClick={signOut}>
             <Logout size={20} />
           </HeaderGlobalAction>
