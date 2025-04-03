@@ -7,7 +7,7 @@ import { AiLabel } from '@carbon/react/icons'
 
 import { EvaluationType, Evaluator } from '@types'
 
-import { PipelineSelect } from '../PipelineSelect'
+import { PipelineSelect } from '../EvaluatorSelect'
 import { usePipelineTypesContext } from '../Providers/PipelineTypesProvider'
 
 interface Props {
