@@ -90,7 +90,9 @@ def get_cross_inference_engine_params(
         #     "RITS_API_KEY": credentials["api_key"]
         # }
     elif provider == ModelProviderEnum.WATSONX:
-        provider_specific_args["max_requests_per_second"] = 8
+        provider_specific_args[ModelProviderEnum.WATSONX] = {
+            "max_requests_per_second": 8
+        }
 
     if provider == ModelProviderEnum.AZURE_OPENAI:
         inference_engine_params["credentials"]["api_base"] = (
@@ -100,7 +102,7 @@ def get_cross_inference_engine_params(
     inference_engine_params["model"] = model_name
     inference_engine_params["provider"] = provider.value
     inference_engine_params["credentials"] = credentials
-    return inference_engine_params
+    return inference_engine_params, provider_specific_args
 
 
 def get_cross_inference_engine(
@@ -109,12 +111,14 @@ def get_cross_inference_engine(
     model_name: EvaluatorNameEnum,
     custom_params: dict = None,
 ):
-    inference_engine_params = get_cross_inference_engine_params(
+    inference_engine_params, provider_specific_args = get_cross_inference_engine_params(
         credentials, provider, model_name
     )
     if custom_params is not None:
         inference_engine_params.update(custom_params)
-    return CrossProviderInferenceEngine(**inference_engine_params)
+    return CrossProviderInferenceEngine(
+        **inference_engine_params, provider_specific_args=provider_specific_args
+    )
 
 
 def get_watsonx_inference_engine(
