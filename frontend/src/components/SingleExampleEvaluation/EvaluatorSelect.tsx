@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import { modelProviderBeautifiedName } from 'src/constants'
-import { getJSONStringWithSortedKeys, returnByPipelineType } from 'src/utils'
+import { getJSONStringWithSortedKeys } from 'src/utils'
 
 import { CSSProperties, useMemo } from 'react'
 
@@ -10,7 +10,7 @@ import { Warning } from '@carbon/react/icons'
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 
 import { EvaluationType, Evaluator, ModelProviderType } from '../../types'
-import classes from './PipelineSelect.module.scss'
+import classes from './EvaluatorSelect.module.scss'
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
 
