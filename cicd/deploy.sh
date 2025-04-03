@@ -169,37 +169,37 @@ spec:
             - name: NEXTAUTH_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secrets
+                  name: ${K8S_NAME}-secret
                   key: NEXTAUTH_SECRET
             - name: NEXTAUTH_URL
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secrets
+                  name: ${K8S_NAME}-secret
                   key: NEXTAUTH_URL
             - name: AUTH_PROVIDER_ID
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secrets
+                  name: ${K8S_NAME}-secret
                   key: AUTH_PROVIDER_ID
             - name: AUTH_PROVIDER_NAME
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secrets
+                  name: ${K8S_NAME}-secret
                   key: AUTH_PROVIDER_NAME
             - name: AUTH_WELL_KNOWN
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secrets
+                  name: ${K8S_NAME}-secret
                   key: AUTH_WELL_KNOWN
             - name: AUTH_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secrets
+                  name: ${K8S_NAME}-secret
                   key: AUTH_CLIENT_ID
             - name: AUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secrets
+                  name: ${K8S_NAME}-secret
                   key: AUTH_CLIENT_SECRET
       imagePullSecrets:
         - name: all-icr-io
