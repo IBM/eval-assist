@@ -1,3 +1,4 @@
+import json
 import logging
 import logging.handlers
 import os
@@ -229,11 +230,36 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
     except AssertionError as e:
         traceback.print_exc()
         raise HTTPException(status_code=400, detail=f"{e}")
+    except RuntimeError as e:
+        # Check if the original exception is available in __cause__
+        if e.__cause__:
+            original_exception = e.__cause__
+            error_message = original_exception.args[0]
+            # Parse the error message (assuming it's a JSON string)
+            try:
+                error_details = json.loads(
+                    error_message.split(" - ", 1)[1]
+                )  # Remove the initial 'watsonxException'
+                user_friendly_message = error_details.get(
+                    "errorMessage", "An unknown error occurred."
+                )
+                error_message = user_friendly_message
+            except Exception as parse_error:
+                # In case JSON parsing fails
+                print(f"Error parsing the error message: {parse_error}")
+                print("Original error message: ", error_message)
+                try:
+                    error_message = error_message.split(" - ", 1)[1]
+                except Exception:
+                    error_message = "Unknown error"
+            raise HTTPException(400, f"Error running unitxt: {error_message}")
+        else:
+            raise HTTPException(400, "Runtime error on unitxt")
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(
             status_code=400,
-            detail=e.error_msg if hasattr(e, "error_msg") else "Unknown error.",
+            detail=getattr(e, "message", getattr(e, "error_msg", "Unknown error.")),
         )
 
 

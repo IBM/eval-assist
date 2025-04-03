@@ -286,7 +286,7 @@ export const SingleExampleEvaluation = () => {
           kind: 'error',
           title: 'Evaluation failed',
           subtitle: errorMessage,
-          timeout: 5000,
+          // timeout: 5000,
         })
 
         return
