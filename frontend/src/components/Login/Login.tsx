@@ -11,7 +11,8 @@ export const LoginView = () => {
         Log in to <br /> EvalAssist
       </h1>
       <div className={styles.authContainer}>
-        <Button onClick={() => signIn('IBMid')}>Log in</Button>
+        {/* <Button onClick={() => signIn('IBMid')}>Log in</Button> */}
+        <Button onClick={() => signIn('IBMid')}>Log in with IBMid</Button>
       </div>
     </div>
   )
