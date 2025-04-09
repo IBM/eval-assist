@@ -1,6 +1,5 @@
 import json
 import logging
-import logging.handlers
 import os
 import traceback
 import uuid
@@ -31,6 +30,8 @@ from unitxt.llm_as_judge import (
     EvaluatorTypeEnum,
 )
 
+from backend.evalassist.api.types import DomainEnum, PersonaEnum
+
 from . import root_pkg_logger
 from .api.common import (
     CriteriaAPI,
@@ -48,7 +49,7 @@ from .api.common import (
 # API type definitions
 from .api.pipelines import EvaluatorMetadataAPI, EvaluatorsResponseModel
 from .benchmark.benchmark import get_all_benchmarks
-from .const import EXTENDED_EVALUATORS_METADATA
+from .const import EXTENDED_EVALUATORS_METADATA, domain_persona_map
 from .db_client import db
 from .evaluators.unitxt import (
     DirectAssessmentEvaluator,
@@ -429,6 +430,13 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
     )
 
 
+@router.get(
+    "/domains-and-personas/", response_model=dict[DomainEnum, list[PersonaEnum]]
+)
+def get_domain_persona_map():
+    return domain_persona_map
+
+
 @router.post("/synthetic-examples/", response_model=SyntheticExampleGenerationResponse)
 def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     # populate config
@@ -463,12 +471,6 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
         ) from e
 
     return SyntheticExampleGenerationResponse([response])
-
-    # mocked_response = {c: "mocked" for c in params.context_variables_names}
-    # mocked_response[params.response_variable_name] = "mocked"
-    # mocked_response = {
-    #   "response": "mocked"
-    # }
 
 
 @app.exception_handler(RequestValidationError)

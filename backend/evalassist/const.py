@@ -10,6 +10,8 @@ from unitxt.llm_as_judge import (
     ModelProviderEnum,
 )
 
+from backend.evalassist.api.types import DomainEnum, PersonaEnum
+
 
 class ExtendedEvaluatorNameEnum(Enum):
     """This enums adds models that are not present in the original unitxt EvaluatorNameEnum"""
@@ -76,3 +78,48 @@ EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = [
         [ExtendedModelProviderEnum.LOCAL_HF],
     ),
 ]
+
+domain_persona_map = {
+    DomainEnum.NEWS_MEDIA_DOMAIN: [
+        PersonaEnum.EXPERIENCED_JOURNALIST,
+        PersonaEnum.NOVICE_JOURNALIST,
+        PersonaEnum.OPINION_COLUMNIST,
+        PersonaEnum.NEWS_ANCHOR,
+        PersonaEnum.EDITOR,
+    ],
+    DomainEnum.HEALTHCARE: [
+        PersonaEnum.MEDICAL_RESEARCHER,
+        PersonaEnum.GENERAL_PRACTITIONER,
+        PersonaEnum.PUBLIC_HEALTH_OFFICIAL,
+        PersonaEnum.HEALTH_BLOGGER,
+        PersonaEnum.MEDICAL_STUDENT,
+    ],
+    DomainEnum.ENTERTAINMENT_AND_POP_CULTURE: [
+        PersonaEnum.FILM_CRITIC,
+        PersonaEnum.CASUAL_SOCIAL_MEDIA_USER,
+        PersonaEnum.TABLOID_REPORTER,
+        PersonaEnum.HARDCORE_FAN_THEORIST,
+        PersonaEnum.INFLUENCER_YOUTUBE_REVIEWER,
+    ],
+    DomainEnum.SOCIAL_MEDIA: [
+        PersonaEnum.INFLUENCER_POSITIVE_BRAND,
+        PersonaEnum.INTERNET_TROLL,
+        PersonaEnum.POLITICAL_ACTIVIST,
+        PersonaEnum.BRAND_VOICE,
+        PersonaEnum.MEMER,
+    ],
+    DomainEnum.CUSTOMER_SUPPORT_AND_BUSSINESS: [
+        PersonaEnum.CUSTOMER_SERVICE_AGENT,
+        PersonaEnum.ANGRY_CUSTOMER,
+        PersonaEnum.CORPORATE_CEO,
+        PersonaEnum.CONSUMER_ADVOCATE,
+        PersonaEnum.MAKETING_SPECIALIST,
+    ],
+    DomainEnum.GAMING_AND_ENTERTAINMENT: [
+        PersonaEnum.FLAMER,
+        PersonaEnum.HARDCORE_GAMER,
+        PersonaEnum.ESPORT_COMENTATOR,
+        PersonaEnum.MOVIE_CRITIC,
+        PersonaEnum.FAN,
+    ],
+}

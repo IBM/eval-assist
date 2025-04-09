@@ -326,3 +326,56 @@ export type ModelProviderCredentials = {
   }
   local_hf: {}
 }
+
+export enum DomainEnum {
+  NewsMedia = 'News Media',
+  Healthcare = 'Healthcare',
+  EntertainmentAndPopCulture = 'Entertainment And Pop Culture',
+  SocialMedia = 'Social Media',
+  CustomerSupportAndBusiness = 'Customer Support And Business',
+  GamingAndEntertainment = 'Gaming And Entertainment',
+}
+
+export enum PersonaEnum {
+  ExperiencedJournalist = 'Experienced journalist',
+  NoviceJournalist = 'Novice journalist',
+  OpinionColumnist = 'Opinion columnist',
+  NewsAnchor = 'News anchor',
+  Editor = 'Editor',
+  MedicalResearcher = 'Medical researcher',
+  GeneralPractitioner = 'General practitioner',
+  PublicHealthOfficial = 'Public health official',
+  HealthBlogger = 'Health blogger',
+  MedicalStudent = 'Medical student',
+  FilmCritic = 'Film critic',
+  CasualSocialMediaUser = 'Casual social media user',
+  TabloidReporter = 'Tabloid reporter',
+  HardcoreFanTheorist = 'Hardcore fan/Theorist',
+  InfluencerYouTubeReviewer = 'Influencer/Youtube reviewer',
+  InfluencerPositiveBrand = 'Influencer (Positive brand)',
+  InternetTroll = 'Internet troll',
+  PoliticalActivistPolarizing = 'Political activist (polarizing)',
+  BrandVoiceCorporateSocialMediaAccount = 'Brand voice (Corporate social media account)',
+  Memer = 'Memer (Meme creator)',
+  CustomerServiceAgent = 'Customer service agent',
+  AngryCustomer = 'Angry customer',
+  CorporateCEO = 'Corporate CEO',
+  ConsumerAdvocate = 'Consumer advocate',
+  MarketingSpecialist = 'Marketing specialist',
+  FlamerAggressivePlayer = 'Flamer (Aggressive player)',
+  HardcoreGamer = 'Hardcore gamer',
+  EsportCommentator = 'Esport commentator',
+  MovieCritic = 'Movie critic',
+  Fan = 'Fan (of a TV show, movie, or game)',
+}
+
+export enum TaskEnum {
+  Summarization = 'Summarization',
+  TextGeneration = 'Text Generation',
+}
+
+export enum GenerationLengthEnum {
+  Short = 'Short',
+  Medium = 'Medium',
+  Long = 'Long',
+}
