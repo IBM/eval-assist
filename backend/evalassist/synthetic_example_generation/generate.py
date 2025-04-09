@@ -39,7 +39,10 @@ class Generator:
             # response schema
             response_variable_name = self.generation_config["response_variable_name"]
             response_schemas = [
-                ResponseSchema(name=response_variable_name, description=f"the requested {response_variable_name}"),
+                ResponseSchema(
+                    name=response_variable_name,
+                    description=f"the requested {response_variable_name}",
+                ),
             ]
             self.output_parser = StructuredOutputParser.from_response_schemas(
                 response_schemas
@@ -87,6 +90,7 @@ class Generator:
                 self.model_config["llm_provider_credentials"],
                 self.model_config["provider"],
                 model_name,
+                custom_params={"use_cache": False},
             )
 
     def generate(self):

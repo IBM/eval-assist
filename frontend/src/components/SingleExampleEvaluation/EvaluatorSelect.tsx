@@ -88,14 +88,14 @@ export const PipelineSelect = ({
   const { getAreRelevantCredentialsProvided } = useModelProviderCredentials()
 
   return (
-    <div style={{ marginBottom: '1.5rem' }} className={className}>
-      <span className={classes['toggle-span']}>{title}</span>
+    <div className={className}>
+      {/* <span className={classes['toggle-span']}>{title}</span> */}
       {loadingEvaluators || directEvaluators === null || pairwiseEvaluators === null ? (
         <SelectSkeleton />
       ) : (
         <Select
           id="pipeline-select"
-          labelText=""
+          labelText={title}
           helperText={
             <div className={classes.helperContent}>
               {selectedEvaluator !== null ? (

@@ -1,8 +1,10 @@
 from typing import Optional
 
 from fastapi import HTTPException
-from pydantic import BaseModel, RootModel, validator
+from pydantic import BaseModel, RootModel, field_validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
+
+from backend.evalassist.api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 
@@ -11,7 +13,7 @@ class CriteriaModel(BaseModel):
     name: str
     description: str
 
-    @validator("description", pre=True, always=True)
+    @field_validator("description")
     def validate_criteria(cls, description):
         if len(description.strip()) == 0:
             raise HTTPException(
@@ -46,7 +48,7 @@ class EvaluationRequestModel(BaseModel):
     #             raise HTTPException(status_code=400, detail="Context variable names can't be empty.")
     #     return context_variables
 
-    @validator("evaluator_name", pre=True, always=True)
+    @field_validator("evaluator_name")
     def validate_pipeline(cls, evaluator_name):
         if not evaluator_name:
             raise HTTPException(
@@ -130,6 +132,10 @@ class SyntheticExampleGenerationRequest(BaseModel):
     criteria: CriteriaWithOptionsAPI | PairwiseCriteriaModel
     response_variable_name: str
     context_variables_names: list[str]
+    generation_length: Optional[GenerationLengthEnum]
+    domain: Optional[DomainEnum]
+    persona: Optional[PersonaEnum]
+    per_criteria_option_count: dict[str, int]
 
 
 class SyntheticExampleGenerationResponse(RootModel):
@@ -150,7 +156,7 @@ class RubricOptionModel(BaseModel):
 class RubricCriteriaModel(CriteriaModel):
     options: list[RubricOptionModel]
 
-    @validator("options", pre=True, always=True)
+    @field_validator("options")
     def validate_options_length(cls, options):
         if len(options) < 2:
             raise HTTPException(

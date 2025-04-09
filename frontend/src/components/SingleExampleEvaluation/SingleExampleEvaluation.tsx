@@ -10,11 +10,12 @@ import { useToastContext } from '@components/SingleExampleEvaluation/Providers/T
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { useGenerateSystheticExamples } from '@customHooks/useGenerateSystheticExamples'
+import { useGenerateSyntheticExamples } from '@customHooks/useGenerateSyntheticExamples'
 import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFromUseCase'
 import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
+import { useSyntheticGenerationState } from '@customHooks/useSyntheticGenerationState'
 import { useUnitxtCodeGeneration } from '@customHooks/useUnitxtNotebookGeneration'
 import { StoredUseCase } from '@prisma/client'
 
@@ -144,6 +145,22 @@ export const SingleExampleEvaluation = () => {
   const temporaryIdRef = useRef(uuid())
   const { getCriteria } = useCriteriasContext()
 
+  const {
+    selectedGenerationLength,
+    setSelectedGenerationLength,
+    selectedDomain,
+    setSelectedDomain,
+    selectedPersona,
+    setSelectedPersona,
+    domainsOptions,
+    personasOptions,
+    generationLengthOptions,
+    loadingDomainPersonaMapping,
+    loadDomainPersonaMapping,
+    quantityPerCriteriaOption,
+    setQuantityPerCriteriaOption,
+  } = useSyntheticGenerationState({ criteria: currentTestCase?.criteria! })
+
   const contextVariableNames = useMemo(
     () => currentTestCase?.instances[0]?.contextVariables.map((c) => c.name) || [],
     [currentTestCase?.instances],
@@ -162,7 +179,7 @@ export const SingleExampleEvaluation = () => {
     })
 
   // TODO: refactor so that this component receives a test case that cant be null
-  const { loadingSyntheticExamples, generateTestData } = useGenerateSystheticExamples({
+  const { loadingSyntheticExamples, generateTestData } = useGenerateSyntheticExamples({
     evaluatorType: currentTestCase?.type,
     criteria: currentTestCase?.criteria,
     responseVariableName: currentTestCase?.responseVariableName,
@@ -170,6 +187,10 @@ export const SingleExampleEvaluation = () => {
     instances: currentTestCase?.instances!,
     setInstances: setInstances,
     type: currentTestCase?.type!,
+    selectedGenerationLength,
+    selectedDomain,
+    selectedPersona,
+    quantityPerCriteriaOption,
   })
 
   const responses = useMemo(
@@ -747,20 +768,36 @@ export const SingleExampleEvaluation = () => {
             currentUseCase={currentTestCase}
             modelProviderCredentials={modelProviderCredentials}
           />
-          <SyntheticGenerationModal
-            open={sysntheticGenerationModalOpen}
-            setOpen={setSysntheticGenerationModalOpen}
-            modelForSyntheticGeneration={modelForSyntheticGeneration}
-            setModelForSyntheticGeneration={setModelForSyntheticGeneration}
-            type={currentTestCase.type}
-            generateTestData={() =>
-              generateTestData({
-                credentials: modelProviderCredentials[modelForSyntheticGeneration?.provider as ModelProviderType],
-                evaluatorName: modelForSyntheticGeneration?.name!,
-                provider: modelForSyntheticGeneration?.provider!,
-              })
-            }
-          />
+          {sysntheticGenerationModalOpen && (
+            <SyntheticGenerationModal
+              open={sysntheticGenerationModalOpen}
+              setOpen={setSysntheticGenerationModalOpen}
+              modelForSyntheticGeneration={modelForSyntheticGeneration}
+              setModelForSyntheticGeneration={setModelForSyntheticGeneration}
+              type={currentTestCase.type}
+              generateTestData={() =>
+                generateTestData({
+                  credentials: modelProviderCredentials[modelForSyntheticGeneration?.provider as ModelProviderType],
+                  evaluatorName: modelForSyntheticGeneration?.name!,
+                  provider: modelForSyntheticGeneration?.provider!,
+                })
+              }
+              selectedGenerationLength={selectedGenerationLength}
+              setSelectedGenerationLength={setSelectedGenerationLength}
+              selectedDomain={selectedDomain}
+              setSelectedDomain={setSelectedDomain}
+              selectedPersona={selectedPersona}
+              setSelectedPersona={setSelectedPersona}
+              domainsOptions={domainsOptions}
+              personasOptions={personasOptions}
+              generationLengthOptions={generationLengthOptions}
+              loadingDomainPersonaMapping={loadingDomainPersonaMapping}
+              loadDomainPersonaMapping={loadDomainPersonaMapping}
+              criteria={currentTestCase.criteria}
+              quantityPerCriteriaOption={quantityPerCriteriaOption}
+              setQuantityPerCriteriaOption={setQuantityPerCriteriaOption}
+            />
+          )}
           <ChooseCodeGenerationType
             open={sampleCodeTypeModalOpen}
             setOpen={setSampleCodeTypeModalOpen}

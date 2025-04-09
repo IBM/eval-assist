@@ -7,10 +7,13 @@ import {
   Criteria,
   CriteriaWithOptions,
   DirectInstance,
+  DomainEnum,
   EvaluationType,
+  GenerationLengthEnum,
   Instance,
   ModelProviderType,
   PairwiseInstance,
+  PersonaEnum,
 } from '@types'
 
 import { useFetchUtils } from './useFetchUtils'
@@ -23,14 +26,18 @@ interface Props {
   instances: Instance[]
   setInstances: (instances: Instance[]) => void
   type: EvaluationType
+  selectedGenerationLength: GenerationLengthEnum | null
+  selectedDomain: DomainEnum | null
+  selectedPersona: PersonaEnum | null
+  quantityPerCriteriaOption: { [k: string]: number }
 }
 
-export const useGenerateSystheticExamples = (props: Props) => {
+export const useGenerateSyntheticExamples = (props: Props) => {
   const [loadingSyntheticExamples, setLoadingSyntheticExamples] = useState(false)
   const { post } = useFetchUtils()
   const { addToast, removeToast } = useToastContext()
 
-  const fetchSystheticExamples = useCallback(
+  const fetchSyntheticExamples = useCallback(
     async ({
       credentials,
       evaluatorName,
@@ -50,6 +57,10 @@ export const useGenerateSystheticExamples = (props: Props) => {
         criteria: props.criteria,
         response_variable_name: props.responseVariableName,
         context_variables_names: props.contextVariableNames,
+        generation_length: props.selectedGenerationLength,
+        domain: props.selectedDomain,
+        persona: props.selectedPersona,
+        per_criteria_option_count: props.quantityPerCriteriaOption,
       }
 
       const response = await post('synthetic-examples/', body)
@@ -80,7 +91,16 @@ export const useGenerateSystheticExamples = (props: Props) => {
 
       return { syntheticExamples, failed: false, errorMessage: '' }
     },
-    [post, props.contextVariableNames, props.criteria, props.evaluatorType, props.responseVariableName],
+    [
+      post,
+      props.contextVariableNames,
+      props.criteria,
+      props.evaluatorType,
+      props.responseVariableName,
+      props.selectedDomain,
+      props.selectedGenerationLength,
+      props.selectedPersona,
+    ],
   )
 
   const generateTestData = useCallback(
@@ -97,7 +117,7 @@ export const useGenerateSystheticExamples = (props: Props) => {
         kind: 'info',
         title: 'Generating synthetic examples...',
       })
-      const result = await fetchSystheticExamples({ credentials, evaluatorName, provider })
+      const result = await fetchSyntheticExamples({ credentials, evaluatorName, provider })
       removeToast(generationInProgressToastId)
 
       if (result.failed) {
@@ -140,8 +160,8 @@ export const useGenerateSystheticExamples = (props: Props) => {
         timeout: 5000,
       })
     },
-    [addToast, fetchSystheticExamples, props, removeToast],
+    [addToast, fetchSyntheticExamples, props, removeToast],
   )
 
-  return { fetchSystheticExamples, loadingSyntheticExamples, generateTestData }
+  return { fetchSystheticExamples: fetchSyntheticExamples, loadingSyntheticExamples, generateTestData }
 }
