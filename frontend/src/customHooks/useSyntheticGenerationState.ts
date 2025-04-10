@@ -5,7 +5,7 @@ import { Criteria, CriteriaWithOptions, DomainEnum, GenerationLengthEnum, Person
 import { useFetchUtils } from './useFetchUtils'
 
 interface Props {
-  criteria: Criteria
+  criteria: Criteria | null
 }
 
 export const useSyntheticGenerationState = ({ criteria }: Props) => {
@@ -47,7 +47,7 @@ export const useSyntheticGenerationState = ({ criteria }: Props) => {
   }, [get])
 
   const [quantityPerCriteriaOption, setQuantityPerCriteriaOption] = useState<{ [k: string]: number }>(
-    Object.fromEntries((criteria as CriteriaWithOptions).options.map((option) => [option.name, 1])),
+    criteria ? Object.fromEntries((criteria as CriteriaWithOptions).options.map((option) => [option.name, 1])) : {},
   )
 
   return {

@@ -20,8 +20,10 @@ interface Props {
   className?: string
   selectedEvaluator: Evaluator | null
   setSelectedEvaluator: (pipeline: Evaluator | null) => void
-  title: string
+  dropdownLabel: string
   evaluatorOptions: Evaluator[]
+  selectionComponentName?: string
+  selectionComponentNameWithArticle?: string
 }
 
 export const PipelineSelect = ({
@@ -30,8 +32,10 @@ export const PipelineSelect = ({
   selectedEvaluator,
   setSelectedEvaluator,
   type,
-  title,
+  dropdownLabel,
   evaluatorOptions,
+  selectionComponentNameWithArticle = 'an evaluator',
+  selectionComponentName = 'evaluator',
 }: Props) => {
   const { loadingEvaluators, directEvaluators, pairwiseEvaluators } = usePipelineTypesContext()
   const { isRisksAndHarms } = useURLInfoContext()
@@ -88,14 +92,14 @@ export const PipelineSelect = ({
   const { getAreRelevantCredentialsProvided } = useModelProviderCredentials()
 
   return (
-    <div className={className}>
+    <div className={className} style={{ ...style }}>
       {/* <span className={classes['toggle-span']}>{title}</span> */}
       {loadingEvaluators || directEvaluators === null || pairwiseEvaluators === null ? (
         <SelectSkeleton />
       ) : (
         <Select
           id="pipeline-select"
-          labelText={title}
+          labelText={dropdownLabel}
           helperText={
             <div className={classes.helperContent}>
               {selectedEvaluator !== null ? (
@@ -115,10 +119,10 @@ export const PipelineSelect = ({
                   (provider) => !getAreRelevantCredentialsProvided(provider as ModelProviderType),
                 ) ? (
                 <div className={classes.providerFont}>
-                  {'Provide at least a provider API credentials in order to select an evaluator.'}
+                  {`Provide at least a provider API credentials in order to select ${selectionComponentNameWithArticle}.`}
                 </div>
               ) : (
-                <div className={classes.providerFont}>{'Select an evaluator'}</div>
+                <div className={classes.providerFont}>{`Select ${selectionComponentNameWithArticle}`}</div>
               )}
             </div>
           }
@@ -130,7 +134,7 @@ export const PipelineSelect = ({
           className={classes.selectReadOnly}
           // readOnly={isRisksAndHarms}
         >
-          {selectedEvaluator === null && <SelectItem value={''} text={`No evaluator selected`} />}
+          {selectedEvaluator === null && <SelectItem value={''} text={`No ${selectionComponentName} selected`} />}
           {Object.entries(providerToEvaluators).map(([provider, providerEvaluators]) => (
             <SelectItemGroup
               label={modelProviderBeautifiedName[provider as ModelProviderType]}
