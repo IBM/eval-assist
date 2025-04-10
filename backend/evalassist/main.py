@@ -7,6 +7,7 @@ from typing import Optional, Union, cast
 
 import nbformat as nbf
 import nest_asyncio
+from evalassist.api.types import DomainEnum, PersonaEnum
 from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,8 +30,6 @@ from unitxt.llm_as_judge import (
     CriteriaWithOptions,
     EvaluatorTypeEnum,
 )
-
-from backend.evalassist.api.types import DomainEnum, PersonaEnum
 
 from . import root_pkg_logger
 from .api.common import (

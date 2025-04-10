@@ -1,10 +1,9 @@
 from typing import Optional
 
+from evalassist.api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 from fastapi import HTTPException
 from pydantic import BaseModel, RootModel, field_validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
-
-from backend.evalassist.api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 
