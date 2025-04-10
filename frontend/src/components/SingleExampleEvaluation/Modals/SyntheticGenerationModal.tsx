@@ -126,7 +126,7 @@ export const SyntheticGenerationModal = ({
               <Dropdown
                 itemToString={(i: { text: string }) => i.text}
                 items={generationLengthOptions}
-                label="Data length"
+                label="No option selected"
                 id="data-length"
                 titleText="Data length"
                 type="default"
@@ -136,7 +136,7 @@ export const SyntheticGenerationModal = ({
               <Dropdown
                 itemToString={(i: { text: string }) => i.text}
                 items={tasksOptions}
-                label="Tasks"
+                label="No option selected"
                 id="task"
                 titleText="Select task"
                 type="default"

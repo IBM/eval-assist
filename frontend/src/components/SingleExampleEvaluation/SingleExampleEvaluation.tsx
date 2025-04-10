@@ -191,6 +191,7 @@ export const SingleExampleEvaluation = () => {
     setInstances: setInstances,
     type: currentTestCase?.type!,
     selectedGenerationLength,
+    selectedTask,
     selectedDomain,
     selectedPersona,
     quantityPerCriteriaOption,
