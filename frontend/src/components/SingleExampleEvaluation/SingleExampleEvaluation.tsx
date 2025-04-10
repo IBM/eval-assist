@@ -148,10 +148,13 @@ export const SingleExampleEvaluation = () => {
   const {
     selectedGenerationLength,
     setSelectedGenerationLength,
+    selectedTask,
+    setSelectedTask,
     selectedDomain,
     setSelectedDomain,
     selectedPersona,
     setSelectedPersona,
+    tasksOptions,
     domainsOptions,
     personasOptions,
     generationLengthOptions,
@@ -784,10 +787,13 @@ export const SingleExampleEvaluation = () => {
               }
               selectedGenerationLength={selectedGenerationLength}
               setSelectedGenerationLength={setSelectedGenerationLength}
+              selectedTask={selectedTask}
+              setSelectedTask={setSelectedTask}
               selectedDomain={selectedDomain}
               setSelectedDomain={setSelectedDomain}
               selectedPersona={selectedPersona}
               setSelectedPersona={setSelectedPersona}
+              tasksOptions={tasksOptions}
               domainsOptions={domainsOptions}
               personasOptions={personasOptions}
               generationLengthOptions={generationLengthOptions}

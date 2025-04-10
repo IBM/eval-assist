@@ -11,7 +11,7 @@ import {
   TextInput,
 } from '@carbon/react'
 
-import { Criteria, CriteriaWithOptions, DomainEnum, GenerationLengthEnum, PersonaEnum } from '@types'
+import { Criteria, CriteriaWithOptions, DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@types'
 import { EvaluationType, Evaluator } from '@types'
 
 import { PipelineSelect } from '../EvaluatorSelect'
@@ -27,10 +27,15 @@ interface Props {
   generateTestData: () => Promise<void>
   selectedGenerationLength: GenerationLengthEnum | null
   setSelectedGenerationLength: Dispatch<SetStateAction<GenerationLengthEnum | null>>
+  selectedTask: TaskEnum | null
+  setSelectedTask: Dispatch<SetStateAction<TaskEnum | null>>
   selectedDomain: DomainEnum | null
   setSelectedDomain: Dispatch<SetStateAction<DomainEnum | null>>
   selectedPersona: PersonaEnum | null
   setSelectedPersona: Dispatch<SetStateAction<PersonaEnum | null>>
+  tasksOptions: {
+    text: TaskEnum
+  }[]
   domainsOptions: {
     text: DomainEnum
   }[]
@@ -62,10 +67,13 @@ export const SyntheticGenerationModal = ({
   generateTestData,
   selectedGenerationLength,
   setSelectedGenerationLength,
+  selectedTask,
+  setSelectedTask,
   selectedDomain,
   setSelectedDomain,
   selectedPersona,
   setSelectedPersona,
+  tasksOptions,
   domainsOptions,
   personasOptions,
   generationLengthOptions,
@@ -124,6 +132,16 @@ export const SyntheticGenerationModal = ({
                 type="default"
                 selectedItem={selectedGenerationLength ? { text: selectedGenerationLength } : null}
                 onChange={({ selectedItem }) => setSelectedGenerationLength(selectedItem?.text as GenerationLengthEnum)}
+              />
+              <Dropdown
+                itemToString={(i: { text: string }) => i.text}
+                items={generationLengthOptions}
+                label="Tasks"
+                id="task"
+                titleText="Select task"
+                type="default"
+                selectedItem={selectedTask ? { text: selectedTask } : null}
+                onChange={({ selectedItem }) => setSelectedTask(selectedItem?.text as TaskEnum)}
               />
               {!loadingDomainPersonaMapping ? (
                 <Dropdown

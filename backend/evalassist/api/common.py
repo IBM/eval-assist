@@ -5,7 +5,7 @@ from pydantic import BaseModel, RootModel, field_validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
 
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
-from .types import DomainEnum, GenerationLengthEnum, PersonaEnum
+from .types import DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum
 
 
 class CriteriaModel(BaseModel):
@@ -132,6 +132,7 @@ class SyntheticExampleGenerationRequest(BaseModel):
     response_variable_name: str
     context_variables_names: list[str]
     generation_length: Optional[GenerationLengthEnum]
+    task: Optional[TaskEnum]
     domain: Optional[DomainEnum]
     persona: Optional[PersonaEnum]
     per_criteria_option_count: dict[str, int]

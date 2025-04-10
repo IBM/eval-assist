@@ -1,15 +1,9 @@
 from enum import Enum
 
-from pydantic import BaseModel
-
 
 class TaskEnum(str, Enum):
     SUMMARIZATION = "Summarization"
     TEXT_GENERATION = "Text Generation"
-
-
-class Task(BaseModel):
-    root: TaskEnum
 
 
 class DomainEnum(str, Enum):
@@ -20,10 +14,6 @@ class DomainEnum(str, Enum):
     SOCIAL_MEDIA = "Social Media"
     CUSTOMER_SUPPORT_AND_BUSSINESS = "Custumer Support And Business"
     GAMING_AND_ENTERTAINMENT = "Gaming And Entertainment"
-
-
-class Domain(BaseModel):
-    root: DomainEnum
 
 
 class PersonaEnum(str, Enum):
@@ -61,10 +51,6 @@ class PersonaEnum(str, Enum):
     ESPORT_COMENTATOR = "Esport commentator"
     MOVIE_CRITIC = "Movie critic"
     FAN = "Fan (of a TV show, movie, or game)"
-
-
-class Persona(BaseModel):
-    root: PersonaEnum
 
 
 class GenerationLengthEnum(str, Enum):

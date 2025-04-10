@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Criteria, CriteriaWithOptions, DomainEnum, GenerationLengthEnum, PersonaEnum } from '@types'
+import { Criteria, CriteriaWithOptions, DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@types'
 
 import { useFetchUtils } from './useFetchUtils'
 
@@ -13,9 +13,18 @@ export const useSyntheticGenerationState = ({ criteria }: Props) => {
   const [selectedGenerationLength, setSelectedGenerationLength] = useState<GenerationLengthEnum | null>(null)
   const [selectedDomain, setSelectedDomain] = useState<DomainEnum | null>(null)
   const [selectedPersona, setSelectedPersona] = useState<PersonaEnum | null>(null)
+  const [selectedTask, setSelectedTask] = useState<TaskEnum | null>(null)
 
   const [loadingDomainPersonaMapping, setLoadingDomainPersonaMapping] = useState(false)
   const [domainPersonaMap, setDomainPersonaMap] = useState<{ [key in DomainEnum]: PersonaEnum[] } | null>(null)
+
+  const tasksOptions = useMemo(
+    () =>
+      Object.values(TaskEnum).map((value) => ({
+        text: value,
+      })),
+    [],
+  )
 
   const domains = useMemo(
     () => (domainPersonaMap ? (Object.keys(domainPersonaMap) as DomainEnum[]) : []),
@@ -57,6 +66,7 @@ export const useSyntheticGenerationState = ({ criteria }: Props) => {
     setSelectedDomain,
     selectedPersona,
     setSelectedPersona,
+    tasksOptions,
     domainsOptions,
     personasOptions,
     generationLengthOptions,
@@ -64,5 +74,7 @@ export const useSyntheticGenerationState = ({ criteria }: Props) => {
     loadDomainPersonaMapping,
     quantityPerCriteriaOption,
     setQuantityPerCriteriaOption,
+    selectedTask,
+    setSelectedTask,
   }
 }
