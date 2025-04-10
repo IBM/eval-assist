@@ -14,6 +14,7 @@ import {
   ModelProviderType,
   PairwiseInstance,
   PersonaEnum,
+  TaskEnum,
 } from '@types'
 
 import { useFetchUtils } from './useFetchUtils'
@@ -27,6 +28,7 @@ interface Props {
   setInstances: (instances: Instance[]) => void
   type: EvaluationType
   selectedGenerationLength: GenerationLengthEnum | null
+  selectedTask: TaskEnum | null
   selectedDomain: DomainEnum | null
   selectedPersona: PersonaEnum | null
   quantityPerCriteriaOption: { [k: string]: number }
@@ -58,6 +60,7 @@ export const useGenerateSyntheticExamples = (props: Props) => {
         response_variable_name: props.responseVariableName,
         context_variables_names: props.contextVariableNames,
         generation_length: props.selectedGenerationLength,
+        task: props.selectedTask,
         domain: props.selectedDomain,
         persona: props.selectedPersona,
         per_criteria_option_count: props.quantityPerCriteriaOption,
@@ -96,10 +99,12 @@ export const useGenerateSyntheticExamples = (props: Props) => {
       props.contextVariableNames,
       props.criteria,
       props.evaluatorType,
+      props.quantityPerCriteriaOption,
       props.responseVariableName,
       props.selectedDomain,
       props.selectedGenerationLength,
       props.selectedPersona,
+      props.selectedTask,
     ],
   )
 
