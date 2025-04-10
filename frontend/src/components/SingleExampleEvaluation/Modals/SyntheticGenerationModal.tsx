@@ -5,7 +5,6 @@ import {
   ComposedModal,
   Dropdown,
   DropdownSkeleton,
-  Layer,
   ModalBody,
   ModalFooter,
   ModalHeader,
@@ -103,7 +102,9 @@ export const SyntheticGenerationModal = ({
                 selectedEvaluator={modelForSyntheticGeneration}
                 setSelectedEvaluator={setModelForSyntheticGeneration}
                 evaluatorOptions={nonGraniteGuardianEvaluators || []}
-                title={'Model for synthetic generation'}
+                dropdownLabel={'Model for synthetic generation'}
+                selectionComponentNameWithArticle="a model"
+                selectionComponentName="model"
               />
             </div>
           </div>

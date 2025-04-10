@@ -159,7 +159,7 @@ export const SingleExampleEvaluation = () => {
     loadDomainPersonaMapping,
     quantityPerCriteriaOption,
     setQuantityPerCriteriaOption,
-  } = useSyntheticGenerationState({ criteria: currentTestCase?.criteria! })
+  } = useSyntheticGenerationState({ criteria: currentTestCase?.criteria || null })
 
   const contextVariableNames = useMemo(
     () => currentTestCase?.instances[0]?.contextVariables.map((c) => c.name) || [],
@@ -655,7 +655,7 @@ export const SingleExampleEvaluation = () => {
               selectedEvaluator={currentTestCase.evaluator}
               setSelectedEvaluator={onSetSelectedPipeline}
               evaluatorOptions={isRisksAndHarms ? graniteGuardianEvaluators || [] : nonGraniteGuardianEvaluators || []}
-              title={'Evaluator'}
+              dropdownLabel={'Evaluator'}
               style={{ marginBottom: '2rem' }}
               className={classes['left-padding']}
             />
