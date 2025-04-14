@@ -102,7 +102,7 @@ export const SyntheticGenerationModal = ({
           <div className={classes.section}>
             <div className={classes.section_description_container}>
               <p className={classes.section_title}>Model</p>
-              <p className={classes.section_description}>Specific what model you would like to use to generate data</p>
+              <p className={classes.section_description}>Specify what model you would like to use to generate data</p>
             </div>
             <div>
               <PipelineSelect
@@ -120,7 +120,7 @@ export const SyntheticGenerationModal = ({
           <div className={classes.section}>
             <div className={classes.section_description_container}>
               <p className={classes.section_title}>Instruction</p>
-              <p className={classes.section_description}>Specific what kind of data you would like to generate</p>
+              <p className={classes.section_description}>Specify what kind of data you would like to generate</p>
             </div>
             <div className={classes.instruction_container}>
               <Dropdown
@@ -138,7 +138,7 @@ export const SyntheticGenerationModal = ({
                 items={tasksOptions}
                 label="No option selected"
                 id="task"
-                titleText="Select task"
+                titleText="Task"
                 type="default"
                 selectedItem={selectedTask ? { text: selectedTask } : null}
                 onChange={({ selectedItem }) => setSelectedTask(selectedItem?.text as TaskEnum)}
@@ -149,7 +149,7 @@ export const SyntheticGenerationModal = ({
                   items={domainsOptions}
                   label="All domains"
                   id="domain"
-                  titleText="Select domain"
+                  titleText="Domain"
                   type="default"
                   selectedItem={selectedDomain ? { text: selectedDomain } : null}
                   onChange={({ selectedItem }) => {
@@ -185,16 +185,16 @@ export const SyntheticGenerationModal = ({
             <div className={classes.section_description_container}>
               <p className={classes.section_title}>Quantity</p>
               <p className={classes.section_description}>
-                Specific how much data per each expected result you would like to generator
+                Specify how much data per each expected result you would like to generator
               </p>
             </div>
             <div className={classes.quantity_container}>
-              {(criteria as CriteriaWithOptions).options.map((option, i) => (
+              {Object.entries(quantityPerCriteriaOption).map(([optionName, optionQuantity], i) => (
                 <React.Fragment key={i}>
                   <TextInput
-                    id={`${i}_optionname_${option.name}`}
-                    key={`${i}_optionname_${option.name}`}
-                    value={option.name}
+                    id={`${i}_optionname_${optionName}`}
+                    key={`${i}_optionname_${optionName}`}
+                    value={optionName}
                     readOnly
                     onChange={() => {}}
                     size="md"
@@ -202,19 +202,18 @@ export const SyntheticGenerationModal = ({
                     labelText={'Expected result'}
                   />
                   <TextInput
-                    id={`${i}_quantity_${option.name}`}
-                    key={`${i}_quantity_${option.name}`}
+                    id={`${i}_quantity_${optionName}`}
+                    key={`${i}_quantity_${optionName}`}
                     onChange={(e) => {
-                      console.log(e)
                       setQuantityPerCriteriaOption({
                         ...quantityPerCriteriaOption,
-                        [option.name]: Number(e.target.value),
+                        [optionName]: Number(e.target.value),
                       })
                     }}
                     size="md"
                     type="number"
                     labelText={'Quantity'}
-                    value={quantityPerCriteriaOption[option.name]}
+                    value={optionQuantity}
                   />
                 </React.Fragment>
               ))}
