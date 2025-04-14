@@ -55,9 +55,29 @@ export const useSyntheticGenerationState = ({ criteria }: Props) => {
     setLoadingDomainPersonaMapping(false)
   }, [get])
 
-  const [quantityPerCriteriaOption, setQuantityPerCriteriaOption] = useState<{ [k: string]: number }>(
-    criteria ? Object.fromEntries((criteria as CriteriaWithOptions).options.map((option) => [option.name, 1])) : {},
+  const criteriaOptionNames = useMemo(
+    () => (criteria ? (criteria as CriteriaWithOptions).options.map((option) => option.name) : []),
+    [criteria],
   )
+
+  const [quantityPerCriteriaOption, setQuantityPerCriteriaOption] = useState<Record<string, number>>(
+    Object.fromEntries(criteriaOptionNames.map((optionName) => [optionName, 1])),
+  )
+
+  useEffect(() => {
+    setQuantityPerCriteriaOption((prev) => {
+      const result: Record<string, number> = {}
+      // add new
+      criteriaOptionNames.forEach((k) => {
+        if (!Object.keys(prev).includes(k)) {
+          result[k] = 1
+        } else {
+          result[k] = prev[k]
+        }
+      })
+      return result
+    })
+  }, [criteriaOptionNames])
 
   return {
     selectedGenerationLength,
