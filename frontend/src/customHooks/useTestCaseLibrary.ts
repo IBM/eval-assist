@@ -273,7 +273,7 @@ export const useTestCaseLibrary = () => {
         name: 'Temperature',
         type: EvaluationType.DIRECT,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [
@@ -294,7 +294,7 @@ export const useTestCaseLibrary = () => {
                 value: 'How is the weather there?',
               },
             ],
-            responseVariableName: 'response',
+            responseVariableName: 'Response',
             response:
               'On most days, the weather is warm and humid, with temperatures often soaring into the high 80s and low 90s Fahrenheit. The dense foliage of the jungle acts as a natural air conditioner, keeping the temperature relatively stable and comfortable for the inhabitants.',
             expectedResult: 'No',
@@ -308,7 +308,7 @@ export const useTestCaseLibrary = () => {
         name: 'RQA Quality',
         type: EvaluationType.DIRECT,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Answer',
         instances: [
           {
             contextVariables: [
@@ -335,7 +335,7 @@ website or contact them to discuss your options.`,
         name: 'Conciseness',
         type: EvaluationType.DIRECT,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [
@@ -369,7 +369,7 @@ website or contact them to discuss your options.`,
         name: 'Harmfulness',
         type: EvaluationType.DIRECT,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [],
@@ -398,7 +398,7 @@ website or contact them to discuss your options.`,
         name: 'Insensitivity',
         type: EvaluationType.DIRECT,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [
@@ -431,7 +431,7 @@ website or contact them to discuss your options.`,
         id: null,
         name: 'Coherence',
         type: EvaluationType.DIRECT,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [
@@ -489,7 +489,7 @@ website or contact them to discuss your options.`,
         name: 'Manipulative Email',
         type: EvaluationType.DIRECT,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [
@@ -547,16 +547,12 @@ website or contact them to discuss your options.`,
         name: 'Summarization Preference',
         type: EvaluationType.DIRECT,
         id: null,
-        responseVariableName: 'summary',
+        responseVariableName: 'Summary',
         instances: [
           {
             contextVariables: [
               {
-                name: 'instruction',
-                value: 'Summarize this article:',
-              },
-              {
-                name: 'article',
+                name: 'Article',
                 value:
                   "A dress worn by Vivien Leigh when she played Scarlett O'Hara in the classic 1939 film Gone With the Wind has fetched $ 137,000 at auction . Heritage Auctions offered the gray jacket and skirt , featuring a black zigzag applique , plus more than 150 other items from the Academy Award-winning film at auction on Saturday in Beverly Hills , California . The dress - a jacket and full skirt ensemble - was worn in several key scenes in the 1939 movie , including when Scarlett O'Hara encounters Rhett Butler , played by Clark Gable , and when she gets attacked in the shanty town . Scroll down for video An outfit worn in several scenes of the 1939 film Gone With The Wind by Vivien Leigh as she played Scarlett O'Hara sold for $ 137,000 at auction on Saturday The dress - a jacket and full skirt ensemble - was worn in several key scenes in the 1939 movie but has suffered a little with age and has faded to light gray from original slate blue-gray color The outfit has suffered a little with age , however . When Leigh wore it in the movie , it was slate blue-gray but over the years it has faded to light gray . It was one of more than 150 items that were part of the private collection of James Tumblin , formerly in charge of the hair and makeup department at Universal Studios . Tumblin began collecting onscreen costumes , props and behind-the-scenes artifacts from the film in the 1960s , amassing a collection of more than 300,000 pieces of memorabilia . During a visit to the Western Costume Company he spotted the Scarlett O'Hara dress on the floor . He learned that the dress was about to be thrown away and negotiated a deal to buy it for $ 20 . Tumblin has 'devoted his life and efforts to promoting Hollywood and this film , touring his items throughout the United States , ' said Kathleen Guzman , managing director of Heritage Auctions . Gone With The Wind , which celebrated its 75th anniversary last year , was based on Margaret Mitchell 's 1936 best-selling book about a spoiled Old South socialite , played by Vivien Leigh , and co-starred Clark gable as Rhett Butler Hattie McDaniel ( left ) , Olivia DeHavilland ( middle ) , and Vivien Leigh : McDaniel famously became the first African-American actor to be nominated for and win an Academy Award Other top selling items from the auction were a straw hat worn by Leigh that sold for $ 52,500 ; the trousers and jacket from a suit worn by Clark Gable as Rhett Butler , selling for $ 55,000 ; and a black bonnet worn by both Leigh and Olivia De Havilland as Melanie Wilkes , which fetched $ 30,000 . Gone With The Wind , which celebrated its 75th anniversary last year , was based on Margaret Mitchell 's 1936 best-selling book about a spoiled Old South socialite . Actress Hattie McDaniel , who played Scarlett 's devoted nanny Mammy , a slave , famously became the first African-American actor to be nominated for and win an Academy Award .",
               },
@@ -568,11 +564,7 @@ website or contact them to discuss your options.`,
           {
             contextVariables: [
               {
-                name: 'instruction',
-                value: 'Summarize this article:',
-              },
-              {
-                name: 'article',
+                name: 'Article',
                 value:
                   "A dress worn by Vivien Leigh when she played Scarlett O'Hara in the classic 1939 film Gone With the Wind has fetched $ 137,000 at auction . Heritage Auctions offered the gray jacket and skirt , featuring a black zigzag applique , plus more than 150 other items from the Academy Award-winning film at auction on Saturday in Beverly Hills , California . The dress - a jacket and full skirt ensemble - was worn in several key scenes in the 1939 movie , including when Scarlett O'Hara encounters Rhett Butler , played by Clark Gable , and when she gets attacked in the shanty town . Scroll down for video An outfit worn in several scenes of the 1939 film Gone With The Wind by Vivien Leigh as she played Scarlett O'Hara sold for $ 137,000 at auction on Saturday The dress - a jacket and full skirt ensemble - was worn in several key scenes in the 1939 movie but has suffered a little with age and has faded to light gray from original slate blue-gray color The outfit has suffered a little with age , however . When Leigh wore it in the movie , it was slate blue-gray but over the years it has faded to light gray . It was one of more than 150 items that were part of the private collection of James Tumblin , formerly in charge of the hair and makeup department at Universal Studios . Tumblin began collecting onscreen costumes , props and behind-the-scenes artifacts from the film in the 1960s , amassing a collection of more than 300,000 pieces of memorabilia . During a visit to the Western Costume Company he spotted the Scarlett O'Hara dress on the floor . He learned that the dress was about to be thrown away and negotiated a deal to buy it for $ 20 . Tumblin has 'devoted his life and efforts to promoting Hollywood and this film , touring his items throughout the United States , ' said Kathleen Guzman , managing director of Heritage Auctions . Gone With The Wind , which celebrated its 75th anniversary last year , was based on Margaret Mitchell 's 1936 best-selling book about a spoiled Old South socialite , played by Vivien Leigh , and co-starred Clark gable as Rhett Butler Hattie McDaniel ( left ) , Olivia DeHavilland ( middle ) , and Vivien Leigh : McDaniel famously became the first African-American actor to be nominated for and win an Academy Award Other top selling items from the auction were a straw hat worn by Leigh that sold for $ 52,500 ; the trousers and jacket from a suit worn by Clark Gable as Rhett Butler , selling for $ 55,000 ; and a black bonnet worn by both Leigh and Olivia De Havilland as Melanie Wilkes , which fetched $ 30,000 . Gone With The Wind , which celebrated its 75th anniversary last year , was based on Margaret Mitchell 's 1936 best-selling book about a spoiled Old South socialite . Actress Hattie McDaniel , who played Scarlett 's devoted nanny Mammy , a slave , famously became the first African-American actor to be nominated for and win an Academy Award .",
               },
@@ -584,11 +576,7 @@ website or contact them to discuss your options.`,
           {
             contextVariables: [
               {
-                name: 'instruction',
-                value: 'Summarize this article:',
-              },
-              {
-                name: 'article',
+                name: 'Article',
                 value:
                   "A dress worn by Vivien Leigh when she played Scarlett O'Hara in the classic 1939 film Gone With the Wind has fetched $ 137,000 at auction . Heritage Auctions offered the gray jacket and skirt , featuring a black zigzag applique , plus more than 150 other items from the Academy Award-winning film at auction on Saturday in Beverly Hills , California . The dress - a jacket and full skirt ensemble - was worn in several key scenes in the 1939 movie , including when Scarlett O'Hara encounters Rhett Butler , played by Clark Gable , and when she gets attacked in the shanty town . Scroll down for video An outfit worn in several scenes of the 1939 film Gone With The Wind by Vivien Leigh as she played Scarlett O'Hara sold for $ 137,000 at auction on Saturday The dress - a jacket and full skirt ensemble - was worn in several key scenes in the 1939 movie but has suffered a little with age and has faded to light gray from original slate blue-gray color The outfit has suffered a little with age , however . When Leigh wore it in the movie , it was slate blue-gray but over the years it has faded to light gray . It was one of more than 150 items that were part of the private collection of James Tumblin , formerly in charge of the hair and makeup department at Universal Studios . Tumblin began collecting onscreen costumes , props and behind-the-scenes artifacts from the film in the 1960s , amassing a collection of more than 300,000 pieces of memorabilia . During a visit to the Western Costume Company he spotted the Scarlett O'Hara dress on the floor . He learned that the dress was about to be thrown away and negotiated a deal to buy it for $ 20 . Tumblin has 'devoted his life and efforts to promoting Hollywood and this film , touring his items throughout the United States , ' said Kathleen Guzman , managing director of Heritage Auctions . Gone With The Wind , which celebrated its 75th anniversary last year , was based on Margaret Mitchell 's 1936 best-selling book about a spoiled Old South socialite , played by Vivien Leigh , and co-starred Clark gable as Rhett Butler Hattie McDaniel ( left ) , Olivia DeHavilland ( middle ) , and Vivien Leigh : McDaniel famously became the first African-American actor to be nominated for and win an Academy Award Other top selling items from the auction were a straw hat worn by Leigh that sold for $ 52,500 ; the trousers and jacket from a suit worn by Clark Gable as Rhett Butler , selling for $ 55,000 ; and a black bonnet worn by both Leigh and Olivia De Havilland as Melanie Wilkes , which fetched $ 30,000 . Gone With The Wind , which celebrated its 75th anniversary last year , was based on Margaret Mitchell 's 1936 best-selling book about a spoiled Old South socialite . Actress Hattie McDaniel , who played Scarlett 's devoted nanny Mammy , a slave , famously became the first African-American actor to be nominated for and win an Academy Award .",
               },
@@ -600,11 +588,7 @@ website or contact them to discuss your options.`,
           {
             contextVariables: [
               {
-                name: 'instruction',
-                value: 'Summarize this article:',
-              },
-              {
-                name: 'article',
+                name: 'Article',
                 value:
                   "A dress worn by Vivien Leigh when she played Scarlett O'Hara in the classic 1939 film Gone With the Wind has fetched $ 137,000 at auction . Heritage Auctions offered the gray jacket and skirt , featuring a black zigzag applique , plus more than 150 other items from the Academy Award-winning film at auction on Saturday in Beverly Hills , California . The dress - a jacket and full skirt ensemble - was worn in several key scenes in the 1939 movie , including when Scarlett O'Hara encounters Rhett Butler , played by Clark Gable , and when she gets attacked in the shanty town . Scroll down for video An outfit worn in several scenes of the 1939 film Gone With The Wind by Vivien Leigh as she played Scarlett O'Hara sold for $ 137,000 at auction on Saturday The dress - a jacket and full skirt ensemble - was worn in several key scenes in the 1939 movie but has suffered a little with age and has faded to light gray from original slate blue-gray color The outfit has suffered a little with age , however . When Leigh wore it in the movie , it was slate blue-gray but over the years it has faded to light gray . It was one of more than 150 items that were part of the private collection of James Tumblin , formerly in charge of the hair and makeup department at Universal Studios . Tumblin began collecting onscreen costumes , props and behind-the-scenes artifacts from the film in the 1960s , amassing a collection of more than 300,000 pieces of memorabilia . During a visit to the Western Costume Company he spotted the Scarlett O'Hara dress on the floor . He learned that the dress was about to be thrown away and negotiated a deal to buy it for $ 20 . Tumblin has 'devoted his life and efforts to promoting Hollywood and this film , touring his items throughout the United States , ' said Kathleen Guzman , managing director of Heritage Auctions . Gone With The Wind , which celebrated its 75th anniversary last year , was based on Margaret Mitchell 's 1936 best-selling book about a spoiled Old South socialite , played by Vivien Leigh , and co-starred Clark gable as Rhett Butler Hattie McDaniel ( left ) , Olivia DeHavilland ( middle ) , and Vivien Leigh : McDaniel famously became the first African-American actor to be nominated for and win an Academy Award Other top selling items from the auction were a straw hat worn by Leigh that sold for $ 52,500 ; the trousers and jacket from a suit worn by Clark Gable as Rhett Butler , selling for $ 55,000 ; and a black bonnet worn by both Leigh and Olivia De Havilland as Melanie Wilkes , which fetched $ 30,000 . Gone With The Wind , which celebrated its 75th anniversary last year , was based on Margaret Mitchell 's 1936 best-selling book about a spoiled Old South socialite . Actress Hattie McDaniel , who played Scarlett 's devoted nanny Mammy , a slave , famously became the first African-American actor to be nominated for and win an Academy Award .",
               },
@@ -621,16 +605,16 @@ website or contact them to discuss your options.`,
         name: 'Reference Document Faithfulness',
         type: EvaluationType.DIRECT,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [
               {
-                name: 'conversation',
+                name: 'Conversation',
                 value: 'Customer: How do i go about upgrading to business class using my corporate card?',
               },
               {
-                name: 'reference document',
+                name: 'Reference document',
                 value:
                   'Choosing your Airfare\n\nEmployees should book airfares presented as "in policy" by the IBM Travel & Expense application or contracted travel agency. This policy applies to all IBM employees for any air travel regardless of trip length and/or same day meetings.\n\nAll air expenses are expected to be charged to the corporate card where issued. \nUpgrading as a Personal Cost\nIf you are upgrading your airfare as a personal cost, the additional cost associated with upgrading your ticket for the same flight is non-reimbursable. When claiming the expense, claim the "in policy" portion as a business expense and provide proof of the IBM "in policy" airfare. Claim the amount in excess of the "in policy" airfare as non-reimbursable/personal.',
               },
@@ -642,11 +626,11 @@ website or contact them to discuss your options.`,
           {
             contextVariables: [
               {
-                name: 'conversation',
+                name: 'Conversation',
                 value: 'Customer: How do i go about upgrading to business class using my corporate card?',
               },
               {
-                name: 'reference document',
+                name: 'Reference document',
                 value:
                   'Choosing your Airfare\n\nEmployees should book airfares presented as "in policy" by the IBM Travel & Expense application or contracted travel agency. This policy applies to all IBM employees for any air travel regardless of trip length and/or same day meetings.\n\nAll air expenses are expected to be charged to the corporate card where issued. \nUpgrading as a Personal Cost\nIf you are upgrading your airfare as a personal cost, the additional cost associated with upgrading your ticket for the same flight is non-reimbursable. When claiming the expense, claim the "in policy" portion as a business expense and provide proof of the IBM "in policy" airfare. Claim the amount in excess of the "in policy" airfare as non-reimbursable/personal.',
               },
@@ -659,11 +643,11 @@ website or contact them to discuss your options.`,
           {
             contextVariables: [
               {
-                name: 'conversation',
+                name: 'Conversation',
                 value: 'Customer: How do i go about upgrading to business class using my corporate card?',
               },
               {
-                name: 'reference document',
+                name: 'Reference document',
                 value:
                   'Choosing your Airfare\n\nEmployees should book airfares presented as "in policy" by the IBM Travel & Expense application or contracted travel agency. This policy applies to all IBM employees for any air travel regardless of trip length and/or same day meetings.\n\nAll air expenses are expected to be charged to the corporate card where issued. \nUpgrading as a Personal Cost\nIf you are upgrading your airfare as a personal cost, the additional cost associated with upgrading your ticket for the same flight is non-reimbursable. When claiming the expense, claim the "in policy" portion as a business expense and provide proof of the IBM "in policy" airfare. Claim the amount in excess of the "in policy" airfare as non-reimbursable/personal.',
               },
@@ -676,11 +660,11 @@ website or contact them to discuss your options.`,
           {
             contextVariables: [
               {
-                name: 'conversation',
+                name: 'Conversation',
                 value: 'Customer: How do i go about upgrading to business class using my corporate card?',
               },
               {
-                name: 'reference document',
+                name: 'Reference document',
                 value:
                   'Choosing your Airfare\n\nEmployees should book airfares presented as "in policy" by the IBM Travel & Expense application or contracted travel agency. This policy applies to all IBM employees for any air travel regardless of trip length and/or same day meetings.\n\nAll air expenses are expected to be charged to the corporate card where issued. \nUpgrading as a Personal Cost\nIf you are upgrading your airfare as a personal cost, the additional cost associated with upgrading your ticket for the same flight is non-reimbursable. When claiming the expense, claim the "in policy" portion as a business expense and provide proof of the IBM "in policy" airfare. Claim the amount in excess of the "in policy" airfare as non-reimbursable/personal.',
               },
@@ -704,7 +688,7 @@ website or contact them to discuss your options.`,
         name: 'Temperature',
         type: EvaluationType.PAIRWISE,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [
@@ -728,7 +712,7 @@ website or contact them to discuss your options.`,
         name: 'Consistency',
         type: EvaluationType.PAIRWISE,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [
@@ -752,7 +736,7 @@ website or contact them to discuss your options.`,
         name: 'Inclusivity',
         type: EvaluationType.PAIRWISE,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [
@@ -776,16 +760,16 @@ website or contact them to discuss your options.`,
         name: 'Reference Document Faithfulness',
         type: EvaluationType.PAIRWISE,
         id: null,
-        responseVariableName: 'response',
+        responseVariableName: 'Response',
         instances: [
           {
             contextVariables: [
               {
-                name: 'conversation',
+                name: 'Conversation',
                 value: 'Customer: How do i go about upgrading to business class using my corporate card?',
               },
               {
-                name: 'reference document',
+                name: 'Reference document',
                 value:
                   'Choosing your Airfare\n\nEmployees should book airfares presented as "in policy" by the IBM Travel & Expense application or contracted travel agency. This policy applies to all IBM employees for any air travel regardless of trip length and/or same day meetings.\n\nAll air expenses are expected to be charged to the corporate card where issued. \nUpgrading as a Personal Cost\nIf you are upgrading your airfare as a personal cost, the additional cost associated with upgrading your ticket for the same flight is non-reimbursable. When claiming the expense, claim the "in policy" portion as a business expense and provide proof of the IBM "in policy" airfare. Claim the amount in excess of the "in policy" airfare as non-reimbursable/personal.',
               },
@@ -807,16 +791,12 @@ website or contact them to discuss your options.`,
         name: 'Summarization Preference',
         type: EvaluationType.PAIRWISE,
         id: null,
-        responseVariableName: 'summary',
+        responseVariableName: 'Summary',
         instances: [
           {
             contextVariables: [
               {
-                name: 'instruction',
-                value: 'Summarize this article:',
-              },
-              {
-                name: 'article',
+                name: 'Article',
                 value:
                   "A dress worn by Vivien Leigh when she played Scarlett O'Hara in the classic 1939 film Gone With the Wind has fetched $ 137,000 at auction . Heritage Auctions offered the gray jacket and skirt , featuring a black zigzag applique , plus more than 150 other items from the Academy Award-winning film at auction on Saturday in Beverly Hills , California . The dress - a jacket and full skirt ensemble - was worn in several key scenes in the 1939 movie , including when Scarlett O'Hara encounters Rhett Butler , played by Clark Gable , and when she gets attacked in the shanty town . Scroll down for video An outfit worn in several scenes of the 1939 film Gone With The Wind by Vivien Leigh as she played Scarlett O'Hara sold for $ 137,000 at auction on Saturday The dress - a jacket and full skirt ensemble - was worn in several key scenes in the 1939 movie but has suffered a little with age and has faded to light gray from original slate blue-gray color The outfit has suffered a little with age , however . When Leigh wore it in the movie , it was slate blue-gray but over the years it has faded to light gray . It was one of more than 150 items that were part of the private collection of James Tumblin , formerly in charge of the hair and makeup department at Universal Studios . Tumblin began collecting onscreen costumes , props and behind-the-scenes artifacts from the film in the 1960s , amassing a collection of more than 300,000 pieces of memorabilia . During a visit to the Western Costume Company he spotted the Scarlett O'Hara dress on the floor . He learned that the dress was about to be thrown away and negotiated a deal to buy it for $ 20 . Tumblin has 'devoted his life and efforts to promoting Hollywood and this film , touring his items throughout the United States , ' said Kathleen Guzman , managing director of Heritage Auctions . Gone With The Wind , which celebrated its 75th anniversary last year , was based on Margaret Mitchell 's 1936 best-selling book about a spoiled Old South socialite , played by Vivien Leigh , and co-starred Clark gable as Rhett Butler Hattie McDaniel ( left ) , Olivia DeHavilland ( middle ) , and Vivien Leigh : McDaniel famously became the first African-American actor to be nominated for and win an Academy Award Other top selling items from the auction were a straw hat worn by Leigh that sold for $ 52,500 ; the trousers and jacket from a suit worn by Clark Gable as Rhett Butler , selling for $ 55,000 ; and a black bonnet worn by both Leigh and Olivia De Havilland as Melanie Wilkes , which fetched $ 30,000 . Gone With The Wind , which celebrated its 75th anniversary last year , was based on Margaret Mitchell 's 1936 best-selling book about a spoiled Old South socialite . Actress Hattie McDaniel , who played Scarlett 's devoted nanny Mammy , a slave , famously became the first African-American actor to be nominated for and win an Academy Award .",
               },

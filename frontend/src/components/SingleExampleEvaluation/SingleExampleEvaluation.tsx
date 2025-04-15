@@ -162,7 +162,10 @@ export const SingleExampleEvaluation = () => {
     loadDomainPersonaMapping,
     quantityPerCriteriaOption,
     setQuantityPerCriteriaOption,
-  } = useSyntheticGenerationState({ criteria: currentTestCase?.criteria || null })
+  } = useSyntheticGenerationState({
+    criteria: currentTestCase?.criteria || null,
+    evaluationType: currentTestCase?.type || null,
+  })
 
   const contextVariableNames = useMemo(
     () => currentTestCase?.instances[0]?.contextVariables.map((c) => c.name) || [],

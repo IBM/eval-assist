@@ -372,8 +372,8 @@ export enum PersonaEnum {
 export enum TaskEnum {
   Summarization = 'Summarization',
   TextGeneration = 'Text Generation',
+  QuestionAnswering = 'Question Answering',
 }
-
 export enum GenerationLengthEnum {
   Short = 'Short',
   Medium = 'Medium',
