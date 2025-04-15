@@ -121,7 +121,7 @@ class Generator:
                     - Focus exclusively on the specified dimension and target
                     - Make sure your summary clearly demonstrates the described characteristics
                     - Do not mention the criteria in your summary - simply generate a summary that embodies the characteristics
-                    - Please keep your summary less than {max_new_tokens} tokens"""),
+                    - Please keep your summary less than tokens"""),
                 )
 
                 self.query_template = PromptTemplate(
@@ -250,7 +250,12 @@ class Generator:
             self.model_config["llm_provider_credentials"],
             self.model_config["provider"],
             model_name,
-            custom_params={"use_cache": False},
+            custom_params={
+                "use_cache": False,
+                "seed": None,
+                "max_tokens": 200,
+                "temperature": 0.7,
+            },
         )
 
     def generate(self):
