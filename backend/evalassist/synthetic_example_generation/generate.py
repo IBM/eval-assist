@@ -11,6 +11,8 @@ from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts import PromptTemplate
 from unitxt.llm_as_judge import CriteriaWithOptions
 
+from ..api.types import TaskEnum
+
 from ..utils import (
     get_evaluator_metadata_wrapper,
     get_inference_engine,
@@ -28,17 +30,19 @@ class Generator:
         self.model_config = config["model"]
         self.generation_config = config["generation"]
         self.criteria = self.generation_config["criteria"]
-        # self.task_type = self.generation_config["task-type"]
-        self.task_type = None  # todo: TEMP
+        self.task: TaskEnum = self.generation_config["task"]
+        self.domain = self.generation_config["domain"]
+        self.persona = self.generation_config["persona"]
         self.response_name = self.generation_config["response_name"]
         self.context_names = self.generation_config["context_names"]
-        self.is_context = len(self.context_names) > 0
+        self.num_generations_per_criteria = self.generation_config["num_generations_per_criteria"]
+        self.has_context_variables = len(self.context_names) > 0
         self.context = {}
 
-        if self.is_context:
+        if self.has_context_variables:
             # response with context
 
-            if self.task_type == "question_answering":
+            if self.task == TaskEnum.QUESTION_ANSWERING:
                 self.context_data = load_jsonl(
                     "backend/src/synthetic_example_generation/data/qa/source_data/questions.jsonl"
                 )
@@ -53,7 +57,6 @@ class Generator:
                     response_schemas
                 )
                 self.format_instructions = self.output_parser.get_format_instructions()
-
                 # prompt templates
                 self.system_prompt_template = PromptTemplate(
                     input_variables=[
@@ -61,11 +64,10 @@ class Generator:
                         "dimension_description",
                         "target",
                         "target_description",
-                        "max_new_tokens",
                     ],
                     template=dedent("""You will be asked to generate an answer to a question according to the following requirements:
 
-                    Dimension: {dimension}  # noqa: W293
+                    Dimension: {dimension}
                     Dimension description: {dimension_description}
                     Target: {target}
                     Target description: {target_description}
@@ -84,7 +86,7 @@ class Generator:
                     partial_variables={"format_instructions": self.format_instructions},
                 )
 
-            elif self.task_type == "summarization":
+            elif self.task == TaskEnum.SUMMARIZATION:
                 self.context_data = load_jsonl(
                     "backend/src/synthetic_example_generation/data/summarization/source_data/articles.jsonl"
                 )
@@ -105,7 +107,6 @@ class Generator:
                         "dimension_description",
                         "target",
                         "target_description",
-                        "max_new_tokens",
                     ],
                     template=dedent("""You will be given some source text and will be asked to generate a summary according to a specific target criteria.
 
@@ -130,7 +131,7 @@ class Generator:
                     partial_variables={"format_instructions": self.format_instructions},
                 )
 
-            elif self.task_type is None:
+            elif self.task is None:
                 # build prompt from variable names
 
                 print(f"RESPONSE NAME: {self.response_name}")
@@ -147,7 +148,6 @@ class Generator:
                     response_schemas
                 )
                 self.format_instructions = self.output_parser.get_format_instructions()
-
                 # prompt templates
                 self.system_prompt_template = PromptTemplate(
                     input_variables=[
@@ -156,7 +156,6 @@ class Generator:
                         "dimension_description",
                         "target",
                         "target_description",
-                        "max_new_tokens",
                     ],
                     template=dedent("""You will be given the following context variables:
                     {context_list}
@@ -186,18 +185,18 @@ class Generator:
 
             else:
                 raise NotImplementedError(
-                    f"Generation not implemented for task type: {self.task_type}"
+                    f"Generation not implemented for task type: {self.task}"
                 )
 
         else:
             # no context (text generation)
 
             # response schema
-            response_variable_name = self.generation_config["response_variable_name"]
+            response_name = self.generation_config["response_name"]
             response_schemas = [
                 ResponseSchema(
-                    name=response_variable_name,
-                    description=f"the requested {response_variable_name}",
+                    name=response_name,
+                    description=f"the requested {response_name}",
                 ),
             ]
             self.output_parser = StructuredOutputParser.from_response_schemas(
@@ -291,9 +290,9 @@ class Generator:
         criteria_dict[criteria_borderline["name"]] = criteria_borderline["description"]
 
         for target, target_description in criteria_dict.items():
-            for gen_idx in range(generation_params["num_generations_per_criteria"]):
-                if self.is_context:
-                    if self.task_type == "question_answering":
+            for gen_idx in range(self.num_generations_per_criteria):
+                if self.has_context_variables:
+                    if self.task == "question_answering":
                         question = random.choice(self.context_data)[
                             "question"
                         ]  # sample random question
@@ -304,11 +303,10 @@ class Generator:
                             dimension_description=self.criteria.description,
                             target=target,
                             target_description=target_description,
-                            max_new_tokens=generation_params["max_new_tokens"],
                         )
                         query = self.query_template.format(question=question)
 
-                    elif self.task_type == "summarization":
+                    elif self.task == "summarization":
                         original_text = random.choice(self.context_data)[
                             "text"
                         ]  # sample random source article
@@ -319,11 +317,10 @@ class Generator:
                             dimension_description=self.criteria.description,
                             target=target,
                             target_description=target_description,
-                            max_new_tokens=generation_params["max_new_tokens"],
                         )
                         query = self.query_template.format(original_text=original_text)
 
-                    elif self.task_type is None:
+                    elif self.task is None:
                         context_list = "\n\n".join(
                             f"- {name}" for name in self.context_names
                         )
@@ -355,6 +352,7 @@ class Generator:
                         dimension_description=self.criteria.description,
                         target=target,
                         target_description=target_description,
+                        persona=self.persona
                     )
                     query = self.query_template.format()
 
