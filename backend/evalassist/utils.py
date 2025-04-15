@@ -76,7 +76,7 @@ def get_cross_inference_engine_params(
     provider: ModelProviderEnum,
     model_name: str,
     custom_params: dict = None,
-    provider_specific_params: dict = None
+    provider_specific_params: dict = None,
 ):
     provider_specific_args = {}
     inference_engine_params = {
@@ -115,15 +115,20 @@ def get_cross_inference_engine(
     provider: ModelProviderEnum,
     model_name: EvaluatorNameEnum,
     custom_params: dict = None,
-    provider_specific_params: dict = None
+    provider_specific_params: dict = None,
 ):
     inference_engine_params, provider_specific_args = get_cross_inference_engine_params(
-        credentials=credentials, provider=provider, model_name=model_name, custom_params=custom_params, provider_specific_params=provider_specific_params
+        credentials=credentials,
+        provider=provider,
+        model_name=model_name,
+        custom_params=custom_params,
+        provider_specific_params=provider_specific_params,
     )
 
     return CrossProviderInferenceEngine(
         **inference_engine_params, provider_specific_args=provider_specific_args
     )
+
 
 def get_watsonx_inference_engine(
     credentials: dict[str, str],
@@ -171,7 +176,7 @@ def get_inference_engine(
     provider: ModelProviderEnum | ExtendedModelProviderEnum,
     model_name: str,
     custom_params: dict = None,
-    provider_specific_params: dict = None
+    provider_specific_params: dict = None,
 ):
     if provider == ExtendedModelProviderEnum.LOCAL_HF:
         return get_hf_inference_engine(model_name, custom_params)
@@ -179,7 +184,9 @@ def get_inference_engine(
         return get_watsonx_inference_engine(
             credentials, provider, model_name, custom_params
         )
-    return get_cross_inference_engine(credentials, provider, model_name, custom_params, provider_specific_params)
+    return get_cross_inference_engine(
+        credentials, provider, model_name, custom_params, provider_specific_params
+    )
 
 
 def get_model_name_from_evaluator(

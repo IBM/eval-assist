@@ -12,7 +12,6 @@ from langchain.prompts import PromptTemplate
 from unitxt.llm_as_judge import CriteriaWithOptions
 
 from ..api.types import TaskEnum
-
 from ..utils import (
     get_evaluator_metadata_wrapper,
     get_inference_engine,
@@ -35,7 +34,9 @@ class Generator:
         self.persona = self.generation_config["persona"]
         self.response_name = self.generation_config["response_name"]
         self.context_names = self.generation_config["context_names"]
-        self.num_generations_per_criteria = self.generation_config["num_generations_per_criteria"]
+        self.num_generations_per_criteria = self.generation_config[
+            "num_generations_per_criteria"
+        ]
         self.has_context_variables = len(self.context_names) > 0
         self.context = {}
 
@@ -352,7 +353,7 @@ class Generator:
                         dimension_description=self.criteria.description,
                         target=target,
                         target_description=target_description,
-                        persona=self.persona
+                        persona=self.persona,
                     )
                     query = self.query_template.format()
 
