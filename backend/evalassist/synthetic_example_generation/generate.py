@@ -345,7 +345,7 @@ class Generator:
                         #  - synthetically generate the context variables (check quality of this)
 
                         context_data = "\n\n".join(
-                            f"- {name:\n ...}" for name in self.context_names
+                            f"- {name} :\n ..." for name in self.context_names
                         )
                         query = self.query_template.format(
                             response_name=self.response_name, context_data=context_data
