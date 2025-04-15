@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo } from 'react'
 import React from 'react'
 
 import {
@@ -83,6 +83,14 @@ export const SyntheticGenerationModal = ({
   quantityPerCriteriaOption,
   setQuantityPerCriteriaOption,
 }: Props) => {
+  const perTaskIndication = useMemo(() => {
+    return {
+      [TaskEnum.QuestionAnswering]: 'This task accepts only one context variable that will be set to a question',
+      [TaskEnum.Summarization]: 'This task accepts only one context variable that will be set to the text to summarize',
+      [TaskEnum.TextGeneration]: "This task doesn't expect any context variable",
+    }
+  }, [])
+
   const onRequestSubmit = useCallback(() => {
     setOpen(false)
     generateTestData()
@@ -110,7 +118,7 @@ export const SyntheticGenerationModal = ({
                 selectedEvaluator={modelForSyntheticGeneration}
                 setSelectedEvaluator={setModelForSyntheticGeneration}
                 evaluatorOptions={nonGraniteGuardianEvaluators || []}
-                dropdownLabel={'Model for synthetic generation'}
+                dropdownLabel={'Model for synthetic generation (required)'}
                 selectionComponentNameWithArticle="a model"
                 selectionComponentName="model"
               />
@@ -138,11 +146,12 @@ export const SyntheticGenerationModal = ({
                 items={tasksOptions}
                 label="No option selected"
                 id="task"
-                titleText="Task"
+                titleText="Task (required)"
                 type="default"
                 selectedItem={selectedTask ? { text: selectedTask } : null}
                 onChange={({ selectedItem }) => setSelectedTask(selectedItem?.text as TaskEnum)}
               />
+              {selectedTask && <p className={classes.task_indication}>{`Note: ${perTaskIndication[selectedTask]}`}</p>}
               {!loadingDomainPersonaMapping ? (
                 <Dropdown
                   itemToString={(i: { text: string }) => i.text}
@@ -226,7 +235,7 @@ export const SyntheticGenerationModal = ({
         primaryButtonText="Generate"
         secondaryButtonText="Cancel"
         onRequestSubmit={onRequestSubmit}
-        primaryButtonDisabled={modelForSyntheticGeneration === null}
+        primaryButtonDisabled={modelForSyntheticGeneration === null || selectedTask === null}
       >
         <></>
       </ModalFooter>

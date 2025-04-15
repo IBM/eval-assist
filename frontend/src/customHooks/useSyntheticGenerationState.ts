@@ -1,14 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Criteria, CriteriaWithOptions, DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@types'
+import {
+  Criteria,
+  CriteriaWithOptions,
+  DomainEnum,
+  EvaluationType,
+  GenerationLengthEnum,
+  PersonaEnum,
+  TaskEnum,
+} from '@types'
+import { returnByPipelineType } from '@utils'
 
 import { useFetchUtils } from './useFetchUtils'
 
 interface Props {
   criteria: Criteria | null
+  evaluationType: EvaluationType | null
 }
 
-export const useSyntheticGenerationState = ({ criteria }: Props) => {
+export const useSyntheticGenerationState = ({ criteria, evaluationType }: Props) => {
   const { get } = useFetchUtils()
   const [selectedGenerationLength, setSelectedGenerationLength] = useState<GenerationLengthEnum | null>(null)
   const [selectedDomain, setSelectedDomain] = useState<DomainEnum | null>(null)
@@ -56,13 +66,22 @@ export const useSyntheticGenerationState = ({ criteria }: Props) => {
   }, [get])
 
   const criteriaOptionNames = useMemo(
-    () => (criteria ? (criteria as CriteriaWithOptions).options.map((option) => option.name) : []),
-    [criteria],
+    () =>
+      criteria && evaluationType
+        ? returnByPipelineType(
+            evaluationType,
+            () => (criteria as CriteriaWithOptions).options.map((option) => option.name),
+            [],
+          )
+        : [],
+    [criteria, evaluationType],
   )
 
-  const [quantityPerCriteriaOption, setQuantityPerCriteriaOption] = useState<Record<string, number>>(
-    Object.fromEntries(criteriaOptionNames.map((optionName) => [optionName, 1])),
-  )
+  const [quantityPerCriteriaOption, setQuantityPerCriteriaOption] = useState<Record<string, number>>(() => {
+    const res = Object.fromEntries(criteriaOptionNames.map((optionName) => [optionName, 1]))
+    res['Borderline'] = 1
+    return res
+  })
 
   useEffect(() => {
     setQuantityPerCriteriaOption((prev) => {
@@ -75,6 +94,7 @@ export const useSyntheticGenerationState = ({ criteria }: Props) => {
           result[k] = prev[k]
         }
       })
+      result['Borderline'] = prev['Borderline']
       return result
     })
   }, [criteriaOptionNames])

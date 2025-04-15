@@ -1,5 +1,3 @@
-import { type } from 'os'
-
 import { useCallback, useState } from 'react'
 
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
@@ -134,28 +132,31 @@ export const useGenerateSyntheticExamples = (props: Props) => {
         })
         return
       }
-      const syntheticExample = result.syntheticExamples[0]
-      let syntheticInstance: Instance = {
-        contextVariables: props.contextVariableNames.map((contextVariableName) => ({
-          name: contextVariableName,
-          value: syntheticExample[contextVariableName],
-        })),
-        expectedResult: '',
-        result: null,
-      }
+      const syntheticExamples = result.syntheticExamples.map((syntheticExample: Record<string, string>) => {
+        let syntheticInstance: Instance = {
+          contextVariables: props.contextVariableNames.map((contextVariableName) => ({
+            name: contextVariableName,
+            value: syntheticExample[contextVariableName],
+          })),
+          expectedResult: '',
+          result: null,
+        }
 
-      if (props.type === EvaluationType.DIRECT) {
-        ;(syntheticInstance as DirectInstance) = {
-          ...syntheticInstance,
-          response: syntheticExample[props.responseVariableName!],
+        if (props.type === EvaluationType.DIRECT) {
+          ;(syntheticInstance as DirectInstance) = {
+            ...syntheticInstance,
+            response: syntheticExample[props.responseVariableName!],
+          }
+        } else {
+          ;(syntheticInstance as PairwiseInstance) = {
+            ...syntheticInstance,
+            responses: (props.instances[0] as PairwiseInstance).responses.map((_) => ''),
+          }
         }
-      } else {
-        ;(syntheticInstance as PairwiseInstance) = {
-          ...syntheticInstance,
-          responses: (props.instances[0] as PairwiseInstance).responses.map((_) => ''),
-        }
-      }
-      props.setInstances([...props.instances, syntheticInstance])
+        return syntheticInstance
+      })
+
+      props.setInstances([...props.instances, ...syntheticExamples])
       addToast({
         kind: 'success',
         title: 'Synthetic examples generated succesfully',

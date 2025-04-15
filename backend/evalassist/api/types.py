@@ -4,7 +4,7 @@ from enum import Enum
 class TaskEnum(str, Enum):
     SUMMARIZATION = "Summarization"
     TEXT_GENERATION = "Text Generation"
-    QUESTION_ANSWERING = "Question"
+    QUESTION_ANSWERING = "Question Answering"
 
 
 class DomainEnum(str, Enum):

@@ -5,6 +5,7 @@ import traceback
 import uuid
 from typing import Optional, Union, cast
 
+import litellm
 import nbformat as nbf
 import nest_asyncio
 from evalassist.api.types import DomainEnum, PersonaEnum
@@ -69,6 +70,7 @@ from .utils import (
     init_evaluator_name,
 )
 
+litellm._turn_on_debug()
 nest_asyncio.apply()
 
 app = FastAPI()
@@ -440,27 +442,24 @@ def get_domain_persona_map():
 def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     # populate config
     evaluator_name, custom_model_name = init_evaluator_name(params.evaluator_name)
-    model_config = {
-        "provider": params.provider,
-        "llm_provider_credentials": params.llm_provider_credentials,
-        "evaluator_name": evaluator_name,
-        "custom_model_name": custom_model_name,
-    }
-    generation_config = {
-        "response_name": params.response_variable_name,
-        "context_names": params.context_variables_names,
-        "criteria": params.criteria,
-        "task": params.task,
-        "persona": params.persona,
-        "domain": params.domain,
-        "num_generations_per_criteria": 1,
-    }
-    config = {"model": model_config, "generation": generation_config}
-
     # initialize generator and generate response
-    generator = Generator(config)
+    generator = Generator(
+        evaluator_name=evaluator_name,
+        custom_model_name=custom_model_name,
+        provider=params.provider,
+        llm_provider_credentials=params.llm_provider_credentials,
+        type=params.type,
+        criteria=params.criteria,
+        response_variable_name=params.response_variable_name,
+        context_variables_names=params.context_variables_names,
+        generation_length=params.generation_length,
+        task=params.task,
+        domain=params.domain,
+        persona=params.persona,
+        per_criteria_option_count=params.per_criteria_option_count,
+    )
     try:
-        response, context = generator.generate()
+        result = generator.generate()
     except OutputParserException as e:
         raise HTTPException(
             status_code=400,
@@ -471,7 +470,7 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     #
     # print(f"CONTEXT: {context}")
 
-    return SyntheticExampleGenerationResponse([{**response, **context}])
+    return SyntheticExampleGenerationResponse(result)
 
 
 @app.exception_handler(RequestValidationError)

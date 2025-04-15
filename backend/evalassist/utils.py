@@ -287,3 +287,7 @@ def log_runtime(function):
         return res
 
     return wrapper
+
+
+def to_snake_case(name: str) -> str:
+    return name.replace(" ", "_").lower()
