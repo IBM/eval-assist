@@ -175,7 +175,7 @@ class Generator:
                     - Focus exclusively on the specified dimension and target
                     - Make sure your {response_name} clearly demonstrates the described characteristics
                     - Do not mention the criteria in your summary - simply generate a {response_name} that embodies the characteristics
-                    - Please keep your {response_name} less than {max_new_tokens} tokens"""),
+                    - Please keep your {response_name} with a length of """),
                 )
 
                 self.query_template = PromptTemplate(
@@ -212,7 +212,6 @@ class Generator:
                     "dimension_description",
                     "target",
                     "target_description",
-                    "max_new_tokens",
                 ],
                 template=dedent("""You will be asked to generate a response according to the following requirements:
                 
@@ -291,8 +290,6 @@ class Generator:
         criteria_borderline = self._get_borderline_criteria(criteria)
         criteria_dict[criteria_borderline["name"]] = criteria_borderline["description"]
 
-        generation_params = self.generation_config["gen_params"]
-
         for target, target_description in criteria_dict.items():
             for gen_idx in range(generation_params["num_generations_per_criteria"]):
                 if self.is_context:
@@ -337,7 +334,6 @@ class Generator:
                             dimension_description=self.criteria.description,
                             target=target,
                             target_description=target_description,
-                            max_new_tokens=generation_params["max_new_tokens"],
                         )
 
                         # todo:
@@ -359,7 +355,6 @@ class Generator:
                         dimension_description=self.criteria.description,
                         target=target,
                         target_description=target_description,
-                        max_new_tokens=generation_params["max_new_tokens"],
                     )
                     query = self.query_template.format()
 
