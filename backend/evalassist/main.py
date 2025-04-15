@@ -450,15 +450,10 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
         "response_name": params.response_variable_name,
         "context_names": params.context_variables_names,
         "criteria": params.criteria,
-        # "task-type": params.task_type,
-        # "persona": params.persona,
-        # "domain": params.domain,
-        "gen_params": {
-            "num_generations_per_criteria": 1,
-            "min_new_tokens": 1,
-            "max_new_tokens": 200,
-            "temperature": 0.7,
-        },
+        "task": params.task,
+        "persona": params.persona,
+        "domain": params.domain,
+        "num_generations_per_criteria": 1,
     }
     config = {"model": model_config, "generation": generation_config}
 
