@@ -3,9 +3,17 @@ import json
 import logging
 import os
 import time
+import traceback
 from enum import Enum
 from typing import Optional
 
+from fastapi import HTTPException
+from ibm_watsonx_ai.wml_client_error import (
+    ApiRequestFailure,
+    CannotSetProjectOrSpace,
+    WMLClientError,
+)
+from openai import AuthenticationError
 from torch import device
 from unitxt.inference import (
     CrossProviderInferenceEngine,
@@ -93,7 +101,7 @@ def get_cross_inference_engine_params(
         # }
     elif provider == ModelProviderEnum.WATSONX:
         provider_specific_args[ModelProviderEnum.WATSONX] = {
-            "max_requests_per_second": 8
+            "max_requests_per_second": 7
         }
 
     if provider == ModelProviderEnum.AZURE_OPENAI:
@@ -291,3 +299,69 @@ def log_runtime(function):
 
 def to_snake_case(name: str) -> str:
     return name.replace(" ", "_").lower()
+
+
+def handle_llm_generation_exceptions(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+
+        except ValueError as e:
+            traceback.print_exc()
+            raise HTTPException(status_code=400, detail=str(e))
+
+        except ApiRequestFailure as e:
+            traceback.print_exc()
+            raise HTTPException(status_code=400, detail=e.error_msg)
+
+        except AuthenticationError:
+            traceback.print_exc()
+            raise HTTPException(
+                status_code=400, detail="Invalid OPENAI credentials provided."
+            )
+
+        except CannotSetProjectOrSpace as e:
+            traceback.print_exc()
+            raise HTTPException(
+                status_code=400, detail=f"watsonx authentication failed: {e.error_msg}"
+            )
+
+        except WMLClientError as e:
+            traceback.print_exc()
+            raise HTTPException(
+                status_code=400, detail=f"watsonx authentication failed: {e.error_msg}"
+            )
+
+        except AssertionError as e:
+            traceback.print_exc()
+            raise HTTPException(status_code=400, detail=f"{e}")
+
+        except RuntimeError as e:
+            traceback.print_exc()
+            if e.__cause__:
+                original_exception = e.__cause__
+                error_message = original_exception.args[0]
+                try:
+                    error_details = json.loads(error_message.split(" - ", 1)[1])
+                    error_message = error_details.get(
+                        "errorMessage", "An unknown error occurred."
+                    )
+                except Exception as parse_error:
+                    print(f"Error parsing the error message: {parse_error}")
+                    print("Original error message: ", error_message)
+                    try:
+                        error_message = error_message.split(" - ", 1)[1]
+                    except Exception:
+                        error_message = "Unknown error"
+                raise HTTPException(400, f"Error running unitxt: {error_message}")
+            else:
+                raise HTTPException(400, "Runtime error on unitxt")
+
+        except Exception as e:
+            traceback.print_exc()
+            raise HTTPException(
+                status_code=400,
+                detail=getattr(e, "message", getattr(e, "error_msg", "Unknown error.")),
+            )
+
+    return wrapper
