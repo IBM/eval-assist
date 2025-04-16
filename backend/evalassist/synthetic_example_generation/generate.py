@@ -179,13 +179,10 @@ class Generator:
                 partial_variables={"format_instructions": self.format_instructions},
             )
         elif self.task == TaskEnum.TEXT_GENERATION:
-            # no context (text generation)
-            # response schema
-            response_name = self.response_name
             response_schemas = [
                 ResponseSchema(
-                    name=response_name,
-                    description=f"the requested {response_name}",
+                    name=self.response_name,
+                    description=f"the requested {self.response_name}",
                 ),
             ]
             self.output_parser = StructuredOutputParser.from_response_schemas(
@@ -195,28 +192,35 @@ class Generator:
 
             # prompt templates
             self.system_prompt_template = PromptTemplate(
-                input_variables=system_prompt_input_variables,
-                template=dedent("""You will be asked to generate a response according to the following requirements:
+                input_variables=system_prompt_input_variables + ["response_name"],
+                template=dedent("""You will be asked to generate a {response_name} according to the following requirements:
                 
                 Dimension: {dimension}
                 Dimension description: {dimension_description}
                 Target: {target}
                 Target description: {target_description}
                 
-                Your task is to generate a response that STRICTLY follows this requirement. This is for evaluation purposes.
+                Your task is to generate a {response_name} that STRICTLY follows this requirement. This is for evaluation purposes.
 
                 Important:
                 - Focus exclusively on the specified dimension and target
                 - Adopt the following persona: {persona}: {persona_description}
-                - The generated response's length should be {generation_length}
+                - The generated {response_name}'s length should be {generation_length}
                 - Make sure your response clearly demonstrates the described characteristics
                 - Do not mention the criteria in your response - simply generate a response that embodies the characteristics"""),
             )
 
+            context_placeholders = "\n".join(
+                [f"{{{name}}}: {{{name}_description}}" for name in self.context_names]
+            )
+
             self.query_template = PromptTemplate(
-                input_variables=[],
-                template="Please generate a response.\n\n{format_instructions}",
-                partial_variables={"format_instructions": self.format_instructions},
+                input_variables=self.context_names,
+                template=f"Please generate a {{response_name}} based on the following context:\n\n{context_placeholders}\n\n{{format_instructions}}",
+                partial_variables={
+                    "format_instructions": self.format_instructions,
+                    "response_name": self.response_name,
+                },
             )
         # elif self.task is None:
         #     # build prompt from variable names
@@ -274,7 +278,7 @@ class Generator:
                 f"Generation not implemented for task type: {self.task}"
             )
 
-        if self.has_context_variables:
+        if self.has_context_variables and task != TaskEnum.TEXT_GENERATION:
             self.context_data = load_jsonl(get_data_path(self.task, self.domain))
 
     def generate(self):
@@ -298,10 +302,17 @@ class Generator:
         result = [
             {
                 self.response_name: next(iter(parsed_response.values())),
-                **context,
             }
-            for parsed_response, context in zip(parsed_responses, contexts)
+            for parsed_response in parsed_responses
         ]
+        if self.has_context_variables:
+            result = [
+                {
+                    **r,
+                    **context,
+                }
+                for r, context in zip(result, contexts)
+            ]
 
         # todo: return prompt as well (for inspection)
 
@@ -327,17 +338,20 @@ class Generator:
 
         for criteria_option_name in self.per_criteria_option_count.keys():
             criteria_option_description = criteria_options_dict[criteria_option_name]
-            system_prompt = self.system_prompt_template.format(
-                dimension=self.criteria.name,
-                dimension_description=self.criteria.description,
-                target=criteria_option_name,
-                target_description=criteria_option_description,
-                persona=self.persona.value if self.persona else "All personas",
-                persona_description="" if self.persona else "",
-                generation_length=self.generation_length.value
+            system_prompt_params = {
+                "dimension": self.criteria.name,
+                "dimension_description": self.criteria.description,
+                "target": criteria_option_name,
+                "target_description": criteria_option_description,
+                "persona": self.persona.value if self.persona else "All personas",
+                "persona_description": "" if self.persona else "",
+                "generation_length": self.generation_length.value
                 if self.generation_length
                 else GenerationLengthEnum.MEDIUM.value,
-            )
+            }
+            if self.task == TaskEnum.TEXT_GENERATION:
+                system_prompt_params["response_name"] = self.response_name
+            system_prompt = self.system_prompt_template.format(**system_prompt_params)
             for gen_idx in range(self.per_criteria_option_count[criteria_option_name]):
                 if self.task == TaskEnum.QUESTION_ANSWERING:
                     question = random.choice(self.context_data)[
@@ -355,8 +369,19 @@ class Generator:
                     query = self.query_template.format(original_text=original_text)
 
                 elif self.task == TaskEnum.TEXT_GENERATION:
-                    # no context (text generation)
-                    query = self.query_template.format()
+                    if self.has_context_variables:
+                        context = self._generate_synthetic_context()
+                        contexts.append(context)
+                    query = self.query_template.format(
+                        **{
+                            context_name: context_name
+                            for context_name in self.context_names
+                        },
+                        **{
+                            f"{context_name}_description": context[context_name]
+                            for context_name in self.context_names
+                        },
+                    )
 
                 # elif self.task is None:
                 #     context_list = "\n\n".join(
@@ -395,6 +420,66 @@ class Generator:
                 )
 
         return system_prompts, queries, contexts, metadata
+
+    def _generate_synthetic_context(self):
+        response_schemas = [
+            ResponseSchema(
+                name=context_name, description=f"the {context_name} to generate"
+            )
+            for context_name in self.context_names
+        ]
+
+        output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+
+        format_instructions = output_parser.get_format_instructions()
+
+        # prompt templates
+        system_prompt_template = PromptTemplate(
+            input_variables=[
+                "criteria",
+                "criteria_description",
+                "response_name",
+                "context_names",
+                "persona",
+                "domain",
+                "task",
+            ],
+            template=dedent("""You will be given a list of context names and you will be asked to generate an example of such context names based on the following reference information.
+
+            Your task is to generate the following context: {context_names}. This is for evaluation purposes.
+            
+            The generated context is intended to be used to generate a {response_name} on the {domain} domain by a {persona}.
+                            
+            The {response_name} is going to be evaluated based on the following criteria.
+                            
+            {criteria}: {criteria_description}"""),
+        )
+
+        query_template = PromptTemplate(
+            input_variables=[],
+            template="Please generate the following context:\n\n{format_instructions}",
+            partial_variables={"format_instructions": format_instructions},
+        )
+
+        system_prompt = system_prompt_template.format(
+            context_names=", ".join(self.context_names),
+            criteria=self.criteria.name,
+            criteria_description=self.criteria.description,
+            response_name=self.response_name,
+            persona=self.persona.value if self.persona else "All personas",
+            domain=self.domain.value if self.domain else "All domains",
+            task=self.task.value,
+        )
+        query = query_template.format()
+
+        prompt = system_prompt + "\n\n" + query
+        print("prompt")
+        print(prompt)
+        response = self.inference_engine.infer([{"source": prompt}])[0]
+
+        parsed_response = output_parser.parse(response)
+
+        return parsed_response
 
     def _get_borderline_criteria(self, criteria: CriteriaWithOptions):
         # criteria_name = criteria.name
