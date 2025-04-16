@@ -7,6 +7,7 @@ import {
   Option,
   PairwiseInstance,
   PairwiseInstanceResult,
+  TaskEnum,
   UseCase,
 } from '@types'
 
@@ -73,6 +74,15 @@ export const getEmptyUseCase = (type: EvaluationType): UseCase => ({
   criteria: getEmptyCriteriaWithTwoOptions(),
   evaluator: null,
   responseVariableName: 'response',
+  syntheticGenerationConfig: {
+    task: null,
+    domain: null,
+    persona: null,
+    generationLength: null,
+    evaluator: null,
+    perCriteriaOptionCount: null,
+    borderlineCount: null,
+  },
 })
 
 export const getEmptyExpectedResults = (count: number) => {
