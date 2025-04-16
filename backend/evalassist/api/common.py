@@ -136,6 +136,7 @@ class SyntheticExampleGenerationRequest(BaseModel):
     domain: Optional[DomainEnum]
     persona: Optional[PersonaEnum]
     per_criteria_option_count: dict[str, int]
+    borderline_count: int
 
 
 class SyntheticExampleGenerationResponse(RootModel):

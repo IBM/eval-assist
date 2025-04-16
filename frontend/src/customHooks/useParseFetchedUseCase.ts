@@ -1,5 +1,3 @@
-import { returnByPipelineType, zip } from 'src/utils'
-
 import { useCallback, useMemo } from 'react'
 
 import { usePipelineTypesContext } from '@components/SingleExampleEvaluation/Providers/PipelineTypesProvider'
@@ -19,12 +17,15 @@ import {
   PairwiseInstanceResultV1,
   ResultsV0,
   ResultsV1,
+  TaskEnum,
   UseCase,
   UseCaseV0,
   UseCaseV1,
   UseCaseV2,
   UseCaseV3,
+  UseCaseV4,
 } from '@types'
+import { returnByPipelineType } from '@utils'
 
 // EXAMPLES
 // fetched use case is v0 and current is v1
@@ -156,6 +157,14 @@ export const useParseFetchedUseCase = () => {
     [],
   )
 
+  const parseFetchedUseCaseV4 = useCallback(
+    (fetchedUseCase: Record<string, any>): UseCaseV4 =>
+      ({
+        ...fetchedUseCase,
+      } as UseCaseV4),
+    [],
+  )
+
   // this version changes contextVariables from a list of {variable: string, value: string} to Record<string, string>
   const parseFetchedUseCaseV0ToV1 = useCallback(
     (fetchedUseCase: UseCaseV0): UseCaseV1 => ({
@@ -261,17 +270,39 @@ export const useParseFetchedUseCase = () => {
     return useCaseV3
   }, [])
 
+  const parseFetchedUseCaseV3ToV4 = useCallback((useCaseV3: UseCaseV3): UseCaseV4 => {
+    const useCaseV4: UseCaseV4 = {
+      ...useCaseV3,
+      syntheticGenerationConfig: {
+        task: TaskEnum.TextGeneration,
+        domain: null,
+        persona: null,
+        generationLength: null,
+        evaluator: null,
+        perCriteriaOptionCount: null,
+        borderlineCount: null,
+      },
+    }
+    return useCaseV4
+  }, [])
+
   const useCaseParsingVersionToVersionFunctions: any[] = useMemo(
-    () => [parseFetchedUseCaseV0ToV1, parseFetchedUseCaseV1ToV2, parseFetchedUseCaseV2ToV3],
-    [parseFetchedUseCaseV0ToV1, parseFetchedUseCaseV1ToV2, parseFetchedUseCaseV2ToV3],
+    () => [parseFetchedUseCaseV0ToV1, parseFetchedUseCaseV1ToV2, parseFetchedUseCaseV2ToV3, parseFetchedUseCaseV3ToV4],
+    [parseFetchedUseCaseV0ToV1, parseFetchedUseCaseV1ToV2, parseFetchedUseCaseV2ToV3, parseFetchedUseCaseV3ToV4],
   )
 
   const useCaseParsingVersionFunctions = useMemo(
-    () => [parseFetchedUseCaseV0, parseFetchedUseCaseV1, parseFetchedUseCaseV2, parseFetchedUseCaseV3],
-    [parseFetchedUseCaseV0, parseFetchedUseCaseV1, parseFetchedUseCaseV2, parseFetchedUseCaseV3],
+    () => [
+      parseFetchedUseCaseV0,
+      parseFetchedUseCaseV1,
+      parseFetchedUseCaseV2,
+      parseFetchedUseCaseV3,
+      parseFetchedUseCaseV4,
+    ],
+    [parseFetchedUseCaseV0, parseFetchedUseCaseV1, parseFetchedUseCaseV2, parseFetchedUseCaseV3, parseFetchedUseCaseV4],
   )
 
-  const CURRENT_FORMAT_VERSION = useMemo(() => 3, [])
+  const CURRENT_FORMAT_VERSION = useMemo(() => 4, [])
 
   const parseFetchedUseCase = useCallback(
     (fetchedUseCase: StoredUseCase): UseCase | null => {
