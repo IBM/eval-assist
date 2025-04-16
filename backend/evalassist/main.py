@@ -1,7 +1,5 @@
-import json
 import logging
 import os
-import traceback
 import uuid
 from typing import Optional, Union, cast
 
@@ -12,13 +10,7 @@ from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException, Request,
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
-from ibm_watsonx_ai.wml_client_error import (
-    ApiRequestFailure,
-    CannotSetProjectOrSpace,
-    WMLClientError,
-)
 from langchain_core.exceptions import OutputParserException
-from openai import AuthenticationError
 from prisma.errors import PrismaError
 from prisma.models import StoredUseCase
 from pydantic import BaseModel
@@ -66,6 +58,7 @@ from .utils import (
     get_custom_models,
     get_evaluator_metadata_wrapper,
     get_model_name_from_evaluator,
+    handle_llm_generation_exceptions,
     init_evaluator_name,
 )
 
@@ -167,7 +160,9 @@ def get_prompt(req: DirectEvaluationRequestModel):
 )
 async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequestModel):
     evaluator_name, custom_model_name = init_evaluator_name(req.evaluator_name)
-    try:
+
+    @handle_llm_generation_exceptions
+    def run():
         if req.type == EvaluatorTypeEnum.DIRECT:
             if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
                 evaluator = GraniteGuardianEvaluator(evaluator_name)
@@ -205,62 +200,7 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
         else:
             return PairwiseResponseModel(results=res)
 
-    except ValueError as e:
-        traceback.print_exc()
-
-        raise HTTPException(status_code=400, detail=str(e))
-    except ApiRequestFailure as e:
-        traceback.print_exc()
-        raise HTTPException(status_code=400, detail=e.error_msg)
-    except AuthenticationError:
-        traceback.print_exc()
-        raise HTTPException(
-            status_code=400, detail="Invalid OPENAI credentials provided."
-        )
-    except CannotSetProjectOrSpace as e:
-        traceback.print_exc()
-        raise HTTPException(
-            status_code=400, detail=f"watsonx authentication failed: {e.error_msg}"
-        )
-    except WMLClientError as e:
-        traceback.print_exc()
-        raise HTTPException(
-            status_code=400, detail=f"watsonx authentication failed: {e.error_msg}"
-        )
-    except AssertionError as e:
-        traceback.print_exc()
-        raise HTTPException(status_code=400, detail=f"{e}")
-    except RuntimeError as e:
-        # Check if the original exception is available in __cause__
-        if e.__cause__:
-            original_exception = e.__cause__
-            error_message = original_exception.args[0]
-            # Parse the error message (assuming it's a JSON string)
-            try:
-                error_details = json.loads(
-                    error_message.split(" - ", 1)[1]
-                )  # Remove the initial 'watsonxException'
-                user_friendly_message = error_details.get(
-                    "errorMessage", "An unknown error occurred."
-                )
-                error_message = user_friendly_message
-            except Exception as parse_error:
-                # In case JSON parsing fails
-                print(f"Error parsing the error message: {parse_error}")
-                print("Original error message: ", error_message)
-                try:
-                    error_message = error_message.split(" - ", 1)[1]
-                except Exception:
-                    error_message = "Unknown error"
-            raise HTTPException(400, f"Error running unitxt: {error_message}")
-        else:
-            raise HTTPException(400, "Runtime error on unitxt")
-    except Exception as e:
-        traceback.print_exc()
-        raise HTTPException(
-            status_code=400,
-            detail=getattr(e, "message", getattr(e, "error_msg", "Unknown error.")),
-        )
+    return run()
 
 
 @router.get("/test_case/")
@@ -440,36 +380,37 @@ def get_domain_persona_map():
 def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     # populate config
     evaluator_name, custom_model_name = init_evaluator_name(params.evaluator_name)
+
     # initialize generator and generate response
-    generator = Generator(
-        evaluator_name=evaluator_name,
-        custom_model_name=custom_model_name,
-        provider=params.provider,
-        llm_provider_credentials=params.llm_provider_credentials,
-        type=params.type,
-        criteria=params.criteria,
-        response_variable_name=params.response_variable_name,
-        context_variables_names=params.context_variables_names,
-        generation_length=params.generation_length,
-        task=params.task,
-        domain=params.domain,
-        persona=params.persona,
-        per_criteria_option_count=params.per_criteria_option_count,
-        borderline_count=params.borderline_count,
-    )
-    try:
-        result = generator.generate()
-    except OutputParserException as e:
-        raise HTTPException(
-            status_code=400,
-            detail=f"{params.evaluator_name} was unable to generate an appropriate synthetic example",
-        ) from e
+    @handle_llm_generation_exceptions
+    def run():
+        generator = Generator(
+            evaluator_name=evaluator_name,
+            custom_model_name=custom_model_name,
+            provider=params.provider,
+            llm_provider_credentials=params.llm_provider_credentials,
+            type=params.type,
+            criteria=params.criteria,
+            response_variable_name=params.response_variable_name,
+            context_variables_names=params.context_variables_names,
+            generation_length=params.generation_length,
+            task=params.task,
+            domain=params.domain,
+            persona=params.persona,
+            per_criteria_option_count=params.per_criteria_option_count,
+            borderline_count=params.borderline_count,
+        )
+        try:
+            result = generator.generate()
+        except OutputParserException as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"{params.evaluator_name} was unable to generate an appropriate synthetic example",
+            ) from e
 
-    # print(f"RESPONSE: {response}")
-    #
-    # print(f"CONTEXT: {context}")
+        return SyntheticExampleGenerationResponse(result)
 
-    return SyntheticExampleGenerationResponse(result)
+    return run()
 
 
 @app.exception_handler(RequestValidationError)
