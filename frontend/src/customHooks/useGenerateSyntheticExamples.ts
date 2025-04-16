@@ -5,14 +5,11 @@ import {
   Criteria,
   CriteriaWithOptions,
   DirectInstance,
-  DomainEnum,
   EvaluationType,
-  GenerationLengthEnum,
   Instance,
   ModelProviderType,
   PairwiseInstance,
-  PersonaEnum,
-  TaskEnum,
+  SyntheticGenerationConfig,
 } from '@types'
 
 import { useFetchUtils } from './useFetchUtils'
@@ -25,11 +22,7 @@ interface Props {
   instances: Instance[]
   setInstances: (instances: Instance[]) => void
   type: EvaluationType
-  selectedGenerationLength: GenerationLengthEnum | null
-  selectedTask: TaskEnum | null
-  selectedDomain: DomainEnum | null
-  selectedPersona: PersonaEnum | null
-  quantityPerCriteriaOption: { [k: string]: number }
+  syntheticGenerationConfig: SyntheticGenerationConfig
 }
 
 export const useGenerateSyntheticExamples = (props: Props) => {
@@ -38,30 +31,23 @@ export const useGenerateSyntheticExamples = (props: Props) => {
   const { addToast, removeToast } = useToastContext()
 
   const fetchSyntheticExamples = useCallback(
-    async ({
-      credentials,
-      evaluatorName,
-      provider,
-    }: {
-      credentials: { [key: string]: string }
-      evaluatorName: string
-      provider: ModelProviderType
-    }) => {
+    async ({ credentials }: { credentials: { [key: string]: string } }) => {
       setLoadingSyntheticExamples(true)
 
       const body = {
-        provider: provider,
+        provider: props.syntheticGenerationConfig.evaluator?.provider,
         llm_provider_credentials: credentials,
-        evaluator_name: evaluatorName,
+        evaluator_name: props.syntheticGenerationConfig.evaluator?.name,
         type: props.evaluatorType,
         criteria: props.criteria,
         response_variable_name: props.responseVariableName,
         context_variables_names: props.contextVariableNames,
-        generation_length: props.selectedGenerationLength,
-        task: props.selectedTask,
-        domain: props.selectedDomain,
-        persona: props.selectedPersona,
-        per_criteria_option_count: props.quantityPerCriteriaOption,
+        generation_length: props.syntheticGenerationConfig.generationLength,
+        task: props.syntheticGenerationConfig.task,
+        domain: props.syntheticGenerationConfig.domain,
+        persona: props.syntheticGenerationConfig.persona,
+        per_criteria_option_count: props.syntheticGenerationConfig.perCriteriaOptionCount,
+        borderline_count: props.syntheticGenerationConfig.borderlineCount,
       }
 
       const response = await post('synthetic-examples/', body)
@@ -97,30 +83,22 @@ export const useGenerateSyntheticExamples = (props: Props) => {
       props.contextVariableNames,
       props.criteria,
       props.evaluatorType,
-      props.quantityPerCriteriaOption,
       props.responseVariableName,
-      props.selectedDomain,
-      props.selectedGenerationLength,
-      props.selectedPersona,
-      props.selectedTask,
+      props.syntheticGenerationConfig,
     ],
   )
 
   const generateTestData = useCallback(
-    async ({
-      credentials,
-      evaluatorName,
-      provider,
-    }: {
-      credentials: { [key: string]: string }
-      evaluatorName: string
-      provider: ModelProviderType
-    }) => {
+    async ({ credentials }: { credentials: { [key: string]: string } }) => {
       const generationInProgressToastId = addToast({
         kind: 'info',
         title: 'Generating synthetic examples...',
       })
-      const result = await fetchSyntheticExamples({ credentials, evaluatorName, provider })
+      const startEvaluationTime = new Date().getTime() / 1000
+      const result = await fetchSyntheticExamples({ credentials })
+      const endEvaluationTime = new Date().getTime() / 1000
+      const totalEvaluationTime = Math.round(endEvaluationTime - startEvaluationTime)
+
       removeToast(generationInProgressToastId)
 
       if (result.failed) {
@@ -162,7 +140,7 @@ export const useGenerateSyntheticExamples = (props: Props) => {
         title: 'Synthetic examples generated succesfully',
         caption: `${result.syntheticExamples.length} example${result.syntheticExamples.length > 1 ? 's' : ''} ${
           result.syntheticExamples.length > 1 ? 'were' : 'was'
-        } generated and added to the test data`,
+        } generated and added to the test data (took ${totalEvaluationTime} seconds)`,
         timeout: 5000,
       })
     },

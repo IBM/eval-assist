@@ -57,6 +57,7 @@ class Generator:
         domain: Optional[DomainEnum],
         persona: Optional[PersonaEnum],
         per_criteria_option_count: dict[str, int],
+        borderline_count: int,
     ):
         self.provider = provider
         self.llm_provider_credentials = llm_provider_credentials
@@ -71,7 +72,7 @@ class Generator:
         self.domain = domain
         self.persona = persona
         self.per_criteria_option_count = per_criteria_option_count
-
+        self.borderline_count = borderline_count
         self.has_context_variables = len(self.context_names) > 0
 
         # intialize model
@@ -291,8 +292,6 @@ class Generator:
             f"The generated unparsed examples are:\n{json.dumps(responses, indent=2)}"
         )
 
-        # parse the last response (the borderline case)
-
         parsed_responses = [
             self.output_parser.parse(response) for response in responses
         ]
@@ -315,17 +314,16 @@ class Generator:
         criteria_options_dict = {
             option.name: option.description for option in criteria.options
         }
-        criteria_borderline = self._get_borderline_criteria(criteria)
-        criteria_options_dict[criteria_borderline["name"]] = criteria_borderline[
-            "description"
-        ]
 
-        # Replace the borderline count by the synthetically generated borderline
-        if criteria_borderline["name"] != "Borderline":
+        if self.borderline_count > 0:
+            criteria_borderline = self._get_borderline_criteria(criteria)
+            criteria_options_dict[criteria_borderline["name"]] = criteria_borderline[
+                "description"
+            ]
+            # Replace the borderline count by the synthetically generated borderline
             self.per_criteria_option_count[criteria_borderline["name"]] = (
-                self.per_criteria_option_count["Borderline"]
+                self.borderline_count
             )
-            del self.per_criteria_option_count["Borderline"]
 
         for criteria_option_name in self.per_criteria_option_count.keys():
             criteria_option_description = criteria_options_dict[criteria_option_name]

@@ -5,7 +5,6 @@ import traceback
 import uuid
 from typing import Optional, Union, cast
 
-import litellm
 import nbformat as nbf
 import nest_asyncio
 from evalassist.api.types import DomainEnum, PersonaEnum
@@ -70,7 +69,6 @@ from .utils import (
     init_evaluator_name,
 )
 
-litellm._turn_on_debug()
 nest_asyncio.apply()
 
 app = FastAPI()
@@ -457,6 +455,7 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
         domain=params.domain,
         persona=params.persona,
         per_criteria_option_count=params.per_criteria_option_count,
+        borderline_count=params.borderline_count,
     )
     try:
         result = generator.generate()

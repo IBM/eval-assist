@@ -197,7 +197,21 @@ export interface UseCaseV3 extends Omit<UseCaseV2, 'results' | 'contextVariables
   instances: Instance[]
 }
 
-export type UseCase = UseCaseV3
+export interface SyntheticGenerationConfig {
+  task: TaskEnum | null
+  domain: DomainEnum | null
+  persona: PersonaEnum | null
+  generationLength: GenerationLengthEnum | null
+  evaluator: Evaluator | null
+  perCriteriaOptionCount: Record<string, number> | null
+  borderlineCount: number | null
+}
+
+export interface UseCaseV4 extends UseCaseV3 {
+  syntheticGenerationConfig: SyntheticGenerationConfig
+}
+
+export type UseCase = UseCaseV4
 
 export enum EvaluationType {
   DIRECT = 'direct',
