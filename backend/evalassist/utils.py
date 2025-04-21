@@ -75,7 +75,7 @@ def get_local_hf_inference_engine_params(
     return {
         "model_name": convert_model_name_wx_to_hf(model_name),
         "max_new_tokens": 1024,
-        "device": get_default_torch_devide(),
+        "device": get_default_torch_device(),
     }
 
 
@@ -253,8 +253,10 @@ def get_evaluator_metadata_wrapper(
         )
 
 
-def get_default_torch_devide(avoid_mps: bool = False) -> device:
-    return TorchDeviceMixin().get_device_id()
+def get_default_torch_device(avoid_mps: bool = False) -> device:
+    device = TorchDeviceMixin().get_device_id()
+    logger.debug(f"Detected device: {device}")
+    return device
 
 
 def init_evaluator_name(
