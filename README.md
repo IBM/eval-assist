@@ -89,3 +89,18 @@ Visit [http://localhost:3000](https://localhost:3000)
 * **clean**:  Removes dependencies and generated files from both backend and frontend.
 * **clean-backend**: Deletes the backend virtual environment and generated Prisma schema.
 * **clean-frontend**: Removes frontend dependencies and generated Prisma schema.
+
+## Custom models
+
+You can add custom new evaluators to EvalAssist using any of the supported providers. To do so, ask you system administrator to add a `custom_models.json` file to the backend's folder. For example, to add DeepSeek R1 Distill
+Llama 70B as an evaluator, add the following json:
+
+```json
+[
+  {
+    "name": "DeepSeek R1 Distill Llama 70B",
+    "path": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "providers": ["local_hf"],
+  },
+]
+```
