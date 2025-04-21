@@ -66,17 +66,26 @@ export const useGenerateSyntheticExamples = (props: Props) => {
 
         setLoadingSyntheticExamples(false)
         return {
-          syntheticExamples: [],
+          generatedInstances: [],
           failed: true,
           errorMessage,
         }
       }
 
-      const syntheticExamples = await response.json()
-
+      const unparsedGeneratedInstances = await response.json()
+      const generatedInstances: DirectInstance[] = unparsedGeneratedInstances.map((unparsedGeneratedInstance: any) => ({
+        contextVariables: Object.entries(unparsedGeneratedInstance.context_variables).map(([name, value]) => ({
+          name,
+          value,
+        })),
+        expectedResult: '',
+        result: null,
+        metadata: unparsedGeneratedInstance.metadata,
+        response: unparsedGeneratedInstance.response,
+      }))
       setLoadingSyntheticExamples(false)
 
-      return { syntheticExamples, failed: false, errorMessage: '' }
+      return { generatedInstances, failed: false, errorMessage: '' }
     },
     [
       post,
@@ -110,36 +119,12 @@ export const useGenerateSyntheticExamples = (props: Props) => {
         })
         return
       }
-      const syntheticExamples = result.syntheticExamples.map((syntheticExample: Record<string, string>) => {
-        let syntheticInstance: Instance = {
-          contextVariables: props.contextVariableNames.map((contextVariableName) => ({
-            name: contextVariableName,
-            value: syntheticExample[contextVariableName],
-          })),
-          expectedResult: '',
-          result: null,
-        }
-
-        if (props.type === EvaluationType.DIRECT) {
-          ;(syntheticInstance as DirectInstance) = {
-            ...syntheticInstance,
-            response: syntheticExample[props.responseVariableName!],
-          }
-        } else {
-          ;(syntheticInstance as PairwiseInstance) = {
-            ...syntheticInstance,
-            responses: (props.instances[0] as PairwiseInstance).responses.map((_) => ''),
-          }
-        }
-        return syntheticInstance
-      })
-
-      props.setInstances([...props.instances, ...syntheticExamples])
+      props.setInstances([...props.instances, ...result.generatedInstances])
       addToast({
         kind: 'success',
         title: 'Synthetic examples generated succesfully',
-        caption: `${result.syntheticExamples.length} example${result.syntheticExamples.length > 1 ? 's' : ''} ${
-          result.syntheticExamples.length > 1 ? 'were' : 'was'
+        caption: `${result.generatedInstances.length} example${result.generatedInstances.length > 1 ? 's' : ''} ${
+          result.generatedInstances.length > 1 ? 'were' : 'was'
         } generated and added to the test data (took ${totalEvaluationTime} seconds)`,
         timeout: 5000,
       })

@@ -17,7 +17,7 @@ from unitxt.llm_as_judge import (
     ModelProviderEnum,
 )
 
-from ..api.common import CriteriaWithOptionsAPI
+from ..api.common import CriteriaWithOptionsAPI, Instance
 from ..api.types import DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 from ..utils import (
@@ -222,57 +222,6 @@ class Generator:
                     "response_name": self.response_name,
                 },
             )
-        # elif self.task is None:
-        #     # build prompt from variable names
-
-        #     print(f"RESPONSE NAME: {self.response_name}")
-        #     print(f"CONTEXT NAMES: {self.context_names}")
-
-        #     # response schema
-        #     response_schemas = [
-        #         ResponseSchema(
-        #             name=self.response_name,
-        #             description=f"the requested {self.response_name}",
-        #         ),
-        #     ]
-        #     self.output_parser = StructuredOutputParser.from_response_schemas(
-        #         response_schemas
-        #     )
-        #     self.format_instructions = self.output_parser.get_format_instructions()
-        #     # prompt templates
-        #     self.system_prompt_template = PromptTemplate(
-        #         input_variables=[
-        #             "context_listresponse_name",
-        #             "dimension",
-        #             "dimension_description",
-        #             "target",
-        #             "target_description",
-        #         ],
-        #         template=dedent("""You will be given the following context variables:
-        #         {context_list}
-
-        #         You will be asked to generate a {response_name} according to a specific target criteria.
-
-        #         You should generate a summary that matches the following requirements:
-        #         Dimension: {dimension}
-        #         Dimension description: {dimension_description}
-        #         Target: {target}
-        #         Target description: {target_description}
-
-        #         Your task is to generate a {response_name} that STRICTLY follows this requirement. This is for evaluation purposes.
-
-        #         Important:
-        #         - Focus exclusively on the specified dimension and target
-        #         - Make sure your {response_name} clearly demonstrates the described characteristics
-        #         - Do not mention the criteria in your summary - simply generate a {response_name} that embodies the characteristics
-        #         - Please keep your {response_name} with a length of """),
-        #     )
-
-        #     self.query_template = PromptTemplate(
-        #         input_variables=["response_name", "context_data"],
-        #         template="Please generate a {response_name} for the following context:\n{context_data} \n\n{format_instructions}",
-        #         partial_variables={"format_instructions": self.format_instructions},
-        #     )
         else:
             raise NotImplementedError(
                 f"Generation not implemented for task type: {self.task}"
@@ -283,7 +232,7 @@ class Generator:
 
     def generate(self):
         # form prompts using criteria
-        system_prompts, queries, contexts, metadata = self._format_prompts()
+        system_prompts, queries, contexts, metadatas = self._format_prompts()
         prompts = [
             system_prompt + "\n\n" + query
             for system_prompt, query in zip(system_prompts, queries)
@@ -299,27 +248,23 @@ class Generator:
         parsed_responses = [
             self.output_parser.parse(response) for response in responses
         ]
-        result = [
-            {
-                self.response_name: next(iter(parsed_response.values())),
-            }
-            for parsed_response in parsed_responses
+
+        instances = [
+            Instance(
+                context_variables=context,
+                response=parsed_responses[self.response_name],
+                response_variable_name=self.response_name,
+                metadata=metadata,
+            )
+            for parsed_responses, context, metadata in zip(
+                parsed_responses, contexts, metadatas
+            )
         ]
-        if self.has_context_variables:
-            result = [
-                {
-                    **r,
-                    **context,
-                }
-                for r, context in zip(result, contexts)
-            ]
 
-        # todo: return prompt as well (for inspection)
-
-        return result
+        return instances
 
     def _format_prompts(self):
-        system_prompts, queries, contexts, metadata = [], [], [], []
+        system_prompts, queries, contexts, metadatas = [], [], [], []
 
         criteria: CriteriaWithOptions = self.criteria
         criteria_options_dict = {
@@ -383,43 +328,24 @@ class Generator:
                         },
                     )
 
-                # elif self.task is None:
-                #     context_list = "\n\n".join(
-                #         f"- {name}" for name in self.context_names
-                #     )
-                #     system_prompt = self.system_prompt_template.format(
-                #         context_list=context_list,
-                #         response_name=self.response_name,
-                #         dimension=self.criteria.name,
-                #         dimension_description=self.criteria.description,
-                #         target=criteria_option_name,
-                #         target_description=criteria_option_description,
-                #     )
-
-                #     # todo:
-                #     #  - pull from dataset bank: use an LLM to map the context variable names to the appropriate dataset
-                #     #  - synthetically generate the context variables (check quality of this)
-
-                #     context_data = "\n\n".join(
-                #         f"- {name} :\n ..." for name in self.context_names
-                #     )
-                #     query = self.query_template.format(
-                #         response_name=self.response_name, context_data=context_data
-                #     )
-
-                # append
                 system_prompts.append(system_prompt)
                 queries.append(query)
-                metadata.append(
+                metadatas.append(
                     {
-                        "dimension": self.criteria.name,
-                        "target": criteria_option_name,
-                        "target_description": criteria_option_description,
-                        "generation_idx": gen_idx,
+                        "synthetic_generation": {
+                            "model_name": self.inference_engine.get_engine_id(),
+                            "criteria_name": self.criteria.name,
+                            "target_option_name": criteria_option_name,
+                            "target_option_description": criteria_option_description,
+                            "system_prompt": system_prompt,
+                            "task": self.task.value,
+                            "persona": self.persona.value if self.persona else None,
+                            "domain": self.domain.value if self.domain else None,
+                        }
                     }
                 )
 
-        return system_prompts, queries, contexts, metadata
+        return system_prompts, queries, contexts, metadatas
 
     def _generate_synthetic_context(self):
         response_schemas = [

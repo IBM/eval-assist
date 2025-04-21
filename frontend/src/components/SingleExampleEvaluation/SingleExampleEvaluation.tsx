@@ -253,12 +253,12 @@ export const SingleExampleEvaluation = () => {
           (acc, item, index) => ({ ...acc, [item.name]: item.value }),
           {},
         ),
-        prediction: returnByPipelineType(
+        response: returnByPipelineType(
           currentTestCase.type,
           (instance as DirectInstance).response,
           (instance as PairwiseInstance).responses,
         ),
-        prediction_variable_name: currentTestCase.responseVariableName,
+        response_variable_name: currentTestCase.responseVariableName,
       })),
       evaluator_name: currentTestCase.evaluator?.name,
       provider: currentTestCase.evaluator?.provider,

@@ -30,11 +30,11 @@ from .api.common import (
     CriteriaWithOptionsAPI,
     DirectEvaluationRequestModel,
     DirectResponseModel,
+    Instance,
     NotebookParams,
     PairwiseEvaluationRequestModel,
     PairwiseResponseModel,
     SyntheticExampleGenerationRequest,
-    SyntheticExampleGenerationResponse,
 )
 
 # API type definitions
@@ -376,7 +376,7 @@ def get_domain_persona_map():
     return domain_persona_map
 
 
-@router.post("/synthetic-examples/", response_model=SyntheticExampleGenerationResponse)
+@router.post("/synthetic-examples/", response_model=list[Instance])
 def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     # populate config
     evaluator_name, custom_model_name = init_evaluator_name(params.evaluator_name)
@@ -401,14 +401,12 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
             borderline_count=params.borderline_count,
         )
         try:
-            result = generator.generate()
+            return generator.generate()
         except OutputParserException as e:
             raise HTTPException(
                 status_code=400,
                 detail=f"{params.evaluator_name} was unable to generate an appropriate synthetic example",
             ) from e
-
-        return SyntheticExampleGenerationResponse(result)
 
     return run()
 

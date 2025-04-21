@@ -52,7 +52,7 @@ class Evaluator(ABC):
         raise NotImplementedError("This method must be implemented.")
 
     def get_predictions(self, instances: list[Instance]) -> list[str | list[str]]:
-        return [instance.prediction for instance in instances]
+        return [instance.response for instance in instances]
 
     def evaluate(
         self,
@@ -218,7 +218,7 @@ class GraniteGuardianEvaluator(ABC):
         return messages[criteria_name]
 
     def get_predictions(self, instances: list[Instance]) -> list[str | list[str]]:
-        return [instance.prediction for instance in instances]
+        return [instance.response for instance in instances]
 
     def get_prompt(self, risk_name, instances) -> str:
         risk_name = self.get_risk_name(risk_name)
@@ -295,7 +295,7 @@ class GraniteGuardianEvaluator(ABC):
         context_variables_list = [instance.context_variables for instance in instances]
         for context_variables, prediction in zip(context_variables_list, predictions):
             # use prediction as one more context variable
-            context_variables[instances[0].prediction_variable_name] = prediction
+            context_variables[instances[0].response_variable_name] = prediction
 
         return [
             {k.lower().replace(" ", "_"): v for k, v in context_variables.items()}
@@ -356,7 +356,7 @@ class GraniteGuardianEvaluator(ABC):
         dataset = load_dataset(card=card, split="test")
         evaluated_dataset = evaluate(predictions=[0.0 for _ in dataset], data=dataset)
         result = self.parse_results(
-            evaluated_dataset, instances[0].prediction_variable_name
+            evaluated_dataset, instances[0].response_variable_name
         )
         return result
 

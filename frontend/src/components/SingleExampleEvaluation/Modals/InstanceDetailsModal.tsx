@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { getOrdinalSuffix, returnByPipelineType, toPercentage, toTitleCase } from 'src/utils'
+import { capitalizeFirstWord, getOrdinalSuffix, returnByPipelineType, toPercentage, toTitleCase } from 'src/utils'
 
 import { Dispatch, Fragment, SetStateAction, useEffect, useMemo, useState } from 'react'
 
@@ -79,7 +79,7 @@ export const InstanceDetailsModal = ({
                 {type === EvaluationType.DIRECT && (
                   <>
                     <p>
-                      <strong>{toTitleCase(responseVariableName)}</strong>
+                      <strong>{`${toTitleCase(responseVariableName)}:`}</strong>
                     </p>
                     <p>{(selectedInstance as DirectInstance).response}</p>
                   </>
@@ -99,7 +99,7 @@ export const InstanceDetailsModal = ({
             <AccordionItem title={`Criteria: ${criteria.name}`} open key={'criteria'}>
               <div className={cx(classes.gridTemplate)}>
                 <p>
-                  <strong>{'Description'}</strong>
+                  <strong>{'Description:'}</strong>
                 </p>
                 <p>{criteria.description}</p>
               </div>{' '}
@@ -288,6 +288,24 @@ export const InstanceDetailsModal = ({
                 <p>{'There are no available results.'}</p>
               )}
             </AccordionItem>
+            {selectedInstance.metadata && 'synthetic_generation' in selectedInstance.metadata && (
+              <AccordionItem title="Synthetic generation metadata" open key={'Synthetic generation metadata'}>
+                <p>{'This instance was generated synthetically by an LLM.'}</p>
+                <br />
+                <div className={cx(classes.gridTemplate)}>
+                  {Object.entries(selectedInstance.metadata['synthetic_generation'] as Record<string, any>).map(
+                    ([k, v]) => (
+                      <>
+                        <p>
+                          <strong>{`${capitalizeFirstWord(k)}:`}</strong>
+                        </p>
+                        <p>{capitalizeFirstWord(v)}</p>
+                      </>
+                    ),
+                  )}
+                </div>
+              </AccordionItem>
+            )}
           </Accordion>
         </Layer>
       </Modal>

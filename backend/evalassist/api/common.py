@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import HTTPException
-from pydantic import BaseModel, RootModel, field_validator
+from pydantic import BaseModel, field_validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
 
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
@@ -23,8 +23,9 @@ class CriteriaModel(BaseModel):
 
 class Instance(BaseModel):
     context_variables: dict[str, str]
-    prediction: str | list[str]
-    prediction_variable_name: Optional[str]
+    response: str | list[str]
+    response_variable_name: Optional[str]
+    metadata: Optional[dict[str, Any]] = None
 
 
 class EvaluationRequestModel(BaseModel):
@@ -137,10 +138,6 @@ class SyntheticExampleGenerationRequest(BaseModel):
     persona: Optional[PersonaEnum]
     per_criteria_option_count: dict[str, int]
     borderline_count: int
-
-
-class SyntheticExampleGenerationResponse(RootModel):
-    root: list[dict[str, str]]
 
 
 class RubricOptionModel(BaseModel):

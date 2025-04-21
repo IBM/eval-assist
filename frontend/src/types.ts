@@ -37,7 +37,6 @@ export interface PerResponsePairwiseResultV1
   extends Omit<PerResponsePairwiseResultV0, 'comparedToIndexes' | 'explanations' | 'certainty'> {
   comparedTo: string[]
   summaries: FetchedPerResponsePairwiseResultV1['summaries']
-  // certainties: FetchedPerResponsePairwiseResultV1['certainties']
 }
 
 export type PerResponsePairwiseResult = PerResponsePairwiseResultV1
@@ -157,6 +156,7 @@ export type Instance = {
   contextVariables: ContextVariableV1[]
   expectedResult: string
   result: DirectInstanceResult | PairwiseInstanceResult | null
+  metadata?: Record<string, any>
 }
 
 export interface DirectInstance extends Instance {
