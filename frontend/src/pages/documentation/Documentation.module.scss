@@ -1,5 +1,5 @@
 .documentation p {
-  font-size: var(--cds-body-01-font-size, 1.0rem);
+  font-size: var(--cds-body-01-font-size, 1rem);
   font-weight: var(--cds-body-01-font-weight, 500);
   line-height: var(--cds-body-01-line-height, 1.42857);
   letter-spacing: var(--cds-body-01-letter-spacing, 0.16px);
@@ -22,4 +22,8 @@
   font-size: 1.25rem;
   line-height: 1.375;
   margin-bottom: 1rem;
+}
+
+.image_border {
+  border: 1px solid gray;
 }
