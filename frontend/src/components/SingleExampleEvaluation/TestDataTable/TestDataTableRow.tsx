@@ -17,7 +17,6 @@ import {
   Instance,
   PairwiseInstance,
   PairwiseInstanceResult,
-  PerResponsePairwiseResult,
 } from '../../../types'
 import RemovableSection from '../../RemovableSection/RemovableSection'
 import classes from './index.module.scss'

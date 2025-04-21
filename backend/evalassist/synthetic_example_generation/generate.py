@@ -251,14 +251,12 @@ class Generator:
 
         instances = [
             Instance(
-                context_variables=context,
-                response=parsed_responses[self.response_name],
+                context_variables=contexts[i] if self.has_context_variables else {},
+                response=parsed_responses[i][self.response_name],
                 response_variable_name=self.response_name,
-                metadata=metadata,
+                metadata=metadatas[i],
             )
-            for parsed_responses, context, metadata in zip(
-                parsed_responses, contexts, metadatas
-            )
+            for i in range(len(parsed_responses))
         ]
 
         return instances
