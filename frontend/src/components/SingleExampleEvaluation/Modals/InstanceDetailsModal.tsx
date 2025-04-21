@@ -3,17 +3,17 @@ import { getOrdinalSuffix, returnByPipelineType, toPercentage, toTitleCase } fro
 
 import { Dispatch, Fragment, SetStateAction, useEffect, useMemo, useState } from 'react'
 
-import { Accordion, AccordionItem, Layer, Link, ListItem, Modal, Tooltip, UnorderedList } from '@carbon/react'
-import { ArrowRight, Warning, WarningAlt } from '@carbon/react/icons'
+import { Accordion, AccordionItem, Layer, ListItem, Modal, Tooltip, UnorderedList } from '@carbon/react'
+import { ArrowRight, Warning } from '@carbon/react/icons'
 
 import {
+  Criteria,
   DirectInstance,
   DirectInstanceResult,
   EvaluationType,
   Instance,
   PairwiseInstance,
   PairwiseInstanceResult,
-  PerResponsePairwiseResult,
 } from '../../../types'
 import classes from './InstanceDetailsModal.module.scss'
 
@@ -24,6 +24,7 @@ interface Props {
   setSelectedInstance: Dispatch<SetStateAction<Instance | null>>
   type: EvaluationType
   responseVariableName: string
+  criteria: Criteria
 }
 
 export const InstanceDetailsModal = ({
@@ -33,6 +34,7 @@ export const InstanceDetailsModal = ({
   setSelectedInstance,
   type,
   responseVariableName,
+  criteria,
 }: Props) => {
   const onClose = () => {
     setOpen(false)
@@ -93,6 +95,14 @@ export const InstanceDetailsModal = ({
                     </Fragment>
                   ))}
               </div>
+            </AccordionItem>
+            <AccordionItem title={`Criteria: ${criteria.name}`} open key={'criteria'}>
+              <div className={cx(classes.gridTemplate)}>
+                <p>
+                  <strong>{'Description'}</strong>
+                </p>
+                <p>{criteria.description}</p>
+              </div>{' '}
             </AccordionItem>
             <AccordionItem title="Results" open key={'results'}>
               {selectedInstance.result ? (
