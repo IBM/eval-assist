@@ -776,6 +776,7 @@ export const SingleExampleEvaluation = () => {
             setSelectedInstance={setSelectedInstance}
             type={currentTestCase.type}
             responseVariableName={currentTestCase.responseVariableName}
+            criteria={currentTestCase.criteria}
           />
           <PromptModal
             open={promptModalOpen}
