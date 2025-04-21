@@ -19,6 +19,7 @@ class ExtendedEvaluatorNameEnum(Enum):
     GRANITE_GUARDIAN3_1_8B = "Granite Guardian 3.1 8B"
     GRANITE_GUARDIAN3_2_3B = "Granite Guardian 3.2 3B"
     GRANITE_GUARDIAN3_2_5B = "Granite Guardian 3.2 5B"
+    DEEPSEEK_V3 = "DeepSeek V3"
     CUSTOM = "custom"
 
 
@@ -36,6 +37,7 @@ EXTENDED_EVALUATOR_TO_MODEL_ID = {
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "ibm/granite-guardian-3-8b",
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B: "ibm-granite/granite-guardian-3.2-3b-a800m",
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B: "ibm-granite/granite-guardian-3.2-5b",
+    ExtendedEvaluatorNameEnum.DEEPSEEK_V3: "deepseek-ai/DeepSeek-V3",
 }
 
 
@@ -75,6 +77,10 @@ EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = [
     ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B,
         [ExtendedModelProviderEnum.LOCAL_HF],
+    ),
+    ExtendedEvaluatorMetadata(
+        ExtendedEvaluatorNameEnum.DEEPSEEK_V3,
+        [ModelProviderEnum.RITS],
     ),
 ]
 
