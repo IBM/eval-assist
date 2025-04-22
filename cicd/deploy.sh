@@ -197,12 +197,12 @@ spec:
               cpu: 1
               memory: 4Gi
           volumeMounts:
-            - name: eval-assist-volume
+            - name: ${CLUSTER_NAMESPACE}-volume
               mountPath: /app/prisma/db
       volumes:
-        - name: eval-assist-volume
+        - name: ${CLUSTER_NAMESPACE}-volume
           persistentVolumeClaim:
-            claimName: eval-assist-volume
+            claimName: ${CLUSTER_NAMESPACE}-volume
 ---
 apiVersion: v1
 kind: Service
@@ -243,7 +243,7 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "true"
     kubernetes.io/ingress.class: f5
     virtual-server.f5.com/balance: round-robin
-    virtual-server.f5.com/ip: 9.12.246.105
+    virtual-server.f5.com/ip: ${INGRESS_IP}
     virtual-server.f5.com/partition: RIS3-INT-OCP-DAL12
     virtual-server.f5.com/clientssl: '[ { "bigIpProfile": "/Common/BlueMix" } ]'
   name: ${K8S_NAME}
