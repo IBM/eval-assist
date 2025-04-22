@@ -10,7 +10,7 @@ import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, Compare, List } from '@carbon/react/icons'
 
 import { EvaluationType, UseCase } from '../../../types'
-import { useURLInfoContext } from '../Providers/URLInfoProvider'
+import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { LinkButton } from './LinkButton'
 import classes from './TwoLevelsPanel.module.scss'
 
@@ -21,7 +21,7 @@ interface Props {
 }
 
 export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: Props) => {
-  const { useCaseId } = useURLInfoContext()
+  const { useCaseId } = useURLParamsContext()
 
   const selectedNode = useMemo(() => {
     return useCaseId !== null ? [`${useCaseId}`] : []

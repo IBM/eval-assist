@@ -19,22 +19,24 @@ interface URLInfoContextValue {
   preloadedUseCase: UseCase | null
   isRisksAndHarms: boolean
   subCatalogName: string | null
+  syntheticGenerationEnabled: boolean
 }
 
-const URLInfoContext = createContext<URLInfoContextValue>({
+const URLParamsContext = createContext<URLInfoContextValue>({
   useCaseId: null,
   useCaseType: null,
   libraryTestCaseName: null,
   preloadedUseCase: null,
   isRisksAndHarms: false,
   subCatalogName: null,
+  syntheticGenerationEnabled: true,
 })
 
-export const useURLInfoContext = () => {
-  return useContext(URLInfoContext)
+export const useURLParamsContext = () => {
+  return useContext(URLParamsContext)
 }
 
-export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
+export const URLParamsProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
   const { getEmptyUseCaseWithCriteria } = useCriteriasContext()
   const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
@@ -63,6 +65,11 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   const criteriaName = useMemo(
     () => (router.query.criteriaName ? toSnakeCase(router.query.criteriaName as string) : null),
     [router.query.criteriaName],
+  )
+
+  const syntheticGenerationEnabled = useMemo(
+    () => (router.query.sge ? router.query.sge === 'true' : false),
+    [router.query.sge],
   )
 
   const getDefaultEvaluator = useCallback(
@@ -162,7 +169,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   ])
 
   return (
-    <URLInfoContext.Provider
+    <URLParamsContext.Provider
       value={{
         useCaseId,
         useCaseType,
@@ -170,9 +177,10 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
         preloadedUseCase,
         isRisksAndHarms,
         subCatalogName,
+        syntheticGenerationEnabled,
       }}
     >
       {children}
-    </URLInfoContext.Provider>
+    </URLParamsContext.Provider>
   )
 }

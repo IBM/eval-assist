@@ -8,7 +8,7 @@ import { Warning } from '@carbon/react/icons'
 import { ModelProviderType, UseCase } from '@types'
 
 import classes from './EvaluateButton.module.scss'
-import { useURLInfoContext } from './Providers/URLInfoProvider'
+import { useURLParamsContext } from './Providers/URLParamsProvider'
 
 interface EvaluateButtonProps {
   evaluationRunning: boolean
@@ -31,7 +31,7 @@ export const EvaluateButton = ({
   style,
   className,
 }: EvaluateButtonProps) => {
-  const { isRisksAndHarms } = useURLInfoContext()
+  const { isRisksAndHarms } = useURLParamsContext()
 
   return (
     <div style={style} className={className}>

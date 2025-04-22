@@ -11,3 +11,5 @@ export const modelProviderBeautifiedName: Record<ModelProviderType, string> = {
   [ModelProviderType.AZURE_OPENAI]: 'Azure OpenAI',
   [ModelProviderType.LOCAL_HF]: 'Local HF',
 }
+
+export const INSTANCES_PER_PAGE = 5

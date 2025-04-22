@@ -22,7 +22,7 @@ import { HighlightTextArea } from '@components/HighlightTextArea'
 import { CriteriaWithOptions } from '@types'
 
 import { JSONTextArea } from '../JSONTextArea'
-import { useURLInfoContext } from '../Providers/URLInfoProvider'
+import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import classes from '../SingleExampleEvaluation.module.scss'
 import customClasses from './index.module.scss'
 
@@ -49,7 +49,7 @@ export const RubricCriteriaView = ({
 }: EvaluationCriteriaProps) => {
   const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(rubricCriteria.name === '')
   const [rawJSONCriteria, setRawJSONCriteria] = useState('')
-  const { isRisksAndHarms } = useURLInfoContext()
+  const { isRisksAndHarms } = useURLParamsContext()
   const isValidRawJSONCriteria = (jsonCriteria: string) => {
     try {
       const rawJSONCriteriaObj = JSON.parse(jsonCriteria)
