@@ -61,13 +61,6 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
       <div className={classes.content}>
         <div className={classes.treeWrapper}>
           <TreeView label="" selected={selectedNode}>
-            {/* <TreeNode
-              key={'rubric'}
-              label={RUBRIC_NAME}
-              onSelect={() => handleToggle('rubric')}
-              onToggle={() => handleToggle('rubric')}
-              isExpanded={expanded.rubric}
-            > */}
             {Object.entries(harmsAndRisksLibraryTestCases).map(([subCatalogName, useCases]) => (
               <TreeNode
                 label={capitalizeFirstWord(subCatalogName)}

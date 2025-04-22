@@ -792,7 +792,9 @@ export const SingleExampleEvaluation = () => {
               generateTestData={() =>
                 generateTestData({
                   credentials: currentTestCase?.evaluator
-                    ? modelProviderCredentials[currentTestCase?.evaluator.provider as ModelProviderType]
+                    ? modelProviderCredentials[
+                        currentTestCase.syntheticGenerationConfig?.evaluator?.provider as ModelProviderType
+                      ]
                     : {},
                 })
               }
