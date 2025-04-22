@@ -178,7 +178,7 @@ class Generator:
                 template="Please summarize the following text:\n\n{original_text}\n\n{format_instructions}",
                 partial_variables={"format_instructions": self.format_instructions},
             )
-        elif self.task == TaskEnum.TEXT_GENERATION:
+        elif self.task == TaskEnum.TEXT_GENERATION or self.task is None:
             response_schemas = [
                 ResponseSchema(
                     name=self.response_name,
@@ -227,7 +227,11 @@ class Generator:
                 f"Generation not implemented for task type: {self.task}"
             )
 
-        if self.has_context_variables and task != TaskEnum.TEXT_GENERATION:
+        if (
+            self.task is not None
+            and self.has_context_variables
+            and task != TaskEnum.TEXT_GENERATION
+        ):
             self.context_data = load_jsonl(get_data_path(self.task, self.domain))
 
     def generate(self):
@@ -293,7 +297,7 @@ class Generator:
                 if self.generation_length
                 else GenerationLengthEnum.MEDIUM.value,
             }
-            if self.task == TaskEnum.TEXT_GENERATION:
+            if self.task == TaskEnum.TEXT_GENERATION or self.task is None:
                 system_prompt_params["response_name"] = self.response_name
             system_prompt = self.system_prompt_template.format(**system_prompt_params)
             for gen_idx in range(self.per_criteria_option_count[criteria_option_name]):
@@ -312,7 +316,7 @@ class Generator:
                     contexts.append(dict(zip(self.context_names, [original_text])))
                     query = self.query_template.format(original_text=original_text)
 
-                elif self.task == TaskEnum.TEXT_GENERATION:
+                elif self.task == TaskEnum.TEXT_GENERATION or self.task is None:
                     if self.has_context_variables:
                         context = self._generate_synthetic_context()
                         contexts.append(context)
@@ -337,9 +341,12 @@ class Generator:
                             "target_option_name": criteria_option_name,
                             "target_option_description": criteria_option_description,
                             "system_prompt": system_prompt,
-                            "task": self.task.value,
-                            "persona": self.persona.value if self.persona else None,
+                            "data_length": self.generation_length.value
+                            if self.generation_length
+                            else None,
+                            "task": self.task.value if self.domain else None,
                             "domain": self.domain.value if self.domain else None,
+                            "persona": self.persona.value if self.persona else None,
                         }
                     }
                 )
@@ -367,7 +374,6 @@ class Generator:
                 "context_names",
                 "persona",
                 "domain",
-                "task",
             ],
             template=dedent("""You will be given a list of context names and you will be asked to generate an example of such context names based on the following reference information.
 
@@ -393,13 +399,11 @@ class Generator:
             response_name=self.response_name,
             persona=self.persona.value if self.persona else "All personas",
             domain=self.domain.value if self.domain else "All domains",
-            task=self.task.value,
+            task=self.task.value if self.task else "All tasks",
         )
         query = query_template.format()
 
         prompt = system_prompt + "\n\n" + query
-        print("prompt")
-        print(prompt)
         response = self.inference_engine.infer([{"source": prompt}])[0]
 
         parsed_response = output_parser.parse(response)
