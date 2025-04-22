@@ -299,7 +299,9 @@ export const InstanceDetailsModal = ({
                         <p>
                           <strong>{`${capitalizeFirstWord(k)}:`}</strong>
                         </p>
-                        <p>{capitalizeFirstWord(v)}</p>
+                        <p style={{ whiteSpace: 'pre-line' }}>
+                          {v !== null ? capitalizeFirstWord(v) : 'Not specified'}
+                        </p>
                       </>
                     ),
                   )}
