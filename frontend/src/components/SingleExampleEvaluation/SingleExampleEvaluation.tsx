@@ -699,7 +699,11 @@ export const SingleExampleEvaluation = () => {
               setSysntheticGenerationModalOpen={setSyntheticGenerationModalOpen}
               generateTestData={() =>
                 generateTestData({
-                  credentials: modelProviderCredentials[currentTestCase.evaluator?.provider as ModelProviderType],
+                  credentials: currentTestCase?.evaluator
+                    ? modelProviderCredentials[
+                        currentTestCase.syntheticGenerationConfig?.evaluator?.provider as ModelProviderType
+                      ]
+                    : {},
                 })
               }
               modelForSyntheticGeneration={currentTestCase.syntheticGenerationConfig.evaluator}
