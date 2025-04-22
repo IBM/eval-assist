@@ -17,8 +17,8 @@ set -eo pipefail
 npm run prisma:prepare:backend
 npm run prisma:prepare:frontend
 
-IMAGE_NAME_BACKEND="eval-assist-backend"
-IMAGE_NAME_FRONTEND="eval-assist-frontend"
+IMAGE_NAME_BACKEND="${IMAGE_NAME}-backend"
+IMAGE_NAME_FRONTEND="${IMAGE_NAME}-frontend"
 # Input env variables (can be received via a pipeline environment properties.file.
 echo "REGISTRY_URL=${REGISTRY_URL}"
 echo "REGISTRY_NAMESPACE=${REGISTRY_NAMESPACE}"
@@ -129,7 +129,7 @@ if [ -z "${ARCHIVE_DIR}" ]; then
 else
   echo -e "Copying working dir into build archive directory: ${ARCHIVE_DIR} "
   mkdir -p ${ARCHIVE_DIR}
-find . -mindepth 1 -maxdepth 1 -not -path "./$ARCHIVE_DIR" -exec cp -R '{}' "${ARCHIVE_DIR}/" ';'
+  find . -mindepth 1 -maxdepth 1 -not -path "./$ARCHIVE_DIR" -exec cp -R '{}' "${ARCHIVE_DIR}/" ';'
 fi
 
 # Load existing build.properties to preserve previous variables

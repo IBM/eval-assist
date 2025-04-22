@@ -24,15 +24,7 @@ echo "REGISTRY_URL=${REGISTRY_URL}"
 echo "IMAGE_MANIFEST_SHA_BACKEND=${IMAGE_MANIFEST_SHA_BACKEND}"
 echo "IMAGE_MANIFEST_SHA_FRONTEND=${IMAGE_MANIFEST_SHA_FRONTEND}"
 echo "REGISTRY_NAMESPACE=${REGISTRY_NAMESPACE}"
-echo "DEPLOYMENT_FILE=${DEPLOYMENT_FILE}"
-echo "USE_ISTIO_GATEWAY=${USE_ISTIO_GATEWAY}"
-echo "KEEP_INGRESS_CUSTOM_DOMAIN=${KEEP_INGRESS_CUSTOM_DOMAIN}"
 echo "KUBERNETES_SERVICE_ACCOUNT_NAME=${KUBERNETES_SERVICE_ACCOUNT_NAME}"
-
-echo "Use for custom Kubernetes cluster target:"
-echo "KUBERNETES_MASTER_ADDRESS=${KUBERNETES_MASTER_ADDRESS}"
-echo "KUBERNETES_MASTER_PORT=${KUBERNETES_MASTER_PORT}"
-echo "KUBERNETES_SERVICE_ACCOUNT_TOKEN=${KUBERNETES_SERVICE_ACCOUNT_TOKEN}"
 
 if [ -z "${IMAGE_MANIFEST_SHA_BACKEND}" ]; then
   IMAGE_BACKEND="${REGISTRY_URL}/${REGISTRY_NAMESPACE}/${IMAGE_NAME_BACKEND}:${IMAGE_TAG}"
@@ -63,13 +55,6 @@ fi
 echo "PIPELINE_KUBERNETES_CLUSTER_NAME=${PIPELINE_KUBERNETES_CLUSTER_NAME}"
 echo "CLUSTER_NAMESPACE=${CLUSTER_NAMESPACE}"
 
-# If custom cluster credentials available, connect to this cluster instead
-if [ ! -z "${KUBERNETES_MASTER_ADDRESS}" ]; then
-  kubectl config set-cluster custom-cluster --server=https://${KUBERNETES_MASTER_ADDRESS}:${KUBERNETES_MASTER_PORT} --insecure-skip-tls-verify=true
-  kubectl config set-credentials sa-user --token="${KUBERNETES_SERVICE_ACCOUNT_TOKEN}"
-  kubectl config set-context custom-context --cluster=custom-cluster --user=sa-user --namespace="${CLUSTER_NAMESPACE}"
-  kubectl config use-context custom-context
-fi
 # Use kubectl auth to check if the kubectl client configuration is appropriate
 # check if the current configuration can create a deployment in the target namespace
 echo "Check ability to create a kubernetes deployment in ${CLUSTER_NAMESPACE} using kubectl CLI"
@@ -78,20 +63,8 @@ kubectl auth can-i create deployment --namespace ${CLUSTER_NAMESPACE}
 #Check cluster availability
 echo "=========================================================="
 echo "CHECKING CLUSTER readiness and namespace existence"
-if [ -z "${KUBERNETES_MASTER_ADDRESS}" ]; then
-  CLUSTER_ID=${PIPELINE_KUBERNETES_CLUSTER_ID:-${PIPELINE_KUBERNETES_CLUSTER_NAME}} # use cluster id instead of cluster name to handle case where there are multiple clusters with same name
-  IP_ADDR=$( ibmcloud ks workers --cluster ${CLUSTER_ID} | grep normal | head -n 1 | awk '{ print $2 }' )
-  if [ -z "${IP_ADDR}" ]; then
-    echo -e "${PIPELINE_KUBERNETES_CLUSTER_NAME} not created or workers not ready"
-    exit 1
-  fi
-  # Use alternate operator .ingress.XXX for vpc/gen2 / apiv2 cluster
-  CLUSTER_INGRESS_SUBDOMAIN=$( ibmcloud ks cluster get --cluster ${CLUSTER_ID} --json | jq -r '.ingressHostname // .ingress.hostname' | cut -d, -f1 )
-  CLUSTER_INGRESS_SECRET=$( ibmcloud ks cluster get --cluster ${CLUSTER_ID} --json | jq -r '.ingressSecretName // .ingress.secretName' | cut -d, -f1 )
-else
-  CLUSTER_INGRESS_SUBDOMAIN=""
-  CLUSTER_INGRESS_SECRET=""
-fi
+CLUSTER_INGRESS_SUBDOMAIN=""
+CLUSTER_INGRESS_SECRET=""
 echo "Configuring cluster namespace"
 if kubectl get namespace ${CLUSTER_NAMESPACE}; then
   echo -e "Namespace ${CLUSTER_NAMESPACE} found."
