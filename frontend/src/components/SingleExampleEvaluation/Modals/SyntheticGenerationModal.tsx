@@ -120,11 +120,16 @@ export const SyntheticGenerationModal = ({
     return {
       [TaskEnum.QuestionAnswering]: 'This task accepts only one context variable that will be set to a question.',
       [TaskEnum.Summarization]:
-        'This task accepts only one context variable that will be set to the text to summarize.',
-      [TaskEnum.TextGeneration]:
-        'Generic text generation. If any, the system will try to generate the context variables or use any of the ones already present in the data table.',
+        'This task only accepts one context variable that will be set to the text to summarize.',
+      [TaskEnum.TextGeneration]: 'Context-free text generation',
     }
   }, [])
+
+  const defaultTaskIndication = useMemo(
+    () =>
+      'Generic synthetic generation task. If any, the EvalAssit will try to generate the context variables and the response.',
+    [],
+  )
 
   const onRequestSubmit = useCallback(() => {
     setOpen(false)
@@ -198,7 +203,7 @@ export const SyntheticGenerationModal = ({
                 items={tasksOptions}
                 label="No option selected"
                 id="task"
-                titleText="Task (required)"
+                titleText="Task"
                 type="default"
                 selectedItem={syntheticGenerationConfig.task ? { text: syntheticGenerationConfig.task } : null}
                 onChange={({ selectedItem }) =>
@@ -206,13 +211,15 @@ export const SyntheticGenerationModal = ({
                 }
               />
               {syntheticGenerationConfig.task && (
-                <p className={classes.task_indication}>{`${perTaskIndication[syntheticGenerationConfig.task]}`}</p>
+                <p className={classes.task_indication}>
+                  {perTaskIndication[syntheticGenerationConfig.task] || defaultTaskIndication}
+                </p>
               )}
               {!loadingDomainPersonaMapping ? (
                 <Dropdown
                   itemToString={(i: { text: string }) => i.text}
                   items={domainsOptions}
-                  label="All domains"
+                  label="No specific domain"
                   id="domain"
                   titleText="Domain"
                   type="default"
@@ -236,9 +243,9 @@ export const SyntheticGenerationModal = ({
                   disabled={!syntheticGenerationConfig.domain}
                   itemToString={(i: { text: string }) => i.text}
                   items={personasOptions}
-                  label="All personas"
+                  label="No specific persona"
                   id="persona"
-                  titleText="Select persona"
+                  titleText="Persona"
                   type="default"
                   selectedItem={syntheticGenerationConfig.persona ? { text: syntheticGenerationConfig.persona } : null}
                   onChange={({ selectedItem }) =>
@@ -344,7 +351,7 @@ export const SyntheticGenerationModal = ({
         primaryButtonText="Generate"
         secondaryButtonText="Cancel"
         onRequestSubmit={onRequestSubmit}
-        primaryButtonDisabled={syntheticGenerationConfig.evaluator === null || syntheticGenerationConfig.task === null}
+        primaryButtonDisabled={syntheticGenerationConfig.evaluator === null}
       >
         <></>
       </ModalFooter>
