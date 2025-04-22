@@ -7,6 +7,7 @@ import { Button, IconButton, InlineLoading, PaginationNav, Toggle } from '@carbo
 import { Add, AiGenerate, Save, SettingsAdjust, TrashCan } from '@carbon/react/icons'
 
 import { EditableTag } from '@components/EditableTag'
+import { INSTANCES_PER_PAGE } from '@constants'
 import { usePagination } from '@customHooks/usePagination'
 
 import {
@@ -22,7 +23,7 @@ import {
   UseCase,
 } from '../../../types'
 import { useToastContext } from '../Providers/ToastProvider'
-import { useURLInfoContext } from '../Providers/URLInfoProvider'
+import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { TestDataTableRow } from './TestDataTableRow'
 import classes from './index.module.scss'
 
@@ -61,7 +62,7 @@ export const TestDataTable = ({
   generateTestData,
   modelForSyntheticGeneration,
 }: Props) => {
-  const instancesPerPage = useMemo(() => 5, [])
+  const instancesPerPage = useMemo(() => INSTANCES_PER_PAGE, [])
   const [explanationOn, setExplanationOn] = useState(false)
   const instances = useMemo(() => currentTestCase.instances, [currentTestCase.instances])
   const { currentInstances, currentPage, goToPage, totalPages, goToLastPage } = usePagination({
@@ -71,7 +72,8 @@ export const TestDataTable = ({
 
   const [expectedResultOn, setExpectedResultOn] = useState(true)
 
-  const { isRisksAndHarms } = useURLInfoContext()
+  const { isRisksAndHarms, syntheticGenerationEnabled } = useURLParamsContext()
+
   const resultsAvailable = useMemo(
     () => instances.some((instance) => (instance as DirectInstance | PairwiseInstance).result !== null),
     [instances],
@@ -378,7 +380,7 @@ export const TestDataTable = ({
             <div className={cx(classes.actionButton)}>
               {loadingSyntheticExamples ? (
                 <InlineLoading description={'Generating...'} status={'active'} />
-              ) : (
+              ) : syntheticGenerationEnabled ? (
                 <div className={classes.syntheticButtons}>
                   <Button
                     kind="tertiary"
@@ -401,7 +403,7 @@ export const TestDataTable = ({
                     <SettingsAdjust />
                   </IconButton>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

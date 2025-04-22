@@ -1,11 +1,13 @@
 import { use, useCallback, useMemo } from 'react'
 
+import { useURLParamsContext } from '@components/SingleExampleEvaluation/Providers/URLParamsProvider'
 import { UseCase } from '@types'
 
 import { useTestCaseLibrary } from './useTestCaseLibrary'
 
 export const useGetQueryParamsFromUseCase = () => {
   const { harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
+  const { syntheticGenerationEnabled } = useURLParamsContext()
   const harmsAndRisksLibraryTestCasesNames = useMemo<string[]>(
     () =>
       Object.values(harmsAndRisksLibraryTestCases).reduce<string[]>(
@@ -40,9 +42,10 @@ export const useGetQueryParamsFromUseCase = () => {
           params.push({ key: 'isRisksAndHarms', value: 'false' })
         }
       }
+      params.push({ key: 'sge', value: syntheticGenerationEnabled ? 'true' : 'false' })
       return params
     },
-    [harmsAndRisksLibraryTestCasesNames],
+    [harmsAndRisksLibraryTestCasesNames, syntheticGenerationEnabled],
   )
 
   return { getQueryParamsFromUseCase }

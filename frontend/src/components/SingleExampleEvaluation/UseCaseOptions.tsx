@@ -7,7 +7,7 @@ import { Add, Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@car
 
 import { EvaluationType } from '../../types'
 import { UseCaseTypeBadge } from '../UseCaseTypeBadge/UseCaseTypeBadge'
-import { useURLInfoContext } from './Providers/URLInfoProvider'
+import { useURLParamsContext } from './Providers/URLParamsProvider'
 import classes from './UseCaseOptions.module.scss'
 
 interface UseCaseOptionsProps {
@@ -43,7 +43,7 @@ export const UseCaseOptions = ({
   setSampleCodeTypeModalOpen,
 }: UseCaseOptionsProps) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
-  const { isRisksAndHarms } = useURLInfoContext()
+  const { isRisksAndHarms } = useURLParamsContext()
   const onSaveClick = async () => {
     setSavingUseCase(true)
     await onSave()

@@ -4,7 +4,7 @@ import { AppSidebarProvider } from './Providers/AppSidebarProvider'
 import { BackendUserProvider } from './Providers/BackendUserProvider'
 import { CriteriasProvider } from './Providers/CriteriasProvider'
 import { PipelineTypesProvider } from './Providers/PipelineTypesProvider'
-import { URLInfoProvider } from './Providers/URLInfoProvider'
+import { URLParamsProvider } from './Providers/URLParamsProvider'
 import { UserUseCasesProvider } from './Providers/UserUseCasesProvider'
 import { SingleExampleEvaluation } from './SingleExampleEvaluation'
 
@@ -13,13 +13,13 @@ const Landing = () => (
     <CriteriasProvider>
       <PipelineTypesProvider>
         <UserUseCasesProvider>
-          <URLInfoProvider>
+          <URLParamsProvider>
             <AppSidebarProvider>
               <EditorProvider>
                 <SingleExampleEvaluation />
               </EditorProvider>
             </AppSidebarProvider>
-          </URLInfoProvider>
+          </URLParamsProvider>
         </UserUseCasesProvider>
       </PipelineTypesProvider>
     </CriteriasProvider>

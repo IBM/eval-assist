@@ -9,7 +9,7 @@ import { UseCase } from '@types'
 
 import layoutClasses from '../Layout.module.scss'
 import { useAppSidebarContext } from '../Providers/AppSidebarProvider'
-import { useURLInfoContext } from '../Providers/URLInfoProvider'
+import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import classes from './AppSidenav.module.scss'
 import { ExampleCatalogPanel } from './ExampleCatalogPanel'
 import { RiskAndHarmPanel } from './RiskAndHarmPanel'
@@ -36,7 +36,7 @@ export const AppSidenavNew = ({
 }: AppSidenavProps) => {
   const id = useId()
   const { sidebarTabSelected: selected, setSidebarTabSelected: setSelected } = useAppSidebarContext()
-  const { useCaseId } = useURLInfoContext()
+  const { useCaseId } = useURLParamsContext()
 
   const onUseCaseClick = (useCase: UseCase, subCatalogName?: string) => {
     // if the usecase is already selected don't do nothing

@@ -57,14 +57,14 @@ import { SyntheticGenerationModal } from './Modals/SyntheticGenerationModal'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
 import { useCriteriasContext } from './Providers/CriteriasProvider'
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
-import { useURLInfoContext } from './Providers/URLInfoProvider'
+import { useURLParamsContext } from './Providers/URLParamsProvider'
 import { useUserUseCasesContext } from './Providers/UserUseCasesProvider'
 import classes from './SingleExampleEvaluation.module.scss'
 import { TestDataTable } from './TestDataTable'
 import { UseCaseOptions } from './UseCaseOptions'
 
 export const SingleExampleEvaluation = () => {
-  const { preloadedUseCase } = useURLInfoContext()
+  const { preloadedUseCase } = useURLParamsContext()
   const [currentTestCase, setCurrentTestCase] = useState(preloadedUseCase)
   const { userUseCases, setUserUseCases } = useUserUseCasesContext()
   // we are ignoring client side rendering to be able to use useSessionStorage
@@ -72,7 +72,7 @@ export const SingleExampleEvaluation = () => {
   const [useCaseSelected, setUseCaseSelected] = useState<{ useCase: UseCase; subCatalogName: string | null } | null>(
     null,
   )
-  const { isRisksAndHarms } = useURLInfoContext()
+  const { isRisksAndHarms } = useURLParamsContext()
 
   // if the usecase doesnt have an id, it means it hasn't been stored
   const isUseCaseSaved = useMemo(() => currentTestCase !== null && currentTestCase.id !== null, [currentTestCase])

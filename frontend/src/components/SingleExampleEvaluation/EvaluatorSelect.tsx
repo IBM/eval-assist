@@ -12,7 +12,7 @@ import { useModelProviderCredentials } from '@customHooks/useModelProviderCreden
 import { EvaluationType, Evaluator, ModelProviderType } from '../../types'
 import classes from './EvaluatorSelect.module.scss'
 import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
-import { useURLInfoContext } from './Providers/URLInfoProvider'
+import { useURLParamsContext } from './Providers/URLParamsProvider'
 
 interface Props {
   type: EvaluationType
@@ -38,7 +38,7 @@ export const PipelineSelect = ({
   selectionComponentName = 'evaluator',
 }: Props) => {
   const { loadingEvaluators, directEvaluators, pairwiseEvaluators } = usePipelineTypesContext()
-  const { isRisksAndHarms } = useURLInfoContext()
+  const { isRisksAndHarms } = useURLParamsContext()
   const providerToEvaluators = useMemo<Record<ModelProviderType, Evaluator[]>>(() => {
     const result: Record<ModelProviderType, Evaluator[]> = {
       [ModelProviderType.RITS]: [],

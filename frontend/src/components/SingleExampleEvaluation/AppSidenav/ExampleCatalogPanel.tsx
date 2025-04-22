@@ -12,7 +12,7 @@ import { ChevronLeft, Compare } from '@carbon/react/icons'
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
 import { UseCase } from '../../../types'
-import { useURLInfoContext } from '../Providers/URLInfoProvider'
+import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { LinkButton } from './LinkButton'
 import classes from './ThreeLevelsPanel.module.scss'
 
@@ -30,7 +30,7 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
     ...Object.keys(rubricLibraryTestCases).reduce((acc, item, index) => ({ ...acc, [item]: true }), {}),
   })
 
-  const { preloadedUseCase } = useURLInfoContext()
+  const { preloadedUseCase } = useURLParamsContext()
 
   const selectedNode = useMemo(() => {
     return preloadedUseCase !== null && preloadedUseCase.id === null
