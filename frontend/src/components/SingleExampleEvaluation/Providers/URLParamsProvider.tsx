@@ -68,7 +68,7 @@ export const URLParamsProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const syntheticGenerationEnabled = useMemo(
-    () => (router.query.sge ? router.query.sge === 'true' : false),
+    () => (router.query.sge ? router.query.sge === 'true' : true),
     [router.query.sge],
   )
 
