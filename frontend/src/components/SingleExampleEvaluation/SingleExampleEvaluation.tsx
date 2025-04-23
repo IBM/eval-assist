@@ -811,6 +811,8 @@ export const SingleExampleEvaluation = () => {
               loadingDomainPersonaMapping={loadingDomainPersonaMapping}
               loadDomainPersonaMapping={loadDomainPersonaMapping}
               criteria={currentTestCase.criteria}
+              contextVariableNames={currentTestCase.instances[0]?.contextVariables.map((c) => c.name) || []}
+              responseVariableName={currentTestCase.responseVariableName}
             />
           )}
           <ChooseCodeGenerationType
