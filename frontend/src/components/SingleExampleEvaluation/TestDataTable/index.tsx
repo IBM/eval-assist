@@ -63,7 +63,6 @@ export const TestDataTable = ({
   modelForSyntheticGeneration,
 }: Props) => {
   const instancesPerPage = useMemo(() => INSTANCES_PER_PAGE, [])
-  const [explanationOn, setExplanationOn] = useState(false)
   const instances = useMemo(() => currentTestCase.instances, [currentTestCase.instances])
   const { currentInstances, currentPage, goToPage, totalPages, goToLastPage } = usePagination({
     instances,
@@ -83,28 +82,24 @@ export const TestDataTable = ({
     () => ({
       [classes.columns1]: !expectedResultOn && (!resultsAvailable || evaluationRunning),
       [classes.columns2]:
-        (!explanationOn && resultsAvailable && !expectedResultOn && !evaluationRunning) ||
+        (resultsAvailable && !expectedResultOn && !evaluationRunning) ||
         (expectedResultOn && !resultsAvailable) ||
         (expectedResultOn && evaluationRunning),
-      [classes.columns3var1]: expectedResultOn && resultsAvailable && !evaluationRunning && !explanationOn,
-      [classes.columns3var2]: !expectedResultOn && resultsAvailable && !evaluationRunning && explanationOn,
-      [classes.columns4]: expectedResultOn && resultsAvailable && !evaluationRunning && explanationOn,
+      [classes.columns3var1]: expectedResultOn && resultsAvailable && !evaluationRunning,
     }),
-    [evaluationRunning, expectedResultOn, explanationOn, resultsAvailable],
+    [evaluationRunning, expectedResultOn, resultsAvailable],
   )
 
   const headerDirectGridClasses = useMemo(
     () => ({
       [classes.columns1]: !expectedResultOn && (!resultsAvailable || evaluationRunning),
       [classes.columns2]:
-        (!explanationOn && resultsAvailable && !expectedResultOn && !evaluationRunning) ||
+        (resultsAvailable && !expectedResultOn && !evaluationRunning) ||
         (expectedResultOn && !resultsAvailable) ||
         (expectedResultOn && evaluationRunning),
-      [classes.columns3var1]: expectedResultOn && resultsAvailable && !evaluationRunning && !explanationOn,
-      [classes.columns3var5]: !expectedResultOn && resultsAvailable && !evaluationRunning && explanationOn,
-      [classes.columns3var4]: expectedResultOn && resultsAvailable && !evaluationRunning && explanationOn,
+      [classes.columns3var1]: expectedResultOn && resultsAvailable && !evaluationRunning,
     }),
-    [evaluationRunning, expectedResultOn, explanationOn, resultsAvailable],
+    [evaluationRunning, expectedResultOn, resultsAvailable],
   )
 
   const pairwiseGridClasses = useMemo(
@@ -331,16 +326,10 @@ export const TestDataTable = ({
             {resultsAvailable && !evaluationRunning && (
               <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>
             )}
-            {resultsAvailable && !evaluationRunning && explanationOn && type === EvaluationType.DIRECT && (
-              <div className={cx(classes.blockElement, classes.subHeaderBlock)}>
-                <strong className={cx(classes.headerTypography)}>{'Explanation'}</strong>
-              </div>
-            )}
           </div>
           {currentInstances.map((instance, i) => (
             <TestDataTableRow
               key={i}
-              explanationOn={explanationOn}
               expectedResultOn={expectedResultOn}
               setSelectedInstance={setSelectedInstance}
               setResultDetailsModalOpen={setResultDetailsModalOpen}

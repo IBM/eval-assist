@@ -4,7 +4,7 @@ import { returnByPipelineType, toTitleCase } from 'src/utils'
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 
 import { Link, Select, SelectItem, Tooltip } from '@carbon/react'
-import { Trophy } from '@carbon/react/icons'
+import { ArrowRight, Trophy } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 
@@ -22,7 +22,6 @@ import RemovableSection from '../../RemovableSection/RemovableSection'
 import classes from './index.module.scss'
 
 interface Props {
-  explanationOn: boolean
   expectedResultOn: boolean
   setSelectedInstance: Dispatch<SetStateAction<Instance | null>>
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
@@ -42,7 +41,6 @@ interface Props {
 }
 
 export const TestDataTableRow = ({
-  explanationOn,
   setSelectedInstance,
   setResultDetailsModalOpen,
   evaluationRunning,
@@ -265,7 +263,6 @@ export const TestDataTableRow = ({
                       {result.positionalBias && (
                         <div className={cx(classes.positionalBias)}>{'Positional bias detected'}</div>
                       )}
-
                       {instance.expectedResult && (
                         <div
                           className={cx(classes.resultBlockTypography, {
@@ -274,35 +271,19 @@ export const TestDataTableRow = ({
                           })}
                         >{`Agreement: ${result.agreement ? 'Yes' : 'No'}`}</div>
                       )}
+                      <Link
+                        onClick={onExpandInstance}
+                        renderIcon={() => <ArrowRight />}
+                        className={classes.viewExplanation}
+                      >
+                        {'View explanation'}
+                      </Link>{' '}
                     </div>
                   </div>
                 </div>
-
-                {/* Explanation */}
-                {type === EvaluationType.DIRECT && explanationOn && (
-                  <FlexTextArea
-                    readOnly
-                    value={(instance.result as DirectInstanceResult)?.explanation || undefined}
-                    labelText={''}
-                    placeholder=""
-                    // key={`rubric_${i}`}
-                    // id={`rubric_${i}_3`}
-                    onFocus={setActive}
-                    onBlur={setInactive}
-                    className={cx(classes.blockElement, classes.resultBlockDefaultCursor, classes.explanationBlock)}
-                    tabIndex={-1}
-                  />
-                )}
               </>
             ) : resultsAvailable ? (
-              <>
-                <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1} />
-                {type === EvaluationType.DIRECT && explanationOn && (
-                  <div
-                    className={cx(classes.blockElement, classes.resultBlockDefaultCursor, classes.explanationBlock)}
-                  />
-                )}
-              </>
+              <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1} />
             ) : null}
           </div>
         )}
