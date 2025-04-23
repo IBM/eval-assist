@@ -31,7 +31,7 @@
     <meta name="keywords" content="KEYWORDS SHOULD BE PLACED HERE" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Academic Project Page</title>
+    <title>EvalAssist</title>
     <link rel="icon" type="image/x-icon" href="static/images/favicon.ico" />
     <link
       href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
@@ -87,73 +87,16 @@
         <div class="container is-max-desktop">
           <div class="columns is-centered">
             <div class="column has-text-centered">
-              <h1 class="title is-1 publication-title">
-                Academic Project Page
-              </h1>
-              <div class="is-size-5 publication-authors">
-                <!-- Paper authors -->
-                <span class="author-block">
-                  <a href="FIRST AUTHOR PERSONAL LINK" target="_blank"
-                    >First Author</a
-                  ><sup>*</sup>,</span
-                >
-                <span class="author-block">
-                  <a href="SECOND AUTHOR PERSONAL LINK" target="_blank"
-                    >Second Author</a
-                  ><sup>*</sup>,</span
-                >
-                <span class="author-block">
-                  <a href="THIRD AUTHOR PERSONAL LINK" target="_blank"
-                    >Third Author</a
-                  >
-                </span>
-              </div>
-
-              <div class="is-size-5 publication-authors">
-                <span class="author-block"
-                  >Institution Name<br />Conferance name and year</span
-                >
-                <span class="eql-cntrb"
-                  ><small
-                    ><br /><sup>*</sup>Indicates Equal Contribution</small
-                  ></span
-                >
-              </div>
+              <h1 class="title is-1 publication-title">EvalAssist</h1>
 
               <div class="column has-text-centered">
                 <div class="publication-links">
                   <!-- Arxiv PDF link -->
-                  <span class="link-block">
-                    <a
-                      href="https://arxiv.org/pdf/<ARXIV PAPER ID>.pdf"
-                      target="_blank"
-                      class="external-link button is-normal is-rounded is-dark"
-                    >
-                      <span class="icon">
-                        <i class="fas fa-file-pdf"></i>
-                      </span>
-                      <span>Paper</span>
-                    </a>
-                  </span>
-
-                  <!-- Supplementary PDF link -->
-                  <span class="link-block">
-                    <a
-                      href="static/pdfs/supplementary_material.pdf"
-                      target="_blank"
-                      class="external-link button is-normal is-rounded is-dark"
-                    >
-                      <span class="icon">
-                        <i class="fas fa-file-pdf"></i>
-                      </span>
-                      <span>Supplementary</span>
-                    </a>
-                  </span>
 
                   <!-- Github link -->
                   <span class="link-block">
                     <a
-                      href="https://github.com/YOUR REPO HERE"
+                      href="https://github.com/IBM/eval-assist"
                       target="_blank"
                       class="external-link button is-normal is-rounded is-dark"
                     >
@@ -161,20 +104,6 @@
                         <i class="fab fa-github"></i>
                       </span>
                       <span>Code</span>
-                    </a>
-                  </span>
-
-                  <!-- ArXiv abstract Link -->
-                  <span class="link-block">
-                    <a
-                      href="https://arxiv.org/abs/<ARXIV PAPER ID>"
-                      target="_blank"
-                      class="external-link button is-normal is-rounded is-dark"
-                    >
-                      <span class="icon">
-                        <i class="ai ai-arxiv"></i>
-                      </span>
-                      <span>arXiv</span>
                     </a>
                   </span>
                 </div>
@@ -189,16 +118,7 @@
     <section class="hero teaser">
       <div class="container is-max-desktop">
         <div class="hero-body">
-          <video poster="" id="tree" autoplay controls muted loop height="100%">
-            <!-- Your video here -->
-            <source src="static/videos/banner_video.mp4" type="video/mp4" />
-          </video>
-          <h2 class="subtitle has-text-centered">
-            Aliquam vitae elit ullamcorper tellus egestas pellentesque. Ut lacus
-            tellus, maximus vel lectus at, placerat pretium mi. Maecenas
-            dignissim tincidunt vestibulum. Sed consequat hendrerit nisl ut
-            maximus.
-          </h2>
+          LLM-as-a-Judge framework for criteria refinement
         </div>
       </div>
     </section>
@@ -209,18 +129,26 @@
       <div class="container is-max-desktop">
         <div class="columns is-centered has-text-centered">
           <div class="column is-four-fifths">
-            <h2 class="title is-3">Abstract</h2>
+            <h2 class="title is-3">What is EvalAssist?</h2>
             <div class="content has-text-justified">
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin
-                ullamcorper tellus sed ante aliquam tempus. Etiam porttitor urna
-                feugiat nibh elementum, et tempor dolor mattis. Donec accumsan
-                enim augue, a vulputate nisi sodales sit amet. Proin bibendum ex
-                eget mauris cursus euismod nec et nibh. Maecenas ac gravida
-                ante, nec cursus dui. Vivamus purus nibh, placerat ac purus
-                eget, sagittis vestibulum metus. Sed vestibulum bibendum lectus
-                gravida commodo. Pellentesque auctor leo vitae sagittis
-                suscipit.
+                EvalAssist is an LLM-as-a-Judge framework built on top of the
+                Unitxt open source evaluation library for large language models.
+                The EvalAssist application provides users with a convenient way
+                of iteratively testing and refining LLM-as-a-judge criteria, and
+                supports both direct (rubric-based) and pairwise assessment
+                paradigms (relation-based), the two most prevalent forms of
+                LLM-as-a-judge evaluations available. EvalAssist is designed to
+                be model-agnostic, i.e. the content to be evaluated can come
+                from any model. EvalAssist supports a rich set of off-the-shelf
+                judge models that can easily be extended. An API key is required
+                to use the pre-defined judge models. Once users are satisfied
+                with their criteria, they can auto-generate a Notebook with
+                Unitxt code to run bulk evaluations with larger data sets based
+                on their criteria definition. EvalAssist also includes a catalog
+                of example test cases, exhibiting the use of LLM-as-a-judge
+                across a variety of scenarios. Users can save their own test
+                cases.
               </p>
             </div>
           </div>
@@ -236,31 +164,23 @@
           <div id="results-carousel" class="carousel results-carousel">
             <div class="item">
               <!-- Your image here -->
-              <img src="static/images/carousel1.jpg" alt="MY ALT TEXT" />
-              <h2 class="subtitle has-text-centered">
-                First image description.
-              </h2>
+              <img src="static/images/homepage.png" alt="MY ALT TEXT" />
+              <h2 class="subtitle has-text-centered">Homepage</h2>
             </div>
             <div class="item">
               <!-- Your image here -->
-              <img src="static/images/carousel2.jpg" alt="MY ALT TEXT" />
-              <h2 class="subtitle has-text-centered">
-                Second image description.
-              </h2>
+              <img src="static/images/define_criteria.png" alt="MY ALT TEXT" />
+              <h2 class="subtitle has-text-centered">Define your criterion</h2>
             </div>
             <div class="item">
               <!-- Your image here -->
-              <img src="static/images/carousel3.jpg" alt="MY ALT TEXT" />
-              <h2 class="subtitle has-text-centered">
-                Third image description.
-              </h2>
+              <img src="static/images/evaluate.png" alt="MY ALT TEXT" />
+              <h2 class="subtitle has-text-centered">Evaluate</h2>
             </div>
             <div class="item">
               <!-- Your image here -->
-              <img src="static/images/carousel4.jpg" alt="MY ALT TEXT" />
-              <h2 class="subtitle has-text-centered">
-                Fourth image description.
-              </h2>
+              <img src="static/images/inspect_results.png" alt="MY ALT TEXT" />
+              <h2 class="subtitle has-text-centered">Inspect the results</h2>
             </div>
           </div>
         </div>
@@ -292,74 +212,6 @@
     </section>
     <!-- End youtube video -->
 
-    <!-- Video carousel -->
-    <section class="hero is-small">
-      <div class="hero-body">
-        <div class="container">
-          <h2 class="title is-3">Another Carousel</h2>
-          <div id="results-carousel" class="carousel results-carousel">
-            <div class="item item-video1">
-              <video
-                poster=""
-                id="video1"
-                autoplay
-                controls
-                muted
-                loop
-                height="100%"
-              >
-                <!-- Your video file here -->
-                <source src="static/videos/carousel1.mp4" type="video/mp4" />
-              </video>
-            </div>
-            <div class="item item-video2">
-              <video
-                poster=""
-                id="video2"
-                autoplay
-                controls
-                muted
-                loop
-                height="100%"
-              >
-                <!-- Your video file here -->
-                <source src="static/videos/carousel2.mp4" type="video/mp4" />
-              </video>
-            </div>
-            <div class="item item-video3">
-              <video
-                poster=""
-                id="video3"
-                autoplay
-                controls
-                muted
-                loop
-                height="100%"
-              >
-                \
-                <!-- Your video file here -->
-                <source src="static/videos/carousel3.mp4" type="video/mp4" />
-              </video>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- End video carousel -->
-
-    <!-- Paper poster -->
-    <section class="hero is-small is-light">
-      <div class="hero-body">
-        <div class="container">
-          <h2 class="title">Poster</h2>
-
-          <iframe src="static/pdfs/sample.pdf" width="100%" height="550">
-          </iframe>
-        </div>
-      </div>
-    </section>
-    <!--End paper poster -->
-
     <!--BibTex citation -->
     <section class="section" id="BibTeX">
       <div class="container is-max-desktop content">
@@ -379,7 +231,7 @@
                 <a
                   href="https://github.com/eliahuhorwitz/Academic-project-page-template"
                   target="_blank"
-                  >Academic Project Page Template</a
+                  >EvalAssist Template</a
                 >
                 which was adopted from the <a
                   href="https://nerfies.github.io"
