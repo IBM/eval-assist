@@ -73,6 +73,7 @@ export const getEmptyUseCase = (type: EvaluationType): UseCase => ({
   instances: returnByPipelineType(type, [getEmptyDirectInstance()], [getEmptyPairwiseInstance()]),
   criteria: getEmptyCriteriaWithTwoOptions(),
   evaluator: null,
+  contextVariableNames: ['context'],
   responseVariableName: 'response',
   syntheticGenerationConfig: {
     task: null,

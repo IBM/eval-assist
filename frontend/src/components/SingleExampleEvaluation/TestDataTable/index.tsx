@@ -36,9 +36,11 @@ interface Props {
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   criteria: CriteriaWithOptions | Criteria
   responseVariableName: string
+  contextVariableNames: string[]
   setResponseVariableName: (newValue: string) => void
   currentTestCase: UseCase
   setInstances: (instances: Instance[]) => void
+  setContextVariableNames: (contextVariableNames: string[]) => void
   loadingSyntheticExamples: boolean
   setSysntheticGenerationModalOpen: Dispatch<SetStateAction<boolean>>
   generateTestData: () => Promise<void>
@@ -49,12 +51,14 @@ export const TestDataTable = ({
   style,
   className,
   setInstances,
+  setContextVariableNames,
   type,
   evaluationRunning,
   setSelectedInstance,
   setResultDetailsModalOpen,
   criteria,
   responseVariableName,
+  contextVariableNames,
   setResponseVariableName,
   loadingSyntheticExamples,
   setSysntheticGenerationModalOpen,
@@ -131,8 +135,8 @@ export const TestDataTable = ({
 
   const addEmptyRow = () => {
     let newEmptyInstance: Instance = {
-      contextVariables: instances[0].contextVariables.map((contextVariable) => ({
-        name: contextVariable.name,
+      contextVariables: contextVariableNames.map((contextVariableName) => ({
+        name: contextVariableName,
         value: '',
       })),
       expectedResult: '',
@@ -159,6 +163,7 @@ export const TestDataTable = ({
         return { ...instance, contextVariables: [...instance.contextVariables, { name: '', value: '' }] }
       }),
     )
+    setContextVariableNames([...contextVariableNames, ''])
   }
 
   const addResponse = () => {
@@ -186,6 +191,11 @@ export const TestDataTable = ({
         }
       }),
     )
+    setContextVariableNames([
+      ...contextVariableNames.slice(0, actualIndex),
+      newValue,
+      ...contextVariableNames.slice(actualIndex + 1),
+    ])
   }
 
   const removeContextVariable = useCallback(
@@ -196,8 +206,9 @@ export const TestDataTable = ({
           contextVariables: instance.contextVariables.filter((_, i) => i !== indexToDelete),
         })),
       ])
+      setContextVariableNames(contextVariableNames.filter((_, i) => i !== indexToDelete))
     },
-    [instances, setInstances],
+    [contextVariableNames, instances, setContextVariableNames, setInstances],
   )
 
   const removePairwiseResponse = useCallback(
@@ -303,10 +314,10 @@ export const TestDataTable = ({
                   )}
                 </div>
               ))}
-              {instances[0].contextVariables.map((contextVariable, i) => (
+              {contextVariableNames.map((contextVariableName, i) => (
                 <div key={i} className={cx(classes.blockElement, classes.subHeaderBlock)}>
                   <EditableTag
-                    value={contextVariable.name}
+                    value={contextVariableName}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => editContextVariable(e.target.value, i)}
                     color="purple"
                   />
@@ -327,6 +338,14 @@ export const TestDataTable = ({
               <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>
             )}
           </div>
+
+          {currentInstances.length === 0 && (
+            <div className={cx(classes.tableRow, classes.columns1, classes.emptyTableRow)}>
+              <div className={cx(classes.blockElement)}>
+                <p className={classes.emptyText}>{'No instances to show'}</p>
+              </div>
+            </div>
+          )}
           {currentInstances.map((instance, i) => (
             <TestDataTableRow
               key={i}
@@ -338,7 +357,7 @@ export const TestDataTable = ({
               gridClasses={returnByPipelineType(type, directGridClasses, pairwiseGridClasses)}
               instance={instance}
               setInstance={(instance) => setInstance(instance, i)}
-              readOnly={instances.length === 1 || evaluationRunning}
+              readOnly={evaluationRunning}
               removeInstance={() => removeInstance(i)}
               type={type}
               addInstance={addInstance}

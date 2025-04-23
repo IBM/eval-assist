@@ -209,6 +209,7 @@ export interface SyntheticGenerationConfig {
 
 export interface UseCaseV4 extends UseCaseV3 {
   syntheticGenerationConfig: SyntheticGenerationConfig
+  contextVariableNames: string[]
 }
 
 export type UseCase = UseCaseV4

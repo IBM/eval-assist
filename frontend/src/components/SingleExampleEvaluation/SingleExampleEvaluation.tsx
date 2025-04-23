@@ -178,6 +178,18 @@ export const SingleExampleEvaluation = () => {
       }
     })
 
+  const setContextVariableNames = (contextVariableNames: string[]) =>
+    setCurrentTestCase((previousCurrentUseCase) => {
+      if (previousCurrentUseCase !== null) {
+        return {
+          ...previousCurrentUseCase,
+          contextVariableNames,
+        }
+      } else {
+        return null
+      }
+    })
+
   // TODO: refactor so that this component receives a test case that cant be null
   const { loadingSyntheticExamples, generateTestData } = useGenerateSyntheticExamples({
     evaluatorType: currentTestCase?.type,
@@ -691,6 +703,7 @@ export const SingleExampleEvaluation = () => {
             <TestDataTable
               currentTestCase={currentTestCase}
               setInstances={setInstances}
+              setContextVariableNames={setContextVariableNames}
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
               type={currentTestCase.type}
@@ -699,6 +712,7 @@ export const SingleExampleEvaluation = () => {
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               criteria={currentTestCase.criteria}
               responseVariableName={currentTestCase.responseVariableName}
+              contextVariableNames={currentTestCase.contextVariableNames}
               setResponseVariableName={(responseVariableName) =>
                 setCurrentTestCase((previousCurrentUseCase) =>
                   previousCurrentUseCase !== null ? { ...previousCurrentUseCase, responseVariableName } : null,

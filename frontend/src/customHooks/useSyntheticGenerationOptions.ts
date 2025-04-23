@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import {
   Criteria,
@@ -10,7 +10,6 @@ import {
   SyntheticGenerationConfig,
   TaskEnum,
 } from '@types'
-import { returnByPipelineType } from '@utils'
 
 import { useFetchUtils } from './useFetchUtils'
 
