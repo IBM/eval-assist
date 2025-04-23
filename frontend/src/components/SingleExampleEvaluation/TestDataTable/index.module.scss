@@ -349,3 +349,9 @@ $columns-4: 3fr 1fr 1fr 2fr;
 .responsesRow:hover .viewExplanation {
   visibility: visible;
 }
+
+.emptyTableRow .emptyText {
+  border-bottom: 1px solid $border-subtle-01;
+  color: $text-helper;
+  padding: 1rem 0.5rem;
+}

@@ -22,6 +22,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('user_message_general_harm', EvaluationType.DIRECT),
           name: 'general_harm',
+          contextVariableNames: [],
           responseVariableName: 'User message',
           instances: [
             {
@@ -44,6 +45,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('user_message_social_bias', EvaluationType.DIRECT),
           name: 'social_bias',
+          contextVariableNames: [],
           responseVariableName: 'User message',
           instances: [
             {
@@ -67,6 +69,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('user_message_jailbreak', EvaluationType.DIRECT),
           name: 'jailbreak',
+          contextVariableNames: [],
           responseVariableName: 'User message',
           instances: [
             {
@@ -90,6 +93,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('user_message_violence', EvaluationType.DIRECT),
           name: 'violence',
+          contextVariableNames: [],
           responseVariableName: 'User message',
           instances: [
             {
@@ -112,6 +116,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('user_message_profanity', EvaluationType.DIRECT),
           name: 'profanity',
+          contextVariableNames: [],
           responseVariableName: 'User message',
           instances: [
             {
@@ -134,6 +139,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('user_message_unethical_behavior', EvaluationType.DIRECT),
           name: 'unethical_behavior',
+          contextVariableNames: [],
           responseVariableName: 'User message',
           instances: [
             {
@@ -158,6 +164,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('assistant_message_general_harm', EvaluationType.DIRECT),
           name: 'general_harm',
+          contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
           instances: [
             {
@@ -186,6 +193,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('assistant_message_social_bias', EvaluationType.DIRECT),
           name: 'social_bias',
+          contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
           instances: [
             {
@@ -215,6 +223,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('assistant_message_violence', EvaluationType.DIRECT),
           name: 'violence',
+          contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
           instances: [
             {
@@ -244,6 +253,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('assistant_message_profanity', EvaluationType.DIRECT),
           name: 'profanity',
+          contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
           instances: [
             {
@@ -271,6 +281,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('assistant_message_unethical_behavior', EvaluationType.DIRECT),
           name: 'unethical_behavior',
+          contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
           instances: [
             {
@@ -301,6 +312,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('context_context_relevance', EvaluationType.DIRECT),
           name: 'context_relevance',
+          contextVariableNames: ['User message', 'Assistant message'],
           responseVariableName: 'Context',
           instances: [
             {
@@ -333,6 +345,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('assistant_message_groundedness', EvaluationType.DIRECT),
           name: 'groundedness',
+          contextVariableNames: ['Context', 'User message'],
           responseVariableName: 'Assistant message',
           instances: [
             {
@@ -367,6 +380,7 @@ export const useTestCaseLibrary = () => {
         {
           ...getEmptyUseCaseWithCriteria('assistant_message_answer_relevance', EvaluationType.DIRECT),
           name: 'answer_relevance',
+          contextVariableNames: ['Context', 'User message'],
           responseVariableName: 'Assistant message',
           instances: [
             {
@@ -408,6 +422,7 @@ export const useTestCaseLibrary = () => {
         type: EvaluationType.DIRECT,
         id: null,
         responseVariableName: 'Response',
+        contextVariableNames: ['Question'],
         instances: [
           {
             contextVariables: [
@@ -451,6 +466,7 @@ export const useTestCaseLibrary = () => {
         name: 'RQA Quality',
         type: EvaluationType.DIRECT,
         id: null,
+        contextVariableNames: ['Question'],
         responseVariableName: 'Answer',
         instances: [
           {
@@ -487,6 +503,7 @@ website or contact them to discuss your options.`,
         name: 'Conciseness',
         type: EvaluationType.DIRECT,
         id: null,
+        contextVariableNames: ['Question'],
         responseVariableName: 'Response',
         instances: [
           {
@@ -530,6 +547,7 @@ website or contact them to discuss your options.`,
         name: 'Harmfulness',
         type: EvaluationType.DIRECT,
         id: null,
+        contextVariableNames: [],
         responseVariableName: 'Response',
         instances: [
           {
@@ -568,6 +586,7 @@ website or contact them to discuss your options.`,
         name: 'Insensitivity',
         type: EvaluationType.DIRECT,
         id: null,
+        contextVariableNames: ['Context'],
         responseVariableName: 'Response',
         instances: [
           {
@@ -610,6 +629,7 @@ website or contact them to discuss your options.`,
         id: null,
         name: 'Coherence',
         type: EvaluationType.DIRECT,
+        contextVariableNames: ['Original text'],
         responseVariableName: 'Response',
         instances: [
           {
@@ -677,6 +697,7 @@ website or contact them to discuss your options.`,
         name: 'Manipulative Email',
         type: EvaluationType.DIRECT,
         id: null,
+        contextVariableNames: ['Context'],
         responseVariableName: 'Response',
         instances: [
           {
@@ -744,6 +765,7 @@ website or contact them to discuss your options.`,
         name: 'Summarization Preference',
         type: EvaluationType.DIRECT,
         id: null,
+        contextVariableNames: ['Article'],
         responseVariableName: 'Summary',
         instances: [
           {
@@ -811,6 +833,7 @@ website or contact them to discuss your options.`,
         name: 'Reference Document Faithfulness',
         type: EvaluationType.DIRECT,
         id: null,
+        contextVariableNames: ['Conversation', 'Reference document'],
         responseVariableName: 'Response',
         instances: [
           {
@@ -903,6 +926,7 @@ website or contact them to discuss your options.`,
         name: 'Temperature',
         type: EvaluationType.PAIRWISE,
         id: null,
+        contextVariableNames: ['Question'],
         responseVariableName: 'Response',
         instances: [
           {
@@ -936,6 +960,7 @@ website or contact them to discuss your options.`,
         name: 'Consistency',
         type: EvaluationType.PAIRWISE,
         id: null,
+        contextVariableNames: ['Source document'],
         responseVariableName: 'Response',
         instances: [
           {
@@ -969,6 +994,7 @@ website or contact them to discuss your options.`,
         name: 'Inclusivity',
         type: EvaluationType.PAIRWISE,
         id: null,
+        contextVariableNames: ['Context'],
         responseVariableName: 'Response',
         instances: [
           {
@@ -1002,6 +1028,7 @@ website or contact them to discuss your options.`,
         name: 'Reference Document Faithfulness',
         type: EvaluationType.PAIRWISE,
         id: null,
+        contextVariableNames: ['Conversation', 'Reference document'],
         responseVariableName: 'Response',
         instances: [
           {
@@ -1042,6 +1069,7 @@ website or contact them to discuss your options.`,
         name: 'Summarization Preference',
         type: EvaluationType.PAIRWISE,
         id: null,
+        contextVariableNames: ['Article'],
         responseVariableName: 'Summary',
         instances: [
           {
@@ -1078,12 +1106,13 @@ website or contact them to discuss your options.`,
         name: 'Email Inclusivity',
         type: EvaluationType.PAIRWISE,
         id: null,
+        contextVariableNames: ['Context'],
         responseVariableName: 'email',
         instances: [
           {
             contextVariables: [
               {
-                name: 'context',
+                name: 'Context',
                 value:
                   'Generate a company wide email to employees inviting them to the yearly Holiday Party. The party takes place on December 20th from 6 PM to 10 PM and is located in the main conference hall. There will be decorations, a gift exchange, music and food.',
               },
