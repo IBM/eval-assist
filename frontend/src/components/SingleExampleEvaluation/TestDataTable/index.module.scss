@@ -255,12 +255,6 @@ $columns-4: 3fr 1fr 1fr 2fr;
   border-bottom: 1px solid $border-subtle-01;
 }
 
-.responsesRow:hover {
-  .resultDetailsAction {
-    visibility: visible;
-  }
-}
-
 .resultDetailsAction {
   text-decoration: none !important;
 }
@@ -345,4 +339,13 @@ $columns-4: 3fr 1fr 1fr 2fr;
 .syntheticButtons {
   display: flex;
   flex-direction: row;
+}
+
+.viewExplanation {
+  cursor: pointer;
+  visibility: hidden;
+}
+
+.responsesRow:hover .viewExplanation {
+  visibility: visible;
 }

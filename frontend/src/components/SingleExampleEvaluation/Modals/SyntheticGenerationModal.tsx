@@ -51,6 +51,8 @@ interface Props {
   loadingDomainPersonaMapping: boolean
   loadDomainPersonaMapping: () => Promise<void>
   criteria: Criteria
+  contextVariableNames: string[]
+  responseVariableName: string
 }
 
 export const SyntheticGenerationModal = ({
@@ -67,6 +69,8 @@ export const SyntheticGenerationModal = ({
   criteria,
   syntheticGenerationConfig,
   setSyntheticGenerationConfig,
+  contextVariableNames,
+  responseVariableName,
 }: Props) => {
   const criteriaOptionNames = useMemo(
     () =>
@@ -118,17 +122,18 @@ export const SyntheticGenerationModal = ({
 
   const perTaskIndication = useMemo(() => {
     return {
-      [TaskEnum.QuestionAnswering]: 'This task accepts only one context variable that will be set to a question.',
-      [TaskEnum.Summarization]:
-        'This task only accepts one context variable that will be set to the text to summarize.',
+      [TaskEnum.QuestionAnswering]: 'This task accepts only one context variable that will be set to a question',
+      [TaskEnum.Summarization]: 'This task only accepts one context variable that will be set to the text to summarize',
       [TaskEnum.TextGeneration]: 'Context-free text generation',
     }
   }, [])
 
   const defaultTaskIndication = useMemo(
     () =>
-      'Generic synthetic generation task. If any, the EvalAssit will try to generate the context variables and the response.',
-    [],
+      `Generic synthetic generation task. EvalAssit will generate the context variables (${contextVariableNames
+        .map((x) => "'" + x + "'")
+        .join(', ')}) and the '${responseVariableName}'`,
+    [contextVariableNames, responseVariableName],
   )
 
   const onRequestSubmit = useCallback(() => {
@@ -147,7 +152,7 @@ export const SyntheticGenerationModal = ({
 
   return (
     <ComposedModal open={open} onClose={() => setOpen(false)}>
-      <ModalHeader title="Generate synthetic example" />
+      <ModalHeader title="Generate synthetic examples" />
       <ModalBody>
         <div className={classes.user_setup_container}>
           <div className={classes.section}>
@@ -181,25 +186,6 @@ export const SyntheticGenerationModal = ({
             <div className={classes.instruction_container}>
               <Dropdown
                 itemToString={(i: { text: string }) => i.text}
-                items={generationLengthOptions}
-                label="No option selected"
-                id="data-length"
-                titleText="Data length"
-                type="default"
-                selectedItem={
-                  syntheticGenerationConfig.generationLength
-                    ? { text: syntheticGenerationConfig.generationLength }
-                    : null
-                }
-                onChange={({ selectedItem }) =>
-                  setSyntheticGenerationConfig({
-                    ...syntheticGenerationConfig,
-                    generationLength: selectedItem?.text as GenerationLengthEnum,
-                  })
-                }
-              />
-              <Dropdown
-                itemToString={(i: { text: string }) => i.text}
                 items={tasksOptions}
                 label="No option selected"
                 id="task"
@@ -210,11 +196,12 @@ export const SyntheticGenerationModal = ({
                   setSyntheticGenerationConfig({ ...syntheticGenerationConfig, task: selectedItem?.text as TaskEnum })
                 }
               />
-              {syntheticGenerationConfig.task && (
-                <p className={classes.task_indication}>
-                  {perTaskIndication[syntheticGenerationConfig.task] || defaultTaskIndication}
-                </p>
-              )}
+              <p className={classes.task_indication}>
+                {syntheticGenerationConfig.task
+                  ? perTaskIndication[syntheticGenerationConfig.task]
+                  : defaultTaskIndication}
+              </p>
+
               {!loadingDomainPersonaMapping ? (
                 <Dropdown
                   itemToString={(i: { text: string }) => i.text}
@@ -258,6 +245,25 @@ export const SyntheticGenerationModal = ({
               ) : (
                 <DropdownSkeleton />
               )}
+              <Dropdown
+                itemToString={(i: { text: string }) => i.text}
+                items={generationLengthOptions}
+                label="No option selected"
+                id="data-length"
+                titleText="Data length"
+                type="default"
+                selectedItem={
+                  syntheticGenerationConfig.generationLength
+                    ? { text: syntheticGenerationConfig.generationLength }
+                    : null
+                }
+                onChange={({ selectedItem }) =>
+                  setSyntheticGenerationConfig({
+                    ...syntheticGenerationConfig,
+                    generationLength: selectedItem?.text as GenerationLengthEnum,
+                  })
+                }
+              />
             </div>
           </div>
           <div className={classes.vertical_divider} />
