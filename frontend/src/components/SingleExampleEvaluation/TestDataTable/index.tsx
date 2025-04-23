@@ -298,7 +298,7 @@ export const TestDataTable = ({
           >
             <div className={cx(classes.tableRowSection)}>
               {returnByPipelineType<string[], string[]>(type, [responseVariableName], () =>
-                (instances[0] as PairwiseInstance).responses.map((_, i) => `Response ${i + 1}`),
+                (instances[0] as PairwiseInstance).responses.map((_, i) => `${responseVariableName} ${i + 1}`),
               ).map((reponseName, i) => (
                 <div key={i} className={cx(classes.blockElement, classes.subHeaderBlock)}>
                   <EditableTag
