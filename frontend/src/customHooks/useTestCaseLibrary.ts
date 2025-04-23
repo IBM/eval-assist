@@ -492,7 +492,7 @@ website or contact them to discuss your options.`,
           {
             contextVariables: [
               {
-                name: 'Context',
+                name: 'Question',
                 value: 'What are the benefits of drinking green tea?',
               },
             ],
@@ -504,7 +504,7 @@ website or contact them to discuss your options.`,
           {
             contextVariables: [
               {
-                name: 'Context',
+                name: 'Question',
                 value: 'What are the benefits of drinking green tea?',
               },
             ],
