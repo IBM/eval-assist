@@ -26,7 +26,7 @@ import { EvaluationType, Evaluator } from '@types'
 import { returnByPipelineType } from '@utils'
 
 import { PipelineSelect } from '../EvaluatorSelect'
-import { usePipelineTypesContext } from '../Providers/PipelineTypesProvider'
+import { useEvaluatorOptionsContext } from '../Providers/EvaluatorOptionsProvider'
 import classes from './SyntheticGenerationModal.module.scss'
 
 interface Props {
@@ -141,7 +141,7 @@ export const SyntheticGenerationModal = ({
     generateTestData()
   }, [generateTestData, setOpen])
 
-  const { nonGraniteGuardianEvaluators } = usePipelineTypesContext()
+  const { nonGraniteGuardianDirectEvaluators, nonGraniteGuardianPairwiseEvaluators } = useEvaluatorOptionsContext()
 
   useEffect(() => {
     loadDomainPersonaMapping()
@@ -170,7 +170,13 @@ export const SyntheticGenerationModal = ({
                     evaluator: newValue,
                   })
                 }
-                evaluatorOptions={nonGraniteGuardianEvaluators || []}
+                evaluatorOptions={
+                  returnByPipelineType(
+                    evaluationType,
+                    nonGraniteGuardianDirectEvaluators,
+                    nonGraniteGuardianPairwiseEvaluators,
+                  ) || []
+                }
                 dropdownLabel={'Model for synthetic generation (required)'}
                 selectionComponentNameWithArticle="a model"
                 selectionComponentName="model"

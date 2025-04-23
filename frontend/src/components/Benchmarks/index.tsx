@@ -1,5 +1,5 @@
 import { CriteriasProvider } from '@components/SingleExampleEvaluation/Providers/CriteriasProvider'
-import { PipelineTypesProvider } from '@components/SingleExampleEvaluation/Providers/PipelineTypesProvider'
+import { EvaluatorOptionsProvider } from '@components/SingleExampleEvaluation/Providers/EvaluatorOptionsProvider'
 
 import { BenchmarkView } from './BenchmarkView'
 import { Landing } from './Landing'
@@ -15,13 +15,13 @@ const LandingOrBenchmarkView = () => {
 export const Benchmarks = () => {
   return (
     <CriteriasProvider>
-      <PipelineTypesProvider>
+      <EvaluatorOptionsProvider>
         <BenchmarksProvider>
           <URLInfoProvider>
             <LandingOrBenchmarkView />
           </URLInfoProvider>
         </BenchmarksProvider>
-      </PipelineTypesProvider>
+      </EvaluatorOptionsProvider>
     </CriteriasProvider>
   )
 }

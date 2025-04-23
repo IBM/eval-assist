@@ -9,7 +9,7 @@ import { Warning } from '@carbon/react/icons'
 import { Criteria, CriteriaWithOptions, EvaluationType, UseCase } from '../../../types'
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'
 import { useCriteriasContext } from '../Providers/CriteriasProvider'
-import { usePipelineTypesContext } from '../Providers/PipelineTypesProvider'
+import { useEvaluatorOptionsContext } from '../Providers/EvaluatorOptionsProvider'
 import { useToastContext } from '../Providers/ToastProvider'
 import classes from './NewUseCaseModal.module.scss'
 
@@ -24,7 +24,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
   const [selectedType, setSelectedType] = useState<EvaluationType | null>(null)
   const [selectedCriteria, setSelectedCriteria] = useState<Criteria | CriteriaWithOptions | null>(null)
 
-  const { directEvaluators, pairwiseEvaluators } = usePipelineTypesContext()
+  const { directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
 
   const { addToast } = useToastContext()
 

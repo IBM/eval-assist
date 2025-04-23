@@ -56,7 +56,7 @@ import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { SyntheticGenerationModal } from './Modals/SyntheticGenerationModal'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
 import { useCriteriasContext } from './Providers/CriteriasProvider'
-import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
+import { useEvaluatorOptionsContext } from './Providers/EvaluatorOptionsProvider'
 import { useURLParamsContext } from './Providers/URLParamsProvider'
 import { useUserUseCasesContext } from './Providers/UserUseCasesProvider'
 import classes from './SingleExampleEvaluation.module.scss'
@@ -126,7 +126,8 @@ export const SingleExampleEvaluation = () => {
   const { modelProviderCredentials, setModelProviderCredentials, getAreRelevantCredentialsProvided } =
     useModelProviderCredentials()
 
-  const { nonGraniteGuardianEvaluators, graniteGuardianEvaluators } = usePipelineTypesContext()
+  const { nonGraniteGuardianDirectEvaluators, nonGraniteGuardianPairwiseEvaluators, graniteGuardianEvaluators } =
+    useEvaluatorOptionsContext()
 
   const areRelevantCredentialsProvided = useMemo(
     () => getAreRelevantCredentialsProvided(currentTestCase?.evaluator?.provider || ModelProviderType.RITS),
@@ -671,7 +672,15 @@ export const SingleExampleEvaluation = () => {
               type={currentTestCase.type}
               selectedEvaluator={currentTestCase.evaluator}
               setSelectedEvaluator={onSetSelectedPipeline}
-              evaluatorOptions={isRisksAndHarms ? graniteGuardianEvaluators || [] : nonGraniteGuardianEvaluators || []}
+              evaluatorOptions={
+                isRisksAndHarms
+                  ? graniteGuardianEvaluators || []
+                  : returnByPipelineType(
+                      currentTestCase.type,
+                      nonGraniteGuardianDirectEvaluators,
+                      nonGraniteGuardianPairwiseEvaluators,
+                    ) || []
+              }
               dropdownLabel={'Evaluator'}
               style={{ marginBottom: '2rem' }}
               className={classes['left-padding']}

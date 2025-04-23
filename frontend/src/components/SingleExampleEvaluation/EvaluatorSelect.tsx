@@ -11,7 +11,7 @@ import { useModelProviderCredentials } from '@customHooks/useModelProviderCreden
 
 import { EvaluationType, Evaluator, ModelProviderType } from '../../types'
 import classes from './EvaluatorSelect.module.scss'
-import { usePipelineTypesContext } from './Providers/PipelineTypesProvider'
+import { useEvaluatorOptionsContext } from './Providers/EvaluatorOptionsProvider'
 import { useURLParamsContext } from './Providers/URLParamsProvider'
 
 interface Props {
@@ -37,7 +37,9 @@ export const PipelineSelect = ({
   selectionComponentNameWithArticle = 'an evaluator',
   selectionComponentName = 'evaluator',
 }: Props) => {
-  const { loadingEvaluators, directEvaluators, pairwiseEvaluators } = usePipelineTypesContext()
+  console.log(getJSONStringWithSortedKeys(selectedEvaluator))
+
+  const { loadingEvaluators, directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
   const { isRisksAndHarms } = useURLParamsContext()
   const providerToEvaluators = useMemo<Record<ModelProviderType, Evaluator[]>>(() => {
     const result: Record<ModelProviderType, Evaluator[]> = {

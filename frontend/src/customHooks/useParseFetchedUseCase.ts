@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 
-import { usePipelineTypesContext } from '@components/SingleExampleEvaluation/Providers/PipelineTypesProvider'
+import { useEvaluatorOptionsContext } from '@components/SingleExampleEvaluation/Providers/EvaluatorOptionsProvider'
 import { StoredUseCase } from '@prisma/client'
 import {
   CriteriaV1,
@@ -39,7 +39,7 @@ import { returnByPipelineType } from '@utils'
 // fetched use case is v3 and current is v4
 // parseFetchedUseCaseV3 -> parseFetchedUseCaseV3toV4
 export const useParseFetchedUseCase = () => {
-  const { directEvaluators, pairwiseEvaluators } = usePipelineTypesContext()
+  const { directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
 
   const parseDirectAssessmentResultsV0ToV1 = useCallback((results: DirectResultsV0): DirectResultsV1 | null => {
     return (
