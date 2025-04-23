@@ -3,7 +3,7 @@ import { EditorProvider } from '@components/HighlightTextArea/EditorProvider'
 import { AppSidebarProvider } from './Providers/AppSidebarProvider'
 import { BackendUserProvider } from './Providers/BackendUserProvider'
 import { CriteriasProvider } from './Providers/CriteriasProvider'
-import { PipelineTypesProvider } from './Providers/PipelineTypesProvider'
+import { EvaluatorOptionsProvider } from './Providers/EvaluatorOptionsProvider'
 import { URLParamsProvider } from './Providers/URLParamsProvider'
 import { UserUseCasesProvider } from './Providers/UserUseCasesProvider'
 import { SingleExampleEvaluation } from './SingleExampleEvaluation'
@@ -11,7 +11,7 @@ import { SingleExampleEvaluation } from './SingleExampleEvaluation'
 const Landing = () => (
   <BackendUserProvider>
     <CriteriasProvider>
-      <PipelineTypesProvider>
+      <EvaluatorOptionsProvider>
         <UserUseCasesProvider>
           <URLParamsProvider>
             <AppSidebarProvider>
@@ -21,7 +21,7 @@ const Landing = () => (
             </AppSidebarProvider>
           </URLParamsProvider>
         </UserUseCasesProvider>
-      </PipelineTypesProvider>
+      </EvaluatorOptionsProvider>
     </CriteriasProvider>
   </BackendUserProvider>
 )

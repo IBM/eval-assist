@@ -3,30 +3,33 @@ import { ReactNode, createContext, useContext, useEffect, useMemo, useState } fr
 import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { returnByPipelineType } from '@utils'
 
 import { EvaluationType, Evaluator, FetchedEvaluator } from '../../../types'
 
-interface PipelineContextValue {
+interface EvaluatorOptionsContextValue {
   directEvaluators: Evaluator[] | null
   pairwiseEvaluators: Evaluator[] | null
   graniteGuardianEvaluators: Evaluator[] | null
-  nonGraniteGuardianEvaluators: Evaluator[] | null
+  nonGraniteGuardianDirectEvaluators: Evaluator[] | null
+  nonGraniteGuardianPairwiseEvaluators: Evaluator[] | null
   loadingEvaluators: boolean
 }
 
-const PipelineTypesContext = createContext<PipelineContextValue>({
+const EvaluatorOptionsContext = createContext<EvaluatorOptionsContextValue>({
   directEvaluators: null,
   pairwiseEvaluators: null,
   graniteGuardianEvaluators: null,
-  nonGraniteGuardianEvaluators: null,
+  nonGraniteGuardianDirectEvaluators: null,
+  nonGraniteGuardianPairwiseEvaluators: null,
   loadingEvaluators: false,
 })
 
-export const usePipelineTypesContext = () => {
-  return useContext(PipelineTypesContext)
+export const useEvaluatorOptionsContext = () => {
+  return useContext(EvaluatorOptionsContext)
 }
 
-export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => {
+export const EvaluatorOptionsProvider = ({ children }: { children: ReactNode }) => {
   const [evaluators, setEvaluators] = useState<Evaluator[] | null>(null)
   const [loadingEvaluators, setLoadingEvaluators] = useState(false)
   const { get } = useFetchUtils()
@@ -40,14 +43,21 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
     () => evaluators?.filter((p) => p.type === EvaluationType.PAIRWISE) ?? null,
     [evaluators],
   )
+
   const graniteGuardianEvaluators = useMemo(
-    () => directEvaluators?.filter((p) => p.name.startsWith('Granite Guardian')) || null,
+    () => directEvaluators?.filter((p) => p.name.startsWith('Granite Guardian')) ?? null,
     [directEvaluators],
   )
 
-  const nonGraniteGuardianEvaluators = useMemo(
-    () => directEvaluators?.filter((p) => !p.name.startsWith('Granite Guardian')) || null,
-    [directEvaluators],
+  const nonGraniteGuardianDirectEvaluators = useMemo(
+    () => evaluators?.filter((p) => p.type === EvaluationType.DIRECT && !p.name.startsWith('Granite Guardian')) ?? null,
+    [evaluators],
+  )
+
+  const nonGraniteGuardianPairwiseEvaluators = useMemo(
+    () =>
+      evaluators?.filter((p) => p.type === EvaluationType.PAIRWISE && !p.name.startsWith('Granite Guardian')) ?? null,
+    [evaluators],
   )
 
   useEffect(() => {
@@ -75,16 +85,17 @@ export const PipelineTypesProvider = ({ children }: { children: ReactNode }) => 
   if (loadingEvaluators || evaluators === null) return <Loading withOverlay />
 
   return (
-    <PipelineTypesContext.Provider
+    <EvaluatorOptionsContext.Provider
       value={{
         directEvaluators,
         pairwiseEvaluators,
         graniteGuardianEvaluators,
-        nonGraniteGuardianEvaluators,
+        nonGraniteGuardianDirectEvaluators,
+        nonGraniteGuardianPairwiseEvaluators,
         loadingEvaluators,
       }}
     >
       {children}
-    </PipelineTypesContext.Provider>
+    </EvaluatorOptionsContext.Provider>
   )
 }

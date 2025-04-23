@@ -9,7 +9,7 @@ import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
 import { EvaluationType, Evaluator, ModelProviderType, UseCase } from '../../../types'
 import { useCriteriasContext } from './CriteriasProvider'
-import { usePipelineTypesContext } from './PipelineTypesProvider'
+import { useEvaluatorOptionsContext } from './EvaluatorOptionsProvider'
 import { useUserUseCasesContext } from './UserUseCasesProvider'
 
 interface URLInfoContextValue {
@@ -41,7 +41,7 @@ export const URLParamsProvider = ({ children }: { children: ReactNode }) => {
   const { getEmptyUseCaseWithCriteria } = useCriteriasContext()
   const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
   const { userUseCases } = useUserUseCasesContext()
-  const { directEvaluators, pairwiseEvaluators } = usePipelineTypesContext()
+  const { directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
   const { getAreRelevantCredentialsProvided } = useModelProviderCredentials()
 
   const useCaseId = useMemo(() => (router.query.id ? +router.query.id : null), [router.query.id])

@@ -215,11 +215,7 @@ export type UseCase = UseCaseV4
 
 export enum EvaluationType {
   DIRECT = 'direct',
-  OLD_DIRECT = 'direct_assessment',
-  OLD_RUBRIC = 'rubric',
   PAIRWISE = 'pairwise',
-  OLD_PAIRWISE = 'pairwise_comparison',
-  OLD_ALL_VS_ALL_PAIRWISE = 'all_vs_all_pairwise',
 }
 
 export enum ModelProviderType {
