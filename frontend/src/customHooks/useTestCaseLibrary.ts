@@ -1107,7 +1107,7 @@ website or contact them to discuss your options.`,
         type: EvaluationType.PAIRWISE,
         id: null,
         contextVariableNames: ['Context'],
-        responseVariableName: 'email',
+        responseVariableName: 'Email',
         instances: [
           {
             contextVariables: [
