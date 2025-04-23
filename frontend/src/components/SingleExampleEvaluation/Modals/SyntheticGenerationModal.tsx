@@ -245,6 +245,9 @@ export const SyntheticGenerationModal = ({
               ) : (
                 <DropdownSkeleton />
               )}
+              {!loadingDomainPersonaMapping && syntheticGenerationConfig.domain === null && (
+                <p className={classes.task_indication}>{'Select a domain to unlock the persona options'}</p>
+              )}
               <Dropdown
                 itemToString={(i: { text: string }) => i.text}
                 items={generationLengthOptions}
