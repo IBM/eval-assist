@@ -162,8 +162,8 @@ export const SingleExampleEvaluation = () => {
   })
 
   const contextVariableNames = useMemo(
-    () => currentTestCase?.instances[0]?.contextVariables.map((c) => c.name) || [],
-    [currentTestCase?.instances],
+    () => currentTestCase?.contextVariableNames || [],
+    [currentTestCase?.contextVariableNames],
   )
 
   const setInstances = (instances: Instance[]) =>
@@ -434,6 +434,7 @@ export const SingleExampleEvaluation = () => {
             criteria: currentTestCase.criteria,
             type: currentTestCase.type,
             evaluator: currentTestCase.evaluator,
+            contextVariableNames: currentTestCase.contextVariableNames,
             responseVariableName: currentTestCase.responseVariableName,
             syntheticGenerationConfig: currentTestCase.syntheticGenerationConfig,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
@@ -485,6 +486,7 @@ export const SingleExampleEvaluation = () => {
             criteria: toSaveUseCase.criteria,
             type: toSaveUseCase.type,
             pipeline: toSaveUseCase.evaluator,
+            contextVariableNames: currentTestCase.contextVariableNames,
             responseVariableName: currentTestCase.responseVariableName,
             syntheticGenerationConfig: currentTestCase.syntheticGenerationConfig,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
@@ -834,7 +836,7 @@ export const SingleExampleEvaluation = () => {
               loadingDomainPersonaMapping={loadingDomainPersonaMapping}
               loadDomainPersonaMapping={loadDomainPersonaMapping}
               criteria={currentTestCase.criteria}
-              contextVariableNames={currentTestCase.instances[0]?.contextVariables.map((c) => c.name) || []}
+              contextVariableNames={currentTestCase.contextVariableNames}
               responseVariableName={currentTestCase.responseVariableName}
             />
           )}
