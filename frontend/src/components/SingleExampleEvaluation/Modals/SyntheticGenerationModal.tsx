@@ -8,6 +8,8 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
+  Select,
+  SelectItem,
   TextInput,
   Tooltip,
 } from '@carbon/react'
@@ -22,7 +24,7 @@ import {
   SyntheticGenerationConfig,
   TaskEnum,
 } from '@types'
-import { EvaluationType, Evaluator } from '@types'
+import { EvaluationType } from '@types'
 import { returnByPipelineType } from '@utils'
 
 import { PipelineSelect } from '../EvaluatorSelect'
@@ -190,18 +192,22 @@ export const SyntheticGenerationModal = ({
               <p className={classes.section_description}>Specify what kind of data you would like to generate</p>
             </div>
             <div className={classes.instruction_container}>
-              <Dropdown
-                itemToString={(i: { text: string }) => i.text}
-                items={tasksOptions}
-                label="No option selected"
-                id="task"
-                titleText="Task"
-                type="default"
-                selectedItem={syntheticGenerationConfig.task ? { text: syntheticGenerationConfig.task } : null}
-                onChange={({ selectedItem }) =>
-                  setSyntheticGenerationConfig({ ...syntheticGenerationConfig, task: selectedItem?.text as TaskEnum })
+              <Select
+                id={'task-selection'}
+                labelText={'Task'}
+                onChange={(e) =>
+                  setSyntheticGenerationConfig({
+                    ...syntheticGenerationConfig,
+                    task: e.target.value !== '' ? (e.target.value as TaskEnum) : null,
+                  })
                 }
-              />
+                value={syntheticGenerationConfig.task || ''}
+              >
+                <SelectItem value={''} text={'Generic/Unstrutured'} />
+                {tasksOptions.map((task, i) => (
+                  <SelectItem key={i} value={task.text} text={task.text} />
+                ))}
+              </Select>
               <p className={classes.task_indication}>
                 {syntheticGenerationConfig.task
                   ? perTaskIndication[syntheticGenerationConfig.task]
