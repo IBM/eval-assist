@@ -282,6 +282,7 @@ export const useParseFetchedUseCase = () => {
         perCriteriaOptionCount: null,
         borderlineCount: null,
       },
+      contextVariableNames: useCaseV3.instances[0].contextVariables.map((cv) => cv.name),
     }
     return useCaseV4
   }, [])
