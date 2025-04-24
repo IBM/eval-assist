@@ -18,7 +18,7 @@ interface Props extends TextInputProps {
   editable?: boolean
 }
 
-export const HighlightTextArea = memo(function HighlightTextArea({
+export const HighlightTextArea = ({
   value,
   labelText,
   toHighlightWords,
@@ -30,7 +30,7 @@ export const HighlightTextArea = memo(function HighlightTextArea({
   growToContent = false,
   editable = true,
   onValueChange,
-}: Props) {
+}: Props) => {
   return (
     <CarbonWrapper isTextArea={isTextArea} isTextInput={isTextInput} labelText={labelText} className={className}>
       <LexicalContent
@@ -46,4 +46,4 @@ export const HighlightTextArea = memo(function HighlightTextArea({
       />
     </CarbonWrapper>
   )
-})
+}

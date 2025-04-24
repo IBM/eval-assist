@@ -79,11 +79,16 @@ export interface FetchedDirectInstanceResultV2
   certainty?: number
 }
 
+export type FetchedDirectInstanceResultWithId = {
+  id: string
+  result: FetchedDirectInstanceResultV2
+}
+
 export type FetchedDirectInstanceResult = FetchedDirectInstanceResultV2
 
 export type FetchedDirectResultsV0 = FetchedDirectInstanceResultV0[]
 export type FetchedDirectResultsV1 = FetchedDirectInstanceResultV1[]
-export type FetchedDirectResultsV2 = FetchedDirectInstanceResultV2[]
+export type FetchedDirectResultsV2 = FetchedDirectInstanceResultWithId[]
 export type FetchedDirectResults = FetchedDirectResultsV2
 
 export type DirectResultsV0 = DirectInstanceResultV0[]
@@ -100,6 +105,12 @@ interface FetchedPerResponsePairwiseResultV0 {
   ranking: number
 }
 
+export interface FetchedPairwiseInstanceResultV0 {
+  perResponseResults: {
+    [key: string]: FetchedPerResponsePairwiseResultV0
+  }
+  ranking: number[]
+}
 interface FetchedPerResponsePairwiseResultV1
   extends Omit<FetchedPerResponsePairwiseResultV0, 'compared_to_indexes' | 'explanations' | 'p_bias' | 'certainty'> {
   compared_to: string[]
@@ -108,16 +119,7 @@ interface FetchedPerResponsePairwiseResultV1
   positional_bias: boolean[]
 }
 
-export interface FetchedPairwiseInstanceResultV0 {
-  perResponseResults: {
-    [key: string]: FetchedPerResponsePairwiseResultV0
-  }
-  ranking: number[]
-}
-
-export type FetchedPairwiseInstanceResultV1 = {
-  [key: string]: FetchedPerResponsePairwiseResultV1
-}
+type FetchedPairwiseInstanceResultV1 = { id: string; result: Record<string, FetchedPerResponsePairwiseResultV1> }
 
 export type FetchedPairwiseInstanceResult = FetchedPairwiseInstanceResultV1
 
@@ -153,6 +155,7 @@ export interface OptionV1 {
 export type Option = OptionV1
 
 export type Instance = {
+  id: string
   contextVariables: ContextVariableV1[]
   expectedResult: string
   result: DirectInstanceResult | PairwiseInstanceResult | null

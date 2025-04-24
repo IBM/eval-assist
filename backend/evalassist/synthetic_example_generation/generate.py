@@ -245,6 +245,7 @@ class Generator:
                 response=next(iter(parsed_responses[i].values())),
                 response_variable_name=self.response_name,
                 metadata=metadatas[i],
+                id="",
             )
             for i in range(len(parsed_responses))
         ]

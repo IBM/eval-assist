@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { $getRoot, BLUR_COMMAND, COMMAND_PRIORITY_LOW, FOCUS_COMMAND } from 'lexical'
+import { $getRoot } from 'lexical'
 import { EditorState } from 'lexical/LexicalEditorState'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'

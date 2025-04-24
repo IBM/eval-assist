@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { useState } from 'react'
 
 import { Tooltip } from '@carbon/react'
-import { Maximize, Replicate, TrashCan } from '@carbon/react/icons'
+import { Maximize, Play, Replicate, TrashCan } from '@carbon/react/icons'
 
 import classes from './RemovableSection.module.scss'
 
@@ -11,11 +11,19 @@ interface Props {
   onRemove: () => void
   onExpand: () => void
   onDuplicate: () => void
+  onEvaluateInstance: () => void
   removeEnabled?: boolean
   children: (arg: { setActive: () => void; setInactive: () => void }) => JSX.Element
 }
 
-export default function RemovableSection({ onRemove, onExpand, onDuplicate, removeEnabled, children }: Props) {
+export default function RemovableSection({
+  onRemove,
+  onExpand,
+  onDuplicate,
+  onEvaluateInstance,
+  removeEnabled,
+  children,
+}: Props) {
   const [active, setActive] = useState(false)
 
   return (
@@ -37,6 +45,18 @@ export default function RemovableSection({ onRemove, onExpand, onDuplicate, remo
             tabIndex={-1}
           >
             <Replicate />
+          </button>
+        </Tooltip>
+        <Tooltip label="Evaluate" align="left">
+          <button
+            aria-label="Evaluate"
+            className={cx(classes.actionButton, {
+              [classes.active]: active,
+            })}
+            onClick={onEvaluateInstance}
+            tabIndex={-1}
+          >
+            <Play />
           </button>
         </Tooltip>
         <Tooltip label="See details" align="left">

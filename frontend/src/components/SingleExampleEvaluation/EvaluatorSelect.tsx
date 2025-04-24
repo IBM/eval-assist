@@ -37,8 +37,6 @@ export const PipelineSelect = ({
   selectionComponentNameWithArticle = 'an evaluator',
   selectionComponentName = 'evaluator',
 }: Props) => {
-  console.log(getJSONStringWithSortedKeys(selectedEvaluator))
-
   const { loadingEvaluators, directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
   const { isRisksAndHarms } = useURLParamsContext()
   const providerToEvaluators = useMemo<Record<ModelProviderType, Evaluator[]>>(() => {

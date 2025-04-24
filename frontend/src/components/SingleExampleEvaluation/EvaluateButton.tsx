@@ -12,13 +12,14 @@ import { useURLParamsContext } from './Providers/URLParamsProvider'
 
 interface EvaluateButtonProps {
   evaluationRunning: boolean
-  runEvaluation: () => Promise<void>
+  runEvaluation: (evaluationIds: string[]) => Promise<void>
   areRelevantCredentialsProvided: boolean
   setPromptModalOpen: Dispatch<SetStateAction<boolean>>
   style?: CSSProperties
   className?: string
   currentUseCase: UseCase | null
   evaluationFailed: boolean
+  outdatedResultInstanceIds: string[]
 }
 
 export const EvaluateButton = ({
@@ -28,6 +29,7 @@ export const EvaluateButton = ({
   setPromptModalOpen,
   currentUseCase,
   evaluationFailed,
+  outdatedResultInstanceIds,
   style,
   className,
 }: EvaluateButtonProps) => {
@@ -53,7 +55,7 @@ export const EvaluateButton = ({
             >
               <span>
                 <Button
-                  onClick={runEvaluation}
+                  onClick={() => runEvaluation(outdatedResultInstanceIds)}
                   disabled={evaluationRunning || !areRelevantCredentialsProvided}
                   renderIcon={Warning}
                 >
@@ -62,7 +64,10 @@ export const EvaluateButton = ({
               </span>
             </Tooltip>
           ) : (
-            <Button onClick={runEvaluation} disabled={evaluationRunning || !areRelevantCredentialsProvided}>
+            <Button
+              onClick={() => runEvaluation(outdatedResultInstanceIds)}
+              disabled={evaluationRunning || !areRelevantCredentialsProvided}
+            >
               Evaluate
             </Button>
           )}

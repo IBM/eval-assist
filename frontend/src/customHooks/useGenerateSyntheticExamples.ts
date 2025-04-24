@@ -82,6 +82,7 @@ export const useGenerateSyntheticExamples = (props: Props) => {
         result: null,
         metadata: unparsedGeneratedInstance.metadata,
         response: unparsedGeneratedInstance.response,
+        id: crypto.randomUUID(),
       }))
       setLoadingSyntheticExamples(false)
 
