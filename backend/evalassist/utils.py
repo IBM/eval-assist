@@ -115,7 +115,8 @@ def get_cross_inference_engine_params(
     inference_engine_params["model"] = model_name
     inference_engine_params["provider"] = provider.value
     inference_engine_params["credentials"] = credentials
-    return inference_engine_params, provider_specific_args
+    inference_engine_params["provider_specific_args"] = provider_specific_args
+    return inference_engine_params
 
 
 def get_cross_inference_engine(
@@ -125,7 +126,7 @@ def get_cross_inference_engine(
     custom_params: dict = None,
     provider_specific_params: dict = None,
 ):
-    inference_engine_params, provider_specific_args = get_cross_inference_engine_params(
+    inference_engine_params = get_cross_inference_engine_params(
         credentials=credentials,
         provider=provider,
         model_name=model_name,
@@ -133,9 +134,7 @@ def get_cross_inference_engine(
         provider_specific_params=provider_specific_params,
     )
 
-    return CrossProviderInferenceEngine(
-        **inference_engine_params, provider_specific_args=provider_specific_args
-    )
+    return CrossProviderInferenceEngine(**inference_engine_params)
 
 
 def get_watsonx_inference_engine(
