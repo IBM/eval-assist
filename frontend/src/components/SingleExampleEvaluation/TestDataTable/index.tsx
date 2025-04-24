@@ -22,7 +22,6 @@ import {
   PairwiseInstanceResultV1,
   UseCase,
 } from '../../../types'
-import { useToastContext } from '../Providers/ToastProvider'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { TestDataTableRow } from './TestDataTableRow'
 import classes from './index.module.scss'
@@ -45,6 +44,8 @@ interface Props {
   setSysntheticGenerationModalOpen: Dispatch<SetStateAction<boolean>>
   generateTestData: () => Promise<void>
   modelForSyntheticGeneration: Evaluator | null
+  evaluatingInstanceIds: string[]
+  runEvaluation: (evaluationIds: string[]) => Promise<void>
 }
 
 export const TestDataTable = ({
@@ -65,6 +66,8 @@ export const TestDataTable = ({
   currentTestCase,
   generateTestData,
   modelForSyntheticGeneration,
+  evaluatingInstanceIds,
+  runEvaluation,
 }: Props) => {
   const instancesPerPage = useMemo(() => INSTANCES_PER_PAGE, [])
   const instances = useMemo(() => currentTestCase.instances, [currentTestCase.instances])
@@ -84,38 +87,29 @@ export const TestDataTable = ({
 
   const directGridClasses = useMemo(
     () => ({
-      [classes.columns1]: !expectedResultOn && (!resultsAvailable || evaluationRunning),
-      [classes.columns2]:
-        (resultsAvailable && !expectedResultOn && !evaluationRunning) ||
-        (expectedResultOn && !resultsAvailable) ||
-        (expectedResultOn && evaluationRunning),
-      [classes.columns3var1]: expectedResultOn && resultsAvailable && !evaluationRunning,
+      [classes.columns1]: !expectedResultOn && !resultsAvailable,
+      [classes.columns2]: (resultsAvailable && !expectedResultOn) || (expectedResultOn && !resultsAvailable),
+      [classes.columns3var1]: expectedResultOn && resultsAvailable,
     }),
-    [evaluationRunning, expectedResultOn, resultsAvailable],
+    [expectedResultOn, resultsAvailable],
   )
 
   const headerDirectGridClasses = useMemo(
     () => ({
-      [classes.columns1]: !expectedResultOn && (!resultsAvailable || evaluationRunning),
-      [classes.columns2]:
-        (resultsAvailable && !expectedResultOn && !evaluationRunning) ||
-        (expectedResultOn && !resultsAvailable) ||
-        (expectedResultOn && evaluationRunning),
-      [classes.columns3var1]: expectedResultOn && resultsAvailable && !evaluationRunning,
+      [classes.columns1]: !expectedResultOn && !resultsAvailable,
+      [classes.columns2]: (resultsAvailable && !expectedResultOn) || (expectedResultOn && !resultsAvailable),
+      [classes.columns3var1]: expectedResultOn && resultsAvailable,
     }),
-    [evaluationRunning, expectedResultOn, resultsAvailable],
+    [expectedResultOn, resultsAvailable],
   )
 
   const pairwiseGridClasses = useMemo(
     () => ({
-      [classes.columns1]: !expectedResultOn && (!resultsAvailable || evaluationRunning),
-      [classes.columns2]:
-        (resultsAvailable && !expectedResultOn && !evaluationRunning) ||
-        (expectedResultOn && !resultsAvailable) ||
-        (expectedResultOn && evaluationRunning),
-      [classes.columns3var3]: expectedResultOn && resultsAvailable && !evaluationRunning,
+      [classes.columns1]: !expectedResultOn && !resultsAvailable,
+      [classes.columns2]: (resultsAvailable && !expectedResultOn) || (expectedResultOn && !resultsAvailable),
+      [classes.columns3var3]: expectedResultOn && resultsAvailable,
     }),
-    [evaluationRunning, expectedResultOn, resultsAvailable],
+    [expectedResultOn, resultsAvailable],
   )
 
   const noPositionalBias = useMemo(() => {
@@ -141,6 +135,7 @@ export const TestDataTable = ({
       })),
       expectedResult: '',
       result: null,
+      id: crypto.randomUUID(),
     }
     if (type === EvaluationType.DIRECT) {
       ;(newEmptyInstance as DirectInstance) = { ...newEmptyInstance, response: '' }
@@ -283,7 +278,7 @@ export const TestDataTable = ({
                 </strong>
               </div>
             )}
-            {resultsAvailable && !evaluationRunning && (
+            {resultsAvailable && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
                 <strong className={classes.headerTypography}>
                   {returnByPipelineType(type, 'Generated result', 'Generated winner')}
@@ -334,9 +329,7 @@ export const TestDataTable = ({
                 </strong> */}
               </div>
             )}
-            {resultsAvailable && !evaluationRunning && (
-              <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>
-            )}
+            {resultsAvailable && <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>}
           </div>
 
           {currentInstances.length === 0 && (
@@ -353,6 +346,7 @@ export const TestDataTable = ({
               setSelectedInstance={setSelectedInstance}
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               evaluationRunning={evaluationRunning}
+              isInstanceEvaluationRunning={evaluatingInstanceIds.includes(instance.id)}
               criteria={criteria}
               gridClasses={returnByPipelineType(type, directGridClasses, pairwiseGridClasses)}
               instance={instance}
@@ -363,6 +357,7 @@ export const TestDataTable = ({
               addInstance={addInstance}
               resultsAvailable={resultsAvailable}
               responseVariableName={responseVariableName}
+              runEvaluation={runEvaluation}
             />
           ))}
           {totalPages > 1 && (

@@ -26,6 +26,7 @@ import {
   EvaluationType,
   Evaluator,
   FetchedDirectInstanceResult,
+  FetchedDirectInstanceResultWithId,
   FetchedDirectResults,
   FetchedPairwiseInstanceResult,
   FetchedPairwiseResults,
@@ -78,7 +79,7 @@ export const SingleExampleEvaluation = () => {
   const isUseCaseSaved = useMemo(() => currentTestCase !== null && currentTestCase.id !== null, [currentTestCase])
   const [evaluationFailed, setEvaluationFailed] = useState(false)
   const [evaluationRunning, setEvaluationRunning] = useState(false)
-
+  const [evaluatingInstanceIds, setEvaluatingInstanceIds] = useState<string[]>([])
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
   const [saveUseCaseModalOpen, setSaveUseCaseModalOpen] = useState(false)
   const [newUseCaseModalOpen, setNewUseCaseModalOpen] = useState(false)
@@ -99,6 +100,18 @@ export const SingleExampleEvaluation = () => {
   )
 
   const [lastSavedUseCaseString, setLastSavedUseCaseString] = useState<string>(currentUseCaseString)
+
+  // update the state if the preloaded test case changes
+  useEffect(() => {
+    if (preloadedUseCase !== null) {
+      setUseCaseSelected(null)
+      setCurrentTestCase({ ...preloadedUseCase })
+      setLastSavedUseCaseString(getJSONStringWithSortedKeys(preloadedUseCase))
+      temporaryIdRef.current = uuid()
+    } else {
+      setCurrentTestCase(null)
+    }
+  }, [preloadedUseCase])
 
   const changesDetected = useMemo(
     () => showingTestCase && lastSavedUseCaseString !== currentUseCaseString && !isRisksAndHarms,
@@ -166,6 +179,46 @@ export const SingleExampleEvaluation = () => {
     [currentTestCase?.contextVariableNames],
   )
 
+  const getStringifiedInstanceContent = useCallback(
+    (instance: Instance) => {
+      return currentTestCase
+        ? getJSONStringWithSortedKeys({
+            evaluator: currentTestCase.evaluator,
+            criteria: currentTestCase.criteria,
+            ...instance.contextVariables,
+            response: returnByPipelineType(
+              currentTestCase.type,
+              () => (instance as DirectInstance).response,
+              (instance as PairwiseInstance).responses,
+            ),
+          })
+        : ''
+    },
+    [currentTestCase],
+  )
+
+  // Used to compute if an instance result is outdated
+  const [instancesLastEvaluatedContent, setInstancesLastEvaluatedContent] = useState<Record<string, string | null>>(
+    () =>
+      currentTestCase
+        ? Object.fromEntries(
+            currentTestCase.instances.map((instance) => [instance.id, getStringifiedInstanceContent(instance)]),
+          )
+        : {},
+  )
+
+  const isInstanceResultOutdated = useMemo<Record<string, boolean>>(() => {
+    return currentTestCase
+      ? Object.fromEntries(
+          currentTestCase.instances.map((instance) => [
+            instance.id,
+            instance.result === null ||
+              instancesLastEvaluatedContent[instance.id] !== getStringifiedInstanceContent(instance),
+          ]),
+        )
+      : {}
+  }, [currentTestCase, getStringifiedInstanceContent, instancesLastEvaluatedContent])
+
   const setInstances = (instances: Instance[]) =>
     setCurrentTestCase((previousCurrentUseCase) => {
       if (previousCurrentUseCase !== null) {
@@ -229,166 +282,195 @@ export const SingleExampleEvaluation = () => {
 
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
 
-  const runEvaluation = useCallback(async () => {
-    if (currentTestCase === null) return
-    setEvaluationFailed(false)
-    setEvaluationRunning(true)
-    const inProgressEvalToastId = addToast({
-      title: 'Running evaluation...',
-      kind: 'info',
-    })
-    setEvaluationRunningToastId(inProgressEvalToastId)
-    // temporaryIdSnapshot is used to discern whether the current test case
-    // was changed during the evaluation request
-    const temporaryIdSnapshot = temporaryIdRef.current
-    let response
-    const parsedCriteria = { ...currentTestCase.criteria }
-    if (isRisksAndHarms) {
-      // check if criteria description changed and criteria name didn't
-      const harmsAndRiskCriteria = getCriteria(toSnakeCase(currentTestCase.criteria.name), EvaluationType.DIRECT)
-      if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.description !== currentTestCase.criteria.description) {
-        // the tokenizer of granite guardian will complain if we send a predefined criteria name
-        // with a custom description.
-        removeToast(inProgressEvalToastId)
-        addToast({
-          kind: 'error',
-          title: 'That risk already exist',
-          subtitle: "Can't change the definition of an existing risk",
-          timeout: 5000,
-        })
-        setEvaluationRunning(false)
-        return
+  const runEvaluation = useCallback(
+    async (evaluationIds: string[]) => {
+      console.log(evaluationIds)
+      if (currentTestCase === null) return
+      const inProgressEvalToastId = addToast({
+        title: 'Running evaluation...',
+        kind: 'info',
+      })
+      setEvaluationRunningToastId(inProgressEvalToastId)
+      // temporaryIdSnapshot is used to discern whether the current test case
+      // was changed during the evaluation request
+      const temporaryIdSnapshot = temporaryIdRef.current
+      let response
+      const parsedCriteria = { ...currentTestCase.criteria }
+      if (isRisksAndHarms) {
+        // check if criteria description changed and criteria name didn't
+        const harmsAndRiskCriteria = getCriteria(toSnakeCase(currentTestCase.criteria.name), EvaluationType.DIRECT)
+        if (
+          harmsAndRiskCriteria !== null &&
+          harmsAndRiskCriteria.description !== currentTestCase.criteria.description
+        ) {
+          // the tokenizer of granite guardian will complain if we send a predefined criteria name
+          // with a custom description.
+          removeToast(inProgressEvalToastId)
+          addToast({
+            kind: 'error',
+            title: 'That risk already exist',
+            subtitle: "Can't change the definition of an existing risk",
+            timeout: 5000,
+          })
+          setEvaluationRunning(false)
+          return
+        }
       }
-    }
-    let body: any = {
-      instances: currentTestCase.instances.map((instance) => ({
+
+      const toEvaluateInstances: Instance[] = currentTestCase.instances.filter((instance) =>
+        evaluationIds.includes(instance.id),
+      )
+
+      const toEvaluateInstancesParsed = toEvaluateInstances.map((instance) => ({
         context_variables: instance.contextVariables.reduce(
           (acc, item, index) => ({ ...acc, [item.name]: item.value }),
           {},
         ),
         response: returnByPipelineType(
           currentTestCase.type,
-          (instance as DirectInstance).response,
-          (instance as PairwiseInstance).responses,
+          () => (instance as DirectInstance).response,
+          () => (instance as PairwiseInstance).responses,
         ),
         response_variable_name: currentTestCase.responseVariableName,
-      })),
-      evaluator_name: currentTestCase.evaluator?.name,
-      provider: currentTestCase.evaluator?.provider,
-      criteria: parsedCriteria,
-      type: currentTestCase.type,
-      response_variable_name: currentTestCase.responseVariableName,
-    }
-    body['llm_provider_credentials'] = {
-      ...modelProviderCredentials[currentTestCase.evaluator?.provider || ModelProviderType.RITS],
-    }
+        id: instance.id,
+      }))
 
-    // changing api_key to apikey this way for backward compatibility
-    // if (currentUseCase.evaluator?.provider === ModelProviderType.WATSONX) {
-    //   body['llm_provider_credentials']['apikey'] = modelProviderCredentials[ModelProviderType.WATSONX].api_key
-    //   delete body['llm_provider_credentials']['api_key']
-    // }
-    const startEvaluationTime = new Date().getTime() / 1000
-    response = await post('evaluate/', body)
-    const endEvaluationTime = new Date().getTime() / 1000
-    const totalEvaluationTime = Math.round(endEvaluationTime - startEvaluationTime)
-    // only perform after-evaluation-finished actions if the current test case didn't change
-    if (isEqualToCurrentTemporaryId(temporaryIdSnapshot)) {
-      setEvaluationRunning(false)
-
-      if (!response.ok) {
-        const error = (await response.json()) as {
-          detail: string
-        }
-
-        const errorMessage =
-          typeof error.detail === 'string'
-            ? error.detail
-            : `Something went wrong with the evaluation (${
-                (error.detail as { type: string; msg: string }[])[0].type
-              }: ${(error.detail as { type: string; msg: string }[])[0].msg})`
-
-        setEvaluationFailed(true)
-        // We are catching this error an so we show the message sent from the backend
+      if (toEvaluateInstancesParsed.length === 0) {
         removeToast(inProgressEvalToastId)
-
         addToast({
-          kind: 'error',
-          title: 'Evaluation failed',
-          subtitle: errorMessage,
-          // timeout: 5000,
+          kind: 'info',
+          title: 'No instances to evaluate',
+          subtitle: 'All instances are already evaluated',
+          timeout: 5000,
         })
-
         return
       }
 
-      // response is ok
-      const responseBody = await response.json()
-      addToast({
-        kind: 'success',
-        title: 'Evaluation finished',
-        subtitle: `Took ${totalEvaluationTime} seconds`,
-        timeout: 5000,
-      })
-      let instancesWithResults: Instance[]
-      if (currentTestCase.type === EvaluationType.DIRECT) {
-        instancesWithResults = currentTestCase.instances.map((instance) => ({ ...instance } as DirectInstance))
-        ;(responseBody.results as FetchedDirectResults).forEach(
-          (fetchedInstanceResult: FetchedDirectInstanceResult, i) => {
-            const instanceResult: DirectInstanceResult = {
-              option: fetchedInstanceResult.option,
-              positionalBiasOption: fetchedInstanceResult.positional_bias_option,
-              explanation: fetchedInstanceResult.explanation,
-              positionalBias: fetchedInstanceResult.positional_bias,
-              certainty: fetchedInstanceResult.certainty,
-            }
-            instancesWithResults[i] = { ...instancesWithResults[i], result: instanceResult }
-          },
-        )
-      } else {
-        instancesWithResults = currentTestCase.instances.map((instance) => ({ ...instance } as PairwiseInstance))
-        ;(responseBody.results as FetchedPairwiseResults).forEach(
-          (fetchedInstanceResult: FetchedPairwiseInstanceResult, i) => {
-            let instanceResult: PairwiseInstanceResult = {}
-            Object.entries(fetchedInstanceResult).forEach(([result_idx, fetchedPerResponseResult]) => {
-              instanceResult[result_idx] = {
-                contestResults: fetchedPerResponseResult.contest_results,
-                comparedTo: fetchedPerResponseResult.compared_to,
-                summaries: fetchedPerResponseResult.summaries,
-                positionalBias:
-                  fetchedPerResponseResult.positional_bias ||
-                  new Array(fetchedPerResponseResult.contest_results.length).fill(false),
-                winrate: fetchedPerResponseResult.winrate,
-                ranking: fetchedPerResponseResult.ranking,
-              }
-            })
-            instancesWithResults[i] = { ...instancesWithResults[i], result: instanceResult }
-          },
-        )
-      }
-      setCurrentTestCase((previousCurrentUseCase) => {
-        if (previousCurrentUseCase !== null) {
-          return {
-            ...previousCurrentUseCase,
-            instances: instancesWithResults,
-          }
-        } else {
-          return null
-        }
-      })
+      setEvaluationFailed(false)
+      setEvaluationRunning(true)
+      setEvaluatingInstanceIds(toEvaluateInstancesParsed.map((instance) => instance.id))
 
-      removeToast(inProgressEvalToastId)
-    }
-  }, [
-    addToast,
-    currentTestCase,
-    getCriteria,
-    isEqualToCurrentTemporaryId,
-    isRisksAndHarms,
-    modelProviderCredentials,
-    post,
-    removeToast,
-  ])
+      let body: any = {
+        instances: toEvaluateInstancesParsed,
+        evaluator_name: currentTestCase.evaluator?.name,
+        provider: currentTestCase.evaluator?.provider,
+        criteria: parsedCriteria,
+        type: currentTestCase.type,
+        response_variable_name: currentTestCase.responseVariableName,
+      }
+      body['llm_provider_credentials'] = {
+        ...modelProviderCredentials[currentTestCase.evaluator?.provider || ModelProviderType.RITS],
+      }
+
+      const startEvaluationTime = new Date().getTime() / 1000
+      response = await post('evaluate/', body)
+      setEvaluatingInstanceIds([])
+      const endEvaluationTime = new Date().getTime() / 1000
+      const totalEvaluationTime = Math.round(endEvaluationTime - startEvaluationTime)
+      // only perform after-evaluation-finished actions if the current test case didn't change
+      if (isEqualToCurrentTemporaryId(temporaryIdSnapshot)) {
+        setEvaluationRunning(false)
+
+        if (!response.ok) {
+          const error = (await response.json()) as {
+            detail: string
+          }
+
+          const errorMessage =
+            typeof error.detail === 'string'
+              ? error.detail
+              : `Something went wrong with the evaluation (${
+                  (error.detail as { type: string; msg: string }[])[0].type
+                }: ${(error.detail as { type: string; msg: string }[])[0].msg})`
+
+          setEvaluationFailed(true)
+          // We are catching this error an so we show the message sent from the backend
+          removeToast(inProgressEvalToastId)
+
+          addToast({
+            kind: 'error',
+            title: 'Evaluation failed',
+            subtitle: errorMessage,
+            // timeout: 5000,
+          })
+
+          return
+        }
+
+        // response is ok
+        const responseBody = await response.json()
+        addToast({
+          kind: 'success',
+          title: 'Evaluation finished',
+          subtitle: `Took ${totalEvaluationTime} seconds`,
+          timeout: 5000,
+        })
+        let updatedInstances: Instance[] = currentTestCase.instances.map((instance) => ({ ...instance }))
+        if (currentTestCase.type === EvaluationType.DIRECT) {
+          ;(responseBody.results as FetchedDirectResults).forEach(
+            (fetchedInstanceResult: FetchedDirectInstanceResultWithId, i) => {
+              const instanceResult: DirectInstanceResult = {
+                option: fetchedInstanceResult.result.option,
+                positionalBiasOption: fetchedInstanceResult.result.positional_bias_option,
+                explanation: fetchedInstanceResult.result.explanation,
+                positionalBias: fetchedInstanceResult.result.positional_bias,
+                certainty: fetchedInstanceResult.result.certainty,
+              }
+              updatedInstances.find((instance) => instance.id === fetchedInstanceResult.id)!.result = instanceResult
+            },
+          )
+        } else {
+          ;(responseBody.results as FetchedPairwiseResults).forEach(
+            (fetchedInstanceResult: FetchedPairwiseInstanceResult, i) => {
+              let instanceResult: PairwiseInstanceResult = {}
+              Object.entries(fetchedInstanceResult.result).forEach(([result_idx, fetchedPerResponseResult]) => {
+                instanceResult[result_idx] = {
+                  contestResults: fetchedPerResponseResult.contest_results,
+                  comparedTo: fetchedPerResponseResult.compared_to,
+                  summaries: fetchedPerResponseResult.summaries,
+                  positionalBias:
+                    fetchedPerResponseResult.positional_bias ||
+                    new Array(fetchedPerResponseResult.contest_results.length).fill(false),
+                  winrate: fetchedPerResponseResult.winrate,
+                  ranking: fetchedPerResponseResult.ranking,
+                }
+              })
+              updatedInstances.find((instance) => instance.id === fetchedInstanceResult.id)!.result = instanceResult
+            },
+          )
+        }
+        setCurrentTestCase((previousCurrentUseCase) => {
+          if (previousCurrentUseCase !== null) {
+            return {
+              ...previousCurrentUseCase,
+              instances: updatedInstances,
+            }
+          } else {
+            return null
+          }
+        })
+
+        setInstancesLastEvaluatedContent(
+          Object.fromEntries(
+            updatedInstances.map((instance) => [instance.id, getStringifiedInstanceContent(instance)]),
+          ),
+        )
+
+        removeToast(inProgressEvalToastId)
+      }
+    },
+    [
+      addToast,
+      currentTestCase,
+      getCriteria,
+      getStringifiedInstanceContent,
+      isEqualToCurrentTemporaryId,
+      isRisksAndHarms,
+      modelProviderCredentials,
+      post,
+      removeToast,
+    ],
+  )
 
   const changeUseCaseURL = useCallback(
     (queryParams: { key: string; value: string }[] | null) => {
@@ -571,18 +653,6 @@ export const SingleExampleEvaluation = () => {
     changeUseCaseURL(null)
   }
 
-  // update the state if the preloaded test case changes
-  useEffect(() => {
-    if (preloadedUseCase !== null) {
-      setUseCaseSelected(null)
-      setCurrentTestCase({ ...preloadedUseCase })
-      setLastSavedUseCaseString(getJSONStringWithSortedKeys(preloadedUseCase))
-      temporaryIdRef.current = uuid()
-    } else {
-      setCurrentTestCase(null)
-    }
-  }, [preloadedUseCase])
-
   const setSyntheticGenerationConfig: React.Dispatch<React.SetStateAction<SyntheticGenerationConfig>> = (
     valueOrUpdater,
   ) => {
@@ -732,6 +802,8 @@ export const SingleExampleEvaluation = () => {
                 })
               }
               modelForSyntheticGeneration={currentTestCase.syntheticGenerationConfig.evaluator}
+              evaluatingInstanceIds={evaluatingInstanceIds}
+              runEvaluation={runEvaluation}
             />
             <EvaluateButton
               evaluationRunning={evaluationRunning}
@@ -741,6 +813,9 @@ export const SingleExampleEvaluation = () => {
               setPromptModalOpen={setPromptModalOpen}
               currentUseCase={currentTestCase}
               evaluationFailed={evaluationFailed}
+              outdatedResultInstanceIds={Object.keys(isInstanceResultOutdated).filter(
+                (i) => isInstanceResultOutdated[i],
+              )}
             />
           </>
         )}

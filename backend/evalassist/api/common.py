@@ -22,6 +22,7 @@ class CriteriaModel(BaseModel):
 
 
 class Instance(BaseModel):
+    id: str
     context_variables: dict[str, str]
     response: str | list[str]
     response_variable_name: Optional[str]
@@ -96,8 +97,13 @@ class PairwiseResultModel(BaseModel):
     selections: list[str]
 
 
+class PairwiseInstanceResultModel(BaseModel):
+    id: str
+    result: dict[str, PairwiseResultModel]
+
+
 class PairwiseResponseModel(BaseModel):
-    results: list[dict[str, PairwiseResultModel]]
+    results: list[PairwiseInstanceResultModel]
 
 
 class NotebookParams(BaseModel):
@@ -195,5 +201,10 @@ class DirectResultModel(BaseModel):
     positional_bias: DirectPositionalBias
 
 
+class DirectInstanceResultModel(BaseModel):
+    id: str
+    result: DirectResultModel
+
+
 class DirectResponseModel(BaseModel):
-    results: list[DirectResultModel]
+    results: list[DirectInstanceResultModel]

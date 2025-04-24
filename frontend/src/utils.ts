@@ -58,6 +58,7 @@ export const getEmptyInstance = (): Instance => ({
   contextVariables: [{ name: 'context', value: '' }],
   expectedResult: '',
   result: null,
+  id: crypto.randomUUID(),
 })
 
 export const getEmptyPairwiseInstance = (): PairwiseInstance => ({

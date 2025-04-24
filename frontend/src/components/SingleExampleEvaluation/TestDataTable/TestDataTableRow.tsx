@@ -3,7 +3,7 @@ import { returnByPipelineType, toTitleCase } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 
-import { Link, Select, SelectItem, Tooltip } from '@carbon/react'
+import { InlineLoading, Link, Select, SelectItem, Tooltip } from '@carbon/react'
 import { ArrowRight, Trophy } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
@@ -26,6 +26,7 @@ interface Props {
   setSelectedInstance: Dispatch<SetStateAction<Instance | null>>
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
+  isInstanceEvaluationRunning: boolean
   criteria: CriteriaWithOptions | Criteria
   gridClasses: {
     [x: string]: boolean
@@ -38,12 +39,14 @@ interface Props {
   addInstance: (instance: Instance) => void
   resultsAvailable: boolean
   responseVariableName: string
+  runEvaluation: (evaluationIds: string[]) => Promise<void>
 }
 
 export const TestDataTableRow = ({
   setSelectedInstance,
   setResultDetailsModalOpen,
   evaluationRunning,
+  isInstanceEvaluationRunning,
   criteria,
   expectedResultOn,
   gridClasses,
@@ -55,6 +58,7 @@ export const TestDataTableRow = ({
   responseVariableName,
   type,
   resultsAvailable,
+  runEvaluation,
 }: Props) => {
   const responses = useMemo(() => {
     return returnByPipelineType(type, [(instance as DirectInstance).response], (instance as PairwiseInstance).responses)
@@ -146,7 +150,7 @@ export const TestDataTableRow = ({
   }
 
   const onDuplicateInstance = () => {
-    addInstance({ ...instance })
+    addInstance({ ...instance, id: crypto.randomUUID() })
   }
 
   const pairwiseWinnerIndex = useMemo(() => {
@@ -162,6 +166,9 @@ export const TestDataTableRow = ({
         onRemove={() => removeInstance()}
         onExpand={() => onExpandInstance()}
         onDuplicate={() => onDuplicateInstance()}
+        onEvaluateInstance={() => {
+          runEvaluation([instance.id])
+        }}
         removeEnabled={!readOnly}
       >
         {({ setActive, setInactive }) => (
@@ -245,7 +252,7 @@ export const TestDataTableRow = ({
               </div>
             )}
 
-            {result !== null && !evaluationRunning ? (
+            {result !== null && !isInstanceEvaluationRunning ? (
               <>
                 <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1}>
                   <div className={classes.resultBlockOuter}>
@@ -283,7 +290,18 @@ export const TestDataTableRow = ({
                 </div>
               </>
             ) : resultsAvailable ? (
-              <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1} />
+              <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1}>
+                {evaluationRunning && isInstanceEvaluationRunning && (
+                  <div className={classes.inlineLoadingContainer}>
+                    <InlineLoading
+                      style={{ inlineSize: 'unset' }}
+                      description={''}
+                      status={'active'}
+                      className={classes.loadingWrapper}
+                    />
+                  </div>
+                )}
+              </div>
             ) : null}
           </div>
         )}

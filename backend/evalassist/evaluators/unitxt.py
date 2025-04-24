@@ -18,7 +18,12 @@ from unitxt.loaders import LoadFromDictionary
 from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
-from ..api.common import DirectPositionalBias, DirectResultModel, Instance
+from ..api.common import (
+    DirectPositionalBias,
+    DirectResultModel,
+    Instance,
+    PairwiseResultModel,
+)
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 from ..utils import (
     get_evaluator_metadata_wrapper,
@@ -98,7 +103,11 @@ class Evaluator(ABC):
         dataset = load_dataset(card=card, split="test")
         predictions = self.get_predictions(instances)
         evaluated_dataset = evaluate(predictions=predictions, data=dataset)
-        return self.parse_results(evaluated_dataset)
+        per_instance_result = self.parse_results(evaluated_dataset)
+        results = []
+        for instance_result, instance in zip(per_instance_result, instances):
+            results.append({"id": instance.id, "result": instance_result})
+        return results
 
 
 class DirectAssessmentEvaluator(Evaluator):
@@ -172,15 +181,17 @@ class PairwiseComparisonEvaluator(Evaluator):
             for key in score.keys():
                 outer_key = key.split("_")[0]
                 if outer_key not in ["score", "criteria"]:
-                    parsed_score[outer_key] = {
-                        "contest_results": score[f"{outer_key}_contest_results"],
-                        "compared_to": score[f"{outer_key}_compared_to"],
-                        "summaries": score[f"{outer_key}_summaries"],
-                        "positional_bias": score[f"{outer_key}_positional_bias"],
-                        "winrate": score[f"{outer_key}_winrate"],
-                        "ranking": score[f"{outer_key}_ranking"],
-                        "selections": score[f"{outer_key}_selections"],
-                    }
+                    parsed_score[outer_key] = PairwiseResultModel(
+                        **{
+                            "contest_results": score[f"{outer_key}_contest_results"],
+                            "compared_to": score[f"{outer_key}_compared_to"],
+                            "summaries": score[f"{outer_key}_summaries"],
+                            "positional_bias": score[f"{outer_key}_positional_bias"],
+                            "winrate": score[f"{outer_key}_winrate"],
+                            "ranking": score[f"{outer_key}_ranking"],
+                            "selections": score[f"{outer_key}_selections"],
+                        }
+                    )
             results.append(parsed_score)
 
         return results
