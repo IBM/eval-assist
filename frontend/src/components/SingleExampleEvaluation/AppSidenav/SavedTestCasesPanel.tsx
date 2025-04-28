@@ -13,6 +13,7 @@ import { EvaluationType, UseCase } from '../../../types'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { LinkButton } from './LinkButton'
 import classes from './TwoLevelsPanel.module.scss'
+import sharedClasses from './shared.module.scss'
 
 interface Props {
   onUseCaseClick: (useCase: UseCase) => void
@@ -82,6 +83,7 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
                           id={`${useCase.id}`}
                           selected={selectedNode}
                           renderIcon={List}
+                          className={cx(sharedClasses.hovered)}
                           label={
                             <div className={classes['tree-node-content']}>
                               <span className={classes['tree-node-label']}>{useCase.name}</span>
@@ -111,6 +113,7 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
                           id={`${useCase.id}`}
                           selected={selectedNode}
                           renderIcon={Compare}
+                          className={cx(sharedClasses.hovered)}
                           label={
                             <div className={classes['tree-node-content']}>
                               <span className={classes['tree-node-label']}>{useCase.name}</span>

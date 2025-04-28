@@ -88,21 +88,6 @@
   }
 }
 
-.linkButton {
-  background-color: transparent;
-  border: none;
-  padding: $spacing-02;
-  height: rem(24px);
-  align-self: start;
-  cursor: pointer;
-  svg {
-    fill: $link-primary;
-    &:hover {
-      fill: $link-primary-hover;
-    }
-  }
-}
-
 .emptyMessage {
   padding-left: $spacing-05;
   padding-right: $spacing-05;

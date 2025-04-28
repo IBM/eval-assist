@@ -15,6 +15,7 @@ import { UseCase } from '../../../types'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { LinkButton } from './LinkButton'
 import classes from './ThreeLevelsPanel.module.scss'
+import sharedClasses from './shared.module.scss'
 
 interface Props {
   onUseCaseClick: (useCase: UseCase) => void
@@ -70,9 +71,10 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
             >
               {rubricLibraryTestCases.map((useCase, i) => (
                 <TreeNode
+                  className={cx(sharedClasses.hovered)}
                   label={
-                    <div className={classes['treeNodeContent']}>
-                      <span className={classes['treeNodeLAabel']}>{useCase.name}</span>
+                    <div className={cx(classes.treeNodeContent)}>
+                      <span className={classes.treeNodeLAabel}>{useCase.name}</span>
                       <LinkButton useCase={useCase} />
                     </div>
                   }
@@ -93,6 +95,7 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
             >
               {pairwiseLibraryTestCases.map((useCase, i) => (
                 <TreeNode
+                  className={cx(sharedClasses.hovered)}
                   label={
                     <div className={classes['treeNodeContent']}>
                       <span className={classes['treeNodeLAabel']}>{useCase.name}</span>

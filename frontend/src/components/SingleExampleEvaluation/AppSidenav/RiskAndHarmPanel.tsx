@@ -15,6 +15,7 @@ import { UseCase } from '../../../types'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { LinkButton } from './LinkButton'
 import classes from './ThreeLevelsPanel.module.scss'
+import sharedClasses from './shared.module.scss'
 
 interface Props {
   onUseCaseClick: (useCase: UseCase, subCatalogName?: string) => void
@@ -72,6 +73,7 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
               >
                 {useCases.map((useCase, i) => (
                   <TreeNode
+                    className={cx(sharedClasses.hovered)}
                     label={
                       <div className={classes['treeNodeContent']}>
                         <span className={classes['treeNodeLabel']}>{toTitleCase(useCase.name)}</span>
