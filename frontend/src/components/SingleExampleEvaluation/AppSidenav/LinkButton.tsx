@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import { stringifyQueryParams } from 'src/utils'
 
 import { useMemo } from 'react'
@@ -10,13 +11,15 @@ import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFrom
 
 import { UseCase } from '../../../types'
 import classes from './LinkButton.module.scss'
+import sharedClasses from './shared.module.scss'
 
 interface LinkButtonProps {
   useCase: UseCase
   subCatalogName?: string
+  className?: string
 }
 
-export const LinkButton = ({ useCase, subCatalogName }: LinkButtonProps) => {
+export const LinkButton = ({ useCase, subCatalogName, className = '' }: LinkButtonProps) => {
   const { getQueryParamsFromUseCase } = useGetQueryParamsFromUseCase()
 
   const urlParams = useMemo(
@@ -29,7 +32,7 @@ export const LinkButton = ({ useCase, subCatalogName }: LinkButtonProps) => {
   return (
     <Link
       onClick={(e) => e.stopPropagation()}
-      className={classes.linkButton}
+      className={cx(sharedClasses.showOnHover, className)}
       target="_blank"
       rel="noopener noreferrer"
       href={`/${queryParams}`}

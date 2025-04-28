@@ -2,18 +2,3 @@
 @import '@carbon/styles/scss/utilities/convert';
 @import '@carbon/styles/scss/spacing';
 @import '@carbon/colors';
-
-.linkButton {
-  background-color: transparent;
-  border: none;
-  padding: $spacing-02;
-  height: rem(24px);
-  align-self: start;
-  cursor: pointer;
-  svg {
-    fill: $link-primary;
-    &:hover {
-      fill: $link-primary-hover;
-    }
-  }
-}
