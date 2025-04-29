@@ -6,6 +6,9 @@ import { LegacyRef, useCallback, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
+import { Button } from '@carbon/react'
+import { WarningFilled } from '@carbon/react/icons'
+
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
@@ -47,6 +50,7 @@ import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
 import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
 import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
 import { InstanceDetailsModal } from './Modals/InstanceDetailsModal'
+import { ModelProviderCredentialsModal } from './Modals/ModelProviderCredentialsModal'
 import { NewUseCaseModal } from './Modals/NewUseCaseModal'
 import { PromptModal } from './Modals/PromptModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
@@ -80,6 +84,7 @@ export const SingleExampleEvaluation = () => {
   } = useCurrentTestCase()
   const { userUseCases, setUserUseCases } = useUserUseCasesContext()
   // we are ignoring client side rendering to be able to use useSessionStorage
+  const { areRelevantCredentialsProvided } = useCurrentTestCase()
 
   const { isRisksAndHarms } = useURLParamsContext()
 
@@ -97,7 +102,7 @@ export const SingleExampleEvaluation = () => {
   const [promptModalOpen, setPromptModalOpen] = useState(false)
   const [syntheticGenerationModalOpen, setSyntheticGenerationModalOpen] = useState(false)
   const [sampleCodeTypeModalOpen, setSampleCodeTypeModalOpen] = useState(false)
-  const [popoverOpen, setPopoverOpen] = useState(false)
+  const [modelProviderCrendentialsModelOpen, setModelProviderCrendentialsModelOpen] = useState(false)
 
   const { setSidebarTabSelected } = useAppSidebarContext()
 
@@ -521,6 +526,7 @@ export const SingleExampleEvaluation = () => {
     setUserUseCases(userUseCases.filter((u) => u.id !== currentTestCase.id))
     changeUseCaseURL(null)
   }
+
   return (
     <>
       <AppSidenavNew
@@ -548,8 +554,6 @@ export const SingleExampleEvaluation = () => {
               className={cx(classes['bottom-divider'], classes['left-padding'])}
             >
               <h3>Evaluation sandbox</h3>
-
-              <APIKeyPopover popoverOpen={popoverOpen} setPopoverOpen={setPopoverOpen} />
             </div>
             <UseCaseOptions
               style={{ marginBottom: '1rem' }}
@@ -570,6 +574,27 @@ export const SingleExampleEvaluation = () => {
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
             />
+            <div className={classes['left-padding']}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '0.5rem',
+                }}
+              >
+                <strong>Model selection</strong>
+                <Button
+                  kind="tertiary"
+                  onClick={() => setModelProviderCrendentialsModelOpen(true)}
+                  iconDescription="Set api key"
+                  renderIcon={!areRelevantCredentialsProvided ? WarningFilled : undefined}
+                >
+                  {'API credentials'}
+                </Button>
+              </div>
+            </div>
             <div
               style={{
                 display: 'grid',
@@ -680,6 +705,10 @@ export const SingleExampleEvaluation = () => {
             open={sampleCodeTypeModalOpen}
             setOpen={setSampleCodeTypeModalOpen}
             downloadUnitxtCode={downloadUnitxtCode}
+          />
+          <ModelProviderCredentialsModal
+            open={modelProviderCrendentialsModelOpen}
+            setOpen={setModelProviderCrendentialsModelOpen}
           />
         </>
       )}
