@@ -7,7 +7,7 @@ import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
 // @ts-ignore
 import { TreeNode, TreeView } from '@carbon/react'
-import { ChevronLeft, Compare } from '@carbon/react/icons'
+import { ChevronLeft, DotMark } from '@carbon/react/icons'
 
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
@@ -74,14 +74,14 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
                   className={cx(sharedClasses.hovered)}
                   label={
                     <div className={cx(classes.treeNodeContent)}>
-                      <span className={classes.treeNodeLAabel}>{useCase.name}</span>
+                      <span className={classes.treeNodeLabel}>{useCase.name}</span>
                       <LinkButton useCase={useCase} />
                     </div>
                   }
                   key={`${useCase.name}_direct`}
                   id={`${useCase.name}_direct`}
                   selected={selectedNode}
-                  renderIcon={Compare}
+                  renderIcon={DotMark}
                   onClick={(e: any) => onClick(e, useCase)}
                 />
               ))}
@@ -98,13 +98,13 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
                   className={cx(sharedClasses.hovered)}
                   label={
                     <div className={classes['treeNodeContent']}>
-                      <span className={classes['treeNodeLAabel']}>{useCase.name}</span>
+                      <span className={classes['treeNodeLabel']}>{useCase.name}</span>
                       <LinkButton useCase={useCase} />
                     </div>
                   }
                   key={`${useCase.name}_pairwise`}
                   id={`${useCase.name}_pairwise`}
-                  renderIcon={Compare}
+                  renderIcon={DotMark}
                   onClick={(e: any) => onClick(e, useCase)}
                 />
               ))}
