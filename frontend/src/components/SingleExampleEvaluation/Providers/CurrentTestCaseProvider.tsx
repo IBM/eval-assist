@@ -103,12 +103,12 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
   const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
 
   const getDefaultEvaluator = useCallback(
-    (type: EvaluationType) => {
+    (type: EvaluationType, onlyInstruct: boolean = false) => {
       if (directEvaluators === null || pairwiseEvaluators === null || type === null) {
         // won't happen!
         return null
       }
-      if (isRisksAndHarms) {
+      if (isRisksAndHarms && !onlyInstruct) {
         return directEvaluators.find((p) => p.name.toLocaleLowerCase().includes('granite guardian')) as Evaluator
       } else {
         const ritsCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.RITS)
@@ -183,8 +183,16 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
     } else {
       pu = null
     }
-    if (pu !== null && !pu.evaluator) {
-      pu = { ...pu, evaluator: getDefaultEvaluator(pu.type) }
+    if (pu !== null) {
+      if (!pu.evaluator) {
+        pu = { ...pu, evaluator: getDefaultEvaluator(pu.type) }
+      }
+      if (!pu.syntheticGenerationConfig.evaluator) {
+        pu = {
+          ...pu,
+          syntheticGenerationConfig: { ...pu.syntheticGenerationConfig, evaluator: getDefaultEvaluator(pu.type, true) },
+        }
+      }
     }
 
     return pu
@@ -201,6 +209,7 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
     getEmptyUseCaseWithCriteria,
     getDefaultEvaluator,
   ])
+
   const showingTestCase = useMemo<boolean>(() => preloadedTestCase !== null, [preloadedTestCase])
 
   const [currentTestCase, setCurrentTestCase] = useState(preloadedTestCase || getEmptyTestCase(EvaluationType.DIRECT))
