@@ -10,7 +10,6 @@ import { Launch } from '@carbon/react/icons'
 import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFromUseCase'
 
 import { UseCase } from '../../../types'
-import classes from './LinkButton.module.scss'
 import sharedClasses from './shared.module.scss'
 
 interface LinkButtonProps {

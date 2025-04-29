@@ -137,7 +137,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
           {/* Sizer element to get ideal textarea height, it is the same
           component type to eliminate mismatch in style (dimensions) */}
           <TextArea className={classes.sizer} value={props.value} ref={sizerRef} tabIndex={-1} labelText="" />
-          {x !== null && y !== null && (
+          {x !== null && y !== null && isFocused && (
             <DirectActionPopup
               popupVisible={popupVisible}
               selectedText={selectedText}
