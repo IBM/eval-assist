@@ -100,48 +100,61 @@ class DirectActionGenerator:
         ]
 
         output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
-
+        action_str = direct_ai_action.action.value.lower()
+        action_tag = f"<{action_str}>"
         format_instructions = output_parser.get_format_instructions()
         text_with_selection = direct_ai_action.text.replace(
             direct_ai_action.selection,
-            "<blank>" + direct_ai_action.selection + "</blank>",
+            action_tag + direct_ai_action.selection + action_tag,
         )
         # prompt templates
         system_prompt_template = PromptTemplate(
             input_variables=[
                 "text_with_selection",
+                "selection",
             ],
             partial_variables={
-                "action_third_person": self.action_third_person_dict[self.action]
+                "action_third_person": self.action_third_person_dict[self.action],
+                "action_tag": action_tag,
+                "format_instructions": format_instructions,
             },
             template=dedent(
-                """You will be given a text that contains a selection, marked with <blank> tags. Your task is to generate a response that {action_third_person} the selection while preserving its original meaning and core information.
+                """You will be given a selection text and the text that contains that selection (to use as context), marked with {action_tag} tags.
+                
+                Your task is to generate a response that {action_third_person} the selection while preserving its original meaning and core information as much as possible.
+            
+            Selection:
+            {selection}
 
-            Example input:
+            Text with selection text (in-between {action_tag} tags):
             {text_with_selection}
+
+            {format_instructions}
             """,
             ),
         )
 
-        query_template = PromptTemplate(
-            input_variables=[],
-            partial_variables={
-                "format_instructions": format_instructions,
-                "action_third_person": self.action_third_person_dict[self.action],
-            },
-            template="Generate a response that {action_third_person} the selection while keeping its original meaning and the core information.\n\n{format_instructions}",
-        )
+        # query_template = PromptTemplate(
+        #     input_variables=[],
+        #     partial_variables={
+        #         "format_instructions": format_instructions,
+        #         "action_third_person": self.action_third_person_dict[self.action],
+        #     },
+        #     template="Generate a response that {action_third_person} the selection while keeping its original meaning and the core information.\n\n{format_instructions}",
+        # )
 
         system_prompt = system_prompt_template.format(
             text_with_selection=text_with_selection,
+            selection=direct_ai_action.selection,
         )
-        query = query_template.format()
+        # query = query_template.format()
 
-        prompt = system_prompt + "\n\n" + query
+        prompt = system_prompt  # + "\n\n" + query
 
         logger.debug(f"Prompt:\n{prompt}")
 
         response = self.inference_engine.infer([{"source": prompt}])[0]
+        logger.debug(f"Response:\n{response}")
 
         parsed_response = output_parser.parse(response)["response"]
 
