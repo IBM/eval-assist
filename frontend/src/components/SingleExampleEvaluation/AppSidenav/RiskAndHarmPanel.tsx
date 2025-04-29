@@ -7,7 +7,7 @@ import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
 // @ts-ignore
 import { TreeNode, TreeView } from '@carbon/react'
-import { ChevronLeft, List } from '@carbon/react/icons'
+import { ChevronLeft, DotMark, List } from '@carbon/react/icons'
 
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
@@ -84,7 +84,7 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
                     }
                     key={`${useCase.name}_${subCatalogName}`}
                     id={`${useCase.name}_${subCatalogName}`}
-                    renderIcon={List}
+                    renderIcon={DotMark}
                     onClick={(e: any) => onClick(e, useCase, subCatalogName)}
                   />
                 ))}
