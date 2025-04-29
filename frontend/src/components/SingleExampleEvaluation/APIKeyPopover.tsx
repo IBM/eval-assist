@@ -1,33 +1,25 @@
 import cx from 'classnames'
 
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef } from 'react'
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
 
 import Link from 'next/link'
 
 import { Button, Layer, Popover, PopoverContent, TextInput } from '@carbon/react'
 import { WarningFilled } from '@carbon/react/icons'
 
-import { ModelProviderCredentials } from '@types'
-
 import classes from './APIKeyPopover.module.scss'
+import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
+import { useModelProviderCredentials } from './Providers/ModelProviderCredentialsProvider'
 
 interface Props {
   popoverOpen: boolean
   setPopoverOpen: Dispatch<SetStateAction<boolean>>
-  modelProviderCrentials: ModelProviderCredentials
-  setModelProviderCredentials: Dispatch<SetStateAction<ModelProviderCredentials>>
-  areRelevantCredentialsProvided: boolean
 }
 
-export const APIKeyPopover = ({
-  popoverOpen,
-  setPopoverOpen,
-  modelProviderCrentials,
-  setModelProviderCredentials,
-  areRelevantCredentialsProvided,
-}: Props) => {
+export const APIKeyPopover = ({ popoverOpen, setPopoverOpen }: Props) => {
   const apiKeyInputRef = useRef(null)
-
+  const { modelProviderCredentials, setModelProviderCredentials } = useModelProviderCredentials()
+  const { areRelevantCredentialsProvided } = useCurrentTestCase()
   useEffect(() => {
     if (popoverOpen && apiKeyInputRef.current !== null) (apiKeyInputRef as any).current.focus()
   }, [popoverOpen])
@@ -58,11 +50,11 @@ export const APIKeyPopover = ({
                   ref={apiKeyInputRef}
                   id={'watsonx-api-key-input'}
                   labelText=""
-                  value={modelProviderCrentials.watsonx.api_key}
+                  value={modelProviderCredentials.watsonx.api_key}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setModelProviderCredentials({
-                      ...modelProviderCrentials,
-                      watsonx: { ...modelProviderCrentials.watsonx, api_key: e.target.value },
+                      ...modelProviderCredentials,
+                      watsonx: { ...modelProviderCredentials.watsonx, api_key: e.target.value },
                     })
                   }
                   autoComplete="off"
@@ -75,11 +67,11 @@ export const APIKeyPopover = ({
                   ref={apiKeyInputRef}
                   id={'watsonx-project-id-input'}
                   labelText=""
-                  value={modelProviderCrentials.watsonx.project_id}
+                  value={modelProviderCredentials.watsonx.project_id}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setModelProviderCredentials({
-                      ...modelProviderCrentials,
-                      watsonx: { ...modelProviderCrentials.watsonx, project_id: e.target.value },
+                      ...modelProviderCredentials,
+                      watsonx: { ...modelProviderCredentials.watsonx, project_id: e.target.value },
                     })
                   }
                   autoComplete="off"
@@ -109,10 +101,10 @@ export const APIKeyPopover = ({
                   ref={apiKeyInputRef}
                   id={'openai-api-key-input'}
                   labelText=""
-                  value={modelProviderCrentials.rits.api_key}
+                  value={modelProviderCredentials.rits.api_key}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setModelProviderCredentials({
-                      ...modelProviderCrentials,
+                      ...modelProviderCredentials,
                       rits: { api_key: e.target.value },
                     })
                   }
@@ -143,10 +135,10 @@ export const APIKeyPopover = ({
                   ref={apiKeyInputRef}
                   id={'openai-api-key-input'}
                   labelText=""
-                  value={modelProviderCrentials['open-ai'].api_key}
+                  value={modelProviderCredentials['open-ai'].api_key}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setModelProviderCredentials({
-                      ...modelProviderCrentials,
+                      ...modelProviderCredentials,
                       ['open-ai']: { api_key: e.target.value },
                     })
                   }
@@ -177,10 +169,10 @@ export const APIKeyPopover = ({
                   ref={apiKeyInputRef}
                   id={'openai-api-key-input'}
                   labelText=""
-                  value={modelProviderCrentials.azure.api_key}
+                  value={modelProviderCredentials.azure.api_key}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setModelProviderCredentials({
-                      ...modelProviderCrentials,
+                      ...modelProviderCredentials,
                       azure: { api_key: e.target.value },
                     })
                   }

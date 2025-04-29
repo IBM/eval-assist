@@ -8,33 +8,28 @@ import { Warning } from '@carbon/react/icons'
 import { ModelProviderType, UseCase } from '@types'
 
 import classes from './EvaluateButton.module.scss'
+import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
 import { useURLParamsContext } from './Providers/URLParamsProvider'
 
 interface EvaluateButtonProps {
   evaluationRunning: boolean
   runEvaluation: (evaluationIds: string[]) => Promise<void>
-  areRelevantCredentialsProvided: boolean
   setPromptModalOpen: Dispatch<SetStateAction<boolean>>
   style?: CSSProperties
   className?: string
-  currentUseCase: UseCase | null
   evaluationFailed: boolean
-  outdatedResultInstanceIds: string[]
 }
 
 export const EvaluateButton = ({
   evaluationRunning,
-  areRelevantCredentialsProvided,
   runEvaluation,
   setPromptModalOpen,
-  currentUseCase,
   evaluationFailed,
-  outdatedResultInstanceIds,
   style,
   className,
 }: EvaluateButtonProps) => {
   const { isRisksAndHarms } = useURLParamsContext()
-
+  const { currentTestCase, areRelevantCredentialsProvided, outdatedResultInstanceIds } = useCurrentTestCase()
   return (
     <div style={style} className={className}>
       {evaluationRunning ? (
@@ -45,10 +40,10 @@ export const EvaluateButton = ({
             <Tooltip
               label={
                 <p className={`${classes['left-padding']} ${classes['api-key-reminder-text']}`}>
-                  {!currentUseCase?.evaluator
+                  {!currentTestCase?.evaluator
                     ? `No evaluator was selected`
                     : `You need to provide the '${
-                        modelProviderBeautifiedName[currentUseCase.evaluator.provider as ModelProviderType]
+                        modelProviderBeautifiedName[currentTestCase.evaluator.provider as ModelProviderType]
                       }' credentials in order to run evaluations`}
                 </p>
               }

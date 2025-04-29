@@ -15,27 +15,16 @@ import {
   PairwiseInstance,
   PairwiseInstanceResult,
 } from '../../../types'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import classes from './InstanceDetailsModal.module.scss'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  selectedInstance: Instance | null
-  setSelectedInstance: Dispatch<SetStateAction<Instance | null>>
-  type: EvaluationType
-  responseVariableName: string
-  criteria: Criteria
 }
 
-export const InstanceDetailsModal = ({
-  open,
-  setOpen,
-  selectedInstance,
-  setSelectedInstance,
-  type,
-  responseVariableName,
-  criteria,
-}: Props) => {
+export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
+  const { currentTestCase, selectedInstance, setSelectedInstance } = useCurrentTestCase()
   const onClose = () => {
     setOpen(false)
     setSelectedInstance(null)
@@ -44,22 +33,22 @@ export const InstanceDetailsModal = ({
   const positionalBiasDetected = useMemo(() => {
     if (selectedInstance === null || selectedInstance.result === null) return null
     return returnByPipelineType(
-      type,
+      currentTestCase.type,
       () => (selectedInstance.result as DirectInstanceResult).positionalBias.detected,
       () =>
         Object.values(selectedInstance.result as PairwiseInstanceResult).some((instance) =>
           instance.positionalBias.some((pb) => pb),
         ),
     )
-  }, [selectedInstance, type])
+  }, [currentTestCase.type, selectedInstance])
 
   const [openedPerReponseResults, setOpenedPerReponseResults] = useState<boolean[]>([])
 
   useEffect(() => {
-    if (selectedInstance === null || type === EvaluationType.DIRECT || !selectedInstance.result)
+    if (selectedInstance === null || currentTestCase.type === EvaluationType.DIRECT || !selectedInstance.result)
       return setOpenedPerReponseResults([])
     setOpenedPerReponseResults(Object.keys(selectedInstance.result as PairwiseInstanceResult).map((_) => false))
-  }, [selectedInstance, type])
+  }, [currentTestCase.type, selectedInstance])
 
   return (
     selectedInstance !== null && (
@@ -76,39 +65,39 @@ export const InstanceDetailsModal = ({
                     <p key={`${i}_1`}>{contectVariable.value}</p>
                   </Fragment>
                 ))}
-                {type === EvaluationType.DIRECT && (
+                {currentTestCase.type === EvaluationType.DIRECT && (
                   <>
                     <p>
-                      <strong>{`${toTitleCase(responseVariableName)}:`}</strong>
+                      <strong>{`${toTitleCase(currentTestCase.responseVariableName)}:`}</strong>
                     </p>
                     <p>{(selectedInstance as DirectInstance).response}</p>
                   </>
                 )}
 
-                {type === EvaluationType.PAIRWISE &&
+                {currentTestCase.type === EvaluationType.PAIRWISE &&
                   (selectedInstance as PairwiseInstance).responses.map((response, i) => (
                     <Fragment key={`response-${i}`}>
                       <p>
-                        <strong>{`${toTitleCase(responseVariableName)} ${i + 1}`}</strong>
+                        <strong>{`${toTitleCase(currentTestCase.responseVariableName)} ${i + 1}`}</strong>
                       </p>
                       <p>{response}</p>
                     </Fragment>
                   ))}
               </div>
             </AccordionItem>
-            <AccordionItem title={`Criteria: ${criteria.name}`} open key={'criteria'}>
+            <AccordionItem title={`Criteria: ${currentTestCase.criteria.name}`} open key={'criteria'}>
               <div className={cx(classes.gridTemplate)}>
                 <p>
                   <strong>{'Description:'}</strong>
                 </p>
-                <p>{criteria.description}</p>
+                <p>{currentTestCase.criteria.description}</p>
               </div>{' '}
             </AccordionItem>
             <AccordionItem title="Results" open key={'results'}>
               {selectedInstance.result ? (
                 <div className={cx(classes.gridTemplate)}>
                   <>
-                    {type === EvaluationType.DIRECT && (
+                    {currentTestCase.type === EvaluationType.DIRECT && (
                       <>
                         {selectedInstance.expectedResult !== '' && (
                           <>
@@ -154,14 +143,14 @@ export const InstanceDetailsModal = ({
                       </>
                     )}
 
-                    {type === EvaluationType.PAIRWISE && (
+                    {currentTestCase.type === EvaluationType.PAIRWISE && (
                       <>
                         {selectedInstance.expectedResult !== '' && (
                           <Fragment key={`expected-results`}>
                             <p key={'expected-result-title'}>
                               <strong>{'Expected winner: '}</strong>
                             </p>
-                            <p key={'expected-result-value'}>{`${toTitleCase(responseVariableName)} ${
+                            <p key={'expected-result-value'}>{`${toTitleCase(currentTestCase.responseVariableName)} ${
                               selectedInstance.expectedResult
                             }`}</p>
                           </Fragment>
@@ -194,7 +183,9 @@ export const InstanceDetailsModal = ({
                                 )} place`}</p>
                                 <ArrowRight style={{ justifySelf: 'start' }} size={16} />
                                 <p style={{ justifySelf: 'start' }}>
-                                  {` ${toTitleCase(responseVariableName)} ${key} (Winrate: ${toPercentage(
+                                  {` ${toTitleCase(
+                                    currentTestCase.responseVariableName,
+                                  )} ${key} (Winrate: ${toPercentage(
                                     (selectedInstance.result as PairwiseInstanceResult)[key].winrate,
                                   )})`}
                                 </p>
@@ -212,13 +203,13 @@ export const InstanceDetailsModal = ({
                           {positionalBiasDetected ? 'Detected' : 'Not detected'}
                         </p>
                         <p key={'instance-per-response-title'}>
-                          <strong>{`Per ${responseVariableName.toLocaleLowerCase()} results: `}</strong>
+                          <strong>{`Per ${currentTestCase.responseVariableName.toLocaleLowerCase()} results: `}</strong>
                         </p>
                         <Accordion className={classes.accordionFullWidth}>
                           {Object.entries(selectedInstance.result as PairwiseInstanceResult).map(
                             ([key, responseResults], j) => (
                               <AccordionItem
-                                title={`${toTitleCase(responseVariableName)} ${key}`}
+                                title={`${toTitleCase(currentTestCase.responseVariableName)} ${key}`}
                                 key={j}
                                 open={openedPerReponseResults[j]}
                                 onClick={() => {

@@ -3,47 +3,36 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 
 import { UseCase } from '../../../types'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 
 interface Props {
   updateURLFromUseCase: (useCaseSelected: { useCase: UseCase; subCatalogName: string | null } | null) => void
-  selectedUseCase: {
-    useCase: UseCase
-    subCatalogName: string | null
-  } | null
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  currentUseCase: UseCase
   onSave: () => Promise<void>
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
-  setLibraryUseCaseSelected: Dispatch<
-    SetStateAction<{
-      useCase: UseCase
-      subCatalogName: string | null
-    } | null>
-  >
 }
 
 export const SwitchUseCaseModal = ({
   open,
   setOpen,
   updateURLFromUseCase,
-  currentUseCase,
-  selectedUseCase,
   onSave,
   setSaveUseCaseModalOpen,
   evaluationRunning,
   setEvaluationRunningModalOpen,
-  setLibraryUseCaseSelected,
 }: Props) => {
   const [saving, setSaving] = useState(false)
+  const { currentTestCase, setTestCaseSelected, testCaseSelected } = useCurrentTestCase()
+
   const onClose = () => {
     setOpen(false)
   }
 
   const onCancel = () => {
-    setLibraryUseCaseSelected(null)
+    setTestCaseSelected(null)
     onClose()
   }
 
@@ -55,7 +44,7 @@ export const SwitchUseCaseModal = ({
     if (evaluationRunning) {
       setEvaluationRunningModalOpen(true)
     } else {
-      updateURLFromUseCase(selectedUseCase)
+      updateURLFromUseCase(testCaseSelected)
     }
   }
 
@@ -68,12 +57,12 @@ export const SwitchUseCaseModal = ({
   }
 
   const onDontSave = async () => {
-    updateURLFromUseCase(selectedUseCase)
+    updateURLFromUseCase(testCaseSelected)
     setOpen(false)
   }
 
   return (
-    selectedUseCase && (
+    testCaseSelected && (
       <ComposedModal size="sm" open={open} onClose={onClose}>
         <ModalHeader title={'Save before leaving?'} />
         <ModalBody>
@@ -89,9 +78,9 @@ export const SwitchUseCaseModal = ({
           <Button
             kind="primary"
             disabled={saving}
-            onClick={() => (currentUseCase.id === null ? onSaveAsClick() : onSaveClick())}
+            onClick={() => (currentTestCase.id === null ? onSaveAsClick() : onSaveClick())}
           >
-            {!saving ? (currentUseCase.id === null ? 'Save as' : 'Save') : 'Saving...'}
+            {!saving ? (currentTestCase.id === null ? 'Save as' : 'Save') : 'Saving...'}
           </Button>
         </ModalFooter>
       </ComposedModal>

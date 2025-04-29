@@ -3,21 +3,23 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Modal, TextInput } from '@carbon/react'
 
 import { UseCase } from '../../../types'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  name: string
-  setName: (name: string) => void
   userUseCases: UseCase[]
   setUserUseCases: Dispatch<SetStateAction<UseCase[]>>
 }
 
-export const EditUseCaseNameModal = ({ open, setOpen, name, setName, userUseCases, setUserUseCases }: Props) => {
-  const [newUseCaseName, setNewUseCaseName] = useState(name)
+export const EditUseCaseNameModal = ({ open, setOpen, userUseCases, setUserUseCases }: Props) => {
+  const { currentTestCase, setCurrentTestCase } = useCurrentTestCase()
+
+  const [newUseCaseName, setNewUseCaseName] = useState(currentTestCase.name)
+
   useEffect(() => {
-    setNewUseCaseName(name)
-  }, [name])
+    setNewUseCaseName(currentTestCase.name)
+  }, [currentTestCase.name])
 
   return (
     <Modal
@@ -28,11 +30,11 @@ export const EditUseCaseNameModal = ({ open, setOpen, name, setName, userUseCase
       secondaryButtonText="Cancel"
       onRequestSubmit={(e) => {
         setOpen(false)
-        setName(newUseCaseName)
+        setCurrentTestCase({ ...currentTestCase, name: newUseCaseName })
         setUserUseCases([
-          ...userUseCases.filter((u) => u.name !== name),
+          ...userUseCases.filter((u) => u.name !== currentTestCase.name),
           {
-            ...(userUseCases.find((u) => u.name === name) as UseCase),
+            ...(userUseCases.find((u) => u.name === currentTestCase.name) as UseCase),
             name: newUseCaseName,
           },
         ])

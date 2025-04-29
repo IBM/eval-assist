@@ -17,8 +17,14 @@ from unitxt.llm_as_judge import (
     ModelProviderEnum,
 )
 
-from ..api.common import CriteriaWithOptionsAPI, Instance
-from ..api.types import DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum
+from ..api.common import CriteriaWithOptionsAPI, DirectAIActionRequest, Instance
+from ..api.types import (
+    DirectActionTypeEnum,
+    DomainEnum,
+    GenerationLengthEnum,
+    PersonaEnum,
+    TaskEnum,
+)
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 from ..utils import (
     get_evaluator_metadata_wrapper,
@@ -39,6 +45,107 @@ def get_data_path(task: TaskEnum, domain: DomainEnum):
         "source_data",
         "source.jsonl",
     )
+
+
+class DirectActionGenerator:
+    def __init__(
+        self,
+        provider: ModelProviderEnum | ExtendedModelProviderEnum,
+        custom_model_name: Optional[str],
+        llm_provider_credentials: dict[str, str],
+        evaluator_name: ExtendedEvaluatorNameEnum,
+        type: EvaluatorTypeEnum,
+        action: DirectActionTypeEnum,
+    ):
+        self.provider = provider
+        self.llm_provider_credentials = llm_provider_credentials
+        self.custom_model_name = custom_model_name
+        self.evaluator_name = evaluator_name
+        self.type = type
+        self.action = action
+
+        # intialize model
+        evaluator_metadata = get_evaluator_metadata_wrapper(
+            self.evaluator_name,
+            self.custom_model_name,
+        )
+        model_name = get_model_name_from_evaluator(
+            evaluator_metadata,
+            self.provider,
+        )
+        self.inference_engine = get_inference_engine(
+            self.llm_provider_credentials,
+            self.provider,
+            model_name,
+            custom_params={
+                "use_cache": False,
+                "seed": None,
+                "max_tokens": 200,
+                "temperature": 0.7,
+            },
+        )
+
+        self.action_third_person_dict = {
+            DirectActionTypeEnum.REPHRASE: "rephrases",
+            DirectActionTypeEnum.SHORTER: "shortens",
+            DirectActionTypeEnum.LONGER: "elaborates on",
+        }
+
+    def generate(self, direct_ai_action: DirectAIActionRequest):
+        response_schemas = [
+            ResponseSchema(
+                name="response",
+                description=f"the selection to {self.action.value.lower()}",
+            )
+        ]
+
+        output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+
+        format_instructions = output_parser.get_format_instructions()
+        text_with_selection = direct_ai_action.text.replace(
+            direct_ai_action.selection,
+            "<blank>" + direct_ai_action.selection + "</blank>",
+        )
+        # prompt templates
+        system_prompt_template = PromptTemplate(
+            input_variables=[
+                "text_with_selection",
+            ],
+            partial_variables={
+                "action_third_person": self.action_third_person_dict[self.action]
+            },
+            template=dedent(
+                """You will be given a text that contains a selection, marked with <blank> tags. Your task is to generate a response that {action_third_person} the selection while preserving its original meaning and core information.
+
+            Example input:
+            {text_with_selection}
+            """,
+            ),
+        )
+
+        query_template = PromptTemplate(
+            input_variables=[],
+            partial_variables={
+                "format_instructions": format_instructions,
+                "action_third_person": self.action_third_person_dict[self.action],
+            },
+            template="Generate a response that {action_third_person} the selection while keeping its original meaning and the core information.\n\n{format_instructions}",
+        )
+
+        system_prompt = system_prompt_template.format(
+            text_with_selection=text_with_selection,
+        )
+        query = query_template.format()
+
+        prompt = system_prompt + "\n\n" + query
+
+        logger.debug(f"Prompt:\n{prompt}")
+
+        response = self.inference_engine.infer([{"source": prompt}])[0]
+
+        parsed_response = output_parser.parse(response)["response"]
+
+        return parsed_response
 
 
 class Generator:

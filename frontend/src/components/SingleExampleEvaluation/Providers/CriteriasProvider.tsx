@@ -1,7 +1,7 @@
 import {
   capitalizeFirstWord,
   getEmptyCriteriaByType,
-  getEmptyUseCase,
+  getEmptyTestCase,
   returnByPipelineType,
   toSnakeCase,
 } from 'src/utils'
@@ -27,7 +27,7 @@ const PipelineTypesContext = createContext<PipelineContextValue>({
   loadingCriterias: false,
   getCriteria: () => null,
   getEmptyUseCaseWithCriteria: () => ({
-    ...getEmptyUseCase(EvaluationType.DIRECT),
+    ...getEmptyTestCase(EvaluationType.DIRECT),
     criteria: getEmptyCriteriaByType(EvaluationType.DIRECT),
   }),
 })
@@ -73,7 +73,7 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
 
   const getEmptyUseCaseWithCriteria = useCallback(
     (criteriaName: string, type: EvaluationType): UseCase => ({
-      ...getEmptyUseCase(type),
+      ...getEmptyTestCase(type),
       criteria: getCriteria(criteriaName, type) || getEmptyCriteriaByType(type),
     }),
     [getCriteria],

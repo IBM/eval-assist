@@ -4,16 +4,17 @@ import { Modal, TextInput } from '@carbon/react'
 
 import { EvaluationType, UseCase } from '../../../types'
 import { UseCaseTypeBadge } from '../../UseCaseTypeBadge/UseCaseTypeBadge'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   onSaveAs: (name: string, fromUseCase?: UseCase) => Promise<boolean>
-  type: EvaluationType
 }
 
-export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, type }: Props) => {
+export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs }: Props) => {
   const [useCaseName, setUseCaseName] = useState('')
+  const { currentTestCase } = useCurrentTestCase()
   const [loadingStatus, setLoadingStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>(
     'inactive',
   )
@@ -38,7 +39,7 @@ export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs, type }: Props) => 
       onRequestClose={resetStatus}
       modalHeading={
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-          Save Test Case <UseCaseTypeBadge style={{ marginLeft: '1rem' }} type={type} />
+          Save Test Case <UseCaseTypeBadge style={{ marginLeft: '1rem' }} type={currentTestCase.type} />
         </div>
       }
       primaryButtonText="Confirm"

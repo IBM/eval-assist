@@ -28,6 +28,8 @@ from .api.common import (
     CriteriaAPI,
     CriteriaOptionAPI,
     CriteriaWithOptionsAPI,
+    DirectAIActionRequest,
+    DirectAIActionResponse,
     DirectEvaluationRequestModel,
     DirectResponseModel,
     Instance,
@@ -53,7 +55,7 @@ from .logger import LoggingRoute
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
 
 # Synthetic
-from .synthetic_example_generation.generate import Generator
+from .synthetic_example_generation.generate import DirectActionGenerator, Generator
 from .utils import (
     get_custom_models,
     get_evaluator_metadata_wrapper,
@@ -374,6 +376,34 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
 )
 def get_domain_persona_map():
     return domain_persona_map
+
+
+@router.post("/direct-ai-action/", response_model=DirectAIActionResponse)
+def perform_direct_ai_action(params: DirectAIActionRequest):
+    evaluator_name, custom_model_name = init_evaluator_name(params.evaluator_name)
+
+    # initialize generator and generate response
+    @handle_llm_generation_exceptions
+    def run():
+        direct_action_generator = DirectActionGenerator(
+            evaluator_name=evaluator_name,
+            custom_model_name=custom_model_name,
+            provider=params.provider,
+            llm_provider_credentials=params.llm_provider_credentials,
+            type=params.type,
+            action=params.action,
+        )
+        try:
+            return DirectAIActionResponse(
+                result=direct_action_generator.generate(params)
+            )
+        except OutputParserException as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"{params.evaluator_name} was unable to generate an appropriate synthetic example",
+            ) from e
+
+    return run()
 
 
 @router.post("/synthetic-examples/", response_model=list[Instance])

@@ -58,3 +58,10 @@ class GenerationLengthEnum(str, Enum):
     SHORT = "Short"
     MEDIUM = "Medium"
     LONG = "Long"
+
+
+class DirectActionTypeEnum(str, Enum):
+    REPHRASE = "Rephrase"
+    LONGER = "Elaborate"
+    SHORTER = "Shorten"
+    CUSTOM = "Custom"

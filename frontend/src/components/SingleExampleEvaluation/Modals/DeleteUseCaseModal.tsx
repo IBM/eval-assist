@@ -2,14 +2,16 @@ import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Modal } from '@carbon/react'
 
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
+
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   onDeleteUseCase: () => Promise<void>
-  useCaseName: string
 }
 
-export const DeleteUseCaseModal = ({ open, setOpen, onDeleteUseCase, useCaseName }: Props) => {
+export const DeleteUseCaseModal = ({ open, setOpen, onDeleteUseCase }: Props) => {
+  const { currentTestCase } = useCurrentTestCase()
   const [loadingStatus, setLoadingStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>(
     'inactive',
   )
@@ -34,7 +36,7 @@ export const DeleteUseCaseModal = ({ open, setOpen, onDeleteUseCase, useCaseName
     <Modal
       open={open}
       onRequestClose={() => setOpen(false)}
-      modalHeading={`Delete workspace '${useCaseName}'`}
+      modalHeading={`Delete workspace '${currentTestCase.name}'`}
       primaryButtonText="Delete"
       danger
       secondaryButtonText="Cancel"

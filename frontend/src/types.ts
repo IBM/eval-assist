@@ -393,3 +393,10 @@ export enum GenerationLengthEnum {
   Medium = 'Medium',
   Long = 'Long',
 }
+
+export enum DirectActionTypeEnum {
+  Rephrase = 'Rephrase',
+  Elaborate = 'Elaborate',
+  Shorten = 'Shorten',
+  Custom = 'Custom',
+}

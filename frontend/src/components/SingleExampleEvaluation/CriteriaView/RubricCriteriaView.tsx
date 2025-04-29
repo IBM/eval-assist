@@ -145,7 +145,6 @@ export const RubricCriteriaView = ({
                             description: value,
                           })
                         }
-                        // readOnly={isRisksAndHarms}
                       />
                       {rubricCriteria.options.map((scale, i) => (
                         <div
@@ -171,7 +170,6 @@ export const RubricCriteriaView = ({
                             }
                             id={`criteria-option-value-${i}`}
                             key={`criteria-option-value-${i}`}
-                            // readOnly={isRisksAndHarms}
                           />
                           <HighlightTextArea
                             id={`criteria-option-description-${i}`}
@@ -193,7 +191,6 @@ export const RubricCriteriaView = ({
                                 ],
                               })
                             }
-                            // readOnly={isRisksAndHarms}
                           />
                           {rubricCriteria.options.length > 2 && (
                             <IconButton
