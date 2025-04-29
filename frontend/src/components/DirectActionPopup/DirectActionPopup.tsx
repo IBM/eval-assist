@@ -78,7 +78,7 @@ export const DirectActionPopup = ({
           >
             <TextShortParagraph />
           </IconButton>
-          {/* <IconButton
+          <IconButton
             className={classes.iconButton}
             kind={'ghost'}
             label={'Custom prompt'}
@@ -89,7 +89,7 @@ export const DirectActionPopup = ({
             }}
           >
             <AiLabel />
-          </IconButton> */}
+          </IconButton>
         </div>
       ) : promptPopupVisible ? (
         <PromptPopup
