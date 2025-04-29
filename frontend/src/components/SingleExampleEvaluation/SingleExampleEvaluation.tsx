@@ -6,8 +6,8 @@ import { LegacyRef, useCallback, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { Button } from '@carbon/react'
-import { WarningFilled } from '@carbon/react/icons'
+import { Button, IconButton } from '@carbon/react'
+import { Add, WarningFilled } from '@carbon/react/icons'
 
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
@@ -65,8 +65,8 @@ import { useSyntheticGeneration } from './Providers/SyntheticGenerationProvider'
 import { useURLParamsContext } from './Providers/URLParamsProvider'
 import { useUserUseCasesContext } from './Providers/UserUseCasesProvider'
 import classes from './SingleExampleEvaluation.module.scss'
+import { TestCaseOptions } from './TestCaseOptions'
 import { TestDataTable } from './TestDataTable'
-import { UseCaseOptions } from './UseCaseOptions'
 
 export const SingleExampleEvaluation = () => {
   const {
@@ -554,8 +554,17 @@ export const SingleExampleEvaluation = () => {
               className={cx(classes['bottom-divider'], classes['left-padding'])}
             >
               <h3>Evaluation sandbox</h3>
+              <Button
+                kind="tertiary"
+                onClick={() => {
+                  setNewUseCaseModalOpen(true)
+                }}
+                renderIcon={Add}
+              >
+                {'New Test Case'}
+              </Button>
             </div>
-            <UseCaseOptions
+            <TestCaseOptions
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
               onSave={onSave}
