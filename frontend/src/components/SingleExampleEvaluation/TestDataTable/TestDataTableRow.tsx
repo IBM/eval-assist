@@ -19,6 +19,7 @@ import {
   PairwiseInstanceResult,
 } from '../../../types'
 import RemovableSection from '../../RemovableSection/RemovableSection'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import classes from './index.module.scss'
 
 interface Props {
@@ -60,6 +61,13 @@ export const TestDataTableRow = ({
   resultsAvailable,
   runEvaluation,
 }: Props) => {
+  const { outdatedResultInstanceIds } = useCurrentTestCase()
+
+  const isResultOutdated = useMemo(
+    () => outdatedResultInstanceIds.includes(instance.id),
+    [instance.id, outdatedResultInstanceIds],
+  )
+
   const responses = useMemo(() => {
     return returnByPipelineType(type, [(instance as DirectInstance).response], (instance as PairwiseInstance).responses)
   }, [instance, type])
@@ -277,6 +285,16 @@ export const TestDataTableRow = ({
                             [classes.softText]: result.agreement,
                           })}
                         >{`Agreement: ${result.agreement ? 'Yes' : 'No'}`}</div>
+                      )}
+                      {isResultOutdated && (
+                        <div
+                          className={cx(classes.resultBlockTypography, {
+                            [classes.untrastedResultTypography]: !result.agreement,
+                            [classes.softText]: result.agreement,
+                          })}
+                        >
+                          {'This result is outdated!'}
+                        </div>
                       )}
                       <Link
                         onClick={onExpandInstance}

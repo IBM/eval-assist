@@ -10,7 +10,6 @@ export const withAuth = (Component: any) => {
 
     if (authenticationEnabled) {
       if (authenticationLoading) return <Loading withOverlay />
-
       // If user is not logged in, return login component
       if (isUnauthenticated) return <LoginView />
     }

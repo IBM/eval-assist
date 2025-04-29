@@ -2,8 +2,6 @@ import cx from 'classnames'
 import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 import { returnByPipelineType } from 'src/utils'
 
-import { Dispatch, SetStateAction } from 'react'
-
 import { EvaluationType } from '../../../types'
 import { Card } from './Card'
 import classes from './PipelineOptionCard.module.scss'
@@ -15,7 +13,6 @@ interface PipelineOptionCardProps {
 }
 
 export const PipelineOptionCard = ({ type, selectedType, onClick }: PipelineOptionCardProps) => {
-
   return (
     <Card
       title={returnByPipelineType(type, DIRECT_NAME, PAIRWISE_NAME)}

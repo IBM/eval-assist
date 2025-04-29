@@ -1,25 +1,46 @@
 import { getJSONStringWithSortedKeys } from 'src/utils'
 import { useLocalStorage } from 'usehooks-ts'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Dispatch, ReactNode, SetStateAction, createContext, useCallback, useContext, useEffect, useState } from 'react'
 
-import { ModelProviderCredentials, ModelProviderType } from '../types'
+import { ModelProviderCredentials, ModelProviderType } from '@types'
 
 const watsonx_url = 'https://us-south.ml.cloud.ibm.com'
 
+const defaultCredentialStorage = {
+  [ModelProviderType.WATSONX]: { api_key: '', project_id: '', api_base: watsonx_url },
+  [ModelProviderType.OPENAI]: { api_key: '' },
+  [ModelProviderType.RITS]: { api_key: '' },
+  [ModelProviderType.AZURE_OPENAI]: { api_key: '' },
+  [ModelProviderType.LOCAL_HF]: {},
+}
+
+interface ModelProviderCredentialsContextValue {
+  modelProviderCredentials: ModelProviderCredentials
+  setModelProviderCredentials: Dispatch<SetStateAction<ModelProviderCredentials>>
+  initializedModelProviderCredentials: boolean
+  getCredentialKeysFromProvider: (provider: ModelProviderType) => string[]
+  getAreRelevantCredentialsProvided: (provider: ModelProviderType) => boolean
+  getProviderCredentials: (provider: ModelProviderType) => Record<string, string>
+}
+
+const ModelProviderCredentialsContext = createContext<ModelProviderCredentialsContextValue>({
+  modelProviderCredentials: defaultCredentialStorage,
+  setModelProviderCredentials: () => {},
+  initializedModelProviderCredentials: false,
+  getCredentialKeysFromProvider: () => [],
+  getAreRelevantCredentialsProvided: () => false,
+  getProviderCredentials: () => ({}),
+})
+
 export const useModelProviderCredentials = () => {
-  const defaultCredentialStorage = useMemo(
-    () => ({
-      [ModelProviderType.WATSONX]: { api_key: '', project_id: '', api_base: watsonx_url },
-      [ModelProviderType.OPENAI]: { api_key: '' },
-      [ModelProviderType.RITS]: { api_key: '' },
-      [ModelProviderType.AZURE_OPENAI]: { api_key: '' },
-      [ModelProviderType.LOCAL_HF]: {},
-    }),
-    [],
-  )
+  return useContext(ModelProviderCredentialsContext)
+}
+
+export const ModelProviderCredentialsProvider = ({ children }: { children: ReactNode }) => {
   const [modelProviderCredentials, setModelProviderCredentials, removeModelProviderCredentials] =
     useLocalStorage<ModelProviderCredentials>('modelProviderCrentials', defaultCredentialStorage)
+
   const [initializedModelProviderCredentials, setInitializedModelProviderCredentials] = useState(false)
 
   // Set default values for new model providers
@@ -86,7 +107,21 @@ export const useModelProviderCredentials = () => {
       setModelProviderCredentials(parsedCredentials)
     }
     setInitializedModelProviderCredentials(true)
-  }, [defaultCredentialStorage, modelProviderCredentials, setModelProviderCredentials])
+  }, [modelProviderCredentials, setModelProviderCredentials])
+
+  const getCredentialKeysFromProvider = useCallback(
+    (provider: ModelProviderType) => {
+      return Object.keys(modelProviderCredentials[provider])
+    },
+    [modelProviderCredentials],
+  )
+
+  const getProviderCredentials = useCallback(
+    (provider: ModelProviderType): Record<string, string> =>
+      modelProviderCredentials[provider] ? modelProviderCredentials[provider] : {},
+    [modelProviderCredentials],
+  )
+
   const getAreRelevantCredentialsProvided = useCallback(
     (provider: ModelProviderType): boolean =>
       modelProviderCredentials[provider] &&
@@ -94,10 +129,18 @@ export const useModelProviderCredentials = () => {
     [modelProviderCredentials],
   )
 
-  return {
-    modelProviderCredentials,
-    setModelProviderCredentials,
-    getAreRelevantCredentialsProvided,
-    initializedModelProviderCredentials,
-  }
+  return (
+    <ModelProviderCredentialsContext.Provider
+      value={{
+        modelProviderCredentials,
+        setModelProviderCredentials,
+        initializedModelProviderCredentials,
+        getCredentialKeysFromProvider,
+        getAreRelevantCredentialsProvided,
+        getProviderCredentials,
+      }}
+    >
+      {children}
+    </ModelProviderCredentialsContext.Provider>
+  )
 }

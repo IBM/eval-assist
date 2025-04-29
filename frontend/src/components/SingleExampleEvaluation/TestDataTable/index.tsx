@@ -22,6 +22,8 @@ import {
   PairwiseInstanceResultV1,
   UseCase,
 } from '../../../types'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
+import { useSyntheticGeneration } from '../Providers/SyntheticGenerationProvider'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { TestDataTableRow } from './TestDataTableRow'
 import classes from './index.module.scss'
@@ -29,21 +31,10 @@ import classes from './index.module.scss'
 interface Props {
   style?: CSSProperties
   className?: string
-  type: EvaluationType
   evaluationRunning: boolean
-  setSelectedInstance: Dispatch<SetStateAction<Instance | null>>
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
-  criteria: CriteriaWithOptions | Criteria
-  responseVariableName: string
-  contextVariableNames: string[]
-  setResponseVariableName: (newValue: string) => void
-  currentTestCase: UseCase
-  setInstances: (instances: Instance[]) => void
-  setContextVariableNames: (contextVariableNames: string[]) => void
   loadingSyntheticExamples: boolean
   setSysntheticGenerationModalOpen: Dispatch<SetStateAction<boolean>>
-  generateTestData: () => Promise<void>
-  modelForSyntheticGeneration: Evaluator | null
   evaluatingInstanceIds: string[]
   runEvaluation: (evaluationIds: string[]) => Promise<void>
 }
@@ -51,30 +42,29 @@ interface Props {
 export const TestDataTable = ({
   style,
   className,
-  setInstances,
-  setContextVariableNames,
-  type,
   evaluationRunning,
-  setSelectedInstance,
   setResultDetailsModalOpen,
-  criteria,
-  responseVariableName,
-  contextVariableNames,
-  setResponseVariableName,
   loadingSyntheticExamples,
   setSysntheticGenerationModalOpen,
-  currentTestCase,
-  generateTestData,
-  modelForSyntheticGeneration,
   evaluatingInstanceIds,
   runEvaluation,
 }: Props) => {
+  const { currentTestCase, setCurrentTestCase, setSelectedInstance } = useCurrentTestCase()
   const instancesPerPage = useMemo(() => INSTANCES_PER_PAGE, [])
   const instances = useMemo(() => currentTestCase.instances, [currentTestCase.instances])
+  const { generateTestData } = useSyntheticGeneration()
+
   const { currentInstances, currentPage, goToPage, totalPages, goToLastPage } = usePagination({
     instances,
     instancesPerPage: instancesPerPage,
   })
+
+  const setInstances = useCallback(
+    (instances: Instance[]) => {
+      setCurrentTestCase({ ...currentTestCase, instances })
+    },
+    [currentTestCase, setCurrentTestCase],
+  )
 
   const [expectedResultOn, setExpectedResultOn] = useState(true)
 
@@ -114,7 +104,7 @@ export const TestDataTable = ({
 
   const noPositionalBias = useMemo(() => {
     if (!resultsAvailable) return
-    return type === EvaluationType.DIRECT
+    return currentTestCase.type === EvaluationType.DIRECT
       ? (instances as DirectInstance[])?.every(
           (instance) => (instance.result as DirectInstanceResult)?.positionalBias.detected == false,
         )
@@ -125,11 +115,11 @@ export const TestDataTable = ({
               perResponseResults.positionalBias.every((pBias) => pBias === false),
             ),
         )
-  }, [instances, resultsAvailable, type])
+  }, [currentTestCase.type, instances, resultsAvailable])
 
   const addEmptyRow = () => {
     let newEmptyInstance: Instance = {
-      contextVariables: contextVariableNames.map((contextVariableName) => ({
+      contextVariables: currentTestCase.contextVariableNames.map((contextVariableName) => ({
         name: contextVariableName,
         value: '',
       })),
@@ -137,7 +127,7 @@ export const TestDataTable = ({
       result: null,
       id: crypto.randomUUID(),
     }
-    if (type === EvaluationType.DIRECT) {
+    if (currentTestCase.type === EvaluationType.DIRECT) {
       ;(newEmptyInstance as DirectInstance) = { ...newEmptyInstance, response: '' }
     } else {
       ;(newEmptyInstance as PairwiseInstance) = {
@@ -145,6 +135,7 @@ export const TestDataTable = ({
         responses: (instances[0] as PairwiseInstance).responses.map((_) => ''),
       }
     }
+
     setInstances([...instances, newEmptyInstance])
   }
 
@@ -154,11 +145,12 @@ export const TestDataTable = ({
 
   const addContextVariable = () => {
     setInstances(
-      instances.map((instance) => {
-        return { ...instance, contextVariables: [...instance.contextVariables, { name: '', value: '' }] }
-      }),
+      instances.map((instance) => ({
+        ...instance,
+        contextVariables: [...instance.contextVariables, { name: '', value: '' }],
+      })),
     )
-    setContextVariableNames([...contextVariableNames, ''])
+    setCurrentTestCase({ ...currentTestCase, contextVariableNames: [...currentTestCase.contextVariableNames, ''] })
   }
 
   const addResponse = () => {
@@ -186,24 +178,30 @@ export const TestDataTable = ({
         }
       }),
     )
-    setContextVariableNames([
-      ...contextVariableNames.slice(0, actualIndex),
-      newValue,
-      ...contextVariableNames.slice(actualIndex + 1),
-    ])
+    setCurrentTestCase({
+      ...currentTestCase,
+      contextVariableNames: [
+        ...currentTestCase.contextVariableNames.slice(0, actualIndex),
+        newValue,
+        ...currentTestCase.contextVariableNames.slice(actualIndex + 1),
+      ],
+    })
   }
 
   const removeContextVariable = useCallback(
     (indexToDelete: number) => {
-      setInstances([
-        ...instances.map((instance) => ({
-          ...instance,
-          contextVariables: instance.contextVariables.filter((_, i) => i !== indexToDelete),
-        })),
-      ])
-      setContextVariableNames(contextVariableNames.filter((_, i) => i !== indexToDelete))
+      const updatedInstances = instances.map((instance) => ({
+        ...instance,
+        contextVariables: instance.contextVariables.filter((_, i) => i !== indexToDelete),
+      }))
+
+      setCurrentTestCase({
+        ...currentTestCase,
+        contextVariableNames: currentTestCase.contextVariableNames.filter((_, i) => i !== indexToDelete),
+        instances: updatedInstances,
+      })
     },
-    [contextVariableNames, instances, setContextVariableNames, setInstances],
+    [currentTestCase, instances, setCurrentTestCase],
   )
 
   const removePairwiseResponse = useCallback(
@@ -257,12 +255,12 @@ export const TestDataTable = ({
         <div className={cx(classes.innerContainer)}>
           <div
             className={cx(classes.tableRow, classes.headerRow, {
-              ...returnByPipelineType(type, headerDirectGridClasses, pairwiseGridClasses),
+              ...returnByPipelineType(currentTestCase.type, headerDirectGridClasses, pairwiseGridClasses),
             })}
           >
             <div className={cx(classes.blockElement, classes.headerBlock, classes.headerResponseBlock)}>
               <strong className={cx(classes.headerTypography)}>{'Test data'}</strong>
-              {type === EvaluationType.PAIRWISE && (
+              {currentTestCase.type === EvaluationType.PAIRWISE && (
                 <Button kind="ghost" size="sm" renderIcon={Add} onClick={addResponse}>
                   {'Add response'}
                 </Button>
@@ -274,42 +272,50 @@ export const TestDataTable = ({
             {expectedResultOn && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
                 <strong className={cx(classes.headerTypography)}>
-                  {returnByPipelineType(type, 'Expected result', 'Expected winner')}
+                  {returnByPipelineType(currentTestCase.type, 'Expected result', 'Expected winner')}
                 </strong>
               </div>
             )}
             {resultsAvailable && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
                 <strong className={classes.headerTypography}>
-                  {returnByPipelineType(type, 'Generated result', 'Generated winner')}
+                  {returnByPipelineType(currentTestCase.type, 'Generated result', 'Generated winner')}
                 </strong>
               </div>
             )}
           </div>
           <div
             className={cx(classes.tableRow, classes.subHeaderRow, {
-              ...returnByPipelineType(type, directGridClasses, pairwiseGridClasses),
+              ...returnByPipelineType(currentTestCase.type, directGridClasses, pairwiseGridClasses),
             })}
           >
             <div className={cx(classes.tableRowSection)}>
-              {returnByPipelineType<string[], string[]>(type, [responseVariableName], () =>
-                (instances[0] as PairwiseInstance).responses.map((_, i) => `${responseVariableName} ${i + 1}`),
+              {returnByPipelineType<string[], string[]>(
+                currentTestCase.type,
+                [currentTestCase.responseVariableName],
+                () =>
+                  (instances[0] as PairwiseInstance).responses.map(
+                    (_, i) => `${currentTestCase.responseVariableName} ${i + 1}`,
+                  ),
               ).map((reponseName, i) => (
                 <div key={i} className={cx(classes.blockElement, classes.subHeaderBlock)}>
                   <EditableTag
                     value={reponseName}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setResponseVariableName(e.target.value)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      setCurrentTestCase({ ...currentTestCase, responseVariableName: e.target.value })
+                    }
                     color="blue"
-                    isEditable={type === EvaluationType.DIRECT}
+                    isEditable={currentTestCase.type === EvaluationType.DIRECT}
                   />
-                  {type == EvaluationType.PAIRWISE && (instances[0] as PairwiseInstance).responses.length > 2 && (
-                    <IconButton kind={'ghost'} label={'Remove'} onClick={() => removePairwiseResponse(i)}>
-                      <TrashCan />
-                    </IconButton>
-                  )}
+                  {currentTestCase.type == EvaluationType.PAIRWISE &&
+                    (instances[0] as PairwiseInstance).responses.length > 2 && (
+                      <IconButton kind={'ghost'} label={'Remove'} onClick={() => removePairwiseResponse(i)}>
+                        <TrashCan />
+                      </IconButton>
+                    )}
                 </div>
               ))}
-              {contextVariableNames.map((contextVariableName, i) => (
+              {currentTestCase.contextVariableNames.map((contextVariableName, i) => (
                 <div key={i} className={cx(classes.blockElement, classes.subHeaderBlock)}>
                   <EditableTag
                     value={contextVariableName}
@@ -347,16 +353,16 @@ export const TestDataTable = ({
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               evaluationRunning={evaluationRunning}
               isInstanceEvaluationRunning={evaluatingInstanceIds.includes(instance.id)}
-              criteria={criteria}
-              gridClasses={returnByPipelineType(type, directGridClasses, pairwiseGridClasses)}
+              criteria={currentTestCase.criteria}
+              gridClasses={returnByPipelineType(currentTestCase.type, directGridClasses, pairwiseGridClasses)}
               instance={instance}
               setInstance={(instance) => setInstance(instance, i)}
               readOnly={evaluationRunning}
               removeInstance={() => removeInstance(i)}
-              type={type}
+              type={currentTestCase.type}
               addInstance={addInstance}
               resultsAvailable={resultsAvailable}
-              responseVariableName={responseVariableName}
+              responseVariableName={currentTestCase.responseVariableName}
               runEvaluation={runEvaluation}
             />
           ))}
@@ -390,9 +396,11 @@ export const TestDataTable = ({
                     size="sm"
                     renderIcon={AiGenerate}
                     onClick={() =>
-                      modelForSyntheticGeneration === null ? setSysntheticGenerationModalOpen(true) : generateTestData()
+                      currentTestCase.syntheticGenerationConfig.evaluator === null
+                        ? setSysntheticGenerationModalOpen(true)
+                        : generateTestData()
                     }
-                    disabled={type == EvaluationType.PAIRWISE}
+                    disabled={currentTestCase.type == EvaluationType.PAIRWISE}
                   >
                     {'Generate test data'}
                   </Button>
@@ -401,7 +409,7 @@ export const TestDataTable = ({
                     label={'Configure'}
                     size="sm"
                     onClick={() => setSysntheticGenerationModalOpen(true)}
-                    disabled={type == EvaluationType.PAIRWISE}
+                    disabled={currentTestCase.type == EvaluationType.PAIRWISE}
                   >
                     <SettingsAdjust />
                   </IconButton>
@@ -426,17 +434,6 @@ export const TestDataTable = ({
           id="toggle-expected-result"
           className={classes.toggle}
         />
-        {/* {resultsAvailable && !evaluationRunning && type === EvaluationType.DIRECT && (
-          <Toggle
-            labelText={'Show Explanation'}
-            toggled={explanationOn}
-            onToggle={() => setExplanationOn(!explanationOn)}
-            size="sm"
-            hideLabel
-            id="toggle-explanation"
-            className={classes.toggle}
-          />
-        )} */}
       </div>
     </div>
   )

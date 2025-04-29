@@ -16,6 +16,8 @@ import { BadgeNode } from './BadgeNode'
 import { useEditor } from './EditorProvider'
 import { MultipleEditorStorePlugin } from './MultipleEditorStorePlugin'
 import { NoEnterPlugin } from './NoEnterPlugin'
+import SelectionPopoverPlugin from './SelectionPopoverPlugin'
+import MouseUpListenerPlugin from './SelectionPopoverPlugin'
 import { MatchPlugin } from './TextNodeTransformPlugin'
 import classes from './index.module.scss'
 import { getEditorContents, setEditorContent } from './utils'
@@ -109,6 +111,7 @@ export const LexicalContent = ({
       <MatchPlugin toHighlightWords={toHighlightWords} />
       {isTextInput && <NoEnterPlugin />}
       <HistoryPlugin />
+      <SelectionPopoverPlugin />
       <MultipleEditorStorePlugin id={editorId} />
       {editable && (
         <OnChangePlugin

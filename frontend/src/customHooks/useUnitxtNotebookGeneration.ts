@@ -1,35 +1,18 @@
+import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
+import { useModelProviderCredentials } from '@components/SingleExampleEvaluation/Providers/ModelProviderCredentialsProvider'
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
+import { returnByPipelineType } from '@utils'
 
 import { DirectInstance, EvaluationType, Instance, PairwiseInstance, UseCase } from '../types'
 import { useFetchUtils } from './useFetchUtils'
 
-interface Props {
-  testCaseName: UseCase['name']
-  criteria: UseCase['criteria']
-  evaluatorName: string | null
-  responses: DirectInstance['response'][] | PairwiseInstance['responses'][]
-  contextVariablesList: Instance['contextVariables'][]
-  // @ts-ignore
-  // tslint says UseCase['evaluator'] can be null, but it can't be null
-  provider: UseCase['evaluator']['provider']
-  credential_keys: string[]
-  evaluatorType: EvaluationType
-}
-export const useUnitxtCodeGeneration = ({
-  criteria,
-  evaluatorName,
-  responses,
-  contextVariablesList,
-  provider,
-  credential_keys,
-  evaluatorType,
-  testCaseName,
-}: Props) => {
+export const useUnitxtCodeGeneration = () => {
   const { post } = useFetchUtils()
   const { addToast, removeToast } = useToastContext()
-
+  const { getCredentialKeysFromProvider } = useModelProviderCredentials()
+  const { currentTestCase } = useCurrentTestCase()
   const downloadUnitxtCode = async ({ downloadAsScript }: { downloadAsScript: boolean }) => {
-    if (!evaluatorName) {
+    if (!currentTestCase.evaluator?.name) {
       addToast({
         kind: 'warning',
         title: 'Select an evaluator in order to generate a notebook',
@@ -43,17 +26,27 @@ export const useUnitxtCodeGeneration = ({
     })
     try {
       const response = await post('download-notebook/', {
-        criteria,
-        evaluator_name: evaluatorName,
-        predictions: responses || [],
+        criteria: currentTestCase.criteria,
+        evaluator_name: currentTestCase.evaluator.name,
+        predictions:
+          currentTestCase.instances.map((instance) =>
+            returnByPipelineType(
+              currentTestCase.type,
+              () => (instance as DirectInstance).response,
+              () => (instance as PairwiseInstance).responses,
+            ),
+          ) || [],
         context_variables:
-          contextVariablesList.map((contextVariables) =>
-            contextVariables.reduce((acc, item, index) => ({ ...acc, [item.name]: item.value }), {}),
+          currentTestCase.instances.map((instance) =>
+            instance.contextVariables.reduce((acc, item, index) => ({ ...acc, [item.name]: item.value }), {}),
           ) || {},
-        provider,
-        credentials: credential_keys.reduce((acc, item, index) => ({ ...acc, [item]: '' }), {}),
-        evaluator_type: evaluatorType!,
-        test_case_name: testCaseName || '',
+        provider: currentTestCase.evaluator.provider,
+        credentials: getCredentialKeysFromProvider(currentTestCase.evaluator.provider).reduce(
+          (acc, item, index) => ({ ...acc, [item]: '' }),
+          {},
+        ),
+        evaluator_type: currentTestCase.type,
+        test_case_name: currentTestCase.name || '',
         plain_python_script: downloadAsScript,
       })
 

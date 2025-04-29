@@ -5,44 +5,34 @@ import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 import { Button, IconButton } from '@carbon/react'
 import { Add, Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
-import { EvaluationType } from '../../types'
 import { UseCaseTypeBadge } from '../UseCaseTypeBadge/UseCaseTypeBadge'
+import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
 import { useURLParamsContext } from './Providers/URLParamsProvider'
 import classes from './UseCaseOptions.module.scss'
 
 interface UseCaseOptionsProps {
   style?: CSSProperties
   className?: string
-  isUseCaseSaved: boolean
-  useCaseName: string
-  type: EvaluationType
-  changesDetected: boolean
   onSave: () => Promise<void>
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
   setDeleteUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  setUseCaseName: (name: string) => void
   setEditNameModalOpen: Dispatch<SetStateAction<boolean>>
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  downloadUnitxtNotebook: () => Promise<void>
   setSampleCodeTypeModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
 export const UseCaseOptions = ({
   style,
   className,
-  useCaseName,
-  type,
-  isUseCaseSaved,
   setSaveUseCaseModalOpen,
   onSave,
   setNewUseCaseModalOpen,
-  changesDetected,
   setDeleteUseCaseModalOpen,
   setEditNameModalOpen,
-  downloadUnitxtNotebook,
   setSampleCodeTypeModalOpen,
 }: UseCaseOptionsProps) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
+  const { currentTestCase, isTestCaseSaved, changesDetected } = useCurrentTestCase()
   const { isRisksAndHarms } = useURLParamsContext()
   const onSaveClick = async () => {
     setSavingUseCase(true)
@@ -54,12 +44,12 @@ export const UseCaseOptions = ({
       <h4
         style={{
           paddingRight: '0.5rem',
-          opacity: useCaseName ? 'inherit' : '0.5',
+          opacity: currentTestCase.name ? 'inherit' : '0.5',
         }}
       >
-        {toTitleCase(useCaseName) || 'Unsaved test case'}
+        {toTitleCase(currentTestCase.name) || 'Unsaved test case'}
       </h4>
-      {isUseCaseSaved && (
+      {isTestCaseSaved && (
         <IconButton
           style={{ marginRight: '0.5rem' }}
           kind={'ghost'}
@@ -70,9 +60,9 @@ export const UseCaseOptions = ({
         </IconButton>
       )}
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
-      <UseCaseTypeBadge type={type} style={{ paddingInline: '0.5rem' }} />
+      <UseCaseTypeBadge type={currentTestCase.type} style={{ paddingInline: '0.5rem' }} />
       <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
-      {isUseCaseSaved ? (
+      {isTestCaseSaved ? (
         <>
           <Button
             disabled={savingUseCase || !changesDetected || isRisksAndHarms}
@@ -108,7 +98,7 @@ export const UseCaseOptions = ({
       <Button
         kind="ghost"
         renderIcon={TrashCan}
-        disabled={!isUseCaseSaved}
+        disabled={!isTestCaseSaved}
         onClick={() => {
           setDeleteUseCaseModalOpen(true)
         }}

@@ -19,71 +19,61 @@ import {
   Criteria,
   CriteriaWithOptions,
   DomainEnum,
+  EvaluationType,
   GenerationLengthEnum,
   PersonaEnum,
   SyntheticGenerationConfig,
   TaskEnum,
 } from '@types'
-import { EvaluationType } from '@types'
 import { returnByPipelineType } from '@utils'
 
 import { PipelineSelect } from '../EvaluatorSelect'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from '../Providers/EvaluatorOptionsProvider'
+import { useSyntheticGeneration } from '../Providers/SyntheticGenerationProvider'
 import classes from './SyntheticGenerationModal.module.scss'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  evaluationType: EvaluationType
-  generateTestData: () => Promise<void>
-  syntheticGenerationConfig: SyntheticGenerationConfig
-  setSyntheticGenerationConfig: React.Dispatch<React.SetStateAction<SyntheticGenerationConfig>>
-  tasksOptions: {
-    text: TaskEnum
-  }[]
-  domainsOptions: {
-    text: DomainEnum
-  }[]
-  personasOptions: {
-    text: PersonaEnum
-  }[]
-  generationLengthOptions: {
-    text: GenerationLengthEnum
-  }[]
-  loadingDomainPersonaMapping: boolean
-  loadDomainPersonaMapping: () => Promise<void>
-  criteria: Criteria
-  contextVariableNames: string[]
-  responseVariableName: string
 }
 
-export const SyntheticGenerationModal = ({
-  open,
-  setOpen,
-  evaluationType,
-  generateTestData,
-  tasksOptions,
-  domainsOptions,
-  personasOptions,
-  generationLengthOptions,
-  loadingDomainPersonaMapping,
-  loadDomainPersonaMapping,
-  criteria,
-  syntheticGenerationConfig,
-  setSyntheticGenerationConfig,
-  contextVariableNames,
-  responseVariableName,
-}: Props) => {
+export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
+  const { currentTestCase, setCurrentTestCase } = useCurrentTestCase()
+  const { generateTestData } = useSyntheticGeneration()
+  const {
+    criteria,
+    type: evaluationType,
+    contextVariableNames,
+    responseVariableName,
+    syntheticGenerationConfig,
+  } = currentTestCase
+  const {
+    tasksOptions,
+    domainsOptions,
+    personasOptions,
+    generationLengthOptions,
+    loadingDomainPersonaMapping,
+    loadDomainPersonaMapping,
+  } = useSyntheticGeneration()
+
+  const setSyntheticGenerationConfig = useCallback(
+    (syntheticGenerationConfig: SyntheticGenerationConfig) => {
+      setCurrentTestCase({ ...currentTestCase, syntheticGenerationConfig })
+    },
+    [currentTestCase, setCurrentTestCase],
+  )
+
   const criteriaOptionNames = useMemo(
     () =>
-      criteria && evaluationType
+      currentTestCase.criteria && evaluationType
         ? returnByPipelineType(
             evaluationType,
             () => (criteria as CriteriaWithOptions).options.map((option) => option.name),
             [],
           )
         : [],
-    [criteria, evaluationType],
+    [criteria, currentTestCase.criteria, evaluationType],
   )
 
   useEffect(() => {
@@ -106,18 +96,18 @@ export const SyntheticGenerationModal = ({
           (criteriaOptionName) => criteriaOptionName in syntheticGenerationConfig.perCriteriaOptionCount!,
         )
       ) {
-        setSyntheticGenerationConfig((prev: SyntheticGenerationConfig) => {
-          const result: Record<string, number> = {}
-          // add new
-          criteriaOptionNames.forEach((k) => {
-            if (!Object.keys(prev).includes(k)) {
-              result[k] = 1
-            } else {
-              result[k] = prev.perCriteriaOptionCount![k]
-            }
-          })
-          return { ...syntheticGenerationConfig, perCriteriaOptionCount: result } as SyntheticGenerationConfig
+        const newSyntheticGenerationConfig = { ...syntheticGenerationConfig }
+        const result: Record<string, number> = {}
+        // add new
+        criteriaOptionNames.forEach((k) => {
+          if (!Object.keys(newSyntheticGenerationConfig).includes(k)) {
+            result[k] = 1
+          } else {
+            result[k] = newSyntheticGenerationConfig.perCriteriaOptionCount![k]
+          }
         })
+        newSyntheticGenerationConfig.perCriteriaOptionCount = result
+        setSyntheticGenerationConfig(newSyntheticGenerationConfig)
       }
     }
   }, [criteriaOptionNames, setSyntheticGenerationConfig, syntheticGenerationConfig])
@@ -164,7 +154,7 @@ export const SyntheticGenerationModal = ({
             </div>
             <div>
               <PipelineSelect
-                type={evaluationType}
+                evaluationType={currentTestCase.syntheticGenerationConfig.evaluator?.type || EvaluationType.DIRECT}
                 selectedEvaluator={syntheticGenerationConfig.evaluator}
                 setSelectedEvaluator={(newValue) =>
                   setSyntheticGenerationConfig({

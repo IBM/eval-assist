@@ -6,20 +6,20 @@ import { Loading, Modal, Select, SelectItem } from '@carbon/react'
 
 import { HighlightTextArea } from '@components/HighlightTextArea'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { DirectInstance, EvaluationType, ModelProviderCredentials, ModelProviderType, UseCase } from '@types'
+import { DirectInstance, EvaluationType } from '@types'
 
 import { useCriteriasContext } from '../Providers/CriteriasProvider'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import { useToastContext } from '../Providers/ToastProvider'
 import classes from './PromptModal.module.scss'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  currentUseCase: UseCase | null
-  modelProviderCredentials: ModelProviderCredentials
 }
 
-export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCredentials }: Props) => {
+export const PromptModal = ({ open, setOpen }: Props) => {
+  const { currentTestCase } = useCurrentTestCase()
   const [prompts, setPrompts] = useState<string[] | null>(null)
   const [selectedPromptIndex, setSelectedPromptIndex] = useState<number>(0)
   const { getCriteria } = useCriteriasContext()
@@ -29,14 +29,17 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
 
   useEffect(() => {
     const getPrompts = async () => {
-      if (currentUseCase !== null && open) {
-        const parsedCriteria = { ...currentUseCase.criteria }
+      if (currentTestCase !== null && open) {
+        const parsedCriteria = { ...currentTestCase.criteria }
         // check if criteria description changed and criteria name didn't
         const harmsAndRiskCriteria = getCriteria(
-          `${toSnakeCase(currentUseCase.criteria.name)}>${toSnakeCase(currentUseCase.responseVariableName)}`,
+          `${toSnakeCase(currentTestCase.criteria.name)}>${toSnakeCase(currentTestCase.responseVariableName)}`,
           EvaluationType.DIRECT,
         )
-        if (harmsAndRiskCriteria !== null && harmsAndRiskCriteria.description !== currentUseCase.criteria.description) {
+        if (
+          harmsAndRiskCriteria !== null &&
+          harmsAndRiskCriteria.description !== currentTestCase.criteria.description
+        ) {
           // the tokenizer of granite guardian will complain if we send a predefined criteria name
           // with a custom description.
           addToast({
@@ -49,19 +52,19 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
         }
 
         let body: any = {
-          instances: currentUseCase.instances.map((instance) => ({
+          instances: currentTestCase.instances.map((instance) => ({
             context_variables: instance.contextVariables.reduce(
               (acc, item, index) => ({ ...acc, [item.name]: item.value }),
               {},
             ),
             prediction: (instance as DirectInstance).response,
-            prediction_variable_name: currentUseCase.responseVariableName,
+            prediction_variable_name: currentTestCase.responseVariableName,
           })),
-          evaluator_name: currentUseCase.evaluator?.name,
-          provider: currentUseCase.evaluator?.provider,
+          evaluator_name: currentTestCase.evaluator?.name,
+          provider: currentTestCase.evaluator?.provider,
           criteria: parsedCriteria,
-          type: currentUseCase.type,
-          response_variable_name: currentUseCase.responseVariableName,
+          type: currentTestCase.type,
+          response_variable_name: currentTestCase.responseVariableName,
           llm_provider_credentials: {},
         }
 
@@ -70,7 +73,7 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
       }
     }
     getPrompts()
-  }, [addToast, currentUseCase, getCriteria, modelProviderCredentials, open, post])
+  }, [addToast, currentTestCase, getCriteria, open, post])
 
   useEffect(() => {
     if (open) {
@@ -89,8 +92,8 @@ export const PromptModal = ({ open, setOpen, currentUseCase, modelProviderCreden
       passiveModal
       size="sm"
       modalHeading={
-        currentUseCase !== null &&
-        (currentUseCase.instances as DirectInstance[]).map((instance) => instance.response).length > 1
+        currentTestCase !== null &&
+        (currentTestCase.instances as DirectInstance[]).map((instance) => instance.response).length > 1
           ? 'Prompts'
           : 'Prompt'
       }

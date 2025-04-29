@@ -9,6 +9,7 @@ import { UseCase } from '@types'
 
 import layoutClasses from '../Layout.module.scss'
 import { useAppSidebarContext } from '../Providers/AppSidebarProvider'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import classes from './AppSidenav.module.scss'
 import { ExampleCatalogPanel } from './ExampleCatalogPanel'
@@ -17,9 +18,7 @@ import { SavedTestCasesPanel } from './SavedTestCasesPanel'
 
 interface AppSidenavProps {
   setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
-  setLibraryUseCaseSelected: Dispatch<SetStateAction<{ useCase: UseCase; subCatalogName: string | null } | null>>
   userUseCases: UseCase[]
-  changesDetected: boolean
   updateURLFromUseCase: (selectedUseCase: { useCase: UseCase; subCatalogName: string | null }) => void
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
@@ -27,9 +26,7 @@ interface AppSidenavProps {
 
 export const AppSidenavNew = ({
   setConfirmationModalOpen,
-  setLibraryUseCaseSelected,
   userUseCases,
-  changesDetected,
   updateURLFromUseCase,
   setEvaluationRunningModalOpen,
   evaluationRunning,
@@ -37,16 +34,17 @@ export const AppSidenavNew = ({
   const id = useId()
   const { sidebarTabSelected: selected, setSidebarTabSelected: setSelected } = useAppSidebarContext()
   const { useCaseId } = useURLParamsContext()
+  const { changesDetected, setTestCaseSelected } = useCurrentTestCase()
 
   const onUseCaseClick = (useCase: UseCase, subCatalogName?: string) => {
     // if the usecase is already selected don't do nothing
     if (useCaseId !== null && useCaseId === useCase.id) return
     // if there are unsaved changes, let the user know that they may lose work
     if (changesDetected) {
-      setLibraryUseCaseSelected({ useCase, subCatalogName: subCatalogName || null })
+      setTestCaseSelected({ useCase, subCatalogName: subCatalogName || null })
       setConfirmationModalOpen(true)
     } else if (evaluationRunning) {
-      setLibraryUseCaseSelected({ useCase, subCatalogName: subCatalogName || null })
+      setTestCaseSelected({ useCase, subCatalogName: subCatalogName || null })
       setEvaluationRunningModalOpen(true)
     } else {
       // no unsaved changes and model is not running update the current use case without modals

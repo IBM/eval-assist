@@ -12,7 +12,7 @@ import { ChevronLeft, Compare } from '@carbon/react/icons'
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
 import { UseCase } from '../../../types'
-import { useURLParamsContext } from '../Providers/URLParamsProvider'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import { LinkButton } from './LinkButton'
 import classes from './ThreeLevelsPanel.module.scss'
 import sharedClasses from './shared.module.scss'
@@ -31,13 +31,13 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
     ...Object.keys(rubricLibraryTestCases).reduce((acc, item, index) => ({ ...acc, [item]: true }), {}),
   })
 
-  const { preloadedUseCase } = useURLParamsContext()
+  const { preloadedTestCase } = useCurrentTestCase()
 
   const selectedNode = useMemo(() => {
-    return preloadedUseCase !== null && preloadedUseCase.id === null
-      ? [`${preloadedUseCase.name}_${preloadedUseCase.type}`]
+    return preloadedTestCase !== null && preloadedTestCase.id === null
+      ? [`${preloadedTestCase.name}_${preloadedTestCase.type}`]
       : []
-  }, [preloadedUseCase])
+  }, [preloadedTestCase])
 
   const handleToggle = (key: string) =>
     setExpanded({

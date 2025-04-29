@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
-import { getEmptyUseCase } from 'src/utils'
+import { getEmptyTestCase } from 'src/utils'
 
 import { Dispatch, SetStateAction } from 'react'
 
@@ -25,11 +25,11 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
   const { sidebarTabSelected, setSidebarTabSelected } = useAppSidebarContext()
 
   const createEmptyRubric = () => {
-    updateURLFromUseCase({ useCase: getEmptyUseCase(EvaluationType.DIRECT), subCatalogName: null })
+    updateURLFromUseCase({ useCase: getEmptyTestCase(EvaluationType.DIRECT), subCatalogName: null })
   }
 
   const createEmptyPairwise = () => {
-    updateURLFromUseCase({ useCase: getEmptyUseCase(EvaluationType.PAIRWISE), subCatalogName: null })
+    updateURLFromUseCase({ useCase: getEmptyTestCase(EvaluationType.PAIRWISE), subCatalogName: null })
   }
 
   const openTestCasesLibrary = () => {

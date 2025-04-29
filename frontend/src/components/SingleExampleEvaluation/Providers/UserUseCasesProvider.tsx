@@ -4,11 +4,11 @@ import { Loading } from '@carbon/react'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { StoredUseCase } from '@prisma/client'
 
 import { UseCase } from '../../../types'
+import { useModelProviderCredentials } from './ModelProviderCredentialsProvider'
 
 interface UserUseCasesContextValue {
   userUseCases: UseCase[]

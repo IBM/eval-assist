@@ -5,7 +5,13 @@ from pydantic import BaseModel, field_validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
 
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
-from .types import DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum
+from .types import (
+    DirectActionTypeEnum,
+    DomainEnum,
+    GenerationLengthEnum,
+    PersonaEnum,
+    TaskEnum,
+)
 
 
 class CriteriaModel(BaseModel):
@@ -208,3 +214,17 @@ class DirectInstanceResultModel(BaseModel):
 
 class DirectResponseModel(BaseModel):
     results: list[DirectInstanceResultModel]
+
+
+class DirectAIActionRequest(BaseModel):
+    action: DirectActionTypeEnum
+    selection: str
+    text: str
+    provider: ModelProviderEnum | ExtendedModelProviderEnum
+    llm_provider_credentials: dict[str, str]
+    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+    type: EvaluatorTypeEnum
+
+
+class DirectAIActionResponse(BaseModel):
+    result: str

@@ -1,44 +1,43 @@
 import cx from 'classnames'
 import { modelProviderBeautifiedName } from 'src/constants'
-import { getJSONStringWithSortedKeys } from 'src/utils'
+import { getJSONStringWithSortedKeys, returnByPipelineType } from 'src/utils'
 
 import { CSSProperties, useMemo } from 'react'
 
 import { Select, SelectItem, SelectItemGroup, SelectSkeleton } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
-import { useModelProviderCredentials } from '@customHooks/useModelProviderCredentials'
-
 import { EvaluationType, Evaluator, ModelProviderType } from '../../types'
 import classes from './EvaluatorSelect.module.scss'
+import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from './Providers/EvaluatorOptionsProvider'
+import { useModelProviderCredentials } from './Providers/ModelProviderCredentialsProvider'
 import { useURLParamsContext } from './Providers/URLParamsProvider'
 
 interface Props {
-  type: EvaluationType
   style?: CSSProperties
   className?: string
-  selectedEvaluator: Evaluator | null
-  setSelectedEvaluator: (pipeline: Evaluator | null) => void
   dropdownLabel: string
-  evaluatorOptions: Evaluator[]
   selectionComponentName?: string
   selectionComponentNameWithArticle?: string
+  selectedEvaluator: Evaluator | null
+  evaluationType: EvaluationType
+  setSelectedEvaluator: (evaluator: Evaluator | null) => void
+  evaluatorOptions: Evaluator[]
 }
 
 export const PipelineSelect = ({
   style,
   className,
+  dropdownLabel,
   selectedEvaluator,
   setSelectedEvaluator,
-  type,
-  dropdownLabel,
+  evaluationType,
   evaluatorOptions,
   selectionComponentNameWithArticle = 'an evaluator',
   selectionComponentName = 'evaluator',
 }: Props) => {
   const { loadingEvaluators, directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
-  const { isRisksAndHarms } = useURLParamsContext()
   const providerToEvaluators = useMemo<Record<ModelProviderType, Evaluator[]>>(() => {
     const result: Record<ModelProviderType, Evaluator[]> = {
       [ModelProviderType.RITS]: [],
@@ -106,7 +105,7 @@ export const PipelineSelect = ({
                 <div className={classes.providerFont}>
                   <span>
                     {'Model provider: '}
-                    {`${modelProviderBeautifiedName[selectedEvaluator?.provider as ModelProviderType]}`}
+                    {`${modelProviderBeautifiedName[selectedEvaluator.provider as ModelProviderType]}`}
                   </span>
                   {selectedEvaluator !== null && !getAreRelevantCredentialsProvided(selectedEvaluator.provider) && (
                     <span className={cx(classes.credentialsNotProvided)}>

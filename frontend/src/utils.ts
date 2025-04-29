@@ -67,7 +67,7 @@ export const getEmptyPairwiseInstance = (): PairwiseInstance => ({
 })
 export const getEmptyDirectInstance = (): DirectInstance => ({ ...getEmptyInstance(), response: '', result: null })
 
-export const getEmptyUseCase = (type: EvaluationType): UseCase => ({
+export const getEmptyTestCase = (type: EvaluationType): UseCase => ({
   id: null,
   name: '',
   type,

@@ -12,6 +12,7 @@ import { ChevronLeft, List } from '@carbon/react/icons'
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
 import { UseCase } from '../../../types'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { LinkButton } from './LinkButton'
 import classes from './ThreeLevelsPanel.module.scss'
@@ -31,13 +32,14 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
     ...Object.keys(harmsAndRisksLibraryTestCases).reduce((acc, item, index) => ({ ...acc, [item]: true }), {}),
   })
 
-  const { preloadedUseCase, subCatalogName } = useURLParamsContext()
+  const { subCatalogName } = useURLParamsContext()
+  const { preloadedTestCase } = useCurrentTestCase()
 
   const selectedNode = useMemo(() => {
-    return preloadedUseCase !== null && preloadedUseCase.id === null
-      ? [`${preloadedUseCase.name}_${subCatalogName}`]
+    return preloadedTestCase !== null && preloadedTestCase.id === null
+      ? [`${preloadedTestCase.name}_${subCatalogName}`]
       : []
-  }, [preloadedUseCase, subCatalogName])
+  }, [preloadedTestCase, subCatalogName])
 
   const handleToggle = (key: string) =>
     setExpanded({

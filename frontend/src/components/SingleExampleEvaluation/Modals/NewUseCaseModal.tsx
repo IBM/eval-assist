@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { capitalizeFirstWord, getEmptyUseCase, returnByPipelineType } from 'src/utils'
+import { capitalizeFirstWord, getEmptyTestCase, returnByPipelineType } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
 
@@ -36,7 +36,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
       if (selectedCriteria !== null) {
         toCreateTestCase = getEmptyUseCaseWithCriteria(selectedCriteria.name, selectedType)
       } else {
-        toCreateTestCase = getEmptyUseCase(selectedType)
+        toCreateTestCase = getEmptyTestCase(selectedType)
       }
       updateURLFromUseCase({
         useCase: {
@@ -46,7 +46,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
         subCatalogName: null,
       })
     } else {
-      updateURLFromUseCase({ useCase: getEmptyUseCase(selectedType as EvaluationType), subCatalogName: null })
+      updateURLFromUseCase({ useCase: getEmptyTestCase(selectedType as EvaluationType), subCatalogName: null })
       addToast({
         kind: 'info',
         title: 'Evaluator options are not yet available',

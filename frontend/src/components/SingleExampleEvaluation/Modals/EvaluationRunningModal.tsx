@@ -3,6 +3,8 @@ import { Dispatch, SetStateAction } from 'react'
 import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 
 import { UseCase } from '../../../types'
+import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
+import { useModelProviderCredentials } from '../Providers/ModelProviderCredentialsProvider'
 
 interface Props {
   updateURLFromUseCase: (
@@ -11,24 +13,15 @@ interface Props {
       subCatalogName: string | null
     } | null,
   ) => void
-  selectedUseCase: {
-    useCase: UseCase
-    subCatalogName: string | null
-  } | null
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
-  changesDetected: boolean
 }
 
-export const EvaluationRunningModal = ({
-  open,
-  setOpen,
-  updateURLFromUseCase,
-  selectedUseCase,
-  setConfirmationModalOpen,
-  changesDetected,
-}: Props) => {
+export const EvaluationRunningModal = ({ open, setOpen, updateURLFromUseCase, setConfirmationModalOpen }: Props) => {
+  const {} = useModelProviderCredentials()
+  const { changesDetected, testCaseSelected } = useCurrentTestCase()
+
   const onClose = () => {
     setOpen(false)
   }
@@ -37,13 +30,13 @@ export const EvaluationRunningModal = ({
     if (changesDetected) {
       setConfirmationModalOpen(true)
     } else {
-      updateURLFromUseCase(selectedUseCase)
+      updateURLFromUseCase(testCaseSelected)
     }
     setOpen(false)
   }
 
   return (
-    selectedUseCase && (
+    testCaseSelected && (
       <ComposedModal size="sm" open={open} onClose={onClose}>
         <ModalHeader title={'Evaluation is still running'} />
         <ModalBody>

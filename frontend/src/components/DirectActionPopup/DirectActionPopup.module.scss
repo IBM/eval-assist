@@ -1,0 +1,21 @@
+@import '@carbon/styles/scss/theme';
+
+.popoverContainer {
+  display: flex;
+  flex-direction: row;
+  z-index: 9999;
+  position: absolute;
+  background-color: $background;
+}
+
+.popoverContainer > *:first-child {
+  border-left: 1px $border-subtle-02 solid;
+}
+
+.iconButton {
+  width: 48px;
+  height: 48px;
+  border-right: 1px $border-subtle-02 solid !important;
+  border-top: 1px $border-subtle-02 solid;
+  border-bottom: 1px $border-subtle-02 solid;
+}
