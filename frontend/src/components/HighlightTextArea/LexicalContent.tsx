@@ -111,7 +111,7 @@ export const LexicalContent = ({
       <MatchPlugin toHighlightWords={toHighlightWords} />
       {isTextInput && <NoEnterPlugin />}
       <HistoryPlugin />
-      <SelectionPopoverPlugin />
+      {/* <SelectionPopoverPlugin /> */}
       <MultipleEditorStorePlugin id={editorId} />
       {editable && (
         <OnChangePlugin

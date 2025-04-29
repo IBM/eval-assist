@@ -5,9 +5,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { IconButton, Popover, PopoverContent } from '@carbon/react'
 import { AiLabel, Rotate, Save, TextLongParagraph, TextShortParagraph } from '@carbon/react/icons'
 
+import { DirectActionPopup } from '@components/DirectActionPopup/DirectActionPopup'
 import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
 import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { DirectActionTypeEnum } from '@types'
 
 import { useEditorsContext } from './EditorProvider'
 import classes from './SelectionPopoverPlugin.module.scss'
@@ -78,7 +80,11 @@ export default function SelectionPopoverPlugin({}: Props): JSX.Element | null {
   }, [editor])
 
   const onRephrase = useCallback(async () => {
-    const res = await performDirectAIAction({ text: popoverState.text, selection: popoverState.selection })
+    const res = await performDirectAIAction({
+      text: popoverState.text,
+      selection: popoverState.selection,
+      action: DirectActionTypeEnum.Elaborate,
+    })
     setCurrentTestCase({
       ...currentTestCase,
       criteria: {
@@ -96,7 +102,6 @@ export default function SelectionPopoverPlugin({}: Props): JSX.Element | null {
 
   if (!popoverState.show || !popoverState.rect) return null
   const { top, left } = popoverState.rect
-  console.log(popoverState.rect)
   return (
     <Popover
       open={true}
