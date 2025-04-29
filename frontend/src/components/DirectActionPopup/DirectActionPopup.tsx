@@ -60,17 +60,17 @@ export const DirectActionPopup = ({
   )
 
   useEffect(() => {
-    if (!textAreaRef.current) {
+    if (!textAreaRef.current || !generatedText) {
       return
     }
 
     const startIndex = wholeText.indexOf(generatedText)
 
     if (startIndex !== -1) {
-      const endIndex = startIndex + generatedText.length - 1
+      const endIndex = startIndex + generatedText.length
       textAreaRef.current.setSelectionRange(startIndex, endIndex)
     }
-  }, [generatedText, textAreaRef, wholeText])
+  }, [generatedText, selectedText, textAreaRef, wholeText])
 
   const closeAll = useCallback(() => {
     setPopupVisible(false)
