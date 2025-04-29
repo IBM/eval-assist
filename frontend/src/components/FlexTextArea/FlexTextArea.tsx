@@ -139,6 +139,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
           <TextArea className={classes.sizer} value={props.value} ref={sizerRef} tabIndex={-1} labelText="" />
           {x !== null && y !== null && isFocused && (
             <DirectActionPopup
+              textAreaRef={innerRef}
               popupVisible={popupVisible}
               selectedText={selectedText}
               wholeText={(props.value as string) || ''}

@@ -1,11 +1,21 @@
 @import '@carbon/styles/scss/theme';
 
 .popoverContainer {
-  display: flex;
-  flex-direction: row;
-  z-index: 9999;
   position: absolute;
   background-color: $background;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.optionsContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.promptContainer {
+  display: flex;
+  flex-direction: row;
 }
 
 .popoverContainer > *:first-child {

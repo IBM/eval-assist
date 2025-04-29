@@ -570,17 +570,48 @@ export const SingleExampleEvaluation = () => {
               style={{ marginBottom: '1rem' }}
               className={classes['left-padding']}
             />
-            <PipelineSelect
-              dropdownLabel={'Evaluator'}
-              style={{ marginBottom: '2rem' }}
-              className={classes['left-padding']}
-              evaluationType={currentTestCase.type}
-              evaluatorOptions={evaluatorOptions}
-              selectedEvaluator={currentTestCase.evaluator}
-              setSelectedEvaluator={(evaluator: Evaluator | null) => {
-                setCurrentTestCase({ ...currentTestCase, evaluator })
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '1rem',
               }}
-            />
+            >
+              <PipelineSelect
+                dropdownLabel={'Evaluator'}
+                style={{ marginBottom: '2rem' }}
+                className={classes['left-padding']}
+                evaluationType={currentTestCase.type}
+                evaluatorOptions={evaluatorOptions}
+                selectedEvaluator={currentTestCase.evaluator}
+                setSelectedEvaluator={(evaluator: Evaluator | null) => {
+                  setCurrentTestCase({ ...currentTestCase, evaluator })
+                }}
+              />
+              <PipelineSelect
+                evaluationType={currentTestCase.syntheticGenerationConfig.evaluator?.type || EvaluationType.DIRECT}
+                selectedEvaluator={currentTestCase.syntheticGenerationConfig.evaluator}
+                setSelectedEvaluator={(newValue) =>
+                  setCurrentTestCase({
+                    ...currentTestCase,
+                    syntheticGenerationConfig: {
+                      ...currentTestCase.syntheticGenerationConfig,
+                      evaluator: newValue,
+                    },
+                  })
+                }
+                evaluatorOptions={
+                  returnByPipelineType(
+                    currentTestCase.type,
+                    nonGraniteGuardianDirectEvaluators,
+                    nonGraniteGuardianPairwiseEvaluators,
+                  ) || []
+                }
+                dropdownLabel={'Synthetic generation'}
+                selectionComponentNameWithArticle="a model"
+                selectionComponentName="model"
+              />
+            </div>
             <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>
               <strong>Test data</strong>
             </div>

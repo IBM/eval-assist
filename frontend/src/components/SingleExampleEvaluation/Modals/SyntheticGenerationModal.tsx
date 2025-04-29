@@ -133,8 +133,6 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
     generateTestData()
   }, [generateTestData, setOpen])
 
-  const { nonGraniteGuardianDirectEvaluators, nonGraniteGuardianPairwiseEvaluators } = useEvaluatorOptionsContext()
-
   useEffect(() => {
     loadDomainPersonaMapping()
   }, [loadDomainPersonaMapping])
@@ -147,34 +145,6 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
       <ModalHeader title="Generate synthetic examples" />
       <ModalBody>
         <div className={classes.user_setup_container}>
-          <div className={classes.section}>
-            <div className={classes.section_description_container}>
-              <p className={classes.section_title}>Model</p>
-              <p className={classes.section_description}>Specify what model you would like to use to generate data</p>
-            </div>
-            <div>
-              <PipelineSelect
-                evaluationType={currentTestCase.syntheticGenerationConfig.evaluator?.type || EvaluationType.DIRECT}
-                selectedEvaluator={syntheticGenerationConfig.evaluator}
-                setSelectedEvaluator={(newValue) =>
-                  setSyntheticGenerationConfig({
-                    ...syntheticGenerationConfig,
-                    evaluator: newValue,
-                  })
-                }
-                evaluatorOptions={
-                  returnByPipelineType(
-                    evaluationType,
-                    nonGraniteGuardianDirectEvaluators,
-                    nonGraniteGuardianPairwiseEvaluators,
-                  ) || []
-                }
-                dropdownLabel={'Model for synthetic generation (required)'}
-                selectionComponentNameWithArticle="a model"
-                selectionComponentName="model"
-              />
-            </div>
-          </div>
           <div className={classes.vertical_divider} />
           <div className={classes.section}>
             <div className={classes.section_description_container}>
