@@ -56,6 +56,7 @@ class DirectActionGenerator:
         evaluator_name: ExtendedEvaluatorNameEnum,
         type: EvaluatorTypeEnum,
         action: DirectActionTypeEnum,
+        prompt: Optional[str],
     ):
         self.provider = provider
         self.llm_provider_credentials = llm_provider_credentials
@@ -63,6 +64,7 @@ class DirectActionGenerator:
         self.evaluator_name = evaluator_name
         self.type = type
         self.action = action
+        self.prompt = prompt
 
         # intialize model
         evaluator_metadata = get_evaluator_metadata_wrapper(
@@ -104,77 +106,143 @@ class DirectActionGenerator:
         }
 
     def generate(self, direct_ai_action: DirectAIActionRequest):
-        response_schemas = [
-            ResponseSchema(
-                name="response",
-                description=f"the selection to {self.action.value.lower()}",
+        if self.action == DirectActionTypeEnum.CUSTOM:
+            response_schemas = [
+                ResponseSchema(
+                    name="response",
+                    description="the selection to apply the action to",
+                )
+            ]
+
+            output_parser = StructuredOutputParser.from_response_schemas(
+                response_schemas
             )
-        ]
+            action_tag = "<custom_action>"
+            format_instructions = output_parser.get_format_instructions()
+            text_with_selection = direct_ai_action.text.replace(
+                direct_ai_action.selection,
+                action_tag + direct_ai_action.selection + action_tag,
+            )
+            # prompt templates
+            system_prompt_template = PromptTemplate(
+                input_variables=[
+                    "text_with_selection",
+                    "selection",
+                ],
+                partial_variables={
+                    "format_instructions": format_instructions,
+                    "action_description": self.prompt,
+                    "action_tag": action_tag,
+                },
+                template=dedent(
+                    """You will be provided with:
 
-        output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
-        action_str = direct_ai_action.action.value.lower()
-        action_tag = f"<{action_str}>"
-        format_instructions = output_parser.get_format_instructions()
-        text_with_selection = direct_ai_action.text.replace(
-            direct_ai_action.selection,
-            action_tag + direct_ai_action.selection + action_tag,
-        )
-        # prompt templates
-        system_prompt_template = PromptTemplate(
-            input_variables=[
-                "text_with_selection",
-                "selection",
-            ],
-            partial_variables={
-                "action_third_person": self.action_third_person_dict[self.action],
-                "action_infinitive": self.action_infinitive_person_dict[self.action],
-                "action_past": self.action_past_dict[self.action],
-                "action_tag": action_tag,
-                "format_instructions": format_instructions,
-            },
-            template=dedent(
-                """You will be provided with:
+                - A selected text
 
-            - A selected text
+                - A text containing that selection, with the selection marked using {action_tag} tags
 
-            - A text containing that selection, with the selection marked using {action_tag} tags
+                Your task is to {action_description} the selected text such that:
 
-            Your task is {action_infinitive} the selected text such that:
+                - It preserves the original meaning and intent
 
-            - It preserves the original meaning and intent
+                - It fits seamlessly into the original text, both semantically and grammatically
 
-            - It fits seamlessly into the original text, both semantically and grammatically
+                ✅ The generated selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
+                🚫 Do not introduce any new information that is not present in the original text.
 
-            ✅ The {action_past} selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
-            🚫 Do not introduce any new information that is not present in the original text.
+                - if the selection is equal to the whole text, your task is re-generate the whole text.
+                
+                Selection:
+                {selection}
 
-            - if the selection is equal to the whole text, your task is {action_infinitive} the whole text.
-            
-            Selection:
-            {selection}
+                Text with selection (wrapped in-between {action_tag} tags):
+                {text_with_selection}
 
-            Text with selection (wrapped in-between {action_tag} tags):
-            {text_with_selection}
+                {format_instructions}
+                """,
+                ),
+            )
 
-            {format_instructions}
-            """,
-            ),
-        )
+            system_prompt = system_prompt_template.format(
+                text_with_selection=text_with_selection,
+                selection=direct_ai_action.selection,
+            )
+        else:
+            response_schemas = [
+                ResponseSchema(
+                    name="response",
+                    description=f"the selection to {self.action.value.lower()}",
+                )
+            ]
 
-        # query_template = PromptTemplate(
-        #     input_variables=[],
-        #     partial_variables={
-        #         "format_instructions": format_instructions,
-        #         "action_third_person": self.action_third_person_dict[self.action],
-        #     },
-        #     template="Generate a response that {action_third_person} the selection while keeping its original meaning and the core information.\n\n{format_instructions}",
-        # )
+            output_parser = StructuredOutputParser.from_response_schemas(
+                response_schemas
+            )
+            action_str = direct_ai_action.action.value.lower()
+            action_tag = f"<{action_str}>"
+            format_instructions = output_parser.get_format_instructions()
+            text_with_selection = direct_ai_action.text.replace(
+                direct_ai_action.selection,
+                action_tag + direct_ai_action.selection + action_tag,
+            )
+            # prompt templates
+            system_prompt_template = PromptTemplate(
+                input_variables=[
+                    "text_with_selection",
+                    "selection",
+                ],
+                partial_variables={
+                    "action_third_person": self.action_third_person_dict[self.action],
+                    "action_infinitive": self.action_infinitive_person_dict[
+                        self.action
+                    ],
+                    "action_past": self.action_past_dict[self.action],
+                    "action_tag": action_tag,
+                    "format_instructions": format_instructions,
+                },
+                template=dedent(
+                    """You will be provided with:
 
-        system_prompt = system_prompt_template.format(
-            text_with_selection=text_with_selection,
-            selection=direct_ai_action.selection,
-        )
-        # query = query_template.format()
+                - A selected text
+
+                - A text containing that selection, with the selection marked using {action_tag} tags
+
+                Your task is {action_infinitive} the selected text such that:
+
+                - It preserves the original meaning and intent
+
+                - It fits seamlessly into the original text, both semantically and grammatically
+
+                ✅ The {action_past} selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
+                🚫 Do not introduce any new information that is not present in the original text.
+
+                - if the selection is equal to the whole text, your task is {action_infinitive} the whole text.
+                
+                Selection:
+                {selection}
+
+                Text with selection (wrapped in-between {action_tag} tags):
+                {text_with_selection}
+
+                {format_instructions}
+                """,
+                ),
+            )
+
+            # query_template = PromptTemplate(
+            #     input_variables=[],
+            #     partial_variables={
+            #         "format_instructions": format_instructions,
+            #         "action_third_person": self.action_third_person_dict[self.action],
+            #     },
+            #     template="Generate a response that {action_third_person} the selection while keeping its original meaning and the core information.\n\n{format_instructions}",
+            # )
+
+            system_prompt = system_prompt_template.format(
+                text_with_selection=text_with_selection,
+                selection=direct_ai_action.selection,
+            )
+            # query = query_template.format()
 
         prompt = system_prompt  # + "\n\n" + query
 

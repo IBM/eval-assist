@@ -26,10 +26,12 @@ interface SyntheticGenerationContextValue {
     text,
     selection,
     action,
+    prompt,
   }: {
     text: string
     selection: string
     action: DirectActionTypeEnum
+    prompt?: string
   }) => Promise<string>
   loadingDirectAIAction: boolean
 }
@@ -100,7 +102,17 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
   }, [get])
 
   const fetchDirectAIAction = useCallback(
-    async ({ text, selection, action }: { text: string; selection: string; action: DirectActionTypeEnum }) => {
+    async ({
+      text,
+      selection,
+      action,
+      prompt,
+    }: {
+      text: string
+      selection: string
+      action: DirectActionTypeEnum
+      prompt?: string
+    }) => {
       setLoadingDirectAIAction(true)
 
       const body = {
@@ -111,6 +123,7 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
         text,
         selection,
         action,
+        prompt,
       }
 
       const response = await post('direct-ai-action/', body)
@@ -149,13 +162,23 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
   )
 
   const performDirectAIAction = useCallback(
-    async ({ text, selection, action }: { text: string; selection: string; action: DirectActionTypeEnum }) => {
+    async ({
+      text,
+      selection,
+      action,
+      prompt,
+    }: {
+      text: string
+      selection: string
+      action: DirectActionTypeEnum
+      prompt?: string
+    }) => {
       const generationInProgressToastId = addToast({
         kind: 'info',
         title: 'Generating direct action...',
       })
       const startEvaluationTime = new Date().getTime() / 1000
-      const result = await fetchDirectAIAction({ text, selection, action })
+      const result = await fetchDirectAIAction({ text, selection, action, prompt })
       const endEvaluationTime = new Date().getTime() / 1000
       const totalEvaluationTime = Math.round(endEvaluationTime - startEvaluationTime)
 

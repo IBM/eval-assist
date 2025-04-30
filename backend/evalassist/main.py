@@ -392,6 +392,7 @@ def perform_direct_ai_action(params: DirectAIActionRequest):
             llm_provider_credentials=params.llm_provider_credentials,
             type=params.type,
             action=params.action,
+            prompt=params.prompt,
         )
         try:
             return DirectAIActionResponse(
