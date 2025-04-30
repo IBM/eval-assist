@@ -1,64 +1,65 @@
 import { Dispatch, RefObject, SetStateAction, useCallback, useEffect, useState } from 'react'
 
 import { IconButton, TextInput } from '@carbon/react'
-import {
-  AiLabel,
-  Checkmark,
-  Delete,
-  MisuseOutline,
-  Rotate,
-  Send,
-  TextLongParagraph,
-  TextShortParagraph,
-  Undo,
-} from '@carbon/react/icons'
+import { AiLabel, Checkmark, Rotate, Send, TextLongParagraph, TextShortParagraph, Undo } from '@carbon/react/icons'
 
 import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
 import { DirectActionTypeEnum } from '@types'
 
-import classes from './DirectActionPopup.module.scss'
+import classes from './index.module.scss'
 
 interface Props {
   popupPosition: { top: number; left: number }
   selectedText: string
   wholeText: string
-  popupVisible: boolean
-  setPopupVisible: Dispatch<SetStateAction<boolean>>
   onChange: (newValue: string) => void
-  promptPopupVisible: boolean
-  setPromptPopupVisible: Dispatch<SetStateAction<boolean>>
   textAreaRef: RefObject<HTMLTextAreaElement>
   setSelectedText: Dispatch<SetStateAction<string>>
+  popupVisibility: DirectAIManipulationPopupVisibility
+  setPopupVisibility: Dispatch<SetStateAction<DirectAIManipulationPopupVisibility>>
+  generatedText: string
+  setGeneratedText: Dispatch<SetStateAction<string>>
 }
 
-export const DirectActionPopup = ({
+export interface DirectAIManipulationPopupVisibility {
+  options: boolean
+  prompt: boolean
+  confirmation: boolean
+}
+
+export const DirectAIManipulationPopup = ({
   popupPosition,
   wholeText,
   selectedText,
-  popupVisible,
-  promptPopupVisible,
   textAreaRef,
-  setPopupVisible,
-  setPromptPopupVisible,
+  popupVisibility,
+  generatedText,
+  setGeneratedText,
+  setPopupVisibility,
   onChange,
   setSelectedText,
 }: Props) => {
   const { performDirectAIAction, loadingDirectAIAction } = useSyntheticGeneration()
   const [prompt, setPrompt] = useState('')
-  const [generatedText, setGeneratedText] = useState('')
-  const [confirmationOpen, setConfirmationOpen] = useState(false)
-  const onDirectActionClick = useCallback(
+
+  const onOptionClick = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement>, action: DirectActionTypeEnum, prompt?: string) => {
       e.preventDefault() // Prevent focus shift
 
       const res = await performDirectAIAction({ text: wholeText, selection: selectedText, action })
       onChange && res && onChange(wholeText.replace(selectedText, res))
       setGeneratedText(res)
-      setPromptPopupVisible(false)
-      setPopupVisible(false)
-      setConfirmationOpen(true)
+      setPopupVisibility({ options: false, prompt: false, confirmation: true })
     },
-    [onChange, performDirectAIAction, selectedText, setPopupVisible, setPromptPopupVisible, wholeText],
+    [onChange, performDirectAIAction, selectedText, setGeneratedText, setPopupVisibility, wholeText],
+  )
+
+  const onCustomOptionClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault()
+      setPopupVisibility({ options: false, prompt: true, confirmation: false })
+    },
+    [setPopupVisibility],
   )
 
   useEffect(() => {
@@ -74,10 +75,8 @@ export const DirectActionPopup = ({
   }, [generatedText, selectedText, textAreaRef, wholeText])
 
   const closeAll = useCallback(() => {
-    setPopupVisible(false)
-    setPromptPopupVisible(false)
-    setConfirmationOpen(false)
-  }, [setPopupVisible, setPromptPopupVisible])
+    setPopupVisibility({ options: false, prompt: false, confirmation: false })
+  }, [setPopupVisibility])
 
   const clean = useCallback(() => {
     closeAll()
@@ -85,7 +84,7 @@ export const DirectActionPopup = ({
     setPrompt('')
     setSelectedText('')
     textAreaRef.current?.setSelectionRange(null, null)
-  }, [closeAll, setSelectedText, textAreaRef])
+  }, [closeAll, setGeneratedText, setSelectedText, textAreaRef])
 
   const onCancelClick = useCallback(() => {
     clean()
@@ -97,7 +96,7 @@ export const DirectActionPopup = ({
   }, [clean])
 
   return (
-    (popupVisible || promptPopupVisible || confirmationOpen) && (
+    Object.values(popupVisibility).some((x) => x) && (
       <div
         style={{
           top: popupPosition.top + 3,
@@ -105,13 +104,13 @@ export const DirectActionPopup = ({
         }}
         className={classes.popoverContainer}
       >
-        {popupVisible && (
+        {popupVisibility.options && (
           <div className={classes.optionsContainer}>
             <IconButton
               className={classes.iconButton}
               kind={'ghost'}
               label={DirectActionTypeEnum.Rephrase}
-              onMouseDown={(e) => onDirectActionClick(e, DirectActionTypeEnum.Rephrase)}
+              onMouseDown={(e) => onOptionClick(e, DirectActionTypeEnum.Rephrase)}
             >
               <Rotate />
             </IconButton>
@@ -119,7 +118,7 @@ export const DirectActionPopup = ({
               className={classes.iconButton}
               kind={'ghost'}
               label={DirectActionTypeEnum.Elaborate}
-              onMouseDown={(e) => onDirectActionClick(e, DirectActionTypeEnum.Elaborate)}
+              onMouseDown={(e) => onOptionClick(e, DirectActionTypeEnum.Elaborate)}
             >
               <TextLongParagraph />
             </IconButton>
@@ -127,7 +126,7 @@ export const DirectActionPopup = ({
               className={classes.iconButton}
               kind={'ghost'}
               label={DirectActionTypeEnum.Shorten}
-              onMouseDown={(e) => onDirectActionClick(e, DirectActionTypeEnum.Shorten)}
+              onMouseDown={(e) => onOptionClick(e, DirectActionTypeEnum.Shorten)}
             >
               <TextShortParagraph />
             </IconButton>
@@ -135,16 +134,13 @@ export const DirectActionPopup = ({
               className={classes.iconButton}
               kind={'ghost'}
               label={'Custom prompt'}
-              onMouseDown={(e) => {
-                e.preventDefault()
-                setPromptPopupVisible(!promptPopupVisible)
-              }}
+              onMouseDown={onCustomOptionClick}
             >
               <AiLabel />
             </IconButton>
           </div>
         )}
-        {promptPopupVisible && (
+        {popupVisibility.prompt && (
           <div className={classes.promptContainer}>
             <TextInput
               autoFocus
@@ -157,13 +153,13 @@ export const DirectActionPopup = ({
               className={classes.iconButton}
               kind={'ghost'}
               label={'Custom prompt'}
-              onMouseDown={(e) => onDirectActionClick(e, DirectActionTypeEnum.Custom, prompt)}
+              onMouseDown={(e) => onOptionClick(e, DirectActionTypeEnum.Custom, prompt)}
             >
               <Send />
             </IconButton>
           </div>
         )}
-        {confirmationOpen && (
+        {popupVisibility.confirmation && (
           <div className={classes.promptContainer}>
             <IconButton className={classes.iconButton} kind={'ghost'} label={'Cancel'} onMouseDown={onCancelClick}>
               <Undo />

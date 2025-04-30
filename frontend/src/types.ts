@@ -400,3 +400,8 @@ export enum DirectActionTypeEnum {
   Shorten = 'Shorten',
   Custom = 'Custom',
 }
+
+export interface CaretCoordinates {
+  x: number
+  y: number
+}
