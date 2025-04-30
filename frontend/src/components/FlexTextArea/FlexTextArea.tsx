@@ -1,14 +1,14 @@
 import cx from 'classnames'
 import debounce from 'lodash/debounce'
 
-import { ComponentProps, forwardRef, useCallback, useEffect, useRef, useState } from 'react'
+import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { fast01 } from '@carbon/motion'
 import { TextArea } from '@carbon/react'
 
-import { DirectActionPopup } from '@components/DirectActionPopup/DirectActionPopup'
-import { useMousePosition } from '@customHooks/useMousePosition'
+import { DirectAIManipulationPopup, DirectAIManipulationPopupVisibility } from '@components/DirectAIManipulationPopup'
 import { useMergeRefs } from '@floating-ui/react'
+import { getCaretPosition } from '@utils'
 
 import classes from './FlexTextArea.module.scss'
 
@@ -21,12 +21,17 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
   { helperText, className, maxInactiveHeight = 125, onBlur, fixMaxHeight, ...props },
   outsideRef,
 ) {
-  const [popupVisible, setPopupVisible] = useState<boolean>(false)
-  const [promptPopupVisible, setPromptPopupVisible] = useState<boolean>(false)
-
+  const [popupVisibility, setPopupVisibility] = useState<DirectAIManipulationPopupVisibility>({
+    options: false,
+    prompt: false,
+    confirmation: false,
+  })
   const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
   const [selectedText, setSelectedText] = useState<string>('')
+  const [generatedText, setGeneratedText] = useState('')
+
   const [isFocused, setFocused] = useState(false)
+  const isPopupOpen = useMemo(() => Object.values(popupVisibility).some((x) => x), [popupVisibility])
 
   const setFocusedDebounce = useCallback(
     // The multiplier is here because JS execution is delayed compared to the CSS transitions
@@ -40,24 +45,32 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
   const ref = useMergeRefs([outsideRef, innerRef])
 
   const handleMouseUp = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
-    const mousePosition = { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }
     const textarea = innerRef.current
     if (!textarea) return
-
+    const { x, y } = getCaretPosition(textarea)
     const selectionStart = textarea.selectionStart
     const selectionEnd = textarea.selectionEnd
     const text = textarea.value.substring(selectionStart, selectionEnd)
     if (text) {
-      const top = mousePosition.y
-      const left = mousePosition.x
-
       setSelectedText(text)
-      setPopupPosition({ top, left })
-      setPopupVisible(true)
+      setPopupPosition({ top: y + 10, left: x })
+      setPopupVisibility({ options: true, prompt: false, confirmation: false })
     } else {
-      setPopupVisible(false)
+      setPopupVisibility({ options: false, prompt: false, confirmation: false })
     }
   }, [])
+
+  useEffect(() => {
+    if (!innerRef.current || !generatedText || !popupVisibility.confirmation) {
+      return
+    }
+    const { x, y } = getCaretPosition(innerRef.current)
+
+    setPopupPosition({
+      left: x,
+      top: y + 10,
+    })
+  }, [generatedText, popupPosition.left, popupVisibility.confirmation])
 
   useEffect(() => {
     if (!fixMaxHeight) {
@@ -114,8 +127,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
           [classes.flexExpanded]: isFocused,
         })}
         onBlur={() => {
-          setPopupVisible(false)
-          setPromptPopupVisible(false)
+          setPopupVisibility({ options: false, prompt: false, confirmation: false })
         }}
       >
         <div className={classes.textAreaWrapper}>
@@ -128,29 +140,43 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
               setFocused(true)
             }}
             onBlur={(e) => {
-              !popupVisible && setFocused(false)
+              !isPopupOpen && setFocused(false)
             }}
           />
           {/* Sizer element to get ideal textarea height, it is the same
           component type to eliminate mismatch in style (dimensions) */}
           <TextArea className={classes.sizer} value={props.value} ref={sizerRef} tabIndex={-1} labelText="" />
+
           {isFocused && (
-            <DirectActionPopup
+            <DirectAIManipulationPopup
               setSelectedText={setSelectedText}
               textAreaRef={innerRef}
-              popupVisible={popupVisible}
               selectedText={selectedText}
               wholeText={(props.value as string) || ''}
               popupPosition={popupPosition}
-              promptPopupVisible={promptPopupVisible}
-              setPromptPopupVisible={setPromptPopupVisible}
+              generatedText={generatedText}
+              setGeneratedText={setGeneratedText}
               onChange={(newValue: string) =>
                 props.onChange &&
                 props.onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLTextAreaElement>)
               }
-              setPopupVisible={setPopupVisible}
+              popupVisibility={popupVisibility}
+              setPopupVisibility={setPopupVisibility}
             />
           )}
+          <div
+            style={{
+              position: 'fixed',
+              top: popupPosition.top - 650,
+              left: popupPosition.left + 40,
+              zIndex: 1000,
+              backgroundColor: 'black',
+              width: '10px',
+              height: '10px',
+            }}
+          >
+            hola
+          </div>
         </div>
       </div>
     </>

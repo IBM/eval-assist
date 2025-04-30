@@ -55,13 +55,20 @@
 
 .sizer {
   position: absolute;
-  inset: 0;
   width: 100%;
   opacity: 0;
   z-index: -1;
   textarea {
     height: 0;
   }
+}
+
+.sizer2 {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  opacity: 0;
+  z-index: -1;
 }
 
 .flexExpanded {

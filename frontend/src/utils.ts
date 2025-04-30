@@ -1,4 +1,5 @@
 import {
+  CaretCoordinates,
   Criteria,
   CriteriaWithOptions,
   DirectInstance,
@@ -202,3 +203,60 @@ export const toSnakeCase = (text: string) => {
 
 // python's zip-like function
 export const zip = (rows: any[][]) => rows[0].map((_, c) => rows.map((row) => row[c]))
+
+export const getCaretPosition = (
+  input: HTMLInputElement | HTMLTextAreaElement,
+  selection: 'selectionStart' | 'selectionEnd' = 'selectionEnd',
+): CaretCoordinates => {
+  const { scrollLeft, scrollTop } = input
+  const selectionPoint = input[selection] ?? input.selectionStart ?? 0
+  const { height, width, left, top } = input.getBoundingClientRect()
+
+  const div = document.createElement('div')
+  const copyStyle = getComputedStyle(input)
+  for (const prop of copyStyle) {
+    div.style.setProperty(prop, copyStyle.getPropertyValue(prop))
+  }
+
+  const swap = '.'
+  const inputValue = input.tagName === 'INPUT' ? input.value.replace(/ /g, swap) : input.value
+
+  const textContent = inputValue.substring(0, selectionPoint)
+  div.textContent = textContent
+
+  if (input.tagName === 'TEXTAREA') div.style.height = 'auto'
+  if (input.tagName === 'INPUT') div.style.width = 'auto'
+
+  div.style.position = 'absolute'
+  div.style.whiteSpace = 'pre-wrap'
+  div.style.visibility = 'hidden'
+
+  const span = document.createElement('span')
+  span.textContent = inputValue.substring(selectionPoint) || '.'
+  div.appendChild(span)
+  document.body.appendChild(div)
+
+  const { offsetLeft: spanX, offsetTop: spanY } = span
+  document.body.removeChild(div)
+
+  let x = spanX
+  let y = spanY
+
+  const lineHeight = parseInt(copyStyle.lineHeight || '0', 10)
+  const paddingRight = parseInt(copyStyle.paddingRight || '0', 10)
+
+  x = x - scrollLeft
+  y = y - scrollTop
+
+  return { x, y }
+}
+
+const getSelectionPosition = (input: HTMLInputElement | HTMLTextAreaElement): CaretCoordinates => {
+  const { y: startY, x: startX } = getCaretPosition(input, 'selectionStart')
+  const { x: endX } = getCaretPosition(input, 'selectionEnd')
+
+  const x = startX + (endX - startX) / 2
+  const y = startY
+
+  return { x, y }
+}

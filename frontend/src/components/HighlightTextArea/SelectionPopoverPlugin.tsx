@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { IconButton, Popover, PopoverContent } from '@carbon/react'
 import { AiLabel, Rotate, Save, TextLongParagraph, TextShortParagraph } from '@carbon/react/icons'
 
-import { DirectActionPopup } from '@components/DirectActionPopup/DirectActionPopup'
+import { DirectAIManipulationPopup } from '@components/DirectAIManipulationPopup'
 import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
 import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
