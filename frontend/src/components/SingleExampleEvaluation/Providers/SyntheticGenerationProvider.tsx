@@ -160,7 +160,7 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
       const totalEvaluationTime = Math.round(endEvaluationTime - startEvaluationTime)
 
       removeToast(generationInProgressToastId)
-      console.log(result)
+
       if (result.failed) {
         addToast({
           kind: 'error',

@@ -27,6 +27,7 @@ interface Props {
   promptPopupVisible: boolean
   setPromptPopupVisible: Dispatch<SetStateAction<boolean>>
   textAreaRef: RefObject<HTMLTextAreaElement>
+  setSelectedText: Dispatch<SetStateAction<string>>
 }
 
 export const DirectActionPopup = ({
@@ -39,6 +40,7 @@ export const DirectActionPopup = ({
   setPopupVisible,
   setPromptPopupVisible,
   onChange,
+  setSelectedText,
 }: Props) => {
   const { performDirectAIAction, loadingDirectAIAction } = useSyntheticGeneration()
   const [prompt, setPrompt] = useState('')
@@ -62,7 +64,6 @@ export const DirectActionPopup = ({
     if (!textAreaRef.current || !generatedText) {
       return
     }
-
     const startIndex = wholeText.indexOf(generatedText)
 
     if (startIndex !== -1) {
@@ -77,15 +78,23 @@ export const DirectActionPopup = ({
     setConfirmationOpen(false)
   }, [setPopupVisible, setPromptPopupVisible])
 
-  const onCancelClick = useCallback(() => {
+  const clean = useCallback(() => {
     closeAll()
+    setGeneratedText('')
+    setPrompt('')
+    setSelectedText('')
+    textAreaRef.current?.setSelectionRange(null, null)
+  }, [closeAll, setSelectedText, textAreaRef])
+
+  const onCancelClick = useCallback(() => {
+    clean()
     onChange && generatedText && onChange(wholeText.replace(generatedText, selectedText))
-  }, [closeAll, generatedText, onChange, selectedText, wholeText])
+  }, [clean, generatedText, onChange, selectedText, wholeText])
 
   const onConfirmClick = useCallback(() => {
-    closeAll()
-    onChange && generatedText && onChange(wholeText.replace(selectedText, generatedText))
-  }, [closeAll, generatedText, onChange, selectedText, wholeText])
+    clean()
+  }, [clean])
+
   return (
     (popupVisible || promptPopupVisible || confirmationOpen) && (
       <div
