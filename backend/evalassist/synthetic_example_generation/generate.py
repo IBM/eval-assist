@@ -147,6 +147,8 @@ class DirectActionGenerator:
 
             ✅ The {action_past} selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
             🚫 Do not introduce any new information that is not present in the original text.
+
+            - if the selection is equal to the whole text, your task is {action_infinitive} the whole text.
             
             Selection:
             {selection}
