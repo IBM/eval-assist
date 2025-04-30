@@ -91,6 +91,18 @@ class DirectActionGenerator:
             DirectActionTypeEnum.LONGER: "elaborates on",
         }
 
+        self.action_infinitive_person_dict = {
+            DirectActionTypeEnum.REPHRASE: "to rephrase",
+            DirectActionTypeEnum.SHORTER: "to shorten",
+            DirectActionTypeEnum.LONGER: "to elaborate on",
+        }
+
+        self.action_past_dict = {
+            DirectActionTypeEnum.REPHRASE: "rephrased",
+            DirectActionTypeEnum.SHORTER: "shortened",
+            DirectActionTypeEnum.LONGER: "elaborated",
+        }
+
     def generate(self, direct_ai_action: DirectAIActionRequest):
         response_schemas = [
             ResponseSchema(
@@ -115,18 +127,31 @@ class DirectActionGenerator:
             ],
             partial_variables={
                 "action_third_person": self.action_third_person_dict[self.action],
+                "action_infinitive": self.action_infinitive_person_dict[self.action],
+                "action_past": self.action_past_dict[self.action],
                 "action_tag": action_tag,
                 "format_instructions": format_instructions,
             },
             template=dedent(
-                """You will be given a selection text and the text that contains that selection (to use as context), marked with {action_tag} tags.
-                
-                Your task is to generate a response that {action_third_person} the selection while preserving its original meaning and core information as much as possible.
+                """You will be provided with:
+
+            - A selected text
+
+            - A text containing that selection, with the selection marked using {action_tag} tags
+
+            Your task is {action_infinitive} the selected text such that:
+
+            - It preserves the original meaning and intent
+
+            - It fits seamlessly into the original text, both semantically and grammatically
+
+            ✅ The {action_past} selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
+            🚫 Do not introduce any new information that is not present in the original text.
             
             Selection:
             {selection}
 
-            Text with selection text (in-between {action_tag} tags):
+            Text with selection (wrapped in-between {action_tag} tags):
             {text_with_selection}
 
             {format_instructions}
