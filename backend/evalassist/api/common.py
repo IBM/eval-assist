@@ -220,6 +220,7 @@ class DirectAIActionRequest(BaseModel):
     action: DirectActionTypeEnum
     selection: str
     text: str
+    prompt: Optional[str] = None
     provider: ModelProviderEnum | ExtendedModelProviderEnum
     llm_provider_credentials: dict[str, str]
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str

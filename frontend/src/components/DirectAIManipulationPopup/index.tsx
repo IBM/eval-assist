@@ -45,8 +45,9 @@ export const DirectAIManipulationPopup = ({
   const onOptionClick = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement>, action: DirectActionTypeEnum, prompt?: string) => {
       e.preventDefault() // Prevent focus shift
+      e.stopPropagation()
 
-      const res = await performDirectAIAction({ text: wholeText, selection: selectedText, action })
+      const res = await performDirectAIAction({ text: wholeText, selection: selectedText, action, prompt })
       onChange && res && onChange(wholeText.replace(selectedText, res))
       setGeneratedText(res)
       setPopupVisibility({ options: false, prompt: false, confirmation: true })
@@ -57,7 +58,8 @@ export const DirectAIManipulationPopup = ({
   const onCustomOptionClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault()
-      setPopupVisibility({ options: false, prompt: true, confirmation: false })
+      e.stopPropagation()
+      setPopupVisibility({ options: true, prompt: true, confirmation: false })
     },
     [setPopupVisibility],
   )

@@ -251,7 +251,7 @@ export const getCaretPosition = (
   return { x, y }
 }
 
-const getSelectionPosition = (input: HTMLInputElement | HTMLTextAreaElement): CaretCoordinates => {
+export const getSelectionPosition = (input: HTMLInputElement | HTMLTextAreaElement): CaretCoordinates => {
   const { y: startY, x: startX } = getCaretPosition(input, 'selectionStart')
   const { x: endX } = getCaretPosition(input, 'selectionEnd')
 

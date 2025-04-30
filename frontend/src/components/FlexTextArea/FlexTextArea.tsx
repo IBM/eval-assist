@@ -141,6 +141,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
             }}
             onBlur={(e) => {
               !isPopupOpen && setFocused(false)
+              // e.stopPropagation()
             }}
           />
           {/* Sizer element to get ideal textarea height, it is the same
