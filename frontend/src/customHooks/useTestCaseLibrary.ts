@@ -1,4 +1,4 @@
-import { toTitleCase } from 'src/utils'
+import { getEmptyCriteriaWithTwoOptions, toTitleCase } from 'src/utils'
 
 import { useMemo } from 'react'
 
@@ -948,6 +948,182 @@ website or contact them to discuss your options.`,
         evaluator: null,
         syntheticGenerationConfig: {
           task: null,
+          domain: null,
+          persona: null,
+          generationLength: null,
+          evaluator: null,
+          perCriteriaOptionCount: null,
+          borderlineCount: null,
+        },
+      },
+      {
+        name: 'Summarization',
+        type: EvaluationType.DIRECT,
+        id: null,
+        contextVariableNames: ['Source'],
+        responseVariableName: 'Summary',
+        instances: [
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "Babies given antibiotics in the first six months of life are more likely to be fat as toddlers , a large-scale study has found . The researchers said say that just as antibiotics are used to make farm animals put on weight , the may also be fattening our children . Writing in the respected medical journal Pediatrics , they said that the widely-prescribed drugs could be contributing to the obesity epidemic . A third of 10-11 year olds and more than a fifth of 4-5 year olds in England are overweight or obese , leading to fears that today 's generation will be the first to die at an earlier age than their parents . [...]",
+              },
+            ],
+            response:
+              "Researchers said that just as antibiotics are used to make farm animals put on weight , the may also be fattening our children . A third of 10-11 year olds and more than a fifth of 4-5 year olds in england are overweight or obese , leading to fears today 's generation will be the first to die at an earlier age than their parents .",
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "Babies given antibiotics in the first six months of life are more likely to be fat as toddlers , a large-scale study has found . The researchers said say that just as antibiotics are used to make farm animals put on weight , the may also be fattening our children . Writing in the respected medical journal Pediatrics , they said that the widely-prescribed drugs could be contributing to the obesity epidemic . A third of 10-11 year olds and more than a fifth of 4-5 year olds in England are overweight or obese , leading to fears that today 's generation will be the first to die at an earlier age than their parents . [...]",
+              },
+            ],
+            response:
+              'Babies given antibiotics in the first six months of life are more likely to be fat as toddlers . A third of 10-11 year olds and more than a fifth of 4-5 year olds in england are overweight or obese .',
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "Babies given antibiotics in the first six months of life are more likely to be fat as toddlers , a large-scale study has found . The researchers said say that just as antibiotics are used to make farm animals put on weight , the may also be fattening our children . Writing in the respected medical journal Pediatrics , they said that the widely-prescribed drugs could be contributing to the obesity epidemic . A third of 10-11 year olds and more than a fifth of 4-5 year olds in England are overweight or obese , leading to fears that today 's generation will be the first to die at an earlier age than their parents . [...]",
+              },
+            ],
+            response:
+              "Babies given antibiotics in first six months of life , more likely to be fat as toddlers , a large-scale study finds . The widely-prescribed drugs could be contributing to the obesity epidemic . A third of 10-11 year olds and more than a fifth of 4-5 year olds in england are overweight or obese . The study did n't prove that antibiotics are used to make farm animals put on weight , the may also be the first to die at an early age age .",
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "This is the embarrassing moment a Buckingham Palace guard slipped and fell on a manhole cover in front of hundreds of shocked tourists as he took up position in his sentry box . The Queen 's Guard was left red-faced after he slipped on a manhole cover during the popular Changing of the Guard - and unfortunately for him the entire incident was caught on camera . [...]",
+              },
+            ],
+            response:
+              "Embarrassing moment a buckingham palace guard slipped and fell on a manhole cover in front of hundreds of shocked tourists as he took up position in his sentry box . The queen 's guard was left red-faced after he slipped on a manhole cover during the popular changing of the guard . He lost his footing and slid sideways , knocking his bearskin on the side of the box and dropping his rifle .",
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "This is the embarrassing moment a Buckingham Palace guard slipped and fell on a manhole cover in front of hundreds of shocked tourists as he took up position in his sentry box . The Queen 's Guard was left red-faced after he slipped on a manhole cover during the popular Changing of the Guard - and unfortunately for him the entire incident was caught on camera . [...]",
+              },
+            ],
+            response:
+              'The guard is thought to have slipped because of the metal protectors nailed to the soles of his boots The guard , wearing full regalia , falls heavily to the floor still clutching his rifle following the slip up The guard , wearing full regalia , falls heavily to the floor still clutching his rifle following the slip up The guard , wearing full regalia , falls heavily to the floor still clutching his rifle following the slip up',
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "This is the embarrassing moment a Buckingham Palace guard slipped and fell on a manhole cover in front of hundreds of shocked tourists as he took up position in his sentry box . The Queen 's Guard was left red-faced after he slipped on a manhole cover during the popular Changing of the Guard - and unfortunately for him the entire incident was caught on camera . [...]",
+              },
+            ],
+            response:
+              'Toddler slipped and fell into cheetah exhibit at Cleveland Metroparks Zoo . Visitors heard a scream as the toddler tumbled into the pit at 3 pm on Saturday . His parents jumped in and pulled him to safety before paramedics arrived . Cheetahs did not approach the boy or his parents while in the pit .',
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "This is the embarrassing moment a Buckingham Palace guard slipped and fell on a manhole cover in front of hundreds of shocked tourists as he took up position in his sentry box . The Queen 's Guard was left red-faced after he slipped on a manhole cover during the popular Changing of the Guard - and unfortunately for him the entire incident was caught on camera . [...]",
+              },
+            ],
+            response:
+              "Buckingham palace guard slipped on manhole cover in front of hundreds of horrified tourists . The queen 's guard was left red-faced after he slipped on a manhole cover . He lost his footing and dropped his rifle on the side of the box and dropping his rifle . The incident was caught on camera camera camera . The guard is thought to have slipped because of metal shutters nailed to the soles of his boots .",
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "A two-year-old boy is recovering after falling into a cheetah exhibit at the Cleveland Metroparks Zoo after his parents dangled him over the edge , officials said . The toddler 's mother was holding him and another child when he slipped and fell between 10 to 12ft and into the pit on Saturday around 3pm . [...]",
+              },
+            ],
+            response:
+              'Toddler slipped and fell into cheetah exhibit at Cleveland Metroparks Zoo . Visitors heard a scream as the toddler tumbled into the pit at 3 pm on Saturday . His parents jumped in and pulled him to safety before paramedics arrived . Cheetahs did not approach the boy or his parents while in the pit .',
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "A two-year-old boy is recovering after falling into a cheetah exhibit at the Cleveland Metroparks Zoo after his parents dangled him over the edge , officials said . The toddler 's mother was holding him and another child when he slipped and fell between 10 to 12ft and into the pit on Saturday around 3pm . [...]",
+              },
+            ],
+            response:
+              "The toddler 's mother was holding the two-year-old boy and another child when he slipped and fell between 10 to 12ft and into the cheetah exhibit at the cleveland metroparks zoo . The boy 's leg was injured in the fall , but he was not attacked by the animals , officials said . He is listed in stable condition after being taken to metrohealth medical center and suffered from minor bruises and was listed in stable condition at the hospital .",
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "A two-year-old boy is recovering after falling into a cheetah exhibit at the Cleveland Metroparks Zoo after his parents dangled him over the edge , officials said . The toddler 's mother was holding him and another child when he slipped and fell between 10 to 12ft and into the pit on Saturday around 3pm . [...]",
+              },
+            ],
+            response:
+              "The toddler 's mother was holding him and another child when he slipped and fell between 10 to 12ft and into the pit on saturday around 3pm . The child was rescued by his parents before firefighters and paramedics arrived on the scene . He suffered from minor bumps and bruises and was listed in stable condition at the hospital .",
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+          {
+            contextVariables: [
+              {
+                name: 'Source',
+                value:
+                  "A two-year-old boy is recovering after falling into a cheetah exhibit at the Cleveland Metroparks Zoo after his parents dangled him over the edge , officials said . The toddler 's mother was holding him and another child when he slipped and fell between 10 to 12ft and into the pit on Saturday around 3pm . [...]",
+              },
+            ],
+            response:
+              'Visitors at cleveland metroparks zoo in ohio heard a scream as the toddler tumbled into the pit at 3pm on saturday . His parents jumped in and pulled him to safety before paramedics arrived . He suffered from minor bumps and bruises and was listed in stable condition . Dr christopher kuhar said there is a strong chance charges will be pressed on monday . A mother was holding the two-year-old boy and another child .',
+            result: null,
+            id: crypto.randomUUID(),
+            expectedResult: '',
+          },
+        ],
+        criteria: { ...getEmptyCriteriaWithTwoOptions(), name: 'Summarization' },
+        evaluator: null,
+        syntheticGenerationConfig: {
+          task: TaskEnum.Summarization,
           domain: null,
           persona: null,
           generationLength: null,
