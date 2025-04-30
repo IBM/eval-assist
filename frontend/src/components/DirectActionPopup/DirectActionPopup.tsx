@@ -16,7 +16,6 @@ import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Prov
 import { DirectActionTypeEnum } from '@types'
 
 import classes from './DirectActionPopup.module.scss'
-import { PromptPopup } from './PromptPopup'
 
 interface Props {
   popupPosition: { top: number; left: number }
@@ -78,8 +77,6 @@ export const DirectActionPopup = ({
     setConfirmationOpen(false)
   }, [setPopupVisible, setPromptPopupVisible])
 
-  console.log(confirmationOpen)
-
   const onCancelClick = useCallback(() => {
     closeAll()
     onChange && generatedText && onChange(wholeText.replace(generatedText, selectedText))
@@ -89,7 +86,6 @@ export const DirectActionPopup = ({
     closeAll()
     onChange && generatedText && onChange(wholeText.replace(selectedText, generatedText))
   }, [closeAll, generatedText, onChange, selectedText, wholeText])
-
   return (
     (popupVisible || promptPopupVisible || confirmationOpen) && (
       <div
@@ -153,7 +149,7 @@ export const DirectActionPopup = ({
               label={'Custom prompt'}
               onMouseDown={(e) => onDirectActionClick(e, DirectActionTypeEnum.Custom, prompt)}
             >
-              <Delete />
+              <Send />
             </IconButton>
           </div>
         )}
