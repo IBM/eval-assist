@@ -106,6 +106,7 @@
     :global(.cds--tree-node__icon) {
       margin-left: $spacing-02;
       align-self: center;
+      transform: scale(0.75);
     }
     ul li :global(.cds--tree-node__label) {
       padding-inline-start: 2rem !important;

@@ -38,29 +38,26 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
   const innerRef = useRef<HTMLTextAreaElement>(null)
 
   const ref = useMergeRefs([outsideRef, innerRef])
-  const { x, y } = useMousePosition()
 
-  const handleMouseUp = useCallback(
-    (e: React.MouseEvent<HTMLTextAreaElement>) => {
-      const textarea = innerRef.current
-      if (!textarea) return
+  const handleMouseUp = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
+    const mousePosition = { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY }
+    const textarea = innerRef.current
+    if (!textarea) return
 
-      const selectionStart = textarea.selectionStart
-      const selectionEnd = textarea.selectionEnd
-      const text = textarea.value.substring(selectionStart, selectionEnd)
-      if (text) {
-        const top = y || 0
-        const left = x || 0
+    const selectionStart = textarea.selectionStart
+    const selectionEnd = textarea.selectionEnd
+    const text = textarea.value.substring(selectionStart, selectionEnd)
+    if (text) {
+      const top = mousePosition.y
+      const left = mousePosition.x
 
-        setSelectedText(text)
-        setPopupPosition({ top, left })
-        setPopupVisible(true)
-      } else {
-        setPopupVisible(false)
-      }
-    },
-    [x, y],
-  )
+      setSelectedText(text)
+      setPopupPosition({ top, left })
+      setPopupVisible(true)
+    } else {
+      setPopupVisible(false)
+    }
+  }, [])
 
   useEffect(() => {
     if (!fixMaxHeight) {
@@ -137,8 +134,9 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
           {/* Sizer element to get ideal textarea height, it is the same
           component type to eliminate mismatch in style (dimensions) */}
           <TextArea className={classes.sizer} value={props.value} ref={sizerRef} tabIndex={-1} labelText="" />
-          {x !== null && y !== null && isFocused && (
+          {isFocused && (
             <DirectActionPopup
+              setSelectedText={setSelectedText}
               textAreaRef={innerRef}
               popupVisible={popupVisible}
               selectedText={selectedText}
