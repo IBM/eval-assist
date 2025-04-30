@@ -73,7 +73,7 @@ export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
             <p className={cx(classes.modelProviderName)}>RITS</p>
             <div>
               <TextInput
-                id={'openai-api-key-input'}
+                id={'rits-api-key-input'}
                 labelText="API key"
                 value={modelProviderCredentials.rits.api_key}
                 type="password"
@@ -135,7 +135,7 @@ export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
             <p className={cx(classes.modelProviderName)}>Azure OpenAI</p>
             <div>
               <TextInput
-                id={'openai-api-key-input'}
+                id={'azure-api-key-input'}
                 labelText="API key"
                 value={modelProviderCredentials.azure.api_key}
                 type="password"
