@@ -10,6 +10,7 @@ import {
   Send,
   TextLongParagraph,
   TextShortParagraph,
+  Undo,
 } from '@carbon/react/icons'
 
 import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
@@ -165,7 +166,7 @@ export const DirectActionPopup = ({
         {confirmationOpen && (
           <div className={classes.promptContainer}>
             <IconButton className={classes.iconButton} kind={'ghost'} label={'Cancel'} onMouseDown={onCancelClick}>
-              <MisuseOutline />
+              <Undo />
             </IconButton>
             <IconButton className={classes.iconButton} kind={'ghost'} label={'Confirm'} onMouseDown={onConfirmClick}>
               <Checkmark />
