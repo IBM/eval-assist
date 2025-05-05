@@ -1,7 +1,7 @@
 import { use, useCallback, useMemo } from 'react'
 
 import { useURLParamsContext } from '@components/SingleExampleEvaluation/Providers/URLParamsProvider'
-import { UseCase } from '@types'
+import { TestCase } from '@types'
 
 import { useTestCaseLibrary } from './useTestCaseLibrary'
 
@@ -18,7 +18,7 @@ export const useGetQueryParamsFromUseCase = () => {
   )
 
   const getQueryParamsFromUseCase = useCallback(
-    (useCase: UseCase, subCatalogName: string | null) => {
+    (useCase: TestCase, subCatalogName: string | null) => {
       let params: { key: string; value: string }[] = []
       if (subCatalogName) {
         params.push({ key: 'subCatalogName', value: subCatalogName })

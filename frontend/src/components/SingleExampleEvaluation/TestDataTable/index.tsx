@@ -11,16 +11,12 @@ import { INSTANCES_PER_PAGE } from '@constants'
 import { usePagination } from '@customHooks/usePagination'
 
 import {
-  Criteria,
-  CriteriaWithOptions,
   DirectInstance,
   DirectInstanceResult,
   EvaluationType,
-  Evaluator,
   Instance,
   PairwiseInstance,
-  PairwiseInstanceResultV1,
-  UseCase,
+  PairwiseInstanceResult,
 } from '../../../types'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import { useSyntheticGeneration } from '../Providers/SyntheticGenerationProvider'
@@ -111,7 +107,7 @@ export const TestDataTable = ({
       : (instances as PairwiseInstance[])?.every(
           (instance) =>
             instance.result === null ||
-            Object.values(instance.result as PairwiseInstanceResultV1).every((perResponseResults) =>
+            Object.values(instance.result as PairwiseInstanceResult).every((perResponseResults) =>
               perResponseResults.positionalBias.every((pBias) => pBias === false),
             ),
         )

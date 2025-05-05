@@ -5,7 +5,7 @@ import { AiLabel, Checkmark, Rotate, Send, TextLongParagraph, TextShortParagraph
 
 import { useSelectedTextContext } from '@components/SingleExampleEvaluation/Providers/SelectedTextProvider'
 import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
-import { DirectActionTypeEnum } from '@types'
+import { DirectActionTypeEnum } from '@constants'
 
 import classes from './index.module.scss'
 

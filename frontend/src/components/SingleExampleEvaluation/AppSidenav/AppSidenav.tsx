@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useId } from 'react'
 import { IconButton } from '@carbon/react'
 import { Categories, IbmSecurity, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 
-import { UseCase } from '@types'
+import { TestCase } from '@types'
 
 import layoutClasses from '../Layout.module.scss'
 import { useAppSidebarContext } from '../Providers/AppSidebarProvider'
@@ -18,8 +18,8 @@ import { SavedTestCasesPanel } from './SavedTestCasesPanel'
 
 interface AppSidenavProps {
   setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
-  userUseCases: UseCase[]
-  updateURLFromUseCase: (selectedUseCase: { useCase: UseCase; subCatalogName: string | null }) => void
+  userUseCases: TestCase[]
+  updateURLFromUseCase: (selectedUseCase: { useCase: TestCase; subCatalogName: string | null }) => void
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
 }
@@ -36,7 +36,7 @@ export const AppSidenavNew = ({
   const { useCaseId } = useURLParamsContext()
   const { changesDetected, setTestCaseSelected } = useCurrentTestCase()
 
-  const onUseCaseClick = (useCase: UseCase, subCatalogName?: string) => {
+  const onUseCaseClick = (useCase: TestCase, subCatalogName?: string) => {
     // if the usecase is already selected don't do nothing
     if (useCaseId !== null && useCaseId === useCase.id) return
     // if there are unsaved changes, let the user know that they may lose work

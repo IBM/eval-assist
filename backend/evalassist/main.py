@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from langchain_core.exceptions import OutputParserException
 from prisma.errors import PrismaError
-from prisma.models import StoredUseCase
+from prisma.models import StoredTestCase
 from pydantic import BaseModel
 from unitxt.llm_as_judge import (
     DIRECT_CRITERIA,
@@ -207,26 +207,26 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
 
 @router.get("/test_case/")
 def get_test_cases(user: str):
-    test_cases = db.storedusecase.find_many(where={"app_user": {"email": user}})
+    test_cases = db.storedtestcase.find_many(where={"app_user": {"email": user}})
     return test_cases
 
 
 @router.get("/test_case/{test_case_id}/")
 def get_test_case(test_case_id: int, user: str):
-    test_case = db.storedusecase.find_unique(where={"id": test_case_id})
+    test_case = db.storedtestcase.find_unique(where={"id": test_case_id})
     return test_case
 
 
 class PutUseCaseBody(BaseModel):
     user: str
-    test_case: StoredUseCase
+    test_case: StoredTestCase
 
 
 @router.put("/test_case/")
 def put_test_case(request_body: PutUseCaseBody):
     user = db.appuser.find_unique(where={"email": request_body.user})
 
-    found = db.storedusecase.find_unique(
+    found = db.storedtestcase.find_unique(
         where={
             "id": request_body.test_case.id,
             "user_id": user.id,
@@ -234,7 +234,7 @@ def put_test_case(request_body: PutUseCaseBody):
     )
 
     if found:
-        res = db.storedusecase.update(
+        res = db.storedtestcase.update(
             where={"id": request_body.test_case.id},
             data={
                 "name": request_body.test_case.name,
@@ -243,7 +243,7 @@ def put_test_case(request_body: PutUseCaseBody):
         )
 
     else:
-        name_and_user_exists = db.storedusecase.find_many(
+        name_and_user_exists = db.storedtestcase.find_many(
             where={
                 "name": request_body.test_case.name,
                 "user_id": user.id,
@@ -257,7 +257,7 @@ def put_test_case(request_body: PutUseCaseBody):
             )
 
         else:
-            res = db.storedusecase.create(
+            res = db.storedtestcase.create(
                 data={
                     "name": request_body.test_case.name,
                     "content": request_body.test_case.content,
@@ -274,7 +274,7 @@ class DeleteUseCaseBody(BaseModel):
 
 @router.delete("/test_case/")
 def delete_test_case(request_body: DeleteUseCaseBody):
-    res = db.storedusecase.delete(where={"id": request_body.test_case_id})
+    res = db.storedtestcase.delete(where={"id": request_body.test_case_id})
     return res
 
 

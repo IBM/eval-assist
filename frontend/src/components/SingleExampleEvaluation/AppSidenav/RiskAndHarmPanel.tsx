@@ -11,7 +11,7 @@ import { ChevronLeft, DotMark, List } from '@carbon/react/icons'
 
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
-import { UseCase } from '../../../types'
+import { TestCase } from '../../../types'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { LinkButton } from './LinkButton'
@@ -19,7 +19,7 @@ import classes from './ThreeLevelsPanel.module.scss'
 import sharedClasses from './shared.module.scss'
 
 interface Props {
-  onUseCaseClick: (useCase: UseCase, subCatalogName?: string) => void
+  onUseCaseClick: (useCase: TestCase, subCatalogName?: string) => void
   onClose: () => void
 }
 
@@ -47,7 +47,7 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
       [key]: !expanded[key],
     })
 
-  const onClick = (e: any, useCase: UseCase, subCatalogName: string) => {
+  const onClick = (e: any, useCase: TestCase, subCatalogName: string) => {
     e.stopPropagation()
     e.preventDefault()
     onUseCaseClick(useCase, subCatalogName)

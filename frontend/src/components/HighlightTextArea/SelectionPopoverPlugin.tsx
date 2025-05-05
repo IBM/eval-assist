@@ -8,8 +8,8 @@ import { AiLabel, Rotate, Save, TextLongParagraph, TextShortParagraph } from '@c
 import { DirectAIManipulationPopup } from '@components/DirectAIManipulationPopup'
 import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
 import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
+import { DirectActionTypeEnum } from '@constants'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { DirectActionTypeEnum } from '@types'
 
 import { useEditorsContext } from './EditorProvider'
 import classes from './SelectionPopoverPlugin.module.scss'

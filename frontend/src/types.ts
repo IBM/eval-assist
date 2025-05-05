@@ -1,18 +1,9 @@
+import { DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@constants'
+
 export interface DirectInstanceResultV0 {
-  name: string
   option: string
-  explanation: string
-  positionalBias: boolean
-  certainty: number
-}
-
-export interface DirectInstanceResultV1 extends Omit<DirectInstanceResultV0, 'certainty' | 'name' | 'explanation'> {
   positionalBiasOption: string
-  certainty: FetchedDirectInstanceResultV1['certainty']
-  summary: string
-}
-
-export interface DirectInstanceResultV2 extends Omit<DirectInstanceResultV1, 'positionalBias' | 'summary'> {
+  certainty: FetchedDirectInstanceResultV0['certainty']
   positionalBias: {
     detected: boolean
     option: string
@@ -21,79 +12,47 @@ export interface DirectInstanceResultV2 extends Omit<DirectInstanceResultV1, 'po
   explanation: string
 }
 
-export type DirectInstanceResult = DirectInstanceResultV2
+export type DirectInstanceResult = DirectInstanceResultV0
 
 export interface PerResponsePairwiseResultV0 {
   contestResults: boolean[]
-  comparedToIndexes: number[]
-  explanations: { [key: string]: string }
   positionalBias: boolean[]
-  certainty: number[]
   winrate: number
   ranking: number
-}
-
-export interface PerResponsePairwiseResultV1
-  extends Omit<PerResponsePairwiseResultV0, 'comparedToIndexes' | 'explanations' | 'certainty'> {
   comparedTo: string[]
   summaries: FetchedPerResponsePairwiseResultV1['summaries']
 }
 
-export type PerResponsePairwiseResult = PerResponsePairwiseResultV1
+export type PerResponsePairwiseResult = PerResponsePairwiseResultV0
 
-export interface PairwiseInstanceResultV0 {
-  perResponseResults: {
-    [key: string]: PerResponsePairwiseResultV0
-  }
-  ranking: number[]
-}
+export type PairwiseInstanceResultV0 = { [key: string]: PerResponsePairwiseResultV0 }
 
-export type PairwiseInstanceResultV1 = { [key: string]: PerResponsePairwiseResultV1 }
-
-export type PairwiseInstanceResult = PairwiseInstanceResultV1
+export type PairwiseInstanceResult = PairwiseInstanceResultV0
 
 export interface FetchedDirectInstanceResultV0 {
-  name: string
   option: string
-  explanation: string
-  p_bias: boolean
-  certainty: number
-}
-
-export interface FetchedDirectInstanceResultV1
-  extends Omit<FetchedDirectInstanceResultV0, 'p_bias' | 'explanation' | 'name' | 'certainty'> {
-  summary: string
-  positional_bias: boolean
   positional_bias_option: string
   certainty?: number
-}
-
-export interface FetchedDirectInstanceResultV2
-  extends Omit<FetchedDirectInstanceResultV1, 'positional_bias' | 'summary'> {
   explanation: string
   positional_bias: {
     detected: boolean
     option: string
     explanation: string
   }
-  certainty?: number
 }
 
 export type FetchedDirectInstanceResultWithId = {
   id: string
-  result: FetchedDirectInstanceResultV2
+  result: FetchedDirectInstanceResultV0
 }
 
-export type FetchedDirectInstanceResult = FetchedDirectInstanceResultV2
+export type FetchedDirectInstanceResult = FetchedDirectInstanceResultV0
 
-export type FetchedDirectResultsV0 = FetchedDirectInstanceResultV0[]
-export type FetchedDirectResultsV1 = FetchedDirectInstanceResultV1[]
-export type FetchedDirectResultsV2 = FetchedDirectInstanceResultWithId[]
-export type FetchedDirectResults = FetchedDirectResultsV2
+export type FetchedDirectResultsV0 = FetchedDirectInstanceResultWithId[]
+export type FetchedDirectResults = FetchedDirectResultsV0
 
 export type DirectResultsV0 = DirectInstanceResultV0[]
-export type DirectResultsV1 = DirectInstanceResultV1[]
-export type DirectResults = DirectResultsV1
+export type DirectResults = DirectResultsV0
 
 interface FetchedPerResponsePairwiseResultV0 {
   contest_results: boolean[]
@@ -127,78 +86,45 @@ export type FetchedPairwiseResultsV0 = FetchedPairwiseInstanceResultV0[]
 export type FetchedPairwiseResultsV1 = FetchedPairwiseInstanceResultV1[]
 export type FetchedPairwiseResults = FetchedPairwiseResultsV1
 
-export type PairwiseResultsV0 = PairwiseInstanceResultV0
-export type PairwiseResultsV1 = PairwiseInstanceResultV1
-export type PairwiseResultsV2 = PairwiseInstanceResultV1[]
-export type PairwiseResults = PairwiseResultsV1
+export type PairwiseResultsV0 = PairwiseInstanceResultV0[]
+export type PairwiseResults = PairwiseResultsV0
 
 export type FetchedResultsV0 = FetchedDirectResultsV0 | FetchedPairwiseResultsV0 | null
 
-export type FetchedResultsV1 = FetchedDirectResultsV1 | FetchedPairwiseInstanceResultV1 | null
-
 export type ResultsV0 = DirectResultsV0 | PairwiseResultsV0 | null
-export type ResultsV1 = DirectResultsV1 | PairwiseResultsV1 | null
-export type ResultsV2 = DirectResultsV1 | PairwiseResultsV2 | null
 
-export type Results = ResultsV2
+export type Results = ResultsV0
 
-export interface OptionV0 {
-  option: string
-  description: string
-}
-
-export interface OptionV1 {
+export interface CriteriaOptionV0 {
   name: string
   description: string
 }
 
-export type Option = OptionV1
+export type CriteriaOption = CriteriaOptionV0
 
-export type Instance = {
+export type InstanceV0 = {
   id: string
-  contextVariables: ContextVariableV1[]
+  contextVariables: ContextVariableV0[]
   expectedResult: string
   result: DirectInstanceResult | PairwiseInstanceResult | null
   metadata?: Record<string, any>
 }
 
-export interface DirectInstance extends Instance {
+export type Instance = InstanceV0
+
+export interface DirectInstanceV0 extends InstanceV0 {
   response: string
 }
 
-export interface PairwiseInstance extends Instance {
-  responses: UseCaseV2['responses']
-}
+export type DirectInstance = DirectInstanceV0
 
-type ContextVariableV0 = { variable: string; value: string }
-type ContextVariableV1 = { name: string; value: string }
-
-export interface UseCaseV0 {
-  id: number | null
-  name: string
-  type: EvaluationType
-  contextVariables: ContextVariableV0[]
-  responseVariableName: string
+export interface PairwiseInstanceV0 extends InstanceV0 {
   responses: string[]
-  criteria: CriteriaWithOptionsV0 | CriteriaV0
-  results: ResultsV0
-  expectedResults: null | string[]
-  pipeline: string | null
 }
 
-export interface UseCaseV1 extends Omit<UseCaseV0, 'pipeline'> {
-  pipeline: Evaluator | null
-}
+export type PairwiseInstance = PairwiseInstanceV0
 
-export interface UseCaseV2 extends Omit<UseCaseV1, 'criteria' | 'pipeline' | 'results'> {
-  evaluator: Evaluator | null
-  criteria: CriteriaWithOptionsV1 | CriteriaV1
-  results: ResultsV1
-}
-
-export interface UseCaseV3 extends Omit<UseCaseV2, 'results' | 'contextVariables' | 'responses' | 'expectedResults'> {
-  instances: Instance[]
-}
+type ContextVariableV0 = { name: string; value: string }
 
 export interface SyntheticGenerationConfig {
   task: TaskEnum | null
@@ -210,12 +136,19 @@ export interface SyntheticGenerationConfig {
   borderlineCount: number | null
 }
 
-export interface UseCaseV4 extends UseCaseV3 {
+export interface TestCaseV0 {
+  id: number | null
+  name: string
+  type: EvaluationType
+  responseVariableName: string
+  evaluator: Evaluator | null
+  criteria: CriteriaV0 | CriteriaWithOptionsV0
+  instances: InstanceV0[]
   syntheticGenerationConfig: SyntheticGenerationConfig
   contextVariableNames: string[]
 }
 
-export type UseCase = UseCaseV4
+export type TestCase = TestCaseV0
 
 export enum EvaluationType {
   DIRECT = 'direct',
@@ -279,27 +212,18 @@ export interface Benchmark {
 
 export type CriteriaWithOptionsV0 = {
   name: string
-  criteria: string
-  options: OptionV0[]
-}
-
-export interface CriteriaWithOptionsV1 extends Omit<CriteriaWithOptionsV0, 'criteria' | 'options'> {
   description: string
-  options: OptionV1[]
+  options: CriteriaOptionV0[]
 }
 
-export type CriteriaWithOptions = CriteriaWithOptionsV1
+export type CriteriaWithOptions = CriteriaWithOptionsV0
 
 export interface CriteriaV0 {
   name: string
-  criteria: string
-}
-
-export interface CriteriaV1 extends Omit<CriteriaV0, 'criteria'> {
   description: string
 }
 
-export type Criteria = CriteriaV1
+export type Criteria = CriteriaV0
 
 export class Version {
   version: string
@@ -339,66 +263,6 @@ export type ModelProviderCredentials = {
     api_key: string
   }
   local_hf: {}
-}
-
-export enum DomainEnum {
-  NewsMedia = 'News Media',
-  Healthcare = 'Healthcare',
-  EntertainmentAndPopCulture = 'Entertainment And Pop Culture',
-  SocialMedia = 'Social Media',
-  CustomerSupportAndBusiness = 'Customer Support And Business',
-  GamingAndEntertainment = 'Gaming And Entertainment',
-}
-
-export enum PersonaEnum {
-  ExperiencedJournalist = 'Experienced journalist',
-  NoviceJournalist = 'Novice journalist',
-  OpinionColumnist = 'Opinion columnist',
-  NewsAnchor = 'News anchor',
-  Editor = 'Editor',
-  MedicalResearcher = 'Medical researcher',
-  GeneralPractitioner = 'General practitioner',
-  PublicHealthOfficial = 'Public health official',
-  HealthBlogger = 'Health blogger',
-  MedicalStudent = 'Medical student',
-  FilmCritic = 'Film critic',
-  CasualSocialMediaUser = 'Casual social media user',
-  TabloidReporter = 'Tabloid reporter',
-  HardcoreFanTheorist = 'Hardcore fan/Theorist',
-  InfluencerYouTubeReviewer = 'Influencer/Youtube reviewer',
-  InfluencerPositiveBrand = 'Influencer (Positive brand)',
-  InternetTroll = 'Internet troll',
-  PoliticalActivistPolarizing = 'Political activist (polarizing)',
-  BrandVoiceCorporateSocialMediaAccount = 'Brand voice (Corporate social media account)',
-  Memer = 'Memer (Meme creator)',
-  CustomerServiceAgent = 'Customer service agent',
-  AngryCustomer = 'Angry customer',
-  CorporateCEO = 'Corporate CEO',
-  ConsumerAdvocate = 'Consumer advocate',
-  MarketingSpecialist = 'Marketing specialist',
-  FlamerAggressivePlayer = 'Flamer (Aggressive player)',
-  HardcoreGamer = 'Hardcore gamer',
-  EsportCommentator = 'Esport commentator',
-  MovieCritic = 'Movie critic',
-  Fan = 'Fan (of a TV show, movie, or game)',
-}
-
-export enum TaskEnum {
-  Summarization = 'Summarization',
-  TextGeneration = 'Text Generation',
-  QuestionAnswering = 'Question Answering',
-}
-export enum GenerationLengthEnum {
-  Short = 'Short',
-  Medium = 'Medium',
-  Long = 'Long',
-}
-
-export enum DirectActionTypeEnum {
-  Rephrase = 'Rephrase',
-  Elaborate = 'Elaborate',
-  Shorten = 'Shorten',
-  Custom = 'Custom',
 }
 
 export interface CaretCoordinates {

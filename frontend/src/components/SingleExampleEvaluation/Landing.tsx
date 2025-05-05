@@ -10,14 +10,14 @@ import { Add, ArrowRight, Launch, View } from '@carbon/react/icons'
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
 
-import { EvaluationType, UseCase } from '../../types'
+import { EvaluationType, TestCase } from '../../types'
 import { Card } from './Card/Card'
 import classes from './Landing.module.scss'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
 
 interface Props {
   setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  updateURLFromUseCase: (useCaseSelected: { useCase: UseCase; subCatalogName: string | null }) => void
+  updateURLFromUseCase: (useCaseSelected: { useCase: TestCase; subCatalogName: string | null }) => void
 }
 
 export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props) => {

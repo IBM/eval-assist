@@ -2,14 +2,14 @@ import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Modal, TextInput } from '@carbon/react'
 
-import { EvaluationType, UseCase } from '../../../types'
+import { EvaluationType, TestCase } from '../../../types'
 import { UseCaseTypeBadge } from '../../UseCaseTypeBadge/UseCaseTypeBadge'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  onSaveAs: (name: string, fromUseCase?: UseCase) => Promise<boolean>
+  onSaveAs: (name: string, fromUseCase?: TestCase) => Promise<boolean>
 }
 
 export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs }: Props) => {

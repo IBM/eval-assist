@@ -1,12 +1,12 @@
 import cx from 'classnames'
-import { getJSONStringWithSortedKeys, returnByPipelineType, stringifyQueryParams, toSnakeCase } from 'src/utils'
+import { returnByPipelineType, stringifyQueryParams, toSnakeCase } from 'src/utils'
 import { v4 as uuid } from 'uuid'
 
 import { LegacyRef, useCallback, useMemo, useRef, useState } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { Button, IconButton } from '@carbon/react'
+import { Button } from '@carbon/react'
 import { Add, WarningFilled } from '@carbon/react/icons'
 
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
@@ -17,28 +17,23 @@ import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFrom
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
 import { useUnitxtCodeGeneration } from '@customHooks/useUnitxtNotebookGeneration'
-import { StoredUseCase } from '@prisma/client'
+import { StoredTestCase } from '@prisma/client'
 
 import {
   DirectInstance,
   DirectInstanceResult,
-  DomainEnum,
   EvaluationType,
   Evaluator,
-  FetchedDirectInstanceResult,
   FetchedDirectInstanceResultWithId,
   FetchedDirectResults,
   FetchedPairwiseInstanceResult,
   FetchedPairwiseResults,
-  GenerationLengthEnum,
   Instance,
   ModelProviderType,
   PairwiseInstance,
   PairwiseInstanceResult,
-  SyntheticGenerationConfig,
-  UseCase,
+  TestCase,
 } from '../../types'
-import { APIKeyPopover } from './APIKeyPopover'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { CriteriaView } from './CriteriaView'
 import { EvaluateButton } from './EvaluateButton'
@@ -70,7 +65,6 @@ import { TestDataTable } from './TestDataTable'
 
 export const SingleExampleEvaluation = () => {
   const {
-    preloadedTestCase,
     currentTestCase,
     setCurrentTestCase,
     changesDetected,
@@ -367,7 +361,7 @@ export const SingleExampleEvaluation = () => {
   )
 
   const updateURLFromUseCase = useCallback(
-    (useCaseSelected: { useCase: UseCase; subCatalogName: string | null } | null) => {
+    (useCaseSelected: { useCase: TestCase; subCatalogName: string | null } | null) => {
       let urlChangePromise: Promise<boolean>
       if (useCaseSelected !== null) {
         // use case is a saved user test case
@@ -387,7 +381,7 @@ export const SingleExampleEvaluation = () => {
 
   const onSave = useCallback(async () => {
     if (currentTestCase === null) return
-    const savedUseCase: StoredUseCase = await (
+    const savedUseCase: StoredTestCase = await (
       await put('test_case/', {
         test_case: {
           name: currentTestCase.name,
@@ -403,12 +397,12 @@ export const SingleExampleEvaluation = () => {
           }),
           user_id: -1,
           id: currentTestCase.id,
-        } as StoredUseCase,
+        } as StoredTestCase,
         user: getUserName(),
       })
     ).json()
 
-    const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as UseCase
+    const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as TestCase
 
     setCurrentTestCase(parsedSavedUseCase)
     // update use case in the use cases list
@@ -439,7 +433,7 @@ export const SingleExampleEvaluation = () => {
   ])
 
   const onSaveAs = useCallback(
-    async (name: string, fromUseCase?: UseCase) => {
+    async (name: string, fromUseCase?: TestCase) => {
       if (currentTestCase === null) return false
       const toSaveUseCase = fromUseCase ?? currentTestCase
       const res = await put('test_case/', {
@@ -457,7 +451,7 @@ export const SingleExampleEvaluation = () => {
           }),
           user_id: -1,
           id: -1,
-        } as StoredUseCase,
+        } as StoredTestCase,
         user: getUserName(),
       })
       if (!res.ok) {
@@ -471,8 +465,8 @@ export const SingleExampleEvaluation = () => {
         })
         return false
       } else {
-        const savedUseCase: StoredUseCase = await res.json()
-        const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as UseCase
+        const savedUseCase: StoredTestCase = await res.json()
+        const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as TestCase
         // useCaseSelected will be different from null when
         // save as is done before switching from an unsaved
         // test case that has changes detected

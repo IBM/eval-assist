@@ -3,7 +3,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model StoredUseCase {
+model StoredTestCase {
   id      Int    @id @default(autoincrement())
   user_id Int
   content String
@@ -21,7 +21,7 @@ model AppUser {
   name       String
   created_at DateTime @default(now())
 
-  stored_test_cases StoredUseCase[]
+  stored_test_cases StoredTestCase[]
 
   @@map("app_user")
 }

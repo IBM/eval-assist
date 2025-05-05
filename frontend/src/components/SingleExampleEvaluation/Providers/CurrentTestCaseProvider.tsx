@@ -21,8 +21,7 @@ import {
   Instance,
   ModelProviderType,
   PairwiseInstance,
-  UseCase,
-  UseCaseV4,
+  TestCase,
 } from '../../../types'
 import { useCriteriasContext } from './CriteriasProvider'
 import { useEvaluatorOptionsContext } from './EvaluatorOptionsProvider'
@@ -31,9 +30,9 @@ import { useURLParamsContext } from './URLParamsProvider'
 import { useUserUseCasesContext } from './UserUseCasesProvider'
 
 interface CurrentTestCaseContextValue {
-  currentTestCase: UseCaseV4
-  setCurrentTestCase: (value: SetStateAction<UseCaseV4>) => void
-  preloadedTestCase: UseCaseV4 | null
+  currentTestCase: TestCase
+  setCurrentTestCase: (value: SetStateAction<TestCase>) => void
+  preloadedTestCase: TestCase | null
   showingTestCase: boolean
   responses: string[] | string[][]
   currentTestCaseString: string
@@ -42,12 +41,12 @@ interface CurrentTestCaseContextValue {
   changesDetected: boolean
   isTestCaseSaved: boolean
   testCaseSelected: {
-    useCase: UseCase
+    useCase: TestCase
     subCatalogName: string | null
   } | null
   setTestCaseSelected: Dispatch<
     SetStateAction<{
-      useCase: UseCase
+      useCase: TestCase
       subCatalogName: string | null
     } | null>
   >
@@ -154,12 +153,12 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
     ],
   )
 
-  const [testCaseSelected, setTestCaseSelected] = useState<{ useCase: UseCase; subCatalogName: string | null } | null>(
+  const [testCaseSelected, setTestCaseSelected] = useState<{ useCase: TestCase; subCatalogName: string | null } | null>(
     null,
   )
 
   const preloadedTestCase = useMemo(() => {
-    let pu: UseCase | null
+    let pu: TestCase | null
     if (useCaseId !== null && userUseCases !== null) {
       pu = userUseCases.find((userUseCase) => userUseCase.id === useCaseId) || null
     } else if (libraryTestCaseName !== null && useCaseType !== null) {

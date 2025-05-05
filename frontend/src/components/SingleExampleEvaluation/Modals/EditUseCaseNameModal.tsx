@@ -2,14 +2,14 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { Modal, TextInput } from '@carbon/react'
 
-import { UseCase } from '../../../types'
+import { TestCase } from '../../../types'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  userUseCases: UseCase[]
-  setUserUseCases: Dispatch<SetStateAction<UseCase[]>>
+  userUseCases: TestCase[]
+  setUserUseCases: Dispatch<SetStateAction<TestCase[]>>
 }
 
 export const EditUseCaseNameModal = ({ open, setOpen, userUseCases, setUserUseCases }: Props) => {
@@ -34,7 +34,7 @@ export const EditUseCaseNameModal = ({ open, setOpen, userUseCases, setUserUseCa
         setUserUseCases([
           ...userUseCases.filter((u) => u.name !== currentTestCase.name),
           {
-            ...(userUseCases.find((u) => u.name === currentTestCase.name) as UseCase),
+            ...(userUseCases.find((u) => u.name === currentTestCase.name) as TestCase),
             name: newUseCaseName,
           },
         ])

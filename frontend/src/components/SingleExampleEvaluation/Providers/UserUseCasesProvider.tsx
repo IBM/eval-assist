@@ -5,14 +5,14 @@ import { Loading } from '@carbon/react'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
-import { StoredUseCase } from '@prisma/client'
+import { StoredTestCase } from '@prisma/client'
 
-import { UseCase } from '../../../types'
+import { TestCase } from '../../../types'
 import { useModelProviderCredentials } from './ModelProviderCredentialsProvider'
 
 interface UserUseCasesContextValue {
-  userUseCases: UseCase[]
-  setUserUseCases: Dispatch<SetStateAction<UseCase[]>>
+  userUseCases: TestCase[]
+  setUserUseCases: Dispatch<SetStateAction<TestCase[]>>
 }
 
 const UserUseCasesContext = createContext<UserUseCasesContextValue>({
@@ -26,7 +26,7 @@ export const useUserUseCasesContext = () => {
 
 export const UserUseCasesProvider = ({ children }: { children: ReactNode }) => {
   const [loadingUseCases, setLoadingUseCases] = useState(false)
-  const [userUseCases, setUserUseCases] = useState<UseCase[] | null>(null)
+  const [userUseCases, setUserUseCases] = useState<TestCase[] | null>(null)
   const { getUserName } = useAuthentication()
   const { get } = useFetchUtils()
   const { parseFetchedUseCase } = useParseFetchedUseCase()
@@ -35,12 +35,12 @@ export const UserUseCasesProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchUseCases = async () => {
       setLoadingUseCases(true)
-      const fetchedUserUseCases: StoredUseCase[] = await (
+      const fetchedUserUseCases: StoredTestCase[] = await (
         await get(`test_case/?user=${encodeURIComponent(getUserName())}`)
       ).json()
       const parsedFetchedUserUseCases = fetchedUserUseCases
         .map((testCase) => parseFetchedUseCase(testCase))
-        .filter((testCase) => testCase !== null) as UseCase[]
+        .filter((testCase) => testCase !== null) as TestCase[]
       setUserUseCases(parsedFetchedUserUseCases)
       setLoadingUseCases(false)
     }
@@ -53,7 +53,7 @@ export const UserUseCasesProvider = ({ children }: { children: ReactNode }) => {
     <UserUseCasesContext.Provider
       value={{
         userUseCases,
-        setUserUseCases: setUserUseCases as Dispatch<SetStateAction<UseCase[]>>,
+        setUserUseCases: setUserUseCases as Dispatch<SetStateAction<TestCase[]>>,
       }}
     >
       {children}
