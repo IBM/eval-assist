@@ -109,7 +109,7 @@ transformers==4.51.3
 typing-inspection==0.4.0
 typing_extensions==4.13.2
 tzdata==2025.2
-unitxt==1.22.4
+unitxt==1.22.3
 urllib3==2.4.0
 uvicorn==0.34.2
 virtualenv==20.30.0
