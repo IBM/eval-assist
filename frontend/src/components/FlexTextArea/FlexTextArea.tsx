@@ -7,6 +7,7 @@ import { fast01 } from '@carbon/motion'
 import { TextArea } from '@carbon/react'
 
 import { DirectAIManipulationPopup, DirectAIManipulationPopupVisibility } from '@components/DirectAIManipulationPopup'
+import { useSelectedTextContext } from '@components/SingleExampleEvaluation/Providers/SelectedTextProvider'
 import { useMergeRefs } from '@floating-ui/react'
 import { getCaretPosition } from '@utils'
 
@@ -27,7 +28,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
     confirmation: false,
   })
   const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
-  const [selectedText, setSelectedText] = useState<string>('')
+  const { selectedText, setSelectedText, isMouseUp } = useSelectedTextContext()
   const [generatedText, setGeneratedText] = useState('')
 
   const [isFocused, setFocused] = useState(false)
@@ -44,33 +45,36 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
 
   const ref = useMergeRefs([outsideRef, innerRef])
 
-  const handleMouseUp = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
-    const textarea = innerRef.current
-    if (!textarea) return
-    const { x, y } = getCaretPosition(textarea)
-    const selectionStart = textarea.selectionStart
-    const selectionEnd = textarea.selectionEnd
-    const text = textarea.value.substring(selectionStart, selectionEnd)
-    if (text) {
-      setSelectedText(text)
-      setPopupPosition({ top: y + 10, left: x })
-      setPopupVisibility({ options: true, prompt: false, confirmation: false })
-    } else {
-      setPopupVisibility({ options: false, prompt: false, confirmation: false })
-    }
-  }, [])
+  // const handleMouseUp = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
+  //   const textarea = innerRef.current
+  //   if (!textarea) return
+  //   const { x, y } = getCaretPosition(textarea)
+  //   if (text) {
+  //     setPopupPosition({ top: y + 10, left: x })
+  //     setPopupVisibility({ options: true, prompt: false, confirmation: false })
+  //   } else {
+  //     setPopupVisibility({ options: false, prompt: false, confirmation: false })
+  //   }
+  // }, [])
 
   useEffect(() => {
-    if (!innerRef.current || !generatedText || !popupVisibility.confirmation) {
+    const textarea = innerRef.current
+    if (!textarea || !selectedText || !isFocused || !isMouseUp) {
+      setPopupVisibility({ options: false, prompt: false, confirmation: false })
       return
     }
-    const { x, y } = getCaretPosition(innerRef.current)
+    const { x, y } = getCaretPosition(textarea)
 
-    setPopupPosition({
-      left: x,
-      top: y + 10,
-    })
-  }, [generatedText, popupPosition.left, popupVisibility.confirmation])
+    if (selectedText || generatedText) {
+      setPopupPosition({ top: y + 10, left: x })
+    }
+
+    if (generatedText) {
+      setPopupVisibility({ options: false, prompt: false, confirmation: true })
+    } else {
+      setPopupVisibility({ options: true, prompt: false, confirmation: false })
+    }
+  }, [generatedText, isFocused, isMouseUp, selectedText])
 
   useEffect(() => {
     if (!fixMaxHeight) {
@@ -126,21 +130,18 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
         className={cx(className, classes.flex, {
           [classes.flexExpanded]: isFocused,
         })}
-        onBlur={() => {
-          setPopupVisibility({ options: false, prompt: false, confirmation: false })
-        }}
+        onBlur={() => {}}
       >
         <div className={classes.textAreaWrapper}>
           <TextArea
             {...props}
-            onMouseUp={handleMouseUp}
             ref={ref}
             className={classes.textArea}
             onFocus={() => {
               setFocused(true)
             }}
             onBlur={(e) => {
-              !isPopupOpen && setFocused(false)
+              setFocused(false)
               // e.stopPropagation()
             }}
           />
@@ -150,9 +151,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
 
           {isFocused && (
             <DirectAIManipulationPopup
-              setSelectedText={setSelectedText}
               textAreaRef={innerRef}
-              selectedText={selectedText}
               wholeText={(props.value as string) || ''}
               popupPosition={popupPosition}
               generatedText={generatedText}
@@ -162,7 +161,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
                 props.onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLTextAreaElement>)
               }
               popupVisibility={popupVisibility}
-              setPopupVisibility={setPopupVisibility}
+              // setPopupVisibility={setPopupVisibility}
             />
           )}
           <div
