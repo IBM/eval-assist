@@ -19,5 +19,5 @@ openai
 transformers>=4.48.0
 torch
 accelerate
-unitxt>=1.21.0
+unitxt>=1.21.3
 nbconvert
