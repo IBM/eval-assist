@@ -6,6 +6,7 @@ import { CriteriasProvider } from './Providers/CriteriasProvider'
 import { CurrentTestCaseProvider } from './Providers/CurrentTestCaseProvider'
 import { EvaluatorOptionsProvider } from './Providers/EvaluatorOptionsProvider'
 import { ModelProviderCredentialsProvider } from './Providers/ModelProviderCredentialsProvider'
+import { SelectedTextProvider } from './Providers/SelectedTextProvider'
 import { SyntheticGenerationProvider } from './Providers/SyntheticGenerationProvider'
 import { URLParamsProvider } from './Providers/URLParamsProvider'
 import { UserUseCasesProvider } from './Providers/UserUseCasesProvider'
@@ -19,13 +20,15 @@ const Landing = () => (
           <UserUseCasesProvider>
             <URLParamsProvider>
               <CurrentTestCaseProvider>
-                <SyntheticGenerationProvider>
-                  <AppSidebarProvider>
-                    <EditorProvider>
-                      <SingleExampleEvaluation />
-                    </EditorProvider>
-                  </AppSidebarProvider>
-                </SyntheticGenerationProvider>
+                <SelectedTextProvider>
+                  <SyntheticGenerationProvider>
+                    <AppSidebarProvider>
+                      <EditorProvider>
+                        <SingleExampleEvaluation />
+                      </EditorProvider>
+                    </AppSidebarProvider>
+                  </SyntheticGenerationProvider>
+                </SelectedTextProvider>
               </CurrentTestCaseProvider>
             </URLParamsProvider>
           </UserUseCasesProvider>

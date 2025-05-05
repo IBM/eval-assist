@@ -3,6 +3,7 @@ import { Dispatch, RefObject, SetStateAction, useCallback, useEffect, useState }
 import { IconButton, TextInput } from '@carbon/react'
 import { AiLabel, Checkmark, Rotate, Send, TextLongParagraph, TextShortParagraph, Undo } from '@carbon/react/icons'
 
+import { useSelectedTextContext } from '@components/SingleExampleEvaluation/Providers/SelectedTextProvider'
 import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
 import { DirectActionTypeEnum } from '@types'
 
@@ -10,13 +11,11 @@ import classes from './index.module.scss'
 
 interface Props {
   popupPosition: { top: number; left: number }
-  selectedText: string
   wholeText: string
   onChange: (newValue: string) => void
   textAreaRef: RefObject<HTMLTextAreaElement>
-  setSelectedText: Dispatch<SetStateAction<string>>
   popupVisibility: DirectAIManipulationPopupVisibility
-  setPopupVisibility: Dispatch<SetStateAction<DirectAIManipulationPopupVisibility>>
+  // setPopupVisibility: Dispatch<SetStateAction<DirectAIManipulationPopupVisibility>>
   generatedText: string
   setGeneratedText: Dispatch<SetStateAction<string>>
 }
@@ -30,39 +29,35 @@ export interface DirectAIManipulationPopupVisibility {
 export const DirectAIManipulationPopup = ({
   popupPosition,
   wholeText,
-  selectedText,
   textAreaRef,
   popupVisibility,
   generatedText,
   setGeneratedText,
-  setPopupVisibility,
+  // setPopupVisibility,
   onChange,
-  setSelectedText,
 }: Props) => {
   const { performDirectAIAction, loadingDirectAIAction } = useSyntheticGeneration()
   const [prompt, setPrompt] = useState('')
+  const [actionedText, setActionedText] = useState('')
+  const { selectedText, setSelectedText, isMouseUp } = useSelectedTextContext()
 
   const onOptionClick = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement>, action: DirectActionTypeEnum, prompt?: string) => {
       e.preventDefault() // Prevent focus shift
       e.stopPropagation()
-
+      setActionedText(selectedText)
       const res = await performDirectAIAction({ text: wholeText, selection: selectedText, action, prompt })
       onChange && res && onChange(wholeText.replace(selectedText, res))
       setGeneratedText(res)
-      setPopupVisibility({ options: false, prompt: false, confirmation: true })
     },
-    [onChange, performDirectAIAction, selectedText, setGeneratedText, setPopupVisibility, wholeText],
+    [onChange, performDirectAIAction, selectedText, setGeneratedText, wholeText],
   )
 
-  const onCustomOptionClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault()
-      e.stopPropagation()
-      setPopupVisibility({ options: true, prompt: true, confirmation: false })
-    },
-    [setPopupVisibility],
-  )
+  const onCustomOptionClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    // setPopupVisibility({ options: true, prompt: true, confirmation: false })
+  }, [])
 
   useEffect(() => {
     if (!textAreaRef.current || !generatedText) {
@@ -77,21 +72,22 @@ export const DirectAIManipulationPopup = ({
   }, [generatedText, selectedText, textAreaRef, wholeText])
 
   const closeAll = useCallback(() => {
-    setPopupVisibility({ options: false, prompt: false, confirmation: false })
-  }, [setPopupVisibility])
+    // setPopupVisibility({ options: false, prompt: false, confirmation: false })
+  }, [])
 
   const clean = useCallback(() => {
-    closeAll()
+    // closeAll()
     setGeneratedText('')
     setPrompt('')
+    setActionedText('')
     setSelectedText('')
-    textAreaRef.current?.setSelectionRange(null, null)
-  }, [closeAll, setGeneratedText, setSelectedText, textAreaRef])
+    // textAreaRef.current?.setSelectionRange(null, null)
+  }, [setGeneratedText, setSelectedText])
 
   const onCancelClick = useCallback(() => {
     clean()
-    onChange && generatedText && onChange(wholeText.replace(generatedText, selectedText))
-  }, [clean, generatedText, onChange, selectedText, wholeText])
+    onChange && generatedText && onChange(wholeText.replace(generatedText, actionedText))
+  }, [actionedText, clean, generatedText, onChange, wholeText])
 
   const onConfirmClick = useCallback(() => {
     clean()
@@ -107,7 +103,7 @@ export const DirectAIManipulationPopup = ({
         className={classes.popoverContainer}
       >
         {popupVisibility.options && (
-          <div className={classes.optionsContainer}>
+          <div className={classes.optionsContainer} onBlur={closeAll}>
             <IconButton
               className={classes.iconButton}
               kind={'ghost'}
@@ -133,6 +129,7 @@ export const DirectAIManipulationPopup = ({
               <TextShortParagraph />
             </IconButton>
             <IconButton
+              disabled
               className={classes.iconButton}
               kind={'ghost'}
               label={'Custom prompt'}
