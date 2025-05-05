@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useCallback, useEffect } from 'react'
 
-import { UseCase } from '@types'
+import { TestCase } from '@types'
 
 interface Props {
   onSave: () => Promise<void>

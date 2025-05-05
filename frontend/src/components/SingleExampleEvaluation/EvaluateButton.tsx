@@ -5,7 +5,7 @@ import { CSSProperties, Dispatch, SetStateAction } from 'react'
 import { Button, InlineLoading, Tooltip } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
-import { ModelProviderType, UseCase } from '@types'
+import { ModelProviderType, TestCase } from '@types'
 
 import classes from './EvaluateButton.module.scss'
 import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'

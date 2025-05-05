@@ -3,20 +3,13 @@ import { getEmptyCriteriaWithTwoOptions, toTitleCase } from 'src/utils'
 import { useMemo } from 'react'
 
 import { useCriteriasContext } from '@components/SingleExampleEvaluation/Providers/CriteriasProvider'
+import { TaskEnum } from '@constants'
 
-import {
-  Criteria,
-  CriteriaWithOptions,
-  DirectInstance,
-  EvaluationType,
-  PairwiseInstance,
-  TaskEnum,
-  UseCase,
-} from '../types'
+import { Criteria, CriteriaWithOptions, DirectInstance, EvaluationType, PairwiseInstance, TestCase } from '../types'
 
 export const useTestCaseLibrary = () => {
   const { getCriteria, getEmptyUseCaseWithCriteria } = useCriteriasContext()
-  const harmsAndRisksLibraryTestCases: { [useCaseCategory: string]: UseCase[] } = useMemo(
+  const harmsAndRisksLibraryTestCases: { [useCaseCategory: string]: TestCase[] } = useMemo(
     () => ({
       harmful_content_in_user_prompt: [
         {
@@ -429,7 +422,7 @@ export const useTestCaseLibrary = () => {
     [getEmptyUseCaseWithCriteria],
   )
 
-  const directLibraryTestCases: UseCase[] = useMemo(
+  const directLibraryTestCases: TestCase[] = useMemo(
     () => [
       {
         name: 'Temperature',
@@ -1136,7 +1129,7 @@ website or contact them to discuss your options.`,
     [getCriteria],
   )
 
-  const pairwiseLibraryTestCases: UseCase[] = useMemo(
+  const pairwiseLibraryTestCases: TestCase[] = useMemo(
     () => [
       {
         name: 'Temperature',
@@ -1365,7 +1358,7 @@ website or contact them to discuss your options.`,
     [getCriteria],
   )
 
-  const allLibraryUseCases = useMemo<UseCase[]>(
+  const allLibraryUseCases = useMemo<TestCase[]>(
     () => [
       ...pairwiseLibraryTestCases,
       ...directLibraryTestCases,

@@ -9,11 +9,11 @@ import { Launch } from '@carbon/react/icons'
 
 import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFromUseCase'
 
-import { UseCase } from '../../../types'
+import { TestCase } from '../../../types'
 import sharedClasses from './shared.module.scss'
 
 interface LinkButtonProps {
-  useCase: UseCase
+  useCase: TestCase
   subCatalogName?: string
   className?: string
 }

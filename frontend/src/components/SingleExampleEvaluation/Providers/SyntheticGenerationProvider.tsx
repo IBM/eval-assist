@@ -2,8 +2,9 @@ import { ReactNode, createContext, useCallback, useContext, useMemo, useState } 
 
 import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
+import { DirectActionTypeEnum, DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@constants'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { DirectActionTypeEnum, DirectInstance, DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@types'
+import { DirectInstance } from '@types'
 
 interface SyntheticGenerationContextValue {
   loadingSyntheticExamples: boolean

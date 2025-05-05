@@ -2,11 +2,11 @@ import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 
-import { UseCase } from '../../../types'
+import { TestCase } from '../../../types'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 
 interface Props {
-  updateURLFromUseCase: (useCaseSelected: { useCase: UseCase; subCatalogName: string | null } | null) => void
+  updateURLFromUseCase: (useCaseSelected: { useCase: TestCase; subCatalogName: string | null } | null) => void
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   onSave: () => Promise<void>

@@ -6,7 +6,7 @@ import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
 import { Layer, Modal, Select, SelectItem } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
-import { Criteria, CriteriaWithOptions, EvaluationType, UseCase } from '../../../types'
+import { Criteria, CriteriaWithOptions, EvaluationType, TestCase } from '../../../types'
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'
 import { useCriteriasContext } from '../Providers/CriteriasProvider'
 import { useEvaluatorOptionsContext } from '../Providers/EvaluatorOptionsProvider'
@@ -17,7 +17,7 @@ interface Props {
   open: boolean
   changesDetected: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  updateURLFromUseCase: (useCaseSelected: { useCase: UseCase; subCatalogName: string | null }) => void
+  updateURLFromUseCase: (useCaseSelected: { useCase: TestCase; subCatalogName: string | null }) => void
 }
 
 export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromUseCase }: Props) => {
@@ -32,7 +32,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
 
   const onSubmit = async () => {
     if (directEvaluators !== null && pairwiseEvaluators !== null && selectedType !== null) {
-      let toCreateTestCase: UseCase
+      let toCreateTestCase: TestCase
       if (selectedCriteria !== null) {
         toCreateTestCase = getEmptyUseCaseWithCriteria(selectedCriteria.name, selectedType)
       } else {

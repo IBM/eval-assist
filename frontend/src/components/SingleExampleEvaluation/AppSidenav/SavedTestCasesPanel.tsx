@@ -9,16 +9,16 @@ import { IconButton } from '@carbon/react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, Compare, DotMark, List } from '@carbon/react/icons'
 
-import { EvaluationType, UseCase } from '../../../types'
+import { EvaluationType, TestCase } from '../../../types'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { LinkButton } from './LinkButton'
 import classes from './TwoLevelsPanel.module.scss'
 import sharedClasses from './shared.module.scss'
 
 interface Props {
-  onUseCaseClick: (useCase: UseCase) => void
+  onUseCaseClick: (useCase: TestCase) => void
   onClose: () => void
-  userUseCases: UseCase[]
+  userUseCases: TestCase[]
 }
 
 export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: Props) => {

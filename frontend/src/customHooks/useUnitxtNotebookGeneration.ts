@@ -3,7 +3,7 @@ import { useModelProviderCredentials } from '@components/SingleExampleEvaluation
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { returnByPipelineType } from '@utils'
 
-import { DirectInstance, EvaluationType, Instance, PairwiseInstance, UseCase } from '../types'
+import { DirectInstance, EvaluationType, Instance, PairwiseInstance, TestCase } from '../types'
 import { useFetchUtils } from './useFetchUtils'
 
 export const useUnitxtCodeGeneration = () => {

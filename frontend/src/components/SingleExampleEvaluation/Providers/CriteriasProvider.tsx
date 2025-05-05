@@ -11,14 +11,14 @@ import { ReactNode, createContext, useCallback, useContext, useEffect, useState 
 import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { Criteria, CriteriaWithOptions, EvaluationType, UseCase } from '@types'
+import { Criteria, CriteriaWithOptions, EvaluationType, TestCase } from '@types'
 
 interface PipelineContextValue {
   directCriterias: CriteriaWithOptions[] | null
   pairwiseCriterias: Criteria[] | null
   loadingCriterias: boolean
   getCriteria: (name: string, type: EvaluationType) => CriteriaWithOptions | Criteria | null
-  getEmptyUseCaseWithCriteria: (criteriaName: string, type: EvaluationType) => UseCase
+  getEmptyUseCaseWithCriteria: (criteriaName: string, type: EvaluationType) => TestCase
 }
 
 const PipelineTypesContext = createContext<PipelineContextValue>({
@@ -72,7 +72,7 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const getEmptyUseCaseWithCriteria = useCallback(
-    (criteriaName: string, type: EvaluationType): UseCase => ({
+    (criteriaName: string, type: EvaluationType): TestCase => ({
       ...getEmptyTestCase(type),
       criteria: getCriteria(criteriaName, type) || getEmptyCriteriaByType(type),
     }),

@@ -15,16 +15,9 @@ import {
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
-import {
-  Criteria,
-  CriteriaWithOptions,
-  DomainEnum,
-  EvaluationType,
-  GenerationLengthEnum,
-  PersonaEnum,
-  SyntheticGenerationConfig,
-  TaskEnum,
-} from '@types'
+import { DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@constants'
+import '@types'
+import { CriteriaWithOptions, SyntheticGenerationConfig } from '@types'
 import { returnByPipelineType } from '@utils'
 
 import { PipelineSelect } from '../EvaluatorSelect'

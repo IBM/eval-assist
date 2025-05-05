@@ -1,18 +1,17 @@
 import {
   CaretCoordinates,
   Criteria,
+  CriteriaOption,
   CriteriaWithOptions,
   DirectInstance,
   EvaluationType,
   Instance,
-  Option,
   PairwiseInstance,
   PairwiseInstanceResult,
-  TaskEnum,
-  UseCase,
+  TestCase,
 } from '@types'
 
-export const isInstanceOfOption = (obj: any): obj is Option =>
+export const isInstanceOfOption = (obj: any): obj is CriteriaOption =>
   typeof obj.name === 'string' && typeof obj.description === 'string'
 
 export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseInstanceResult =>
@@ -27,7 +26,7 @@ export const isInstanceOfCriteriaWithOptions = (obj: any): obj is CriteriaWithOp
   typeof obj.name === 'string' &&
   typeof obj.description === 'string' &&
   obj.options !== undefined &&
-  obj.options.every((o: Option) => isInstanceOfOption(o))
+  obj.options.every((o: CriteriaOption) => isInstanceOfOption(o))
 
 export const isInstanceOfCriteria = (obj: any): obj is Criteria =>
   typeof obj.name === 'string' && typeof obj.description === 'string'
@@ -68,7 +67,7 @@ export const getEmptyPairwiseInstance = (): PairwiseInstance => ({
 })
 export const getEmptyDirectInstance = (): DirectInstance => ({ ...getEmptyInstance(), response: '', result: null })
 
-export const getEmptyTestCase = (type: EvaluationType): UseCase => ({
+export const getEmptyTestCase = (type: EvaluationType): TestCase => ({
   id: null,
   name: '',
   type,

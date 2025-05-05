@@ -11,14 +11,14 @@ import { ChevronLeft, DotMark } from '@carbon/react/icons'
 
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
-import { UseCase } from '../../../types'
+import { TestCase } from '../../../types'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import { LinkButton } from './LinkButton'
 import classes from './ThreeLevelsPanel.module.scss'
 import sharedClasses from './shared.module.scss'
 
 interface Props {
-  onUseCaseClick: (useCase: UseCase) => void
+  onUseCaseClick: (useCase: TestCase) => void
   onClose: () => void
 }
 
@@ -45,7 +45,7 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
       [key]: !expanded[key],
     })
 
-  const onClick = (e: any, useCase: UseCase) => {
+  const onClick = (e: any, useCase: TestCase) => {
     e.stopPropagation()
     e.preventDefault()
     onUseCaseClick(useCase)
