@@ -366,10 +366,14 @@ class GraniteGuardianEvaluator(ABC):
 
         dataset = load_dataset(card=card, split="test")
         evaluated_dataset = evaluate(predictions=[0.0 for _ in dataset], data=dataset)
-        result = self.parse_results(
+
+        per_instance_result = self.parse_results(
             evaluated_dataset, instances[0].response_variable_name
         )
-        return result
+        results = []
+        for instance_result, instance in zip(per_instance_result, instances):
+            results.append({"id": instance.id, "result": instance_result})
+        return results
 
     def infer_risk_type(
         self, risk_name: str, field_map: dict[str, str], input_fields: dict[str, str]
