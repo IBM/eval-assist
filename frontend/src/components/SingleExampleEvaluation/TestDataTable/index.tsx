@@ -140,13 +140,14 @@ export const TestDataTable = ({
   }
 
   const addContextVariable = () => {
-    setInstances(
-      instances.map((instance) => ({
+    setCurrentTestCase({
+      ...currentTestCase,
+      instances: instances.map((instance) => ({
         ...instance,
         contextVariables: [...instance.contextVariables, { name: '', value: '' }],
       })),
-    )
-    setCurrentTestCase({ ...currentTestCase, contextVariableNames: [...currentTestCase.contextVariableNames, ''] })
+      contextVariableNames: [...currentTestCase.contextVariableNames, ''],
+    })
   }
 
   const addResponse = () => {
@@ -158,28 +159,23 @@ export const TestDataTable = ({
   }
 
   const editContextVariable = (newValue: string, index: number) => {
-    const actualIndex = getActualInstanceIndex(index)
-    setInstances(
-      instances.map((instance) => {
-        return {
-          ...instance,
-          contextVariables: [
-            ...instance.contextVariables.slice(0, actualIndex),
-            {
-              name: newValue,
-              value: instance.contextVariables[actualIndex].value,
-            },
-            ...instance.contextVariables.slice(actualIndex + 1),
-          ],
-        }
-      }),
-    )
     setCurrentTestCase({
       ...currentTestCase,
+      instances: instances.map((instance) => ({
+        ...instance,
+        contextVariables: [
+          ...instance.contextVariables.slice(0, index),
+          {
+            name: newValue,
+            value: instance.contextVariables[index].value,
+          },
+          ...instance.contextVariables.slice(index + 1),
+        ],
+      })),
       contextVariableNames: [
-        ...currentTestCase.contextVariableNames.slice(0, actualIndex),
+        ...currentTestCase.contextVariableNames.slice(0, index),
         newValue,
-        ...currentTestCase.contextVariableNames.slice(actualIndex + 1),
+        ...currentTestCase.contextVariableNames.slice(index + 1),
       ],
     })
   }
