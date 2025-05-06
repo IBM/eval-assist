@@ -57,6 +57,7 @@ from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNot
 # Synthetic
 from .synthetic_example_generation.generate import DirectActionGenerator, Generator
 from .utils import (
+    clean_object,
     get_custom_models,
     get_evaluator_metadata_wrapper,
     get_model_name_from_evaluator,
@@ -122,6 +123,28 @@ def get_evaluators():
             )
         )
     return EvaluatorsResponseModel(evaluators=evaluators)
+
+
+@router.get("/default-credentials/", response_model=dict[str, dict[str, str]])
+def get_default_credentials():
+    openai_api_key = os.getenv("OPENAI_API_KEY", None)
+    azure_openai_api_key = os.getenv("AZURE_OPENAI_API_KEY", None)
+    rits_api_key = os.getenv("RITS_API_KEY", None)
+    watsonx_api_key = os.getenv("WATSONX_API_KEY", None)
+    watsonx_project_id = os.getenv("WATSONX_PROJECT_ID", None)
+
+    res = clean_object(
+        {
+            "rits": {"api_key": rits_api_key},
+            "watsonx": {
+                "api_key": watsonx_api_key,
+                "project_id": watsonx_project_id,
+            },
+            "open-ai": {"api_key": openai_api_key},
+            "azure": {"api_key": azure_openai_api_key},
+        }
+    )
+    return res
 
 
 @router.get("/criterias/")

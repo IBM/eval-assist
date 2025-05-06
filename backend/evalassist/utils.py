@@ -366,3 +366,25 @@ def handle_llm_generation_exceptions(func):
             )
 
     return wrapper
+
+
+def clean_object(results: dict | list):
+    """Cleans the object by removing `None` values and empty lists and dictionaries.
+
+    Args:
+        results (Union[dict, list]): The results to clean.
+
+    Returns:
+        Union[dict, list]: The cleaned results.
+    """
+    if isinstance(results, list):
+        return [clean_object(x) for x in results]
+    cleaned = {
+        k: (v if not isinstance(v, dict) else clean_object(v))
+        for k, v in results.items()
+        if v is not None and not (isinstance(v, (list, dict)) and len(v) == 0)
+    }
+    # Remove the dictionary itself if it becomes empty
+    return {
+        k: v for k, v in cleaned.items() if not (isinstance(v, dict) and len(v) == 0)
+    }
