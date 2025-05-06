@@ -287,12 +287,7 @@ export const TestDataTableRow = ({
                         >{`Agreement: ${result.agreement ? 'Yes' : 'No'}`}</div>
                       )}
                       {isResultOutdated && (
-                        <div
-                          className={cx(classes.resultBlockTypography, {
-                            [classes.untrastedResultTypography]: !result.agreement,
-                            [classes.softText]: result.agreement,
-                          })}
-                        >
+                        <div className={cx(classes.resultBlockTypography, classes.softText)}>
                           {'This result is outdated!'}
                         </div>
                       )}
