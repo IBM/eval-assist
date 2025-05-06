@@ -1,5 +1,3 @@
-import json
-
 # from model import Model
 # from _archive.liberated_model import LiberatedModel
 # from utils.data_utils import load_jsonl, save_to_jsonl
@@ -135,28 +133,29 @@ class DirectActionGenerator:
                     "action_tag": action_tag,
                 },
                 template=dedent(
-                    """You will be provided with:
+                    """\
+                    You will be provided with:
 
-                - A selected text
+                    - A selected text
 
-                - A text containing that selection, with the selection marked using {action_tag} tags
+                    - A text containing that selection, with the selection marked using {action_tag} tags
 
-                Your task is to {action_description} the selected text such that:
+                    Your task is to {action_description} the selected text such that:
 
-                - It preserves the original meaning and intent
+                    - It preserves the original meaning and intent
 
-                - It fits seamlessly into the original text, both semantically and grammatically
+                    - It fits seamlessly into the original text, both semantically and grammatically
 
-                ✅ The generated selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
-                🚫 Do not introduce any new information that is not present in the original text.
+                    ✅ The generated selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
+                    🚫 Do not introduce any new information that is not present in the original text.
 
-                Selection:
-                {selection}
+                    Selection:
+                    {selection}
 
-                Text with selection (wrapped in-between {action_tag} tags):
-                {text_with_selection}
+                    Text with selection (wrapped in-between {action_tag} tags):
+                    {text_with_selection}
 
-                {format_instructions}
+                    {format_instructions}
                 """,
                 ),
             )
@@ -198,33 +197,32 @@ class DirectActionGenerator:
                     "action_tag": action_tag,
                     "format_instructions": format_instructions,
                 },
-                template=dedent(
-                    """You will be provided with:
+                template=dedent("""\
+                    You will be provided with:
 
-                - A selected text
+                    - A selected text
 
-                - A text containing that selection, with the selection marked using {action_tag} tags
+                    - A text containing that selection, with the selection marked using {action_tag} tags
 
-                Your task is {action_infinitive} the selected text such that:
+                    Your task is {action_infinitive} the selected text such that:
 
-                - It preserves the original meaning and intent
+                    - It preserves the original meaning and intent
 
-                - It fits seamlessly into the original text, both semantically and grammatically
+                    - It fits seamlessly into the original text, both semantically and grammatically
 
-                ✅ The {action_past} selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
-                🚫 Do not introduce any new information that is not present in the original text.
+                    ✅ The {action_past} selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
+                    🚫 Do not introduce any new information that is not present in the original text.
 
-                - if the selection is equal to the whole text, your task is {action_infinitive} the whole text.
-                
-                Selection:
-                {selection}
+                    - if the selection is equal to the whole text, your task is {action_infinitive} the whole text.
+                    
+                    Selection:
+                    {selection}
 
-                Text with selection (wrapped in-between {action_tag} tags):
-                {text_with_selection}
+                    Text with selection (wrapped in-between {action_tag} tags):
+                    {text_with_selection}
 
-                {format_instructions}
-                """,
-                ),
+                    {format_instructions}
+                    """),
             )
 
             # query_template = PromptTemplate(
@@ -333,19 +331,21 @@ class Generator:
             # prompt templates
             self.system_prompt_template = PromptTemplate(
                 input_variables=system_prompt_input_variables,
-                template=dedent("""You will be asked to generate an answer to a question according to the following requirements:
+                template=dedent("""\
+                    You will be asked to generate an answer to a question according to the following requirements:
 
-                Dimension: {dimension}
-                Dimension description: {dimension_description}
-                Target: {target}
-                {target_description_section}
+                    Dimension: {dimension}
+                    Dimension description: {dimension_description}
+                    Target: {target}
+                    {target_description_section}
 
-                Your task is to generate an answer that STRICTLY follows this requirement. This is for evaluation purposes.
+                    Your task is to generate an answer that STRICTLY follows this requirement. This is for evaluation purposes.
 
-                Important:
-                {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
-                - Make sure your answer clearly demonstrates the described characteristics
-                - Do not mention the criteria in your answer - simply generate an answer to the question that embodies the characteristics"""),
+                    Important:
+                    {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
+                    - Make sure your answer clearly demonstrates the described characteristics
+                    - Do not mention the criteria in your answer - simply generate an answer to the question that embodies the characteristics
+                    """),
             )
 
             self.query_template = PromptTemplate(
@@ -366,20 +366,22 @@ class Generator:
             # prompt templates
             self.system_prompt_template = PromptTemplate(
                 input_variables=system_prompt_input_variables,
-                template=dedent("""You will be given some source text and will be asked to generate a summary according to a specific target criteria.
+                template=dedent("""\
+                    You will be given some source text and will be asked to generate a summary according to a specific target criteria.
 
-                You should generate a summary that matches the following requirements:
-                Dimension: {dimension}
-                Dimension description: {dimension_description}
-                Target: {target}
-                {target_description_section}
+                    You should generate a summary that matches the following requirements:
+                    Dimension: {dimension}
+                    Dimension description: {dimension_description}
+                    Target: {target}
+                    {target_description_section}
 
-                Your task is to generate a summary that STRICTLY follows this requirement. This is for evaluation purposes.
+                    Your task is to generate a summary that STRICTLY follows this requirement. This is for evaluation purposes.
 
-                Important:
-                {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
-                - Make sure your summary clearly demonstrates the described characteristics
-                - Do not mention the criteria in your summary - simply generate a summary that embodies the characteristics"""),
+                    Important:
+                    {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
+                    - Make sure your summary clearly demonstrates the described characteristics
+                    - Do not mention the criteria in your summary - simply generate a summary that embodies the characteristics
+                    """),
             )
 
             self.query_template = PromptTemplate(
@@ -401,19 +403,21 @@ class Generator:
 
             self.system_prompt_template = PromptTemplate(
                 input_variables=system_prompt_input_variables,
-                template=dedent("""You will be asked to generate a {response_name} according to the following requirements:
-                
-                Dimension: {dimension}
-                Dimension description: {dimension_description}
-                Target: {target}
-                {target_description_section}
-                
-                Your task is to generate a {response_name} that STRICTLY follows this requirement. This is for evaluation purposes.
+                template=dedent("""\
+                    You will be asked to generate a {response_name} according to the following requirements:
+                    
+                    Dimension: {dimension}
+                    Dimension description: {dimension_description}
+                    Target: {target}
+                    {target_description_section}
+                    
+                    Your task is to generate a {response_name} that STRICTLY follows this requirement. This is for evaluation purposes.
 
-                Important:
-                {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
-                - Make sure your response clearly demonstrates the described characteristics
-                - Do not mention the criteria in your response - simply generate a response that embodies the characteristics"""),
+                    Important:
+                    {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
+                    - Make sure your response clearly demonstrates the described characteristics
+                    - Do not mention the criteria in your response - simply generate a response that embodies the characteristics
+                    """),
             )
 
             self.query_template = PromptTemplate(
@@ -443,9 +447,8 @@ class Generator:
         responses = self.inference_engine.infer(
             [{"source": prompt} for prompt in prompts]
         )
-        logger.debug(
-            f"The generated unparsed examples are:\n{json.dumps(responses, indent=2)}"
-        )
+        logger.debug(f"The first prompt is: \n{prompts[0]}")
+        logger.debug(f"The generated unparsed examples are:\n{responses}")
 
         parsed_responses = [
             self.output_parser.parse(response) for response in responses
@@ -596,15 +599,17 @@ class Generator:
                 "persona",
                 "domain",
             ],
-            template=dedent("""You will be given a list of context names and you will be asked to generate an example of such context names based on the following reference information.
+            template=dedent("""\
+                You will be given a list of context names and you will be asked to generate an example of such context names based on the following reference information.
 
-            Your task is to generate the following context: {context_names}. This is for evaluation purposes.
-            
-            The generated context is intended to be used to generate a {response_name}{domain_section}{persona_section}.
-                            
-            The {response_name} is going to be evaluated based on the following criteria.
-                            
-            {criteria}: {criteria_description}"""),
+                Your task is to generate the following context: {context_names}. This is for evaluation purposes.
+                
+                The generated context is intended to be used to generate a {response_name}{domain_section}{persona_section}.
+                                
+                The {response_name} is going to be evaluated based on the following criteria.
+                                
+                {criteria}: {criteria_description}
+                """),
         )
 
         query_template = PromptTemplate(
@@ -624,7 +629,11 @@ class Generator:
         query = query_template.format()
 
         prompt = system_prompt + "\n\n" + query
+
         response = self.inference_engine.infer([{"source": prompt}])[0]
+
+        logger.debug(f"The prompt used for synthetic generation is:\n{prompt}")
+        logger.debug(f"The synthetic generation response is:\n{response}")
 
         parsed_response = output_parser.parse(response)
 
