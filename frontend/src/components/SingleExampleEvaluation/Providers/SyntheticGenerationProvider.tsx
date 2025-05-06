@@ -215,15 +215,6 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
   useEffect(() => {
     setCurrentTestCase((prevCurrentTestCase) => {
       const updatedTestCase = { ...prevCurrentTestCase }
-      if (prevCurrentTestCase.syntheticGenerationConfig.perCriteriaOptionCount === null) {
-        updatedTestCase.syntheticGenerationConfig.perCriteriaOptionCount = Object.fromEntries(
-          criteriaOptionNames.map((optionName) => [optionName, 1]),
-        )
-      }
-
-      if (prevCurrentTestCase.syntheticGenerationConfig.borderlineCount === null) {
-        prevCurrentTestCase.syntheticGenerationConfig.borderlineCount = 1
-      }
 
       if (prevCurrentTestCase.syntheticGenerationConfig.perCriteriaOptionCount !== null) {
         if (
@@ -248,7 +239,7 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
       }
       return updatedTestCase
     })
-  }, [criteriaOptionNames, currentTestCase.syntheticGenerationConfig, setCurrentTestCase])
+  }, [criteriaOptionNames, setCurrentTestCase])
 
   const fetchSyntheticExamples = useCallback(async () => {
     setLoadingSyntheticExamples(true)
