@@ -265,6 +265,8 @@ export type ModelProviderCredentials = {
   local_hf: {}
 }
 
+export type PartialModelProviderCredentials = Partial<Pick<ModelProviderCredentials, keyof ModelProviderCredentials>>
+
 export interface CaretCoordinates {
   x: number
   y: number
