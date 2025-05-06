@@ -20,9 +20,7 @@ import '@types'
 import { CriteriaWithOptions, SyntheticGenerationConfig } from '@types'
 import { returnByPipelineType } from '@utils'
 
-import { PipelineSelect } from '../EvaluatorSelect'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
-import { useEvaluatorOptionsContext } from '../Providers/EvaluatorOptionsProvider'
 import { useSyntheticGeneration } from '../Providers/SyntheticGenerationProvider'
 import classes from './SyntheticGenerationModal.module.scss'
 
@@ -56,54 +54,6 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
     },
     [currentTestCase, setCurrentTestCase],
   )
-
-  const criteriaOptionNames = useMemo(
-    () =>
-      currentTestCase.criteria && evaluationType
-        ? returnByPipelineType(
-            evaluationType,
-            () => (criteria as CriteriaWithOptions).options.map((option) => option.name),
-            [],
-          )
-        : [],
-    [criteria, currentTestCase.criteria, evaluationType],
-  )
-
-  useEffect(() => {
-    if (syntheticGenerationConfig.perCriteriaOptionCount === null) {
-      setSyntheticGenerationConfig({
-        ...syntheticGenerationConfig,
-        perCriteriaOptionCount: Object.fromEntries(criteriaOptionNames.map((optionName) => [optionName, 1])),
-      })
-    }
-
-    if (syntheticGenerationConfig.borderlineCount === null) {
-      setSyntheticGenerationConfig({
-        ...syntheticGenerationConfig,
-        borderlineCount: 1,
-      })
-    }
-    if (syntheticGenerationConfig.perCriteriaOptionCount !== null) {
-      if (
-        !criteriaOptionNames.every(
-          (criteriaOptionName) => criteriaOptionName in syntheticGenerationConfig.perCriteriaOptionCount!,
-        )
-      ) {
-        const newSyntheticGenerationConfig = { ...syntheticGenerationConfig }
-        const result: Record<string, number> = {}
-        // add new
-        criteriaOptionNames.forEach((k) => {
-          if (!Object.keys(newSyntheticGenerationConfig).includes(k)) {
-            result[k] = 1
-          } else {
-            result[k] = newSyntheticGenerationConfig.perCriteriaOptionCount![k]
-          }
-        })
-        newSyntheticGenerationConfig.perCriteriaOptionCount = result
-        setSyntheticGenerationConfig(newSyntheticGenerationConfig)
-      }
-    }
-  }, [criteriaOptionNames, setSyntheticGenerationConfig, syntheticGenerationConfig])
 
   const perTaskIndication = useMemo(() => {
     return {
