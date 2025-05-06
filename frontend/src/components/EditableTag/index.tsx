@@ -56,6 +56,11 @@ export const EditableTag = ({
               labelText={''}
               placeholder="Variable name"
               autoFocus
+              onKeyUp={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                if (event.key == 'Enter') {
+                  setIsEditing(false)
+                }
+              }}
             />
             {value !== '' && (
               <IconButton kind={'ghost'} label={'Save'} onClick={() => setIsEditing(false)}>
