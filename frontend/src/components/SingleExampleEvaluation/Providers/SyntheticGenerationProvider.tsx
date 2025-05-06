@@ -1,10 +1,11 @@
-import { ReactNode, createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { DirectActionTypeEnum, DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@constants'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { DirectInstance } from '@types'
+import { CriteriaWithOptions, DirectInstance } from '@types'
+import { returnByPipelineType } from '@utils'
 
 interface SyntheticGenerationContextValue {
   loadingSyntheticExamples: boolean
@@ -198,6 +199,56 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
     },
     [addToast, fetchDirectAIAction, removeToast],
   )
+
+  const criteriaOptionNames = useMemo(
+    () =>
+      currentTestCase.criteria && currentTestCase.type
+        ? returnByPipelineType(
+            currentTestCase.type,
+            () => (currentTestCase.criteria as CriteriaWithOptions).options.map((option) => option.name),
+            [],
+          )
+        : [],
+    [currentTestCase.criteria, currentTestCase.type],
+  )
+
+  useEffect(() => {
+    setCurrentTestCase((prevCurrentTestCase) => {
+      const updatedTestCase = { ...prevCurrentTestCase }
+      if (prevCurrentTestCase.syntheticGenerationConfig.perCriteriaOptionCount === null) {
+        updatedTestCase.syntheticGenerationConfig.perCriteriaOptionCount = Object.fromEntries(
+          criteriaOptionNames.map((optionName) => [optionName, 1]),
+        )
+      }
+
+      if (prevCurrentTestCase.syntheticGenerationConfig.borderlineCount === null) {
+        prevCurrentTestCase.syntheticGenerationConfig.borderlineCount = 1
+      }
+
+      if (prevCurrentTestCase.syntheticGenerationConfig.perCriteriaOptionCount !== null) {
+        if (
+          !criteriaOptionNames.every(
+            (criteriaOptionName) =>
+              criteriaOptionName in prevCurrentTestCase.syntheticGenerationConfig.perCriteriaOptionCount!,
+          )
+        ) {
+          const newSyntheticGenerationConfig = { ...prevCurrentTestCase.syntheticGenerationConfig }
+          const result: Record<string, number> = {}
+          // add new
+          criteriaOptionNames.forEach((k) => {
+            if (!Object.keys(newSyntheticGenerationConfig).includes(k)) {
+              result[k] = 1
+            } else {
+              result[k] = newSyntheticGenerationConfig.perCriteriaOptionCount![k]
+            }
+          })
+          newSyntheticGenerationConfig.perCriteriaOptionCount = result
+          updatedTestCase.syntheticGenerationConfig = newSyntheticGenerationConfig
+        }
+      }
+      return updatedTestCase
+    })
+  }, [criteriaOptionNames, currentTestCase.syntheticGenerationConfig, setCurrentTestCase])
 
   const fetchSyntheticExamples = useCallback(async () => {
     setLoadingSyntheticExamples(true)
