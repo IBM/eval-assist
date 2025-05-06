@@ -15,6 +15,7 @@ import {
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
 import {
+  CriteriaWithOptions,
   DirectInstance,
   EvaluationType,
   Evaluator,
@@ -192,6 +193,18 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
           syntheticGenerationConfig: { ...pu.syntheticGenerationConfig, evaluator: getDefaultEvaluator(pu.type, true) },
         }
       }
+      if (pu.type === EvaluationType.DIRECT) {
+        if (pu.syntheticGenerationConfig.perCriteriaOptionCount === null) {
+          pu.syntheticGenerationConfig.perCriteriaOptionCount = Object.fromEntries(
+            (pu.criteria as CriteriaWithOptions).options.map((option) => [option.name, 1]),
+          )
+        }
+        if (pu.syntheticGenerationConfig.borderlineCount === null) {
+          pu.syntheticGenerationConfig.borderlineCount = 1
+        }
+      }
+
+      console.log(pu)
     }
 
     return pu
