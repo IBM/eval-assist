@@ -301,7 +301,7 @@ class Generator:
             custom_params={
                 "use_cache": False,
                 "seed": None,
-                "max_tokens": 200,
+                "max_tokens": 1200,
                 "temperature": 0.7,
             },
         )
@@ -505,7 +505,12 @@ class Generator:
             persona_section = ""
 
         if self.generation_length is not None:
-            generation_length_section = f"- The generated {self.response_name.lower()}'s length should be {self.generation_length.value.lower()}\n"
+            generation_length_section = f"- The generated {self.response_name.lower()}'s length should be {self.generation_length.value.lower()}"
+            if self.task == TaskEnum.SUMMARIZATION:
+                generation_length_section += (
+                    f" and no longer than the {self.context_names[0]}"
+                )
+            generation_length_section += ".\n"
         else:
             generation_length_section = ""
 
@@ -605,29 +610,28 @@ class Generator:
                 "criteria_description",
                 "response_name",
                 "context_names",
+                "custom_requirements",
                 "task_section",
                 "domain_section",
                 "persona_section",
             ],
             template=dedent("""\
-                You will be given a list of context names and you will be asked to generate an example of such context names based on the following reference information.
+                You will be provided with a list of context variable names. Your task is to generate example values for each of these context variables, considering the following information:
 
-                - Your task is to generate the following contexts: {context_names}.
+                - Context variables to generate: {context_names}.
                 - The generated context is intended to be used to generate a {response_name}.
-                {task_section}{domain_section}{persona_section}- The {response_name} is going to be evaluated based on the following criteria.
-                                
-                {criteria}: {criteria_description}
+                {custom_requirements}{task_section}{domain_section}{persona_section}
                 """),
         )
 
         query_template = PromptTemplate(
             input_variables=[],
-            template="Please generate the following context:\n\n{format_instructions}",
+            template="\n{format_instructions}",
             partial_variables={"format_instructions": format_instructions},
         )
 
         if self.task is not None:
-            task_section = f"- The context is part of a dataset that conforms to a {self.task.value} task. For example, if the task is summarization and the context is named original text, a summary should be generated.\n"
+            task_section = f"- The generated context is part of a dataset that conforms to a {self.task.value} task.\n"
         else:
             task_section = ""
 
@@ -637,22 +641,29 @@ class Generator:
             domain_section = ""
 
         if self.persona is not None:
-            persona_section = f"- The generated context will be evaluated by the following persona: {self.persona.lower()}.\n"
+            persona_section = f"- The generated context will be used by the following persona: {self.persona.lower()}.\n"
         else:
             persona_section = ""
+
+        custom_requirements = ("",)
+        if self.task == TaskEnum.SUMMARIZATION:
+            custom_requirements = (
+                f"- The {self.context_names[0]} should be 10-20 sentences long.\n"
+            )
 
         system_prompt = system_prompt_template.format(
             context_names=", ".join(self.context_names),
             criteria=self.criteria.name,
             criteria_description=self.criteria.description,
             response_name=self.response_name,
+            custom_requirements=custom_requirements,
             task_section=task_section,
             domain_section=domain_section,
             persona_section=persona_section,
         )
         query = query_template.format()
 
-        prompt = system_prompt + "\n\n" + query
+        prompt = system_prompt + query
 
         response = self.inference_engine.infer([{"source": prompt}])[0]
 
