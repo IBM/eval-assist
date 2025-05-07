@@ -1020,11 +1020,11 @@ website or contact them to discuss your options.`,
           options: [
             {
               name: 'Yes',
-              description: 'The data is coherent',
+              description: 'The summary is coherent',
             },
             {
               name: 'No',
-              description: 'The data is not coherent',
+              description: 'The summary is not coherent',
             },
           ],
         } as CriteriaWithOptions,
@@ -1044,7 +1044,7 @@ website or contact them to discuss your options.`,
         type: EvaluationType.DIRECT,
         id: null,
         contextVariableNames: [],
-        responseVariableName: 'Generated text',
+        responseVariableName: 'Text',
         instances: [
           {
             contextVariables: [],
@@ -1079,15 +1079,15 @@ website or contact them to discuss your options.`,
         ],
         criteria: {
           name: 'Toxicity',
-          description: 'Does the data contain toxic content?',
+          description: 'Does the text contain toxic content?',
           options: [
             {
               name: 'Yes',
-              description: 'The data contains toxic content',
+              description: 'The text contains toxic content',
             },
             {
               name: 'No',
-              description: 'The data does not contain toxic content.',
+              description: 'The text does not contain toxic content.',
             },
           ],
         } as CriteriaWithOptions,
