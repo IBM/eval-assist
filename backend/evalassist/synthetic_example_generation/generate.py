@@ -3,7 +3,6 @@
 # from utils.data_utils import load_jsonl, save_to_jsonl
 import logging
 import os
-import random
 from textwrap import dedent
 from typing import Optional
 
@@ -321,7 +320,9 @@ class Generator:
         if self.task == TaskEnum.QUESTION_ANSWERING:
             # response schema
             response_schema = [
-                ResponseSchema(name="answer", description="the answer to the question"),
+                ResponseSchema(
+                    name=self.response_name, description="the answer to the question"
+                ),
             ]
             self.output_parser = StructuredOutputParser.from_response_schemas(
                 response_schema
@@ -349,14 +350,17 @@ class Generator:
             )
 
             self.query_template = PromptTemplate(
-                input_variables=["question"],
+                input_variables=[self.response_name],
                 template="Please generate an answer to the following question:\n\n{question}\n\n{format_instructions}",
                 partial_variables={"format_instructions": self.format_instructions},
             )
         elif self.task == TaskEnum.SUMMARIZATION:
             # response schema
             response_schema = [
-                ResponseSchema(name="summary", description="the text's summary"),
+                ResponseSchema(
+                    name=self.response_name,
+                    description=f"the {self.context_names[0]}'s summary",
+                ),
             ]
             self.output_parser = StructuredOutputParser.from_response_schemas(
                 response_schema
@@ -385,9 +389,12 @@ class Generator:
             )
 
             self.query_template = PromptTemplate(
-                input_variables=["original_text"],
-                template="Please summarize the following text:\n\n{original_text}\n\n{format_instructions}",
-                partial_variables={"format_instructions": self.format_instructions},
+                input_variables=["context_section"],
+                template="Please summarize the following {context_section}\n\n{format_instructions}",
+                partial_variables={
+                    "format_instructions": self.format_instructions,
+                    "context_name": self.context_names[0],
+                },
             )
         elif self.task == TaskEnum.TEXT_GENERATION or self.task is None:
             response_schema = [
@@ -447,12 +454,13 @@ class Generator:
         responses = self.inference_engine.infer(
             [{"source": prompt} for prompt in prompts]
         )
-        logger.debug(f"The first prompt is: \n{prompts[0]}")
-        logger.debug(f"The generated unparsed examples are:\n{responses}")
 
         parsed_responses = [
             self.output_parser.parse(response) for response in responses
         ]
+
+        logger.debug(f"The first prompt is: \n{prompts[0]}")
+        logger.debug(f"The generated parsed examples are:\n{parsed_responses}")
 
         instances = [
             Instance(
@@ -492,8 +500,7 @@ class Generator:
             domain_section = ""
 
         if self.persona is not None:
-            persona_description = ""
-            persona_section = f"- Adopt the following persona: {self.persona.lower()} ({persona_description})\n"
+            persona_section = f"- Adopt the following persona: {self.persona.lower()}\n"
         else:
             persona_section = ""
 
@@ -525,34 +532,36 @@ class Generator:
             system_prompt = self.system_prompt_template.format(**system_prompt_params)
 
             for gen_idx in range(self.per_criteria_option_count[criteria_option_name]):
-                if self.task == TaskEnum.QUESTION_ANSWERING:
-                    question = random.choice(self.context_data)[
-                        "question"
-                    ]  # sample random ques tion
-                    contexts.append(dict(zip(self.context_names, [question])))
+                # if self.task == TaskEnum.QUESTION_ANSWERING:
+                #     question = random.choice(self.context_data)[
+                #         "question"
+                #     ]  # sample random ques tion
+                #     contexts.append(dict(zip(self.context_names, [question])))
 
-                    query = self.query_template.format(question=question)
+                #     query = self.query_template.format(question=question)
 
-                elif self.task == TaskEnum.SUMMARIZATION:
-                    original_text = random.choice(self.context_data)[
-                        "text"
-                    ]  # sample random source article
-                    contexts.append(dict(zip(self.context_names, [original_text])))
-                    query = self.query_template.format(original_text=original_text)
+                # elif self.task == TaskEnum.SUMMARIZATION:
+                #     original_text = random.choice(self.context_data)[
+                #         "text"
+                #     ]  # sample random source article
+                #     contexts.append(dict(zip(self.context_names, [original_text])))
+                #     query = self.query_template.format(original_text=original_text)
 
-                elif self.task == TaskEnum.TEXT_GENERATION or self.task is None:
-                    if self.has_context_variables:
-                        context = self._generate_synthetic_context()
-                        contexts.append(context)
-                        context_placeholders = "\n".join(
-                            [f"{name}: {context[name]}" for name in self.context_names]
-                        )
-                        context_section = f" based on the following context:\n\n{context_placeholders}"
-                    else:
-                        context_section = ""
-                    query = self.query_template.format(
-                        context_section=context_section,
+                # if self.task == TaskEnum.QUESTION_ANSWERING or self.task == TaskEnum.SUMMARIZATION or self.task == TaskEnum.TEXT_GENERATION or self.task is None:
+                if self.has_context_variables:
+                    context = self._generate_synthetic_context()
+                    contexts.append(context)
+                    context_placeholders = "\n".join(
+                        [f"{name}: {context[name]}" for name in self.context_names]
                     )
+                    context_section = (
+                        f" based on the following context:\n\n{context_placeholders}"
+                    )
+                else:
+                    context_section = ""
+                query = self.query_template.format(
+                    context_section=context_section,
+                )
 
                 prompt = system_prompt + "\n\n" + query
                 prompts.append(prompt)
@@ -596,17 +605,16 @@ class Generator:
                 "criteria_description",
                 "response_name",
                 "context_names",
-                "persona",
-                "domain",
+                "task_section",
+                "domain_section",
+                "persona_section",
             ],
             template=dedent("""\
                 You will be given a list of context names and you will be asked to generate an example of such context names based on the following reference information.
 
-                Your task is to generate the following context: {context_names}. This is for evaluation purposes.
-                
-                The generated context is intended to be used to generate a {response_name}{domain_section}{persona_section}.
-                                
-                The {response_name} is going to be evaluated based on the following criteria.
+                - Your task is to generate the following contexts: {context_names}.
+                - The generated context is intended to be used to generate a {response_name}.
+                {task_section}{domain_section}{persona_section}- The {response_name} is going to be evaluated based on the following criteria.
                                 
                 {criteria}: {criteria_description}
                 """),
@@ -618,13 +626,29 @@ class Generator:
             partial_variables={"format_instructions": format_instructions},
         )
 
+        if self.task is not None:
+            task_section = f"- The context is part of a dataset that conforms to a {self.task.value} task. For example, if the task is summarization and the context is named original text, a summary should be generated.\n"
+        else:
+            task_section = ""
+
+        if self.domain is not None:
+            domain_section = f"- The generated context should be related to the {self.domain.value} domain.\n"
+        else:
+            domain_section = ""
+
+        if self.persona is not None:
+            persona_section = f"- The generated context will be evaluated by the following persona: {self.persona.lower()}.\n"
+        else:
+            persona_section = ""
+
         system_prompt = system_prompt_template.format(
             context_names=", ".join(self.context_names),
             criteria=self.criteria.name,
             criteria_description=self.criteria.description,
             response_name=self.response_name,
-            domain_section=f"'{self.domain.value}' domain" if self.domain else "",
-            persona_section=self.persona.value if self.persona else "",
+            task_section=task_section,
+            domain_section=domain_section,
+            persona_section=persona_section,
         )
         query = query_template.format()
 
