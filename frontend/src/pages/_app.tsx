@@ -8,10 +8,9 @@ import Head from 'next/head'
 import '@styles/globals.scss'
 
 import { AppShell } from '@components/AppShell/AppShell'
-import { RouterLoading } from '@components/RouterLoading/RouterLoading'
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ session: Session }>) => {
-  const title = `IBM ${PLATFORM_NAME}`
+  const title = `${PLATFORM_NAME}`
   return (
     <>
       <Head>
