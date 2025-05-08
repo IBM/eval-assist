@@ -203,8 +203,6 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
           pu.syntheticGenerationConfig.borderlineCount = 1
         }
       }
-
-      console.log(pu)
     }
 
     return pu
