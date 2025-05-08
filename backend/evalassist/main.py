@@ -454,13 +454,7 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
             per_criteria_option_count=params.per_criteria_option_count,
             borderline_count=params.borderline_count,
         )
-        try:
-            return generator.generate()
-        except OutputParserException as e:
-            raise HTTPException(
-                status_code=400,
-                detail=f"{params.evaluator_name} was unable to generate an appropriate synthetic example",
-            ) from e
+        return generator.generate()
 
     return run()
 

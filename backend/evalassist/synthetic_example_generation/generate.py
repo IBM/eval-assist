@@ -22,7 +22,11 @@ from ..api.types import (
     PersonaEnum,
     TaskEnum,
 )
-from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
+from ..const import (
+    ExtendedEvaluatorNameEnum,
+    ExtendedModelProviderEnum,
+    generation_length_to_sentence_count,
+)
 from ..utils import (
     get_evaluator_metadata_wrapper,
     get_inference_engine,
@@ -390,10 +394,11 @@ class Generator:
 
             self.query_template = PromptTemplate(
                 input_variables=["context_section"],
-                template="Please summarize the following {context_section}\n\n{format_instructions}",
+                template="Please summarize the following {summary_context_name}:{context_section}\n\n{format_instructions}",
                 partial_variables={
                     "format_instructions": self.format_instructions,
                     "context_name": self.context_names[0],
+                    "summary_context_name": self.context_names[0],
                 },
             )
         elif self.task == TaskEnum.TEXT_GENERATION or self.task is None:
@@ -449,22 +454,25 @@ class Generator:
 
     def generate(self):
         # form prompts using criteria
-        prompts, contexts, metadatas = self._format_prompts()
+        prompts, context, metadatas = self._format_prompts()
 
         responses = self.inference_engine.infer(
             [{"source": prompt} for prompt in prompts]
         )
 
+        logger.debug(f"The first prompt is: \n{prompts[0]}")
+
+        logger.debug(f"unparsed responses:\n{responses}")
+
         parsed_responses = [
             self.output_parser.parse(response) for response in responses
         ]
 
-        logger.debug(f"The first prompt is: \n{prompts[0]}")
         logger.debug(f"The generated parsed examples are:\n{parsed_responses}")
 
         instances = [
             Instance(
-                context_variables=contexts[i] if self.has_context_variables else {},
+                context_variables=context,
                 # response=parsed_responses[i][self.response_name],
                 response=next(iter(parsed_responses[i].values())),
                 response_variable_name=self.response_name,
@@ -477,7 +485,7 @@ class Generator:
         return instances
 
     def _format_prompts(self):
-        prompts, contexts, metadatas = [], [], []
+        prompts, metadatas = [], []
 
         criteria: CriteriaWithOptions = self.criteria
         criteria_options_dict = {
@@ -505,14 +513,25 @@ class Generator:
             persona_section = ""
 
         if self.generation_length is not None:
-            generation_length_section = f"- The generated {self.response_name.lower()}'s length should be {self.generation_length.value.lower()}"
-            if self.task == TaskEnum.SUMMARIZATION:
-                generation_length_section += (
-                    f" and no longer than the {self.context_names[0]}"
-                )
-            generation_length_section += ".\n"
+            generation_length_section = f"- The generated {self.response_name.lower()}'s length should be {self.generation_length.value.lower()} ({generation_length_to_sentence_count[self.generation_length]} long).\n"
         else:
             generation_length_section = ""
+
+        context = {}
+        if self.has_context_variables:
+            context = self._generate_synthetic_context()
+
+            if self.task == TaskEnum.SUMMARIZATION:
+                context_section = f"\n{context[self.context_names[0]]}"
+            else:
+                context_placeholders = "\n".join(
+                    [f"{name}: {context[name]}" for name in self.context_names]
+                )
+                context_section = (
+                    f" based on the following context:\n\n{context_placeholders}"
+                )
+        else:
+            context_section = ""
 
         for criteria_option_name in self.per_criteria_option_count.keys():
             criteria_option_description = criteria_options_dict[criteria_option_name]
@@ -536,93 +555,133 @@ class Generator:
 
             system_prompt = self.system_prompt_template.format(**system_prompt_params)
 
-            for gen_idx in range(self.per_criteria_option_count[criteria_option_name]):
-                # if self.task == TaskEnum.QUESTION_ANSWERING:
-                #     question = random.choice(self.context_data)[
-                #         "question"
-                #     ]  # sample random ques tion
-                #     contexts.append(dict(zip(self.context_names, [question])))
+            # for gen_idx in range(self.per_criteria_option_count[criteria_option_name]):
+            # if self.task == TaskEnum.QUESTION_ANSWERING:
+            #     question = random.choice(self.context_data)[
+            #         "question"
+            #     ]  # sample random ques tion
+            #     contexts.append(dict(zip(self.context_names, [question])))
 
-                #     query = self.query_template.format(question=question)
+            #     query = self.query_template.format(question=question)
 
-                # elif self.task == TaskEnum.SUMMARIZATION:
-                #     original_text = random.choice(self.context_data)[
-                #         "text"
-                #     ]  # sample random source article
-                #     contexts.append(dict(zip(self.context_names, [original_text])))
-                #     query = self.query_template.format(original_text=original_text)
+            # elif self.task == TaskEnum.SUMMARIZATION:
+            #     original_text = random.choice(self.context_data)[
+            #         "text"
+            #     ]  # sample random source article
+            #     contexts.append(dict(zip(self.context_names, [original_text])))
+            #     query = self.query_template.format(original_text=original_text)
 
-                # if self.task == TaskEnum.QUESTION_ANSWERING or self.task == TaskEnum.SUMMARIZATION or self.task == TaskEnum.TEXT_GENERATION or self.task is None:
-                if self.has_context_variables:
-                    context = self._generate_synthetic_context()
-                    contexts.append(context)
-                    context_placeholders = "\n".join(
-                        [f"{name}: {context[name]}" for name in self.context_names]
-                    )
-                    context_section = (
-                        f" based on the following context:\n\n{context_placeholders}"
-                    )
-                else:
-                    context_section = ""
-                query = self.query_template.format(
-                    context_section=context_section,
-                )
+            # if self.task == TaskEnum.QUESTION_ANSWERING or self.task == TaskEnum.SUMMARIZATION or self.task == TaskEnum.TEXT_GENERATION or self.task is None:
 
-                prompt = system_prompt + "\n\n" + query
-                prompts.append(prompt)
+            query = self.query_template.format(
+                context_section=context_section,
+            )
 
-                metadatas.append(
-                    {
-                        "synthetic_generation": {
-                            "model_name": self.inference_engine.get_engine_id(),
-                            "criteria_name": self.criteria.name,
-                            "target_option_name": criteria_option_name,
-                            "target_option_description": criteria_option_description,
-                            "prompt": prompt,
-                            "data_length": self.generation_length.value
-                            if self.generation_length
-                            else None,
-                            "task": self.task.value if self.task else None,
-                            "domain": self.domain.value if self.domain else None,
-                            "persona": self.persona.value if self.persona else None,
-                        }
-                    }
-                )
+            prompt = system_prompt + "\n\n" + query
+            prompts.extend(
+                [prompt] * self.per_criteria_option_count[criteria_option_name]
+            )
+            metadata = {
+                "synthetic_generation": {
+                    "model_name": self.inference_engine.get_engine_id(),
+                    "criteria_name": self.criteria.name,
+                    "target_option_name": criteria_option_name,
+                    "target_option_description": criteria_option_description,
+                    "prompt": prompt,
+                    "data_length": self.generation_length.value
+                    if self.generation_length
+                    else None,
+                    "task": self.task.value if self.task else None,
+                    "domain": self.domain.value if self.domain else None,
+                    "persona": self.persona.value if self.persona else None,
+                }
+            }
+            metadatas.extend(
+                [metadata] * self.per_criteria_option_count[criteria_option_name]
+            )
 
-        return prompts, contexts, metadatas
+        return prompts, context, metadatas
 
     def _generate_synthetic_context(self):
-        response_schemas = [
-            ResponseSchema(
-                name=context_name, description=f"the {context_name} to generate"
+        if self.task == TaskEnum.SUMMARIZATION:
+            system_prompt_template = PromptTemplate(
+                input_variables=[
+                    "domain_section",
+                ],
+                template=dedent("""\
+                Your task is to generate a sample paragraph considering the following information:
+
+                - The generated text is intended to be used to generate a summary.
+                - The generated text should be 10-20 sentences long.
+                {domain_section}
+                """),
             )
-            for context_name in self.context_names
-        ]
+            # domain_section = f"- Pick a topic that is under the {self.domain.value} domain. The generated text should be related to this topic." if self.domain is not None else ""
+            domain_section = (
+                f"- You are working within the {self.domain.value} domain. "
+                f"First, pick a specific topic _within_ {self.domain.value} (don't pick the domain itself as a topic) "
+                f"(for example: investigative reporting on climate change, "
+                f"the impact of social media on breaking news, etc.). "
+                if self.domain is not None
+                else ""
+            )
+            system_prompt = system_prompt_template.format(
+                domain_section=domain_section,
+            )
+            response_schemas = [
+                ResponseSchema(name="text", description="the text to generate")
+            ]
+        else:
+            system_prompt_template = PromptTemplate(
+                input_variables=[
+                    "criteria",
+                    "criteria_description",
+                    "response_name",
+                    "context_names",
+                    "task_section",
+                    "domain_section",
+                    "persona_section",
+                ],
+                template=dedent("""\
+                You will be provided with a list of context variable names. Your task is to generate example values for each of these context variables, considering the following information:
+
+                - Context variables to generate: {context_names}.
+                - The generated context is intended to be used to generate a {response_name}.{task_section}{domain_section}{persona_section}"""),
+            )
+            task_section = (
+                f"- The generated context is part of a dataset that conforms to a {self.task.value} task.\n"
+                if self.task is not None
+                else ""
+            )
+            domain_section = (
+                f"- The generated context should be related to the {self.domain.value} domain.\n"
+                if self.domain is not None
+                else ""
+            )
+            persona_section = (
+                f"- The generated context will be used by the following persona: {self.persona.lower()}.\n"
+                if self.persona is not None
+                else ""
+            )
+            system_prompt = system_prompt_template.format(
+                context_names=", ".join(self.context_names),
+                criteria=self.criteria.name,
+                criteria_description=self.criteria.description,
+                response_name=self.response_name,
+                task_section=task_section,
+                domain_section=domain_section,
+                persona_section=persona_section,
+            )
+            response_schemas = [
+                ResponseSchema(
+                    name=context_name, description=f"the {context_name} to generate"
+                )
+                for context_name in self.context_names
+            ]
 
         output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
 
         format_instructions = output_parser.get_format_instructions()
-
-        # prompt templates
-        system_prompt_template = PromptTemplate(
-            input_variables=[
-                "criteria",
-                "criteria_description",
-                "response_name",
-                "context_names",
-                "custom_requirements",
-                "task_section",
-                "domain_section",
-                "persona_section",
-            ],
-            template=dedent("""\
-                You will be provided with a list of context variable names. Your task is to generate example values for each of these context variables, considering the following information:
-
-                - Context variables to generate: {context_names}.
-                - The generated context is intended to be used to generate a {response_name}.
-                {custom_requirements}{task_section}{domain_section}{persona_section}
-                """),
-        )
 
         query_template = PromptTemplate(
             input_variables=[],
@@ -630,37 +689,6 @@ class Generator:
             partial_variables={"format_instructions": format_instructions},
         )
 
-        if self.task is not None:
-            task_section = f"- The generated context is part of a dataset that conforms to a {self.task.value} task.\n"
-        else:
-            task_section = ""
-
-        if self.domain is not None:
-            domain_section = f"- The generated context should be related to the {self.domain.value} domain.\n"
-        else:
-            domain_section = ""
-
-        if self.persona is not None:
-            persona_section = f"- The generated context will be used by the following persona: {self.persona.lower()}.\n"
-        else:
-            persona_section = ""
-
-        custom_requirements = ("",)
-        if self.task == TaskEnum.SUMMARIZATION:
-            custom_requirements = (
-                f"- The {self.context_names[0]} should be 10-20 sentences long.\n"
-            )
-
-        system_prompt = system_prompt_template.format(
-            context_names=", ".join(self.context_names),
-            criteria=self.criteria.name,
-            criteria_description=self.criteria.description,
-            response_name=self.response_name,
-            custom_requirements=custom_requirements,
-            task_section=task_section,
-            domain_section=domain_section,
-            persona_section=persona_section,
-        )
         query = query_template.format()
 
         prompt = system_prompt + query
@@ -671,12 +699,12 @@ class Generator:
         logger.debug(f"The synthetic generation response is:\n{response}")
 
         parsed_response = output_parser.parse(response)
+        if self.task == TaskEnum.SUMMARIZATION:
+            parsed_response = {self.context_names[0]: parsed_response["text"]}
 
         return parsed_response
 
     def _get_borderline_criteria(self, criteria: CriteriaWithOptions):
-        # criteria_name = criteria.name
-
         criteria_options = criteria.options
         if len(criteria_options) < 2:
             raise ValueError(
