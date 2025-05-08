@@ -42,44 +42,20 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/bulma-carousel/4.0.44/css/bulma-carousel.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/bulma-slider/0.9.2/css/bulma-slider.min.css"
-    />
-
     <!-- Font Awesome -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
 
-    <!-- Academicons -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css"
-    />
-
     <!-- Custom CSS -->
     <link rel="stylesheet" href="static/css/index.css" />
-
-    <!-- Scripts -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
 
     <!-- Font Awesome JS -->
     <script
       defer
       src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"
     ></script>
-
-    <!-- Bulma Carousel and Slider JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bulma-carousel/4.0.44/js/bulma-carousel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bulma-slider/0.9.2/js/bulma-slider.min.js"></script>
-    <script src="static/js/index.js"></script>
   </head>
   <body>
     <section class="hero">
@@ -87,42 +63,40 @@
         <div class="container is-max-desktop">
           <div class="columns is-centered">
             <div class="column has-text-centered">
-              <h1 class="title is-1 publication-title">EvalAssist</h1>
-
-              <div class="column has-text-centered">
-                <div class="publication-links">
-                  <!-- Arxiv PDF link -->
-
-                  <!-- Github link -->
-                  <span class="link-block">
-                    <a
-                      href="https://github.com/IBM/eval-assist"
-                      target="_blank"
-                      class="external-link button is-normal is-rounded is-dark"
-                    >
-                      <span class="icon">
-                        <i class="fab fa-github"></i>
-                      </span>
-                      <span>Code</span>
-                    </a>
-                  </span>
-                </div>
-              </div>
+              <h1 class="title is-1">
+                <span class="icon is-large">
+                  <img
+                    src="static/images/logo.svg"
+                    alt="EvalAssist Icon"
+                    style="width: 32px; height: 32px"
+                  />
+                </span>
+                EvalAssist
+              </h1>
             </div>
+          </div>
+          <div class="columns is-centered">
+            <div class="column has-text-centered">
+              <span>
+                <a
+                  href="https://github.com/IBM/eval-assist"
+                  target="_blank"
+                  class="button is-normal is-rounded is-dark"
+                >
+                  <span class="icon">
+                    <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                </a>
+              </span>
+            </div>
+          </div>
+          <div class="column has-text-centered">
+            <div>Start small, refine fast, scale smart.</div>
           </div>
         </div>
       </div>
     </section>
-
-    <!-- Teaser video-->
-    <section class="hero teaser">
-      <div class="container is-max-desktop">
-        <div class="hero-body">
-          LLM-as-a-Judge framework for criteria refinement
-        </div>
-      </div>
-    </section>
-    <!-- End teaser video -->
 
     <!-- Paper abstract -->
     <section class="section hero is-light">
@@ -132,23 +106,11 @@
             <h2 class="title is-3">What is EvalAssist?</h2>
             <div class="content has-text-justified">
               <p>
-                EvalAssist is an LLM-as-a-Judge framework built on top of the
-                Unitxt open source evaluation library for large language models.
-                The EvalAssist application provides users with a convenient way
-                of iteratively testing and refining LLM-as-a-judge criteria, and
-                supports both direct (rubric-based) and pairwise assessment
-                paradigms (relation-based), the two most prevalent forms of
-                LLM-as-a-judge evaluations available. EvalAssist is designed to
-                be model-agnostic, i.e. the content to be evaluated can come
-                from any model. EvalAssist supports a rich set of off-the-shelf
-                judge models that can easily be extended. An API key is required
-                to use the pre-defined judge models. Once users are satisfied
-                with their criteria, they can auto-generate a Notebook with
-                Unitxt code to run bulk evaluations with larger data sets based
-                on their criteria definition. EvalAssist also includes a catalog
-                of example test cases, exhibiting the use of LLM-as-a-judge
-                across a variety of scenarios. Users can save their own test
-                cases.
+                A framework that facilitates the use of large language models as
+                evaluators ( LLM-as-a-Judge ) by suppor ting users in
+                iteratively refining evaluation criteria in a web-based user
+                experience and applying them to large amounts of data through a
+                Python tool kit
               </p>
             </div>
           </div>
@@ -157,35 +119,95 @@
     </section>
     <!-- End paper abstract -->
 
+    <section class="section">
+      <div class="container">
+        <!-- Section Title -->
+        <!-- <h2 class="title is-2 has-text-centered">Section Title</h2> -->
+
+        <!-- First Row -->
+        <div class="columns">
+          <div class="column">
+            <h3 class="title is-4 has-text-centered">Custom Metrics</h3>
+            <p class="content has-text-justified">
+              A library of criteria templates allows users to iteratively design
+              and refine evaluation metrics interactively. These can be expor
+              ted
+            </p>
+          </div>
+          <div class="column">
+            <h3 class="title is-4 has-text-centered">Flexible Modalities</h3>
+            <p>
+              Supports both direct assessment and pair wise comparison
+              evaluation methods, giving users the flexibility to choose what
+              fits their use case best.
+            </p>
+          </div>
+          <div class="column">
+            <h3 class="title is-4 has-text-centered">Trustwor thy Results</h3>
+            <p>
+              Empowers users to inspect outcomes with built-in trustwor thiness
+              metrics such as positional bias, cer tainty scores, and
+              model-generated explanations.
+            </p>
+          </div>
+        </div>
+
+        <!-- Second Row -->
+        <div class="columns">
+          <div class="column">
+            <h3 class="title is-4 has-text-centered">Specialized Models</h3>
+            <p>
+              Integrates a range of general and specialized LLM judges,
+              including IBM Granite Guardian, Llama 3, Mixtral, Prometheus 2,
+              and GPT-4, using a chained prompting process to ensure consistent
+              and accurate evaluations
+            </p>
+          </div>
+          <div class="column">
+            <h3 class="title is-4 has-text-centered">Scalable Toolkit</h3>
+            <p>
+              Built on top of the open-source UNITXT librar y, Eval Assist
+              includes a toolkit for running bulk evaluations, making it easy to
+              adopt and scale across projects
+            </p>
+          </div>
+          <div class="column">
+            <h3 class="title is-4 has-text-centered">Robust Eval Data</h3>
+            <p>
+              Uses LLM s to generate diverse datasets representing different
+              personas and domains, helping users uncover blind spots and
+              improve the robustness of their evaluation criteria
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Image carousel -->
-    <section class="hero is-small">
+    <!-- <section class="hero is-small">
       <div class="hero-body">
         <div class="container">
           <div id="results-carousel" class="carousel results-carousel">
             <div class="item">
-              <!-- Your image here -->
               <img src="static/images/homepage.png" alt="MY ALT TEXT" />
               <h2 class="subtitle has-text-centered">Homepage</h2>
             </div>
             <div class="item">
-              <!-- Your image here -->
               <img src="static/images/define_criteria.png" alt="MY ALT TEXT" />
               <h2 class="subtitle has-text-centered">Define your criterion</h2>
             </div>
             <div class="item">
-              <!-- Your image here -->
               <img src="static/images/evaluate.png" alt="MY ALT TEXT" />
               <h2 class="subtitle has-text-centered">Evaluate</h2>
             </div>
             <div class="item">
-              <!-- Your image here -->
               <img src="static/images/inspect_results.png" alt="MY ALT TEXT" />
               <h2 class="subtitle has-text-centered">Inspect the results</h2>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
     <!-- End image carousel -->
 
     <!-- Youtube video -->
@@ -212,50 +234,69 @@
     </section>
     <!-- End youtube video -->
 
-    <!--BibTex citation -->
-    <section class="section" id="BibTeX">
-      <div class="container is-max-desktop content">
-        <h2 class="title">BibTeX</h2>
-        <pre><code>BibTex Code Here</code></pre>
-      </div>
-    </section>
-    <!--End BibTex citation -->
-
-    <footer class="footer">
+    <section class="section">
       <div class="container">
-        <div class="columns is-centered">
-          <div class="column is-8">
-            <div class="content">
-              <p>
-                This page was built using the
-                <a
-                  href="https://github.com/eliahuhorwitz/Academic-project-page-template"
-                  target="_blank"
-                  >Academic Project Page Template</a
-                >
-                which was adopted from the <a
-                  href="https://nerfies.github.io"
-                  target="_blank"
-                  >Nerfies</a
-                > project page. You are free to borrow the source code of this
-                website, we just ask that you link back to this page in the
-                footer. <br />
-                This website is licensed under a
-                <a
-                  rel="license"
-                  href="http://creativecommons.org/licenses/by-sa/4.0/"
-                  target="_blank"
-                  >Creative Commons Attribution-ShareAlike 4.0 International
-                  License</a
-                >.
-              </p>
-            </div>
-          </div>
+        <h2 class="title is-3">Publications</h2>
+
+        <div class="content">
+          <ul>
+            <li>
+              <strong
+                >EvaluLLM: LLM Assisted Evaluation of Generative Outputs</strong
+              ><br />
+              <em>IUI ’24 Companion</em> –
+              <a
+                href="https://dl.acm.org/doi/epdf/10.1145/3640544.3645216"
+                target="_blank"
+                >Read Paper</a
+              >
+            </li>
+            <li>
+              <strong
+                >Human-Centered Design Recommendations for
+                LLM-as-a-Judge</strong
+              ><br />
+              <em>ACL 2024 Workshop HuCLLM</em> –
+              <a
+                href="https://aclanthology.org/2024.hucllm-1.2/"
+                target="_blank"
+                >Read Paper</a
+              >
+            </li>
+            <li>
+              <strong
+                >Black-box Uncertainty Quantification Method for
+                LLM-as-a-Judge</strong
+              ><br />
+              <em>NeurIPS 2024</em> –
+              <a href="https://arxiv.org/abs/2410.11594" target="_blank"
+                >Read Paper</a
+              >
+            </li>
+            <li>
+              <strong>EvalAssist: LLM-as-a-Judge Simplified</strong><br />
+              <em>AAAI 2025</em> –
+              <a
+                href="https://ojs.aaai.org/index.php/AAAI/article/view/35351"
+                target="_blank"
+                >Read Paper</a
+              >
+            </li>
+            <li>
+              <strong
+                >Aligning Human and LLM Judgments: Insights from EvalAssist on
+                Task-Specific Evaluations and AI-assisted Assessment Strategy
+                Preferences</strong
+              ><br />
+              <em>Preprint</em> –
+              <a href="https://arxiv.org/abs/2410.00873" target="_blank"
+                >Read Paper</a
+              >
+            </li>
+          </ul>
         </div>
       </div>
-    </footer>
-
-    <!-- Statcounter tracking code -->
+    </section>
 
     <!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
 
