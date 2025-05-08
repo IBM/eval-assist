@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional
 
-from evalassist.api.types import DomainEnum, PersonaEnum
+from evalassist.api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 from unitxt.inference import HFAutoModelInferenceEngine
 from unitxt.llm_as_judge import (
     EVALUATOR_TO_MODEL_ID,
@@ -127,4 +127,10 @@ domain_persona_map = {
         PersonaEnum.MOVIE_CRITIC,
         PersonaEnum.FAN,
     ],
+}
+
+generation_length_to_sentence_count = {
+    GenerationLengthEnum.SHORT: "1-2 sentences",
+    GenerationLengthEnum.MEDIUM: "3-5 sentences",
+    GenerationLengthEnum.LONG: "5-9 sentences",
 }

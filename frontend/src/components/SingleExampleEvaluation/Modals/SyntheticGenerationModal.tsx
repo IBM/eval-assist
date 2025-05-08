@@ -17,8 +17,7 @@ import { Information } from '@carbon/react/icons'
 
 import { DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@constants'
 import '@types'
-import { CriteriaWithOptions, SyntheticGenerationConfig } from '@types'
-import { returnByPipelineType } from '@utils'
+import { SyntheticGenerationConfig } from '@types'
 
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import { useSyntheticGeneration } from '../Providers/SyntheticGenerationProvider'
@@ -31,20 +30,15 @@ interface Props {
 
 export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
   const { currentTestCase, setCurrentTestCase } = useCurrentTestCase()
-  const { generateTestData } = useSyntheticGeneration()
-  const {
-    criteria,
-    type: evaluationType,
-    contextVariableNames,
-    responseVariableName,
-    syntheticGenerationConfig,
-  } = currentTestCase
+  const { contextVariableNames, responseVariableName, syntheticGenerationConfig } = currentTestCase
+
   const {
     tasksOptions,
     domainsOptions,
     personasOptions,
     generationLengthOptions,
     loadingDomainPersonaMapping,
+    generateTestData,
     loadDomainPersonaMapping,
   } = useSyntheticGeneration()
 
@@ -134,6 +128,7 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
                     setSyntheticGenerationConfig({
                       ...syntheticGenerationConfig,
                       domain: selectedItem?.text as DomainEnum,
+                      persona: null,
                     })
                   }}
                 />

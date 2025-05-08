@@ -13,6 +13,7 @@ from ibm_watsonx_ai.wml_client_error import (
     CannotSetProjectOrSpace,
     WMLClientError,
 )
+from langchain_core.exceptions import OutputParserException
 from openai import AuthenticationError
 from torch import device
 from unitxt.inference import (
@@ -306,7 +307,12 @@ def handle_llm_generation_exceptions(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-
+        except OutputParserException as e:
+            traceback.print_exc()
+            raise HTTPException(
+                status_code=400,
+                detail="The model was unable to generate an appropriate synthetic example.",
+            ) from e
         except ValueError as e:
             traceback.print_exc()
             raise HTTPException(status_code=400, detail=str(e))
@@ -357,7 +363,6 @@ def handle_llm_generation_exceptions(func):
                 raise HTTPException(400, f"Error running unitxt: {error_message}")
             else:
                 raise HTTPException(400, "Runtime error on unitxt")
-
         except Exception as e:
             traceback.print_exc()
             raise HTTPException(
