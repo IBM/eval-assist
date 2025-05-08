@@ -306,7 +306,7 @@ class Generator:
                 "use_cache": False,
                 "seed": None,
                 "max_tokens": 1200,
-                "temperature": 0.7,
+                "temperature": 1,
             },
         )
 
