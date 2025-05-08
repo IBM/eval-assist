@@ -620,8 +620,6 @@ class Generator:
             domain_section = (
                 f"- You are working within the {self.domain.value} domain. "
                 f"First, pick a specific topic _within_ {self.domain.value} (don't pick the domain itself as a topic) "
-                f"(for example: investigative reporting on climate change, "
-                f"the impact of social media on breaking news, etc.). "
                 if self.domain is not None
                 else ""
             )
