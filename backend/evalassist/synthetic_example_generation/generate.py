@@ -394,7 +394,7 @@ class Generator:
 
             self.query_template = PromptTemplate(
                 input_variables=["context_section"],
-                template="Please summarize the following {summary_context_name}:{context_section}\n\n{format_instructions}",
+                template="Please summarize the following {summary_context_name}:{context_section}\n\n{format_instructions}\nDon't forget to enclose the {summary_context_name} value in double quotes.",
                 partial_variables={
                     "format_instructions": self.format_instructions,
                     "context_name": self.context_names[0],
