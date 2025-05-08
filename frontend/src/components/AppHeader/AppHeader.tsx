@@ -10,7 +10,6 @@ import {
   HeaderMenuItem,
   HeaderName,
   HeaderNavigation,
-  Theme,
 } from '@carbon/react'
 import { Document, LogoGithub, Logout, QqPlot } from '@carbon/react/icons'
 
@@ -19,18 +18,18 @@ import { useAuthentication } from '@customHooks/useAuthentication'
 import classes from './AppHeader.module.scss'
 
 export const AppHeader = () => {
-  const title = `IBM ${PLATFORM_NAME}`
+  const title = `${PLATFORM_NAME}`
   const { authenticationEnabled, isAuthenticated } = useAuthentication()
   const router = useRouter()
 
   return (
     <Header className={classes.root} aria-label={title}>
-      <HeaderName prefix="IBM" style={{ cursor: 'pointer' }} href="/">
+      <HeaderName prefix={''} style={{ cursor: 'pointer' }} href="/">
         {PLATFORM_NAME}
       </HeaderName>
 
       <HeaderGlobalBar>
-        <HeaderNavigation aria-label="IBM [Platform]">
+        <HeaderNavigation aria-label="[Platform]">
           <HeaderMenuItem href="/documentation" isActive={router.pathname === '/documentation'}>
             <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
               Documentation
