@@ -3,6 +3,7 @@
 # from utils.data_utils import load_jsonl, save_to_jsonl
 import logging
 import os
+import uuid
 from textwrap import dedent
 from typing import Optional
 
@@ -477,7 +478,8 @@ class Generator:
                 response=next(iter(parsed_responses[i].values())),
                 response_variable_name=self.response_name,
                 metadata=metadatas[i],
-                id="",
+                expected_result="",
+                id=str(uuid.uuid4()),
             )
             for i in range(len(parsed_responses))
         ]
