@@ -16,11 +16,13 @@ def log_info(method, path, req_body, res_body, headers, runtime):
         "timestamp": time.time(),
         "runtime": runtime,
     }
+    if path == "/default-credentials/":
+        return
 
     if req_body:
         req = json.loads(req_body.decode())
-        if "bam_api_key" in req:
-            req["bam_api_key"] = ""
+        if "llm_provider_credentials" in req:
+            req["llm_provider_credentials"] = ""
         record["request"] = req
 
     if res_body:
