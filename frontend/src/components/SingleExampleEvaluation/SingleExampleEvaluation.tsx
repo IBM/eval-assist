@@ -212,6 +212,7 @@ export const SingleExampleEvaluation = () => {
         response_variable_name: currentTestCase.responseVariableName,
         id: instance.id,
         expected_result: instance.expectedResult,
+        is_synthetic: instance.metadata?.synthetic_generation ? true : false,
       }))
 
       if (toEvaluateInstancesParsed.length === 0) {
