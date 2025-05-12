@@ -10,7 +10,6 @@ from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException, Request,
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
-from langchain_core.exceptions import OutputParserException
 from prisma.errors import PrismaError
 from prisma.models import StoredTestCase
 from pydantic import BaseModel
@@ -417,15 +416,7 @@ def perform_direct_ai_action(params: DirectAIActionRequest):
             action=params.action,
             prompt=params.prompt,
         )
-        try:
-            return DirectAIActionResponse(
-                result=direct_action_generator.generate(params)
-            )
-        except OutputParserException as e:
-            raise HTTPException(
-                status_code=400,
-                detail=f"{params.evaluator_name} was unable to generate an appropriate synthetic example",
-            ) from e
+        return DirectAIActionResponse(result=direct_action_generator.generate(params))
 
     return run()
 
