@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eval-assist-frontend
+  labels:
+    app: eval-assist-frontend
+spec:
+  selector:
+    matchLabels:
+      app: eval-assist-frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: eval-assist-frontend
+    spec:
+      containers:
+        - name: eval-assist-frontend
+          image: us.icr.io/eval-assist/eval-assist-frontend@sha256:107ef6b8b6b979843a7f75267087e7dc56306554bb9de57ffa4d16ebcfd0e899
+          resources:
+            limits:
+              cpu: 4
+              memory: 2Gi
+            requests:
+              cpu: 2
+              memory: 2Gi
+          ports:
+            - containerPort: 3000
+          env:
+            - name: APPID_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: eval-assist-secret
+                  key: APPID_CLIENT_ID
+            - name: APPID_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: eval-assist-secret
+                  key: APPID_CLIENT_SECRET
+            - name: APPID_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: eval-assist-secret
+                  key: APPID_ISSUER
+            - name: NEXTAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: eval-assist-secret
+                  key: NEXTAUTH_SECRET
+            - name: NEXTAUTH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eval-assist-secret
+                  key: NEXTAUTH_URL
+      imagePullSecrets:
+        - name: all-icr-io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eval-assist-backend
+  labels:
+    app: eval-assist-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eval-assist-backend
+  template:
+    metadata:
+      labels:
+        app: eval-assist-backend
+    spec:
+      containers:
+        - name: eval-assist-backend
+          image: us.icr.io/eval-assist/eval-assist-backend@sha256:ef8e1b908a3640bf496e2c2469350a45daa8f8ef2c8dcb11276ee49a30c7a9c9
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              cpu: 4
+              memory: 8Gi
+            requests:
+              cpu: 1
+              memory: 4Gi
+          volumeMounts:
+            - name: eval-assist-volume
+              mountPath: /app/prisma/db
+      volumes:
+        - name: eval-assist-volume
+          persistentVolumeClaim:
+            claimName: eval-assist-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eval-assist-frontend
+  labels:
+    app: eval-assist-frontend
+spec:
+  type: NodePort
+  selector:
+    app: eval-assist-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eval-assist-backend
+  labels:
+    app: eval-assist-backend
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+  selector:
+    app: eval-assist-backend
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/allow-http: "false"
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: f5
+    virtual-server.f5.com/balance: round-robin
+    virtual-server.f5.com/ip: 9.12.246.105
+    virtual-server.f5.com/partition: RIS3-INT-OCP-DAL12
+    virtual-server.f5.com/clientssl: '[ { "bigIpProfile": "/Common/BlueMix" } ]'
+  name: eval-assist
+  namespace: eval-assist
+spec:
+  rules:
+    - host: eval-assist-api.bx.cloud9.ibm.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: eval-assist-backend
+                port:
+                  number: 80
+            path: /
+            pathType: ImplementationSpecific
+    - host: eval-assist.bx.cloud9.ibm.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: eval-assist-frontend
+              port:
+                number: 80
+          path: /
