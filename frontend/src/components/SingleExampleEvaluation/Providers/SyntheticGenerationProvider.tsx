@@ -292,7 +292,7 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
       result: null,
       metadata: unparsedGeneratedInstance.metadata,
       response: unparsedGeneratedInstance.response,
-      id: crypto.randomUUID(),
+      id: unparsedGeneratedInstance.id,
     }))
     setLoadingSyntheticExamples(false)
 
