@@ -233,6 +233,11 @@ def get_test_cases(user: str):
     return test_cases
 
 
+@router.post("/log_test_case_checkpoint/")
+def log_test_case_checkpoint():
+    pass
+
+
 @router.get("/test_case/{test_case_id}/")
 def get_test_case(test_case_id: int, user: str):
     test_case = db.storedtestcase.find_unique(where={"id": test_case_id})

@@ -12,6 +12,7 @@ import {
   useState,
 } from 'react'
 
+import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
 import {
@@ -93,14 +94,22 @@ export const useCurrentTestCase = () => {
 }
 
 export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) => {
-  const { isRisksAndHarms, useCaseType, useCaseId, subCatalogName, libraryTestCaseName, criteriaName } =
-    useURLParamsContext()
+  const {
+    isRisksAndHarms,
+    useCaseType,
+    useCaseId,
+    subCatalogName,
+    libraryTestCaseName,
+    criteriaName,
+    syntheticGenerationEnabled,
+  } = useURLParamsContext()
   const { modelProviderCredentials, getAreRelevantCredentialsProvided, getProviderCredentials } =
     useModelProviderCredentials()
   const { getEmptyUseCaseWithCriteria } = useCriteriasContext()
   const { directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
   const { userUseCases } = useUserUseCasesContext()
   const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
+  const { post } = useFetchUtils()
 
   const getDefaultEvaluator = useCallback(
     (type: EvaluationType, onlyInstruct: boolean = false) => {
@@ -333,6 +342,15 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
       // temporaryIdRef.current = uuid()
     }
   }, [preloadedTestCase, setCurrentTestCase])
+
+  useEffect(() => {
+    if (showingTestCase) {
+      post('log_test_case_checkpoint/', {
+        name: currentTestCase.name,
+        syntheticGenerationEnabled,
+      })
+    }
+  }, [currentTestCase.name, post, showingTestCase, syntheticGenerationEnabled])
 
   return (
     <CurrentTestCaseContext.Provider
