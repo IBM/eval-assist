@@ -164,19 +164,6 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
               // setPopupVisibility={setPopupVisibility}
             />
           )}
-          <div
-            style={{
-              position: 'fixed',
-              top: popupPosition.top - 650,
-              left: popupPosition.left + 40,
-              zIndex: 1000,
-              backgroundColor: 'black',
-              width: '10px',
-              height: '10px',
-            }}
-          >
-            hola
-          </div>
         </div>
       </div>
     </>
