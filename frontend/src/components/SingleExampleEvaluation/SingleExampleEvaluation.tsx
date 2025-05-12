@@ -211,6 +211,7 @@ export const SingleExampleEvaluation = () => {
         ),
         response_variable_name: currentTestCase.responseVariableName,
         id: instance.id,
+        expected_result: instance.expectedResult,
       }))
 
       if (toEvaluateInstancesParsed.length === 0) {

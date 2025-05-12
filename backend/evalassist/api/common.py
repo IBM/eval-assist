@@ -33,6 +33,7 @@ class Instance(BaseModel):
     response: str | list[str]
     response_variable_name: Optional[str]
     metadata: Optional[dict[str, Any]] = None
+    expected_result: str
 
 
 class EvaluationRequestModel(BaseModel):
