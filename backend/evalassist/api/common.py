@@ -96,7 +96,7 @@ class PairwiseEvaluationRequestModel(EvaluationRequestModel):
 class PairwiseResultModel(BaseModel):
     contest_results: list[bool]
     compared_to: list[int]
-    summaries: list[str]
+    explanations: list[str]
     positional_bias: list[bool] | None = None
     certainty: list[float] | None = None
     winrate: float

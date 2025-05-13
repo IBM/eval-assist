@@ -2,16 +2,15 @@ import cx from 'classnames'
 import { capitalizeFirstWord, getOrdinalSuffix, returnByPipelineType, toPercentage, toTitleCase } from 'src/utils'
 
 import { Dispatch, Fragment, SetStateAction, useEffect, useMemo, useState } from 'react'
+import Markdown from 'react-markdown'
 
 import { Accordion, AccordionItem, Layer, ListItem, Modal, Tooltip, UnorderedList } from '@carbon/react'
 import { ArrowRight, Warning } from '@carbon/react/icons'
 
 import {
-  Criteria,
   DirectInstance,
   DirectInstanceResult,
   EvaluationType,
-  Instance,
   PairwiseInstance,
   PairwiseInstanceResult,
 } from '../../../types'
@@ -116,7 +115,10 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                         <p>
                           <strong>Explanation:</strong>
                         </p>
-                        <p>{(selectedInstance.result as DirectInstanceResult).explanation}</p>
+                        <div>
+                          <Markdown>{(selectedInstance.result as DirectInstanceResult).explanation}</Markdown>
+                        </div>
+                        {/* <p>{(selectedInstance.result as DirectInstanceResult).explanation}</p> */}
                         <p>
                           <strong>{'Positional bias:'}</strong>
                         </p>
@@ -137,7 +139,11 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                             <p>
                               <strong>{'Positional bias explanation:'}</strong>
                             </p>
-                            <p>{(selectedInstance.result as DirectInstanceResult).positionalBias.explanation}</p>
+                            <div>
+                              <Markdown>
+                                {(selectedInstance.result as DirectInstanceResult).positionalBias.explanation}
+                              </Markdown>
+                            </div>
                           </>
                         )}
                       </>
@@ -229,21 +235,11 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                     <strong>{'Winrate: '}</strong>
                                   </p>
                                   <p>{toPercentage(responseResults.winrate)}</p>
-                                  {/* <p>
-                                    <strong>{'Positional bias:'}</strong>
-                                  </p>
-                                  <p
-                                    className={cx({
-                                      [classes.errorText]: responseResults.positionalBias.some((pb) => pb),
-                                    })}
-                                  >
-                                    {responseResults.positionalBias.some((pb) => pb) ? 'Detected' : 'Not detected'}
-                                  </p> */}
                                   <p>
                                     <strong>{'Contest results: '}</strong>
                                   </p>
                                   <UnorderedList>
-                                    {Object.values(responseResults.summaries).map((explanation, i) => (
+                                    {Object.values(responseResults.explanations).map((explanation, i) => (
                                       <ListItem key={i}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                           <div>
@@ -251,8 +247,10 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                               <strong>{`${
                                                 responseResults.contestResults[i] ? 'Won' : 'Lost'
                                               } against response ${responseResults.comparedTo[i]}: `}</strong>
-                                              {explanation}
                                             </p>
+                                            <div>
+                                              <Markdown>{explanation}</Markdown>
+                                            </div>
                                             <br />
                                           </div>
                                           {responseResults.positionalBias[i] && (
