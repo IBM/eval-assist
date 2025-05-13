@@ -45,18 +45,6 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
 
   const ref = useMergeRefs([outsideRef, innerRef])
 
-  // const handleMouseUp = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
-  //   const textarea = innerRef.current
-  //   if (!textarea) return
-  //   const { x, y } = getCaretPosition(textarea)
-  //   if (text) {
-  //     setPopupPosition({ top: y + 10, left: x })
-  //     setPopupVisibility({ options: true, prompt: false, confirmation: false })
-  //   } else {
-  //     setPopupVisibility({ options: false, prompt: false, confirmation: false })
-  //   }
-  // }, [])
-
   useEffect(() => {
     const textarea = innerRef.current
     if (!textarea || !selectedText || !isFocused || !isMouseUp) {
@@ -111,8 +99,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
     } else {
       let newHeight = isFocused ? `${sizerEl.scrollHeight}px` : ''
       if (newHeight == '' && maxInactiveHeight) {
-        // newHeight = `${Math.min(sizerEl.scrollHeight, maxInactiveHeight)}px`
-        newHeight = `${maxInactiveHeight}px`
+        newHeight = `${Math.min(sizerEl.scrollHeight, maxInactiveHeight)}px`
       }
       if (newHeight !== el.style.height) {
         el.style.height = newHeight
