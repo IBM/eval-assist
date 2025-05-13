@@ -38,7 +38,9 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  justify-content: space-evenly;
+  justify-content: start;
+  gap: 0.7rem;
+  padding-top: 0.75rem;
   opacity: 0;
   transition: opacity $duration-slow-01;
 
