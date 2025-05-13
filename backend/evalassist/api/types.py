@@ -61,6 +61,7 @@ class GenerationLengthEnum(str, Enum):
 
 
 class DirectActionTypeEnum(str, Enum):
+    REGENERATE = "Regenerate"
     REPHRASE = "Rephrase"
     LONGER = "Elaborate"
     SHORTER = "Shorten"

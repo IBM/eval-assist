@@ -160,10 +160,58 @@ class DirectActionGenerator:
                     {text_with_selection}
 
                     {format_instructions}
+                    Don't forget to enclose the response value in double quotes.
                 """,
                 ),
             )
 
+            system_prompt = system_prompt_template.format(
+                text_with_selection=text_with_selection,
+                selection=direct_ai_action.selection,
+            )
+        elif self.action == DirectActionTypeEnum.REGENERATE:
+            response_schemas = [
+                ResponseSchema(
+                    name="response",
+                    description="the selection to regenerate",
+                )
+            ]
+
+            output_parser = StructuredOutputParser.from_response_schemas(
+                response_schemas
+            )
+            action_str = direct_ai_action.action.value.lower()
+            action_tag = "<regenerate>"
+            format_instructions = output_parser.get_format_instructions()
+            text_with_selection = direct_ai_action.text.replace(
+                direct_ai_action.selection,
+                action_tag + direct_ai_action.selection + action_tag,
+            )
+            # prompt templates
+            system_prompt_template = PromptTemplate(
+                input_variables=[
+                    "text_with_selection",
+                    "selection",
+                ],
+                partial_variables={
+                    "format_instructions": format_instructions,
+                },
+                template=dedent("""\
+                    You will be provided with:
+                    - A selected text
+                    - A text containing that selection, with the selection marked using <regenerate> tags
+                    - Your task is to substitute the selected text with a counterfactual example to diversify perspective, demographic, or approach. It should fit seamlessly into the original text. The regenerated selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
+                    
+                    Selection:
+                    {selection}
+
+                    Text with selection (wrapped in-between <regenerate> tags):
+                    {text_with_selection}
+
+                    {format_instructions}
+                    Don't forget to enclose the response value in double quotes.
+                    """),
+            )
             system_prompt = system_prompt_template.format(
                 text_with_selection=text_with_selection,
                 selection=direct_ai_action.selection,
@@ -226,25 +274,16 @@ class DirectActionGenerator:
                     {text_with_selection}
 
                     {format_instructions}
+                    Don't forget to enclose the response value in double quotes.
                     """),
             )
-
-            # query_template = PromptTemplate(
-            #     input_variables=[],
-            #     partial_variables={
-            #         "format_instructions": format_instructions,
-            #         "action_third_person": self.action_third_person_dict[self.action],
-            #     },
-            #     template="Generate a response that {action_third_person} the selection while keeping its original meaning and the core information.\n\n{format_instructions}",
-            # )
 
             system_prompt = system_prompt_template.format(
                 text_with_selection=text_with_selection,
                 selection=direct_ai_action.selection,
             )
-            # query = query_template.format()
 
-        prompt = system_prompt  # + "\n\n" + query
+        prompt = system_prompt
 
         logger.debug(f"Prompt:\n{prompt}")
 

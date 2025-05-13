@@ -68,6 +68,7 @@ export enum GenerationLengthEnum {
 }
 
 export enum DirectActionTypeEnum {
+  Regenerate = 'Regenerate',
   Rephrase = 'Rephrase',
   Elaborate = 'Elaborate',
   Shorten = 'Shorten',

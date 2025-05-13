@@ -1,7 +1,16 @@
 import { Dispatch, RefObject, SetStateAction, useCallback, useEffect, useState } from 'react'
 
 import { IconButton, TextInput } from '@carbon/react'
-import { AiLabel, Checkmark, Rotate, Send, TextLongParagraph, TextShortParagraph, Undo } from '@carbon/react/icons'
+import {
+  AiLabel,
+  Checkmark,
+  MagicWand,
+  Rotate,
+  Send,
+  TextLongParagraph,
+  TextShortParagraph,
+  Undo,
+} from '@carbon/react/icons'
 
 import { useSelectedTextContext } from '@components/SingleExampleEvaluation/Providers/SelectedTextProvider'
 import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
@@ -129,6 +138,14 @@ export const DirectAIManipulationPopup = ({
               <TextShortParagraph />
             </IconButton>
             <IconButton
+              className={classes.iconButton}
+              kind={'ghost'}
+              label={DirectActionTypeEnum.Regenerate}
+              onMouseDown={(e) => onOptionClick(e, DirectActionTypeEnum.Regenerate)}
+            >
+              <MagicWand />
+            </IconButton>
+            {/* <IconButton
               disabled
               className={classes.iconButton}
               kind={'ghost'}
@@ -136,7 +153,7 @@ export const DirectAIManipulationPopup = ({
               onMouseDown={onCustomOptionClick}
             >
               <AiLabel />
-            </IconButton>
+            </IconButton> */}
           </div>
         )}
         {popupVisibility.prompt && (
