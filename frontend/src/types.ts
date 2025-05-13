@@ -20,7 +20,7 @@ export interface PerResponsePairwiseResultV0 {
   winrate: number
   ranking: number
   comparedTo: string[]
-  summaries: FetchedPerResponsePairwiseResultV1['summaries']
+  explanations: FetchedPerResponsePairwiseResultV0['explanations']
 }
 
 export type PerResponsePairwiseResult = PerResponsePairwiseResultV0
@@ -56,35 +56,26 @@ export type DirectResults = DirectResultsV0
 
 interface FetchedPerResponsePairwiseResultV0 {
   contest_results: boolean[]
-  compared_to_indexes: number[]
-  explanations: { [key: string]: string }
-  p_bias?: boolean[]
-  certainty: number[]
   winrate: number
   ranking: number
-}
-
-export interface FetchedPairwiseInstanceResultV0 {
-  perResponseResults: {
-    [key: string]: FetchedPerResponsePairwiseResultV0
-  }
-  ranking: number[]
-}
-interface FetchedPerResponsePairwiseResultV1
-  extends Omit<FetchedPerResponsePairwiseResultV0, 'compared_to_indexes' | 'explanations' | 'p_bias' | 'certainty'> {
   compared_to: string[]
-  summaries: string[]
+  explanations: string[]
   certainties?: number[]
   positional_bias: boolean[]
 }
 
-type FetchedPairwiseInstanceResultV1 = { id: string; result: Record<string, FetchedPerResponsePairwiseResultV1> }
+export type FetchedPairwiseInstanceResultV0 = {
+  [key: string]: FetchedPerResponsePairwiseResultV0
+}
 
-export type FetchedPairwiseInstanceResult = FetchedPairwiseInstanceResultV1
+export type FetchedPairwiseInstanceResultWithIdV0 = {
+  id: string
+  result: FetchedPairwiseInstanceResultV0
+}
 
-export type FetchedPairwiseResultsV0 = FetchedPairwiseInstanceResultV0[]
-export type FetchedPairwiseResultsV1 = FetchedPairwiseInstanceResultV1[]
-export type FetchedPairwiseResults = FetchedPairwiseResultsV1
+export type FetchedPairwiseResultsV0 = FetchedPairwiseInstanceResultWithIdV0[]
+
+export type FetchedPairwiseResults = FetchedPairwiseResultsV0
 
 export type PairwiseResultsV0 = PairwiseInstanceResultV0[]
 export type PairwiseResults = PairwiseResultsV0
@@ -171,18 +162,10 @@ export interface Evaluator {
 
 export interface FetchedEvaluatorV0 {
   name: string
-  model_id: string
-  type: EvaluationType
-  version: string
   providers: ModelProviderType[]
 }
 
-export interface FetchedEvaluatorV1 extends Omit<FetchedEvaluatorV0, 'model_id' | 'version' | 'type'> {
-  name: string
-  providers: ModelProviderType[]
-}
-
-export type FetchedEvaluator = FetchedEvaluatorV1
+export type FetchedEvaluator = FetchedEvaluatorV0
 
 export interface Dataset {
   name: string

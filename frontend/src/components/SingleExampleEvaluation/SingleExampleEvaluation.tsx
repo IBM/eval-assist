@@ -26,7 +26,6 @@ import {
   Evaluator,
   FetchedDirectInstanceResultWithId,
   FetchedDirectResults,
-  FetchedPairwiseInstanceResult,
   FetchedPairwiseResults,
   Instance,
   ModelProviderType,
@@ -300,24 +299,22 @@ export const SingleExampleEvaluation = () => {
             },
           )
         } else {
-          ;(responseBody.results as FetchedPairwiseResults).forEach(
-            (fetchedInstanceResult: FetchedPairwiseInstanceResult, i) => {
-              let instanceResult: PairwiseInstanceResult = {}
-              Object.entries(fetchedInstanceResult.result).forEach(([result_idx, fetchedPerResponseResult]) => {
-                instanceResult[result_idx] = {
-                  contestResults: fetchedPerResponseResult.contest_results,
-                  comparedTo: fetchedPerResponseResult.compared_to,
-                  summaries: fetchedPerResponseResult.summaries,
-                  positionalBias:
-                    fetchedPerResponseResult.positional_bias ||
-                    new Array(fetchedPerResponseResult.contest_results.length).fill(false),
-                  winrate: fetchedPerResponseResult.winrate,
-                  ranking: fetchedPerResponseResult.ranking,
-                }
-              })
-              updatedInstances.find((instance) => instance.id === fetchedInstanceResult.id)!.result = instanceResult
-            },
-          )
+          ;(responseBody.results as FetchedPairwiseResults).forEach((fetchedInstanceResult, i) => {
+            let instanceResult: PairwiseInstanceResult = {}
+            Object.entries(fetchedInstanceResult.result).forEach(([result_idx, fetchedPerResponseResult]) => {
+              instanceResult[result_idx] = {
+                contestResults: fetchedPerResponseResult.contest_results,
+                comparedTo: fetchedPerResponseResult.compared_to,
+                explanations: fetchedPerResponseResult.explanations,
+                positionalBias:
+                  fetchedPerResponseResult.positional_bias ||
+                  new Array(fetchedPerResponseResult.contest_results.length).fill(false),
+                winrate: fetchedPerResponseResult.winrate,
+                ranking: fetchedPerResponseResult.ranking,
+              }
+            })
+            updatedInstances.find((instance) => instance.id === fetchedInstanceResult.id)!.result = instanceResult
+          })
         }
         setCurrentTestCase({
           ...currentTestCase,

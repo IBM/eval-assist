@@ -79,7 +79,7 @@ class Evaluator(ABC):
             "inference_engine": inference_engine,
             "context_fields": list(context_variables_list[0].keys()),
             "criteria_field": "criteria",
-            "generate_summaries": True,
+            "generate_summaries": False,
         }
 
         input_fields = {
@@ -141,13 +141,13 @@ class DirectAssessmentEvaluator(Evaluator):
                     f"{prefix}_positional_bias_selected_option"
                 ]
                 positional_bias.explanation = instance_score[
-                    f"{prefix}_positional_bias_summary"
+                    f"{prefix}_positional_bias_assessment"
                 ]
 
             results.append(
                 DirectResultModel(
                     option=instance_score[f"{prefix}_selected_option"],
-                    explanation=instance_score[f"{prefix}_summary"],
+                    explanation=instance_score[f"{prefix}_assessment"],
                     positional_bias=positional_bias,
                 )
             )
@@ -185,7 +185,7 @@ class PairwiseComparisonEvaluator(Evaluator):
                         **{
                             "contest_results": score[f"{outer_key}_contest_results"],
                             "compared_to": score[f"{outer_key}_compared_to"],
-                            "summaries": score[f"{outer_key}_summaries"],
+                            "explanations": score[f"{outer_key}_assessments"],
                             "positional_bias": score[f"{outer_key}_positional_bias"],
                             "winrate": score[f"{outer_key}_winrate"],
                             "ranking": score[f"{outer_key}_ranking"],

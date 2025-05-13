@@ -215,7 +215,6 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
         res = evaluator.evaluate(
             instances=req.instances,
             criteria=criteria,
-            # response_variable_name_list=[req.response_variable_name] * len(req.responses),
             credentials=req.llm_provider_credentials,
             provider=req.provider,
         )
