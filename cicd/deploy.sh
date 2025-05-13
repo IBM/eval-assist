@@ -343,7 +343,7 @@ echo "DEPLOYED PODS:"
 kubectl describe pods --selector app=${APP_NAME_BACKEND} --namespace ${CLUSTER_NAMESPACE}
 
 echo "=========================================================="
-APP_NAME_FRONTEND=$(kubectl get pods --namespace ${CLUSTER_NAMESPACE} -o json | jq -r '[ .items[] | select(.spec.containers[]?.image | test("'"${APP_NAME_FRONTEND}"'(@.+|$)")) | .metadata.labels.app] [0]')
+APP_NAME_FRONTEND=$(kubectl get pods --namespace ${CLUSTER_NAMESPACE} -o json | jq -r '[ .items[] | select(.spec.containers[]?.image | test("'"${IMAGE_FRONTEND}"'(@.+|$)")) | .metadata.labels.app] [0]')
 echo -e "APP: ${APP_NAME_FRONTEND}"
 echo "DEPLOYED PODS:"
 kubectl describe pods --selector app=${APP_NAME_FRONTEND} --namespace ${CLUSTER_NAMESPACE}
