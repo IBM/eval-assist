@@ -16,10 +16,12 @@ import classes from './FlexTextArea.module.scss'
 type Props = {
   maxInactiveHeight?: number
   fixMaxHeight?: boolean
+  instanceId: string
+  fieldName: string
 } & ComponentProps<typeof TextArea>
 
 export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function FlexTextArea(
-  { helperText, className, maxInactiveHeight = 125, onBlur, fixMaxHeight, ...props },
+  { instanceId, fieldName, helperText, className, maxInactiveHeight = 125, onBlur, fixMaxHeight, ...props },
   outsideRef,
 ) {
   const [popupVisibility, setPopupVisibility] = useState<DirectAIManipulationPopupVisibility>({
@@ -142,6 +144,8 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
               wholeText={(props.value as string) || ''}
               popupPosition={popupPosition}
               generatedText={generatedText}
+              instanceId={instanceId}
+              fieldName={fieldName}
               setGeneratedText={setGeneratedText}
               onChange={(newValue: string) =>
                 props.onChange &&
