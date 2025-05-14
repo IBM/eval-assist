@@ -6,7 +6,7 @@ import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useRef, us
 import { fast01 } from '@carbon/motion'
 import { TextArea } from '@carbon/react'
 
-import { DirectAIManipulationPopup, DirectAIManipulationPopupVisibility } from '@components/DirectAIManipulationPopup'
+import { DirectAIActionPopup, DirectAIActionPopupVisibility } from '@components/DirectAIActionPopup'
 import { useSelectedTextContext } from '@components/SingleExampleEvaluation/Providers/SelectedTextProvider'
 import { useMergeRefs } from '@floating-ui/react'
 import { getCaretPosition } from '@utils'
@@ -24,7 +24,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
   { instanceId, fieldName, helperText, className, maxInactiveHeight = 125, onBlur, fixMaxHeight, ...props },
   outsideRef,
 ) {
-  const [popupVisibility, setPopupVisibility] = useState<DirectAIManipulationPopupVisibility>({
+  const [popupVisibility, setPopupVisibility] = useState<DirectAIActionPopupVisibility>({
     options: false,
     prompt: false,
     confirmation: false,
@@ -139,7 +139,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
           <TextArea className={classes.sizer} value={props.value} ref={sizerRef} tabIndex={-1} labelText="" />
 
           {isFocused && (
-            <DirectAIManipulationPopup
+            <DirectAIActionPopup
               textAreaRef={innerRef}
               wholeText={(props.value as string) || ''}
               popupPosition={popupPosition}
