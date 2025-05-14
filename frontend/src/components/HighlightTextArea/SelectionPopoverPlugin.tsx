@@ -3,7 +3,7 @@ import { $getSelection, $isRangeSelection } from 'lexical'
 import { useCallback, useEffect, useState } from 'react'
 
 import { IconButton, Popover, PopoverContent } from '@carbon/react'
-import { AiLabel, Rotate, Save, TextLongParagraph, TextShortParagraph } from '@carbon/react/icons'
+import { AiLabel, Rotate, TextLongParagraph, TextShortParagraph } from '@carbon/react/icons'
 
 import { DirectAIActionPopup } from '@components/DirectAIActionPopup'
 import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
@@ -84,6 +84,8 @@ export default function SelectionPopoverPlugin({}: Props): JSX.Element | null {
       text: popoverState.text,
       selection: popoverState.selection,
       action: DirectActionTypeEnum.Elaborate,
+      instanceId: '',
+      fieldName: '',
     })
     setCurrentTestCase({
       ...currentTestCase,
