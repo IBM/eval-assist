@@ -55,7 +55,7 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
           {'Create New Test Case'}
         </Button>
       </div>
-      <p className={classes.description}>{'New features'}</p>
+      {/* <p className={classes.description}>{'New features'}</p>
       <div
         className={cx(classes.cards, {
           [classes['sidebar-expanded']]: sidebarTabSelected !== null,
@@ -75,7 +75,7 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
           badge={{ text: 'Catalog', color: 'purple' }}
         />
       </div>
-      <div className={cx(classes.bottomDivider)}></div>
+      <div className={cx(classes.bottomDivider)}></div> */}
       <p className={cx(classes.description, classes.sectionSeparation)}>{'Here are some key features we offer'}</p>
       <div className={cx(classes.cards, { [classes['sidebar-expanded']]: sidebarTabSelected !== null })}>
         <Card
@@ -104,6 +104,19 @@ export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props)
           }
           className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
           badge={{ text: 'Sandbox', color: 'blue' }}
+        />
+        <Card
+          title={'Direct Assessment of Harms & Risks'}
+          description={'Try Granite Guardian LLM judges'}
+          imageSrc="python_library"
+          onClick={openRisksAndHarms}
+          actionButton={
+            <Button renderIcon={View} kind="ghost" onClick={openRisksAndHarms}>
+              {'View it'}
+            </Button>
+          }
+          className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
+          badge={{ text: 'Catalog', color: 'purple' }}
         />
         <Card
           title={'Example Catalog'}
