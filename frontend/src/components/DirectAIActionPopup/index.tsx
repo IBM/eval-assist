@@ -23,21 +23,21 @@ interface Props {
   wholeText: string
   onChange: (newValue: string) => void
   textAreaRef: RefObject<HTMLTextAreaElement>
-  popupVisibility: DirectAIManipulationPopupVisibility
+  popupVisibility: DirectAIActionPopupVisibility
   instanceId: string
   fieldName: string
-  // setPopupVisibility: Dispatch<SetStateAction<DirectAIManipulationPopupVisibility>>
+  // setPopupVisibility: Dispatch<SetStateAction<DirectAIActionPopupVisibility>>
   generatedText: string
   setGeneratedText: Dispatch<SetStateAction<string>>
 }
 
-export interface DirectAIManipulationPopupVisibility {
+export interface DirectAIActionPopupVisibility {
   options: boolean
   prompt: boolean
   confirmation: boolean
 }
 
-export const DirectAIManipulationPopup = ({
+export const DirectAIActionPopup = ({
   popupPosition,
   wholeText,
   textAreaRef,
