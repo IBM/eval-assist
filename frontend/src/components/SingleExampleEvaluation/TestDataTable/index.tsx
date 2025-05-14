@@ -320,13 +320,6 @@ export const TestDataTable = ({
                 </div>
               ))}
             </div>
-            {expectedResultOn && (
-              <div className={cx(classes.blockElement, classes.subHeaderBlock)}>
-                {/* <strong className={cx(classes.headerTypography)}>
-                  {returnByPipelineType(type, 'Expected result', 'Expected ranking')}
-                </strong> */}
-              </div>
-            )}
             {resultsAvailable && <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>}
           </div>
 
@@ -416,7 +409,7 @@ export const TestDataTable = ({
           {'No positional bias was detected in any of the instances.'}
         </p>
       ) : null}
-      <div className={classes.toggles}>
+      {/* <div className={classes.toggles}>
         <Toggle
           labelText={'Show expected result'}
           toggled={expectedResultOn}
@@ -426,7 +419,7 @@ export const TestDataTable = ({
           id="toggle-expected-result"
           className={classes.toggle}
         />
-      </div>
+      </div> */}
     </div>
   )
 }
