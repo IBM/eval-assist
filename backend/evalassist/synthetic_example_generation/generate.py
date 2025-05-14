@@ -394,8 +394,8 @@ class Generator:
             )
 
             self.query_template = PromptTemplate(
-                input_variables=[self.response_name],
-                template="Please generate an answer to the following question:\n\n{question}\n\n{format_instructions}",
+                input_variables=["context_section"],
+                template="Please generate an answer to the following question:\n\n{context_section}\n\n{format_instructions}",
                 partial_variables={"format_instructions": self.format_instructions},
             )
         elif self.task == TaskEnum.SUMMARIZATION:
@@ -562,7 +562,10 @@ class Generator:
         if self.has_context_variables:
             context = self._generate_synthetic_context()
 
-            if self.task == TaskEnum.SUMMARIZATION:
+            if (
+                self.task == TaskEnum.SUMMARIZATION
+                or self.task == TaskEnum.QUESTION_ANSWERING
+            ):
                 context_section = f"\n{context[self.context_names[0]]}"
             else:
                 context_placeholders = "\n".join(
@@ -573,7 +576,8 @@ class Generator:
                 )
         else:
             context_section = ""
-
+        print("context_section")
+        print(context_section)
         for criteria_option_name in self.per_criteria_option_count.keys():
             criteria_option_description = criteria_options_dict[criteria_option_name]
             if criteria_option_description:
