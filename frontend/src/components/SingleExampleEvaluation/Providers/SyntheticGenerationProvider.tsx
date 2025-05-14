@@ -1,11 +1,26 @@
-import { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useLocalStorage } from 'usehooks-ts'
+
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
 import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { DirectActionTypeEnum, DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@constants'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 import { CriteriaWithOptions, DirectInstance } from '@types'
 import { returnByPipelineType } from '@utils'
+
+import { useUserUseCasesContext } from './UserUseCasesProvider'
 
 interface SyntheticGenerationContextValue {
   loadingSyntheticExamples: boolean
@@ -33,6 +48,8 @@ interface SyntheticGenerationContextValue {
     fieldName: string
   }) => Promise<string>
   loadingDirectAIAction: boolean
+  hasGeneratedSyntheticMap: Record<string, boolean>
+  setHasGeneratedSyntheticMap: Dispatch<SetStateAction<Record<string, boolean>>>
 }
 
 const SyntheticGenerationContext = createContext<SyntheticGenerationContextValue>({
@@ -46,6 +63,8 @@ const SyntheticGenerationContext = createContext<SyntheticGenerationContextValue
   loadingDomainPersonaMapping: false,
   performDirectAIAction: () => Promise.resolve(''),
   loadingDirectAIAction: false,
+  hasGeneratedSyntheticMap: {},
+  setHasGeneratedSyntheticMap: () => {},
 })
 
 export const useSyntheticGeneration = () => useContext(SyntheticGenerationContext)
@@ -341,6 +360,22 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
     })
   }, [addToast, currentTestCase, fetchSyntheticExamples, removeToast, setCurrentTestCase])
 
+  const { userUseCases } = useUserUseCasesContext()
+  const { allLibraryUseCases } = useTestCaseLibrary()
+  const [hasGeneratedSyntheticMap, setHasGeneratedSyntheticMap, removeHasGeneratedSyntheticMap] = useLocalStorage<
+    Record<string, boolean>
+  >(
+    'hasGeneratedSyntheticMap',
+    Object.fromEntries([...userUseCases, ...allLibraryUseCases].map((u) => [u.name, false])),
+  )
+
+  useEffect(() => {
+    setHasGeneratedSyntheticMap((prev) => ({
+      ...Object.fromEntries(Object.keys(prev).map((k) => [k, prev[k]])),
+      ...Object.fromEntries(userUseCases.map((u) => [u.name, false])),
+    }))
+  }, [setHasGeneratedSyntheticMap, userUseCases])
+
   return (
     <SyntheticGenerationContext.Provider
       value={{
@@ -354,6 +389,8 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
         loadingDirectAIAction,
         loadDomainPersonaMapping,
         performDirectAIAction,
+        hasGeneratedSyntheticMap,
+        setHasGeneratedSyntheticMap,
       }}
     >
       {children}

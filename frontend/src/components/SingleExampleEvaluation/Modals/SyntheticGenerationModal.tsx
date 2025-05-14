@@ -40,6 +40,7 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
     loadingDomainPersonaMapping,
     generateTestData,
     loadDomainPersonaMapping,
+    setHasGeneratedSyntheticMap,
   } = useSyntheticGeneration()
 
   const setSyntheticGenerationConfig = useCallback(
@@ -68,7 +69,10 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
   const onRequestSubmit = useCallback(() => {
     setOpen(false)
     generateTestData()
-  }, [generateTestData, setOpen])
+    setHasGeneratedSyntheticMap((prev) =>
+      Object.fromEntries(Object.keys(prev).map((k) => [k, k === currentTestCase.name ? true : prev[k]])),
+    )
+  }, [currentTestCase.name, generateTestData, setHasGeneratedSyntheticMap, setOpen])
 
   useEffect(() => {
     loadDomainPersonaMapping()

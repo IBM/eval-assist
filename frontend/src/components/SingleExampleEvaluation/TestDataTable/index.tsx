@@ -48,7 +48,7 @@ export const TestDataTable = ({
   const { currentTestCase, setCurrentTestCase, setSelectedInstance } = useCurrentTestCase()
   const instancesPerPage = useMemo(() => INSTANCES_PER_PAGE, [])
   const instances = useMemo(() => currentTestCase.instances, [currentTestCase.instances])
-  const { generateTestData } = useSyntheticGeneration()
+  const { generateTestData, hasGeneratedSyntheticMap } = useSyntheticGeneration()
 
   const { currentInstances, currentPage, goToPage, totalPages, goToLastPage } = usePagination({
     instances,
@@ -249,6 +249,23 @@ export const TestDataTable = ({
     [currentTestCase.responseVariableName, currentTestCase.type, instances],
   )
 
+  const onGenerateSyntheticDataClick = useCallback(() => {
+    if (
+      currentTestCase.syntheticGenerationConfig.evaluator === null ||
+      !!!hasGeneratedSyntheticMap[currentTestCase.name]
+    ) {
+      setSysntheticGenerationModalOpen(true)
+    } else {
+      generateTestData()
+    }
+  }, [
+    currentTestCase.name,
+    currentTestCase.syntheticGenerationConfig.evaluator,
+    generateTestData,
+    hasGeneratedSyntheticMap,
+    setSysntheticGenerationModalOpen,
+  ])
+
   return (
     <div style={style} className={className}>
       <div className={classes.content}>
@@ -321,6 +338,7 @@ export const TestDataTable = ({
                 </div>
               ))}
             </div>
+            {expectedResultOn && <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>}
             {resultsAvailable && <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>}
           </div>
 
@@ -381,11 +399,7 @@ export const TestDataTable = ({
                     kind="tertiary"
                     size="sm"
                     renderIcon={AiGenerate}
-                    onClick={() =>
-                      currentTestCase.syntheticGenerationConfig.evaluator === null
-                        ? setSysntheticGenerationModalOpen(true)
-                        : generateTestData()
-                    }
+                    onClick={onGenerateSyntheticDataClick}
                     disabled={currentTestCase.type == EvaluationType.PAIRWISE}
                   >
                     {'Generate test data'}
