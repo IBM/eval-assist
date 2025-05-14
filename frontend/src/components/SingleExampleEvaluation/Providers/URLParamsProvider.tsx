@@ -1,15 +1,10 @@
 import { toSnakeCase } from 'src/utils'
 
-import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
+import { ReactNode, createContext, useContext, useMemo } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
-
 import { EvaluationType } from '../../../types'
-import { useCriteriasContext } from './CriteriasProvider'
-import { useEvaluatorOptionsContext } from './EvaluatorOptionsProvider'
-import { useModelProviderCredentials } from './ModelProviderCredentialsProvider'
 
 interface URLInfoContextValue {
   useCaseId: number | null

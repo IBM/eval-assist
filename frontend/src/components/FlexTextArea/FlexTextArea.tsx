@@ -6,8 +6,11 @@ import { ComponentProps, forwardRef, useCallback, useEffect, useMemo, useRef, us
 import { fast01 } from '@carbon/motion'
 import { TextArea } from '@carbon/react'
 
+import { useURLInfoContext } from '@components/Benchmarks/Providers/URLInfoProvider'
 import { DirectAIActionPopup, DirectAIActionPopupVisibility } from '@components/DirectAIActionPopup'
 import { useSelectedTextContext } from '@components/SingleExampleEvaluation/Providers/SelectedTextProvider'
+import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
+import { URLParamsProvider, useURLParamsContext } from '@components/SingleExampleEvaluation/Providers/URLParamsProvider'
 import { useMergeRefs } from '@floating-ui/react'
 import { getCaretPosition } from '@utils'
 
@@ -32,7 +35,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
   const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
   const { selectedText, setSelectedText, isMouseUp } = useSelectedTextContext()
   const [generatedText, setGeneratedText] = useState('')
-
+  const { syntheticGenerationEnabled } = useURLParamsContext()
   const [isFocused, setFocused] = useState(false)
   const isPopupOpen = useMemo(() => Object.values(popupVisibility).some((x) => x), [popupVisibility])
 
@@ -138,7 +141,7 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
           component type to eliminate mismatch in style (dimensions) */}
           <TextArea className={classes.sizer} value={props.value} ref={sizerRef} tabIndex={-1} labelText="" />
 
-          {isFocused && (
+          {isFocused && syntheticGenerationEnabled && (
             <DirectAIActionPopup
               textAreaRef={innerRef}
               wholeText={(props.value as string) || ''}
