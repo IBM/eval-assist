@@ -241,6 +241,14 @@ export const TestDataTable = ({
     goToLastPage()
   }, [goToLastPage, instances.length])
 
+  const responseNames = useMemo(
+    () =>
+      returnByPipelineType<string[], string[]>(currentTestCase.type, [currentTestCase.responseVariableName], () =>
+        (instances[0] as PairwiseInstance).responses.map((_, i) => `${currentTestCase.responseVariableName} ${i + 1}`),
+      ),
+    [currentTestCase.responseVariableName, currentTestCase.type, instances],
+  )
+
   return (
     <div style={style} className={className}>
       <div className={classes.content}>
@@ -282,14 +290,7 @@ export const TestDataTable = ({
             })}
           >
             <div className={cx(classes.tableRowSection)}>
-              {returnByPipelineType<string[], string[]>(
-                currentTestCase.type,
-                [currentTestCase.responseVariableName],
-                () =>
-                  (instances[0] as PairwiseInstance).responses.map(
-                    (_, i) => `${currentTestCase.responseVariableName} ${i + 1}`,
-                  ),
-              ).map((reponseName, i) => (
+              {responseNames.map((reponseName, i) => (
                 <div key={i} className={cx(classes.blockElement, classes.subHeaderBlock)}>
                   <EditableTag
                     value={reponseName}
