@@ -24,16 +24,13 @@ interface SyntheticGenerationContextValue {
   }[]
   loadingDomainPersonaMapping: boolean
   loadDomainPersonaMapping: () => Promise<void>
-  performDirectAIAction: ({
-    text,
-    selection,
-    action,
-    prompt,
-  }: {
+  performDirectAIAction: ({}: {
     text: string
     selection: string
     action: DirectActionTypeEnum
     prompt?: string
+    instanceId: string
+    fieldName: string
   }) => Promise<string>
   loadingDirectAIAction: boolean
 }
@@ -109,11 +106,15 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
       selection,
       action,
       prompt,
+      instanceId,
+      fieldName,
     }: {
       text: string
       selection: string
       action: DirectActionTypeEnum
       prompt?: string
+      instanceId: string
+      fieldName: string
     }) => {
       setLoadingDirectAIAction(true)
 
@@ -126,6 +127,8 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
         selection,
         action,
         prompt,
+        instanceId,
+        fieldName,
       }
 
       const response = await post('direct-ai-action/', body)
@@ -169,18 +172,22 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
       selection,
       action,
       prompt,
+      instanceId,
+      fieldName,
     }: {
       text: string
       selection: string
       action: DirectActionTypeEnum
       prompt?: string
+      instanceId: string
+      fieldName: string
     }) => {
       const generationInProgressToastId = addToast({
         kind: 'info',
         title: 'Generating direct action...',
       })
       const startEvaluationTime = new Date().getTime() / 1000
-      const result = await fetchDirectAIAction({ text, selection, action, prompt })
+      const result = await fetchDirectAIAction({ text, selection, action, prompt, instanceId, fieldName })
       const endEvaluationTime = new Date().getTime() / 1000
       const totalEvaluationTime = Math.round(endEvaluationTime - startEvaluationTime)
 

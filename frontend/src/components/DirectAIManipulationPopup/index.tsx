@@ -24,6 +24,8 @@ interface Props {
   onChange: (newValue: string) => void
   textAreaRef: RefObject<HTMLTextAreaElement>
   popupVisibility: DirectAIManipulationPopupVisibility
+  instanceId: string
+  fieldName: string
   // setPopupVisibility: Dispatch<SetStateAction<DirectAIManipulationPopupVisibility>>
   generatedText: string
   setGeneratedText: Dispatch<SetStateAction<string>>
@@ -42,6 +44,8 @@ export const DirectAIManipulationPopup = ({
   popupVisibility,
   generatedText,
   setGeneratedText,
+  instanceId,
+  fieldName,
   // setPopupVisibility,
   onChange,
 }: Props) => {
@@ -55,11 +59,18 @@ export const DirectAIManipulationPopup = ({
       e.preventDefault() // Prevent focus shift
       e.stopPropagation()
       setActionedText(selectedText)
-      const res = await performDirectAIAction({ text: wholeText, selection: selectedText, action, prompt })
+      const res = await performDirectAIAction({
+        text: wholeText,
+        selection: selectedText,
+        action,
+        prompt,
+        instanceId,
+        fieldName,
+      })
       onChange && res && onChange(wholeText.replace(selectedText, res))
       setGeneratedText(res)
     },
-    [onChange, performDirectAIAction, selectedText, setGeneratedText, wholeText],
+    [fieldName, instanceId, onChange, performDirectAIAction, selectedText, setGeneratedText, wholeText],
   )
 
   const onCustomOptionClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {

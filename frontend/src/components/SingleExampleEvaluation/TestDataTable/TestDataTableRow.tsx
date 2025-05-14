@@ -219,6 +219,8 @@ export const TestDataTableRow = ({
                     onFocus={setActive}
                     onBlur={setInactive}
                     className={cx(classes.blockElement)}
+                    instanceId={instance.id}
+                    fieldName={responseVariableName}
                   />
                 </div>
               ))}
@@ -233,6 +235,8 @@ export const TestDataTableRow = ({
                   onFocus={setActive}
                   onBlur={setInactive}
                   className={cx(classes.blockElement)}
+                  instanceId={instance.id}
+                  fieldName={contextVariable.name}
                 />
               ))}
             </div>
