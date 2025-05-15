@@ -232,8 +232,9 @@ def get_test_cases(user: str):
     return test_cases
 
 
-@router.post("/log_test_case_checkpoint/")
-def log_test_case_checkpoint():
+# used to log varying user actions
+@router.post("/log_user_action/")
+def log_user_action():
     pass
 
 

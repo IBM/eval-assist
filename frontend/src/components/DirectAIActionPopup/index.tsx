@@ -15,6 +15,7 @@ import {
 import { useSelectedTextContext } from '@components/SingleExampleEvaluation/Providers/SelectedTextProvider'
 import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
 import { DirectActionTypeEnum } from '@constants'
+import { useFetchUtils } from '@customHooks/useFetchUtils'
 
 import classes from './index.module.scss'
 
@@ -26,7 +27,6 @@ interface Props {
   popupVisibility: DirectAIActionPopupVisibility
   instanceId: string
   fieldName: string
-  // setPopupVisibility: Dispatch<SetStateAction<DirectAIActionPopupVisibility>>
   generatedText: string
   setGeneratedText: Dispatch<SetStateAction<string>>
 }
@@ -53,7 +53,7 @@ export const DirectAIActionPopup = ({
   const [prompt, setPrompt] = useState('')
   const [actionedText, setActionedText] = useState('')
   const { selectedText, setSelectedText, isMouseUp } = useSelectedTextContext()
-
+  const { post } = useFetchUtils()
   const onOptionClick = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement>, action: DirectActionTypeEnum, prompt?: string) => {
       e.preventDefault() // Prevent focus shift
@@ -90,28 +90,43 @@ export const DirectAIActionPopup = ({
       textAreaRef.current.setSelectionRange(startIndex, endIndex)
     }
   }, [generatedText, selectedText, textAreaRef, wholeText])
-
-  const closeAll = useCallback(() => {
-    // setPopupVisibility({ options: false, prompt: false, confirmation: false })
-  }, [])
-
+  console.log(actionedText)
   const clean = useCallback(() => {
-    // closeAll()
     setGeneratedText('')
     setPrompt('')
     setActionedText('')
     setSelectedText('')
-    // textAreaRef.current?.setSelectionRange(null, null)
+    console.log('jererereere')
   }, [setGeneratedText, setSelectedText])
 
   const onCancelClick = useCallback(() => {
-    clean()
+    post('log_user_action/', {
+      action: 'direct_ai_action_confirmation',
+      content: {
+        accepted: false,
+        generatedText,
+        actionedText,
+        instanceId,
+        fieldName,
+      },
+    })
     onChange && generatedText && onChange(wholeText.replace(generatedText, actionedText))
-  }, [actionedText, clean, generatedText, onChange, wholeText])
+    clean()
+  }, [actionedText, clean, fieldName, generatedText, instanceId, onChange, post, wholeText])
 
   const onConfirmClick = useCallback(() => {
+    post('log_user_action/', {
+      action: 'direct_ai_action_confirmation',
+      content: {
+        accepted: true,
+        generatedText,
+        actionedText,
+        instanceId,
+        fieldName,
+      },
+    })
     clean()
-  }, [clean])
+  }, [actionedText, clean, fieldName, generatedText, instanceId, post])
 
   return (
     Object.values(popupVisibility).some((x) => x) && (
@@ -123,7 +138,7 @@ export const DirectAIActionPopup = ({
         className={classes.popoverContainer}
       >
         {popupVisibility.options && (
-          <div className={classes.optionsContainer} onBlur={closeAll}>
+          <div className={classes.optionsContainer}>
             <IconButton
               className={classes.iconButton}
               kind={'ghost'}
