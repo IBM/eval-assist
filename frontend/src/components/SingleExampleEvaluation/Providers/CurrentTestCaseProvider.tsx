@@ -345,9 +345,12 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
 
   useEffect(() => {
     if (showingTestCase) {
-      post('log_test_case_checkpoint/', {
-        name: currentTestCase.name,
-        syntheticGenerationEnabled,
+      post('log_user_action/', {
+        action: 'enter_test_case',
+        content: {
+          name: currentTestCase.name,
+          syntheticGenerationEnabled,
+        },
       })
     }
   }, [currentTestCase.name, post, showingTestCase, syntheticGenerationEnabled])
