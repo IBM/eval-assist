@@ -90,7 +90,7 @@ export const DirectAIActionPopup = ({
       textAreaRef.current.setSelectionRange(startIndex, endIndex)
     }
   }, [generatedText, selectedText, textAreaRef, wholeText])
-  console.log(actionedText)
+
   const clean = useCallback(() => {
     setGeneratedText('')
     setPrompt('')
