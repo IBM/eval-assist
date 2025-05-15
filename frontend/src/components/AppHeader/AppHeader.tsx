@@ -1,6 +1,7 @@
 import { PLATFORM_NAME } from 'src/constants'
 
 import { signOut } from 'next-auth/react'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 
 import {
@@ -25,6 +26,7 @@ export const AppHeader = () => {
   return (
     <Header className={classes.root} aria-label={title}>
       <HeaderName prefix={''} style={{ cursor: 'pointer' }} href="/">
+        <Image width={16} height={16} src={`images/logo.svg`} alt={'title'} style={{ marginRight: '0.25rem' }} />
         {PLATFORM_NAME}
       </HeaderName>
 
