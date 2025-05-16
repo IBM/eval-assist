@@ -71,29 +71,11 @@ export const TestDataTable = ({
     [instances],
   )
 
-  const directGridClasses = useMemo(
+  const gridClasses = useMemo(
     () => ({
       [classes.columns1]: !expectedResultOn && !resultsAvailable,
       [classes.columns2]: (resultsAvailable && !expectedResultOn) || (expectedResultOn && !resultsAvailable),
       [classes.columns3var1]: expectedResultOn && resultsAvailable,
-    }),
-    [expectedResultOn, resultsAvailable],
-  )
-
-  const headerDirectGridClasses = useMemo(
-    () => ({
-      [classes.columns1]: !expectedResultOn && !resultsAvailable,
-      [classes.columns2]: (resultsAvailable && !expectedResultOn) || (expectedResultOn && !resultsAvailable),
-      [classes.columns3var1]: expectedResultOn && resultsAvailable,
-    }),
-    [expectedResultOn, resultsAvailable],
-  )
-
-  const pairwiseGridClasses = useMemo(
-    () => ({
-      [classes.columns1]: !expectedResultOn && !resultsAvailable,
-      [classes.columns2]: (resultsAvailable && !expectedResultOn) || (expectedResultOn && !resultsAvailable),
-      [classes.columns3var3]: expectedResultOn && resultsAvailable,
     }),
     [expectedResultOn, resultsAvailable],
   )
@@ -270,19 +252,15 @@ export const TestDataTable = ({
     <div style={style} className={className}>
       <div className={classes.content}>
         <div className={cx(classes.innerContainer)}>
-          <div
-            className={cx(classes.tableRow, classes.headerRow, {
-              ...returnByPipelineType(currentTestCase.type, headerDirectGridClasses, pairwiseGridClasses),
-            })}
-          >
+          <div className={cx(classes.tableRow, classes.headerRow, gridClasses)}>
             <div className={cx(classes.blockElement, classes.headerBlock, classes.headerResponseBlock)}>
               <strong className={cx(classes.headerTypography)}>{'Test data'}</strong>
               {currentTestCase.type === EvaluationType.PAIRWISE && (
-                <Button kind="ghost" size="sm" renderIcon={Add} onClick={addResponse}>
+                <Button kind="ghost" size="sm" renderIcon={Add} onClick={addResponse} disabled={evaluationRunning}>
                   {'Add response'}
                 </Button>
               )}
-              <Button kind="ghost" size="sm" renderIcon={Add} onClick={addContextVariable}>
+              <Button kind="ghost" size="sm" renderIcon={Add} onClick={addContextVariable} disabled={evaluationRunning}>
                 {'Add variable'}
               </Button>
             </div>
@@ -301,11 +279,7 @@ export const TestDataTable = ({
               </div>
             )}
           </div>
-          <div
-            className={cx(classes.tableRow, classes.subHeaderRow, {
-              ...returnByPipelineType(currentTestCase.type, directGridClasses, pairwiseGridClasses),
-            })}
-          >
+          <div className={cx(classes.tableRow, classes.subHeaderRow, gridClasses)}>
             <div className={cx(classes.tableRowSection)}>
               {responseNames.map((reponseName, i) => (
                 <div key={i} className={cx(classes.blockElement, classes.subHeaderBlock)}>
@@ -358,7 +332,7 @@ export const TestDataTable = ({
               evaluationRunning={evaluationRunning}
               isInstanceEvaluationRunning={evaluatingInstanceIds.includes(instance.id)}
               criteria={currentTestCase.criteria}
-              gridClasses={returnByPipelineType(currentTestCase.type, directGridClasses, pairwiseGridClasses)}
+              gridClasses={gridClasses}
               instance={instance}
               setInstance={(instance) => setInstance(instance, i)}
               readOnly={false}
