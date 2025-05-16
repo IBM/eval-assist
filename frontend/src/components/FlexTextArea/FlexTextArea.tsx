@@ -15,14 +15,14 @@ import { getCaretPosition } from '@utils'
 import classes from './FlexTextArea.module.scss'
 
 type Props = {
-  maxInactiveHeight?: number
+  unfocusedHeight?: number
   fixMaxHeight?: boolean
   instanceId: string
   fieldName: string
 } & ComponentProps<typeof TextArea>
 
 export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function FlexTextArea(
-  { instanceId, fieldName, helperText, className, maxInactiveHeight = 125, onBlur, fixMaxHeight, ...props },
+  { instanceId, fieldName, helperText, className, unfocusedHeight = 125, onBlur, fixMaxHeight, ...props },
   outsideRef,
 ) {
   const [popupVisibility, setPopupVisibility] = useState<DirectAIActionPopupVisibility>({
@@ -100,15 +100,17 @@ export const FlexTextArea = forwardRef<HTMLTextAreaElement, Props>(function Flex
     if (fixMaxHeight) {
       el.style.height = `${sizerEl.scrollHeight + 2}px`
     } else {
-      let newHeight = isFocused ? `${sizerEl.scrollHeight}px` : ''
-      if (newHeight == '' && maxInactiveHeight) {
-        newHeight = `${Math.min(sizerEl.scrollHeight, maxInactiveHeight)}px`
+      let newHeight
+      if (isFocused) {
+        newHeight = `${Math.max(sizerEl.scrollHeight, unfocusedHeight)}px`
+      } else {
+        newHeight = `${unfocusedHeight}px`
       }
       if (newHeight !== el.style.height) {
         el.style.height = newHeight
       }
     }
-  }, [isFocused, maxInactiveHeight, fixMaxHeight])
+  }, [fixMaxHeight, isFocused, unfocusedHeight])
 
   useEffect(() => {
     updateHeight()
