@@ -289,7 +289,8 @@ export const TestDataTable = ({
                       setCurrentTestCase({ ...currentTestCase, responseVariableName: e.target.value })
                     }
                     color="blue"
-                    isEditable={currentTestCase.type === EvaluationType.DIRECT}
+                    // isEditable={currentTestCase.type === EvaluationType.DIRECT}
+                    // onEdit={() => }
                   />
                   {currentTestCase.type == EvaluationType.PAIRWISE &&
                     (instances[0] as PairwiseInstance).responses.length > 2 && (
