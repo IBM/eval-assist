@@ -3,15 +3,16 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import { Modal } from '@carbon/react'
 
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
+import { useTestCaseActionsContext } from '../Providers/TestCaseActionsProvider'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  onDeleteUseCase: () => Promise<void>
 }
 
-export const DeleteUseCaseModal = ({ open, setOpen, onDeleteUseCase }: Props) => {
+export const DeleteUseCaseModal = ({ open, setOpen }: Props) => {
   const { currentTestCase } = useCurrentTestCase()
+  const { onDeleteTestCase } = useTestCaseActionsContext()
   const [loadingStatus, setLoadingStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>(
     'inactive',
   )
@@ -25,7 +26,7 @@ export const DeleteUseCaseModal = ({ open, setOpen, onDeleteUseCase }: Props) =>
 
   const onSubmit = async () => {
     setLoadingStatus('active')
-    await onDeleteUseCase()
+    await onDeleteTestCase()
     setLoadingStatus('finished')
     setDescription('Deleted')
     setOpen(false)

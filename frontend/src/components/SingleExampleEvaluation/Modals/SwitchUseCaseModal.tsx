@@ -4,14 +4,13 @@ import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@car
 
 import { TestCase } from '../../../types'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
+import { useTestCaseActionsContext } from '../Providers/TestCaseActionsProvider'
 
 interface Props {
   updateURLFromUseCase: (useCaseSelected: { useCase: TestCase; subCatalogName: string | null } | null) => void
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  onSave: () => Promise<void>
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  evaluationRunning: boolean
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
@@ -19,11 +18,10 @@ export const SwitchUseCaseModal = ({
   open,
   setOpen,
   updateURLFromUseCase,
-  onSave,
   setSaveUseCaseModalOpen,
-  evaluationRunning,
   setEvaluationRunningModalOpen,
 }: Props) => {
+  const { onSave, evaluationRunning } = useTestCaseActionsContext()
   const [saving, setSaving] = useState(false)
   const { currentTestCase, setTestCaseSelected, testCaseSelected } = useCurrentTestCase()
 

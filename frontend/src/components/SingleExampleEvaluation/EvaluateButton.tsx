@@ -5,31 +5,25 @@ import { CSSProperties, Dispatch, SetStateAction } from 'react'
 import { Button, InlineLoading, Tooltip } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
-import { ModelProviderType, TestCase } from '@types'
+import { ModelProviderType } from '@types'
 
 import classes from './EvaluateButton.module.scss'
 import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
+import { useModalsContext } from './Providers/ModalsProvider'
+import { useTestCaseActionsContext } from './Providers/TestCaseActionsProvider'
 import { useURLParamsContext } from './Providers/URLParamsProvider'
 
 interface EvaluateButtonProps {
-  evaluationRunning: boolean
-  runEvaluation: (evaluationIds: string[]) => Promise<void>
-  setPromptModalOpen: Dispatch<SetStateAction<boolean>>
   style?: CSSProperties
   className?: string
-  evaluationFailed: boolean
 }
 
-export const EvaluateButton = ({
-  evaluationRunning,
-  runEvaluation,
-  setPromptModalOpen,
-  evaluationFailed,
-  style,
-  className,
-}: EvaluateButtonProps) => {
+export const EvaluateButton = ({ style, className }: EvaluateButtonProps) => {
   const { isRisksAndHarms } = useURLParamsContext()
   const { currentTestCase, areRelevantCredentialsProvided, outdatedResultInstanceIds } = useCurrentTestCase()
+  const { runEvaluation, evaluationFailed, evaluationRunning } = useTestCaseActionsContext()
+  const { setPromptModalOpen } = useModalsContext()
+
   return (
     <div style={style} className={className}>
       {evaluationRunning ? (

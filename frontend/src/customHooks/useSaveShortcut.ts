@@ -1,15 +1,16 @@
 import { Dispatch, SetStateAction, useCallback, useEffect } from 'react'
 
+import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
+import { useModalsContext } from '@components/SingleExampleEvaluation/Providers/ModalsProvider'
+import { useTestCaseActionsContext } from '@components/SingleExampleEvaluation/Providers/TestCaseActionsProvider'
 import { TestCase } from '@types'
 
-interface Props {
-  onSave: () => Promise<void>
-  isTestCaseSaved: boolean
-  setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  changesDetected: boolean
-}
+interface Props {}
 
-export const useSaveShortcut = ({ onSave, isTestCaseSaved, changesDetected, setSaveUseCaseModalOpen }: Props) => {
+export const useSaveShortcut = ({}: Props) => {
+  const { isTestCaseSaved, changesDetected } = useCurrentTestCase()
+  const { onSave } = useTestCaseActionsContext()
+  const { setSaveUseCaseModalOpen } = useModalsContext()
   const onShortcut = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 's' && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {

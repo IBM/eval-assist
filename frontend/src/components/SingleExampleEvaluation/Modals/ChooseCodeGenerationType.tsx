@@ -2,16 +2,18 @@ import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 
 import { ComposedModal, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGroup } from '@carbon/react'
 
+import { useUnitxtCodeGeneration } from '@customHooks/useUnitxtNotebookGeneration'
+
 import classes from './ChooseCodeGenerationType copy.module.scss'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  downloadUnitxtCode: (options: { downloadAsScript: boolean }) => void
 }
 
-export const ChooseCodeGenerationType = ({ open, setOpen, downloadUnitxtCode }: Props) => {
+export const ChooseCodeGenerationType = ({ open, setOpen }: Props) => {
   const [selectedFormat, setSelectedFormat] = useState<'ipynb' | 'py'>('ipynb')
+  const { downloadUnitxtCode } = useUnitxtCodeGeneration()
 
   const onRequestSubmit = useCallback(() => {
     setOpen(false)

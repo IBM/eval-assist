@@ -5,20 +5,21 @@ import { Modal, TextInput } from '@carbon/react'
 import { EvaluationType, TestCase } from '../../../types'
 import { UseCaseTypeBadge } from '../../UseCaseTypeBadge/UseCaseTypeBadge'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
+import { useTestCaseActionsContext } from '../Providers/TestCaseActionsProvider'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  onSaveAs: (name: string, fromUseCase?: TestCase) => Promise<boolean>
 }
 
-export const SaveAsUseCaseModal = ({ open, setOpen, onSaveAs }: Props) => {
+export const SaveAsUseCaseModal = ({ open, setOpen }: Props) => {
   const [useCaseName, setUseCaseName] = useState('')
   const { currentTestCase } = useCurrentTestCase()
   const [loadingStatus, setLoadingStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>(
     'inactive',
   )
   const [loadingDescription, setLoadingDescription] = useState('Saving...')
+  const { onSaveAs } = useTestCaseActionsContext()
 
   const resetStatus = () => {
     setLoadingStatus('inactive')

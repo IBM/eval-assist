@@ -7,7 +7,7 @@ import Link from 'next/link'
 
 import { Launch } from '@carbon/react/icons'
 
-import { useGetQueryParamsFromUseCase } from '@customHooks/useGetQueryParamsFromUseCase'
+import { useGetQueryParamsFromTestCase } from '@customHooks/useGetQueryParamsFromTestCase'
 
 import { TestCase } from '../../../types'
 import sharedClasses from './shared.module.scss'
@@ -19,11 +19,11 @@ interface LinkButtonProps {
 }
 
 export const LinkButton = ({ useCase, subCatalogName, className = '' }: LinkButtonProps) => {
-  const { getQueryParamsFromUseCase } = useGetQueryParamsFromUseCase()
+  const { getQueryParamsFromTestCase } = useGetQueryParamsFromTestCase()
 
   const urlParams = useMemo(
-    () => getQueryParamsFromUseCase(useCase, subCatalogName || null),
-    [getQueryParamsFromUseCase, subCatalogName, useCase],
+    () => getQueryParamsFromTestCase(useCase, subCatalogName || null),
+    [getQueryParamsFromTestCase, subCatalogName, useCase],
   )
 
   const queryParams = useMemo(() => stringifyQueryParams(urlParams), [urlParams])

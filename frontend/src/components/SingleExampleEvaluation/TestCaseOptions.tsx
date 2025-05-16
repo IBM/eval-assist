@@ -7,33 +7,23 @@ import { Add, Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@car
 
 import { UseCaseTypeBadge } from '../UseCaseTypeBadge/UseCaseTypeBadge'
 import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
+import { useModalsContext } from './Providers/ModalsProvider'
+import { useTestCaseActionsContext } from './Providers/TestCaseActionsProvider'
 import { useURLParamsContext } from './Providers/URLParamsProvider'
 import classes from './TestCaseOptions.module.scss'
 
 interface Props {
   style?: CSSProperties
   className?: string
-  onSave: () => Promise<void>
-  setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  setDeleteUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  setEditNameModalOpen: Dispatch<SetStateAction<boolean>>
-  setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  setSampleCodeTypeModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
-export const TestCaseOptions = ({
-  style,
-  className,
-  setSaveUseCaseModalOpen,
-  onSave,
-  setNewUseCaseModalOpen,
-  setDeleteUseCaseModalOpen,
-  setEditNameModalOpen,
-  setSampleCodeTypeModalOpen,
-}: Props) => {
+export const TestCaseOptions = ({ style, className }: Props) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
   const { currentTestCase, isTestCaseSaved, changesDetected } = useCurrentTestCase()
   const { isRisksAndHarms } = useURLParamsContext()
+  const { setDeleteUseCaseModalOpen, setSaveUseCaseModalOpen, setEditNameModalOpen, setSampleCodeTypeModalOpen } =
+    useModalsContext()
+  const { onSave } = useTestCaseActionsContext()
   const onSaveClick = async () => {
     setSavingUseCase(true)
     await onSave()
