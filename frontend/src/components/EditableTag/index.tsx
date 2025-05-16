@@ -19,6 +19,7 @@ interface Props {
   className?: string
   color: BadgeColor
   isEditable?: boolean
+  onEdit?: () => {}
 }
 
 export const EditableTag = ({
@@ -30,6 +31,7 @@ export const EditableTag = ({
   color,
   className,
   isEditable = true,
+  onEdit,
 }: Props) => {
   const [isEditing, setIsEditing] = useState(value === '')
   const inputRef = useRef(null)
@@ -74,7 +76,7 @@ export const EditableTag = ({
               {value}
             </Tag>
             {isEditable && (
-              <IconButton kind={'ghost'} label={'Edit'} onClick={() => setIsEditing(true)}>
+              <IconButton kind={'ghost'} label={'Edit'} onClick={() => (onEdit ? onEdit() : setIsEditing(true))}>
                 <Edit />
               </IconButton>
             )}
