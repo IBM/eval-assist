@@ -316,9 +316,13 @@ export const SingleExampleEvaluation = () => {
             updatedInstances.find((instance) => instance.id === fetchedInstanceResult.id)!.result = instanceResult
           })
         }
-        setCurrentTestCase({
-          ...currentTestCase,
-          instances: updatedInstances,
+        setCurrentTestCase((prev) => {
+          // used to filter the instances to update if one or more instances were deleted while the evaluation was running
+          const currentInstanceIds = prev.instances.map((i) => i.id)
+          return {
+            ...currentTestCase,
+            instances: updatedInstances.filter((ui) => currentInstanceIds.includes(ui.id)),
+          }
         })
 
         setInstancesLastEvaluatedContent(
