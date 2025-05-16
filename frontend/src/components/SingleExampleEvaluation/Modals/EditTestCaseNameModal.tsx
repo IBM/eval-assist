@@ -4,16 +4,16 @@ import { Modal, TextInput } from '@carbon/react'
 
 import { TestCase } from '../../../types'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
+import { useUserUseCasesContext } from '../Providers/UserUseCasesProvider'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  userUseCases: TestCase[]
-  setUserUseCases: Dispatch<SetStateAction<TestCase[]>>
 }
 
-export const EditUseCaseNameModal = ({ open, setOpen, userUseCases, setUserUseCases }: Props) => {
+export const EditTestCaseNameModal = ({ open, setOpen }: Props) => {
   const { currentTestCase, setCurrentTestCase } = useCurrentTestCase()
+  const { userUseCases, setUserUseCases } = useUserUseCasesContext()
 
   const [newUseCaseName, setNewUseCaseName] = useState(currentTestCase.name)
 
@@ -25,7 +25,7 @@ export const EditUseCaseNameModal = ({ open, setOpen, userUseCases, setUserUseCa
     <Modal
       open={open}
       onRequestClose={() => setOpen(false)}
-      modalHeading={`Change use case name`}
+      modalHeading={`Change test case name`}
       primaryButtonText="Confirm"
       secondaryButtonText="Cancel"
       onRequestSubmit={(e) => {

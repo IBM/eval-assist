@@ -19,7 +19,7 @@ interface Props {
   className?: string
   color: BadgeColor
   isEditable?: boolean
-  onEdit?: () => {}
+  onEdit?: () => void
 }
 
 export const EditableTag = ({

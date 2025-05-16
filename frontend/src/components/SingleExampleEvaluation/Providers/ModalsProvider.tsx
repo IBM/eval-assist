@@ -31,10 +31,12 @@ interface ModalsContextValue {
   sampleCodeTypeModalOpen: boolean
   setSampleCodeTypeModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 
-  modelProviderCrendentialsModelOpen: boolean
-  setModelProviderCrendentialsModelOpen: React.Dispatch<React.SetStateAction<boolean>>
-}
+  modelProviderCrendentialsModalOpen: boolean
+  setmodelProviderCrendentialsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 
+  editPairwiseResponseNameModalOpen: boolean
+  setEditPairwiseResponseNameModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
 const ModalsContext = createContext<ModalsContextValue>({
   confirmationModalOpen: false,
   setConfirmationModalOpen: () => {},
@@ -66,8 +68,11 @@ const ModalsContext = createContext<ModalsContextValue>({
   sampleCodeTypeModalOpen: false,
   setSampleCodeTypeModalOpen: () => {},
 
-  modelProviderCrendentialsModelOpen: false,
-  setModelProviderCrendentialsModelOpen: () => {},
+  modelProviderCrendentialsModalOpen: false,
+  setmodelProviderCrendentialsModalOpen: () => {},
+
+  editPairwiseResponseNameModalOpen: false,
+  setEditPairwiseResponseNameModalOpen: () => {},
 })
 
 export const useModalsContext = () => {
@@ -85,7 +90,8 @@ export const ModalsProvider = ({ children }: { children: ReactNode }) => {
   const [promptModalOpen, setPromptModalOpen] = useState(false)
   const [syntheticGenerationModalOpen, setSyntheticGenerationModalOpen] = useState(false)
   const [sampleCodeTypeModalOpen, setSampleCodeTypeModalOpen] = useState(false)
-  const [modelProviderCrendentialsModelOpen, setModelProviderCrendentialsModelOpen] = useState(false)
+  const [modelProviderCrendentialsModalOpen, setmodelProviderCrendentialsModalOpen] = useState(false)
+  const [editPairwiseResponseNameModalOpen, setEditPairwiseResponseNameModalOpen] = useState(false)
 
   return (
     <ModalsContext.Provider
@@ -120,8 +126,11 @@ export const ModalsProvider = ({ children }: { children: ReactNode }) => {
         sampleCodeTypeModalOpen,
         setSampleCodeTypeModalOpen,
 
-        modelProviderCrendentialsModelOpen,
-        setModelProviderCrendentialsModelOpen,
+        modelProviderCrendentialsModalOpen,
+        setmodelProviderCrendentialsModalOpen,
+
+        editPairwiseResponseNameModalOpen,
+        setEditPairwiseResponseNameModalOpen,
       }}
     >
       {children}
