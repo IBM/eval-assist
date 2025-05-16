@@ -67,7 +67,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
       router.push(newUrl, newUrl, {
         shallow: true,
       })
-      // use case is a saved user test case
+      // test case is a saved user test case
     },
     [getURLFromBenchmark, router],
   )

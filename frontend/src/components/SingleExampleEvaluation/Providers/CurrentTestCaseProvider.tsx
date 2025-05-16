@@ -370,7 +370,7 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
     (useCaseSelected: { useCase: TestCase; subCatalogName: string | null } | null) => {
       let urlChangePromise: Promise<boolean>
       if (useCaseSelected !== null) {
-        // use case is a saved user test case
+        // test case is a saved user test case
         urlChangePromise = changeTestCaseURL(
           getQueryParamsFromTestCase(useCaseSelected.useCase, useCaseSelected.subCatalogName),
         )

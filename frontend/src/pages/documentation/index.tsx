@@ -126,7 +126,7 @@ const Documentation = () => {
               <strong>Test Data: </strong>In the test data section, enter the text you would like to evaluate according
               the the criteria you defined and the context variables provided. The text to evaluate will often the same
               as the output of an LLM (response) you want to evaluate. Hence, the default name of this variable is
-              called response. Depending on your use case, you may want to change the name of the variable so you can
+              called response. Depending on your test case, you may want to change the name of the variable so you can
               properly refer to it in your criteria description. The text to evaluate could be anything though and
               doesn&apos;t necessarily have to come from another LLM. If you are adding a lot of test data points, it
               may be helpful to add an expected rating (or ranking in case of pairwise comparison) so you can see at a
