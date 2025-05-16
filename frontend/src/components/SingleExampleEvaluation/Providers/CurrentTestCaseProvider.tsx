@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { useGetQueryParamsFromTestCase } from '@customHooks/useGetQueryParamsFromTestCase'
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 
 import {
@@ -62,6 +63,12 @@ interface CurrentTestCaseContextValue {
   setInstancesLastEvaluatedContent: Dispatch<SetStateAction<Record<string, string | null>>>
   outdatedResultInstanceIds: string[]
   isInstanceResultOutdated: Record<string, boolean>
+  updateURLFromTestCase: (
+    useCaseSelected: {
+      useCase: TestCase
+      subCatalogName: string | null
+    } | null,
+  ) => void
 }
 
 const CurrentTestCaseContext = createContext<CurrentTestCaseContextValue>({
@@ -87,6 +94,7 @@ const CurrentTestCaseContext = createContext<CurrentTestCaseContextValue>({
   currentGenerationProviderCredentials: {},
   selectedInstance: null,
   setSelectedInstance: () => null,
+  updateURLFromTestCase: () => {},
 })
 
 export const useCurrentTestCase = () => {
@@ -102,6 +110,7 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
     libraryTestCaseName,
     criteriaName,
     syntheticGenerationEnabled,
+    changeTestCaseURL,
   } = useURLParamsContext()
   const { modelProviderCredentials, getAreRelevantCredentialsProvided, getProviderCredentials } =
     useModelProviderCredentials()
@@ -355,6 +364,27 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
     }
   }, [currentTestCase.name, post, showingTestCase, syntheticGenerationEnabled])
 
+  const { getQueryParamsFromTestCase } = useGetQueryParamsFromTestCase()
+
+  const updateURLFromTestCase = useCallback(
+    (useCaseSelected: { useCase: TestCase; subCatalogName: string | null } | null) => {
+      let urlChangePromise: Promise<boolean>
+      if (useCaseSelected !== null) {
+        // use case is a saved user test case
+        urlChangePromise = changeTestCaseURL(
+          getQueryParamsFromTestCase(useCaseSelected.useCase, useCaseSelected.subCatalogName),
+        )
+        // if (evaluationRunningToastId) removeToast(evaluationRunningToastId)
+        // setEvaluationRunningToastId(null)
+        // // if evaluation is running, cancel it (superficially)
+        // if (evaluationRunning) {
+        //   setEvaluationRunning(false)
+        // }
+      }
+    },
+    [changeTestCaseURL, getQueryParamsFromTestCase],
+  )
+
   return (
     <CurrentTestCaseContext.Provider
       value={{
@@ -380,6 +410,7 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
         setInstancesLastEvaluatedContent,
         outdatedResultInstanceIds,
         isInstanceResultOutdated,
+        updateURLFromTestCase,
       }}
     >
       {children}

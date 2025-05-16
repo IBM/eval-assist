@@ -3,7 +3,6 @@ import { ReactNode, createContext, useContext, useEffect, useMemo, useState } fr
 import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { returnByPipelineType } from '@utils'
 
 import { EvaluationType, Evaluator, FetchedEvaluator } from '../../../types'
 

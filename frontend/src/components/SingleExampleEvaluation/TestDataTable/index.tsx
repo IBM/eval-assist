@@ -19,7 +19,9 @@ import {
   PairwiseInstanceResult,
 } from '../../../types'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
+import { useModalsContext } from '../Providers/ModalsProvider'
 import { useSyntheticGeneration } from '../Providers/SyntheticGenerationProvider'
+import { useTestCaseActionsContext } from '../Providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { TestDataTableRow } from './TestDataTableRow'
 import classes from './index.module.scss'
@@ -27,29 +29,17 @@ import classes from './index.module.scss'
 interface Props {
   style?: CSSProperties
   className?: string
-  evaluationRunning: boolean
-  setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
-  loadingSyntheticExamples: boolean
-  setSysntheticGenerationModalOpen: Dispatch<SetStateAction<boolean>>
-  evaluatingInstanceIds: string[]
-  runEvaluation: (evaluationIds: string[]) => Promise<void>
 }
 
-export const TestDataTable = ({
-  style,
-  className,
-  evaluationRunning,
-  setResultDetailsModalOpen,
-  loadingSyntheticExamples,
-  setSysntheticGenerationModalOpen,
-  evaluatingInstanceIds,
-  runEvaluation,
-}: Props) => {
+export const TestDataTable = ({ style, className }: Props) => {
   const { currentTestCase, setCurrentTestCase, setSelectedInstance } = useCurrentTestCase()
+  const { evaluationRunning, evaluatingInstanceIds } = useTestCaseActionsContext()
+  const { setResultDetailsModalOpen, setSyntheticGenerationModalOpen } = useModalsContext()
+  const { loadingSyntheticExamples } = useSyntheticGeneration()
   const instancesPerPage = useMemo(() => INSTANCES_PER_PAGE, [])
   const instances = useMemo(() => currentTestCase.instances, [currentTestCase.instances])
   const { generateTestData, hasGeneratedSyntheticMap } = useSyntheticGeneration()
-
+  const { runEvaluation } = useTestCaseActionsContext()
   const { currentInstances, currentPage, goToPage, totalPages, goToLastPage } = usePagination({
     instances,
     instancesPerPage: instancesPerPage,
@@ -236,7 +226,7 @@ export const TestDataTable = ({
       currentTestCase.syntheticGenerationConfig.evaluator === null ||
       !!!hasGeneratedSyntheticMap[currentTestCase.name]
     ) {
-      setSysntheticGenerationModalOpen(true)
+      setSyntheticGenerationModalOpen(true)
     } else {
       generateTestData()
     }
@@ -245,7 +235,7 @@ export const TestDataTable = ({
     currentTestCase.syntheticGenerationConfig.evaluator,
     generateTestData,
     hasGeneratedSyntheticMap,
-    setSysntheticGenerationModalOpen,
+    setSyntheticGenerationModalOpen,
   ])
 
   return (
@@ -383,7 +373,7 @@ export const TestDataTable = ({
                     kind={'tertiary'}
                     label={'Configure'}
                     size="sm"
-                    onClick={() => setSysntheticGenerationModalOpen(true)}
+                    onClick={() => setSyntheticGenerationModalOpen(true)}
                     disabled={currentTestCase.type == EvaluationType.PAIRWISE}
                   >
                     <SettingsAdjust />

@@ -1,10 +1,10 @@
-import { toSnakeCase } from 'src/utils'
+import { stringifyQueryParams, toSnakeCase } from 'src/utils'
 
-import { ReactNode, createContext, useContext, useMemo } from 'react'
+import { ReactNode, createContext, useCallback, useContext, useMemo } from 'react'
 
 import { useRouter } from 'next/router'
 
-import { EvaluationType } from '../../../types'
+import { EvaluationType, TestCase } from '../../../types'
 
 interface URLInfoContextValue {
   useCaseId: number | null
@@ -14,6 +14,14 @@ interface URLInfoContextValue {
   subCatalogName: string | null
   syntheticGenerationEnabled: boolean
   criteriaName: string | null
+  changeTestCaseURL: (
+    queryParams:
+      | {
+          key: string
+          value: string
+        }[]
+      | null,
+  ) => Promise<boolean>
 }
 
 const URLParamsContext = createContext<URLInfoContextValue>({
@@ -24,6 +32,7 @@ const URLParamsContext = createContext<URLInfoContextValue>({
   subCatalogName: null,
   syntheticGenerationEnabled: true,
   criteriaName: null,
+  changeTestCaseURL: () => Promise.resolve(true),
 })
 
 export const useURLParamsContext = () => {
@@ -61,6 +70,20 @@ export const URLParamsProvider = ({ children }: { children: ReactNode }) => {
     [router.query.sge],
   )
 
+  const changeTestCaseURL = useCallback(
+    (queryParams: { key: string; value: string }[] | null) => {
+      if (queryParams !== null) {
+        const paramsString = stringifyQueryParams(queryParams)
+        return router.push(`/${paramsString}`, `/${paramsString}`, {
+          shallow: true,
+        })
+      } else {
+        return router.push({ pathname: '/' }, `/`, { shallow: true })
+      }
+    },
+    [router],
+  )
+
   return (
     <URLParamsContext.Provider
       value={{
@@ -71,6 +94,7 @@ export const URLParamsProvider = ({ children }: { children: ReactNode }) => {
         subCatalogName,
         syntheticGenerationEnabled,
         criteriaName,
+        changeTestCaseURL,
       }}
     >
       {children}

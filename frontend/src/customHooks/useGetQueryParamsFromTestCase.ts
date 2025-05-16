@@ -5,7 +5,7 @@ import { TestCase } from '@types'
 
 import { useTestCaseLibrary } from './useTestCaseLibrary'
 
-export const useGetQueryParamsFromUseCase = () => {
+export const useGetQueryParamsFromTestCase = () => {
   const { harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
   const { syntheticGenerationEnabled } = useURLParamsContext()
   const harmsAndRisksLibraryTestCasesNames = useMemo<string[]>(
@@ -17,7 +17,7 @@ export const useGetQueryParamsFromUseCase = () => {
     [harmsAndRisksLibraryTestCases],
   )
 
-  const getQueryParamsFromUseCase = useCallback(
+  const getQueryParamsFromTestCase = useCallback(
     (useCase: TestCase, subCatalogName: string | null) => {
       let params: { key: string; value: string }[] = []
       if (subCatalogName) {
@@ -48,5 +48,5 @@ export const useGetQueryParamsFromUseCase = () => {
     [harmsAndRisksLibraryTestCasesNames, syntheticGenerationEnabled],
   )
 
-  return { getQueryParamsFromUseCase }
+  return { getQueryParamsFromTestCase }
 }

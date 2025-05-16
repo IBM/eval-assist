@@ -10,32 +10,25 @@ import { TestCase } from '@types'
 import layoutClasses from '../Layout.module.scss'
 import { useAppSidebarContext } from '../Providers/AppSidebarProvider'
 import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
+import { useModalsContext } from '../Providers/ModalsProvider'
+import { useTestCaseActionsContext } from '../Providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
+import { useUserUseCasesContext } from '../Providers/UserUseCasesProvider'
 import classes from './AppSidenav.module.scss'
 import { ExampleCatalogPanel } from './ExampleCatalogPanel'
 import { RiskAndHarmPanel } from './RiskAndHarmPanel'
 import { SavedTestCasesPanel } from './SavedTestCasesPanel'
 
-interface AppSidenavProps {
-  setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
-  userUseCases: TestCase[]
-  updateURLFromUseCase: (selectedUseCase: { useCase: TestCase; subCatalogName: string | null }) => void
-  setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
-  evaluationRunning: boolean
-}
+interface AppSidenavProps {}
 
-export const AppSidenavNew = ({
-  setConfirmationModalOpen,
-  userUseCases,
-  updateURLFromUseCase,
-  setEvaluationRunningModalOpen,
-  evaluationRunning,
-}: AppSidenavProps) => {
+export const AppSidenavNew = ({}: AppSidenavProps) => {
   const id = useId()
   const { sidebarTabSelected: selected, setSidebarTabSelected: setSelected } = useAppSidebarContext()
+  const { setConfirmationModalOpen, setEvaluationRunningModalOpen } = useModalsContext()
   const { useCaseId } = useURLParamsContext()
-  const { changesDetected, setTestCaseSelected } = useCurrentTestCase()
-
+  const { changesDetected, setTestCaseSelected, updateURLFromTestCase } = useCurrentTestCase()
+  const { evaluationRunning } = useTestCaseActionsContext()
+  const { userUseCases } = useUserUseCasesContext()
   const onUseCaseClick = (useCase: TestCase, subCatalogName?: string) => {
     // if the usecase is already selected don't do nothing
     if (useCaseId !== null && useCaseId === useCase.id) return
@@ -48,7 +41,7 @@ export const AppSidenavNew = ({
       setEvaluationRunningModalOpen(true)
     } else {
       // no unsaved changes and model is not running update the current use case without modals
-      updateURLFromUseCase({ useCase, subCatalogName: subCatalogName || null })
+      updateURLFromTestCase({ useCase, subCatalogName: subCatalogName || null })
     }
   }
 

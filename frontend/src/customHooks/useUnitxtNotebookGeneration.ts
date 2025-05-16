@@ -84,6 +84,6 @@ export const useUnitxtCodeGeneration = () => {
   }
 
   return {
-    downloadUnitxtCode: downloadUnitxtCode,
+    downloadUnitxtCode,
   }
 }

@@ -14,22 +14,22 @@ import { EvaluationType, TestCase } from '../../types'
 import { Card } from './Card/Card'
 import classes from './Landing.module.scss'
 import { useAppSidebarContext } from './Providers/AppSidebarProvider'
+import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
+import { useModalsContext } from './Providers/ModalsProvider'
 
-interface Props {
-  setNewUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
-  updateURLFromUseCase: (useCaseSelected: { useCase: TestCase; subCatalogName: string | null }) => void
-}
+interface Props {}
 
-export const Landing = ({ setNewUseCaseModalOpen, updateURLFromUseCase }: Props) => {
+export const Landing = ({}: Props) => {
   const { isDarkMode } = useThemeContext()
   const { sidebarTabSelected, setSidebarTabSelected } = useAppSidebarContext()
-
+  const { setNewUseCaseModalOpen } = useModalsContext()
+  const { updateURLFromTestCase } = useCurrentTestCase()
   const createEmptyRubric = () => {
-    updateURLFromUseCase({ useCase: getEmptyTestCase(EvaluationType.DIRECT), subCatalogName: null })
+    updateURLFromTestCase({ useCase: getEmptyTestCase(EvaluationType.DIRECT), subCatalogName: null })
   }
 
   const createEmptyPairwise = () => {
-    updateURLFromUseCase({ useCase: getEmptyTestCase(EvaluationType.PAIRWISE), subCatalogName: null })
+    updateURLFromTestCase({ useCase: getEmptyTestCase(EvaluationType.PAIRWISE), subCatalogName: null })
   }
 
   const openTestCasesLibrary = () => {
