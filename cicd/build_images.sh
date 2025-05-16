@@ -102,7 +102,7 @@ echo "Building backend image"
 buildctl build \
     --frontend dockerfile.v0 --opt filename=${DOCKER_FILE} --local dockerfile=backend \
     --local context=backend \
-    --opt build-arg:DATABASE_URL=${DATABASE_URL} \
+    # --opt build-arg:DATABASE_URL=${DATABASE_URL} \
     --output type=image,name="${REGISTRY_URL}/${REGISTRY_NAMESPACE}/${IMAGE_NAME_BACKEND}:${IMAGE_TAG}",push=true
 set +x
 
