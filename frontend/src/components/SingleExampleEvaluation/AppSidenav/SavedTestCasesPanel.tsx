@@ -7,7 +7,7 @@ import { IconButton } from '@carbon/react'
 // carbon doesnt yet have types of TreeView
 // @ts-ignore
 import { TreeNode, TreeView } from '@carbon/react'
-import { ChevronLeft, Compare, DotMark, List } from '@carbon/react/icons'
+import { ChevronLeft, DotMark } from '@carbon/react/icons'
 
 import { EvaluationType, TestCase } from '../../../types'
 import { useURLParamsContext } from '../Providers/URLParamsProvider'
@@ -112,7 +112,7 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
                           key={`${useCase.id}`}
                           id={`${useCase.id}`}
                           selected={selectedNode}
-                          renderIcon={Compare}
+                          renderIcon={DotMark}
                           className={cx(sharedClasses.hovered)}
                           label={
                             <div className={classes['tree-node-content']}>
