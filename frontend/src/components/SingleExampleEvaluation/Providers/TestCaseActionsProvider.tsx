@@ -296,7 +296,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
     const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as TestCase
 
     setCurrentTestCase(parsedSavedUseCase)
-    // update use case in the use cases list
+    // update test case in the test cases list
     const i = userUseCases.findIndex((useCase) => useCase.id === currentTestCase.id)
     setUserUseCases([...userUseCases.slice(0, i), parsedSavedUseCase, ...userUseCases.slice(i + 1)])
 
@@ -374,7 +374,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         // notify the user
         addToast({
           kind: 'success',
-          title: `Created use case '${parsedSavedUseCase.name}'`,
+          title: `Created test case '${parsedSavedUseCase.name}'`,
           timeout: 5000,
         })
       }
@@ -401,7 +401,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
     // notify the user
     addToast({
       kind: 'success',
-      title: `Deleted use case '${currentTestCase.name}'`,
+      title: `Deleted test case '${currentTestCase.name}'`,
       timeout: 5000,
     })
 

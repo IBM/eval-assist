@@ -40,7 +40,7 @@ export const AppSidenavNew = ({}: AppSidenavProps) => {
       setTestCaseSelected({ useCase, subCatalogName: subCatalogName || null })
       setEvaluationRunningModalOpen(true)
     } else {
-      // no unsaved changes and model is not running update the current use case without modals
+      // no unsaved changes and model is not running update the current test case without modals
       updateURLFromTestCase({ useCase, subCatalogName: subCatalogName || null })
     }
   }

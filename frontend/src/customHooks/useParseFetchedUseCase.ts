@@ -5,15 +5,15 @@ import { StoredTestCase } from '@prisma/client'
 import { TestCase, TestCaseV0 } from '@types'
 
 // EXAMPLES
-// fetched use case is v0 and current is v1
+// fetched test case is v0 and current is v1
 // parseFetchedUseCaseV0 -> parseFetchedUseCaseV0toV1
 
-// fetched use case is v1 and current is v1
+// fetched test case is v1 and current is v1
 // parseFetchedUseCaseV1
 
-// fetched use case is v0 and current is v4
+// fetched test case is v0 and current is v4
 // parseFetchedUseCaseV0 -> parseFetchedUseCaseV0toV1 -> parseFetchedUseCaseV1toV2 -> parseFetchedUseCaseV2toV3 -> parseFetchedUseCaseV3toV4
-// fetched use case is v3 and current is v4
+// fetched test case is v3 and current is v4
 // parseFetchedUseCaseV3 -> parseFetchedUseCaseV3toV4
 export const useParseFetchedUseCase = () => {
   const { directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
