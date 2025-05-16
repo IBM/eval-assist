@@ -1,6 +1,7 @@
 import { ChooseCodeGenerationType } from './Modals/ChooseCodeGenerationType'
 import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
-import { EditUseCaseNameModal } from './Modals/EditUseCaseNameModal'
+import { EditPairwiseResponseName } from './Modals/EditPairwiseResponseName'
+import { EditTestCaseNameModal } from './Modals/EditTestCaseNameModal'
 import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
 import { InstanceDetailsModal } from './Modals/InstanceDetailsModal'
 import { ModelProviderCredentialsModal } from './Modals/ModelProviderCredentialsModal'
@@ -11,7 +12,6 @@ import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { SyntheticGenerationModal } from './Modals/SyntheticGenerationModal'
 import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
 import { useModalsContext } from './Providers/ModalsProvider'
-import { useUserUseCasesContext } from './Providers/UserUseCasesProvider'
 
 export const Modals = () => {
   const {
@@ -35,11 +35,11 @@ export const Modals = () => {
     setSyntheticGenerationModalOpen,
     sampleCodeTypeModalOpen,
     setSampleCodeTypeModalOpen,
-    modelProviderCrendentialsModelOpen,
-    setModelProviderCrendentialsModelOpen,
+    modelProviderCrendentialsModalOpen,
+    setmodelProviderCrendentialsModalOpen,
+    editPairwiseResponseNameModalOpen,
+    setEditPairwiseResponseNameModalOpen,
   } = useModalsContext()
-
-  const { userUseCases, setUserUseCases } = useUserUseCasesContext()
 
   const { showingTestCase, changesDetected, updateURLFromTestCase } = useCurrentTestCase()
 
@@ -63,12 +63,7 @@ export const Modals = () => {
           <SaveAsUseCaseModal open={saveUseCaseModalOpen} setOpen={setSaveUseCaseModalOpen} />
 
           <DeleteUseCaseModal open={deleteUseCaseModalOpen} setOpen={setDeleteUseCaseModalOpen} />
-          <EditUseCaseNameModal
-            open={editNameModalOpen}
-            setOpen={setEditNameModalOpen}
-            userUseCases={userUseCases}
-            setUserUseCases={setUserUseCases}
-          />
+          <EditTestCaseNameModal open={editNameModalOpen} setOpen={setEditNameModalOpen} />
           <EvaluationRunningModal
             open={evaluationRunningModalOpen}
             setOpen={setEvaluationRunningModalOpen}
@@ -82,8 +77,12 @@ export const Modals = () => {
           )}
           <ChooseCodeGenerationType open={sampleCodeTypeModalOpen} setOpen={setSampleCodeTypeModalOpen} />
           <ModelProviderCredentialsModal
-            open={modelProviderCrendentialsModelOpen}
-            setOpen={setModelProviderCrendentialsModelOpen}
+            open={modelProviderCrendentialsModalOpen}
+            setOpen={setmodelProviderCrendentialsModalOpen}
+          />
+          <EditPairwiseResponseName
+            open={editPairwiseResponseNameModalOpen}
+            setOpen={setEditPairwiseResponseNameModalOpen}
           />
         </>
       )}

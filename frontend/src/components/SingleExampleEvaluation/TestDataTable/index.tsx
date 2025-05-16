@@ -34,7 +34,8 @@ interface Props {
 export const TestDataTable = ({ style, className }: Props) => {
   const { currentTestCase, setCurrentTestCase, setSelectedInstance } = useCurrentTestCase()
   const { evaluationRunning, evaluatingInstanceIds } = useTestCaseActionsContext()
-  const { setResultDetailsModalOpen, setSyntheticGenerationModalOpen } = useModalsContext()
+  const { setResultDetailsModalOpen, setSyntheticGenerationModalOpen, setEditPairwiseResponseNameModalOpen } =
+    useModalsContext()
   const { loadingSyntheticExamples } = useSyntheticGeneration()
   const instancesPerPage = useMemo(() => INSTANCES_PER_PAGE, [])
   const instances = useMemo(() => currentTestCase.instances, [currentTestCase.instances])
@@ -280,7 +281,7 @@ export const TestDataTable = ({ style, className }: Props) => {
                     }
                     color="blue"
                     // isEditable={currentTestCase.type === EvaluationType.DIRECT}
-                    // onEdit={() => }
+                    onEdit={() => setEditPairwiseResponseNameModalOpen(true)}
                   />
                   {currentTestCase.type == EvaluationType.PAIRWISE &&
                     (instances[0] as PairwiseInstance).responses.length > 2 && (

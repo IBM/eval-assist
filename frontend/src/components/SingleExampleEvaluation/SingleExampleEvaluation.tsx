@@ -33,7 +33,7 @@ export const SingleExampleEvaluation = () => {
   const { currentTestCase, setCurrentTestCase, changesDetected, isTestCaseSaved, showingTestCase } =
     useCurrentTestCase()
 
-  const { setNewUseCaseModalOpen, setModelProviderCrendentialsModelOpen } = useModalsContext()
+  const { setNewUseCaseModalOpen, setmodelProviderCrendentialsModalOpen } = useModalsContext()
 
   // we are ignoring client side rendering to be able to use useSessionStorage
   const { areRelevantCredentialsProvided } = useCurrentTestCase()
@@ -138,7 +138,7 @@ export const SingleExampleEvaluation = () => {
                 <strong>Model selection</strong>
                 <Button
                   kind="tertiary"
-                  onClick={() => setModelProviderCrendentialsModelOpen(true)}
+                  onClick={() => setmodelProviderCrendentialsModalOpen(true)}
                   iconDescription="Set api key"
                   renderIcon={!areRelevantCredentialsProvided ? WarningFilled : undefined}
                 >
