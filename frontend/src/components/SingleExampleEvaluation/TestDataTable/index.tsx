@@ -361,7 +361,7 @@ export const TestDataTable = ({
               gridClasses={returnByPipelineType(currentTestCase.type, directGridClasses, pairwiseGridClasses)}
               instance={instance}
               setInstance={(instance) => setInstance(instance, i)}
-              readOnly={evaluationRunning}
+              readOnly={false}
               removeInstance={() => removeInstance(i)}
               type={currentTestCase.type}
               addInstance={addInstance}
