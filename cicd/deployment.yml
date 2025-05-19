@@ -79,11 +79,11 @@ spec:
             - containerPort: 8000
           resources:
             limits:
-              cpu: 4
-              memory: 8Gi
+              cpu: 8
+              memory: 32Gi
             requests:
-              cpu: 1
-              memory: 4Gi
+              cpu: 4
+              memory: 16Gi
           volumeMounts:
             - name: eval-assist-volume
               mountPath: /app/prisma/db
@@ -151,9 +151,9 @@ spec:
     - host: eval-assist.bx.cloud9.ibm.com
       http:
         paths:
-        - backend:
-            service:
-              name: eval-assist-frontend
-              port:
-                number: 80
-          path: /
+          - backend:
+              service:
+                name: eval-assist-frontend
+                port:
+                  number: 80
+            path: /
