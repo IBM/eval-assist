@@ -174,7 +174,7 @@ metadata:
   labels:
     app: ${BACKEND_K8S_NAME}
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: ${BACKEND_K8S_NAME}
@@ -191,18 +191,31 @@ spec:
             - containerPort: 8000
           resources:
             limits:
-              cpu: 4
-              memory: 8Gi
+              cpu: 8
+              memory: 32Gi
             requests:
-              cpu: 1
+              cpu: 2
               memory: 4Gi
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ${K8S_NAME}-secret
+                  key: DATABASE_URL
+            - name: UNITXT_INFERENCE_ENGINE_CACHE_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: ${K8S_NAME}-secret
+                  key: UNITXT_INFERENCE_ENGINE_CACHE_PATH
           volumeMounts:
             - name: ${CLUSTER_NAMESPACE}-volume
-              mountPath: /app/prisma/db
+              mountPath: /app/shared_volume
       volumes:
         - name: ${CLUSTER_NAMESPACE}-volume
           persistentVolumeClaim:
             claimName: ${CLUSTER_NAMESPACE}-volume
+      imagePullSecrets:
+        - name: all-icr-io
 ---
 apiVersion: v1
 kind: Service
