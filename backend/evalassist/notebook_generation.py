@@ -124,7 +124,7 @@ class DirectEvaluationNotebook(EvaluationNotebookGenerator):
 import json
 from unitxt.api import evaluate, create_dataset
 from unitxt.inference import CrossProviderInferenceEngine
-from unitxt.llm_as_judge import LLMJudgeDirect, EvaluatorNameEnum, CriteriaWithOptions
+from unitxt.llm_as_judge import LLMJudgeDirect, CriteriaWithOptions
 from unitxt.task import Task
 import pandas as pd
 import nest_asyncio
@@ -211,7 +211,7 @@ import json
 from typing import List
 from unitxt.api import evaluate, load_dataset
 from unitxt.inference import CrossProviderInferenceEngine
-from unitxt.llm_as_judge import LLMJudgePairwise, EvaluatorNameEnum, Criteria
+from unitxt.llm_as_judge import LLMJudgePairwise, Criteria
 from unitxt.blocks import Task, TaskCard
 from unitxt.loaders import LoadFromDictionary
 from unitxt.templates import NullTemplate
