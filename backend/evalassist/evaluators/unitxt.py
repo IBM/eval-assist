@@ -71,7 +71,16 @@ class Evaluator(ABC):
             provider,
         )
 
-        inference_engine = get_inference_engine(credentials, provider, model_name)
+        inference_engine = get_inference_engine(
+            credentials,
+            provider,
+            model_name,
+            custom_params={
+                "use_cache": True,
+                "seed": 42,
+                "temperature": 0,
+            },
+        )
 
         context_variables_list = [instance.context_variables for instance in instances]
 
