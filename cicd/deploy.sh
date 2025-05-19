@@ -174,7 +174,7 @@ metadata:
   labels:
     app: ${BACKEND_K8S_NAME}
 spec:
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: ${BACKEND_K8S_NAME}
@@ -194,8 +194,8 @@ spec:
               cpu: 8
               memory: 32Gi
             requests:
-              cpu: 2
-              memory: 4Gi
+              cpu: 4
+              memory: 16Gi
           env:
             - name: DATABASE_URL
               valueFrom:
