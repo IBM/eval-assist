@@ -1,7 +1,7 @@
 import sys
 
 REQUIRED_MIN_VERSION = (3, 10)
-REQUIRED_MAX_VERSION = (3, 13)
+REQUIRED_MAX_VERSION = (3, 14)
 
 if REQUIRED_MIN_VERSION < sys.version_info < REQUIRED_MAX_VERSION:
     print(
