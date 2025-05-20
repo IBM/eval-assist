@@ -43,6 +43,8 @@ The following command will install the frontend and backend dependencies. It wil
 npm install
 ```
 
+_Note: you can run `npm run install:[backend|frontend]` to install components separatelly. This can be useful to customize the way you install them. For example: install the frontend running `npm run install:frontend` and install the backend dependencies using other package installer than `pip`, like `uv`._
+
 ### 4. Set the environment variables
 
 Both frontend and backend need a few environment variables to be set in order to work properly.
