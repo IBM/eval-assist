@@ -31,7 +31,7 @@ cd eval-assist
 ### 2. Install the requirements
 
 * Node > 20 (install [here](https://nodejs.org/en/download))
-* Python >= 3.10, <3.13
+* Python >= 3.10, <3.14
 
 _Note: In this project, npm is used both as a task manager (used to easily setup the dev environment) and as the package manager for the Next.js frontend app._
 
