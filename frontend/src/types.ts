@@ -149,9 +149,15 @@ export enum EvaluationType {
 export enum ModelProviderType {
   WATSONX = 'watsonx',
   OPENAI = 'open-ai',
+  OPENAI_LIKE = 'open-ai-like',
   RITS = 'rits',
   AZURE_OPENAI = 'azure',
   LOCAL_HF = 'local_hf',
+  TOGETHER_AI = 'together-ai',
+  AWS = 'aws',
+  VERTEX_AI = 'vertex-ai',
+  REPLICATE = 'replicate',
+  OLLAMA = 'ollama',
 }
 
 export interface Evaluator {
@@ -239,6 +245,10 @@ export type ModelProviderCredentials = {
   'open-ai': {
     api_key: string
   }
+  'open-ai-like': {
+    api_key: string
+    api_base: string
+  }
   rits: {
     api_key: string
   }
@@ -246,6 +256,21 @@ export type ModelProviderCredentials = {
     api_key: string
   }
   local_hf: {}
+  'together-ai': {
+    api_key: string
+  }
+  aws: {
+    api_key: string
+  }
+  ['vertex-ai']: {
+    api_key: string
+  }
+  replicate: {
+    api_key: string
+  }
+  ollama: {
+    api_base: string
+  }
 }
 
 export type PartialModelProviderCredentials = Partial<Pick<ModelProviderCredentials, keyof ModelProviderCredentials>>

@@ -21,3 +21,5 @@ torch
 accelerate
 unitxt>=1.23.0
 nbconvert
+boto3
+ollama

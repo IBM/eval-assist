@@ -7,9 +7,15 @@ export const DIRECT_NAME = 'Direct Assessment'
 export const modelProviderBeautifiedName: Record<ModelProviderType, string> = {
   [ModelProviderType.WATSONX]: 'Watsonx',
   [ModelProviderType.OPENAI]: 'OpenAI',
+  [ModelProviderType.OPENAI_LIKE]: 'OpenAI Compatible',
   [ModelProviderType.RITS]: 'RITS',
   [ModelProviderType.AZURE_OPENAI]: 'Azure OpenAI',
   [ModelProviderType.LOCAL_HF]: 'Local HF',
+  [ModelProviderType.TOGETHER_AI]: 'Together AI',
+  [ModelProviderType.AWS]: 'AWS/Bedrock',
+  [ModelProviderType.VERTEX_AI]: 'Vertex AI',
+  [ModelProviderType.REPLICATE]: 'Replicate',
+  [ModelProviderType.OLLAMA]: 'Ollama',
 }
 
 export const INSTANCES_PER_PAGE = 5

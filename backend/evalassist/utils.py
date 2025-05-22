@@ -7,6 +7,7 @@ import traceback
 from enum import Enum
 from typing import Optional
 
+from botocore.exceptions import NoCredentialsError
 from fastapi import HTTPException
 from ibm_watsonx_ai.wml_client_error import (
     ApiRequestFailure,
@@ -105,7 +106,7 @@ def get_cross_inference_engine_params(
             "max_requests_per_second": 7
         }
 
-    if provider == ModelProviderEnum.AZURE_OPENAI:
+    if provider == ModelProviderEnum.AZURE:
         inference_engine_params["credentials"]["api_base"] = (
             f"https://eteopenai.azure-api.net/openai/deployments/{model_name}/chat/completions?api-version=2024-08-01-preview"
         )
@@ -218,12 +219,10 @@ def get_evaluator_metadata_wrapper(
             e
             for e in EXTENDED_EVALUATORS_METADATA
             if e.name.name == evaluator_name.name
-        ]  # and e.evaluator_type == evaluator_type]
+        ]
         if len(evaluator_search) == 0:
-            # raise ValueError(f'A {evaluator_type} evaluator with id {name} does not exist.')
             raise ValueError(f"An evaluator with id {evaluator_name} does not exist.")
         if len(evaluator_search) > 1:
-            # raise ValueError(f'A {evaluator_type} evaluator with id {name} matched several models.')
             raise ValueError(
                 f"An evaluator with id {evaluator_name} matched several models."
             )
@@ -320,7 +319,12 @@ def handle_llm_generation_exceptions(func):
         except ApiRequestFailure as e:
             traceback.print_exc()
             raise HTTPException(status_code=400, detail=e.error_msg)
-
+        except NoCredentialsError:
+            traceback.print_exc()
+            raise HTTPException(
+                status_code=400,
+                detail="Credentials not found. Please check your AWS credentials.",
+            )
         except AuthenticationError:
             traceback.print_exc()
             raise HTTPException(
@@ -348,6 +352,8 @@ def handle_llm_generation_exceptions(func):
             if e.__cause__:
                 original_exception = e.__cause__
                 error_message = original_exception.args[0]
+                print("error_message")
+                print(error_message)
                 try:
                     error_details = json.loads(error_message.split(" - ", 1)[1])
                     error_message = error_details.get(
