@@ -131,6 +131,13 @@ def get_default_credentials():
     rits_api_key = os.getenv("RITS_API_KEY", None)
     watsonx_api_key = os.getenv("WATSONX_API_KEY", None)
     watsonx_project_id = os.getenv("WATSONX_PROJECT_ID", None)
+    replicate_api_key = os.getenv("REPLICATE_API_KEY", None)
+    together_ai_api_key = os.getenv("TOGETHER_AI_API_KEY", None)
+    bedrock_ai_api_key = os.getenv("BEDROCK_AI_API_KEY", None)
+    open_ai_like_api_key = os.getenv("OPEN_AI_LIKE_API_KEY", None)
+    open_ai_like_api_base = os.getenv("OPEN_AI_LIKE_API_BASE", None)
+    ollama_api_key = os.getenv("OLLAMA_API_BASE", None)
+    vertex_ai_api_key = os.getenv("VERTEX_AI_API_KEY", None)
 
     res = clean_object(
         {
@@ -140,7 +147,16 @@ def get_default_credentials():
                 "project_id": watsonx_project_id,
             },
             "open-ai": {"api_key": openai_api_key},
+            "replicate": {"api_key": replicate_api_key},
             "azure": {"api_key": azure_openai_api_key},
+            "together-ai": {"api_key": together_ai_api_key},
+            "vertex-ai": {"api_key": vertex_ai_api_key},
+            "bedrock": {"api_key": bedrock_ai_api_key},
+            "open-ai-like": {
+                "api_key": open_ai_like_api_key,
+                "api_base": open_ai_like_api_base,
+            },
+            "ollama": {"api_base": ollama_api_key},
         }
     )
     return res

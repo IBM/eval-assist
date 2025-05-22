@@ -129,7 +129,38 @@ export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
             </div>
             <div className={classes.bottomDivider} />
             <div className={cx(classes.modelProviderContainer)}>
-              <p className={cx(classes.modelProviderName)}>Azure OpenAI</p>
+              <p className={cx(classes.modelProviderName)}>OpenAI Compatible</p>
+              <div className={classes.credentialsContainer}>
+                <TextInput
+                  id={'open-ai-like-api-key-input'}
+                  labelText="API key"
+                  value={modelProviderCredentials['open-ai-like'].api_key}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCredentials,
+                      'open-ai-like': { ...modelProviderCredentials['open-ai-like'], api_key: e.target.value },
+                    })
+                  }
+                  className={classes.credentialInput}
+                  autoComplete="off"
+                />
+                <TextInput
+                  id={'open-ai-like-api-base-input'}
+                  labelText="Base URL"
+                  value={modelProviderCredentials['open-ai-like'].api_base}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCredentials,
+                      'open-ai-like': { ...modelProviderCredentials['open-ai-like'], api_base: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+            <div className={classes.bottomDivider} />
+            <div className={cx(classes.modelProviderContainer)}>
+              <p className={cx(classes.modelProviderName)}>Azure</p>
               <div>
                 <TextInput
                   id={'azure-api-key-input'}
@@ -147,7 +178,160 @@ export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
                 <p className="cds--form__helper-text">
                   {"Don't have a key? Get one "}
                   <Link
-                    href={'https://platform.openai.com/api-keys'}
+                    href={
+                      'https://learn.microsoft.com/en-us/azure/search/search-security-api-keys?tabs=rest-use%2Cportal-find%2Cportal-query'
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    {'here'}
+                  </Link>
+                </p>
+              </div>
+            </div>
+            <div className={classes.bottomDivider} />
+            <div className={cx(classes.modelProviderContainer)}>
+              <p className={cx(classes.modelProviderName)}>Together AI</p>
+              <div>
+                <TextInput
+                  id={'together-ai-api-key-input'}
+                  labelText="API key"
+                  value={modelProviderCredentials['together-ai'].api_key}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCredentials,
+                      'together-ai': { api_key: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                  className={classes.credentialInput}
+                />
+                <p className="cds--form__helper-text">
+                  {"Don't have a key? Get one "}
+                  <Link
+                    href={'https://api.together.xyz/settings/api-keys'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    {'here'}
+                  </Link>
+                </p>
+              </div>
+            </div>
+            <div className={classes.bottomDivider} />
+            <div className={cx(classes.modelProviderContainer)}>
+              <p className={cx(classes.modelProviderName)}>AWS/Bedrock</p>
+              <div>
+                <TextInput
+                  id={'aws-api-key-input'}
+                  labelText="API key"
+                  value={modelProviderCredentials.aws.api_key}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCredentials,
+                      aws: { api_key: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                  className={classes.credentialInput}
+                />
+                <p className="cds--form__helper-text">
+                  {"Don't have a key? Get one "}
+                  <Link
+                    href={'https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started-api.html'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    {'here'}
+                  </Link>
+                </p>
+              </div>
+            </div>
+            <div className={classes.bottomDivider} />
+            <div className={cx(classes.modelProviderContainer)}>
+              <p className={cx(classes.modelProviderName)}>Vertex AI</p>
+              <div>
+                <TextInput
+                  id={'aws-api-key-input'}
+                  labelText="API key"
+                  value={modelProviderCredentials['vertex-ai'].api_key}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCredentials,
+                      'vertex-ai': { api_key: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                  className={classes.credentialInput}
+                />
+                <p className="cds--form__helper-text">
+                  {"Don't have a key? Get one "}
+                  <Link
+                    href={
+                      'https://cloud.google.com/vertex-ai/generative-ai/docs/start/quickstarts/quickstart-multimodal'
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    {'here'}
+                  </Link>
+                </p>
+              </div>
+            </div>
+            <div className={classes.bottomDivider} />
+            <div className={cx(classes.modelProviderContainer)}>
+              <p className={cx(classes.modelProviderName)}>Replicate</p>
+              <div>
+                <TextInput
+                  id={'replicate-api-key-input'}
+                  labelText="API key"
+                  value={modelProviderCredentials.replicate.api_key}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCredentials,
+                      replicate: { api_key: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                  className={classes.credentialInput}
+                />
+                <p className="cds--form__helper-text">
+                  {"Don't have a key? Get one "}
+                  <Link
+                    href={'https://replicate.com/account/api-tokens'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    {'here'}
+                  </Link>
+                </p>
+              </div>
+            </div>
+            <div className={classes.bottomDivider} />
+            <div className={cx(classes.modelProviderContainer)}>
+              <p className={cx(classes.modelProviderName)}>Ollama</p>
+              <div>
+                <TextInput
+                  id={'aws-api-key-input'}
+                  labelText="Base URL"
+                  value={modelProviderCredentials.ollama.api_base}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCredentials,
+                      ollama: { api_base: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                />
+                <p className="cds--form__helper-text">
+                  {"Don't have a key? Get one "}
+                  <Link
+                    href={'https://replicate.com/account/api-tokens'}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ textDecoration: 'none' }}

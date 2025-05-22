@@ -1,5 +1,10 @@
 import logging
 
+import litellm
+
+litellm.drop_params = True
+
+
 root_pkg_logger = logging.getLogger(__name__)
 root_pkg_logger.propagate = False
 

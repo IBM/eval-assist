@@ -157,7 +157,6 @@ export const SingleExampleEvaluation = () => {
                 dropdownLabel={'Evaluator'}
                 style={{ marginBottom: '2rem' }}
                 className={classes['left-padding']}
-                evaluationType={currentTestCase.type}
                 evaluatorOptions={evaluatorOptions}
                 selectedEvaluator={currentTestCase.evaluator}
                 setSelectedEvaluator={(evaluator: Evaluator | null) => {
@@ -165,7 +164,6 @@ export const SingleExampleEvaluation = () => {
                 }}
               />
               <PipelineSelect
-                evaluationType={currentTestCase.syntheticGenerationConfig.evaluator?.type || EvaluationType.DIRECT}
                 selectedEvaluator={currentTestCase.syntheticGenerationConfig.evaluator}
                 setSelectedEvaluator={(newValue) =>
                   setCurrentTestCase({

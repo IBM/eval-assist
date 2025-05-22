@@ -19,7 +19,8 @@ class ExtendedEvaluatorNameEnum(Enum):
     GRANITE_GUARDIAN3_1_8B = "Granite Guardian 3.1 8B"
     GRANITE_GUARDIAN3_2_3B = "Granite Guardian 3.2 3B"
     GRANITE_GUARDIAN3_2_5B = "Granite Guardian 3.2 5B"
-    DEEPSEEK_V3 = "DeepSeek V3"
+    LLAMA_3_3_70B_FREE = "Llama 3.3 70B Free"
+    DEEPSEEK_R1_DISTILLED_LLAMA_70B_FREE = "DeepSeek R1 Distilled Llama 70B Free"
     CUSTOM = "custom"
 
 
@@ -37,14 +38,15 @@ EXTENDED_EVALUATOR_TO_MODEL_ID = {
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "ibm/granite-guardian-3-8b",
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B: "ibm-granite/granite-guardian-3.2-3b-a800m",
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B: "ibm-granite/granite-guardian-3.2-5b",
-    ExtendedEvaluatorNameEnum.DEEPSEEK_V3: "deepseek-ai/DeepSeek-V3",
+    ExtendedEvaluatorNameEnum.LLAMA_3_3_70B_FREE: "llama-3-3-70b-instruct-free",
+    ExtendedEvaluatorNameEnum.DEEPSEEK_R1_DISTILLED_LLAMA_70B_FREE: "deepseek-r1-distilled-llama-70b-free",
 }
 
 
 class ExtendedEvaluatorMetadata(EvaluatorMetadata):
     name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
-    custom_model_name: Optional[str]
-    custom_model_path: Optional[str]
+    custom_model_name: Optional[str] = None
+    custom_model_path: Optional[str] = None
     providers: list[ModelProviderEnum | ExtendedModelProviderEnum]
 
     def __init__(
@@ -79,8 +81,11 @@ EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = [
         [ExtendedModelProviderEnum.LOCAL_HF],
     ),
     ExtendedEvaluatorMetadata(
-        ExtendedEvaluatorNameEnum.DEEPSEEK_V3,
-        [ModelProviderEnum.RITS],
+        ExtendedEvaluatorNameEnum.DEEPSEEK_R1_DISTILLED_LLAMA_70B_FREE,
+        [ModelProviderEnum.TOGETHER_AI],
+    ),
+    ExtendedEvaluatorMetadata(
+        ExtendedEvaluatorNameEnum.LLAMA_3_3_70B_FREE, [ModelProviderEnum.TOGETHER_AI]
     ),
 ]
 

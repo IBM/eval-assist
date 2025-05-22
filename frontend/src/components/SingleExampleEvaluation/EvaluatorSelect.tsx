@@ -1,18 +1,16 @@
 import cx from 'classnames'
 import { modelProviderBeautifiedName } from 'src/constants'
-import { getJSONStringWithSortedKeys, returnByPipelineType } from 'src/utils'
+import { getJSONStringWithSortedKeys } from 'src/utils'
 
 import { CSSProperties, useMemo } from 'react'
 
 import { Select, SelectItem, SelectItemGroup, SelectSkeleton } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
-import { EvaluationType, Evaluator, ModelProviderType } from '../../types'
+import { Evaluator, ModelProviderType } from '../../types'
 import classes from './EvaluatorSelect.module.scss'
-import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from './Providers/EvaluatorOptionsProvider'
 import { useModelProviderCredentials } from './Providers/ModelProviderCredentialsProvider'
-import { useURLParamsContext } from './Providers/URLParamsProvider'
 
 interface Props {
   style?: CSSProperties
@@ -21,7 +19,6 @@ interface Props {
   selectionComponentName?: string
   selectionComponentNameWithArticle?: string
   selectedEvaluator: Evaluator | null
-  evaluationType: EvaluationType
   setSelectedEvaluator: (evaluator: Evaluator | null) => void
   evaluatorOptions: Evaluator[]
 }
@@ -32,7 +29,6 @@ export const PipelineSelect = ({
   dropdownLabel,
   selectedEvaluator,
   setSelectedEvaluator,
-  evaluationType,
   evaluatorOptions,
   selectionComponentNameWithArticle = 'an evaluator',
   selectionComponentName = 'evaluator',
@@ -43,8 +39,14 @@ export const PipelineSelect = ({
       [ModelProviderType.RITS]: [],
       [ModelProviderType.WATSONX]: [],
       [ModelProviderType.OPENAI]: [],
+      [ModelProviderType.OPENAI_LIKE]: [],
       [ModelProviderType.AZURE_OPENAI]: [],
       [ModelProviderType.LOCAL_HF]: [],
+      [ModelProviderType.TOGETHER_AI]: [],
+      [ModelProviderType.AWS]: [],
+      [ModelProviderType.VERTEX_AI]: [],
+      [ModelProviderType.REPLICATE]: [],
+      [ModelProviderType.OLLAMA]: [],
     }
     if (evaluatorOptions === null) return result
 
@@ -140,9 +142,13 @@ export const PipelineSelect = ({
               key={provider}
               disabled={!getAreRelevantCredentialsProvided(provider as ModelProviderType)}
             >
-              {providerEvaluators.map((evaluator, i) => (
-                <SelectItem value={getJSONStringWithSortedKeys(evaluator)} text={evaluator.name} key={i} />
-              ))}
+              {getAreRelevantCredentialsProvided(provider as ModelProviderType) ? (
+                providerEvaluators.map((evaluator, i) => (
+                  <SelectItem value={getJSONStringWithSortedKeys(evaluator)} text={evaluator.name} key={i} />
+                ))
+              ) : (
+                <SelectItem value="" text="No credentials provided" key={'empty-result'} />
+              )}
             </SelectItemGroup>
           ))}
         </Select>

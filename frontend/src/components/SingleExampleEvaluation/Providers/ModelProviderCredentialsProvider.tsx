@@ -8,14 +8,21 @@ import { Loading } from '@carbon/react'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { ModelProviderCredentials, ModelProviderType, PartialModelProviderCredentials } from '@types'
 
-const watsonx_url = 'https://us-south.ml.cloud.ibm.com'
+const watsonxURL = 'https://us-south.ml.cloud.ibm.com'
+const defaultOllamaURL = 'http://localhost:11434/'
 
 const defaultCredentialStorage = {
-  [ModelProviderType.WATSONX]: { api_key: '', project_id: '', api_base: watsonx_url },
+  [ModelProviderType.WATSONX]: { api_key: '', project_id: '', api_base: watsonxURL },
   [ModelProviderType.OPENAI]: { api_key: '' },
+  [ModelProviderType.OPENAI_LIKE]: { api_key: '', api_base: '' },
   [ModelProviderType.RITS]: { api_key: '' },
   [ModelProviderType.AZURE_OPENAI]: { api_key: '' },
   [ModelProviderType.LOCAL_HF]: {},
+  [ModelProviderType.TOGETHER_AI]: { api_key: '' },
+  [ModelProviderType.AWS]: { api_key: '' },
+  [ModelProviderType.VERTEX_AI]: { api_key: '' },
+  [ModelProviderType.REPLICATE]: { api_key: '' },
+  [ModelProviderType.OLLAMA]: { api_base: defaultOllamaURL },
 }
 
 interface ModelProviderCredentialsContextValue {
@@ -85,7 +92,7 @@ export const ModelProviderCredentialsProvider = ({ children }: { children: React
       }
 
       if (!('api_base' in parsedCredentials.watsonx) || parsedCredentials.watsonx.api_base === '') {
-        parsedCredentials['watsonx']['api_base'] = watsonx_url
+        parsedCredentials['watsonx']['api_base'] = watsonxURL
       }
 
       // @ts-ignore
