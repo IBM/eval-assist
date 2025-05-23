@@ -33,11 +33,7 @@
     <title>EvalAssist</title>
     <link rel="icon" type="image/x-icon" href="static/images/logo.svg" />
 
-    <link
-      href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
-      rel="stylesheet"
-    />
-
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css"
@@ -59,156 +55,127 @@
   </head>
   <body>
     <section class="hero">
-      <div class="hero-body">
+      <div class="hero-body pb-0">
         <div class="container is-max-desktop">
           <div class="columns is-centered">
             <div class="column has-text-centered">
               <h1
                 class="title is-1 is-flex is-align-items-center is-justify-content-center"
               >
-                <span class="icon is-large mr-3">
+                <span class="icon is-large mr-3"
+                style="width: 75px; height: 75px"
+                >
                   <img
                     src="static/images/logo.svg"
                     alt="EvalAssist Icon"
-                    style="width: 80px; height: 80px"
+                    
                   />
                 </span>
                 EvalAssist
               </h1>
-              <h2 class="title is-4">LLM-as-a-Judge Simplified &mdash; Start Small, Refine Fast, Scale Smart</h2>
+              <h2 class="is-size-5 has-text-grey has-text-weight-medium">LLM-as-a-Judge Simplified &mdash; Start Small, Refine Fast, Scale Smart</h2>
 
 
             </div>
           </div>
           <div class="columns is-centered">
-            <div class="column has-text-centered">
-              <span>
-                <a
-                  href="https://github.com/IBM/eval-assist"
-                  target="_blank"
-                  class="button is-normal is-rounded is-dark"
-                >
-                  <span class="icon">
-                    <i class="fab fa-github"></i>
-                  </span>
-                  <span>Code</span>
-                </a>
-                <a
-                  href="#publications"
-                  class="button is-normal is-rounded is-dark"
-                >
-                  <span class="icon">
-                    <i class="fas fa-file-pdf"></i>
-                  </span>
-                  <span>Publications</span>
-                </a>
-                <a
-                  href="#people"
-                  class="button is-normal is-rounded is-dark"
-                >
-                  <span class="icon">
-                    <i class="fas fa-user-group"></i>
-                  </span>
-                  <span>Contributors</span>
-                </a>
-                <a
-                  href="https://www.unitxt.ai/"
-                  target="_blank"
-                  class="button is-normal is-rounded is-dark"
-                >
-                  <span class="icon">
-                    <i class="fas fa-paper-plane"></i>
-                  </span>
-                  <span>Unitxt</span>
-                </a>                
-              </span>
+            <div class="column has-text-centered buttons are-small">
+              <a
+                href="https://github.com/IBM/eval-assist"
+                target="_blank"
+                class="button is-dark mr-0"
+              >
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+                <span class="is-size-7 has-text-weight-light">Code</span>
+              </a>
+              <a
+                href="#publications"
+                class="button   is-dark mr-0"
+              >
+                <span class="icon">
+                  <i class="fas fa-file-pdf"></i>
+                </span>
+                <span class="is-size-7">Publications</span>
+              </a>
+              <a
+                href="#team"
+                class="button   is-dark mr-0"
+              >
+                <span class="icon">
+                  <i class="fas fa-user-group"></i>
+                </span>
+                <span class="is-size-7">Team</span>
+              </a>
+              <!-- <a
+                href="https://www.unitxt.ai/"
+                target="_blank"
+                class="button   is-dark mr-0"
+              >
+                <span class="icon">
+                  <i class="fas fa-paper-plane"></i>
+                </span>
+                <span class="is-size-7">Unitxt</span>
+              </a>                 -->
             </div>
           </div>
           <div class="columns is-centered">
             <div class="column has-text-centered">
+              <h2 class="is-size-3 has-text-weight-medium has-text-black has-text-centered">About</h2>
+              <div class="content has-text-justified">
+                <p class="is-size-6 has-text-weight-light">
+                  EvalAssist is an application that simplifies using large language models as evaluators (LLM-as-a-Judge) of the output of other large language models by supporting users in iteratively refining evaluation criteria in a web-based user experience. EvalAssist is based on the open source <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a> evaluation library leveraging a multi-step prompt-chaining approach to conduct evaluations. Once users are satisfied with their criteria, they can generate a Jupyter notebook to run <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a> evaluations of their criteria at scale.
+                </p>
+              </div>
+              <h2 class="is-size-4 has-text-weight-medium has-text-black has-text-centered">Overview</h2>
               <img 
                 src="static/images/evalassist.gif" 
                 alt="EvalAssist Teaser Image" 
                 class="center-image" 
-                style="max-width: 80%; height: auto; margin: 24px;"
+                style="max-width: 80%; height: auto; "
               >
-              <div class="content has-text-justified">
-                <p>
-                  EvalAssist is an application that simplifies using large language models as evaluators (LLM-as-a-Judge) of the output of other large language models by supporting users in iteratively refining evaluation criteria in a web-based user experience. EvalAssist is based on the open source <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a> evaluation library leveraging a multi-step prompt-chaining approach to conduct evaluations. Once users are satisfied with their criteria, they can generate a Jupyter notebook to run <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a> evaluations of their criteria at scale.
-                </p>
-              </div>
             </div>  
           </div>
-
-          
         </div>
       </div>
     </section>
 
-    <!-- Paper abstract -->
-    <!--
-    <section class="section hero is-light">
-      <div class="container is-max-desktop">
-        <div class="columns is-centered has-text-centered">
-          <div class="column is-four-fifths">
-            <h2 class="title is-3">What is EvalAssist?</h2>
-            <div class="content has-text-justified">
-              <p>
-                A framework that facilitates the use of large language models as
-                evaluators ( LLM-as-a-Judge ) by suppor ting users in
-                iteratively refining evaluation criteria in a web-based user
-                experience and applying them to large amounts of data through a
-                Python tool kit
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    -->
-    <!-- End paper abstract -->
-
-
-     <section class="section hero">
+     <section class="section hero pt-0">
       <div class="container">
-        <!-- Section Title -->
-        <!-- <h2 class="title is-2 has-text-centered">Section Title</h2> -->
-
+        <h2 class="title is-size-4 has-text-weight-medium has-text-black has-text-centered pb-3">Key features</h2>
         <!-- First Row -->
         <div class="columns">
-          <div class="column" style="background-color: #f5f5f5; display: flex; flex-direction: column; justify-content: center;">
-              <h3 class="title is-4 has-text-centered">Flexible Methods</h3>
-              <p style="padding: 0.5rem 1rem;">
+          <div class="column key-feature-text is-half">
+              <h3 class="title is-4">Flexible Methods</h3>
+              <p>
                 Supports custom criteria development for both direct assessment and pairwise comparison
                 evaluation methods, giving users the flexibility to choose what
                 fits their use case best.
               </p>
           </div>
-          
-          
-          <div class="column">
+          <div class="column key-feature-image">
             <img 
                 src="static/images/Flexible Methods.png" 
                 alt="EvalAssist Teaser Image" 
-                class="center-image" 
-                style="max-width: 80%; height: auto; margin: 24px;"
+                class="feature-image" 
               >
           </div>
         </div>
 
         <!-- Second Row -->
         <div class="columns">
-          <div class="column">
+          <div class="column key-feature-image">
             <img 
                 src="static/images/AI-Assisted Criteria Refinement.png" 
                 alt="EvalAssist Teaser Image" 
-                class="center-image" 
-                style="max-width: 80%; height: auto; margin: 24px;"
+                class="feature-image" 
+
               >
           </div>
-           <div class="column" style="background-color: #f5f5f5; display: flex; flex-direction: column; justify-content: center;">
-            <h3 class="title is-4 has-text-centered">AI-Assisted Criteria Refinement</h3>
-            <p class="content has-text-justified" style="padding: 0.5rem 1rem;">
+           <div class="column key-feature-text is-half" >
+            <h3 class="title is-4">AI-Assisted Criteria Refinement</h3>
+            <p>
               Allows users to iteratively design and refine evaluation criteria interactively with AI-assistance. Synthetic data produces edge cases to test your criteria on multiple data samples simultaneously.
             </p>
           </div>
@@ -217,74 +184,74 @@
         <!-- Third row -->
         <div class="columns">
           
-           <div class="column" style="background-color: #f5f5f5; display: flex; flex-direction: column; justify-content: center;">
-            <h3 class="title is-4 has-text-centered">Trustworthy Results</h3>
-            <p style="padding: 0.5rem 1rem;">
+           <div class="column key-feature-text is-half">
+            <h3 class="title is-4 ">Trustworthy Results</h3>
+            <p>
               Empowers users to inspect outcomes with built-in trustworthiness
               metrics such as positional bias and
               model-generated explanations.
             </p>
           </div>
-          <div class="column">
+          <div class="column key-feature-image is-half">
             <img 
                 src="static/images/Trustworthy Results.png" 
                 alt="EvalAssist Teaser Image" 
-                class="center-image" 
-                style="max-width: 80%; height: auto; margin: 24px;"
+                class="feature-image" 
+
               >
           </div>
         </div>
 
         <div class="columns">
-          <div class="column">
+          <div class="column is-half key-feature-image">
             <img 
                 src="static/images/Scalable Toolkit.png" 
                 alt="EvalAssist Teaser Image" 
-                class="center-image" 
-                style="max-width: 80%; height: auto; margin: 24px;"
+                class="feature-image" 
+
               >
           </div>
-           <div class="column" style="background-color: #f5f5f5; display: flex; flex-direction: column; justify-content: center;">
+           <div class="column is-half key-feature-text" >
             <h3 class="title is-4 has-text-centered">Scalable Toolkit</h3>
-            <p style="padding: 0.5rem 1rem;">
+            <p>
               Built on top of the open source <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a> library, EvalAssist allows you to export your criteria to Jupyter notebooks running bulk evaluations based on <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a>, making it easy to scale your evaluations programmatically.
             </p>
           </div>
         </div>
 
         <div class="columns">
-          <div class="column" style="background-color: #f5f5f5; display: flex; flex-direction: column; justify-content: center;">
-            <h3 class="title is-4 has-text-centered">Specialized Models</h3>
-            <p style="padding: 0.5rem 1rem;">
+          <div class="column is-half key-feature-text">
+            <h3 class="title is-4">Specialized Models</h3>
+            <p>
               Integrates a range of general and specialized LLM judges,
               including <a target="_blank" href="https://www.ibm.com/granite/docs/models/guardian/">IBM Granite Guardian</a>, Llama 3, Mixtral, and GPT-4, 
               using a chained prompting process to ensure consistent
               and accurate evaluations.
             </p>
           </div>
-          <div class="column">
+          <div class="column is-half key-feature-image">
             <img 
                 src="static/images/Specialized Models.png" 
                 alt="EvalAssist Teaser Image" 
-                class="center-image" 
-                style="max-width: 80%; height: auto; margin: 24px;"
+                class="feature-image" 
+
               >
           </div>
            
         </div>
 
         <div class="columns">
-          <div class="column">
+          <div class="column is-half key-feature-image">
             <img 
                 src="static/images/Test Case Catalog.png" 
                 alt="EvalAssist Teaser Image" 
-                class="center-image" 
-                style="max-width: 80%; height: auto; margin: 24px;"
+                class="feature-image" 
+
               >
           </div>
-           <div class="column" style="background-color: #f5f5f5; display: flex; flex-direction: column; justify-content: center;">
-            <h3 class="title is-4 has-text-centered">Test Case Catalog</h3>
-            <p style="padding: 0.5rem 1rem;">
+           <div class="column is-half key-feature-text">
+            <h3 class="title is-4">Test Case Catalog</h3>
+            <p>
               Includes a small catalogue of test cases to get you started and allows you to save your own test cases. If you develop criteria that could be of benefit to the larger community, consider contributing them to Unitxt.
             </p>
           </div>
@@ -293,113 +260,17 @@
       </div>
     </section>
 
-
-
-
-
-    <!--
-    <section class="section hero is-light">
-      <div class="container">
-        
-        <div class="columns">
-          <div class="column">
-            <h3 class="title is-4 has-text-centered">Flexible Methods</h3>
-            <p>
-              Supports custom criteria development for both direct assessment and pairwise comparison
-              evaluation methods, giving users the flexibility to choose what
-              fits their use case best.
-            </p>
-          </div>
-          
-          <div class="column">
-            <h3 class="title is-4 has-text-centered">AI-Assisted Criteria Refinement</h3>
-            <p class="content has-text-justified">
-              Allows users to iteratively design and refine evaluation criteria interactively with AI-assistance. Synthetic data produces edge cases to test your criteria on multiple data samples simultaneously.
-            </p>
-          </div>
-         
-          <div class="column">
-            <h3 class="title is-4 has-text-centered">Trustworthy Results</h3>
-            <p>
-              Empowers users to inspect outcomes with built-in trustworthiness
-              metrics such as positional bias and
-              model-generated explanations.
-            </p>
-          </div>
-        </div>
-
-        
-        <div class="columns">
-          <div class="column">
-            <h3 class="title is-4 has-text-centered">Scalable Toolkit</h3>
-            <p>
-              Built on top of the open source <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a> library, EvalAssist allows you to export your criteria to Jupyter notebooks running bulk evaluations based on <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a>, making it easy to scale your evaluations programmatically.
-            </p>
-          </div>
-          <div class="column">
-            <h3 class="title is-4 has-text-centered">Specialized Models</h3>
-            <p>
-              Integrates a range of general and specialized LLM judges,
-              including IBM Granite Guardian, Llama 3, Mixtral, and GPT-4, 
-              using a chained prompting process to ensure consistent
-              and accurate evaluations.
-            </p>
-          </div>
-
-          <div class="column">
-            <h3 class="title is-4 has-text-centered">Test Case Catalog</h3>
-            <p>
-              Includes a small catalogue of test cases to get you started and allows you to save your own test cases. If you develop criteria that could be of benefit to the larger community, consider contributing them to Unitxt.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  -->
-
-    <!-- Image carousel -->
-    <!-- <section class="hero is-small">
-      <div class="hero-body">
-        <div class="container">
-          <div id="results-carousel" class="carousel results-carousel">
-            <div class="item">
-              <img src="static/images/homepage.png" alt="MY ALT TEXT" />
-              <h2 class="subtitle has-text-centered">Homepage</h2>
-            </div>
-            <div class="item">
-              <img src="static/images/define_criteria.png" alt="MY ALT TEXT" />
-              <h2 class="subtitle has-text-centered">Define your criterion</h2>
-            </div>
-            <div class="item">
-              <img src="static/images/evaluate.png" alt="MY ALT TEXT" />
-              <h2 class="subtitle has-text-centered">Evaluate</h2>
-            </div>
-            <div class="item">
-              <img src="static/images/inspect_results.png" alt="MY ALT TEXT" />
-              <h2 class="subtitle has-text-centered">Inspect the results</h2>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section> -->
-    <!-- End image carousel -->
 
     <!-- Youtube video -->
     <section class="hero is-small is-light">
       <div class="hero-body">
         <div class="container">
           <!-- Paper video. -->
-          <h2 class="title is-3">Summary Video</h2>
+          <h2 class="title is-size-3 has-text-weight-medium has-text-black has-text-centered">Video demo</h2>
+
           <div class="columns is-centered has-text-centered">
             <div class="column is-four-fifths">
               <div class="publication-video">
-                <!-- Youtube embed code here -->
-                <!--<iframe
-                  src="https://youtu.be/YWwS911iLhg?si=9jboQzai4h5w3NR4"
-                  frameborder="0"
-                  allow="autoplay; encrypted-media"
-                  allowfullscreen
-                ></iframe> -->
                 <iframe width="350" src="https://www.youtube.com/embed/Fb70IJ-vcx0?si=TQprD8BkmTAEYUUz" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
               </div>
@@ -410,9 +281,9 @@
     </section>
     <!-- End youtube video -->
 
-    <section class="section">
+    <section id="publications" class="section">
       <div class="container">
-        <h2 id="publications" class="title is-3">Publications</h2>
+        <h2 class="title is-size-3 has-text-weight-medium has-text-black has-text-centered">Publications</h2>
 
         <div class="content">
           <ul>
@@ -474,50 +345,23 @@
       </div>
     </section>
 
-    <section class="section is-light">
-        <div class="container">
-          <h2 id="contributing" class="title is-3">Contributing Criteria to Unitxt</h2>
-
-          <div class="content">
-            
-        </div>
-      </div>
-    </section>
-
-    <section class="section is-light">
-      <div class="container">
-        <h2 id="people" class="title is-3">Contributors</h2>
-
-        <div class="content">
-          <div class="author-container">
+    <section id="team" class="section px-0 team-section" >
+      <div class="container team-container py-6 is-fluid">
+        <h2 class="title is-size-3 has-text-weight-medium has-text-centered has-text-white">Team</h2>
+          <div class="authors-container has-text-white">
             <div class="author">
               <div class="author-image">
                 <a href="http://zahraashktorab.com/">
                   <img src="static/images/ZahraAshktorab.jpeg">
                 </a>
               </div>
-              <p>
-                <a href="http://zahraashktorab.com/"> 
+              <p >
+                <a href="http://zahraashktorab.com/" class="has-text-white"> 
                   Zahra Ashktorab
                 </a>
               </p>
-              <p>
+              <p class="is-italic has-text-weight-light is-size-7 org">
                 IBM Research Yorktown
-              </p>
-            </div>
-            <div class="author">
-              <div class="author-image">
-                <a href="https://scholar.google.com/citations?user=LmIGTXEAAAAJ&hl=en">
-                  <img src="static/images/MartinSantillanCooper.jpeg">
-                </a>
-              </div>
-              <p>
-                <a href="https://scholar.google.com/citations?user=LmIGTXEAAAAJ&hl=en"> 
-                  Martin S. Cooper
-                </a>
-              </p>
-              <p>
-                IBM Research Argentina
               </p>
             </div>
             <div class="author">
@@ -527,11 +371,11 @@
                 </a>
               </div>
               <p>
-                <a href="https://research.ibm.com/people/elizabeth-daly"> 
+                <a href="https://research.ibm.com/people/elizabeth-daly" class="has-text-white"> 
                   Elizabeth Daly
                 </a>
               </p>
-              <p>
+              <p class="is-italic has-text-weight-light is-size-7 org">
                 IBM Research Dublin
               </p>
             </div>
@@ -542,11 +386,11 @@
                 </a>
               </div>
               <p>
-                <a href="https://scholar.google.com/citations?user=p_QSrigAAAAJ&hl=en"> 
+                <a href="https://scholar.google.com/citations?user=p_QSrigAAAAJ&hl=en" class="has-text-white"> 
                   Michael Desmond
                 </a>
               </p>
-              <p>
+              <p class="is-italic has-text-weight-light is-size-7 org">
                 IBM Research Yorktown
               </p>
             </div>
@@ -557,11 +401,11 @@
                 </a>
               </div>
               <p>
-                <a href="https://research.ibm.com/people/hyo-jin-do"> 
+                <a href="https://research.ibm.com/people/hyo-jin-do" class="has-text-white"> 
                   Gina Do
                 </a>
               </p>
-              <p>
+              <p class="is-italic has-text-weight-light is-size-7 org">
                 IBM Research Cambridge
               </p>
             </div>
@@ -572,11 +416,11 @@
                 </a>
               </div>
               <p>
-                <a href="https://wernergeyer.com/"> 
+                <a href="https://wernergeyer.com/" class="has-text-white"> 
                   Werner Geyer
                 </a>
               </p>
-              <p>
+              <p class="is-italic has-text-weight-light is-size-7 org">
                 IBM Research Cambridge
               </p>
             </div>
@@ -587,11 +431,11 @@
                 </a>
               </div>
               <p>
-                <a href="https://research.ibm.com/people/erik-miehling"> 
+                <a href="https://research.ibm.com/people/erik-miehling" class="has-text-white"> 
                   Erik Miehling
                 </a>
               </p>
-              <p>
+              <p class="is-italic has-text-weight-light is-size-7 org">
                 IBM Research Dublin
               </p>
             </div>
@@ -602,11 +446,11 @@
                 </a>
               </div>
               <p>
-                <a href="https://research.ibm.com/people/rahul-nair"> 
+                <a href="https://research.ibm.com/people/rahul-nair" class="has-text-white"> 
                   Rahul Nair
                 </a>
               </p>
-              <p>
+              <p class="is-italic has-text-weight-light is-size-7 org">
                 IBM Research Dublin
               </p>
             </div>
@@ -617,11 +461,11 @@
                 </a>
               </div>
               <p>
-                <a href="https://research.ibm.com/people/qian-pan"> 
+                <a href="https://research.ibm.com/people/qian-pan" class="has-text-white"> 
                   Qian Pan
                 </a>
               </p>
-              <p>
+              <p class="is-italic has-text-weight-light is-size-7 org">
                 IBM Research Cambridge
               </p>
             </div>
@@ -631,16 +475,30 @@
                 <div class="author-fallback">TP</div>
               </div>
               <p>
-                <a href="https://scholar.google.com/citations?hl=en&user=nwSF2RkAAAAJ"> 
+                <a href="https://scholar.google.com/citations?hl=en&user=nwSF2RkAAAAJ" class="has-text-white"> 
                   Tejaswini Pedapati
                 </a>
               </p>
-              <p>
+              <p class="is-italic has-text-weight-light is-size-7 org">
                 IBM Research Yorktown
               </p>
             </div>
+                        <div class="author">
+              <div class="author-image">
+                <a href="https://scholar.google.com/citations?user=LmIGTXEAAAAJ&hl=en">
+                  <img src="static/images/MartinSantillanCooper.jpeg">
+                </a>
+              </div>
+              <p >
+                <a href="https://scholar.google.com/citations?user=LmIGTXEAAAAJ&hl=en" class="has-text-white"> 
+                  Martin Santillán Cooper
+                </a>
+              </p>
+              <p class="is-italic has-text-weight-light is-size-7 org">
+                IBM Research Argentina
+              </p>
+            </div>
           </div>
-        </div>
       </div>
     </section>
 
