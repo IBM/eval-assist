@@ -93,7 +93,7 @@ body {
 }
 
 .key-feature-text {
-  background-color: #F2F4F8;
+  background-color: #f2f4f8;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -104,17 +104,18 @@ body {
 
 .key-feature-image {
   padding: 0;
-
-} 
+}
 
 .feature-image {
-  object-fit: cover; width: 100%; height: 100%;
-  border: 2rem solid #0F62FE;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  border: 0rem solid #0f62fe;
   border-radius: 2px;
 }
 
 .team-container {
-  background-color: #0F62FE;
+  background-color: #0f62fe;
 }
 
 .team-section {
