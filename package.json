@@ -2,7 +2,7 @@
     "name": "eval-assist",
     "private": false,
     "engines": {
-        "node": ">20"
+        "node": ">=20.0.0"
     },
     "scripts": {
         "prepare": ". backend/venv/bin/activate && cd backend && python3 -m pip install pre-commit && python3 -m pre_commit install",
@@ -34,9 +34,9 @@
         "docker:build:frontend": "npm run prisma:prepare:frontend && cd frontend && docker build -t eval-assist-frontend ."
     },
     "devDependencies": {
-        "concurrently": "^8.2.2",
-        "dotenv-cli": "^8.0.0",
-        "rimraf": "^6.0.1",
-        "wait-on": "^8.0.2"
+        "concurrently": "8.2.2",
+        "dotenv-cli": "8.0.0",
+        "rimraf": "6.0.1",
+        "wait-on": "8.0.2"
     }
 }
