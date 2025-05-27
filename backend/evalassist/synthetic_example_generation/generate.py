@@ -1,6 +1,3 @@
-# from model import Model
-# from _archive.liberated_model import LiberatedModel
-# from utils.data_utils import load_jsonl, save_to_jsonl
 import logging
 import os
 import uuid
@@ -495,8 +492,6 @@ class Generator:
         )
 
         logger.debug(f"The first prompt is: \n{prompts[0]}")
-
-        logger.debug(f"unparsed responses:\n{responses}")
 
         parsed_responses = [
             self.output_parser.parse(response) for response in responses
