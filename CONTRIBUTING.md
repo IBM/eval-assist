@@ -5,7 +5,7 @@ free to scratch it.
 To contribute code or documentation, please submit a [pull request](https://github.com/ibm/eval-assist/pulls).
 
 A good way to familiarize yourself with the codebase and contribution process is
-to look for and tackle low-hanging fruit in the [issue tracker](https://github.com/ibm/eval-assist/issues).
+to look for and tackle low-hanging fruits in the [issue tracker](https://github.com/ibm/eval-assist/issues).
 
 **Note: We appreciate your effort, and want to avoid a situation where a contribution
 requires extensive rework (by you or by us), sits in backlog for a long time, or
@@ -97,7 +97,7 @@ The most straightforward way to add a new criterion to Unitxt is to [create an i
 }
 ```
 
-In the issue, you should also add context around when this criteria should be used, which context variables was it used with and what is the name of the response variable. In addition, add a mapping between the option names and numerical values. Unitxt uses numerical values to compute metrics like Pearson correlation when benchmarking evaluators on specific criteria. For example:
+In the issue, you should add information about when this criteria should be used, what data you used to test it, how you validated it and how well it works. While we do not make decisions about new Unitxt criteria, perhaps general guidance could be how valuable a tested criteria could be to the broader AI research community. You may want to include any comments in this regard as well. Please also add the names of the context variables used and the name of the response variable. In addition, add a mapping between the option names and numerical values. Unitxt uses numerical values to compute metrics like Pearson correlation when benchmarking evaluators on specific criteria. For example:
 
 ```text
 Context variables: []
@@ -107,7 +107,7 @@ Option map: {"Yes": 1.0, "No": 0.5, "Pass": 0.0}
 
 #### Contribute creating a PR
 
-If you are familiarize with Unitxt ecosystem. You can perform the following steps:
+If you are familiar with the Unitxt environment. You can perform the following steps:
 1. Find the `DirectCriteriaCatalogEnum` or `PairwiseCriteriaCatalogEnum` enum in the [llm_as_judge_constants.py](https://github.com/IBM/unitxt/blob/main/src/unitxt/llm_as_judge_constants.py) file -depending on wether you want to contribute a direct or pairwise criteria-.
 2. Create your criteria object (using either `CriteriaWithOptions` or `Criteria`).
-3. Run the [prepare file](https://github.com/IBM/unitxt/blob/main/prepare/metrics/llm_as_judge/llm_as_judge.py) to create the criteria's artifact.
+3. Run [prepare file](https://github.com/IBM/unitxt/blob/main/prepare/metrics/llm_as_judge/llm_as_judge.py) to create the criteria's artifact.
