@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Charter_2_SIt" data-name="Charter 2_SIt" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 591.81 591.81">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill: #0f62fe;
+      }
+
+      .cls-3 {
+        fill: #898989;
+      }
+
+      .cls-4 {
+        fill: #272726;
+      }
+    </style>
+  </defs>
+  <rect class="cls-2" x="0" y="0" width="591.81" height="591.81" rx="295.9" ry="295.9"/>
+  <polygon class="cls-1" points="220.52 161.32 126.31 268.33 226.82 332.69 521.72 270.76 220.52 161.32"/>
+  <polygon class="cls-4" points="521.72 270.76 226.82 332.69 232.45 478.15 401.95 431.23 521.72 270.76"/>
+  <polyline class="cls-3" points="126.31 268.33 226.82 332.69 232.45 478.15"/>
+</svg>
