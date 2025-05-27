@@ -34,7 +34,6 @@ from ..utils import (
     get_model_name_from_evaluator,
     to_snake_case,
 )
-from .utils.data_utils import load_jsonl
 
 logger = logging.getLogger(__name__)
 
@@ -486,13 +485,6 @@ class Generator:
             raise NotImplementedError(
                 f"Generation not implemented for task type: {self.task}"
             )
-
-        if (
-            self.task is not None
-            and self.has_context_variables
-            and task != TaskEnum.TEXT_GENERATION
-        ):
-            self.context_data = load_jsonl(get_data_path(self.task, self.domain))
 
     def generate(self):
         # form prompts using criteria
