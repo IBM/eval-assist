@@ -32,7 +32,10 @@
     <title>EvalAssist</title>
     <link rel="icon" type="image/x-icon" href="static/images/logo.svg" />
 
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css"
@@ -61,20 +64,18 @@
               <h1
                 class="title is-1 is-flex is-align-items-center is-justify-content-center"
               >
-                <span class="icon is-large mr-3"
-                style="width: 75px; height: 75px"
+                <span
+                  class="icon is-large mr-3"
+                  style="width: 75px; height: 75px"
                 >
-                  <img
-                    src="static/images/logo.svg"
-                    alt="EvalAssist Icon"
-                    
-                  />
+                  <img src="static/images/logo.svg" alt="EvalAssist Icon" />
                 </span>
                 EvalAssist
               </h1>
-              <h2 class="is-size-5 has-text-grey has-text-weight-medium">LLM-as-a-Judge Simplified &mdash; Start Small, Refine Fast, Scale Smart</h2>
-
-
+              <h2 class="is-size-5 has-text-grey has-text-weight-medium">
+                LLM-as-a-Judge Simplified &mdash; Start Small, Refine Fast,
+                Scale Smart
+              </h2>
             </div>
           </div>
           <div class="columns is-centered">
@@ -89,19 +90,13 @@
                 </span>
                 <span class="is-size-7 has-text-weight-light">Code</span>
               </a>
-              <a
-                href="#publications"
-                class="button   is-dark mr-0"
-              >
+              <a href="#publications" class="button is-dark mr-0">
                 <span class="icon">
                   <i class="fas fa-file-pdf"></i>
                 </span>
                 <span class="is-size-7">Publications</span>
               </a>
-              <a
-                href="#team"
-                class="button   is-dark mr-0"
-              >
+              <a href="#team" class="button is-dark mr-0">
                 <span class="icon">
                   <i class="fas fa-user-group"></i>
                 </span>
@@ -121,99 +116,123 @@
           </div>
           <div class="columns is-centered">
             <div class="column has-text-centered">
-              <h2 class="is-size-3 has-text-weight-medium has-text-black has-text-centered">About</h2>
+              <h2
+                class="is-size-3 has-text-weight-medium has-text-black has-text-centered"
+              >
+                About
+              </h2>
               <div class="content has-text-justified">
                 <p class="is-size-6 has-text-weight-light">
-                  EvalAssist is an application that simplifies using large language models as evaluators (LLM-as-a-Judge) of the output of other large language models by supporting users in iteratively refining evaluation criteria in a web-based user experience. EvalAssist is based on the open source <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a> evaluation library leveraging a multi-step prompt-chaining approach to conduct evaluations. Once users are satisfied with their criteria, they can generate a Jupyter notebook to run <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a> evaluations of their criteria at scale.
+                  EvalAssist is an application that simplifies using large
+                  language models as evaluators (LLM-as-a-Judge) of the output
+                  of other large language models by supporting users in
+                  iteratively refining evaluation criteria in a web-based user
+                  experience. EvalAssist is based on the open source
+                  <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a>
+                  evaluation library leveraging a multi-step prompt-chaining
+                  approach to conduct evaluations. Once users are satisfied with
+                  their criteria, they can generate a Jupyter notebook to run
+                  <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a>
+                  evaluations of their criteria at scale.
                 </p>
               </div>
-              <h2 class="is-size-4 has-text-weight-medium has-text-black has-text-centered">Overview</h2>
-              <img 
-                src="static/images/evalassist.gif" 
-                alt="EvalAssist Teaser Image" 
-                class="center-image" 
-                
+              <h2
+                class="is-size-4 has-text-weight-medium has-text-black has-text-centered"
               >
-            </div>  
+                Overview
+              </h2>
+              <img
+                src="static/images/evalassist.gif"
+                alt="EvalAssist Teaser Image"
+                class="center-image"
+              />
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-     <section class="section hero pt-0">
+    <section class="section hero pt-0">
       <div class="container">
-        <h2 class="title is-size-4 has-text-weight-medium has-text-black has-text-centered pb-3">Key features</h2>
+        <h2
+          class="title is-size-4 has-text-weight-medium has-text-black has-text-centered pb-3"
+        >
+          Key features
+        </h2>
         <!-- First Row -->
         <div class="columns">
           <div class="column key-feature-text is-half">
-              <h3 class="title is-4">Flexible Methods</h3>
-              <p>
-                Supports custom criteria development for both direct assessment and pairwise comparison
-                evaluation methods, giving users the flexibility to choose what
-                fits their use case best.
-              </p>
+            <h3 class="title is-4">Flexible Methods</h3>
+            <p>
+              Supports custom criteria development for both direct assessment
+              and pairwise comparison evaluation methods, giving users the
+              flexibility to choose what fits their use case best.
+            </p>
           </div>
           <div class="column key-feature-image">
-            <img 
-                src="static/images/Flexible Methods.png" 
-                alt="EvalAssist Teaser Image" 
-                class="feature-image" 
-              >
+            <img
+              src="static/images/Flexible Methods.png"
+              alt="EvalAssist Teaser Image"
+              class="feature-image"
+            />
           </div>
         </div>
 
         <!-- Second Row -->
         <div class="columns">
           <div class="column key-feature-image">
-            <img 
-                src="static/images/AI-Assisted Criteria Refinement.png" 
-                alt="EvalAssist Teaser Image" 
-                class="feature-image" 
-
-              >
+            <img
+              src="static/images/AI-Assisted Criteria Refinement.png"
+              alt="EvalAssist Teaser Image"
+              class="feature-image"
+            />
           </div>
-           <div class="column key-feature-text is-half" >
+          <div class="column key-feature-text is-half">
             <h3 class="title is-4">AI-Assisted Criteria Refinement</h3>
             <p>
-              Allows users to iteratively design and refine evaluation criteria interactively with AI-assistance. Synthetic data produces edge cases to test your criteria on multiple data samples simultaneously.
+              Allows users to iteratively design and refine evaluation criteria
+              interactively with AI-assistance. Synthetic data produces edge
+              cases to test your criteria on multiple data samples
+              simultaneously.
             </p>
           </div>
         </div>
 
         <!-- Third row -->
         <div class="columns">
-          
-           <div class="column key-feature-text is-half">
-            <h3 class="title is-4 ">Trustworthy Results</h3>
+          <div class="column key-feature-text is-half">
+            <h3 class="title is-4">Trustworthy Results</h3>
             <p>
               Empowers users to inspect outcomes with built-in trustworthiness
-              metrics such as positional bias and
-              model-generated explanations.
+              metrics such as positional bias and model-generated explanations.
             </p>
           </div>
           <div class="column key-feature-image is-half">
-            <img 
-                src="static/images/Trustworthy Results.png" 
-                alt="EvalAssist Teaser Image" 
-                class="feature-image" 
-
-              >
+            <img
+              src="static/images/Trustworthy Results.png"
+              alt="EvalAssist Teaser Image"
+              class="feature-image"
+            />
           </div>
         </div>
 
         <div class="columns">
           <div class="column is-half key-feature-image">
-            <img 
-                src="static/images/Scalable Toolkit.png" 
-                alt="EvalAssist Teaser Image" 
-                class="feature-image" 
-
-              >
+            <img
+              src="static/images/Scalable Toolkit.png"
+              alt="EvalAssist Teaser Image"
+              class="feature-image"
+            />
           </div>
-           <div class="column is-half key-feature-text" >
+          <div class="column is-half key-feature-text">
             <h3 class="title is-4 has-text-centered">Scalable Toolkit</h3>
             <p>
-              Built on top of the open source <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a> library, EvalAssist allows you to export your criteria to Jupyter notebooks running bulk evaluations based on <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a>, making it easy to scale your evaluations programmatically.
+              Built on top of the open source
+              <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a>
+              library, EvalAssist allows you to export your criteria to Jupyter
+              notebooks running bulk evaluations based on
+              <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a>,
+              making it easy to scale your evaluations programmatically.
             </p>
           </div>
         </div>
@@ -223,55 +242,68 @@
             <h3 class="title is-4">Specialized Models</h3>
             <p>
               Integrates a range of general and specialized LLM judges,
-              including <a target="_blank" href="https://www.ibm.com/granite/docs/models/guardian/">IBM Granite Guardian</a>, Llama 3, Mixtral, and GPT-4, 
-              using a chained prompting process to ensure consistent
-              and accurate evaluations.
+              including
+              <a
+                target="_blank"
+                href="https://www.ibm.com/granite/docs/models/guardian/"
+                >IBM Granite Guardian</a
+              >, Llama 3, Mixtral, and GPT-4, using a chained prompting process
+              to ensure consistent and accurate evaluations.
             </p>
           </div>
           <div class="column is-half key-feature-image">
-            <img 
-                src="static/images/Specialized Models.png" 
-                alt="EvalAssist Teaser Image" 
-                class="feature-image" 
-
-              >
+            <img
+              src="static/images/Specialized Models.png"
+              alt="EvalAssist Teaser Image"
+              class="feature-image"
+            />
           </div>
-           
         </div>
 
         <div class="columns">
           <div class="column is-half key-feature-image">
-            <img 
-                src="static/images/Test Case Catalog.png" 
-                alt="EvalAssist Teaser Image" 
-                class="feature-image" 
-
-              >
+            <img
+              src="static/images/Test Case Catalog.png"
+              alt="EvalAssist Teaser Image"
+              class="feature-image"
+            />
           </div>
-           <div class="column is-half key-feature-text">
+          <div class="column is-half key-feature-text">
             <h3 class="title is-4">Test Case Catalog</h3>
             <p>
-              Includes a small catalogue of test cases to get you started and allows you to save your own test cases. If you develop criteria that could be of benefit to the larger community, consider contributing them to Unitxt.
+              Includes a small catalogue of test cases to get you started and
+              allows you to save your own test cases. If you develop criteria
+              that could be of benefit to the larger community, consider
+              contributing them to Unitxt.
             </p>
           </div>
         </div>
-
       </div>
     </section>
-
 
     <!-- Youtube video -->
     <section class="hero is-small is-light">
       <div class="hero-body">
         <div class="container">
           <!-- Paper video. -->
-          <h2 class="title is-size-3 has-text-weight-medium has-text-black has-text-centered">Video demo</h2>
+          <h2
+            class="title is-size-3 has-text-weight-medium has-text-black has-text-centered"
+          >
+            Video demo
+          </h2>
 
           <div class="columns is-centered has-text-centered">
             <div class="column is-four-fifths">
               <div class="publication-video">
-                <iframe width="350" src="https://www.youtube.com/embed/Fb70IJ-vcx0?si=TQprD8BkmTAEYUUz" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
+                <iframe
+                  width="350"
+                  src="https://www.youtube.com/embed/Fb70IJ-vcx0?si=TQprD8BkmTAEYUUz"
+                  title="YouTube video player"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen
+                ></iframe>
               </div>
             </div>
           </div>
@@ -282,7 +314,11 @@
 
     <section id="publications" class="section">
       <div class="container">
-        <h2 class="title is-size-3 has-text-weight-medium has-text-black has-text-centered">Publications</h2>
+        <h2
+          class="title is-size-3 has-text-weight-medium has-text-black has-text-centered"
+        >
+          Publications
+        </h2>
 
         <div class="content">
           <ul>
@@ -344,163 +380,194 @@
       </div>
     </section>
 
-    <section id="team" class="section px-0 team-section" >
+    <section id="team" class="section px-0 team-section">
       <div class="container team-container py-6 is-fluid">
-        <h2 class="title is-size-3 has-text-weight-medium has-text-centered has-text-white">Team</h2>
-          <div class="authors-container has-text-white">
-            <div class="author">
-              <div class="author-image">
-                <a href="http://zahraashktorab.com/">
-                  <img src="static/images/ZahraAshktorab.jpeg">
-                </a>
-              </div>
-              <p >
-                <a href="http://zahraashktorab.com/" class="has-text-white"> 
-                  Zahra Ashktorab
-                </a>
-              </p>
-              <p class="is-italic has-text-weight-light is-size-7 org">
-                IBM Research Yorktown
-              </p>
+        <h2
+          class="title is-size-3 has-text-weight-medium has-text-centered has-text-white"
+        >
+          Team
+        </h2>
+        <div class="authors-container has-text-white">
+          <div class="author">
+            <div class="author-image">
+              <a href="http://zahraashktorab.com/">
+                <img src="static/images/ZahraAshktorab.jpeg" />
+              </a>
             </div>
-            <div class="author">
-              <div class="author-image">
-                <a href="https://research.ibm.com/people/elizabeth-daly">
-                  <img src="static/images/ElizabethDaly.jpeg">
-                </a>
-              </div>
-              <p>
-                <a href="https://research.ibm.com/people/elizabeth-daly" class="has-text-white"> 
-                  Elizabeth Daly
-                </a>
-              </p>
-              <p class="is-italic has-text-weight-light is-size-7 org">
-                IBM Research Dublin
-              </p>
-            </div>
-            <div class="author">
-              <div class="author-image">
-                <a href="https://scholar.google.com/citations?user=p_QSrigAAAAJ&hl=en">
-                  <img src="static/images/MichaelDesmond.jpeg">
-                </a>
-              </div>
-              <p>
-                <a href="https://scholar.google.com/citations?user=p_QSrigAAAAJ&hl=en" class="has-text-white"> 
-                  Michael Desmond
-                </a>
-              </p>
-              <p class="is-italic has-text-weight-light is-size-7 org">
-                IBM Research Yorktown
-              </p>
-            </div>
-            <div class="author">
-              <div class="author-image">
-                <a href="https://research.ibm.com/people/hyo-jin-do">
-                  <img src="static/images/GinaDo.jpeg">
-                </a>
-              </div>
-              <p>
-                <a href="https://research.ibm.com/people/hyo-jin-do" class="has-text-white"> 
-                  Gina Do
-                </a>
-              </p>
-              <p class="is-italic has-text-weight-light is-size-7 org">
-                IBM Research Cambridge
-              </p>
-            </div>
-            <div class="author">
-              <div class="author-image">
-                <a href="https://wernergeyer.com/">
-                  <img src="static/images/WernerGeyer.jpeg">
-                </a>
-              </div>
-              <p>
-                <a href="https://wernergeyer.com/" class="has-text-white"> 
-                  Werner Geyer
-                </a>
-              </p>
-              <p class="is-italic has-text-weight-light is-size-7 org">
-                IBM Research Cambridge
-              </p>
-            </div>
-            <div class="author">
-              <div class="author-image">
-                <a href="https://research.ibm.com/people/erik-miehling">
-                  <img src="static/images/ErikMiehling.jpeg">
-                </a>
-              </div>
-              <p>
-                <a href="https://research.ibm.com/people/erik-miehling" class="has-text-white"> 
-                  Erik Miehling
-                </a>
-              </p>
-              <p class="is-italic has-text-weight-light is-size-7 org">
-                IBM Research Dublin
-              </p>
-            </div>
-             <div class="author">
-              <div class="author-image">
-                <a href="https://research.ibm.com/people/rahul-nair">
-                  <img src="static/images/RahulNair.jpeg">
-                </a>
-              </div>
-              <p>
-                <a href="https://research.ibm.com/people/rahul-nair" class="has-text-white"> 
-                  Rahul Nair
-                </a>
-              </p>
-              <p class="is-italic has-text-weight-light is-size-7 org">
-                IBM Research Dublin
-              </p>
-            </div>
-            <div class="author">
-              <div class="author-image">
-                <a href="https://research.ibm.com/people/qian-pan">
-                  <img src="static/images/QianPan.jpeg">
-                </a>
-              </div>
-              <p>
-                <a href="https://research.ibm.com/people/qian-pan" class="has-text-white"> 
-                  Qian Pan
-                </a>
-              </p>
-              <p class="is-italic has-text-weight-light is-size-7 org">
-                IBM Research Cambridge
-              </p>
-            </div>
-            <div class="author">
-              <div class="author-image">
-                <img src="static/images/TejaswiniPedapati.png">
-                <div class="author-fallback">TP</div>
-              </div>
-              <p>
-                <a href="https://scholar.google.com/citations?hl=en&user=nwSF2RkAAAAJ" class="has-text-white"> 
-                  Tejaswini Pedapati
-                </a>
-              </p>
-              <p class="is-italic has-text-weight-light is-size-7 org">
-                IBM Research Yorktown
-              </p>
-            </div>
-                        <div class="author">
-              <div class="author-image">
-                <a href="https://scholar.google.com/citations?user=LmIGTXEAAAAJ&hl=en">
-                  <img src="static/images/MartinSantillanCooper.jpeg">
-                </a>
-              </div>
-              <p >
-                <a href="https://scholar.google.com/citations?user=LmIGTXEAAAAJ&hl=en" class="has-text-white"> 
-                  Martin Santillán Cooper
-                </a>
-              </p>
-              <p class="is-italic has-text-weight-light is-size-7 org">
-                IBM Research Argentina
-              </p>
-            </div>
+            <p>
+              <a href="http://zahraashktorab.com/" class="has-text-white">
+                Zahra Ashktorab
+              </a>
+            </p>
+            <p class="is-italic has-text-weight-light is-size-7 org">
+              IBM Research Yorktown
+            </p>
           </div>
+          <div class="author">
+            <div class="author-image">
+              <a href="https://research.ibm.com/people/elizabeth-daly">
+                <img src="static/images/ElizabethDaly.jpeg" />
+              </a>
+            </div>
+            <p>
+              <a
+                href="https://research.ibm.com/people/elizabeth-daly"
+                class="has-text-white"
+              >
+                Elizabeth Daly
+              </a>
+            </p>
+            <p class="is-italic has-text-weight-light is-size-7 org">
+              IBM Research Dublin
+            </p>
+          </div>
+          <div class="author">
+            <div class="author-image">
+              <a
+                href="https://scholar.google.com/citations?user=p_QSrigAAAAJ&hl=en"
+              >
+                <img src="static/images/MichaelDesmond.jpeg" />
+              </a>
+            </div>
+            <p>
+              <a
+                href="https://scholar.google.com/citations?user=p_QSrigAAAAJ&hl=en"
+                class="has-text-white"
+              >
+                Michael Desmond
+              </a>
+            </p>
+            <p class="is-italic has-text-weight-light is-size-7 org">
+              IBM Research Yorktown
+            </p>
+          </div>
+          <div class="author">
+            <div class="author-image">
+              <a href="https://research.ibm.com/people/hyo-jin-do">
+                <img src="static/images/GinaDo.jpeg" />
+              </a>
+            </div>
+            <p>
+              <a
+                href="https://research.ibm.com/people/hyo-jin-do"
+                class="has-text-white"
+              >
+                Gina Do
+              </a>
+            </p>
+            <p class="is-italic has-text-weight-light is-size-7 org">
+              IBM Research Cambridge
+            </p>
+          </div>
+          <div class="author">
+            <div class="author-image">
+              <a href="https://wernergeyer.com/">
+                <img src="static/images/WernerGeyer.jpeg" />
+              </a>
+            </div>
+            <p>
+              <a href="https://wernergeyer.com/" class="has-text-white">
+                Werner Geyer
+              </a>
+            </p>
+            <p class="is-italic has-text-weight-light is-size-7 org">
+              IBM Research Cambridge
+            </p>
+          </div>
+          <div class="author">
+            <div class="author-image">
+              <a href="https://research.ibm.com/people/erik-miehling">
+                <img src="static/images/ErikMiehling.jpeg" />
+              </a>
+            </div>
+            <p>
+              <a
+                href="https://research.ibm.com/people/erik-miehling"
+                class="has-text-white"
+              >
+                Erik Miehling
+              </a>
+            </p>
+            <p class="is-italic has-text-weight-light is-size-7 org">
+              IBM Research Dublin
+            </p>
+          </div>
+          <div class="author">
+            <div class="author-image">
+              <a href="https://research.ibm.com/people/rahul-nair">
+                <img src="static/images/RahulNair.jpeg" />
+              </a>
+            </div>
+            <p>
+              <a
+                href="https://research.ibm.com/people/rahul-nair"
+                class="has-text-white"
+              >
+                Rahul Nair
+              </a>
+            </p>
+            <p class="is-italic has-text-weight-light is-size-7 org">
+              IBM Research Dublin
+            </p>
+          </div>
+          <div class="author">
+            <div class="author-image">
+              <a href="https://research.ibm.com/people/qian-pan">
+                <img src="static/images/QianPan.jpeg" />
+              </a>
+            </div>
+            <p>
+              <a
+                href="https://research.ibm.com/people/qian-pan"
+                class="has-text-white"
+              >
+                Qian Pan
+              </a>
+            </p>
+            <p class="is-italic has-text-weight-light is-size-7 org">
+              IBM Research Cambridge
+            </p>
+          </div>
+          <div class="author">
+            <div class="author-image">
+              <img src="static/images/TejaswiniPedapati.png" />
+              <div class="author-fallback">TP</div>
+            </div>
+            <p>
+              <a
+                href="https://scholar.google.com/citations?hl=en&user=nwSF2RkAAAAJ"
+                class="has-text-white"
+              >
+                Tejaswini Pedapati
+              </a>
+            </p>
+            <p class="is-italic has-text-weight-light is-size-7 org">
+              IBM Research Yorktown
+            </p>
+          </div>
+          <div class="author">
+            <div class="author-image">
+              <a
+                href="https://scholar.google.com/citations?user=LmIGTXEAAAAJ&hl=en"
+              >
+                <img src="static/images/MartinSantillanCooper.jpeg" />
+              </a>
+            </div>
+            <p>
+              <a
+                href="https://scholar.google.com/citations?user=LmIGTXEAAAAJ&hl=en"
+                class="has-text-white"
+              >
+                Martin Santillán Cooper
+              </a>
+            </p>
+            <p class="is-italic has-text-weight-light is-size-7 org">
+              IBM Research Argentina
+            </p>
+          </div>
+        </div>
       </div>
     </section>
-
 
     <!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
 
