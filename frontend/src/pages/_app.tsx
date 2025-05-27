@@ -16,7 +16,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ ses
       <Head>
         <title>{title}</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/logo.svg" />
+        <link rel="icon" href="/favicon.ico" />
         <meta name="apple-mobile-web-app-title" content={title} />
         <meta name="application-name" content={title} />
         <meta name="msapplication-TileColor" content="#052fad" />
