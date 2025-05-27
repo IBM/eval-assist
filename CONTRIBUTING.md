@@ -70,9 +70,9 @@ Testing is not available at this time.
 
 EvalAssist relies heavily on [Unitxt](https://www.unitxt.ai/en/latest/), a Python library designed for flexible and reusable data preparation and evaluation for generative AI models. EvalAssist's LLM-as-a-Judge evaluator are part of the Unitxt sourcode. To enhance the broader community and promote interoperability, we encourage you to contribute your evaluation criteria and related components to Unitxt.
 
-## How to contribute criteria to Unitxt
+### How to contribute criteria to Unitxt
 
-### Contribute creating an issue
+#### Contribute creating an issue
 
 The most straightforward way to add a new criterion to Unitxt is to [create an issue](https://github.com/IBM/unitxt/issues/new) and filling it with the required information. In the issue's body, copy and past your criteria from EvalAssist -you can copy/paste the json format in the JSON tab in the Evaluation criteria section-. For example:
 
@@ -105,7 +105,7 @@ Response variable: response
 Option map: {"Yes": 1.0, "No": 0.5, "Pass": 0.0}
 ```
 
-### Contribute creating a PR
+#### Contribute creating a PR
 
 If you are familiarize with Unitxt ecosystem. You can perform the following steps:
 1. Find the `DirectCriteriaCatalogEnum` or `PairwiseCriteriaCatalogEnum` enum in the [llm_as_judge_constants.py](https://github.com/IBM/unitxt/blob/main/src/unitxt/llm_as_judge_constants.py) file -depending on wether you want to contribute a direct or pairwise criteria-.
