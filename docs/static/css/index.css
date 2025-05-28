@@ -1,5 +1,5 @@
 body {
-  font-family: "Noto Sans", sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
 }
 
 .publication-banner video {
@@ -99,7 +99,7 @@ body {
   justify-content: center;
   align-items: center;
   padding-inline: 4rem;
-  text-align: justify;
+  text-align: start;
 }
 
 .key-feature-image {
