@@ -32,7 +32,11 @@ export const AppHeader = () => {
 
       <HeaderGlobalBar>
         <HeaderNavigation aria-label="[Platform]">
-          <HeaderMenuItem href="/documentation" isActive={router.pathname === '/documentation'}>
+          <HeaderMenuItem
+            href="https://github.com/IBM/eval-assist/wiki/EvalAssist-Documentation"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
               Documentation
               <Document style={{ marginLeft: '0.5rem' }} size={18} />
