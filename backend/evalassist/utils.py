@@ -2,6 +2,7 @@ import functools
 import json
 import logging
 import os
+import re
 import time
 import traceback
 from enum import Enum
@@ -35,6 +36,21 @@ from .const import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def fill_unknown_template(template: str, value: str) -> str:
+    # Case 1: Unnamed placeholder(s) like "hello {}"
+    if "{}" in template:
+        return template.format(value)
+
+    # Case 2: Named placeholder like "hello {world}"
+    match = re.search(r"\{(\w+)\}", template)
+    if match:
+        var_name = match.group(1)
+        return template.format(**{var_name: value})
+
+    # Case 3: No placeholder
+    return template
 
 
 def get_custom_models():
@@ -92,31 +108,35 @@ def get_cross_inference_engine_params(
     inference_engine_params = {
         "max_tokens": 1024,
         "seed": 42,
-        "credentials": credentials,
+        "credentials": credentials.copy(),
     }
     if provider == ModelProviderEnum.RITS:
         inference_engine_params["credentials"]["api_base"] = (
             RITSInferenceEngine.get_base_url_from_model_name(model_name) + "/v1"
         )
-        # inference_engine_params["extra_headers"] = {
-        #     "RITS_API_KEY": credentials["api_key"]
-        # }
     elif provider == ModelProviderEnum.WATSONX:
         provider_specific_args[ModelProviderEnum.WATSONX] = {
             "max_requests_per_second": 7
         }
 
-    if provider == ModelProviderEnum.AZURE:
-        inference_engine_params["credentials"]["api_base"] = (
-            f"https://eteopenai.azure-api.net/openai/deployments/{model_name}/chat/completions?api-version=2024-08-01-preview"
+    if (
+        provider == ModelProviderEnum.AZURE
+        or provider == ExtendedModelProviderEnum.OPENAI_LIKE
+    ):
+        inference_engine_params["credentials"]["api_base"] = fill_unknown_template(
+            credentials["api_base"], model_name
         )
+
+    elif provider == ExtendedModelProviderEnum.OPENAI_LIKE:
+        provider = ModelProviderEnum.OPENAI
+
     if custom_params is not None:
         inference_engine_params.update(custom_params)
     if provider_specific_params is not None:
         provider_specific_args.update(provider_specific_params)
     inference_engine_params["model"] = model_name
     inference_engine_params["provider"] = provider.value
-    inference_engine_params["credentials"] = credentials
+    print(inference_engine_params["credentials"])
     inference_engine_params["provider_specific_args"] = provider_specific_args
     return inference_engine_params
 

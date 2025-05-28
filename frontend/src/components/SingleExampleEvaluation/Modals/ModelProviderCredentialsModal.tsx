@@ -13,7 +13,7 @@ interface Props {
 }
 
 export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
-  const { modelProviderCredentials, setModelProviderCredentials } = useModelProviderCredentials()
+  const { modelProviderCredentials, setModelProviderCredentials, defaultCrendentials } = useModelProviderCredentials()
   return (
     <ComposedModal open={open} onClose={() => setOpen(false)}>
       <ModalHeader title="Model provider credentials" />
@@ -53,6 +53,19 @@ export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
                   }
                   autoComplete="off"
                   className={classes.credentialInput}
+                />
+                <TextInput
+                  id={'watsonx-api-base-input'}
+                  labelText="Base URL"
+                  value={modelProviderCredentials.watsonx.api_base}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCredentials,
+                      watsonx: { ...modelProviderCredentials.watsonx, api_base: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                  placeholder={defaultCrendentials.watsonx?.api_base}
                 />
                 <p className="cds--form__helper-text">
                   {"Don't have a key? Get one "}
@@ -161,7 +174,7 @@ export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
             <div className={classes.bottomDivider} />
             <div className={cx(classes.modelProviderContainer)}>
               <p className={cx(classes.modelProviderName)}>Azure</p>
-              <div>
+              <div className={classes.credentialsContainer}>
                 <TextInput
                   id={'azure-api-key-input'}
                   labelText="API key"
@@ -169,11 +182,24 @@ export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setModelProviderCredentials({
                       ...modelProviderCredentials,
-                      azure: { api_key: e.target.value },
+                      azure: { ...modelProviderCredentials.azure, api_key: e.target.value },
                     })
                   }
                   autoComplete="off"
                   className={classes.credentialInput}
+                />
+                <TextInput
+                  id={'azure-apibase-key-input'}
+                  labelText="Base URL"
+                  value={modelProviderCredentials.azure.api_base}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCredentials,
+                      azure: { ...modelProviderCredentials.azure, api_base: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                  placeholder={defaultCrendentials.azure?.api_base}
                 />
                 <p className="cds--form__helper-text">
                   {"Don't have a key? Get one "}
@@ -327,6 +353,7 @@ export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
                     })
                   }
                   autoComplete="off"
+                  placeholder={defaultCrendentials.ollama?.api_base}
                 />
                 <p className="cds--form__helper-text">
                   {"Don't have a key? Get one "}

@@ -26,6 +26,7 @@ class ExtendedEvaluatorNameEnum(Enum):
 
 class ExtendedModelProviderEnum(str, Enum):
     LOCAL_HF = "local_hf"
+    OPENAI_LIKE = "open-ai-like"
 
 
 EXTENDED_INFERENCE_ENGINE_NAME_TO_CLASS = {

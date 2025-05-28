@@ -14,7 +14,6 @@ import {
   FetchedDirectResults,
   FetchedPairwiseResults,
   Instance,
-  ModelProviderType,
   PairwiseInstance,
   PairwiseInstanceResult,
   TestCase,
@@ -58,7 +57,6 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   const {
     currentTestCase,
     setCurrentTestCase,
-
     setLastSavedTestCaseString,
     currentTestCaseString,
     testCaseSelected,
@@ -73,7 +71,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   const [evaluationRunning, setEvaluationRunning] = useState(false)
   const [evaluationFailed, setEvaluationFailed] = useState(false)
   const [evaluatingInstanceIds, setEvaluatingInstanceIds] = useState<string[]>([])
-  const { modelProviderCredentials } = useModelProviderCredentials()
+  const { modelProviderCredentials, getProviderCredentialsWithDefaults } = useModelProviderCredentials()
   const { deleteCustom, post, put } = useFetchUtils()
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
   const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
@@ -158,9 +156,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         type: currentTestCase.type,
         response_variable_name: currentTestCase.responseVariableName,
       }
-      body['llm_provider_credentials'] = {
-        ...modelProviderCredentials[currentTestCase.evaluator?.provider || ModelProviderType.RITS],
-      }
+      body['llm_provider_credentials'] = getProviderCredentialsWithDefaults(currentTestCase.evaluator!.provider)
 
       const startEvaluationTime = new Date().getTime() / 1000
       response = await post('evaluate/', body)
@@ -259,10 +255,10 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       addToast,
       currentTestCase,
       getCriteria,
+      getProviderCredentialsWithDefaults,
       getStringifiedInstanceContent,
       isEqualToCurrentTemporaryId,
       isRisksAndHarms,
-      modelProviderCredentials,
       post,
       removeToast,
       setCurrentTestCase,

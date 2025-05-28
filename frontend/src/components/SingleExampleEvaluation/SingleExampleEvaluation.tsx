@@ -78,9 +78,6 @@ export const SingleExampleEvaluation = () => {
   useBeforeOnload(changesDetected)
   const temporaryIdRef = useRef(uuid())
   const { onSave } = useTestCaseActionsContext()
-  const { loadingSyntheticExamples } = useSyntheticGeneration()
-
-  const { downloadUnitxtCode } = useUnitxtCodeGeneration()
 
   useSaveShortcut({ onSave, changesDetected, isTestCaseSaved })
 

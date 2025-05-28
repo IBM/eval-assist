@@ -40,7 +40,7 @@ export const PipelineSelect = ({
       [ModelProviderType.WATSONX]: [],
       [ModelProviderType.OPENAI]: [],
       [ModelProviderType.OPENAI_LIKE]: [],
-      [ModelProviderType.AZURE_OPENAI]: [],
+      [ModelProviderType.AZURE]: [],
       [ModelProviderType.LOCAL_HF]: [],
       [ModelProviderType.TOGETHER_AI]: [],
       [ModelProviderType.AWS]: [],
@@ -94,7 +94,6 @@ export const PipelineSelect = ({
 
   return (
     <div className={className} style={{ ...style }}>
-      {/* <span className={classes['toggle-span']}>{title}</span> */}
       {loadingEvaluators || directEvaluators === null || pairwiseEvaluators === null ? (
         <SelectSkeleton />
       ) : (
