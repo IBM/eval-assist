@@ -1,4 +1,10 @@
-## Contributing In General
+# Table of content
+
+- [Contributing to EvalAssist](#contributing-to-evalassist)
+- [Contributing to Unitxt](#contributing-to-unitxt)
+
+## Contributing to EvalAssist
+
 Our project welcomes external contributions. If you have an itch, please feel
 free to scratch it.
 
