@@ -127,7 +127,7 @@ def get_evaluators():
 @router.get("/default-credentials/", response_model=dict[str, dict[str, str]])
 def get_default_credentials():
     openai_api_key = os.getenv("OPENAI_API_KEY", None)
-    azure_openai_api_key = os.getenv("AZURE_OPENAI_API_KEY", None)
+    azure_openai_api_key = os.getenv("AZURE_API_KEY", None)
     rits_api_key = os.getenv("RITS_API_KEY", None)
     watsonx_api_key = os.getenv("WATSONX_API_KEY", None)
     watsonx_project_id = os.getenv("WATSONX_PROJECT_ID", None)

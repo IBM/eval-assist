@@ -132,7 +132,7 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
         const ritsCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.RITS)
         const watsonxCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.WATSONX)
         const openaiCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.OPENAI)
-        const azureCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.AZURE_OPENAI)
+        const azureCredentialsExist = getAreRelevantCredentialsProvided(ModelProviderType.AZURE)
         const defaultProvider = watsonxCredentialsExist
           ? ModelProviderType.WATSONX
           : ritsCredentialsExist
@@ -140,7 +140,7 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
           : openaiCredentialsExist
           ? ModelProviderType.OPENAI
           : azureCredentialsExist
-          ? ModelProviderType.AZURE_OPENAI
+          ? ModelProviderType.AZURE
           : null
 
         if (defaultProvider === null) return null

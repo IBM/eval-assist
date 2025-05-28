@@ -9,7 +9,7 @@ export const modelProviderBeautifiedName: Record<ModelProviderType, string> = {
   [ModelProviderType.OPENAI]: 'OpenAI',
   [ModelProviderType.OPENAI_LIKE]: 'OpenAI Compatible',
   [ModelProviderType.RITS]: 'RITS',
-  [ModelProviderType.AZURE_OPENAI]: 'Azure OpenAI',
+  [ModelProviderType.AZURE]: 'Azure',
   [ModelProviderType.LOCAL_HF]: 'Local HF',
   [ModelProviderType.TOGETHER_AI]: 'Together AI',
   [ModelProviderType.AWS]: 'AWS/Bedrock',
@@ -18,7 +18,7 @@ export const modelProviderBeautifiedName: Record<ModelProviderType, string> = {
   [ModelProviderType.OLLAMA]: 'Ollama',
 }
 
-export const INSTANCES_PER_PAGE = 5
+export const INSTANCES_PER_PAGE = 10
 
 export enum DomainEnum {
   NewsMedia = 'News Media',

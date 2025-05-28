@@ -151,7 +151,7 @@ export enum ModelProviderType {
   OPENAI = 'open-ai',
   OPENAI_LIKE = 'open-ai-like',
   RITS = 'rits',
-  AZURE_OPENAI = 'azure',
+  AZURE = 'azure',
   LOCAL_HF = 'local_hf',
   TOGETHER_AI = 'together-ai',
   AWS = 'aws',
@@ -254,6 +254,7 @@ export type ModelProviderCredentials = {
   }
   azure: {
     api_key: string
+    api_base: string
   }
   local_hf: {}
   'together-ai': {
@@ -273,8 +274,21 @@ export type ModelProviderCredentials = {
   }
 }
 
-export type PartialModelProviderCredentials = Partial<Pick<ModelProviderCredentials, keyof ModelProviderCredentials>>
+export type PartialModelProviderCredentials = Partial<ModelProviderCredentials>
 
+export type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>
+    }
+  : T
+
+export type DeepPartialModelProviderCredentials = DeepPartial<ModelProviderCredentials>
+
+export type DeepPartialBooleanMap<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartialBooleanMap<T[P]> : boolean
+}
+
+export type DeepPartialBooleanModelProviderCredentials = DeepPartialBooleanMap<ModelProviderCredentials>
 export interface CaretCoordinates {
   x: number
   y: number

@@ -390,17 +390,6 @@ export const TestDataTable = ({ style, className }: Props) => {
           {'No positional bias was detected in any of the instances.'}
         </p>
       ) : null}
-      {/* <div className={classes.toggles}>
-        <Toggle
-          labelText={'Show expected result'}
-          toggled={expectedResultOn}
-          onToggle={() => setExpectedResultOn(!expectedResultOn)}
-          size="sm"
-          hideLabel
-          id="toggle-expected-result"
-          className={classes.toggle}
-        />
-      </div> */}
     </div>
   )
 }
