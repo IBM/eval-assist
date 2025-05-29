@@ -9,8 +9,6 @@ import { ModelProviderCredentials, ModelProviderType, PartialModelProviderCreden
 
 const defaultWatsonxURL = 'https://us-south.ml.cloud.ibm.com'
 const defaultOllamaURL = 'http://localhost:11434/'
-const defaultAzureURL =
-  'https://eteopenai.azure-api.net/openai/deployments/{model_name}/chat/completions?api-version=2024-08-01-preview'
 
 const defaultCredentialStorage = {
   [ModelProviderType.WATSONX]: { api_key: '', project_id: '', api_base: '' },
@@ -31,7 +29,7 @@ const defaultCrendentials = {
   [ModelProviderType.OPENAI]: { api_key: '' },
   [ModelProviderType.OPENAI_LIKE]: { api_key: '', api_base: '' },
   [ModelProviderType.RITS]: { api_key: '' },
-  [ModelProviderType.AZURE]: { api_key: '', api_base: defaultAzureURL },
+  [ModelProviderType.AZURE]: { api_key: '', api_base: '' },
   [ModelProviderType.LOCAL_HF]: {},
   [ModelProviderType.TOGETHER_AI]: { api_key: '' },
   [ModelProviderType.AWS]: { api_key: '' },
