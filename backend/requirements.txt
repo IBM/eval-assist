@@ -19,7 +19,7 @@ openai
 transformers>=4.48.0
 torch
 accelerate
-unitxt>=1.23.0
+unitxt>=1.23.1
 nbconvert
 boto3
 ollama
