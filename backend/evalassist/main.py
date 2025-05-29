@@ -127,10 +127,12 @@ def get_evaluators():
 @router.get("/default-credentials/", response_model=dict[str, dict[str, str]])
 def get_default_credentials():
     openai_api_key = os.getenv("OPENAI_API_KEY", None)
-    azure_openai_api_key = os.getenv("AZURE_API_KEY", None)
+    azure_api_key = os.getenv("AZURE_API_KEY", None)
+    azure_api_base = os.getenv("AZURE_API_BASE", None)
     rits_api_key = os.getenv("RITS_API_KEY", None)
     watsonx_api_key = os.getenv("WATSONX_API_KEY", None)
     watsonx_project_id = os.getenv("WATSONX_PROJECT_ID", None)
+    watsonx_api_base = os.getenv("WATSONX_API_BASE", None)
     replicate_api_key = os.getenv("REPLICATE_API_KEY", None)
     together_ai_api_key = os.getenv("TOGETHER_AI_API_KEY", None)
     bedrock_ai_api_key = os.getenv("BEDROCK_AI_API_KEY", None)
@@ -145,10 +147,11 @@ def get_default_credentials():
             "watsonx": {
                 "api_key": watsonx_api_key,
                 "project_id": watsonx_project_id,
+                "api_base": watsonx_api_base,
             },
             "open-ai": {"api_key": openai_api_key},
             "replicate": {"api_key": replicate_api_key},
-            "azure": {"api_key": azure_openai_api_key},
+            "azure": {"api_key": azure_api_key, "api_base": azure_api_base},
             "together-ai": {"api_key": together_ai_api_key},
             "vertex-ai": {"api_key": vertex_ai_api_key},
             "bedrock": {"api_key": bedrock_ai_api_key},
