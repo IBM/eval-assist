@@ -142,27 +142,27 @@ spec:
             - name: APPID_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secret
+                  name: ${CLUSTER_NAMESPACE}-secret
                   key: APPID_CLIENT_ID
             - name: APPID_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secret
+                  name: ${CLUSTER_NAMESPACE}-secret
                   key: APPID_CLIENT_SECRET
             - name: APPID_ISSUER
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secret
+                  name: ${CLUSTER_NAMESPACE}-secret
                   key: APPID_ISSUER
             - name: NEXTAUTH_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secret
+                  name: ${CLUSTER_NAMESPACE}-secret
                   key: NEXTAUTH_SECRET
             - name: NEXTAUTH_URL
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secret
+                  name: ${CLUSTER_NAMESPACE}-secret
                   key: NEXTAUTH_URL
       imagePullSecrets:
         - name: all-icr-io
