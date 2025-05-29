@@ -92,17 +92,10 @@ Visit [http://localhost:3000](https://localhost:3000)
 * **clean-backend**: Deletes the backend virtual environment and generated Prisma schema.
 * **clean-frontend**: Removes frontend dependencies and generated Prisma schema.
 
-## Custom models
+## Contributing
 
-You can add custom new evaluators to EvalAssist using any of the supported providers. To do so, ask you system administrator to add a `custom_models.json` file to the backend's folder. For example, to add DeepSeek R1 Distill
-Llama 70B as an evaluator, add the following json:
+You can contribute to EvalAssist or to Unitxt. Look at the [Contribution Guidalines](htPtps://github.com/IBM/eval-assist/blob/main/CONTRIBUTING.md) for more details.
 
-```json
-[
-  {
-    "name": "DeepSeek R1 Distill Llama 70B",
-    "path": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
-    "providers": ["local_hf"],
-  },
-]
-```
+## Documentation
+
+You can find extesive documentation of the system in the [Documentation page](https://github.com/IBM/eval-assist/wiki).
