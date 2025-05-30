@@ -164,6 +164,91 @@ spec:
                 secretKeyRef:
                   name: ${CLUSTER_NAMESPACE}-secret
                   key: NEXTAUTH_URL
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: OPENAI_API_KEY
+                  optional: true
+            - name: AZURE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: AZURE_API_KEY
+                  optional: true
+            - name: AZURE_API_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: AZURE_API_BASE
+                  optional: true
+            - name: RITS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: RITS_API_KEY
+                  optional: true
+            - name: WATSONX_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: WATSONX_API_KEY
+                  optional: true
+            - name: WATSONX_PROJECT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: WATSONX_PROJECT_ID
+                  optional: true
+            - name: WATSONX_API_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: WATSONX_API_BASE
+                  optional: true
+            - name: REPLICATE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: REPLICATE_API_KEY
+                  optional: true
+            - name: TOGETHER_AI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: TOGETHER_AI_API_KEY
+                  optional: true
+            - name: BEDROCK_AI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: BEDROCK_AI_API_KEY
+                  optional: true
+            - name: OPEN_AI_LIKE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: OPEN_AI_LIKE_API_KEY
+                  optional: true
+            - name: OPEN_AI_LIKE_API_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: OPEN_AI_LIKE_API_BASE
+                  optional: true
+            - name: OLLAMA_API_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: OLLAMA_API_BASE
+                  optional: true
+            - name: VERTEX_AI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: VERTEX_AI_API_KEY
+                  optional: true
+
       imagePullSecrets:
         - name: all-icr-io
 ---
