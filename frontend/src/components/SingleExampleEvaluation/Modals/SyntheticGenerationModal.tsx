@@ -104,9 +104,9 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
                 }
                 value={syntheticGenerationConfig.task || ''}
               >
-                <SelectItem value={''} text={'Generic/Unstrutured'} />
+                <SelectItem key={'Generic/Unstrutured'} value={''} text={'Generic/Unstrutured'} />
                 {tasksOptions.map((task, i) => (
-                  <SelectItem key={i} value={task.text} text={task.text} />
+                  <SelectItem key={i} value={task} text={task} />
                 ))}
               </Select>
               <p className={classes.task_indication}>
@@ -117,21 +117,20 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
 
               {!loadingDomainPersonaMapping ? (
                 <Dropdown
-                  itemToString={(i: { text: string }) => i.text}
-                  items={domainsOptions}
-                  label="No specific domain"
+                  items={syntheticGenerationConfig.domain ? ['No specific domain', ...domainsOptions] : domainsOptions}
+                  label=""
                   id="domain"
                   titleText="Domain"
                   type="default"
-                  selectedItem={syntheticGenerationConfig.domain ? { text: syntheticGenerationConfig.domain } : null}
+                  selectedItem={syntheticGenerationConfig.domain || 'No specific domain'}
                   onChange={({ selectedItem }) => {
-                    const newSelectedDomain = selectedItem?.text as DomainEnum
+                    const newSelectedDomain = selectedItem as DomainEnum
                     if (newSelectedDomain !== syntheticGenerationConfig.domain) {
                       setSyntheticGenerationConfig({ ...syntheticGenerationConfig, persona: null })
                     }
                     setSyntheticGenerationConfig({
                       ...syntheticGenerationConfig,
-                      domain: selectedItem?.text as DomainEnum,
+                      domain: selectedItem === 'No specific domain' ? null : (selectedItem as DomainEnum),
                       persona: null,
                     })
                   }}
@@ -142,17 +141,18 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
               {!loadingDomainPersonaMapping ? (
                 <Dropdown
                   disabled={!syntheticGenerationConfig.domain}
-                  itemToString={(i: { text: string }) => i.text}
-                  items={personasOptions}
-                  label="No specific persona"
+                  items={
+                    syntheticGenerationConfig.persona ? ['No specific persona', ...personasOptions] : personasOptions
+                  }
+                  label=""
                   id="persona"
                   titleText="Persona"
                   type="default"
-                  selectedItem={syntheticGenerationConfig.persona ? { text: syntheticGenerationConfig.persona } : null}
+                  selectedItem={syntheticGenerationConfig.persona || 'No specific persona'}
                   onChange={({ selectedItem }) =>
                     setSyntheticGenerationConfig({
                       ...syntheticGenerationConfig,
-                      persona: selectedItem?.text as PersonaEnum,
+                      persona: selectedItem === 'No specific persona' ? null : (selectedItem as PersonaEnum),
                     })
                   }
                 />
@@ -163,21 +163,21 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
                 <p className={classes.task_indication}>{'Select a domain to unlock the persona options'}</p>
               )}
               <Dropdown
-                itemToString={(i: { text: string }) => i.text}
-                items={generationLengthOptions}
-                label="No option selected"
+                items={
+                  syntheticGenerationConfig.generationLength
+                    ? ['Not specific length', ...generationLengthOptions]
+                    : generationLengthOptions
+                }
+                label=""
                 id="data-length"
                 titleText="Data length"
                 type="default"
-                selectedItem={
-                  syntheticGenerationConfig.generationLength
-                    ? { text: syntheticGenerationConfig.generationLength }
-                    : null
-                }
+                selectedItem={syntheticGenerationConfig.generationLength || 'Not specific length'}
                 onChange={({ selectedItem }) =>
                   setSyntheticGenerationConfig({
                     ...syntheticGenerationConfig,
-                    generationLength: selectedItem?.text as GenerationLengthEnum,
+                    generationLength:
+                      selectedItem === 'Not specific length' ? null : (selectedItem as GenerationLengthEnum),
                   })
                 }
               />
