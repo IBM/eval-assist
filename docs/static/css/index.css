@@ -102,6 +102,15 @@ body {
   text-align: start;
 }
 
+.key-feature-text h3 {
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+  font-weight: 600;
+  line-height: 1.125;
+  color: #363636;
+  width: 100%;
+}
+
 .key-feature-image {
   padding: 0;
 }
