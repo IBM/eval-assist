@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: eval-assist-frontend
+  name: eval-assist-demo-frontend
   labels:
-    app: eval-assist-frontend
+    app: eval-assist-demo-frontend
 spec:
   selector:
     matchLabels:
-      app: eval-assist-frontend
+      app: eval-assist-demo-frontend
   replicas: 1
   template:
     metadata:
       labels:
-        app: eval-assist-frontend
+        app: eval-assist-demo-frontend
     spec:
       containers:
-        - name: eval-assist-frontend
-          image: us.icr.io/eval-assist/eval-assist-frontend@sha256:107ef6b8b6b979843a7f75267087e7dc56306554bb9de57ffa4d16ebcfd0e899
+        - name: eval-assist-demo-frontend
+          image: us.icr.io/eval-assist/eval-assist-demo-frontend@sha256:582be08f4572a8e30f7e80160ab0c0a67670e7fb977c3186c7000d2a2297c84c
           resources:
             limits:
               cpu: 4
@@ -30,27 +30,27 @@ spec:
             - name: APPID_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: eval-assist-secret
+                  name: eval-assist-demo-secret
                   key: APPID_CLIENT_ID
             - name: APPID_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: eval-assist-secret
+                  name: eval-assist-demo-secret
                   key: APPID_CLIENT_SECRET
             - name: APPID_ISSUER
               valueFrom:
                 secretKeyRef:
-                  name: eval-assist-secret
+                  name: eval-assist-demo-secret
                   key: APPID_ISSUER
             - name: NEXTAUTH_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: eval-assist-secret
+                  name: eval-assist-demo-secret
                   key: NEXTAUTH_SECRET
             - name: NEXTAUTH_URL
               valueFrom:
                 secretKeyRef:
-                  name: eval-assist-secret
+                  name: eval-assist-demo-secret
                   key: NEXTAUTH_URL
       imagePullSecrets:
         - name: all-icr-io
@@ -58,22 +58,22 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: eval-assist-backend
+  name: eval-assist-demo-backend
   labels:
-    app: eval-assist-backend
+    app: eval-assist-demo-backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: eval-assist-backend
+      app: eval-assist-demo-backend
   template:
     metadata:
       labels:
-        app: eval-assist-backend
+        app: eval-assist-demo-backend
     spec:
       containers:
-        - name: eval-assist-backend
-          image: us.icr.io/eval-assist/eval-assist-backend@sha256:ef8e1b908a3640bf496e2c2469350a45daa8f8ef2c8dcb11276ee49a30c7a9c9
+        - name: eval-assist-demo-backend
+          image: us.icr.io/eval-assist/eval-assist-demo-backend@sha256:5683ebbe3be1a6510dd49f53d36478358ffae400f650ec7335633d830da02e39
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -83,25 +83,38 @@ spec:
               memory: 32Gi
             requests:
               cpu: 4
-              memory: 16Gi
+              memory: 8Gi
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eval-assist-demo-secret
+                  key: DATABASE_URL
+            - name: UNITXT_INFERENCE_ENGINE_CACHE_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: eval-assist-demo-secret
+                  key: UNITXT_INFERENCE_ENGINE_CACHE_PATH
           volumeMounts:
-            - name: eval-assist-volume
-              mountPath: /app/prisma/db
+            - name: eval-assist-demo-volume
+              mountPath: /app/shared_volume
       volumes:
-        - name: eval-assist-volume
+        - name: eval-assist-demo-volume
           persistentVolumeClaim:
-            claimName: eval-assist-volume
+            claimName: eval-assist-demo-volume
+      imagePullSecrets:
+        - name: all-icr-io
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: eval-assist-frontend
+  name: eval-assist-demo-frontend
   labels:
-    app: eval-assist-frontend
+    app: eval-assist-demo-frontend
 spec:
   type: NodePort
   selector:
-    app: eval-assist-frontend
+    app: eval-assist-demo-frontend
   ports:
     - name: http
       port: 80
@@ -111,9 +124,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: eval-assist-backend
+  name: eval-assist-demo-backend
   labels:
-    app: eval-assist-backend
+    app: eval-assist-demo-backend
+
 spec:
   type: NodePort
   ports:
@@ -121,7 +135,7 @@ spec:
       port: 80
       targetPort: 8000
   selector:
-    app: eval-assist-backend
+    app: eval-assist-demo-backend
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -131,29 +145,30 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "true"
     kubernetes.io/ingress.class: f5
     virtual-server.f5.com/balance: round-robin
-    virtual-server.f5.com/ip: 9.12.246.105
+    virtual-server.f5.com/ip: 9.12.246.144
     virtual-server.f5.com/partition: RIS3-INT-OCP-DAL12
     virtual-server.f5.com/clientssl: '[ { "bigIpProfile": "/Common/BlueMix" } ]'
-  name: eval-assist
-  namespace: eval-assist
+  name: eval-assist-demo
+  namespace: eval-assist-demo
 spec:
   rules:
-    - host: eval-assist-api.bx.cloud9.ibm.com
+    - host: eval-assist-demo-api.bx.cloud9.ibm.com
       http:
         paths:
           - backend:
               service:
-                name: eval-assist-backend
+                name: eval-assist-demo-backend
                 port:
                   number: 80
             path: /
             pathType: ImplementationSpecific
-    - host: eval-assist.bx.cloud9.ibm.com
+    - host: eval-assist-demo.bx.cloud9.ibm.com
       http:
         paths:
           - backend:
               service:
-                name: eval-assist-frontend
+                name: eval-assist-demo-frontend
                 port:
                   number: 80
             path: /
+            pathType: ImplementationSpecific
