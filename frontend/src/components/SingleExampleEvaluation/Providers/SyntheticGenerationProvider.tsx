@@ -25,18 +25,10 @@ import { useUserUseCasesContext } from './UserUseCasesProvider'
 interface SyntheticGenerationContextValue {
   loadingSyntheticExamples: boolean
   generateTestData: () => Promise<void>
-  tasksOptions: {
-    text: TaskEnum
-  }[]
-  domainsOptions: {
-    text: DomainEnum
-  }[]
-  personasOptions: {
-    text: PersonaEnum
-  }[]
-  generationLengthOptions: {
-    text: GenerationLengthEnum
-  }[]
+  tasksOptions: TaskEnum[]
+  domainsOptions: DomainEnum[]
+  personasOptions: PersonaEnum[]
+  generationLengthOptions: GenerationLengthEnum[]
   loadingDomainPersonaMapping: boolean
   loadDomainPersonaMapping: () => Promise<void>
   performDirectAIAction: ({}: {
@@ -92,25 +84,13 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
     [domainPersonaMap, currentTestCase.syntheticGenerationConfig],
   )
 
-  const tasksOptions = useMemo(
-    () =>
-      Object.values(TaskEnum).map((value) => ({
-        text: value,
-      })),
-    [],
-  )
+  const tasksOptions = useMemo(() => Object.values(TaskEnum), [])
 
-  const domainsOptions = useMemo(() => domains.map((d) => ({ text: d })), [domains])
+  const domainsOptions = useMemo(() => domains, [domains])
 
-  const personasOptions = useMemo(() => personas.map((p) => ({ text: p })), [personas])
+  const personasOptions = useMemo(() => personas, [personas])
 
-  const generationLengthOptions = useMemo(
-    () =>
-      Object.values(GenerationLengthEnum).map((value) => ({
-        text: value,
-      })),
-    [],
-  )
+  const generationLengthOptions = useMemo(() => Object.values(GenerationLengthEnum), [])
 
   const loadDomainPersonaMapping = useCallback(async () => {
     setLoadingDomainPersonaMapping(true)
