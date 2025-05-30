@@ -164,6 +164,50 @@ spec:
                 secretKeyRef:
                   name: ${CLUSTER_NAMESPACE}-secret
                   key: NEXTAUTH_URL
+
+      imagePullSecrets:
+        - name: all-icr-io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${BACKEND_K8S_NAME}
+  labels:
+    app: ${BACKEND_K8S_NAME}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${BACKEND_K8S_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${BACKEND_K8S_NAME}
+    spec:
+      containers:
+        - name: ${BACKEND_K8S_NAME}
+          image: ${IMAGE_BACKEND}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              cpu: 8
+              memory: 32Gi
+            requests:
+              cpu: 4
+              memory: 16Gi
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ${K8S_NAME}-secret
+                  key: DATABASE_URL
+            - name: UNITXT_INFERENCE_ENGINE_CACHE_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: ${K8S_NAME}-secret
+                  key: UNITXT_INFERENCE_ENGINE_CACHE_PATH
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -248,50 +292,6 @@ spec:
                   name: ${CLUSTER_NAMESPACE}-secret
                   key: VERTEX_AI_API_KEY
                   optional: true
-
-      imagePullSecrets:
-        - name: all-icr-io
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ${BACKEND_K8S_NAME}
-  labels:
-    app: ${BACKEND_K8S_NAME}
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ${BACKEND_K8S_NAME}
-  template:
-    metadata:
-      labels:
-        app: ${BACKEND_K8S_NAME}
-    spec:
-      containers:
-        - name: ${BACKEND_K8S_NAME}
-          image: ${IMAGE_BACKEND}
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8000
-          resources:
-            limits:
-              cpu: 8
-              memory: 32Gi
-            requests:
-              cpu: 4
-              memory: 16Gi
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: ${K8S_NAME}-secret
-                  key: DATABASE_URL
-            - name: UNITXT_INFERENCE_ENGINE_CACHE_PATH
-              valueFrom:
-                secretKeyRef:
-                  name: ${K8S_NAME}-secret
-                  key: UNITXT_INFERENCE_ENGINE_CACHE_PATH
           volumeMounts:
             - name: ${CLUSTER_NAMESPACE}-volume
               mountPath: /app/shared_volume
