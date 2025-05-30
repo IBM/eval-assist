@@ -201,12 +201,12 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secret
+                  name: ${CLUSTER_NAMESPACE}-secret
                   key: DATABASE_URL
             - name: UNITXT_INFERENCE_ENGINE_CACHE_PATH
               valueFrom:
                 secretKeyRef:
-                  name: ${K8S_NAME}-secret
+                  name: ${CLUSTER_NAMESPACE}-secret
                   key: UNITXT_INFERENCE_ENGINE_CACHE_PATH
             - name: OPENAI_API_KEY
               valueFrom:
