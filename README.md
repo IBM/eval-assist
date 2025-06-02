@@ -4,6 +4,11 @@
   <img src="frontend/public/images/logo.svg" alt="EvalAssist Logo" width="200"/>
 </p>
 
+<p align="center">
+  <a href="https://ibm.github.io/eval-assist/">Project Website</a> •
+  <a href="https://github.com/IBM/eval-assist/wiki">Documentation</a>
+</p>
+
 <!-- Build Status, is a great thing to have at the top of your repository, it shows that you take your CI/CD as first class citizens -->
 <!-- [![Build Status](https://travis-ci.org/jjasghar/ibm-cloud-cli.svg?branch=master)](https://travis-ci.org/jjasghar/ibm-cloud-cli) -->
 
