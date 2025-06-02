@@ -136,7 +136,6 @@ def get_cross_inference_engine_params(
         provider_specific_args.update(provider_specific_params)
     inference_engine_params["model"] = model_name
     inference_engine_params["provider"] = provider.value
-    print(inference_engine_params["credentials"])
     inference_engine_params["provider_specific_args"] = provider_specific_args
     return inference_engine_params
 

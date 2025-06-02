@@ -9,13 +9,13 @@ from starlette.background import BackgroundTask
 from .db_client import db
 
 ignored_endpoints = [
-    "/health/",
+    "/health",
     "/evaluators/",
     "/criterias/",
     "/test_case/",
     "/user/",
     "/default-credentials/",
-    "/benchmarks/",
+    "/benchmarks//domains-and-personas/",
 ]
 
 
@@ -26,6 +26,7 @@ def log_info(method, path, req_body, res_body, headers, runtime):
         "timestamp": time.time(),
         "runtime": runtime,
     }
+
     if path in ignored_endpoints:
         return
 
@@ -56,7 +57,6 @@ class LoggingRoute(APIRoute):
             end_timestamp = time.time()
             runtime = round(end_timestamp - start_timestamp, 2)
             tasks = response.background
-
             request.headers
             task = BackgroundTask(
                 log_info,

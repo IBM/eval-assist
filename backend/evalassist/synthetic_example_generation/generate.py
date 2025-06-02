@@ -565,8 +565,6 @@ class Generator:
                 )
         else:
             context_section = ""
-        print("context_section")
-        print(context_section)
         for criteria_option_name in self.per_criteria_option_count.keys():
             criteria_option_description = criteria_options_dict[criteria_option_name]
             if criteria_option_description:

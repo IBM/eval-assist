@@ -23,7 +23,7 @@ exhibiting the use of LLM-as-a-judge across a variety of scenarios. Users can sa
 Start by cloning the repository to your local machine using Git:
 
 ```bash
-git clone https://github.ibm.com/AIExperience/eval-assist.git 
+git clone https://github.com/IBM/eval-assist.git 
 # or via ssh: git clone git@github.ibm.com:AIExperience/eval-assist.git
 cd eval-assist
 ```

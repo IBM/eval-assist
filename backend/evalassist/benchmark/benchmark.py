@@ -18,7 +18,6 @@ def get_all_benchmarks():
         for file in files:
             if file.endswith(".json"):
                 file_path = os.path.join(root, file)
-                print(file_path)
                 with open(file_path, "r") as f:
                     try:
                         to_merge_benchmark = json.load(f)
