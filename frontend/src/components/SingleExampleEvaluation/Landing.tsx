@@ -131,32 +131,6 @@ export const Landing = ({}: Props) => {
           className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
           badge={{ text: 'Catalog', color: 'purple' }}
         />
-        {/* <Card
-          title={'LLM-as-a-judge Toolkit'}
-          description={'Apply criteria from sandbox with larger dataset'}
-          imageSrc="python_library"
-          onClick={() => {
-            const newWindow = window.open(
-              'https://github.ibm.com/AIExperience/llm-as-a-judge',
-              '_blank',
-              'noopener,noreferrer',
-            )
-            if (newWindow) newWindow.opener = null
-          }}
-          actionButton={
-            <Button
-              renderIcon={Launch}
-              kind="ghost"
-              href="https://github.ibm.com/AIExperience/llm-as-a-judge"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {'Go'}
-            </Button>
-          }
-          className={cx({ [classes['card-white-mode']]: !!!isDarkMode() })}
-          badge={{ text: 'Python Library', color: 'green' }}
-        /> */}
       </div>
     </div>
   )

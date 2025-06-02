@@ -48,11 +48,7 @@ export const AppHeader = () => {
               <QqPlot style={{ marginLeft: '0.5rem' }} size={18} />
             </div>
           </HeaderMenuItem>
-          <HeaderMenuItem
-            href="https://github.ibm.com/AIExperience/eval-assist"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <HeaderMenuItem href="https://github.com/IBM/eval-assist" target="_blank" rel="noopener noreferrer">
             <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
               Github
               <LogoGithub style={{ marginLeft: '0.5rem' }} size={18} />
