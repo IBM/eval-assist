@@ -2,9 +2,9 @@ import cx from 'classnames'
 import { modelProviderBeautifiedName } from 'src/constants'
 import { getJSONStringWithSortedKeys } from 'src/utils'
 
-import { CSSProperties, useMemo } from 'react'
+import { CSSProperties, ReactNode, useMemo } from 'react'
 
-import { Select, SelectItem, SelectItemGroup, SelectSkeleton } from '@carbon/react'
+import { Link, Select, SelectItem, SelectItemGroup, SelectSkeleton } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
 import { Evaluator, ModelProviderType } from '../../types'
@@ -21,6 +21,7 @@ interface Props {
   selectedEvaluator: Evaluator | null
   setSelectedEvaluator: (evaluator: Evaluator | null) => void
   evaluatorOptions: Evaluator[]
+  helperChildren?: ReactNode
 }
 
 export const PipelineSelect = ({
@@ -32,6 +33,7 @@ export const PipelineSelect = ({
   evaluatorOptions,
   selectionComponentNameWithArticle = 'an evaluator',
   selectionComponentName = 'evaluator',
+  helperChildren,
 }: Props) => {
   const { loadingEvaluators, directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
   const providerToEvaluators = useMemo<Record<ModelProviderType, Evaluator[]>>(() => {
@@ -124,6 +126,7 @@ export const PipelineSelect = ({
               ) : (
                 <div className={classes.providerFont}>{`Select ${selectionComponentNameWithArticle}`}</div>
               )}
+              {helperChildren}
             </div>
           }
           value={getJSONStringWithSortedKeys(selectedEvaluator) || ''}
