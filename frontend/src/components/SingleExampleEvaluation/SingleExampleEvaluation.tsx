@@ -4,14 +4,13 @@ import { v4 as uuid } from 'uuid'
 
 import { LegacyRef, useMemo, useRef } from 'react'
 
-import { Button } from '@carbon/react'
+import { Button, Link } from '@carbon/react'
 import { Add, WarningFilled } from '@carbon/react/icons'
 
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
-import { useUnitxtCodeGeneration } from '@customHooks/useUnitxtNotebookGeneration'
 
-import { EvaluationType, Evaluator } from '../../types'
+import { Evaluator } from '../../types'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { CriteriaView } from './CriteriaView'
 import { EvaluateButton } from './EvaluateButton'
@@ -22,7 +21,6 @@ import { Modals } from './Modals'
 import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from './Providers/EvaluatorOptionsProvider'
 import { useModalsContext } from './Providers/ModalsProvider'
-import { useSyntheticGeneration } from './Providers/SyntheticGenerationProvider'
 import { useTestCaseActionsContext } from './Providers/TestCaseActionsProvider'
 import { useURLParamsContext } from './Providers/URLParamsProvider'
 import classes from './SingleExampleEvaluation.module.scss'
@@ -159,6 +157,15 @@ export const SingleExampleEvaluation = () => {
                 setSelectedEvaluator={(evaluator: Evaluator | null) => {
                   setCurrentTestCase({ ...currentTestCase, evaluator })
                 }}
+                helperChildren={
+                  <Link
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    href="https://github.com/IBM/eval-assist/wiki#evaluation-methodology"
+                  >
+                    How do evaluators work?
+                  </Link>
+                }
               />
               <PipelineSelect
                 selectedEvaluator={currentTestCase.syntheticGenerationConfig.evaluator}
