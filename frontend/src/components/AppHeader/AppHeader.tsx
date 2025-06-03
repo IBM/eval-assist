@@ -42,12 +42,12 @@ export const AppHeader = () => {
               <Document style={{ marginLeft: '0.5rem' }} size={18} />
             </div>
           </HeaderMenuItem>
-          <HeaderMenuItem href="/benchmarks" isActive={router.pathname.startsWith('/benchmarks')}>
+          {/* <HeaderMenuItem href="/benchmarks" isActive={router.pathname.startsWith('/benchmarks')}>
             <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
               Benchmarks
               <QqPlot style={{ marginLeft: '0.5rem' }} size={18} />
             </div>
-          </HeaderMenuItem>
+          </HeaderMenuItem> */}
           <HeaderMenuItem href="https://github.com/IBM/eval-assist" target="_blank" rel="noopener noreferrer">
             <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
               Github
