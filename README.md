@@ -83,6 +83,8 @@ npm start
 
 Visit [http://localhost:3000](https://localhost:3000)
 
+_Check out the tutorials to see how to [run evaluations](https://github.com/IBM/eval-assist/wiki#mini-tutorial-running-an-evaluation) and [generate synthetic data](https://github.com/IBM/eval-assist/wiki#mini-tutorial-generating-test-data)._
+
 ## Commands summary
 
 * **install**:  Installs dependencies for both the backend and frontend in parallel.
