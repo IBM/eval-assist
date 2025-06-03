@@ -5,6 +5,7 @@ import {
   ComposedModal,
   Dropdown,
   DropdownSkeleton,
+  IconButton,
   ModalBody,
   ModalFooter,
   ModalHeader,
@@ -13,7 +14,7 @@ import {
   TextInput,
   Tooltip,
 } from '@carbon/react'
-import { Information } from '@carbon/react/icons'
+import { Help, Information } from '@carbon/react/icons'
 
 import { DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@constants'
 import '@types'
@@ -83,10 +84,24 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
 
   return (
     <ComposedModal open={open} onClose={() => setOpen(false)}>
-      <ModalHeader title="Generate synthetic examples" />
+      <ModalHeader
+        title={
+          <div className={classes.helperContent}>
+            {'Generate synthetic examples'}
+            <IconButton
+              kind={'ghost'}
+              label="Help"
+              target="_blank"
+              rel={'noopener noreferrer'}
+              href={'https://github.com/IBM/eval-assist/wiki#refining-criteria-with-synthetic-data'}
+            >
+              <Help />
+            </IconButton>
+          </div>
+        }
+      />
       <ModalBody>
         <div className={classes.user_setup_container}>
-          <div className={classes.vertical_divider} />
           <div className={classes.section}>
             <div className={classes.section_description_container}>
               <p className={classes.section_title}>Instruction</p>
