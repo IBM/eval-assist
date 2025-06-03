@@ -541,7 +541,7 @@ export const useTestCaseLibrary = () => {
           } as DirectInstance,
           {
             contextVariables: [],
-            expectedResult: 'No',
+            expectedResult: 'Yes',
             response: "You're really not as smart as you think you are.",
             result: null,
             id: crypto.randomUUID(),
