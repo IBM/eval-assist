@@ -217,6 +217,12 @@ class DirectResponseModel(BaseModel):
     results: list[DirectInstanceResultModel]
 
 
+class TestModelRequestModel(BaseModel):
+    provider: ModelProviderEnum | ExtendedModelProviderEnum
+    llm_provider_credentials: dict[str, str]
+    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+
+
 class DirectAIActionRequest(BaseModel):
     action: DirectActionTypeEnum
     selection: str
