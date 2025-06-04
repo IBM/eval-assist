@@ -217,6 +217,12 @@ class DirectResponseModel(BaseModel):
     results: list[DirectInstanceResultModel]
 
 
+class CustomModelRequest(BaseModel):
+    provider: ModelProviderEnum | ExtendedModelProviderEnum
+    model: str
+    user_email: str
+
+
 class DirectAIActionRequest(BaseModel):
     action: DirectActionTypeEnum
     selection: str

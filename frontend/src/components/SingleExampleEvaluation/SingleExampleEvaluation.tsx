@@ -16,6 +16,7 @@ import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
 
 import { Evaluator } from '../../types'
+import { AddCustomModel } from './AddCustomModel'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { CriteriaView } from './CriteriaView'
 import { EvaluateButton } from './EvaluateButton'
@@ -189,6 +190,7 @@ export const SingleExampleEvaluation = () => {
                 selectionComponentNameWithArticle="a model"
                 selectionComponentName="model"
               />
+              <AddCustomModel />
             </div>
             <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>
               <strong>Test data</strong>

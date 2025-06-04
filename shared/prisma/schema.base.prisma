@@ -22,6 +22,7 @@ model AppUser {
   created_at DateTime @default(now())
 
   stored_test_cases StoredTestCase[]
+  CustomModel       CustomModel[]
 
   @@map("app_user")
 }
@@ -31,4 +32,16 @@ model LogRecord {
   data String
 
   @@map("log_record")
+}
+
+model CustomModel {
+  id       Int    @id @default(autoincrement())
+  user_id  Int
+  name     String
+  provider String
+
+  app_user AppUser @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, name, provider])
+  @@map("custom_model")
 }

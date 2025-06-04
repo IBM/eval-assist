@@ -36,6 +36,9 @@ interface ModalsContextValue {
 
   editPairwiseResponseNameModalOpen: boolean
   setEditPairwiseResponseNameModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+
+  addCustomModelModalOpen: boolean
+  setAddCustomModelModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 const ModalsContext = createContext<ModalsContextValue>({
   confirmationModalOpen: false,
@@ -73,6 +76,9 @@ const ModalsContext = createContext<ModalsContextValue>({
 
   editPairwiseResponseNameModalOpen: false,
   setEditPairwiseResponseNameModalOpen: () => {},
+
+  addCustomModelModalOpen: false,
+  setAddCustomModelModalOpen: () => {},
 })
 
 export const useModalsContext = () => {
@@ -92,7 +98,7 @@ export const ModalsProvider = ({ children }: { children: ReactNode }) => {
   const [sampleCodeTypeModalOpen, setSampleCodeTypeModalOpen] = useState(false)
   const [modelProviderCrendentialsModalOpen, setmodelProviderCrendentialsModalOpen] = useState(false)
   const [editPairwiseResponseNameModalOpen, setEditPairwiseResponseNameModalOpen] = useState(false)
-
+  const [addCustomModelModalOpen, setAddCustomModelModalOpen] = useState(false)
   return (
     <ModalsContext.Provider
       value={{
@@ -131,6 +137,9 @@ export const ModalsProvider = ({ children }: { children: ReactNode }) => {
 
         editPairwiseResponseNameModalOpen,
         setEditPairwiseResponseNameModalOpen,
+
+        addCustomModelModalOpen,
+        setAddCustomModelModalOpen,
       }}
     >
       {children}
