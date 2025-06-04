@@ -71,7 +71,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   const [evaluationRunning, setEvaluationRunning] = useState(false)
   const [evaluationFailed, setEvaluationFailed] = useState(false)
   const [evaluatingInstanceIds, setEvaluatingInstanceIds] = useState<string[]>([])
-  const { modelProviderCredentials, getProviderCredentialsWithDefaults } = useModelProviderCredentials()
+  const { getProviderCredentialsWithDefaults } = useModelProviderCredentials()
   const { deleteCustom, post, put } = useFetchUtils()
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
   const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
