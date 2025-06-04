@@ -356,9 +356,9 @@ export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
                   placeholder={defaultCrendentials.ollama?.api_base}
                 />
                 <p className="cds--form__helper-text">
-                  {"Don't have a key? Get one "}
+                  {'Find more info '}
                   <Link
-                    href={'https://replicate.com/account/api-tokens'}
+                    href={'https://ollama.com/'}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ textDecoration: 'none' }}
