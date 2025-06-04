@@ -39,17 +39,17 @@ export const PipelineSelect = ({
   const { loadingEvaluators, directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
   const providerToEvaluators = useMemo<Record<ModelProviderType, Evaluator[]>>(() => {
     const result: Record<ModelProviderType, Evaluator[]> = {
-      [ModelProviderType.RITS]: [],
-      [ModelProviderType.WATSONX]: [],
+      [ModelProviderType.AZURE]: [],
+      [ModelProviderType.AWS]: [],
+      [ModelProviderType.LOCAL_HF]: [],
+      [ModelProviderType.OLLAMA]: [],
       [ModelProviderType.OPENAI]: [],
       [ModelProviderType.OPENAI_LIKE]: [],
-      [ModelProviderType.AZURE]: [],
-      [ModelProviderType.LOCAL_HF]: [],
-      [ModelProviderType.TOGETHER_AI]: [],
-      [ModelProviderType.AWS]: [],
-      [ModelProviderType.VERTEX_AI]: [],
       [ModelProviderType.REPLICATE]: [],
-      [ModelProviderType.OLLAMA]: [],
+      [ModelProviderType.RITS]: [],
+      [ModelProviderType.TOGETHER_AI]: [],
+      [ModelProviderType.VERTEX_AI]: [],
+      [ModelProviderType.WATSONX]: [],
     }
     if (evaluatorOptions === null) return result
 
