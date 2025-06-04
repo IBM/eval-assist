@@ -6,7 +6,8 @@
 
 <p align="center">
   <a href="https://ibm.github.io/eval-assist/">Project Website</a> •
-  <a href="https://github.com/IBM/eval-assist/wiki">Documentation</a>
+  <a href="https://github.com/IBM/eval-assist/wiki">Documentation</a> •
+  <a href="https://www.youtube.com/embed/bTf0N1GGslE?si=wGT1irti4DxGI71P">Video demo</a>
 </p>
 
 <!-- Build Status, is a great thing to have at the top of your repository, it shows that you take your CI/CD as first class citizens -->
