@@ -824,7 +824,7 @@ export const useTestCaseLibrary = () => {
 
             result: null,
             id: crypto.randomUUID(),
-            expectedResult: 'No',
+            expectedResult: 'Yes',
           },
         ],
         criteria: getCriteria('reference_document_faithfulness', EvaluationType.DIRECT) as CriteriaWithOptions,
