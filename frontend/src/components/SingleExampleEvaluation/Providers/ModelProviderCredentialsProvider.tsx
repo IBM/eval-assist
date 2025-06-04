@@ -35,7 +35,7 @@ const defaultCrendentials = {
   [ModelProviderType.AWS]: { api_key: '' },
   [ModelProviderType.VERTEX_AI]: { api_key: '' },
   [ModelProviderType.REPLICATE]: { api_key: '' },
-  [ModelProviderType.OLLAMA]: { api_base: defaultOllamaURL },
+  [ModelProviderType.OLLAMA]: { api_base: '' },
 }
 interface ModelProviderCredentialsContextValue {
   modelProviderCredentials: ModelProviderCredentials
@@ -177,7 +177,7 @@ export const ModelProviderCredentialsProvider = ({ children }: { children: React
       Object.keys(getProviderCredentials(provider)).every((key) => {
         const credential = defaultCrendentials[provider]
         // @ts-ignore
-        return getProviderCredentials(provider)[key] !== '' // || defaultCrendentials[provider][key] !== ''
+        return getProviderCredentials(provider)[key] !== '' || defaultCrendentials[provider][key] !== ''
       }),
     [getProviderCredentials],
   )
