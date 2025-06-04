@@ -34,6 +34,7 @@ from .api.common import (
     CriteriaAPI,
     CriteriaOptionAPI,
     CriteriaWithOptionsAPI,
+    CustomModelRequest,
     DirectAIActionRequest,
     DirectAIActionResponse,
     DirectEvaluationRequestModel,
@@ -142,18 +143,36 @@ def get_feature_flags() -> HealthCheck:
 
 
 @router.get("/evaluators/", response_model=EvaluatorsResponseModel)
-def get_evaluators():
+def get_evaluators(user_email: str):
     """Get the list of available pipelines, as supported by llm-as-a-judge library"""
     evaluators = [
         EvaluatorMetadataAPI(**e.__dict__) for e in EXTENDED_EVALUATORS_METADATA
     ]
-    custom_models = get_custom_models()
-    for custom_model in custom_models:
+    # Add custom models set by the system admin
+    system_custom_models = get_custom_models()
+    for custom_model in system_custom_models:
         evaluators.append(
             EvaluatorMetadataAPI(
                 name=custom_model["name"], providers=custom_model["providers"]
             )
         )
+
+    # Add custom models set by the user
+    user = db.appuser.find_unique(where={"email": user_email})
+    if user is not None:
+        user_custom_models = db.custommodel.find_many(where={"user_id": user.id})
+
+    for custom_model in user_custom_models:
+        evaluators.append(
+            EvaluatorMetadataAPI(
+                name=custom_model.name, providers=[custom_model.provider]
+            )
+        )
+
+    print("user")
+    print(user)
+    print("user_custom_models")
+    print(user_custom_models)
     return EvaluatorsResponseModel(evaluators=evaluators)
 
 
@@ -277,19 +296,16 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
 
     return run()
 
+# used to log varying user actions
+@router.post("/log_user_action/")
+def log_user_action():
+    pass
 
 @router.get("/test_case/")
 def get_test_cases(user: str, session: Session = Depends(get_session)):
     statement = select(StoredTestCase).join(AppUser).where(AppUser.email == user)
     test_cases = session.exec(statement).all()
     return test_cases
-
-
-# used to log varying user actions
-@router.post("/log_user_action/")
-def log_user_action():
-    pass
-
 
 @router.get("/test_case/{test_case_id}/")
 def get_test_case(
@@ -474,8 +490,28 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
 @router.get(
     "/domains-and-personas/", response_model=dict[DomainEnum, list[PersonaEnum]]
 )
-def get_domain_persona_map():
+def get_domain_persona_map(req: CustomModelRequest):
     return domain_persona_map
+
+
+@router.post("/custom-model/")
+def add_custom_model(req: CustomModelRequest):
+    user = db.appuser.find_unique(where={"email": req.user_email})
+    try:
+        res = db.custommodel.create(
+            data={
+                "name": req.model,
+                "provider": req.provider,
+                "user_id": user.id,
+            }
+        )
+        return res.id
+
+    except Exception as e:
+        root_pkg_logger.error(f"Error creating custom model: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error creating custom model: {str(e)}"
+        )
 
 
 @router.post("/direct-ai-action/", response_model=DirectAIActionResponse)

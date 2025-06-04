@@ -2,6 +2,7 @@ import { ReactNode, createContext, useContext, useEffect, useMemo, useState } fr
 
 import { Loading } from '@carbon/react'
 
+import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 
 import { EvaluationType, Evaluator, FetchedEvaluator } from '../types'
@@ -32,6 +33,7 @@ export const EvaluatorOptionsProvider = ({ children }: { children: ReactNode }) 
   const [evaluators, setEvaluators] = useState<Evaluator[] | null>(null)
   const [loadingEvaluators, setLoadingEvaluators] = useState(false)
   const { get } = useFetchUtils()
+  const { getUserName } = useAuthentication()
 
   const directEvaluators = useMemo(
     () => evaluators?.filter((p) => p.type === EvaluationType.DIRECT) ?? null,
@@ -62,7 +64,7 @@ export const EvaluatorOptionsProvider = ({ children }: { children: ReactNode }) 
   useEffect(() => {
     const fetchData = async () => {
       setLoadingEvaluators(true)
-      const response = await get('evaluators/')
+      const response = await get(`evaluators/?user_email=${encodeURIComponent(getUserName())}`)
       const data = await response.json()
       setLoadingEvaluators(false)
       let evaluators: Evaluator[] = []
@@ -79,7 +81,7 @@ export const EvaluatorOptionsProvider = ({ children }: { children: ReactNode }) 
       setEvaluators(evaluators)
     }
     fetchData()
-  }, [get])
+  }, [get, getUserName])
 
   if (loadingEvaluators || evaluators === null) return <Loading withOverlay />
 
