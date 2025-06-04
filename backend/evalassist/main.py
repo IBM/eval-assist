@@ -59,10 +59,10 @@ from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNot
 from .synthetic_example_generation.generate import DirectActionGenerator, Generator
 from .utils import (
     clean_object,
-    get_custom_models,
     get_evaluator_metadata_wrapper,
     get_inference_engine,
     get_model_name_from_evaluator,
+    get_system_custom_models,
     handle_llm_generation_exceptions,
     init_evaluator_name,
 )
@@ -118,7 +118,7 @@ def get_evaluators(user_email: str):
         EvaluatorMetadataAPI(**e.__dict__) for e in EXTENDED_EVALUATORS_METADATA
     ]
     # Add custom models set by the system admin
-    system_custom_models = get_custom_models()
+    system_custom_models = get_system_custom_models()
     for custom_model in system_custom_models:
         evaluators.append(
             EvaluatorMetadataAPI(
@@ -219,9 +219,9 @@ def get_prompt(req: DirectEvaluationRequestModel):
     return res
 
 
-@router.post("/test-model/")
-async def test_provider(req: TestModelRequestModel):
-    evaluator_name, custom_model_name = init_evaluator_name(req.evaluator_name)
+@router.post("/test-model-connection/")
+async def test_model_connection(req: TestModelRequestModel):
+    evaluator_name, custom_model_name = init_evaluator_name(req.model_name)
     model_name = get_model_name_from_evaluator(
         get_evaluator_metadata_wrapper(evaluator_name, custom_model_name),
         req.provider,

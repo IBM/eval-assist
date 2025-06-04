@@ -226,7 +226,7 @@ class CustomModelRequest(BaseModel):
 class TestModelRequestModel(BaseModel):
     provider: ModelProviderEnum | ExtendedModelProviderEnum
     llm_provider_credentials: dict[str, str]
-    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+    model_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
 
 
 class DirectAIActionRequest(BaseModel):
