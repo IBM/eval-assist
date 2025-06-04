@@ -2,7 +2,7 @@ import cx from 'classnames'
 import { returnByPipelineType } from 'src/utils'
 import { v4 as uuid } from 'uuid'
 
-import { LegacyRef, useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react'
 
 import { Button, Link } from '@carbon/react'
 import { Add, Password, WarningFilled } from '@carbon/react/icons'
@@ -17,6 +17,7 @@ import { useURLParamsContext } from '@providers/URLParamsProvider'
 
 import { Evaluator } from '../../types'
 import { AppSidenavNew } from './AppSidenav'
+import { ConnectionTest } from './ConnectionTest'
 import { CriteriaView } from './CriteriaView'
 import { EvaluateButton } from './EvaluateButton'
 import { PipelineSelect } from './EvaluatorSelect'
@@ -64,7 +65,7 @@ export const SingleExampleEvaluation = () => {
   const { onSave } = useTestCaseActionsContext()
 
   useSaveShortcut({ onSave, changesDetected, isTestCaseSaved })
-  console.log(currentTestCase.contextVariableNames)
+
   return (
     <>
       <AppSidenavNew />
@@ -142,13 +143,16 @@ export const SingleExampleEvaluation = () => {
                   setCurrentTestCase({ ...currentTestCase, evaluator })
                 }}
                 helperChildren={
-                  <Link
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href="https://github.com/IBM/eval-assist/wiki#evaluation-methodology"
-                  >
-                    How do evaluators work?
-                  </Link>
+                  <>
+                    <Link
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      href="https://github.com/IBM/eval-assist/wiki#evaluation-methodology"
+                    >
+                      {'How do evaluators work?'}
+                    </Link>
+                    <ConnectionTest model={currentTestCase.evaluator!} />
+                  </>
                 }
               />
               <PipelineSelect
@@ -172,6 +176,18 @@ export const SingleExampleEvaluation = () => {
                 dropdownLabel={'Synthetic generation'}
                 selectionComponentNameWithArticle="a model"
                 selectionComponentName="model"
+                helperChildren={
+                  <>
+                    <Link
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      href="https://github.com/IBM/eval-assist/wiki#refining-criteria-with-synthetic-data"
+                    >
+                      {'Why is synthetic generation?'}
+                    </Link>
+                    <ConnectionTest model={currentTestCase.syntheticGenerationConfig.evaluator!} />
+                  </>
+                }
               />
             </div>
             <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>

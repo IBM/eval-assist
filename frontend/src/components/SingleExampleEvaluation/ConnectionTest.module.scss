@@ -1,0 +1,23 @@
+@import '@carbon/styles/scss/theme';
+
+.connectionTestingFont {
+  font-size: var(--cds-body-compact-01-font-size, 0.875rem);
+  font-weight: var(--cds-body-compact-01-font-weight, 400);
+  line-height: var(--cds-body-compact-01-line-height, 1.28572);
+  letter-spacing: var(--cds-body-compact-01-letter-spacing, 0.16px);
+}
+
+.successConnectionContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.successLogo {
+  color: $support-success;
+}
+
+.failureLogo {
+  color: $support-error;
+}
