@@ -1,11 +1,14 @@
 {
   "extends": ["next/core-web-vitals", "plugin:prettier/recommended", "prettier"],
+  "plugins": ["react-you-might-not-need-an-effect"],
+
   "rules": {
     "react/no-unknown-property": [
       2,
       {
         "ignore": ["global", "jsx"]
       }
-    ]
+    ],
+    "react-you-might-not-need-an-effect/you-might-not-need-an-effect": "warn"
   }
 }
