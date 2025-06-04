@@ -8,10 +8,12 @@ import { Button, Link } from '@carbon/react'
 import { Add, WarningFilled } from '@carbon/react/icons'
 
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
+import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
+import { useModelProviderCredentials } from '@providers/ModelProviderCredentialsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
 
@@ -79,6 +81,16 @@ export const SingleExampleEvaluation = () => {
   const { onSave } = useTestCaseActionsContext()
 
   useSaveShortcut({ onSave, changesDetected, isTestCaseSaved })
+  const { post } = useFetchUtils()
+  const { getProviderCredentialsWithDefaults } = useModelProviderCredentials()
+
+  const testModel = () => {
+    post('test-model/', {
+      provider: currentTestCase.syntheticGenerationConfig.evaluator?.provider,
+      llm_provider_credentials: getProviderCredentialsWithDefaults(currentTestCase.evaluator!.provider),
+      evaluator_name: currentTestCase.syntheticGenerationConfig.evaluator?.name,
+    })
+  }
 
   return (
     <>
@@ -159,13 +171,16 @@ export const SingleExampleEvaluation = () => {
                   setCurrentTestCase({ ...currentTestCase, evaluator })
                 }}
                 helperChildren={
-                  <Link
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href="https://github.com/IBM/eval-assist/wiki#evaluation-methodology"
-                  >
-                    How do evaluators work?
-                  </Link>
+                  <>
+                    <Link
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      href="https://github.com/IBM/eval-assist/wiki#evaluation-methodology"
+                    >
+                      How do evaluators work?
+                    </Link>
+                    <Link onClick={testModel}>Test</Link>
+                  </>
                 }
               />
               <PipelineSelect

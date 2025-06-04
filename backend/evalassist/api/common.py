@@ -223,6 +223,12 @@ class CustomModelRequest(BaseModel):
     user_email: str
 
 
+class TestModelRequestModel(BaseModel):
+    provider: ModelProviderEnum | ExtendedModelProviderEnum
+    llm_provider_credentials: dict[str, str]
+    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+
+
 class DirectAIActionRequest(BaseModel):
     action: DirectActionTypeEnum
     selection: str

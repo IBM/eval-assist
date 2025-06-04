@@ -37,6 +37,7 @@ from .api.common import (
     PairwiseEvaluationRequestModel,
     PairwiseResponseModel,
     SyntheticExampleGenerationRequest,
+    TestModelRequestModel,
 )
 
 # API type definitions
@@ -60,6 +61,7 @@ from .utils import (
     clean_object,
     get_custom_models,
     get_evaluator_metadata_wrapper,
+    get_inference_engine,
     get_model_name_from_evaluator,
     handle_llm_generation_exceptions,
     init_evaluator_name,
@@ -215,6 +217,31 @@ def get_prompt(req: DirectEvaluationRequestModel):
         risk_name=req.criteria.name,
     )
     return res
+
+
+@router.post("/test-model/")
+async def test_provider(req: TestModelRequestModel):
+    evaluator_name, custom_model_name = init_evaluator_name(req.evaluator_name)
+    model_name = get_model_name_from_evaluator(
+        get_evaluator_metadata_wrapper(evaluator_name, custom_model_name),
+        req.provider,
+    )
+    inference_engine = get_inference_engine(
+        req.llm_provider_credentials,
+        req.provider,
+        model_name,
+        custom_params={
+            "max_tokens": 1,
+        },
+    )
+    try:
+        inference_engine.infer([{"source": "Test"}])[0]
+        return HealthCheck(status="OK")
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail="Model test failed. Please check your credentials or model name.",
+        )
 
 
 @router.post(
