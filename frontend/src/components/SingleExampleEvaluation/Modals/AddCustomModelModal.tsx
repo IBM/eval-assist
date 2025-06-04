@@ -1,9 +1,10 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
 
-import { Modal, Select, SelectItem, TextInput } from '@carbon/react'
+import { Link, Modal, Select, SelectItem, TextInput } from '@carbon/react'
 
 import { modelProviderBeautifiedName } from '@constants'
 import { useAddCustomModel } from '@customHooks/useAddCustomModel'
+import { useTestModelConnection } from '@customHooks/useTestModelConnection'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { ModelProviderType } from '@types'
 
@@ -18,6 +19,8 @@ export const AddCustomModelModal = ({ open, setOpen }: Props) => {
   const [selectedProvider, setSelectedProvider] = useState('')
   const [loading, setLoading] = useState(false)
   const { addCustomModel } = useAddCustomModel()
+  const { testModelConnection } = useTestModelConnection()
+
   const onConfirm = useCallback(async () => {
     setLoading(true)
     await addCustomModel(customModelName, ModelProviderType.AWS)
@@ -57,6 +60,7 @@ export const AddCustomModelModal = ({ open, setOpen }: Props) => {
         id={'new-custom-model-text-input'}
         labelText={'Custom model name'}
       />
+      <Link onClick={() => testModelConnection(ModelProviderType.RITS, customModelName)}>Test</Link>
     </Modal>
   )
 }

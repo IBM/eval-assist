@@ -10,6 +10,7 @@ import { Add, Password, WarningFilled } from '@carbon/react/icons'
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
+import { useTestModelConnection } from '@customHooks/useTestModelConnection'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
@@ -17,7 +18,7 @@ import { useModelProviderCredentials } from '@providers/ModelProviderCredentials
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
 
-import { Evaluator } from '../../types'
+import { Evaluator, ModelProviderType } from '../../types'
 import { AddCustomModel } from './AddCustomModel'
 import { AppSidenavNew } from './AppSidenav/AppSidenav'
 import { CriteriaView } from './CriteriaView'
@@ -79,16 +80,8 @@ export const SingleExampleEvaluation = () => {
   const { onSave } = useTestCaseActionsContext()
 
   useSaveShortcut({ onSave, changesDetected, isTestCaseSaved })
-  const { post } = useFetchUtils()
-  const { getProviderCredentialsWithDefaults } = useModelProviderCredentials()
 
-  const testModel = () => {
-    post('test-model/', {
-      provider: currentTestCase.syntheticGenerationConfig.evaluator?.provider,
-      llm_provider_credentials: getProviderCredentialsWithDefaults(currentTestCase.evaluator!.provider),
-      evaluator_name: currentTestCase.syntheticGenerationConfig.evaluator?.name,
-    })
-  }
+  const { testModelConnection } = useTestModelConnection()
 
   return (
     <>
@@ -176,7 +169,16 @@ export const SingleExampleEvaluation = () => {
                     >
                       How do evaluators work?
                     </Link>
-                    <Link onClick={testModel}>Test</Link>
+                    <Link
+                      onClick={() =>
+                        testModelConnection(
+                          currentTestCase.evaluator?.provider || ModelProviderType.RITS,
+                          currentTestCase.evaluator?.name || '',
+                        )
+                      }
+                    >
+                      Test
+                    </Link>
                   </>
                 }
               />
