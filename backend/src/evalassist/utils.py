@@ -213,7 +213,7 @@ preloaded_hf_models = {}
 
 def get_hf_inference_engine(
     model_name: str,
-    custom_params: dict = None,
+    custom_params: Optional[dict] = None,
 ):
     global preloaded_hf_models
     if model_name in preloaded_hf_models:
@@ -230,11 +230,11 @@ def get_hf_inference_engine(
 
 
 def get_inference_engine(
-    credentials: dict[str, str],
+    credentials: dict[str, Optional[str]],
     provider: ModelProviderEnum | ExtendedModelProviderEnum,
     model_name: str,
-    custom_params: dict = None,
-    provider_specific_params: dict = None,
+    custom_params: Optional[dict] = None,
+    provider_specific_params: Optional[dict] = None,
 ):
     if provider == ExtendedModelProviderEnum.LOCAL_HF:
         return get_hf_inference_engine(model_name, custom_params)

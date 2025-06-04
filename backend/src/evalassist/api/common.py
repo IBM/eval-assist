@@ -141,7 +141,7 @@ class CriteriaWithOptionsAPI(BaseModel):
 
 class SyntheticExampleGenerationRequest(BaseModel):
     provider: ModelProviderEnum | ExtendedModelProviderEnum
-    llm_provider_credentials: dict[str, str]
+    llm_provider_credentials: dict[str, Optional[str]]
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
     type: EvaluatorTypeEnum
     criteria: CriteriaWithOptionsAPI | PairwiseCriteriaModel
@@ -219,13 +219,19 @@ class DirectResponseModel(BaseModel):
     results: list[DirectInstanceResultModel]
 
 
+class TestModelRequestModel(BaseModel):
+    provider: ModelProviderEnum | ExtendedModelProviderEnum
+    llm_provider_credentials: dict[str, Optional[str]]
+    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
+
+
 class DirectAIActionRequest(BaseModel):
     action: DirectActionTypeEnum
     selection: str
     text: str
     prompt: Optional[str] = None
     provider: ModelProviderEnum | ExtendedModelProviderEnum
-    llm_provider_credentials: dict[str, str]
+    llm_provider_credentials: dict[str, Optional[str]]
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
     type: EvaluatorTypeEnum
 
