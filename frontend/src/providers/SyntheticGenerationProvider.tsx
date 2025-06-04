@@ -12,11 +12,11 @@ import {
   useState,
 } from 'react'
 
-import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
-import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
 import { DirectActionTypeEnum, DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@constants'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useToastContext } from '@providers/ToastProvider'
 import { CriteriaWithOptions, DirectInstance } from '@types'
 import { returnByPipelineType } from '@utils'
 

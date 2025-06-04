@@ -2,9 +2,10 @@ import { Dispatch, SetStateAction } from 'react'
 
 import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useModelProviderCredentials } from '@providers/ModelProviderCredentialsProvider'
+
 import { TestCase } from '../../../types'
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
-import { useModelProviderCredentials } from '../Providers/ModelProviderCredentialsProvider'
 
 interface Props {
   updateURLFromUseCase: (

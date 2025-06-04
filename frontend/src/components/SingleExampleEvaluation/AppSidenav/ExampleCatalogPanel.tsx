@@ -10,9 +10,9 @@ import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, DotMark } from '@carbon/react/icons'
 
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 
 import { TestCase } from '../../../types'
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import { LinkButton } from './LinkButton'
 import classes from './ThreeLevelsPanel.module.scss'
 import sharedClasses from './shared.module.scss'

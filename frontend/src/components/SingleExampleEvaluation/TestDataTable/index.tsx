@@ -9,6 +9,11 @@ import { Add, AiGenerate, Save, SettingsAdjust, TrashCan } from '@carbon/react/i
 import { EditableTag } from '@components/EditableTag'
 import { INSTANCES_PER_PAGE } from '@constants'
 import { usePagination } from '@customHooks/usePagination'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useModalsContext } from '@providers/ModalsProvider'
+import { useSyntheticGeneration } from '@providers/SyntheticGenerationProvider'
+import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
+import { useURLParamsContext } from '@providers/URLParamsProvider'
 
 import {
   DirectInstance,
@@ -18,11 +23,6 @@ import {
   PairwiseInstance,
   PairwiseInstanceResult,
 } from '../../../types'
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
-import { useModalsContext } from '../Providers/ModalsProvider'
-import { useSyntheticGeneration } from '../Providers/SyntheticGenerationProvider'
-import { useTestCaseActionsContext } from '../Providers/TestCaseActionsProvider'
-import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { TestDataTableRow } from './TestDataTableRow'
 import classes from './index.module.scss'
 

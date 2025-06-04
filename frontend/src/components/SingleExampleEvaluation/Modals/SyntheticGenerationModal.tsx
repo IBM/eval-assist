@@ -17,11 +17,11 @@ import {
 import { Help, Information } from '@carbon/react/icons'
 
 import { DomainEnum, GenerationLengthEnum, PersonaEnum, TaskEnum } from '@constants'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useSyntheticGeneration } from '@providers/SyntheticGenerationProvider'
 import '@types'
 import { SyntheticGenerationConfig } from '@types'
 
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
-import { useSyntheticGeneration } from '../Providers/SyntheticGenerationProvider'
 import classes from './SyntheticGenerationModal.module.scss'
 
 interface Props {

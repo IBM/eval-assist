@@ -1,9 +1,9 @@
-import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
-import { useModelProviderCredentials } from '@components/SingleExampleEvaluation/Providers/ModelProviderCredentialsProvider'
-import { useToastContext } from '@components/SingleExampleEvaluation/Providers/ToastProvider'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useModelProviderCredentials } from '@providers/ModelProviderCredentialsProvider'
+import { useToastContext } from '@providers/ToastProvider'
 import { returnByPipelineType } from '@utils'
 
-import { DirectInstance, EvaluationType, Instance, PairwiseInstance, TestCase } from '../types'
+import { DirectInstance, PairwiseInstance } from '../types'
 import { useFetchUtils } from './useFetchUtils'
 
 export const useUnitxtCodeGeneration = () => {

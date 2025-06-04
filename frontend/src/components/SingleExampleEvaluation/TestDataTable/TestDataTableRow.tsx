@@ -7,6 +7,7 @@ import { InlineLoading, Link, Select, SelectItem, Tooltip } from '@carbon/react'
 import { ArrowRight, Trophy } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 
 import {
   Criteria,
@@ -19,7 +20,6 @@ import {
   PairwiseInstanceResult,
 } from '../../../types'
 import RemovableSection from '../../RemovableSection/RemovableSection'
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import classes from './index.module.scss'
 
 interface Props {

@@ -9,13 +9,13 @@ import { Add, ArrowRight, Launch, View } from '@carbon/react/icons'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
+import { useAppSidebarContext } from '@providers/AppSidebarProvider'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useModalsContext } from '@providers/ModalsProvider'
 
 import { EvaluationType, TestCase } from '../../types'
 import { Card } from './Card/Card'
 import classes from './Landing.module.scss'
-import { useAppSidebarContext } from './Providers/AppSidebarProvider'
-import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
-import { useModalsContext } from './Providers/ModalsProvider'
 
 interface Props {}
 

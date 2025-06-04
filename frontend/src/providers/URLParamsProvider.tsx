@@ -4,7 +4,7 @@ import { ReactNode, createContext, useCallback, useContext, useMemo } from 'reac
 
 import { useRouter } from 'next/router'
 
-import { EvaluationType, TestCase } from '../../../types'
+import { EvaluationType, TestCase } from '../types'
 
 interface URLInfoContextValue {
   useCaseId: number | null

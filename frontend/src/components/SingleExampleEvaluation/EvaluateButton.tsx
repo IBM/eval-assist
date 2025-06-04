@@ -5,13 +5,13 @@ import { CSSProperties, Dispatch, SetStateAction } from 'react'
 import { Button, InlineLoading, Tooltip } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useModalsContext } from '@providers/ModalsProvider'
+import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
+import { useURLParamsContext } from '@providers/URLParamsProvider'
 import { ModelProviderType } from '@types'
 
 import classes from './EvaluateButton.module.scss'
-import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
-import { useModalsContext } from './Providers/ModalsProvider'
-import { useTestCaseActionsContext } from './Providers/TestCaseActionsProvider'
-import { useURLParamsContext } from './Providers/URLParamsProvider'
 
 interface EvaluateButtonProps {
   style?: CSSProperties

@@ -5,11 +5,12 @@ import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 import { Button, IconButton } from '@carbon/react'
 import { Add, Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useModalsContext } from '@providers/ModalsProvider'
+import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
+import { useURLParamsContext } from '@providers/URLParamsProvider'
+
 import { UseCaseTypeBadge } from '../UseCaseTypeBadge/UseCaseTypeBadge'
-import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
-import { useModalsContext } from './Providers/ModalsProvider'
-import { useTestCaseActionsContext } from './Providers/TestCaseActionsProvider'
-import { useURLParamsContext } from './Providers/URLParamsProvider'
 import classes from './TestCaseOptions.module.scss'
 
 interface Props {

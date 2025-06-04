@@ -3,12 +3,12 @@ import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 
 import { useMemo, useState } from 'react'
 
+import { useBenchmarksContext } from '@providers/BenchmarksProvider'
 import { BadgeColor, EvaluationType, badgeColorsArray } from '@types'
 
 import { BenchmarkCard } from './BenchmarkCard'
 import { Filter } from './Filter'
 import landingClasses from './Landing.module.scss'
-import { useBenchmarksContext } from './Providers/BenchmarksProvider'
 import { BenchmarkSidenav } from './Sidenav'
 import classes from './index.module.scss'
 

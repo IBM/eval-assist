@@ -2,9 +2,10 @@ import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
+
 import { TestCase } from '../../../types'
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
-import { useTestCaseActionsContext } from '../Providers/TestCaseActionsProvider'
 
 interface Props {
   updateURLFromUseCase: (useCaseSelected: { useCase: TestCase; subCatalogName: string | null } | null) => void

@@ -12,10 +12,10 @@ import {
   Undo,
 } from '@carbon/react/icons'
 
-import { useSelectedTextContext } from '@components/SingleExampleEvaluation/Providers/SelectedTextProvider'
-import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
 import { DirectActionTypeEnum } from '@constants'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { useSelectedTextContext } from '@providers/SelectedTextProvider'
+import { useSyntheticGeneration } from '@providers/SyntheticGenerationProvider'
 
 import classes from './index.module.scss'
 

@@ -2,9 +2,10 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { Modal, TextInput } from '@carbon/react'
 
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useUserUseCasesContext } from '@providers/UserUseCasesProvider'
+
 import { TestCase } from '../../../types'
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
-import { useUserUseCasesContext } from '../Providers/UserUseCasesProvider'
 
 interface Props {
   open: boolean

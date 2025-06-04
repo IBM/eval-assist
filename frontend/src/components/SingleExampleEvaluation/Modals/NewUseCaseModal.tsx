@@ -6,11 +6,12 @@ import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
 import { Layer, Modal, Select, SelectItem } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
+import { useCriteriasContext } from '@providers/CriteriasProvider'
+import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
+import { useToastContext } from '@providers/ToastProvider'
+
 import { Criteria, CriteriaWithOptions, EvaluationType, TestCase } from '../../../types'
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'
-import { useCriteriasContext } from '../Providers/CriteriasProvider'
-import { useEvaluatorOptionsContext } from '../Providers/EvaluatorOptionsProvider'
-import { useToastContext } from '../Providers/ToastProvider'
 import classes from './NewUseCaseModal.module.scss'
 
 interface Props {

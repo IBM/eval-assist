@@ -6,11 +6,11 @@ import { Loading, Modal, Select, SelectItem } from '@carbon/react'
 
 import { HighlightTextArea } from '@components/HighlightTextArea'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
+import { useCriteriasContext } from '@providers/CriteriasProvider'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useToastContext } from '@providers/ToastProvider'
 import { DirectInstance, EvaluationType } from '@types'
 
-import { useCriteriasContext } from '../Providers/CriteriasProvider'
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
-import { useToastContext } from '../Providers/ToastProvider'
 import classes from './PromptModal.module.scss'
 
 interface Props {

@@ -2,8 +2,8 @@ import { getEmptyCriteriaWithTwoOptions, toTitleCase } from 'src/utils'
 
 import { useMemo } from 'react'
 
-import { useCriteriasContext } from '@components/SingleExampleEvaluation/Providers/CriteriasProvider'
 import { TaskEnum } from '@constants'
+import { useCriteriasContext } from '@providers/CriteriasProvider'
 
 import { Criteria, CriteriaWithOptions, DirectInstance, EvaluationType, PairwiseInstance, TestCase } from '../types'
 

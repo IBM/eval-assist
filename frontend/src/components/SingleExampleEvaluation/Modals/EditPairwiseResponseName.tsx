@@ -2,7 +2,8 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 import { Modal, TextInput } from '@carbon/react'
 
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+
 import classes from './EditPairwiseResponseName.module.scss'
 
 interface Props {

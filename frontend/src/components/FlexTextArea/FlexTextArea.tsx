@@ -7,9 +7,9 @@ import { fast01 } from '@carbon/motion'
 import { TextArea } from '@carbon/react'
 
 import { DirectAIActionPopup, DirectAIActionPopupVisibility } from '@components/DirectAIActionPopup'
-import { useSelectedTextContext } from '@components/SingleExampleEvaluation/Providers/SelectedTextProvider'
-import { useURLParamsContext } from '@components/SingleExampleEvaluation/Providers/URLParamsProvider'
 import { useMergeRefs } from '@floating-ui/react'
+import { useSelectedTextContext } from '@providers/SelectedTextProvider'
+import { useURLParamsContext } from '@providers/URLParamsProvider'
 import { getCaretPosition } from '@utils'
 
 import classes from './FlexTextArea.module.scss'

@@ -7,10 +7,11 @@ import { CSSProperties, ReactNode, useMemo } from 'react'
 import { Link, Select, SelectItem, SelectItemGroup, SelectSkeleton } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
+import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
+import { useModelProviderCredentials } from '@providers/ModelProviderCredentialsProvider'
+
 import { Evaluator, ModelProviderType } from '../../types'
 import classes from './EvaluatorSelect.module.scss'
-import { useEvaluatorOptionsContext } from './Providers/EvaluatorOptionsProvider'
-import { useModelProviderCredentials } from './Providers/ModelProviderCredentialsProvider'
 
 interface Props {
   style?: CSSProperties
