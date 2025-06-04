@@ -7,8 +7,7 @@ import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
 import { StoredTestCase } from '@prisma/client'
 
-import { TestCase } from '../../../types'
-import { useModelProviderCredentials } from './ModelProviderCredentialsProvider'
+import { TestCase } from '../types'
 
 interface UserUseCasesContextValue {
   userUseCases: TestCase[]

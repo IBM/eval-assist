@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 
-import { useBackendUserContext } from '@components/SingleExampleEvaluation/Providers/BackendUserProvider'
+import { useBackendUserContext } from '@providers/BackendUserProvider'
 
 export const useFetchUtils = () => {
   const { backendUser } = useBackendUserContext()

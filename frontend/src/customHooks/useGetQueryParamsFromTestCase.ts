@@ -1,6 +1,6 @@
 import { use, useCallback, useMemo } from 'react'
 
-import { useURLParamsContext } from '@components/SingleExampleEvaluation/Providers/URLParamsProvider'
+import { useURLParamsContext } from '@providers/URLParamsProvider'
 import { TestCase } from '@types'
 
 import { useTestCaseLibrary } from './useTestCaseLibrary'

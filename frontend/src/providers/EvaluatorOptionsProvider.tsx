@@ -4,7 +4,7 @@ import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 
-import { EvaluationType, Evaluator, FetchedEvaluator } from '../../../types'
+import { EvaluationType, Evaluator, FetchedEvaluator } from '../types'
 
 interface EvaluatorOptionsContextValue {
   directEvaluators: Evaluator[] | null

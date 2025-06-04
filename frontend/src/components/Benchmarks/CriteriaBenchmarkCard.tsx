@@ -16,12 +16,12 @@ import {
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
-import { useCriteriasContext } from '@components/SingleExampleEvaluation/Providers/CriteriasProvider'
+import { useCriteriasContext } from '@providers/CriteriasProvider'
+import { useURLInfoContext } from '@providers/URLInfoProvider'
 import { CriteriaBenchmark, EvaluationType, EvaluatorBenchmark, Version } from '@types'
 
 import classes from './CriteriaBenchmarkCard.module.scss'
 import { CriteriaDetailsModal } from './CriteriaDetailsModal'
-import { useURLInfoContext } from './Providers/URLInfoProvider'
 
 interface Props {
   criteriaBenchmark: CriteriaBenchmark

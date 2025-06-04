@@ -1,10 +1,10 @@
-import { CriteriasProvider } from '@components/SingleExampleEvaluation/Providers/CriteriasProvider'
-import { EvaluatorOptionsProvider } from '@components/SingleExampleEvaluation/Providers/EvaluatorOptionsProvider'
+import { BenchmarksProvider } from '@providers/BenchmarksProvider'
+import { CriteriasProvider } from '@providers/CriteriasProvider'
+import { EvaluatorOptionsProvider } from '@providers/EvaluatorOptionsProvider'
+import { URLInfoProvider, useURLInfoContext } from '@providers/URLInfoProvider'
 
 import { BenchmarkView } from './BenchmarkView'
 import { Landing } from './Landing'
-import { BenchmarksProvider } from './Providers/BenchmarksProvider'
-import { URLInfoProvider, useURLInfoContext } from './Providers/URLInfoProvider'
 
 const LandingOrBenchmarkView = () => {
   const { benchmark } = useURLInfoContext()

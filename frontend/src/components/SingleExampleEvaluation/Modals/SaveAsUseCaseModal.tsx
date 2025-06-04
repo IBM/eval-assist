@@ -2,10 +2,11 @@ import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Modal, TextInput } from '@carbon/react'
 
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
+
 import { EvaluationType, TestCase } from '../../../types'
 import { UseCaseTypeBadge } from '../../UseCaseTypeBadge/UseCaseTypeBadge'
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
-import { useTestCaseActionsContext } from '../Providers/TestCaseActionsProvider'
 
 interface Props {
   open: boolean

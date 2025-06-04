@@ -25,7 +25,7 @@ import {
   ModelProviderType,
   PairwiseInstance,
   TestCase,
-} from '../../../types'
+} from '../types'
 import { useCriteriasContext } from './CriteriasProvider'
 import { useEvaluatorOptionsContext } from './EvaluatorOptionsProvider'
 import { useModelProviderCredentials } from './ModelProviderCredentialsProvider'

@@ -9,10 +9,10 @@ import Link from 'next/link'
 import { ListItem, Tile, UnorderedList } from '@carbon/react'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
+import { useURLInfoContext } from '@providers/URLInfoProvider'
 import { BadgeColor, Benchmark } from '@types'
 
 import classes from './BenchmarkCard.module.scss'
-import { useURLInfoContext } from './Providers/URLInfoProvider'
 import { TagBadge } from './TagBadge'
 
 interface Props {

@@ -1,19 +1,19 @@
 import cx from 'classnames'
 
-import { Dispatch, SetStateAction, useId } from 'react'
+import { useId } from 'react'
 
 import { IconButton } from '@carbon/react'
 import { Categories, IbmSecurity, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 
+import { useAppSidebarContext } from '@providers/AppSidebarProvider'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useModalsContext } from '@providers/ModalsProvider'
+import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
+import { useURLParamsContext } from '@providers/URLParamsProvider'
+import { useUserUseCasesContext } from '@providers/UserUseCasesProvider'
 import { TestCase } from '@types'
 
 import layoutClasses from '../Layout.module.scss'
-import { useAppSidebarContext } from '../Providers/AppSidebarProvider'
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
-import { useModalsContext } from '../Providers/ModalsProvider'
-import { useTestCaseActionsContext } from '../Providers/TestCaseActionsProvider'
-import { useURLParamsContext } from '../Providers/URLParamsProvider'
-import { useUserUseCasesContext } from '../Providers/UserUseCasesProvider'
 import classes from './AppSidenav.module.scss'
 import { ExampleCatalogPanel } from './ExampleCatalogPanel'
 import { RiskAndHarmPanel } from './RiskAndHarmPanel'

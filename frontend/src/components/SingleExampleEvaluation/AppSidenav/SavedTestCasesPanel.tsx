@@ -9,8 +9,9 @@ import { IconButton } from '@carbon/react'
 import { TreeNode, TreeView } from '@carbon/react'
 import { ChevronLeft, DotMark } from '@carbon/react/icons'
 
+import { useURLParamsContext } from '@providers/URLParamsProvider'
+
 import { EvaluationType, TestCase } from '../../../types'
-import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import { LinkButton } from './LinkButton'
 import classes from './TwoLevelsPanel.module.scss'
 import sharedClasses from './shared.module.scss'

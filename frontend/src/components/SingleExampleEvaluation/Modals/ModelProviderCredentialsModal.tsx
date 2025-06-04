@@ -4,7 +4,8 @@ import React, { Dispatch, SetStateAction } from 'react'
 
 import { ComposedModal, FormGroup, Link, ModalBody, ModalFooter, ModalHeader, TextInput } from '@carbon/react'
 
-import { useModelProviderCredentials } from '../Providers/ModelProviderCredentialsProvider'
+import { useModelProviderCredentials } from '@providers/ModelProviderCredentialsProvider'
+
 import classes from './ModelProviderCredentialsModal.module.scss'
 
 interface Props {

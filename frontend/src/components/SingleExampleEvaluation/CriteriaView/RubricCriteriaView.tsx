@@ -19,10 +19,10 @@ import {
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 
 import { HighlightTextArea } from '@components/HighlightTextArea'
+import { useURLParamsContext } from '@providers/URLParamsProvider'
 import { CriteriaWithOptions } from '@types'
 
 import { JSONTextArea } from '../JSONTextArea'
-import { useURLParamsContext } from '../Providers/URLParamsProvider'
 import classes from '../SingleExampleEvaluation.module.scss'
 import customClasses from './index.module.scss'
 

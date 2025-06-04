@@ -6,10 +6,10 @@ import { IconButton, Popover, PopoverContent } from '@carbon/react'
 import { AiLabel, Rotate, TextLongParagraph, TextShortParagraph } from '@carbon/react/icons'
 
 import { DirectAIActionPopup } from '@components/DirectAIActionPopup'
-import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
-import { useSyntheticGeneration } from '@components/SingleExampleEvaluation/Providers/SyntheticGenerationProvider'
 import { DirectActionTypeEnum } from '@constants'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useSyntheticGeneration } from '@providers/SyntheticGenerationProvider'
 
 import { useEditorsContext } from './EditorProvider'
 import classes from './SelectionPopoverPlugin.module.scss'

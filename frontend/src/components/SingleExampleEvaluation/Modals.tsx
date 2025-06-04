@@ -1,3 +1,6 @@
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useModalsContext } from '@providers/ModalsProvider'
+
 import { ChooseCodeGenerationType } from './Modals/ChooseCodeGenerationType'
 import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
 import { EditPairwiseResponseName } from './Modals/EditPairwiseResponseName'
@@ -10,8 +13,6 @@ import { PromptModal } from './Modals/PromptModal'
 import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
 import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
 import { SyntheticGenerationModal } from './Modals/SyntheticGenerationModal'
-import { useCurrentTestCase } from './Providers/CurrentTestCaseProvider'
-import { useModalsContext } from './Providers/ModalsProvider'
 
 export const Modals = () => {
   const {

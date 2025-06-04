@@ -7,6 +7,8 @@ import Markdown from 'react-markdown'
 import { Accordion, AccordionItem, Layer, ListItem, Modal, Tooltip, UnorderedList } from '@carbon/react'
 import { ArrowRight, Warning } from '@carbon/react/icons'
 
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+
 import {
   DirectInstance,
   DirectInstanceResult,
@@ -14,7 +16,6 @@ import {
   PairwiseInstance,
   PairwiseInstanceResult,
 } from '../../../types'
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
 import classes from './InstanceDetailsModal.module.scss'
 
 interface Props {

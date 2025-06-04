@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction, useCallback, useEffect } from 'react'
 
-import { useCurrentTestCase } from '@components/SingleExampleEvaluation/Providers/CurrentTestCaseProvider'
-import { useModalsContext } from '@components/SingleExampleEvaluation/Providers/ModalsProvider'
-import { useTestCaseActionsContext } from '@components/SingleExampleEvaluation/Providers/TestCaseActionsProvider'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useModalsContext } from '@providers/ModalsProvider'
+import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { TestCase } from '@types'
 
 interface Props {}

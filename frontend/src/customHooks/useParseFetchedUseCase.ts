@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
-import { useEvaluatorOptionsContext } from '@components/SingleExampleEvaluation/Providers/EvaluatorOptionsProvider'
 import { StoredTestCase } from '@prisma/client'
+import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
 import { TestCase, TestCaseV0 } from '@types'
 
 // EXAMPLES

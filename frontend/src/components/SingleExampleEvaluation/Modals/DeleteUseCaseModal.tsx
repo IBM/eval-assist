@@ -2,8 +2,8 @@ import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Modal } from '@carbon/react'
 
-import { useCurrentTestCase } from '../Providers/CurrentTestCaseProvider'
-import { useTestCaseActionsContext } from '../Providers/TestCaseActionsProvider'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 
 interface Props {
   open: boolean
