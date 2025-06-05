@@ -5,10 +5,7 @@ import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@car
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 
-import { TestCase } from '../../../types'
-
 interface Props {
-  updateURLFromUseCase: (useCaseSelected: { useCase: TestCase; subCatalogName: string | null } | null) => void
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
   setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
@@ -18,13 +15,12 @@ interface Props {
 export const SwitchUseCaseModal = ({
   open,
   setOpen,
-  updateURLFromUseCase,
   setSaveUseCaseModalOpen,
   setEvaluationRunningModalOpen,
 }: Props) => {
   const { onSave, evaluationRunning } = useTestCaseActionsContext()
   const [saving, setSaving] = useState(false)
-  const { currentTestCase, setTestCaseSelected, testCaseSelected } = useCurrentTestCase()
+  const { currentTestCase, setTestCaseSelected, testCaseSelected, updateURLFromTestCase } = useCurrentTestCase()
 
   const onClose = () => {
     setOpen(false)
@@ -43,7 +39,7 @@ export const SwitchUseCaseModal = ({
     if (evaluationRunning) {
       setEvaluationRunningModalOpen(true)
     } else {
-      updateURLFromUseCase(testCaseSelected)
+      updateURLFromTestCase(testCaseSelected)
     }
   }
 
@@ -56,8 +52,12 @@ export const SwitchUseCaseModal = ({
   }
 
   const onDontSave = async () => {
-    updateURLFromUseCase(testCaseSelected)
-    setOpen(false)
+    onClose()
+    if (evaluationRunning) {
+      setEvaluationRunningModalOpen(true)
+    } else {
+      updateURLFromTestCase(testCaseSelected)
+    }
   }
 
   return (

@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid'
 import { LegacyRef, useMemo, useRef } from 'react'
 
 import { Button, Link } from '@carbon/react'
-import { Add, WarningFilled } from '@carbon/react/icons'
+import { Add, Password, WarningFilled } from '@carbon/react/icons'
 
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
@@ -135,7 +135,7 @@ export const SingleExampleEvaluation = () => {
                   kind="tertiary"
                   onClick={() => setmodelProviderCrendentialsModalOpen(true)}
                   iconDescription="Set api key"
-                  renderIcon={!areRelevantCredentialsProvided ? WarningFilled : undefined}
+                  renderIcon={!areRelevantCredentialsProvided ? WarningFilled : Password}
                 >
                   {'API credentials'}
                 </Button>

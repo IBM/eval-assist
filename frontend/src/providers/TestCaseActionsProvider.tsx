@@ -36,6 +36,7 @@ interface TestCaseActionsContextValue {
   evaluationRunning: boolean
   evaluationFailed: boolean
   evaluatingInstanceIds: string[]
+  cancelEvaluation: () => void
 }
 
 const TestCaseActionsContext = createContext<TestCaseActionsContextValue>({
@@ -43,6 +44,7 @@ const TestCaseActionsContext = createContext<TestCaseActionsContextValue>({
   onSave: () => Promise.resolve(),
   onSaveAs: () => Promise.resolve(true),
   onDeleteTestCase: () => Promise.resolve(),
+  cancelEvaluation: () => {},
   evaluationRunning: false,
   evaluationFailed: false,
   evaluatingInstanceIds: [],
@@ -71,13 +73,28 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   const [evaluationRunning, setEvaluationRunning] = useState(false)
   const [evaluationFailed, setEvaluationFailed] = useState(false)
   const [evaluatingInstanceIds, setEvaluatingInstanceIds] = useState<string[]>([])
-  const { modelProviderCredentials, getProviderCredentialsWithDefaults } = useModelProviderCredentials()
+  const { getProviderCredentialsWithDefaults } = useModelProviderCredentials()
   const { deleteCustom, post, put } = useFetchUtils()
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
   const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
   const { getUserName } = useAuthentication()
   const { userUseCases, setUserUseCases } = useUserUseCasesContext()
   const { setSidebarTabSelected } = useAppSidebarContext()
+  const [inProgressEvalToastId, setInProgressEvalToastId] = useState<string | null>(null)
+
+  const cancelEvaluation = useCallback(() => {
+    temporaryIdRef.current = uuid()
+    setEvaluationRunning(false)
+    addToast({
+      kind: 'info',
+      title: 'The evaluation was canceled',
+      timeout: 5000,
+    })
+    if (inProgressEvalToastId) {
+      removeToast(inProgressEvalToastId)
+    }
+    setEvaluatingInstanceIds([])
+  }, [addToast, inProgressEvalToastId, removeToast])
 
   const runEvaluation = useCallback(
     async (evaluationIds: string[]) => {
@@ -86,6 +103,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         title: 'Running evaluation...',
         kind: 'info',
       })
+      setInProgressEvalToastId(inProgressEvalToastId)
       setEvaluationRunningToastId(inProgressEvalToastId)
       // temporaryIdSnapshot is used to discern whether the current test case
       // was changed during the evaluation request
@@ -412,6 +430,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         onSave,
         onSaveAs,
         onDeleteTestCase,
+        cancelEvaluation,
         evaluationRunning,
         evaluationFailed,
         evaluatingInstanceIds,

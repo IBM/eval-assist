@@ -3,36 +3,24 @@ import { Dispatch, SetStateAction } from 'react'
 import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react'
 
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
-import { useModelProviderCredentials } from '@providers/ModelProviderCredentialsProvider'
-
-import { TestCase } from '../../../types'
+import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 
 interface Props {
-  updateURLFromUseCase: (
-    selectedUseCase: {
-      useCase: TestCase
-      subCatalogName: string | null
-    } | null,
-  ) => void
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  setConfirmationModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
-export const EvaluationRunningModal = ({ open, setOpen, updateURLFromUseCase, setConfirmationModalOpen }: Props) => {
-  const {} = useModelProviderCredentials()
-  const { changesDetected, testCaseSelected } = useCurrentTestCase()
+export const EvaluationRunningModal = ({ open, setOpen }: Props) => {
+  const { cancelEvaluation } = useTestCaseActionsContext()
+  const { changesDetected, testCaseSelected, updateURLFromTestCase } = useCurrentTestCase()
 
   const onClose = () => {
     setOpen(false)
   }
 
   const onContinue = async () => {
-    if (changesDetected) {
-      setConfirmationModalOpen(true)
-    } else {
-      updateURLFromUseCase(testCaseSelected)
-    }
+    updateURLFromTestCase(testCaseSelected)
+    cancelEvaluation()
     setOpen(false)
   }
 

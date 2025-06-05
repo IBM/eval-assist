@@ -42,20 +42,14 @@ export const Modals = () => {
     setEditPairwiseResponseNameModalOpen,
   } = useModalsContext()
 
-  const { showingTestCase, changesDetected, updateURLFromTestCase } = useCurrentTestCase()
+  const { showingTestCase } = useCurrentTestCase()
 
   return (
     <>
-      <NewUseCaseModal
-        open={newUseCaseModalOpen}
-        setOpen={setNewUseCaseModalOpen}
-        changesDetected={changesDetected}
-        updateURLFromUseCase={updateURLFromTestCase}
-      />
+      <NewUseCaseModal open={newUseCaseModalOpen} setOpen={setNewUseCaseModalOpen} />
       {showingTestCase && (
         <>
           <SwitchUseCaseModal
-            updateURLFromUseCase={updateURLFromTestCase}
             open={confirmationModalOpen}
             setOpen={setConfirmationModalOpen}
             setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
@@ -65,12 +59,7 @@ export const Modals = () => {
 
           <DeleteUseCaseModal open={deleteUseCaseModalOpen} setOpen={setDeleteUseCaseModalOpen} />
           <EditTestCaseNameModal open={editNameModalOpen} setOpen={setEditNameModalOpen} />
-          <EvaluationRunningModal
-            open={evaluationRunningModalOpen}
-            setOpen={setEvaluationRunningModalOpen}
-            updateURLFromUseCase={updateURLFromTestCase}
-            setConfirmationModalOpen={setConfirmationModalOpen}
-          />
+          <EvaluationRunningModal open={evaluationRunningModalOpen} setOpen={setEvaluationRunningModalOpen} />
           <InstanceDetailsModal open={resultDetailsModalOpen} setOpen={setResultDetailsModalOpen} />
           <PromptModal open={promptModalOpen} setOpen={setPromptModalOpen} />
           {syntheticGenerationModalOpen && (

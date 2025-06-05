@@ -2,8 +2,8 @@ import { modelProviderBeautifiedName } from 'src/constants'
 
 import { CSSProperties, Dispatch, SetStateAction } from 'react'
 
-import { Button, InlineLoading, Tooltip } from '@carbon/react'
-import { Warning } from '@carbon/react/icons'
+import { Button, IconButton, InlineLoading, Tooltip } from '@carbon/react'
+import { Stop, Warning } from '@carbon/react/icons'
 
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
@@ -21,13 +21,26 @@ interface EvaluateButtonProps {
 export const EvaluateButton = ({ style, className }: EvaluateButtonProps) => {
   const { isRisksAndHarms } = useURLParamsContext()
   const { currentTestCase, areRelevantCredentialsProvided, outdatedResultInstanceIds } = useCurrentTestCase()
-  const { runEvaluation, evaluationFailed, evaluationRunning } = useTestCaseActionsContext()
+  const { runEvaluation, evaluationFailed, evaluationRunning, cancelEvaluation } = useTestCaseActionsContext()
   const { setPromptModalOpen } = useModalsContext()
 
   return (
     <div style={style} className={className}>
       {evaluationRunning ? (
-        <InlineLoading description={'Running evaluation...'} status={'active'} className={classes.loadingWrapper} />
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            gap: '0.5rem',
+            justifyContent: 'flex-start',
+          }}
+        >
+          <InlineLoading description={'Running evaluation...'} status={'active'} className={classes.loadingWrapper} />
+          <IconButton kind={'ghost'} label={'Cancel evaluation'} onMouseDown={cancelEvaluation}>
+            <Stop />
+          </IconButton>
+        </div>
       ) : (
         <div>
           {!areRelevantCredentialsProvided && !evaluationRunning && !evaluationFailed ? (

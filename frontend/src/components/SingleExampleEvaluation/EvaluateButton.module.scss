@@ -1,5 +1,6 @@
 .loadingWrapper {
   height: 48px;
+  inline-size: unset;
 }
 
 .loadingWrapper :global .cds--inline-loading__text {
