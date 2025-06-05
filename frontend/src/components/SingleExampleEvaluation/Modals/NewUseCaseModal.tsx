@@ -7,6 +7,7 @@ import { Layer, Modal, Select, SelectItem } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
 import { useCriteriasContext } from '@providers/CriteriasProvider'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
 import { useToastContext } from '@providers/ToastProvider'
 
@@ -16,12 +17,12 @@ import classes from './NewUseCaseModal.module.scss'
 
 interface Props {
   open: boolean
-  changesDetected: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  updateURLFromUseCase: (useCaseSelected: { useCase: TestCase; subCatalogName: string | null }) => void
 }
 
-export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromUseCase }: Props) => {
+export const NewUseCaseModal = ({ open, setOpen }: Props) => {
+  const { changesDetected, updateURLFromTestCase } = useCurrentTestCase()
+
   const [selectedType, setSelectedType] = useState<EvaluationType | null>(null)
   const [selectedCriteria, setSelectedCriteria] = useState<Criteria | CriteriaWithOptions | null>(null)
 
@@ -39,7 +40,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
       } else {
         toCreateTestCase = getEmptyTestCase(selectedType)
       }
-      updateURLFromUseCase({
+      updateURLFromTestCase({
         useCase: {
           ...toCreateTestCase,
           evaluator: selectedType === EvaluationType.DIRECT ? directEvaluators[0] : pairwiseEvaluators[0],
@@ -47,7 +48,7 @@ export const NewUseCaseModal = ({ open, changesDetected, setOpen, updateURLFromU
         subCatalogName: null,
       })
     } else {
-      updateURLFromUseCase({ useCase: getEmptyTestCase(selectedType as EvaluationType), subCatalogName: null })
+      updateURLFromTestCase({ useCase: getEmptyTestCase(selectedType as EvaluationType), subCatalogName: null })
       addToast({
         kind: 'info',
         title: 'Evaluator options are not yet available',

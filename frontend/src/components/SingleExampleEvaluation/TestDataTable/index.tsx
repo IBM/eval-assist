@@ -216,8 +216,13 @@ export const TestDataTable = ({ style, className }: Props) => {
 
   const responseNames = useMemo(
     () =>
-      returnByPipelineType<string[], string[]>(currentTestCase.type, [currentTestCase.responseVariableName], () =>
-        (instances[0] as PairwiseInstance).responses.map((_, i) => `${currentTestCase.responseVariableName} ${i + 1}`),
+      returnByPipelineType<string[], string[]>(
+        currentTestCase.type,
+        () => [currentTestCase.responseVariableName],
+        () =>
+          (instances[0] as PairwiseInstance).responses.map(
+            (_, i) => `${currentTestCase.responseVariableName} ${i + 1}`,
+          ),
       ),
     [currentTestCase.responseVariableName, currentTestCase.type, instances],
   )

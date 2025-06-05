@@ -338,19 +338,11 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
 
   useEffect(() => {
     if (preloadedTestCase !== null) {
-      setCurrentTestCase(preloadedTestCase)
+      setCurrentTestCase({ ...preloadedTestCase })
+      setTestCaseSelected(null)
+      setLastSavedTestCaseString(getJSONStringWithSortedKeys(preloadedTestCase))
     }
   }, [preloadedTestCase])
-
-  // update the state if the preloaded test case changes
-  useEffect(() => {
-    if (preloadedTestCase !== null) {
-      setTestCaseSelected(null)
-      setCurrentTestCase({ ...preloadedTestCase })
-      setLastSavedTestCaseString(getJSONStringWithSortedKeys(preloadedTestCase))
-      // temporaryIdRef.current = uuid()
-    }
-  }, [preloadedTestCase, setCurrentTestCase])
 
   useEffect(() => {
     if (showingTestCase) {
