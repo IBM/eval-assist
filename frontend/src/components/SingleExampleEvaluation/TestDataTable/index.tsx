@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { returnByPipelineType } from 'src/utils'
+import { returnByPipelineType, toTitleCase } from 'src/utils'
 
 import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -253,11 +253,11 @@ export const TestDataTable = ({ style, className }: Props) => {
               <strong className={cx(classes.headerTypography)}>{'Test data'}</strong>
               {currentTestCase.type === EvaluationType.PAIRWISE && (
                 <Button kind="ghost" size="sm" renderIcon={Add} onClick={addResponse} disabled={evaluationRunning}>
-                  {'Add response'}
+                  {`Add ${toTitleCase(currentTestCase.responseVariableName)}`}
                 </Button>
               )}
               <Button kind="ghost" size="sm" renderIcon={Add} onClick={addContextVariable} disabled={evaluationRunning}>
-                {'Add variable'}
+                {'Add Context Variable'}
               </Button>
             </div>
             {expectedResultOn && (
