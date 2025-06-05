@@ -277,7 +277,13 @@ export const TestDataTableRow = ({
                         onFocus={setActive}
                         onBlur={setInactive}
                       >
-                        <strong>{result.result}</strong>
+                        <strong>
+                          {returnByPipelineType(
+                            type,
+                            result.result,
+                            `${toTitleCase(responseVariableName)} ${pairwiseWinnerIndex! + 1}`,
+                          )}
+                        </strong>
                       </div>
                       {result.positionalBias && (
                         <div className={cx(classes.positionalBias)}>{'Positional bias detected'}</div>
