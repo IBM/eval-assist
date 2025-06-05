@@ -7,9 +7,9 @@ import Link from 'next/link'
 import { Breadcrumb, BreadcrumbItem } from '@carbon/react'
 
 import { UseCaseTypeBadge } from '@components/UseCaseTypeBadge/UseCaseTypeBadge'
-import { useURLInfoContext } from '@providers/URLInfoProvider'
 
 import { CriteriaBenchmarkCard } from './CriteriaBenchmarkCard'
+import { useURLInfoContext } from './Providers/URLInfoProvider'
 import { BenchmarkSidenav } from './Sidenav'
 import classes from './index.module.scss'
 

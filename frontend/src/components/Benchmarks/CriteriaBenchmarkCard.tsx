@@ -17,11 +17,11 @@ import {
 import { Information } from '@carbon/react/icons'
 
 import { useCriteriasContext } from '@providers/CriteriasProvider'
-import { useURLInfoContext } from '@providers/URLInfoProvider'
-import { CriteriaBenchmark, EvaluationType, EvaluatorBenchmark, Version } from '@types'
+import { CriteriaBenchmark, EvaluationType, Version } from '@types'
 
 import classes from './CriteriaBenchmarkCard.module.scss'
 import { CriteriaDetailsModal } from './CriteriaDetailsModal'
+import { useURLInfoContext } from './Providers/URLInfoProvider'
 
 interface Props {
   criteriaBenchmark: CriteriaBenchmark
