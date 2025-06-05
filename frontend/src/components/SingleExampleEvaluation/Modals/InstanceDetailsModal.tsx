@@ -247,7 +247,9 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                             <p key={i} className={classes.explanation}>
                                               <strong>{`${
                                                 responseResults.contestResults[i] ? 'Won' : 'Lost'
-                                              } against response ${responseResults.comparedTo[i]}: `}</strong>
+                                              } against ${toTitleCase(currentTestCase.responseVariableName)} ${
+                                                responseResults.comparedTo[i]
+                                              }: `}</strong>
                                             </p>
                                             <div>
                                               <Markdown>{explanation}</Markdown>
