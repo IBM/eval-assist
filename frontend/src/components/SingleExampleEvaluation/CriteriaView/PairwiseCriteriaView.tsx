@@ -5,7 +5,6 @@ import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
 import {
   Accordion,
   AccordionItem,
-  Button,
   IconButton,
   Layer,
   Tab,
@@ -45,7 +44,7 @@ export const PairwiseCriteriaView = ({
   toHighlightWords,
   style,
 }: EvaluationCriteriaProps) => {
-  const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(pairwiseCriteria.name === '')
+  const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(false)
   const [rawJSONCriteria, setRawJSONCriteria] = useState('')
 
   const isValidRawJSONCriteria = (jsonCriteria: string) => {
