@@ -66,7 +66,7 @@ export const ModelProviderCredentialsProvider = ({ children }: { children: React
     useLocalStorage<ModelProviderCredentials>('modelProviderCrentials', defaultCredentialStorage)
   const { get } = useFetchUtils()
 
-  const [loadingDefaultCredentials, setLoadingDefaultCredentials] = useState(false)
+  const [loadedDefaultCredentials, setLoadedDefaultCredentials] = useState(false)
   const [initializedModelProviderCredentials, setInitializedModelProviderCredentials] = useState(false)
 
   // Set default values for new model providers
@@ -136,9 +136,8 @@ export const ModelProviderCredentialsProvider = ({ children }: { children: React
 
   useEffect(() => {
     const getDefaultCredentials = async () => {
-      setLoadingDefaultCredentials(true)
       const defaultCredentials = (await (await get('default-credentials/')).json()) as PartialModelProviderCredentials
-      setLoadingDefaultCredentials(false)
+      setLoadedDefaultCredentials(true)
       // only use default values for provider credentials that are empty
       setModelProviderCredentials((prev) => {
         const updatedCredentials = { ...prev }
@@ -195,7 +194,7 @@ export const ModelProviderCredentialsProvider = ({ children }: { children: React
     [getProviderCredentials],
   )
 
-  if (!initializedModelProviderCredentials || loadingDefaultCredentials) return <Loading withOverlay />
+  if (!initializedModelProviderCredentials || !loadedDefaultCredentials) return <Loading withOverlay />
 
   return (
     <ModelProviderCredentialsContext.Provider
