@@ -21,7 +21,6 @@ from torch import device
 from unitxt.inference import (
     CrossProviderInferenceEngine,
     HFAutoModelInferenceEngine,
-    RITSInferenceEngine,
     TorchDeviceMixin,
     WMLInferenceEngineGeneration,
 )
@@ -110,11 +109,11 @@ def get_cross_inference_engine_params(
         "seed": 42,
         "credentials": credentials.copy(),
     }
-    if provider == ModelProviderEnum.RITS:
-        inference_engine_params["credentials"]["api_base"] = (
-            RITSInferenceEngine.get_base_url_from_model_name(model_name) + "/v1"
-        )
-    elif provider == ModelProviderEnum.WATSONX:
+    # if provider == ModelProviderEnum.RITS:
+    #     inference_engine_params["credentials"]["api_base"] = (
+    #         RITSInferenceEngine.get_base_url_from_model_name(model_name) + "/v1"
+    #     )
+    if provider == ModelProviderEnum.WATSONX:
         provider_specific_args[ModelProviderEnum.WATSONX] = {
             "max_requests_per_second": 7
         }
