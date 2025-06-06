@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Modal, TextInput } from '@carbon/react'
 
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
-import { useUserUseCasesContext } from '@providers/UserUseCasesProvider'
+import { useUserTestCasesContext } from '@providers/UserTestCasesProvider'
 
 import { TestCase } from '../../../types'
 
@@ -14,7 +14,7 @@ interface Props {
 
 export const EditTestCaseNameModal = ({ open, setOpen }: Props) => {
   const { currentTestCase, setCurrentTestCase } = useCurrentTestCase()
-  const { userUseCases, setUserUseCases } = useUserUseCasesContext()
+  const { userTestCases: userUseCases, setUserTestCases: setUserUseCases } = useUserTestCasesContext()
 
   const [newUseCaseName, setNewUseCaseName] = useState(currentTestCase.name)
 

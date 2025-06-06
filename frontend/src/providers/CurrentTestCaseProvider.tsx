@@ -30,7 +30,7 @@ import { useCriteriasContext } from './CriteriasProvider'
 import { useEvaluatorOptionsContext } from './EvaluatorOptionsProvider'
 import { useModelProviderCredentials } from './ModelProviderCredentialsProvider'
 import { useURLParamsContext } from './URLParamsProvider'
-import { useUserUseCasesContext } from './UserUseCasesProvider'
+import { useUserTestCasesContext } from './UserTestCasesProvider'
 
 interface CurrentTestCaseContextValue {
   currentTestCase: TestCase
@@ -116,7 +116,7 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
     useModelProviderCredentials()
   const { getEmptyUseCaseWithCriteria } = useCriteriasContext()
   const { directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
-  const { userUseCases } = useUserUseCasesContext()
+  const { userTestCases: userUseCases } = useUserTestCasesContext()
   const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
   const { post } = useFetchUtils()
 
