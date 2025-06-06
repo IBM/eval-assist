@@ -10,7 +10,7 @@ import { SelectedTextProvider } from '@providers/SelectedTextProvider'
 import { SyntheticGenerationProvider } from '@providers/SyntheticGenerationProvider'
 import { TestCaseActionsProvider } from '@providers/TestCaseActionsProvider'
 import { URLParamsProvider } from '@providers/URLParamsProvider'
-import { UserUseCasesProvider } from '@providers/UserUseCasesProvider'
+import { UserTestCasesProvider } from '@providers/UserTestCasesProvider'
 
 import { SingleExampleEvaluation } from './SingleExampleEvaluation'
 
@@ -19,7 +19,7 @@ const Landing = () => (
     <CriteriasProvider>
       <EvaluatorOptionsProvider>
         <ModelProviderCredentialsProvider>
-          <UserUseCasesProvider>
+          <UserTestCasesProvider>
             <URLParamsProvider>
               <CurrentTestCaseProvider>
                 <TestCaseActionsProvider>
@@ -37,7 +37,7 @@ const Landing = () => (
                 </TestCaseActionsProvider>
               </CurrentTestCaseProvider>
             </URLParamsProvider>
-          </UserUseCasesProvider>
+          </UserTestCasesProvider>
         </ModelProviderCredentialsProvider>
       </EvaluatorOptionsProvider>
     </CriteriasProvider>

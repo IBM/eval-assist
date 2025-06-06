@@ -20,7 +20,7 @@ import { useToastContext } from '@providers/ToastProvider'
 import { CriteriaWithOptions, DirectInstance } from '@types'
 import { returnByPipelineType } from '@utils'
 
-import { useUserUseCasesContext } from './UserUseCasesProvider'
+import { useUserTestCasesContext } from './UserTestCasesProvider'
 
 interface SyntheticGenerationContextValue {
   loadingSyntheticExamples: boolean
@@ -340,7 +340,7 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
     })
   }, [addToast, currentTestCase, fetchSyntheticExamples, removeToast, setCurrentTestCase])
 
-  const { userUseCases } = useUserUseCasesContext()
+  const { userTestCases: userUseCases } = useUserTestCasesContext()
   const { allLibraryUseCases } = useTestCaseLibrary()
   const [hasGeneratedSyntheticMap, setHasGeneratedSyntheticMap, removeHasGeneratedSyntheticMap] = useLocalStorage<
     Record<string, boolean>

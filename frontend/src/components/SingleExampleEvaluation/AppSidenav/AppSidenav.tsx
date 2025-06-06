@@ -10,7 +10,7 @@ import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
-import { useUserUseCasesContext } from '@providers/UserUseCasesProvider'
+import { useUserTestCasesContext } from '@providers/UserTestCasesProvider'
 import { TestCase } from '@types'
 
 import layoutClasses from '../Layout.module.scss'
@@ -28,7 +28,7 @@ export const AppSidenavNew = ({}: AppSidenavProps) => {
   const { useCaseId } = useURLParamsContext()
   const { changesDetected, setTestCaseSelected, updateURLFromTestCase } = useCurrentTestCase()
   const { evaluationRunning } = useTestCaseActionsContext()
-  const { userUseCases } = useUserUseCasesContext()
+  const { userTestCases: userUseCases } = useUserTestCasesContext()
   const onUseCaseClick = (useCase: TestCase, subCatalogName?: string) => {
     // if the usecase is already selected don't do nothing
     if (useCaseId !== null && useCaseId === useCase.id) return

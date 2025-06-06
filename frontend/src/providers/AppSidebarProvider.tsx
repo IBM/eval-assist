@@ -1,7 +1,7 @@
 import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffect, useState } from 'react'
 
 import { useURLParamsContext } from './URLParamsProvider'
-import { useUserUseCasesContext } from './UserUseCasesProvider'
+import { useUserTestCasesContext } from './UserTestCasesProvider'
 
 interface AppSidebarContextValue {
   sidebarTabSelected: 'user_test_cases' | 'library_test_cases' | 'risks_and_harms' | null
@@ -22,7 +22,7 @@ export const AppSidebarProvider = ({ children }: { children: ReactNode }) => {
     'user_test_cases' | 'library_test_cases' | 'risks_and_harms' | null
   >(null)
   const { useCaseId, useCaseType, libraryTestCaseName, isRisksAndHarms } = useURLParamsContext()
-  const { userUseCases } = useUserUseCasesContext()
+  const { userTestCases: userUseCases } = useUserTestCasesContext()
 
   useEffect(() => {
     if (useCaseId !== null && userUseCases !== null) {

@@ -26,7 +26,7 @@ import { useCurrentTestCase } from './CurrentTestCaseProvider'
 import { useModelProviderCredentials } from './ModelProviderCredentialsProvider'
 import { useToastContext } from './ToastProvider'
 import { useURLParamsContext } from './URLParamsProvider'
-import { useUserUseCasesContext } from './UserUseCasesProvider'
+import { useUserTestCasesContext } from './UserTestCasesProvider'
 
 interface TestCaseActionsContextValue {
   runEvaluation: (evaluationIds: string[]) => Promise<void>
@@ -78,7 +78,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
   const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
   const { getUserName } = useAuthentication()
-  const { userUseCases, setUserUseCases } = useUserUseCasesContext()
+  const { userTestCases: userUseCases, setUserTestCases: setUserUseCases } = useUserTestCasesContext()
   const { setSidebarTabSelected } = useAppSidebarContext()
   const [inProgressEvalToastId, setInProgressEvalToastId] = useState<string | null>(null)
 
