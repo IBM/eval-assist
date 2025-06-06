@@ -366,12 +366,6 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
         urlChangePromise = changeTestCaseURL(
           getQueryParamsFromTestCase(useCaseSelected.useCase, useCaseSelected.subCatalogName),
         )
-        // if (evaluationRunningToastId) removeToast(evaluationRunningToastId)
-        // setEvaluationRunningToastId(null)
-        // // if evaluation is running, cancel it (superficially)
-        // if (evaluationRunning) {
-        //   setEvaluationRunning(false)
-        // }
       }
     },
     [changeTestCaseURL, getQueryParamsFromTestCase],

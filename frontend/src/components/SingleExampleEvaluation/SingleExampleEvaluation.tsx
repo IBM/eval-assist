@@ -71,8 +71,6 @@ export const SingleExampleEvaluation = () => {
     ],
   )
 
-  const popoverRef = useRef<HTMLDivElement>()
-
   useBeforeOnload(changesDetected)
   const temporaryIdRef = useRef(uuid())
   const { onSave } = useTestCaseActionsContext()
@@ -96,7 +94,6 @@ export const SingleExampleEvaluation = () => {
                 paddingBottom: '1rem',
                 marginBottom: '1rem',
               }}
-              ref={popoverRef as LegacyRef<HTMLDivElement> | undefined}
               className={cx(classes['bottom-divider'], classes['left-padding'])}
             >
               <h3>Evaluation sandbox</h3>

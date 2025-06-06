@@ -19,7 +19,7 @@ import {
 import { Add, Edit, Save, TrashCan } from '@carbon/react/icons'
 
 import { HighlightTextArea } from '@components/HighlightTextArea'
-import { useURLParamsContext } from '@providers/URLParamsProvider'
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { CriteriaWithOptions } from '@types'
 
 import { JSONTextArea } from '../JSONTextArea'
@@ -47,9 +47,8 @@ export const RubricCriteriaView = ({
   toHighlightWords,
   style,
 }: EvaluationCriteriaProps) => {
-  const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(rubricCriteria.name === '')
+  const [isEditingCriteriaTitle, setIsEditingCriteriaTitle] = useState(false)
   const [rawJSONCriteria, setRawJSONCriteria] = useState('')
-  const { isRisksAndHarms } = useURLParamsContext()
   const isValidRawJSONCriteria = (jsonCriteria: string) => {
     try {
       const rawJSONCriteriaObj = JSON.parse(jsonCriteria)
