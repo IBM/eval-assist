@@ -1,5 +1,3 @@
-import { getEmptyCriteriaWithTwoOptions, toTitleCase } from 'src/utils'
-
 import { useMemo } from 'react'
 
 import { TaskEnum } from '@constants'
@@ -723,7 +721,27 @@ export const useTestCaseLibrary = () => {
             expectedResult: 'Excellent',
           } as DirectInstance,
         ],
-        criteria: getCriteria('summarization_preference', EvaluationType.DIRECT) as CriteriaWithOptions,
+        criteria: {
+          name: 'Summarization quality',
+          description: 'Does the summary capture the essence of the article in the best possible way?',
+          options: [
+            {
+              name: 'Excellent',
+              description:
+                'The summary includes all relevant details such as key figures, numbers, dates and details which are crucial for the entire understanding.',
+            },
+            {
+              name: 'Good',
+              description:
+                'The order of events in the summary is logical and coherent and the summary contains most relevant details.',
+            },
+            {
+              name: 'Poor',
+              description:
+                'The summary includes minor and irrelevant details which add no value and the narrative is inconsistent and scattered.',
+            },
+          ],
+        },
         evaluator: null,
         syntheticGenerationConfig: {
           task: TaskEnum.Summarization,
