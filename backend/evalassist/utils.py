@@ -16,7 +16,7 @@ from ibm_watsonx_ai.wml_client_error import (
     WMLClientError,
 )
 from langchain_core.exceptions import OutputParserException
-from openai import AuthenticationError
+from openai import AuthenticationError, NotFoundError
 from torch import device
 from unitxt.inference import (
     CrossProviderInferenceEngine,
@@ -109,10 +109,6 @@ def get_cross_inference_engine_params(
         "seed": 42,
         "credentials": credentials.copy(),
     }
-    # if provider == ModelProviderEnum.RITS:
-    #     inference_engine_params["credentials"]["api_base"] = (
-    #         RITSInferenceEngine.get_base_url_from_model_name(model_name) + "/v1"
-    #     )
     if provider == ModelProviderEnum.WATSONX:
         provider_specific_args[ModelProviderEnum.WATSONX] = {
             "max_requests_per_second": 7
@@ -320,79 +316,77 @@ def to_snake_case(name: str) -> str:
     return name.replace(" ", "_").lower()
 
 
+def parse_exception_message(e: Exception) -> str:
+    error_message = e.message if hasattr(e, "message") else None
+    if error_message is None:
+        return str(e)
+    result = error_message.split(" - ", 1)
+    if len(result) == 1:
+        return result[0]
+    try:
+        result = json.loads(result[1])
+    except json.JSONDecodeError:
+        return result[1]
+    if "errorMessage" in result:
+        return result["errorMessage"]
+    elif (
+        "errors" in result
+        and len(result["errors"]) > 0
+        and "message" in result["errors"][0]
+    ):
+        return result["errors"][0]["message"]
+    elif "title" in result:
+        return result["detail"]
+    else:
+        return str(result)
+
+
+def handle_exception(e: Exception) -> None:
+    error_message = parse_exception_message(e)
+    if isinstance(e, OutputParserException):
+        raise HTTPException(
+            status_code=400,
+            detail=error_message,
+        ) from e
+    elif isinstance(e, NotFoundError):
+        raise HTTPException(status_code=400, detail=error_message)
+    elif isinstance(e, ValueError):
+        raise HTTPException(status_code=400, detail=error_message)
+    elif isinstance(e, ApiRequestFailure):
+        raise HTTPException(status_code=400, detail=error_message)
+    elif isinstance(e, NoCredentialsError):
+        raise HTTPException(
+            status_code=400,
+            detail=error_message,
+        )
+    elif isinstance(e, AuthenticationError):
+        raise HTTPException(status_code=400, detail=error_message)
+    elif isinstance(e, CannotSetProjectOrSpace):
+        raise HTTPException(status_code=400, detail=error_message)
+    elif isinstance(e, WMLClientError):
+        raise HTTPException(status_code=400, detail=error_message)
+    elif isinstance(e, AssertionError):
+        raise HTTPException(status_code=400, detail=error_message)
+    elif isinstance(e, RuntimeError):
+        if e.__cause__:
+            handle_exception(e.__cause__)
+        else:
+            raise HTTPException(400, error_message)
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail=error_message,
+        )
+
+
 def handle_llm_generation_exceptions(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except OutputParserException as e:
-            traceback.print_exc()
-            raise HTTPException(
-                status_code=400,
-                detail="The model was unable to generate an appropriate synthetic example.",
-            ) from e
-        except ValueError as e:
-            traceback.print_exc()
-            raise HTTPException(status_code=400, detail=str(e))
-
-        except ApiRequestFailure as e:
-            traceback.print_exc()
-            raise HTTPException(status_code=400, detail=e.error_msg)
-        except NoCredentialsError:
-            traceback.print_exc()
-            raise HTTPException(
-                status_code=400,
-                detail="Credentials not found. Please check your AWS credentials.",
-            )
-        except AuthenticationError:
-            traceback.print_exc()
-            raise HTTPException(
-                status_code=400, detail="Invalid OPENAI credentials provided."
-            )
-
-        except CannotSetProjectOrSpace as e:
-            traceback.print_exc()
-            raise HTTPException(
-                status_code=400, detail=f"watsonx authentication failed: {e.error_msg}"
-            )
-
-        except WMLClientError as e:
-            traceback.print_exc()
-            raise HTTPException(
-                status_code=400, detail=f"watsonx authentication failed: {e.error_msg}"
-            )
-
-        except AssertionError as e:
-            traceback.print_exc()
-            raise HTTPException(status_code=400, detail=f"{e}")
-
-        except RuntimeError as e:
-            traceback.print_exc()
-            if e.__cause__:
-                original_exception = e.__cause__
-                error_message = original_exception.args[0]
-                print("error_message")
-                print(error_message)
-                try:
-                    error_details = json.loads(error_message.split(" - ", 1)[1])
-                    error_message = error_details.get(
-                        "errorMessage", "An unknown error occurred."
-                    )
-                except Exception as parse_error:
-                    print(f"Error parsing the error message: {parse_error}")
-                    print("Original error message: ", error_message)
-                    try:
-                        error_message = error_message.split(" - ", 1)[1]
-                    except Exception:
-                        error_message = "Unknown error"
-                raise HTTPException(400, f"Error running unitxt: {error_message}")
-            else:
-                raise HTTPException(400, "Runtime error on unitxt")
         except Exception as e:
+            handle_exception(e)
+        finally:
             traceback.print_exc()
-            raise HTTPException(
-                status_code=400,
-                detail=getattr(e, "message", getattr(e, "error_msg", "Unknown error.")),
-            )
 
     return wrapper
 
