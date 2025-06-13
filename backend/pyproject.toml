@@ -1,6 +1,6 @@
 
 [project]
-name = "eval-assist"
+name = "evalassist"
 dynamic = ["version"]
 description = "EvalAssist is an open-source project that simplifies using large language models as evaluators (LLM-as-a-Judge) of the output of other large language models by supporting users in iteratively refining evaluation criteria in a web-based user experience."
 license = "Apache-2.0"                                                                                                                                                                                                                                                       # set your license here
