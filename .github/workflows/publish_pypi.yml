@@ -68,20 +68,10 @@ jobs:
           ls
           poetry install
 
-      - name: Debug
-        run: |
-          pip list
-          ls
-
-      - name: Build package
-        working-directory: backend
-        run: poetry build
-
       - name: Publish package
         working-directory: backend
         env:
-          TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry config repositories.test-pypi https://test.pypi.org/legacy/
-          poetry config pypi-token.test-pypi $TEST_PYPI_TOKEN
-          poetry publish -r test-pypi
+          poetry config http-basic.pypi __token__ "$PYPI_TOKEN"
+          poetry publish --build -r pypi
