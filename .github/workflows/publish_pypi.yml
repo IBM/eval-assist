@@ -80,7 +80,7 @@ jobs:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
           poetry config pypi-token.pypi "$PYPI_TOKEN"
-          poetry publish --build -r
+          poetry publish --build
 
       #  run: |
       #     poetry config repositories.test-pypi https://test.pypi.org/legacy/
