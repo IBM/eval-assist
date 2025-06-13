@@ -72,10 +72,8 @@ dependencies = [
 
 
 [tool.poetry]
-packages = [
-    { include = "evalassist" },
-    { include = "evalassist/prisma_client" },
-]
+packages = [{ include = "evalassist" }]
+include = ["evalassist/prisma_client/**/*"]
 version = "0.0.0"
 
 
@@ -86,7 +84,7 @@ optional = true
 click = "*"
 
 [project.scripts]
-eval-assist = "evalassist.cli:main"
+evalassist = "evalassist.cli:main"
 
 [project.urls]
 homepage = "https://ibm.github.io/eval-assist/"
