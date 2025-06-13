@@ -61,6 +61,8 @@ jobs:
       - run: poetry self add poetry-dynamic-versioning
 
       - name: Prisma generate backend
+        env:
+          DATABASE_URL: "file:sqlite.db"
         run: |
           npm run prisma:prepare:backend
           cd backend
