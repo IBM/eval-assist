@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional
 
-from evalassist.api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
+from .api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 from unitxt.inference import HFAutoModelInferenceEngine
 from unitxt.llm_as_judge import (
     EVALUATOR_TO_MODEL_ID,
