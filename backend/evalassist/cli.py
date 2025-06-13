@@ -14,7 +14,7 @@ def serve():
 
 @cli.command()
 def version():
-    click.echo("EvalAssist v0.1.2")
+    click.echo("EvalAssist v0.1.5")
 
 
 def main():

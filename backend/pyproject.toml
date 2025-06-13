@@ -84,7 +84,7 @@ optional = true
 click = "*"
 
 [project.scripts]
-evalassist = "evalassist.cli:main"
+eval-assist = "evalassist.cli:main"
 
 [project.urls]
 homepage = "https://ibm.github.io/eval-assist/"
