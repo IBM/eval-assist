@@ -16,6 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Write DATABASE_URL to .env
+        working-directory: backend/evalassist
+        run: |
+          echo 'DATABASE_URL="file:sqlite.db"' > .env
+          ls
+
       # Node and frontend build
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -55,8 +61,6 @@ jobs:
       - run: poetry self add poetry-dynamic-versioning
 
       - name: Prisma generate backend
-        env:
-          DATABASE_URL: file:sqlite.db
         run: |
           npm run prisma:prepare:backend
           cd backend

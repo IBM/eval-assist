@@ -1,7 +1,8 @@
 import logging
 
 import litellm
-
+from dotenv import load_dotenv
+load_dotenv()
 litellm.drop_params = True
 
 
