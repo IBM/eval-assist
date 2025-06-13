@@ -6,7 +6,7 @@ from typing import Optional, Union, cast
 
 import nbformat as nbf
 import nest_asyncio
-from evalassist.api.types import DomainEnum, PersonaEnum
+from .api.types import DomainEnum, PersonaEnum
 from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -489,21 +489,22 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 frontend_build_folder = os.getenv("FRONTEND_BUILD_FOLDER", None)
 
 
-STATIC_DIR = Path(
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        frontend_build_folder,
+if frontend_build_folder is not None:
+    STATIC_DIR = Path(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            frontend_build_folder,
+        )
     )
-)
-if frontend_build_folder is not None and os.path.exists(STATIC_DIR):
-    router.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+    if os.path.exists(STATIC_DIR):
+        router.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
-    @router.get("/{full_path:path}")
-    async def serve_frontend(full_path: str):
-        file_path = STATIC_DIR / full_path
-        if os.path.exists(file_path) and os.path.isfile(file_path):
-            return FileResponse(file_path)
-        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+        @router.get("/{full_path:path}")
+        async def serve_frontend(full_path: str):
+            file_path = STATIC_DIR / full_path
+            if os.path.exists(file_path) and os.path.isfile(file_path):
+                return FileResponse(file_path)
+            return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
 app.include_router(router)

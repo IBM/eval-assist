@@ -16,10 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Write DATABASE_URL to .env
+      - name: Write DATABASE_URL and FRONTEND_BUILD_FOLDER to .env
         working-directory: backend/evalassist
         run: |
-          echo 'DATABASE_URL="file:sqlite.db"' > .env
+          echo 'DATABASE_URL="file:sqlite.db"\nFRONTEND_BUILD_FOLDER="fe_build"' > .env
           ls -a
 
       # Node and frontend build
@@ -67,6 +67,7 @@ jobs:
           poetry remove prisma
           poetry add prisma
           poetry run prisma generate --schema=prisma/schema.prisma
+          poetry run prisma migrate deploy
 
       - name: Install dependencies
         working-directory: backend

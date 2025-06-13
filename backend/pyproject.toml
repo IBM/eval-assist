@@ -73,7 +73,20 @@ dependencies = [
 
 [tool.poetry]
 packages = [{ include = "evalassist" }]
-include = ["evalassist/prisma_client/**/*"]
+include = [
+    { path = "evalassist/prisma_client/**/*", format = [
+        "sdist",
+        "wheel",
+    ] },
+    { path = "evalassist/.env", format = [
+        "sdist",
+        "wheel",
+    ] },
+    { path = "evalassist/fe_build/**/*", format = [
+        "sdist",
+        "wheel",
+    ] },
+]
 version = "0.0.0"
 
 
