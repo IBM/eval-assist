@@ -62,7 +62,9 @@ jobs:
 
       - name: Install dependencies
         working-directory: backend
-        run: poetry install
+        run: |
+          ls
+          poetry install
 
       - name: Debug
         run: |
