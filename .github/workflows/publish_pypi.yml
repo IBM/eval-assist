@@ -1,7 +1,9 @@
 name: Publish to pypi
 
-on: [pull_request]
-
+on:
+  push:
+    tags:
+      - "v*.*.*"
 jobs:
   build_and_publish:
     runs-on: ubuntu-22.04
