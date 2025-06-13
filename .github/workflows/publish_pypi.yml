@@ -20,7 +20,7 @@ jobs:
         working-directory: backend/evalassist
         run: |
           echo 'DATABASE_URL="file:sqlite.db"' > .env
-          ls
+          ls -a
 
       # Node and frontend build
       - name: Setup Node.js
@@ -79,8 +79,8 @@ jobs:
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry config http-basic.pypi __token__ "$PYPI_TOKEN"
-          poetry publish --build -r pypi
+          poetry config pypi-token.pypi "$PYPI_TOKEN"
+          poetry publish --build -r
 
       #  run: |
       #     poetry config repositories.test-pypi https://test.pypi.org/legacy/
