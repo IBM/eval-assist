@@ -61,6 +61,7 @@ jobs:
           poetry run prisma generate --schema=prisma/schema.prisma
 
       - name: Install dependencies
+        working-directory: backend
         run: poetry install
 
       - name: Debug
