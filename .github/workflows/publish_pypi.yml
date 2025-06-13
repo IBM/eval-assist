@@ -56,8 +56,9 @@ jobs:
         run: |
           npm run prisma:prepare:backend
           cd backend
+          poetry remove prisma
           poetry add prisma
-          poetry run python3 -m prisma generate --schema=prisma/schema.prisma
+          poetry run prisma generate --schema=prisma/schema.prisma
 
       - name: Install dependencies
         run: poetry install
