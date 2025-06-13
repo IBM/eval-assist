@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    tags:
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-22.04
+    if: startsWith(github.ref, 'refs/tags/')
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.13]
+        poetry-version: [2.1.2]
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node and frontend build
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+
+      - name: Install Next.js deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build and export Next.js
+        working-directory: frontend
+        env:
+          NEXT_OUTPUT_MODE: export
+        run: |
+          npm run build
+          mv out ../backend/evalassist/fe_build
+
+      # Python environment
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+        run: poetry self add poetry-dynamic-versioning
+
+      - name: Prisma generate frontend
+        run: |
+          npm run prisma:prepare:frontend
+          cd frontend
+          npx prisma generate
+
+      - name: Prisma generate backend
+        run: |
+          npm run prisma:prepare:backend
+          poetry add prisma
+          poetry run prisma generate --schema=backend/prisma/schema.prisma
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Build package
+        working-directory: backend
+        run: poetry build
+
+      - name: Publish package
+        working-directory: backend
+        run: |
+          poetry config repositories.test-pypi https://test.pypi.org/legacy/
+          poetry config pypi-token.test-pypi ${{ secrets.TEST_PYPI_TOKEN }}
+          poetry publish

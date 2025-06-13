@@ -1,0 +1,108 @@
+
+[project]
+name = "eval-assist"
+dynamic = ["version"]
+description = "EvalAssist is an open-source project that simplifies using large language models as evaluators (LLM-as-a-Judge) of the output of other large language models by supporting users in iteratively refining evaluation criteria in a web-based user experience."
+license = "Apache-2.0"                                                                                                                                                                                                                                                       # set your license here
+# readme = "README.md"
+requires-python = ">=3.10,<3.14"
+authors = [
+    { name = "Martín Santillán Cooper", email = "martinsantillancooper@gmail.com" },
+]
+keywords = ["LLM", "evaluation", "LLM-as-a-Judge", "AI-evaluation"]
+classifiers = [
+    # Project maturity
+    "Development Status :: 4 - Beta", # Assuming the project is in beta stage
+
+    # Intended audience
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: End Users/Desktop",
+
+    # License
+    "License :: OSI Approved :: Apache Software License", # Assuming MIT License
+
+    # Supported Python versions
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+
+    # Supported operating systems
+    "Operating System :: OS Independent",
+
+    # Project topics
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Linguistic",
+
+    # Frameworks and tools
+    "Framework :: FastAPI",
+    "Framework :: Jupyter",
+]
+
+dependencies = [
+    "fastapi",
+    "pydantic",
+    "prisma",
+    "uvicorn",
+    "nest_asyncio",
+    "python-dotenv",
+    "nbformat",
+    "litellm",
+    "tenacity",
+    "diskcache",
+    "datasets",
+    "langchain",
+    "numpy",
+    "openai",
+    "pandas",
+    "scipy",
+    "ibm_watsonx_ai",
+    "transformers",
+    "torch",
+    "accelerate",
+    "unitxt",
+    "nbconvert",
+    "boto3",
+    "ollama",
+    "setuptools (>=80.9.0,<81.0.0)",
+]
+
+
+[tool.poetry]
+packages = [
+    { include = "evalassist" },
+    { include = "evalassist/prisma_client" },
+]
+version = "0.0.0"
+
+
+[tool.poetry.group.build]
+optional = true
+
+[tool.poetry.group.build.dependencies]
+click = "*"
+
+[project.scripts]
+eval-assist = "evalassist.cli:main"
+
+[project.urls]
+homepage = "https://ibm.github.io/eval-assist/"
+repository = "https://github.com/IBM/eval-assist"
+documentation = "https://github.com/IBM/eval-assist/wiki"
+"Bug Tracker" = "https://github.com/IBM/eval-assist/issues"
+
+
+[tool.poetry.requires-plugins]
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+metadata = false

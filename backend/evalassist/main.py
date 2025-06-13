@@ -1,6 +1,7 @@
 import logging
 import os
 import uuid
+from pathlib import Path
 from typing import Optional, Union, cast
 
 import nbformat as nbf
@@ -10,8 +11,7 @@ from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException, Request,
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
-from prisma.errors import PrismaError
-from prisma.models import StoredTestCase
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from unitxt.llm_as_judge import (
     DIRECT_CRITERIA,
@@ -52,6 +52,8 @@ from .evaluators.unitxt import (
 # Logging req/resp
 from .logger import LoggingRoute
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
+from .prisma_client.errors import PrismaError
+from .prisma_client.models import StoredTestCase
 
 # Synthetic
 from .synthetic_example_generation.generate import DirectActionGenerator, Generator
@@ -482,6 +484,23 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     return JSONResponse(
         content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
     )
+
+
+STATIC_DIR = Path(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        os.getenv("FRONTEND_BUILD_FOLDER", None),
+    )
+)
+if os.path.exists(STATIC_DIR):
+    router.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+    @router.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        file_path = STATIC_DIR / full_path
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
 app.include_router(router)
