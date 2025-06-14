@@ -66,6 +66,7 @@ dependencies = [
     "nbconvert",
     "boto3",
     "ollama",
+    "click",
     "setuptools (>=80.9.0,<81.0.0)",
     "sqlmodel (>=0.0.24,<0.0.25)",
 ]
@@ -77,11 +78,11 @@ include = [{ path = "evalassist/static/**/*", format = ["sdist", "wheel"] }]
 version = "0.0.0"
 
 
-[tool.poetry.group.build]
+[tool.poetry.group.dev]
 optional = true
 
-[tool.poetry.group.build.dependencies]
-click = "*"
+[tool.poetry.group.dev.dependencies]
+pre_commit = "*"
 
 [project.scripts]
 eval-assist = "evalassist.cli:main"

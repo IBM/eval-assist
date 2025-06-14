@@ -1,9 +1,8 @@
-from enum import Enum
 import os
+from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-from .api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 from unitxt.inference import HFAutoModelInferenceEngine
 from unitxt.llm_as_judge import (
     EVALUATOR_TO_MODEL_ID,
@@ -12,6 +11,8 @@ from unitxt.llm_as_judge import (
     EvaluatorNameEnum,
     ModelProviderEnum,
 )
+
+from .api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 
 
 class ExtendedEvaluatorNameEnum(Enum):
@@ -150,5 +151,5 @@ DATA_DIR = Path(os.getenv("STATIC_DIR", EVAL_ASSIST_DIR / "data"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DATA_DIR}/evalassist.db")
 
-print(f'EVAL_ASSIST_DIR: {EVAL_ASSIST_DIR}')
-print(f'DATABASE_URL: {DATABASE_URL}')
+print(f"EVAL_ASSIST_DIR: {EVAL_ASSIST_DIR}")
+print(f"DATABASE_URL: {DATABASE_URL}")

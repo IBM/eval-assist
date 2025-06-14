@@ -43,13 +43,18 @@ jobs:
         working-directory: backend
         run: poetry install --no-interaction --no-root
 
+      - name: Build backend package
+        working-directory: backend
+        run: poetry build
+
       - name: Build and publish package
         working-directory: backend
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
+          ls dist
           poetry config pypi-token.pypi "$PYPI_TOKEN"
-          poetry publish --build
+          poetry publish
 
       #  run: |
       #     poetry config repositories.test-pypi https://test.pypi.org/legacy/

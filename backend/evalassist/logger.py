@@ -5,10 +5,10 @@ from collections.abc import Callable
 from evalassist.model import LogRecord
 from fastapi import Request, Response
 from fastapi.routing import APIRoute
+from sqlmodel import Session
 from starlette.background import BackgroundTask
 
 from .database import engine  # Assumes you have engine/session setup
-from sqlmodel import Session
 
 ignored_endpoints = [
     "/health",
@@ -49,6 +49,7 @@ def log_info(method, path, req_body, res_body, headers, runtime):
     with Session(engine) as session:
         session.add(log_record)
         session.commit()
+
 
 class LoggingRoute(APIRoute):
     def get_route_handler(self) -> Callable:

@@ -1,18 +1,25 @@
 import logging
 import os
 import uuid
-from pathlib import Path
 from typing import Optional, Union, cast
 
 import nbformat as nbf
 import nest_asyncio
-from .api.types import DomainEnum, PersonaEnum
-from fastapi import APIRouter, BackgroundTasks, FastAPI, HTTPException, Request, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    FastAPI,
+    HTTPException,
+    Request,
+    status,
+)
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from sqlmodel import Session, select
 from unitxt.llm_as_judge import (
     DIRECT_CRITERIA,
     PAIRWISE_CRITERIA,
@@ -40,8 +47,10 @@ from .api.common import (
 
 # API type definitions
 from .api.pipelines import EvaluatorMetadataAPI, EvaluatorsResponseModel
+from .api.types import DomainEnum, PersonaEnum
 from .benchmark.benchmark import get_all_benchmarks
 from .const import EXTENDED_EVALUATORS_METADATA, STATIC_DIR, domain_persona_map
+from .database import engine  # Assumes you have engine/session setup
 from .evaluators.unitxt import (
     DirectAssessmentEvaluator,
     GraniteGuardianEvaluator,
@@ -50,8 +59,8 @@ from .evaluators.unitxt import (
 
 # Logging req/resp
 from .logger import LoggingRoute
-from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
 from .model import AppUser, StoredTestCase
+from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
 
 # Synthetic
 from .synthetic_example_generation.generate import DirectActionGenerator, Generator
@@ -63,11 +72,6 @@ from .utils import (
     handle_llm_generation_exceptions,
     init_evaluator_name,
 )
-
-
-from fastapi import HTTPException, Depends
-from sqlmodel import Session, select
-from .database import engine  # Assumes you have engine/session setup
 
 nest_asyncio.apply()
 
@@ -82,9 +86,11 @@ app.add_middleware(
 
 router = APIRouter(route_class=LoggingRoute)
 
+
 def get_session():
     with Session(engine) as session:
         yield session
+
 
 class HealthCheck(BaseModel):
     status: str = "OK"
@@ -262,7 +268,9 @@ def log_user_action():
 
 
 @router.get("/test_case/{test_case_id}/")
-def get_test_case(test_case_id: int, user: str, session: Session = Depends(get_session)):
+def get_test_case(
+    test_case_id: int, user: str, session: Session = Depends(get_session)
+):
     statement = select(StoredTestCase).where(StoredTestCase.id == test_case_id)
     test_case = session.exec(statement).first()
     if not test_case:
@@ -277,18 +285,23 @@ class PutUseCaseBody(BaseModel):
 
 # from .schemas import PutUseCaseBody  # Make sure this is defined
 
+
 @router.put("/test_case/")
-def put_test_case(request_body: PutUseCaseBody, session: Session = Depends(get_session)):
+def put_test_case(
+    request_body: PutUseCaseBody, session: Session = Depends(get_session)
+):
     # Find user by email
-    user = session.exec(select(AppUser).where(AppUser.email == request_body.user)).first()
+    user = session.exec(
+        select(AppUser).where(AppUser.email == request_body.user)
+    ).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
     # Try to find the test case by id and user_id
     found = session.exec(
         select(StoredTestCase).where(
-            (StoredTestCase.id == request_body.test_case.id) &
-            (StoredTestCase.user_id == user.id)
+            (StoredTestCase.id == request_body.test_case.id)
+            & (StoredTestCase.user_id == user.id)
         )
     ).first()
 
@@ -303,8 +316,8 @@ def put_test_case(request_body: PutUseCaseBody, session: Session = Depends(get_s
         # Check if name is already used by this user
         name_and_user_exists = session.exec(
             select(StoredTestCase).where(
-                (StoredTestCase.name == request_body.test_case.name) &
-                (StoredTestCase.user_id == user.id)
+                (StoredTestCase.name == request_body.test_case.name)
+                & (StoredTestCase.user_id == user.id)
             )
         ).first()
 
@@ -324,13 +337,16 @@ def put_test_case(request_body: PutUseCaseBody, session: Session = Depends(get_s
             session.refresh(new_case)
             return new_case
 
+
 class DeleteUseCaseBody(BaseModel):
     test_case_id: int
 
 
 @router.delete("/test_case/")
 @router.delete("/test_case/")
-def delete_test_case(request_body: DeleteUseCaseBody, session: Session = Depends(get_session)):
+def delete_test_case(
+    request_body: DeleteUseCaseBody, session: Session = Depends(get_session)
+):
     test_case = session.get(StoredTestCase, request_body.test_case_id)
     if not test_case:
         raise HTTPException(status_code=404, detail="Test case not found")
@@ -345,7 +361,9 @@ class CreateUserPostBody(BaseModel):
 
 
 @router.post("/user/")
-def create_user_if_not_exist(user: CreateUserPostBody, session: Session = Depends(get_session)):
+def create_user_if_not_exist(
+    user: CreateUserPostBody, session: Session = Depends(get_session)
+):
     db_user = session.exec(select(AppUser).where(AppUser.email == user.email)).first()
     root_pkg_logger.debug(f"Found user:\n{db_user}")
     if db_user is None:
@@ -494,6 +512,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     return JSONResponse(
         content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
     )
+
 
 app.include_router(router)
 
