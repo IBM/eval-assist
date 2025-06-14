@@ -29,6 +29,8 @@ jobs:
 
       - name: Install frontend dependencies and build
         working-directory: frontend
+        env:
+          NEXT_OUTPUT_MODE: export
         run: |
           npm install
           npm run build
