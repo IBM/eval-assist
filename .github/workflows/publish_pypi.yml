@@ -43,10 +43,6 @@ jobs:
         working-directory: backend
         run: poetry install --no-interaction --no-root
 
-      - name: Build backend package
-        working-directory: backend
-        run: poetry build
-
       - name: Build and publish package
         working-directory: backend
         env:
