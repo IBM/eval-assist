@@ -1,6 +1,5 @@
 fastapi
 pydantic
-prisma
 uvicorn
 nest_asyncio
 python-dotenv
@@ -23,3 +22,4 @@ unitxt>=1.23.1
 nbconvert
 boto3
 ollama
+sqlmodel

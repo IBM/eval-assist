@@ -45,7 +45,6 @@ classifiers = [
 dependencies = [
     "fastapi",
     "pydantic",
-    "prisma",
     "uvicorn",
     "nest_asyncio",
     "python-dotenv",
@@ -68,25 +67,13 @@ dependencies = [
     "boto3",
     "ollama",
     "setuptools (>=80.9.0,<81.0.0)",
+    "sqlmodel (>=0.0.24,<0.0.25)",
 ]
 
 
 [tool.poetry]
 packages = [{ include = "evalassist" }]
-include = [
-    { path = "evalassist/prisma_client/**/*", format = [
-        "sdist",
-        "wheel",
-    ] },
-    { path = "evalassist/.env", format = [
-        "sdist",
-        "wheel",
-    ] },
-    { path = "evalassist/fe_build/**/*", format = [
-        "sdist",
-        "wheel",
-    ] },
-]
+include = [{ path = "evalassist/static/**/*", format = ["sdist", "wheel"] }]
 version = "0.0.0"
 
 

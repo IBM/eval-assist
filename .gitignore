@@ -49,10 +49,4 @@ certificates
 
 inference_engine_cache
 
-
-evalassist/prisma_client/
-
-**/prisma_client
-**/fe_build
-
 *.db

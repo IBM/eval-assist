@@ -1,13 +1,22 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+export NEXT_OUTPUT_MODE="export"
+# 1. Install and build frontend dependencies
+echo "🔧 Installing frontend dependencies..."
+cd frontend
+npm install
+npm run build
+cd ..
 
-# Navigate to the backend directory
-cd ../backend
+# 4. Move built frontend to backend/evalassist
+SRC="frontend/out"
+DST="backend/evalassist/static"
+echo "📁 Moving built frontend from '$SRC' to '$DST' (overwriting)..."
+rm -rf "$DST"
+mv "$SRC" "$DST"
 
-# Activate the virtual environment
-source venv/bin/activate
+echo "✅ Done—frontend moved to backend/evalassist/out"
 
 # Build the package
-python -m build
-
-# Upload to Test PyPI
-twine upload --repository testpypi dist/*
+cd backend
+poetry build

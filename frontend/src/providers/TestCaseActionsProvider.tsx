@@ -5,7 +5,6 @@ import { ReactNode, createContext, useCallback, useContext, useRef, useState } f
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
-import { StoredTestCase } from '@prisma/client'
 import {
   DirectInstance,
   DirectInstanceResult,
@@ -13,6 +12,7 @@ import {
   FetchedDirectInstanceResultWithId,
   FetchedDirectResults,
   FetchedPairwiseResults,
+  FetchedTestCase,
   Instance,
   PairwiseInstance,
   PairwiseInstanceResult,
@@ -286,7 +286,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
 
   const onSave = useCallback(async () => {
     if (currentTestCase === null) return
-    const savedUseCase: StoredTestCase = await (
+    const savedUseCase: FetchedTestCase = await (
       await put('test_case/', {
         test_case: {
           name: currentTestCase.name,
@@ -302,7 +302,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
           }),
           user_id: -1,
           id: currentTestCase.id,
-        } as StoredTestCase,
+        } as FetchedTestCase,
         user: getUserName(),
       })
     ).json()
@@ -356,7 +356,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
           }),
           user_id: -1,
           id: -1,
-        } as StoredTestCase,
+        } as FetchedTestCase,
         user: getUserName(),
       })
       if (!res.ok) {
@@ -370,7 +370,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         })
         return false
       } else {
-        const savedUseCase: StoredTestCase = await res.json()
+        const savedUseCase: FetchedTestCase = await res.json()
         const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as TestCase
         // useCaseSelected will be different from null when
         // save as is done before switching from an unsaved

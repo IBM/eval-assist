@@ -41,8 +41,7 @@ from .api.common import (
 # API type definitions
 from .api.pipelines import EvaluatorMetadataAPI, EvaluatorsResponseModel
 from .benchmark.benchmark import get_all_benchmarks
-from .const import EXTENDED_EVALUATORS_METADATA, domain_persona_map
-from .db_client import db
+from .const import EXTENDED_EVALUATORS_METADATA, STATIC_DIR, domain_persona_map
 from .evaluators.unitxt import (
     DirectAssessmentEvaluator,
     GraniteGuardianEvaluator,
@@ -52,8 +51,7 @@ from .evaluators.unitxt import (
 # Logging req/resp
 from .logger import LoggingRoute
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
-from .prisma_client.errors import PrismaError
-from .prisma_client.models import StoredTestCase
+from .model import AppUser, StoredTestCase
 
 # Synthetic
 from .synthetic_example_generation.generate import DirectActionGenerator, Generator
@@ -65,6 +63,11 @@ from .utils import (
     handle_llm_generation_exceptions,
     init_evaluator_name,
 )
+
+
+from fastapi import HTTPException, Depends
+from sqlmodel import Session, select
+from .database import engine  # Assumes you have engine/session setup
 
 nest_asyncio.apply()
 
@@ -79,6 +82,9 @@ app.add_middleware(
 
 router = APIRouter(route_class=LoggingRoute)
 
+def get_session():
+    with Session(engine) as session:
+        yield session
 
 class HealthCheck(BaseModel):
     status: str = "OK"
@@ -103,11 +109,6 @@ class MissingColumnsException(Exception):
 )
 def get_health() -> HealthCheck:
     return HealthCheck(status="OK")
-
-
-@app.on_event("shutdown")
-async def app_shutdown():
-    db.disconnect()
 
 
 @router.get("/evaluators/", response_model=EvaluatorsResponseModel)
@@ -248,8 +249,9 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
 
 
 @router.get("/test_case/")
-def get_test_cases(user: str):
-    test_cases = db.storedtestcase.find_many(where={"app_user": {"email": user}})
+def get_test_cases(user: str, session: Session = Depends(get_session)):
+    statement = select(StoredTestCase).join(AppUser).where(AppUser.email == user)
+    test_cases = session.exec(statement).all()
     return test_cases
 
 
@@ -260,8 +262,11 @@ def log_user_action():
 
 
 @router.get("/test_case/{test_case_id}/")
-def get_test_case(test_case_id: int, user: str):
-    test_case = db.storedtestcase.find_unique(where={"id": test_case_id})
+def get_test_case(test_case_id: int, user: str, session: Session = Depends(get_session)):
+    statement = select(StoredTestCase).where(StoredTestCase.id == test_case_id)
+    test_case = session.exec(statement).first()
+    if not test_case:
+        raise HTTPException(status_code=404, detail="Test case not found")
     return test_case
 
 
@@ -270,60 +275,68 @@ class PutUseCaseBody(BaseModel):
     test_case: StoredTestCase
 
 
-@router.put("/test_case/")
-def put_test_case(request_body: PutUseCaseBody):
-    user = db.appuser.find_unique(where={"email": request_body.user})
+# from .schemas import PutUseCaseBody  # Make sure this is defined
 
-    found = db.storedtestcase.find_unique(
-        where={
-            "id": request_body.test_case.id,
-            "user_id": user.id,
-        }
-    )
+@router.put("/test_case/")
+def put_test_case(request_body: PutUseCaseBody, session: Session = Depends(get_session)):
+    # Find user by email
+    user = session.exec(select(AppUser).where(AppUser.email == request_body.user)).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Try to find the test case by id and user_id
+    found = session.exec(
+        select(StoredTestCase).where(
+            (StoredTestCase.id == request_body.test_case.id) &
+            (StoredTestCase.user_id == user.id)
+        )
+    ).first()
 
     if found:
-        res = db.storedtestcase.update(
-            where={"id": request_body.test_case.id},
-            data={
-                "name": request_body.test_case.name,
-                "content": request_body.test_case.content,
-            },
-        )
-
+        found.name = request_body.test_case.name
+        found.content = request_body.test_case.content
+        session.add(found)
+        session.commit()
+        session.refresh(found)
+        return found
     else:
-        name_and_user_exists = db.storedtestcase.find_many(
-            where={
-                "name": request_body.test_case.name,
-                "user_id": user.id,
-            }
-        )
+        # Check if name is already used by this user
+        name_and_user_exists = session.exec(
+            select(StoredTestCase).where(
+                (StoredTestCase.name == request_body.test_case.name) &
+                (StoredTestCase.user_id == user.id)
+            )
+        ).first()
 
         if name_and_user_exists:
             raise HTTPException(
                 status_code=409,
                 detail=f"The name '{request_body.test_case.name}' is already in use",
             )
-
         else:
-            res = db.storedtestcase.create(
-                data={
-                    "name": request_body.test_case.name,
-                    "content": request_body.test_case.content,
-                    "user_id": user.id,
-                }
+            new_case = StoredTestCase(
+                name=request_body.test_case.name,
+                content=request_body.test_case.content,
+                user_id=user.id,
             )
-
-    return res
-
+            session.add(new_case)
+            session.commit()
+            session.refresh(new_case)
+            return new_case
 
 class DeleteUseCaseBody(BaseModel):
     test_case_id: int
 
 
 @router.delete("/test_case/")
-def delete_test_case(request_body: DeleteUseCaseBody):
-    res = db.storedtestcase.delete(where={"id": request_body.test_case_id})
-    return res
+@router.delete("/test_case/")
+def delete_test_case(request_body: DeleteUseCaseBody, session: Session = Depends(get_session)):
+    test_case = session.get(StoredTestCase, request_body.test_case_id)
+    if not test_case:
+        raise HTTPException(status_code=404, detail="Test case not found")
+    session.delete(test_case)
+    session.commit()
+    return {"ok": True}
 
 
 class CreateUserPostBody(BaseModel):
@@ -332,22 +345,19 @@ class CreateUserPostBody(BaseModel):
 
 
 @router.post("/user/")
-def create_user_if_not_exist(user: CreateUserPostBody):
-    try:
-        db_user = db.appuser.find_unique(where={"email": user.email})
-        root_pkg_logger.debug(f"Found user:\n{db_user}")
-        if db_user is None:
-            db_user = db.appuser.create(
-                data={
-                    "email": user.email,
-                    "name": user.name if user.name is not None else "",
-                }
-            )
-            root_pkg_logger.debug(f"User not found. Created user:\n{db_user}")
-        return db_user
-    except PrismaError as pe:
-        root_pkg_logger.error(f"Prisma error raised: {pe}")
-        return None
+def create_user_if_not_exist(user: CreateUserPostBody, session: Session = Depends(get_session)):
+    db_user = session.exec(select(AppUser).where(AppUser.email == user.email)).first()
+    root_pkg_logger.debug(f"Found user:\n{db_user}")
+    if db_user is None:
+        db_user = AppUser(
+            email=user.email,
+            name=user.name if user.name is not None else "",
+        )
+        session.add(db_user)
+        session.commit()
+        session.refresh(db_user)
+        root_pkg_logger.debug(f"User not found. Created user:\n{db_user}")
+    return db_user
 
 
 @router.get("/benchmarks/")
@@ -485,26 +495,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
     )
 
-
-frontend_build_folder = os.getenv("FRONTEND_BUILD_FOLDER", None)
-
-
-if frontend_build_folder is not None:
-    STATIC_DIR = Path(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            frontend_build_folder,
-        )
-    )
-    if os.path.exists(STATIC_DIR):
-        router.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-
-        @router.get("/{full_path:path}")
-        async def serve_frontend(full_path: str):
-            file_path = STATIC_DIR / full_path
-            if os.path.exists(file_path) and os.path.isfile(file_path):
-                return FileResponse(file_path)
-            return FileResponse(os.path.join(STATIC_DIR, "index.html"))
-
-
 app.include_router(router)
+
+if os.path.exists(STATIC_DIR):
+    root_pkg_logger.debug(f"Serving static files from {STATIC_DIR}")
+    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

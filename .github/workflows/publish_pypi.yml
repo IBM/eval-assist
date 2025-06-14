@@ -1,83 +1,51 @@
-name: Publish to pypi
+name: Build and Publish Python Package
 
 on:
   push:
     tags:
       - "v*.*.*"
+
 jobs:
-  build_and_publish:
-    runs-on: ubuntu-22.04
-    # if: startsWith(github.ref, 'refs/tags/')
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.13]
-        poetry-version: [2.1.2]
+  build-and-publish:
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Write DATABASE_URL and FRONTEND_BUILD_FOLDER to .env
-        working-directory: backend/evalassist
-        run: |
-          echo 'DATABASE_URL="file:sqlite.db"\nFRONTEND_BUILD_FOLDER="fe_build"' > .env
-          ls -a
-
-      # Node and frontend build
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "20"
 
-      - name: Install Next.js deps
-        working-directory: frontend
-        run: npm ci
-
-      - name: Prisma generate frontend
-        run: |
-          npm run prisma:prepare:frontend
-          cd frontend
-          npx prisma generate
-
-      - name: Build and export Next.js
-        working-directory: frontend
-        env:
-          NEXT_OUTPUT_MODE: export
-        run: |
-          npm run build
-          mv out ../backend/evalassist/fe_build
-
-      # Python environment
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
 
       - name: Install Poetry
-        run: |
-          python -m pip install pipx
-          pipx install poetry
-          curl -sSL https://install.python-poetry.org | python3 -
-
+        run: pip install poetry
       - run: poetry self add poetry-dynamic-versioning
 
-      - name: Prisma generate backend
-        env:
-          DATABASE_URL: "file:sqlite.db"
+      - name: Install frontend dependencies and build
+        working-directory: frontend
         run: |
-          npm run prisma:prepare:backend
-          cd backend
-          poetry remove prisma
-          poetry add prisma
-          poetry run prisma generate --schema=prisma/schema.prisma
-          poetry run prisma migrate deploy
+          npm install
+          npm run build
 
-      - name: Install dependencies
+      - name: Move built frontend to backend/evalassist/static
+        run: |
+          mv frontend/out backend/evalassist/static
+
+      - name: Install backend dependencies
         working-directory: backend
-        run: |
-          ls
-          poetry install
+        run: poetry install --no-interaction --no-root
 
-      - name: Publish package
+      - name: Build backend package
+        working-directory: backend
+        run: poetry build
+
+      - name: Build and publish package
         working-directory: backend
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}

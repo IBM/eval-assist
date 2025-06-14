@@ -38,50 +38,6 @@ function install_backend() {
   }
 }
 
-function prisma_prepare_backend() {
-  run("node shared/scripts/mergePrisma.js backend");
-}
-
-function prisma_prepare_frontend() {
-  run("node shared/scripts/mergePrisma.js frontend");
-}
-
-function prisma_generate_backend() {
-  try {
-    if (!isWindows) {
-      run(
-        ". backend/venv/bin/activate && cd backend && python3 -m prisma generate"
-      );
-    } else {
-      run(
-        "backend\\venv\\Scripts\\activate && cd backend && python -m prisma generate"
-      );
-    }
-  } catch (err) {
-    console.error("prisma_generate_backend failed");
-  }
-}
-
-function prisma_generate_frontend() {
-  run("cd frontend && npx prisma generate");
-}
-
-function prisma_sync() {
-  try {
-    if (!isWindows) {
-      run(
-        ". backend/venv/bin/activate && python3 -m prisma migrate dev --name init --schema backend/prisma/schema.prisma"
-      );
-    } else {
-      run(
-        "backend\\venv\\Scripts\\activate && python -m prisma migrate dev --name init --schema backend/prisma/schema.prisma"
-      );
-    }
-  } catch (err) {
-    console.error("prisma_sync failed");
-  }
-}
-
 function pre_commit_backend() {
   try {
     if (!isWindows) {
@@ -156,11 +112,6 @@ function start_frontend() {
 const actions = {
   say_hello,
   install_backend,
-  prisma_prepare_backend,
-  prisma_prepare_frontend,
-  prisma_generate_backend,
-  prisma_generate_frontend,
-  prisma_sync,
   pre_commit_backend,
   freeze_deps_backend,
   prepare,
