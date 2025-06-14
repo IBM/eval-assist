@@ -52,7 +52,6 @@ jobs:
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          ls dist
           poetry config pypi-token.pypi "$PYPI_TOKEN"
           poetry publish
 
