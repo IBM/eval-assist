@@ -1,7 +1,8 @@
+import os
 from enum import Enum
+from pathlib import Path
 from typing import Optional
 
-from evalassist.api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 from unitxt.inference import HFAutoModelInferenceEngine
 from unitxt.llm_as_judge import (
     EVALUATOR_TO_MODEL_ID,
@@ -10,6 +11,8 @@ from unitxt.llm_as_judge import (
     EvaluatorNameEnum,
     ModelProviderEnum,
 )
+
+from .api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 
 
 class ExtendedEvaluatorNameEnum(Enum):
@@ -140,3 +143,13 @@ generation_length_to_sentence_count = {
     GenerationLengthEnum.MEDIUM: "3-5 sentences",
     GenerationLengthEnum.LONG: "5-9 sentences",
 }
+
+
+EVAL_ASSIST_DIR = Path(__file__).parent
+STATIC_DIR = Path(os.getenv("DATA_DIR", EVAL_ASSIST_DIR / "static"))
+DATA_DIR = Path(os.getenv("STATIC_DIR", EVAL_ASSIST_DIR / "data"))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DATA_DIR}/evalassist.db")
+
+print(f"EVAL_ASSIST_DIR: {EVAL_ASSIST_DIR}")
+print(f"DATABASE_URL: {DATABASE_URL}")

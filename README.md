@@ -26,87 +26,35 @@ with their criteria, they can auto-generate a Notebook with Unitxt code to run b
 data sets based on their criteria definition. EvalAssist also includes a catalog of example test cases,
 exhibiting the use of LLM-as-a-judge across a variety of scenarios. Users can save their own test cases.
 
-## Run EvalAssist locally
+## How to Install 🚀
 
-### 1. Clone the repository
+### Installation via Python pip 🐍
 
-Start by cloning the repository to your local machine using Git:
+EvalAssist can be installed using pip, the Python package installer. Before proceeding, ensure you're using **Python >= 3.10, <3.14** to avoid compatibility issues.
 
-```bash
-git clone https://github.com/IBM/eval-assist.git 
-# or via ssh: git clone git@github.ibm.com:AIExperience/eval-assist.git
-cd eval-assist
-```
+1. **Install EvalAssist**:
+   Open your terminal and run the following command to install EvalAssist:
 
-### 2. Install the requirements
+   ```bash
+   pip install evalassist
+   ```
 
-* Node > 20 (install [here](https://nodejs.org/en/download))
-* Python >= 3.10, <3.14
+2. **Running EvalAssist**:
+   After installation, you can start EvalAssist by executing:
 
-_Note: In this project, npm is used both as a task manager (used to easily setup the dev environment) and as the package manager for the Next.js frontend app._
+   ```bash
+   eval-assist serve
+   ```
 
-### 3. Install the dependencies
-
-The following command will install the frontend and backend dependencies. It will install the frontend dependencies using npm. In addition, it will install the backend dependencies by creating a virtual environment (`venv`), activating it and using pip to install the dependencies.
-
-```bash
-npm install
-```
-
-_Note: you can run `npm run install:[backend|frontend]` to install components separately. This can be useful to customize the way you install them. For example: install the frontend running `npm run install:frontend` and install the backend dependencies using other package installer than `pip`, like `uv`._
-
-### 4. Set the environment variables
-
-Both frontend and backend need a few environment variables to be set in order to work properly.
-
-Create an `.env` file in the root directory with the following entries:
-
-* `NEXT_PUBLIC_BACKEND_API_HOST`: the URL of the backend FastAPI app
-* `NEXT_PUBLIC_USE_AUTH`: whether to use authentication or not. Authentication is performed through IBMId Oauth, but other methods can be added/contributed.
-
-_Note: you can use the content of `.env.example` to start with some default values:_
-
-```bash
-cp .env.example .env
-```
-
-### 5. Run the system
-
-The following command will run both the backend and the frontend concurrently. If you want to run them separately you can use `start:backend` and `start:frontend`.
-
-```bash
-npm start
-```
-
-**Important:** Sensitive data, such as API keys from third-party providers, is transmitted between the frontend and backend and must be encrypted. Ensure proper TLS termination when deploying the system.
-
-### 6. Open EvalAssist
-
-Visit [http://localhost:3000](https://localhost:3000)
+This will start the EvalAssist server, which you can access at [http://localhost:8000](http://localhost:8000)
 
 _Check out the tutorials to see how to [run evaluations](https://github.com/IBM/eval-assist/wiki#mini-tutorial-running-an-evaluation) and [generate synthetic data](https://github.com/IBM/eval-assist/wiki#mini-tutorial-generating-test-data)._
 
-## Commands summary
-
-* **install**:  Installs dependencies for both the backend and frontend in parallel.
-* **install:backend**: Sets up the Python virtual environment and installs backend dependencies.
-* **install:frontend**: Installs frontend dependencies using npm.
-* **start**:  Starts both the backend and frontend, ensuring Prisma is set up first.
-* **start:backend**: Runs the FastAPI backend using the Python virtual environment.
-* **start:frontend**: Waits for the backend to be ready, then starts the Next.js frontend.
-* **prisma**:  Prepares and generates Prisma clients for both backend and frontend.
-* **prisma:prepare**: Merges the Prisma schema for both backend and frontend.
-* **prisma:generate**: Generates Prisma clients for both backend and frontend in parallel.
-* **prisma:sync** : Runs Prisma database migrations using the backend schema.
-* **db**: Starts a local PostgreSQL database using Docker.
-* **pre-commit**: Runs pre-commit hooks for both backend and frontend.
-* **clean**:  Removes dependencies and generated files from both backend and frontend.
-* **clean-backend**: Deletes the backend virtual environment and generated Prisma schema.
-* **clean-frontend**: Removes frontend dependencies and generated Prisma schema.
-
 ## Contributing
 
-You can contribute to EvalAssist or to Unitxt. Look at the [Contribution Guidalines](htPtps://github.com/IBM/eval-assist/blob/main/CONTRIBUTING.md) for more details.
+You can contribute to EvalAssist or to Unitxt. Look at the [Contribution Guidelines](https://github.com/IBM/eval-assist/blob/main/CONTRIBUTING.md) for more details.
+
+Look at the [Local Development Guide](https://github.com/IBM/eval-assist/blob/main/LOCAL_DEV_GUIDE.md) for instructions on setting up a local development environment.
 
 ## Documentation
 
