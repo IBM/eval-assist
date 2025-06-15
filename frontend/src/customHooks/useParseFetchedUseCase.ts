@@ -1,8 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
-import { StoredTestCase } from '@prisma/client'
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
-import { TestCase, TestCaseV0 } from '@types'
+import { FetchedTestCase, TestCase, TestCaseV0 } from '@types'
 
 // EXAMPLES
 // fetched test case is v0 and current is v1
@@ -138,7 +137,7 @@ export const useParseFetchedUseCase = () => {
   const CURRENT_FORMAT_VERSION = useMemo(() => 0, [])
 
   const parseFetchedUseCase = useCallback(
-    (fetchedUseCase: StoredTestCase): TestCase | null => {
+    (fetchedUseCase: FetchedTestCase): TestCase | null => {
       const toParseObj: Record<string, any> = {
         ...JSON.parse(fetchedUseCase.content),
         id: fetchedUseCase.id,

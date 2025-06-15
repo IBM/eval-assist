@@ -6,14 +6,8 @@
 
 $block-radius: 4px;
 
-$columns-1: 1fr 0 0 0;
 $columns-2: 5fr 1fr 0 0;
-$columns-3-var1: 5fr 1fr 1fr 0;
-$columns-3-var2: 4fr 1fr 2fr 0;
-$columns-3-var3: 5fr 1fr 2fr 0;
-$columns-3-var4: 3fr 1fr 3fr 0;
-$columns-3-var5: 4fr 3fr 0 0;
-$columns-4: 3fr 1fr 1fr 2fr;
+$columns-3: 5fr 1fr 1fr 0;
 
 .content {
   display: flex;
@@ -129,36 +123,12 @@ $columns-4: 3fr 1fr 1fr 2fr;
   gap: 0.5rem;
 }
 
-.columns1 {
-  grid-template-columns: $columns-1;
-}
-
 .columns2 {
   grid-template-columns: $columns-2;
 }
 
-.columns3var1 {
-  grid-template-columns: $columns-3-var1;
-}
-
-.columns3var2 {
-  grid-template-columns: $columns-3-var2;
-}
-
-.columns3var3 {
-  grid-template-columns: $columns-3-var3;
-}
-
-.columns3var4 {
-  grid-template-columns: $columns-3-var4;
-}
-
-.columns3var5 {
-  grid-template-columns: $columns-3-var5;
-}
-
-.columns4 {
-  grid-template-columns: $columns-4;
+.columns3 {
+  grid-template-columns: $columns-3;
 }
 
 .actionButton {
