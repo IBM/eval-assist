@@ -1,0 +1,61 @@
+name: Build and Publish Python Package
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pip install poetry
+      - run: poetry self add poetry-dynamic-versioning
+
+      - name: Install frontend dependencies and build
+        working-directory: frontend
+        env:
+          NEXT_OUTPUT_MODE: export
+        run: |
+          npm install
+          npm run build
+
+      - name: Move built frontend to backend/evalassist/static
+        run: |
+          mv frontend/out backend/evalassist/static
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: poetry install --no-interaction --no-root
+
+      - name: Build backend package
+        working-directory: backend
+        run: poetry build
+
+      - name: Build package
+        working-directory: backend
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          poetry config pypi-token.pypi "$PYPI_TOKEN"
+          poetry publish
+
+      #  run: |
+      #     poetry config repositories.test-pypi https://test.pypi.org/legacy/
+      #     poetry config pypi-token.test-pypi $TEST_PYPI_TOKEN
+      #     poetry publish --build -r test-pypi

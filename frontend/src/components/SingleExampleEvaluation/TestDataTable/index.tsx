@@ -53,9 +53,7 @@ export const TestDataTable = ({ style, className }: Props) => {
     [currentTestCase, setCurrentTestCase],
   )
 
-  const [expectedResultOn, setExpectedResultOn] = useState(true)
-
-  const { isRisksAndHarms, syntheticGenerationEnabled } = useURLParamsContext()
+  const { syntheticGenerationEnabled } = useURLParamsContext()
 
   const resultsAvailable = useMemo(
     () => instances.some((instance) => (instance as DirectInstance | PairwiseInstance).result !== null),
@@ -64,13 +62,13 @@ export const TestDataTable = ({ style, className }: Props) => {
 
   const gridClasses = useMemo(
     () => ({
-      [classes.columns1]: !expectedResultOn && !resultsAvailable,
-      [classes.columns2]: (resultsAvailable && !expectedResultOn) || (expectedResultOn && !resultsAvailable),
-      [classes.columns3var1]: expectedResultOn && resultsAvailable,
+      [classes.columns2]: !resultsAvailable,
+      [classes.columns3]: resultsAvailable,
     }),
-    [expectedResultOn, resultsAvailable],
+    [resultsAvailable],
   )
 
+  console.log(gridClasses)
   const noPositionalBias = useMemo(() => {
     if (!resultsAvailable) return
     return currentTestCase.type === EvaluationType.DIRECT
@@ -260,13 +258,11 @@ export const TestDataTable = ({ style, className }: Props) => {
                 {'Add Context Variable'}
               </Button>
             </div>
-            {expectedResultOn && (
-              <div className={cx(classes.blockElement, classes.headerBlock)}>
-                <strong className={cx(classes.headerTypography)}>
-                  {returnByPipelineType(currentTestCase.type, 'Expected result', 'Expected winner')}
-                </strong>
-              </div>
-            )}
+            <div className={cx(classes.blockElement, classes.headerBlock)}>
+              <strong className={cx(classes.headerTypography)}>
+                {returnByPipelineType(currentTestCase.type, 'Expected result', 'Expected winner')}
+              </strong>
+            </div>
             {resultsAvailable && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
                 <strong className={classes.headerTypography}>
@@ -285,7 +281,6 @@ export const TestDataTable = ({ style, className }: Props) => {
                       setCurrentTestCase({ ...currentTestCase, responseVariableName: e.target.value })
                     }
                     color="blue"
-                    // isEditable={currentTestCase.type === EvaluationType.DIRECT}
                     onEdit={() => setEditPairwiseResponseNameModalOpen(true)}
                   />
                   {currentTestCase.type == EvaluationType.PAIRWISE &&
@@ -309,7 +304,7 @@ export const TestDataTable = ({ style, className }: Props) => {
                 </div>
               ))}
             </div>
-            {expectedResultOn && <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>}
+            <div className={cx(classes.blockElement, classes.subHeaderBlock)} />
             {resultsAvailable && <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>}
           </div>
 
@@ -323,7 +318,6 @@ export const TestDataTable = ({ style, className }: Props) => {
           {currentInstances.map((instance, i) => (
             <TestDataTableRow
               key={i}
-              expectedResultOn={expectedResultOn}
               setSelectedInstance={setSelectedInstance}
               setResultDetailsModalOpen={setResultDetailsModalOpen}
               evaluationRunning={evaluationRunning}

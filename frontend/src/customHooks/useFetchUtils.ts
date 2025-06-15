@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 
+import { BACKEND_API_HOST } from '@constants'
 import { useBackendUserContext } from '@providers/BackendUserProvider'
 
 export const useFetchUtils = () => {
@@ -16,7 +17,7 @@ export const useFetchUtils = () => {
         headers['Content-Type'] = contentType
       }
 
-      return await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_HOST}/${path}`, {
+      return await fetch(`${BACKEND_API_HOST}/${path}`, {
         headers,
         method: method,
         body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,

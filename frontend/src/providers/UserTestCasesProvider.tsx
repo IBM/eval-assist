@@ -5,9 +5,8 @@ import { Loading } from '@carbon/react'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
-import { StoredTestCase } from '@prisma/client'
 
-import { TestCase } from '../types'
+import { FetchedTestCase, TestCase } from '../types'
 
 interface UserTestCasesContextValue {
   userTestCases: TestCase[]
@@ -32,7 +31,7 @@ export const UserTestCasesProvider = ({ children }: { children: ReactNode }) => 
   useEffect(() => {
     const fetchTestCases = async () => {
       setLoadingTestCases(true)
-      const fetchedUserTestCases: StoredTestCase[] = await (
+      const fetchedUserTestCases: FetchedTestCase[] = await (
         await get(`test_case/?user=${encodeURIComponent(getUserName())}`)
       ).json()
       const parsedFetchedUserTestCases = fetchedUserTestCases

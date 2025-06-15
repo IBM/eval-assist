@@ -1,0 +1,33 @@
+name: Verify Backend Code Quality & Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install requirements
+        working-directory: backend
+        run: |
+          pip install poetry
+          poetry install --with dev
+      - name: Install the pre-commit hooks
+        working-directory: backend
+        run: poetry run python3 -m pre_commit install
+      - name: Validate all pre-commit verification were run correctly
+        working-directory: backend
+        run: poetry run python3 -m pre_commit run --all-files
+      - name: Send failure message
+        if: failure() # This step will only run if a previous step failed
+        run: echo "The quality & security verification failed. This is likely due to not using pre-commit hooks please run 'pre-commit install' before any commit."

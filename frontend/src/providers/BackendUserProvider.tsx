@@ -4,7 +4,7 @@ import { Loading } from '@carbon/react'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { AppUser } from '@prisma/client'
+import { AppUser } from '@types'
 
 interface BackendUserContextValue {
   backendUser: AppUser | null

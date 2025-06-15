@@ -111,6 +111,6 @@ venv.bak/
 
 .litellm_cache/
 
-/prisma/schema.prisma
-
 custom_models.json
+
+evalassist/static

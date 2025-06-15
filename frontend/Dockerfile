@@ -24,7 +24,6 @@ ENV NEXT_PUBLIC_USE_AUTH $NEXT_PUBLIC_USE_AUTH
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV TSC_COMPILE_ON_ERROR=true
 
-RUN npx prisma generate
 RUN npm run build
 # If using npm comment out above and use below instead
 # RUN npm run build
