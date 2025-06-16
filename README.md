@@ -56,7 +56,7 @@ _Check out the tutorials to see how to [run evaluations](https://github.com/IBM/
 
 You can contribute to EvalAssist or to Unitxt. Look at the [Contribution Guidelines](https://github.com/IBM/eval-assist/blob/main/CONTRIBUTING.md) for more details.
 
-Look at the [Local Development Guide](https://github.com/IBM/eval-assist/blob/main/LOCAL_DEV_GUIDE.md) for instructions on setting up a local development environment.
+Look at the [Local Development Guide](https://github.com/IBM/eval-assist/blob/main/LOCAL_DEV_GUIDE.MD) for instructions on setting up a local development environment.
 
 ## Documentation
 
