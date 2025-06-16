@@ -23,7 +23,7 @@ function install_backend() {
   try {
     run("npm run check:python");
     run(
-      "cd backend && pip3 install --upgrade pip poetry && poetry install --with dev"
+      "cd backend && python3 -m pip3 install --upgrade pip poetry && poetry install --with dev"
     );
     run("npm run prepare");
   } catch (err) {
@@ -71,7 +71,7 @@ function start_frontend() {
   const rawUrl =
     process.env.NEXT_PUBLIC_BACKEND_API_HOST || "http://localhost:8000";
   const strippedHost = rawUrl.replace(/^https?:\/\//, ""); // Remove http:// or https://
-  run(`npx wait-on -t 120s http-get://${strippedHost}/health`);
+  run(`npx wait-on http-get://${strippedHost}/health`);
   run("cd frontend && npm run dev");
 }
 
