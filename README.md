@@ -39,6 +39,8 @@ EvalAssist can be installed using pip, the Python package installer. Before proc
    pip install evalassist
    ```
 
+    _Note: It is recommended to install EvalAssist in an isolated Python environment using a tool like venv or conda._
+
 2. **Running EvalAssist**:
    After installation, you can start EvalAssist by executing:
 
