@@ -14,9 +14,6 @@ set -eo pipefail
 # Minting image tag using format: BUILD_NUMBER-BRANCH-COMMIT_ID-TIMESTAMP
 # Also copies information into a build.properties file, so they can be reused later on by other scripts (e.g. image url, chart name, ...)
 
-npm run prisma:prepare:backend
-npm run prisma:prepare:frontend
-
 IMAGE_NAME_BACKEND="${IMAGE_NAME}-backend"
 IMAGE_NAME_FRONTEND="${IMAGE_NAME}-frontend"
 # Input env variables (can be received via a pipeline environment properties.file.
