@@ -31,7 +31,7 @@ jobs:
       - name: Try starting the server
         working-directory: backend
         run: |
-          python3 run.py & sleep 30
+          poetry run python3 run.py & sleep 30
       - name: Test that FastAPI app is running
         run: |
           curl -f http://127.0.0.1:8000 || (echo "App did not start correctly" && exit 1)
