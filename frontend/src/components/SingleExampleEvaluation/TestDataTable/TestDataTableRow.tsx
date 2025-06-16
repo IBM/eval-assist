@@ -23,7 +23,6 @@ import RemovableSection from '../../RemovableSection/RemovableSection'
 import classes from './index.module.scss'
 
 interface Props {
-  expectedResultOn: boolean
   setSelectedInstance: Dispatch<SetStateAction<Instance | null>>
   setResultDetailsModalOpen: Dispatch<SetStateAction<boolean>>
   evaluationRunning: boolean
@@ -49,7 +48,6 @@ export const TestDataTableRow = ({
   evaluationRunning,
   isInstanceEvaluationRunning,
   criteria,
-  expectedResultOn,
   gridClasses,
   readOnly,
   instance,
@@ -241,28 +239,26 @@ export const TestDataTableRow = ({
               ))}
             </div>
             {/* Expected result */}
-            {expectedResultOn && (
-              <div className={cx(classes.blockElement, classes.resultBlock)}>
-                <Select
-                  id={`select-expected-results`}
-                  noLabel
-                  value={
-                    instance.expectedResult !== null && instance.expectedResult !== '' ? instance.expectedResult : ''
-                  }
-                  onChange={(e) =>
-                    setInstance({
-                      ...instance,
-                      expectedResult: e.target.value,
-                    })
-                  }
-                >
-                  <SelectItem value={''} text={''} />
-                  {expectedResultsOptions.map((option, i) => (
-                    <SelectItem key={i} text={option.text} value={option.value} />
-                  ))}
-                </Select>
-              </div>
-            )}
+            <div className={cx(classes.blockElement, classes.resultBlock)}>
+              <Select
+                id={`select-expected-results`}
+                noLabel
+                value={
+                  instance.expectedResult !== null && instance.expectedResult !== '' ? instance.expectedResult : ''
+                }
+                onChange={(e) =>
+                  setInstance({
+                    ...instance,
+                    expectedResult: e.target.value,
+                  })
+                }
+              >
+                <SelectItem value={''} text={''} />
+                {expectedResultsOptions.map((option, i) => (
+                  <SelectItem key={i} text={option.text} value={option.value} />
+                ))}
+              </Select>
+            </div>
 
             {result !== null && !isInstanceEvaluationRunning ? (
               <>

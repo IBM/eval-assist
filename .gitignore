@@ -49,4 +49,4 @@ certificates
 
 inference_engine_cache
 
-**/dev.db
+*.db

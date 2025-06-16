@@ -293,3 +293,17 @@ export interface CaretCoordinates {
   x: number
   y: number
 }
+
+export type FetchedTestCase = {
+  id: number
+  user_id: number
+  content: string
+  name: string
+}
+
+export type AppUser = {
+  id: number
+  emai: string
+  name: string
+  createdAt: string
+}
