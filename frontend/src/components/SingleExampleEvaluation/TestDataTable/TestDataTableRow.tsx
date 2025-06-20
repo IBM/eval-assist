@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { returnByPipelineType, toTitleCase } from 'src/utils'
+import { generateId, returnByPipelineType, toTitleCase } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 
@@ -156,7 +156,7 @@ export const TestDataTableRow = ({
   }
 
   const onDuplicateInstance = () => {
-    addInstance({ ...instance, id: crypto.randomUUID() })
+    addInstance({ ...instance, id: generateId() })
   }
 
   const pairwiseWinnerIndex = useMemo(() => {
