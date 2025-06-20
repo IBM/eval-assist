@@ -31,10 +31,10 @@ jobs:
       - name: Try starting the server
         working-directory: backend
         run: |
-          poetry run python3 run.py & sleep 30
+          poetry run eval-assist serve & sleep 45
       - name: Test that FastAPI app is running
         run: |
-          curl -f http://127.0.0.1:8000 || (echo "App did not start correctly" && exit 1)
+          curl -f http://127.0.0.1:8000/health || (echo "App did not start correctly" && exit 1)
       - name: Send failure message
         if: failure() # This step will only run if a previous step failed
         run: echo "The quality & security verification failed. This is likely due to not using pre-commit hooks please run 'pre-commit install' before any commit."
