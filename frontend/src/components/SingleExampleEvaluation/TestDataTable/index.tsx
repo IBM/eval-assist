@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { returnByPipelineType, toTitleCase } from 'src/utils'
+import { generateId, returnByPipelineType, toTitleCase } from 'src/utils'
 
 import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -68,7 +68,6 @@ export const TestDataTable = ({ style, className }: Props) => {
     [resultsAvailable],
   )
 
-  console.log(gridClasses)
   const noPositionalBias = useMemo(() => {
     if (!resultsAvailable) return
     return currentTestCase.type === EvaluationType.DIRECT
@@ -92,7 +91,7 @@ export const TestDataTable = ({ style, className }: Props) => {
       })),
       expectedResult: '',
       result: null,
-      id: crypto.randomUUID(),
+      id: generateId(),
     }
     if (currentTestCase.type === EvaluationType.DIRECT) {
       ;(newEmptyInstance as DirectInstance) = { ...newEmptyInstance, response: '' }

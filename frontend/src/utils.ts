@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid'
+
 import {
   CaretCoordinates,
   Criteria,
@@ -58,7 +60,7 @@ export const getEmptyInstance = (): Instance => ({
   contextVariables: [{ name: 'context', value: '' }],
   expectedResult: '',
   result: null,
-  id: crypto.randomUUID(),
+  id: generateId(),
 })
 
 export const getEmptyPairwiseInstance = (): PairwiseInstance => ({
@@ -259,3 +261,6 @@ export const getSelectionPosition = (input: HTMLInputElement | HTMLTextAreaEleme
 
   return { x, y }
 }
+
+export const generateId = () =>
+  typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : uuidv4()
