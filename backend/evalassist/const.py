@@ -12,6 +12,7 @@ from unitxt.llm_as_judge import (
     ModelProviderEnum,
 )
 
+from . import root_pkg_logger
 from .api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 
 
@@ -148,9 +149,12 @@ generation_length_to_sentence_count = {
 EVAL_ASSIST_DIR = Path(__file__).parent
 STATIC_DIR = Path(os.getenv("DATA_DIR", EVAL_ASSIST_DIR / "static"))
 DATA_DIR = Path(os.getenv("STATIC_DIR", EVAL_ASSIST_DIR / "data"))
+print("DATA DIR EXISTS:", os.path.exists(DATA_DIR))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+print("DATA DIR EXISTS:", os.path.exists(DATA_DIR))
+print("DATA DIR WRITEABLE:", os.access(DATA_DIR, os.W_OK))
 DEFAULT_DATABASE_URL = f"sqlite:///{DATA_DIR / 'evalassist.db'}"
 DATABASE_URL = os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URL)
 
-print(f"EVAL_ASSIST_DIR: {EVAL_ASSIST_DIR}")
-print(f"DATABASE_URL: {DATABASE_URL}")
+root_pkg_logger.debug(f"EVAL_ASSIST_DIR: {EVAL_ASSIST_DIR}")
+root_pkg_logger.debug(f"DATABASE_URL: {DATABASE_URL}")
