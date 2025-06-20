@@ -12,5 +12,6 @@ if __name__ == "__main__":
             ":"
         )[1][2:],
         port=8000,
-        reload=False,
+        reload=True,
+        loop="asyncio",
     )
