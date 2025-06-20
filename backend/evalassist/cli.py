@@ -8,13 +8,18 @@ def cli():
 
 
 @cli.command()
-def serve():
-    uvicorn.run("evalassist.main:app", host="127.0.0.1", port=8000)
+@click.option("--host", default="127.0.0.1", help="Host to bind to.")
+@click.option("--port", default=8000, type=int, help="Port to bind to.")
+@click.option("--reload", default=False, type=bool, help="Reload on changes.")
+def serve(host: str, port: int, reload: bool):
+    uvicorn.run(
+        "evalassist.main:app", host=host, port=port, loop="asyncio", reload=reload
+    )
 
 
 @cli.command()
 def version():
-    click.echo("EvalAssist v0.1.5")
+    click.echo("EvalAssist v0.1.8")
 
 
 def main():
