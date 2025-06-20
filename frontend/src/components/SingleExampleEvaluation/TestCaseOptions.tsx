@@ -1,10 +1,11 @@
 import { toTitleCase } from 'src/utils'
 
-import { CSSProperties, Dispatch, SetStateAction, useState } from 'react'
+import { CSSProperties, useState } from 'react'
 
 import { Button, IconButton } from '@carbon/react'
-import { Add, Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
+import { Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
+import { USE_STORAGE } from '@constants'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
@@ -59,7 +60,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
         <UseCaseTypeBadge type={currentTestCase.type} style={{ paddingInline: '0.5rem' }} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        {isTestCaseSaved && (
+        {USE_STORAGE && isTestCaseSaved && (
           <IconButton
             disabled={savingUseCase || !changesDetected || isRisksAndHarms}
             kind="ghost"
@@ -70,33 +71,51 @@ export const TestCaseOptions = ({ style, className }: Props) => {
           </IconButton>
         )}
 
-        <IconButton
-          disabled={isRisksAndHarms}
-          label={'Save as'}
-          kind="ghost"
-          onClick={() => setSaveUseCaseModalOpen(true)}
-        >
-          <WatsonHealthSaveImage />
-        </IconButton>
-        <IconButton
-          disabled={isRisksAndHarms}
-          kind="ghost"
-          label={'Sample code'}
-          onClick={() => setSampleCodeTypeModalOpen(true)}
-        >
-          <Download />
-        </IconButton>
-        <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
-        <IconButton
-          kind="ghost"
-          disabled={!isTestCaseSaved}
-          label={'Delete Test Case'}
-          onClick={() => {
-            setDeleteUseCaseModalOpen(true)
-          }}
-        >
-          <TrashCan />
-        </IconButton>
+        {USE_STORAGE && (
+          <IconButton
+            disabled={isRisksAndHarms}
+            label={'Save as'}
+            kind="ghost"
+            onClick={() => setSaveUseCaseModalOpen(true)}
+          >
+            <WatsonHealthSaveImage />
+          </IconButton>
+        )}
+
+        {USE_STORAGE ? (
+          <IconButton
+            disabled={isRisksAndHarms}
+            kind="ghost"
+            label={'Sample code'}
+            onClick={() => setSampleCodeTypeModalOpen(true)}
+          >
+            <Download />
+          </IconButton>
+        ) : (
+          <Button
+            disabled={isRisksAndHarms}
+            kind="ghost"
+            renderIcon={Download}
+            onClick={() => setSampleCodeTypeModalOpen(true)}
+          >
+            {'Donwload as code'}
+          </Button>
+        )}
+        {USE_STORAGE && (
+          <>
+            <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
+            <IconButton
+              kind="ghost"
+              disabled={!isTestCaseSaved}
+              label={'Delete Test Case'}
+              onClick={() => {
+                setDeleteUseCaseModalOpen(true)
+              }}
+            >
+              <TrashCan />
+            </IconButton>
+          </>
+        )}
       </div>
     </div>
   )
