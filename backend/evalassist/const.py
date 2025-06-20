@@ -149,12 +149,34 @@ generation_length_to_sentence_count = {
 EVAL_ASSIST_DIR = Path(__file__).parent
 STATIC_DIR = Path(os.getenv("DATA_DIR", EVAL_ASSIST_DIR / "static"))
 DATA_DIR = Path(os.getenv("STATIC_DIR", EVAL_ASSIST_DIR / "data"))
-print("DATA DIR EXISTS:", os.path.exists(DATA_DIR))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
-print("DATA DIR EXISTS:", os.path.exists(DATA_DIR))
-print("DATA DIR WRITEABLE:", os.access(DATA_DIR, os.W_OK))
+
 DEFAULT_DATABASE_URL = f"sqlite:///{DATA_DIR / 'evalassist.db'}"
 DATABASE_URL = os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URL)
 
+DEFAULT_UNITXT_INFERENCE_ENGINE_CACHE_PATH = DATA_DIR / "inference_engine_cache"
+
+UNITXT_INFERENCE_ENGINE_CACHE_PATH = os.environ.get(
+    "UNITXT_INFERENCE_ENGINE_CACHE_PATH"
+)
+if UNITXT_INFERENCE_ENGINE_CACHE_PATH is None:
+    UNITXT_INFERENCE_ENGINE_CACHE_PATH = DEFAULT_UNITXT_INFERENCE_ENGINE_CACHE_PATH / ""
+    os.environ["UNITXT_INFERENCE_ENGINE_CACHE_PATH"] = str(
+        DEFAULT_UNITXT_INFERENCE_ENGINE_CACHE_PATH / ""
+    )
+else:
+    UNITXT_INFERENCE_ENGINE_CACHE_PATH = Path(UNITXT_INFERENCE_ENGINE_CACHE_PATH)
+UNITXT_INFERENCE_ENGINE_CACHE_PATH.mkdir(parents=True, exist_ok=True)
+
+USE_UNITXT_CACHE = os.environ.get("USE_UNITXT_CACHE", "true").lower() == "true"
+USE_STORAGE = os.environ.get("NEXT_PUBLIC_USE_STORAGE", "true").lower() == "true"
+os.environ["USE_STORAGE"] = str(USE_STORAGE)
+
 root_pkg_logger.debug(f"EVAL_ASSIST_DIR: {EVAL_ASSIST_DIR}")
+root_pkg_logger.debug(f"DATA_DIR: {DATA_DIR}")
 root_pkg_logger.debug(f"DATABASE_URL: {DATABASE_URL}")
+root_pkg_logger.debug(
+    f"UNITXT_INFERENCE_ENGINE_CACHE_PATH: {UNITXT_INFERENCE_ENGINE_CACHE_PATH}"
+)
+root_pkg_logger.debug(f"USE_UNITXT_CACHE: {USE_UNITXT_CACHE}")
+root_pkg_logger.debug(f"USE_STORAGE: {USE_STORAGE}")

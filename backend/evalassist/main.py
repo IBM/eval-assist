@@ -88,8 +88,14 @@ router = APIRouter(route_class=LoggingRoute)
 
 
 def get_session():
-    with Session(engine) as session:
-        yield session
+    if engine is not None:
+        with Session(engine) as session:
+            yield session
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="The database engine is None, probably because USE_STORAGE is set to false.",
+        )
 
 
 class HealthCheck(BaseModel):

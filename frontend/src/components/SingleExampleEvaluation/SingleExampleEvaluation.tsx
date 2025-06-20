@@ -16,7 +16,7 @@ import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
 
 import { Evaluator } from '../../types'
-import { AppSidenavNew } from './AppSidenav/AppSidenav'
+import { AppSidenavNew } from './AppSidenav'
 import { CriteriaView } from './CriteriaView'
 import { EvaluateButton } from './EvaluateButton'
 import { PipelineSelect } from './EvaluatorSelect'
