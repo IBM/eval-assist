@@ -5,6 +5,7 @@ import { useId } from 'react'
 import { IconButton } from '@carbon/react'
 import { Categories, IbmSecurity, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 
+import { USE_STORAGE } from '@constants'
 import { useAppSidebarContext } from '@providers/AppSidebarProvider'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
@@ -92,26 +93,28 @@ export const AppSidenavNew = ({}: AppSidenavProps) => {
             <IbmSecurity size={20} />
           </IconButton>
         </li>
-        <li>
-          <IconButton
-            align="right"
-            label="My Test Cases"
-            kind="ghost"
-            size="lg"
-            className={cx(classes.itemBtn, {
-              [classes.selected]: selected === 'user_test_cases',
-            })}
-            id={`${id}-tab__user_test_cases`}
-            role="tab"
-            aria-selected={selected === 'user_test_cases'}
-            aria-controls={`${id}-tabpanel__user_test_cases`}
-            onClick={() => {
-              setSelected((selected) => (selected === 'user_test_cases' ? null : 'user_test_cases'))
-            }}
-          >
-            <WatsonHealthSaveAnnotation size={20} />
-          </IconButton>
-        </li>
+        {USE_STORAGE && (
+          <li>
+            <IconButton
+              align="right"
+              label="My Test Cases"
+              kind="ghost"
+              size="lg"
+              className={cx(classes.itemBtn, {
+                [classes.selected]: selected === 'user_test_cases',
+              })}
+              id={`${id}-tab__user_test_cases`}
+              role="tab"
+              aria-selected={selected === 'user_test_cases'}
+              aria-controls={`${id}-tabpanel__user_test_cases`}
+              onClick={() => {
+                setSelected((selected) => (selected === 'user_test_cases' ? null : 'user_test_cases'))
+              }}
+            >
+              <WatsonHealthSaveAnnotation size={20} />
+            </IconButton>
+          </li>
+        )}
       </ul>
       <div
         role="tabpanel"

@@ -2,6 +2,7 @@ import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffe
 
 import { Loading } from '@carbon/react'
 
+import { USE_STORAGE } from '@constants'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
@@ -40,7 +41,11 @@ export const UserTestCasesProvider = ({ children }: { children: ReactNode }) => 
       setUserTestCases(parsedFetchedUserTestCases)
       setLoadingTestCases(false)
     }
-    fetchTestCases()
+    if (USE_STORAGE) {
+      fetchTestCases()
+    } else {
+      setUserTestCases([])
+    }
   }, [get, getUserName, parseFetchedUseCase])
 
   if (loadingTestCases || userTestCases === null) return <Loading withOverlay />
@@ -48,7 +53,7 @@ export const UserTestCasesProvider = ({ children }: { children: ReactNode }) => 
   return (
     <UserTestCasesContext.Provider
       value={{
-        userTestCases: userTestCases,
+        userTestCases,
         setUserTestCases: setUserTestCases as Dispatch<SetStateAction<TestCase[]>>,
       }}
     >

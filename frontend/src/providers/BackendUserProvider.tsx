@@ -2,6 +2,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from 'react
 
 import { Loading } from '@carbon/react'
 
+import { USE_STORAGE } from '@constants'
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { AppUser } from '@types'
@@ -52,11 +53,14 @@ export const BackendUserProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     }
-    createUserIfNotExist()
+
+    if (USE_STORAGE) {
+      createUserIfNotExist()
+    }
     // eslint-disable-next-line
   }, [JSON.stringify(user)])
 
-  if (fetchingBackendUser || backendUser === null) return <Loading withOverlay />
+  if ((fetchingBackendUser || backendUser === null) && USE_STORAGE) return <Loading withOverlay />
 
   return (
     <BackendUserContext.Provider
