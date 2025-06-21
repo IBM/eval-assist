@@ -8,6 +8,7 @@ import Head from 'next/head'
 import '@styles/globals.scss'
 
 import { AppShell } from '@components/AppShell/AppShell'
+import { FeatureFlagsProvider } from '@providers/FeatureFlagsProvider'
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ session: Session }>) => {
   const title = `${PLATFORM_NAME}`

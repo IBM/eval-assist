@@ -5,9 +5,9 @@ import { useId } from 'react'
 import { IconButton } from '@carbon/react'
 import { Categories, IbmSecurity, WatsonHealthSaveAnnotation } from '@carbon/react/icons'
 
-import { USE_STORAGE } from '@constants'
 import { useAppSidebarContext } from '@providers/AppSidebarProvider'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
@@ -24,6 +24,7 @@ interface AppSidenavProps {}
 
 export const AppSidenavNew = ({}: AppSidenavProps) => {
   const id = useId()
+  const { useStorage } = useFeatureFlags()
   const { sidebarTabSelected: selected, setSidebarTabSelected: setSelected } = useAppSidebarContext()
   const { setConfirmationModalOpen, setEvaluationRunningModalOpen } = useModalsContext()
   const { useCaseId } = useURLParamsContext()
@@ -93,7 +94,7 @@ export const AppSidenavNew = ({}: AppSidenavProps) => {
             <IbmSecurity size={20} />
           </IconButton>
         </li>
-        {USE_STORAGE && (
+        {useStorage && (
           <li>
             <IconButton
               align="right"

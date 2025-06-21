@@ -38,6 +38,7 @@ from .api.common import (
     DirectAIActionResponse,
     DirectEvaluationRequestModel,
     DirectResponseModel,
+    FeatureFlagsModel,
     Instance,
     NotebookParams,
     PairwiseEvaluationRequestModel,
@@ -49,7 +50,13 @@ from .api.common import (
 from .api.pipelines import EvaluatorMetadataAPI, EvaluatorsResponseModel
 from .api.types import DomainEnum, PersonaEnum
 from .benchmark.benchmark import get_all_benchmarks
-from .const import EXTENDED_EVALUATORS_METADATA, STATIC_DIR, domain_persona_map
+from .const import (
+    EXTENDED_EVALUATORS_METADATA,
+    STATIC_DIR,
+    USE_AUTH,
+    USE_STORAGE,
+    domain_persona_map,
+)
 from .database import engine  # Assumes you have engine/session setup
 from .evaluators.unitxt import (
     DirectAssessmentEvaluator,
@@ -121,6 +128,17 @@ class MissingColumnsException(Exception):
 )
 def get_health() -> HealthCheck:
     return HealthCheck(status="OK")
+
+
+@router.get(
+    "/feature-flags/",
+    response_model=FeatureFlagsModel,
+)
+def get_feature_flags() -> HealthCheck:
+    return {
+        "use_auth": USE_AUTH,
+        "use_storage": USE_STORAGE,
+    }
 
 
 @router.get("/evaluators/", response_model=EvaluatorsResponseModel)

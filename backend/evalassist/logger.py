@@ -8,6 +8,7 @@ from fastapi.routing import APIRoute
 from sqlmodel import Session
 from starlette.background import BackgroundTask
 
+from .const import USE_STORAGE
 from .database import engine  # Assumes you have engine/session setup
 
 ignored_endpoints = [
@@ -17,11 +18,14 @@ ignored_endpoints = [
     "/test_case/",
     "/user/",
     "/default-credentials/",
-    "/benchmarks//domains-and-personas/",
+    "/benchmarks/",
+    "/domains-and-personas/",
 ]
 
 
 def log_info(method, path, req_body, res_body, headers, runtime):
+    if not USE_STORAGE:
+        return
     record = {
         "path": path,
         "method": method,

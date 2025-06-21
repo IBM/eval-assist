@@ -22,7 +22,6 @@ const nextConfig = {
   trailingSlash: true,
   env: {
     NEXT_PUBLIC_BACKEND_API_HOST: process.env.NEXT_PUBLIC_BACKEND_API_HOST,
-    NEXT_PUBLIC_USE_AUTH: process.env.NEXT_PUBLIC_USE_AUTH,
   },
 }
 

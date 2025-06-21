@@ -1,12 +1,14 @@
 import { useCallback, useMemo } from 'react'
 
 import { useSession } from 'next-auth/react'
-import { USE_AUTH } from '@constants'
+
+import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 
 export const useAuthentication = () => {
+  const { useAuth } = useFeatureFlags()
   const { data: session, status } = useSession()
   const user = useMemo(() => session?.user, [session])
-  const authenticationEnabled = useMemo(() => USE_AUTH, [])
+  const authenticationEnabled = useMemo(() => useAuth, [useAuth])
 
   const isAuthenticated = status === 'authenticated'
 
