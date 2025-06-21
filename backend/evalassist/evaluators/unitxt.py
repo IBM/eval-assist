@@ -25,7 +25,7 @@ from ..api.common import (
     PairwiseResultModel,
 )
 from ..const import (
-    USE_UNITXT_CACHE,
+    UNITXT_CACHE_ENABLED,
     ExtendedEvaluatorNameEnum,
     ExtendedModelProviderEnum,
 )
@@ -80,7 +80,7 @@ class Evaluator(ABC):
             provider,
             model_name,
             custom_params={
-                "use_cache": USE_UNITXT_CACHE,
+                "use_cache": UNITXT_CACHE_ENABLED,
                 "seed": 42,
                 "temperature": 0,
             },

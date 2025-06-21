@@ -51,10 +51,10 @@ from .api.pipelines import EvaluatorMetadataAPI, EvaluatorsResponseModel
 from .api.types import DomainEnum, PersonaEnum
 from .benchmark.benchmark import get_all_benchmarks
 from .const import (
+    AUTHENTICATION_ENABLED,
     EXTENDED_EVALUATORS_METADATA,
     STATIC_DIR,
-    USE_AUTH,
-    USE_STORAGE,
+    STORAGE_ENABLED,
     domain_persona_map,
 )
 from .database import engine  # Assumes you have engine/session setup
@@ -101,7 +101,7 @@ def get_session():
     else:
         raise HTTPException(
             status_code=400,
-            detail="The database engine is None, probably because USE_STORAGE is set to false.",
+            detail="The database engine is None, probably because STORAGE_ENABLED is set to false.",
         )
 
 
@@ -136,8 +136,8 @@ def get_health() -> HealthCheck:
 )
 def get_feature_flags() -> HealthCheck:
     return {
-        "use_auth": USE_AUTH,
-        "use_storage": USE_STORAGE,
+        "authentication_enabled": AUTHENTICATION_ENABLED,
+        "storage_enabled": STORAGE_ENABLED,
     }
 
 

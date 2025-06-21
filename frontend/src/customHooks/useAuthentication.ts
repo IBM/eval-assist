@@ -5,10 +5,9 @@ import { useSession } from 'next-auth/react'
 import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 
 export const useAuthentication = () => {
-  const { useAuth } = useFeatureFlags()
+  const { authenticationEnabled } = useFeatureFlags()
   const { data: session, status } = useSession()
   const user = useMemo(() => session?.user, [session])
-  const authenticationEnabled = useMemo(() => useAuth, [useAuth])
 
   const isAuthenticated = status === 'authenticated'
 

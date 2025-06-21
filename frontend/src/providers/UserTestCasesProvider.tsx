@@ -27,7 +27,7 @@ export const UserTestCasesProvider = ({ children }: { children: ReactNode }) => 
   const [loadingTestCases, setLoadingTestCases] = useState(false)
   const [userTestCases, setUserTestCases] = useState<TestCase[] | null>(null)
   const { getUserName } = useAuthentication()
-  const { useStorage } = useFeatureFlags()
+  const { storageEnabled } = useFeatureFlags()
   const { get } = useFetchUtils()
   const { parseFetchedUseCase } = useParseFetchedUseCase()
   useEffect(() => {
@@ -42,12 +42,12 @@ export const UserTestCasesProvider = ({ children }: { children: ReactNode }) => 
       setUserTestCases(parsedFetchedUserTestCases)
       setLoadingTestCases(false)
     }
-    if (useStorage) {
+    if (storageEnabled) {
       fetchTestCases()
     } else {
       setUserTestCases([])
     }
-  }, [get, getUserName, parseFetchedUseCase, useStorage])
+  }, [get, getUserName, parseFetchedUseCase, storageEnabled])
 
   if (loadingTestCases || userTestCases === null) return <Loading withOverlay />
 
