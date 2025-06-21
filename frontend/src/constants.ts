@@ -82,6 +82,4 @@ export enum DirectActionTypeEnum {
 }
 
 export const BACKEND_API_HOST = process.env.NEXT_PUBLIC_BACKEND_API_HOST || '' // '' means the next app was exported statically and is served by the FastAPI backend
-export const USE_AUTH = process.env.NEXT_PUBLIC_USE_AUTH === 'true' // '' means the next app was exported statically and is served by the FastAPI backend
-export const USE_STORAGE =
-  process.env.NEXT_PUBLIC_USE_STORAGE !== undefined ? process.env.NEXT_PUBLIC_USE_STORAGE === 'true' : true
+console.log('BACKEND_API_HOST', BACKEND_API_HOST)

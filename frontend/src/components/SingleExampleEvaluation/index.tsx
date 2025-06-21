@@ -4,6 +4,7 @@ import { BackendUserProvider } from '@providers/BackendUserProvider'
 import { CriteriasProvider } from '@providers/CriteriasProvider'
 import { CurrentTestCaseProvider } from '@providers/CurrentTestCaseProvider'
 import { EvaluatorOptionsProvider } from '@providers/EvaluatorOptionsProvider'
+import { FeatureFlagsProvider } from '@providers/FeatureFlagsProvider'
 import { ModalsProvider } from '@providers/ModalsProvider'
 import { ModelProviderCredentialsProvider } from '@providers/ModelProviderCredentialsProvider'
 import { SelectedTextProvider } from '@providers/SelectedTextProvider'
@@ -15,33 +16,35 @@ import { UserTestCasesProvider } from '@providers/UserTestCasesProvider'
 import { SingleExampleEvaluation } from './SingleExampleEvaluation'
 
 const Landing = () => (
-  <BackendUserProvider>
-    <CriteriasProvider>
-      <EvaluatorOptionsProvider>
-        <ModelProviderCredentialsProvider>
-          <UserTestCasesProvider>
-            <URLParamsProvider>
-              <CurrentTestCaseProvider>
-                <TestCaseActionsProvider>
-                  <ModalsProvider>
-                    <SelectedTextProvider>
-                      <SyntheticGenerationProvider>
-                        <AppSidebarProvider>
-                          <EditorProvider>
-                            <SingleExampleEvaluation />
-                          </EditorProvider>
-                        </AppSidebarProvider>
-                      </SyntheticGenerationProvider>
-                    </SelectedTextProvider>
-                  </ModalsProvider>
-                </TestCaseActionsProvider>
-              </CurrentTestCaseProvider>
-            </URLParamsProvider>
-          </UserTestCasesProvider>
-        </ModelProviderCredentialsProvider>
-      </EvaluatorOptionsProvider>
-    </CriteriasProvider>
-  </BackendUserProvider>
+  <FeatureFlagsProvider>
+    <BackendUserProvider>
+      <CriteriasProvider>
+        <EvaluatorOptionsProvider>
+          <ModelProviderCredentialsProvider>
+            <UserTestCasesProvider>
+              <URLParamsProvider>
+                <CurrentTestCaseProvider>
+                  <TestCaseActionsProvider>
+                    <ModalsProvider>
+                      <SelectedTextProvider>
+                        <SyntheticGenerationProvider>
+                          <AppSidebarProvider>
+                            <EditorProvider>
+                              <SingleExampleEvaluation />
+                            </EditorProvider>
+                          </AppSidebarProvider>
+                        </SyntheticGenerationProvider>
+                      </SelectedTextProvider>
+                    </ModalsProvider>
+                  </TestCaseActionsProvider>
+                </CurrentTestCaseProvider>
+              </URLParamsProvider>
+            </UserTestCasesProvider>
+          </ModelProviderCredentialsProvider>
+        </EvaluatorOptionsProvider>
+      </CriteriasProvider>
+    </BackendUserProvider>
+  </FeatureFlagsProvider>
 )
 
 export default Landing

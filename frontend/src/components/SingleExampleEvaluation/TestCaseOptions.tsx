@@ -5,8 +5,8 @@ import { CSSProperties, useState } from 'react'
 import { Button, IconButton } from '@carbon/react'
 import { Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
-import { USE_STORAGE } from '@constants'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
@@ -21,6 +21,7 @@ interface Props {
 
 export const TestCaseOptions = ({ style, className }: Props) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
+  const { useStorage } = useFeatureFlags()
   const { currentTestCase, isTestCaseSaved, changesDetected } = useCurrentTestCase()
   const { isRisksAndHarms } = useURLParamsContext()
   const { setDeleteUseCaseModalOpen, setSaveUseCaseModalOpen, setEditNameModalOpen, setSampleCodeTypeModalOpen } =
@@ -60,7 +61,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
         <UseCaseTypeBadge type={currentTestCase.type} style={{ paddingInline: '0.5rem' }} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        {USE_STORAGE && isTestCaseSaved && (
+        {useStorage && isTestCaseSaved && (
           <IconButton
             disabled={savingUseCase || !changesDetected || isRisksAndHarms}
             kind="ghost"
@@ -71,7 +72,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
           </IconButton>
         )}
 
-        {USE_STORAGE && (
+        {useStorage && (
           <IconButton
             disabled={isRisksAndHarms}
             label={'Save as'}
@@ -82,7 +83,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
           </IconButton>
         )}
 
-        {USE_STORAGE ? (
+        {useStorage ? (
           <IconButton
             disabled={isRisksAndHarms}
             kind="ghost"
@@ -101,7 +102,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
             {'Donwload as code'}
           </Button>
         )}
-        {USE_STORAGE && (
+        {useStorage && (
           <>
             <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
             <IconButton

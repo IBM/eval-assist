@@ -230,3 +230,8 @@ class DirectAIActionRequest(BaseModel):
 
 class DirectAIActionResponse(BaseModel):
     result: str
+
+
+class FeatureFlagsModel(BaseModel):
+    use_auth: bool
+    use_storage: bool

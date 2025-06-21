@@ -96,7 +96,6 @@ export const DirectAIActionPopup = ({
     setPrompt('')
     setActionedText('')
     setSelectedText('')
-    console.log('jererereere')
   }, [setGeneratedText, setSelectedText])
 
   const onCancelClick = useCallback(() => {
