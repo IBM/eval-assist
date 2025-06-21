@@ -5,13 +5,13 @@ import { Loading } from '@carbon/react'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 
 interface FeatureFlags {
-  useAuth: boolean
-  useStorage: boolean
+  authenticationEnabled: boolean
+  storageEnabled: boolean
 }
 
 const defaultFeatureFlags = {
-  useAuth: false,
-  useStorage: true,
+  authenticationEnabled: false,
+  storageEnabled: true,
 }
 
 const FeatureFlagsContext = createContext<FeatureFlags>(defaultFeatureFlags)
@@ -33,8 +33,8 @@ export const FeatureFlagsProvider = ({ children }: { children: ReactNode }) => {
         if (response.ok) {
           const flags = await response.json()
           setFeatureFlags({
-            useAuth: flags.use_auth,
-            useStorage: flags.use_storage,
+            authenticationEnabled: flags.authentication_enabled,
+            storageEnabled: flags.storage_enabled,
           })
         } else {
           console.error('Failed to fetch feature flags')

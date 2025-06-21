@@ -8,7 +8,7 @@ from fastapi.routing import APIRoute
 from sqlmodel import Session
 from starlette.background import BackgroundTask
 
-from .const import USE_STORAGE
+from .const import STORAGE_ENABLED
 from .database import engine  # Assumes you have engine/session setup
 
 ignored_endpoints = [
@@ -24,7 +24,7 @@ ignored_endpoints = [
 
 
 def log_info(method, path, req_body, res_body, headers, runtime):
-    if not USE_STORAGE:
+    if not STORAGE_ENABLED:
         return
     record = {
         "path": path,

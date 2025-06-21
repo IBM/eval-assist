@@ -233,5 +233,5 @@ class DirectAIActionResponse(BaseModel):
 
 
 class FeatureFlagsModel(BaseModel):
-    use_auth: bool
-    use_storage: bool
+    authentication_enabled: bool
+    storage_enabled: bool

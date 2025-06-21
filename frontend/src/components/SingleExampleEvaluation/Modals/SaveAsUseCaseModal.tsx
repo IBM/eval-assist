@@ -5,7 +5,6 @@ import { Modal, TextInput } from '@carbon/react'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 
-import { EvaluationType, TestCase } from '../../../types'
 import { UseCaseTypeBadge } from '../../UseCaseTypeBadge/UseCaseTypeBadge'
 
 interface Props {

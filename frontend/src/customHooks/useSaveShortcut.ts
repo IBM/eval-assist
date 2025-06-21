@@ -1,14 +1,15 @@
-import { Dispatch, SetStateAction, useCallback, useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
-import { TestCase } from '@types'
 
 interface Props {}
 
 export const useSaveShortcut = ({}: Props) => {
   const { isTestCaseSaved, changesDetected } = useCurrentTestCase()
+  const { storageEnabled } = useFeatureFlags()
   const { onSave } = useTestCaseActionsContext()
   const { setSaveUseCaseModalOpen } = useModalsContext()
   const onShortcut = useCallback(
@@ -26,7 +27,9 @@ export const useSaveShortcut = ({}: Props) => {
   )
 
   useEffect(() => {
-    document.addEventListener('keydown', onShortcut)
-    return () => document.removeEventListener('keydown', onShortcut)
-  }, [isTestCaseSaved, onSave, onShortcut, setSaveUseCaseModalOpen])
+    if (storageEnabled) {
+      document.addEventListener('keydown', onShortcut)
+      return () => document.removeEventListener('keydown', onShortcut)
+    }
+  }, [isTestCaseSaved, onSave, onShortcut, setSaveUseCaseModalOpen, storageEnabled])
 }
