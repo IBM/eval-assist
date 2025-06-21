@@ -176,6 +176,17 @@ AUTHENTICATION_ENABLED = (
     os.environ.get("AUTHENTICATION_ENABLED", "false").lower() == "true"
 )
 
+UVICORN_WORKERS = os.environ.get("UVICORN_WORKERS", "1")
+try:
+    UVICORN_WORKERS = int(UVICORN_WORKERS)
+    if UVICORN_WORKERS < 1:
+        UVICORN_WORKERS = 1
+except ValueError:
+    UVICORN_WORKERS = 1
+    root_pkg_logger.info(
+        f"Invalid UVICORN_WORKERS value, defaulting to {UVICORN_WORKERS}"
+    )
+
 root_pkg_logger.debug(f"EVAL_ASSIST_DIR: {EVAL_ASSIST_DIR}")
 root_pkg_logger.debug(f"DATA_DIR: {DATA_DIR}")
 root_pkg_logger.debug(f"DATABASE_URL: {DATABASE_URL}")
@@ -185,3 +196,4 @@ root_pkg_logger.debug(
 root_pkg_logger.debug(f"UNITXT_CACHE_ENABLED: {UNITXT_CACHE_ENABLED}")
 root_pkg_logger.debug(f"STORAGE_ENABLED: {STORAGE_ENABLED}")
 root_pkg_logger.debug(f"AUTHENTICATION_ENABLED: {AUTHENTICATION_ENABLED}")
+root_pkg_logger.debug(f"UVICORN_WORKERS: {UVICORN_WORKERS}")
