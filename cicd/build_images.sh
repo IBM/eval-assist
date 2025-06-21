@@ -93,12 +93,12 @@ buildctl build \
     --frontend dockerfile.v0 --opt filename=${DOCKER_FILE} --local dockerfile=frontend \
     --local context=frontend \
     --opt build-arg:NEXT_PUBLIC_BACKEND_API_HOST=${NEXT_PUBLIC_BACKEND_API_HOST} \
-    --opt build-arg:NEXT_PUBLIC_USE_AUTH=${NEXT_PUBLIC_USE_AUTH} \
     --output type=image,name="${REGISTRY_URL}/${REGISTRY_NAMESPACE}/${IMAGE_NAME_FRONTEND}:${IMAGE_TAG}",push=true
 echo "Building backend image"
 buildctl build \
     --frontend dockerfile.v0 --opt filename=${DOCKER_FILE} --local dockerfile=backend \
     --local context=backend \
+    --opt build-arg:USE_AUTH=${USE_AUTH} \
     --output type=image,name="${REGISTRY_URL}/${REGISTRY_NAMESPACE}/${IMAGE_NAME_BACKEND}:${IMAGE_TAG}",push=true
 set +x
 

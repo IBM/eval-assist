@@ -169,8 +169,10 @@ else:
 UNITXT_INFERENCE_ENGINE_CACHE_PATH.mkdir(parents=True, exist_ok=True)
 
 USE_UNITXT_CACHE = os.environ.get("USE_UNITXT_CACHE", "true").lower() == "true"
-USE_STORAGE = os.environ.get("NEXT_PUBLIC_USE_STORAGE", "true").lower() == "true"
+USE_STORAGE = os.environ.get("USE_STORAGE", "true").lower() == "true"
 os.environ["USE_STORAGE"] = str(USE_STORAGE)
+
+USE_AUTH = os.environ.get("USE_AUTH", "false").lower() == "true"
 
 root_pkg_logger.debug(f"EVAL_ASSIST_DIR: {EVAL_ASSIST_DIR}")
 root_pkg_logger.debug(f"DATA_DIR: {DATA_DIR}")
@@ -180,3 +182,4 @@ root_pkg_logger.debug(
 )
 root_pkg_logger.debug(f"USE_UNITXT_CACHE: {USE_UNITXT_CACHE}")
 root_pkg_logger.debug(f"USE_STORAGE: {USE_STORAGE}")
+root_pkg_logger.debug(f"USE_AUTH: {USE_AUTH}")

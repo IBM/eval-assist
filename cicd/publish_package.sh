@@ -21,5 +21,5 @@ echo "✅ Done—frontend moved to backend/evalassist/out"
 cd backend
 poetry build
 
-poetry config pypi-token.pypi "$PYPI_TOKEN"
-poetry publish
+# poetry config pypi-token.pypi "$PYPI_TOKEN"
+# poetry publish
