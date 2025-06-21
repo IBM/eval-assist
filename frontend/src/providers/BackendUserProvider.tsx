@@ -23,7 +23,7 @@ export const useBackendUserContext = () => {
 }
 
 export const BackendUserProvider = ({ children }: { children: ReactNode }) => {
-  const { useStorage } = useFeatureFlags()
+  const { storageEnabled } = useFeatureFlags()
   const [fetchingBackendUser, setFetchingBackendUser] = useState(false)
   const { user, authenticationEnabled, defaultUserName } = useAuthentication()
   const [backendUser, setBackendUser] = useState<AppUser | null>(null)
@@ -57,13 +57,13 @@ export const BackendUserProvider = ({ children }: { children: ReactNode }) => {
       }
     }
 
-    if (useStorage) {
+    if (storageEnabled) {
       createUserIfNotExist()
     }
     // eslint-disable-next-line
-  }, [JSON.stringify(user), useStorage])
+  }, [JSON.stringify(user), storageEnabled])
 
-  if ((fetchingBackendUser || backendUser === null) && useStorage) return <Loading withOverlay />
+  if ((fetchingBackendUser || backendUser === null) && storageEnabled) return <Loading withOverlay />
 
   return (
     <BackendUserContext.Provider

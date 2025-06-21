@@ -24,18 +24,19 @@ interface AppSidenavProps {}
 
 export const AppSidenavNew = ({}: AppSidenavProps) => {
   const id = useId()
-  const { useStorage } = useFeatureFlags()
+  const { storageEnabled } = useFeatureFlags()
   const { sidebarTabSelected: selected, setSidebarTabSelected: setSelected } = useAppSidebarContext()
   const { setConfirmationModalOpen, setEvaluationRunningModalOpen } = useModalsContext()
   const { useCaseId } = useURLParamsContext()
   const { changesDetected, setTestCaseSelected, updateURLFromTestCase } = useCurrentTestCase()
   const { evaluationRunning } = useTestCaseActionsContext()
   const { userTestCases: userUseCases } = useUserTestCasesContext()
+
   const onUseCaseClick = (useCase: TestCase, subCatalogName?: string) => {
     // if the usecase is already selected don't do nothing
     if (useCaseId !== null && useCaseId === useCase.id) return
     // if there are unsaved changes, let the user know that they may lose work
-    if (changesDetected) {
+    if (changesDetected && storageEnabled) {
       setTestCaseSelected({ useCase, subCatalogName: subCatalogName || null })
       setConfirmationModalOpen(true)
     } else if (evaluationRunning) {
@@ -94,7 +95,7 @@ export const AppSidenavNew = ({}: AppSidenavProps) => {
             <IbmSecurity size={20} />
           </IconButton>
         </li>
-        {useStorage && (
+        {storageEnabled && (
           <li>
             <IconButton
               align="right"

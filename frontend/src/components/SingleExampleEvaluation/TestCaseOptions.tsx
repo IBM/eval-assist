@@ -21,7 +21,7 @@ interface Props {
 
 export const TestCaseOptions = ({ style, className }: Props) => {
   const [savingUseCase, setSavingUseCase] = useState(false)
-  const { useStorage } = useFeatureFlags()
+  const { storageEnabled } = useFeatureFlags()
   const { currentTestCase, isTestCaseSaved, changesDetected } = useCurrentTestCase()
   const { isRisksAndHarms } = useURLParamsContext()
   const { setDeleteUseCaseModalOpen, setSaveUseCaseModalOpen, setEditNameModalOpen, setSampleCodeTypeModalOpen } =
@@ -61,7 +61,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
         <UseCaseTypeBadge type={currentTestCase.type} style={{ paddingInline: '0.5rem' }} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        {useStorage && isTestCaseSaved && (
+        {storageEnabled && isTestCaseSaved && (
           <IconButton
             disabled={savingUseCase || !changesDetected || isRisksAndHarms}
             kind="ghost"
@@ -72,7 +72,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
           </IconButton>
         )}
 
-        {useStorage && (
+        {storageEnabled && (
           <IconButton
             disabled={isRisksAndHarms}
             label={'Save as'}
@@ -83,7 +83,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
           </IconButton>
         )}
 
-        {useStorage ? (
+        {storageEnabled ? (
           <IconButton
             disabled={isRisksAndHarms}
             kind="ghost"
@@ -102,7 +102,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
             {'Donwload as code'}
           </Button>
         )}
-        {useStorage && (
+        {storageEnabled && (
           <>
             <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
             <IconButton
