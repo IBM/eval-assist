@@ -1,5 +1,6 @@
 import click
 import uvicorn
+from evalassist.const import UVICORN_WORKERS
 
 
 @click.group()
@@ -13,13 +14,18 @@ def cli():
 @click.option("--reload", default=False, type=bool, help="Reload on changes.")
 def serve(host: str, port: int, reload: bool):
     uvicorn.run(
-        "evalassist.main:app", host=host, port=port, loop="asyncio", reload=reload
+        "evalassist.main:app",
+        host=host,
+        port=port,
+        loop="asyncio",
+        reload=reload,
+        workers=UVICORN_WORKERS,
     )
 
 
 @cli.command()
 def version():
-    click.echo("EvalAssist v0.1.8")
+    click.echo("EvalAssist v0.1.11")
 
 
 def main():
