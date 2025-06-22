@@ -1,7 +1,7 @@
 # EvalAssist
 
 <p align="center">
-  <img src="frontend/public/images/logo.svg" alt="EvalAssist Logo" width="200"/>
+  <img src="frontend/public/images/icon.svg" alt="EvalAssist Logo" width="200"/>
 </p>
 
 <p align="center">
