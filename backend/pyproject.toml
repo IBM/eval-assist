@@ -83,6 +83,7 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 pre_commit = "*"
+bandit = { version = "*", extras = ["standard", "toml"] }
 
 [project.scripts]
 eval-assist = "evalassist.cli:main"
@@ -106,3 +107,7 @@ build-backend = "poetry_dynamic_versioning.backend"
 enable = true
 vcs = "git"
 metadata = false
+
+
+[tool.bandit]
+exclude_dirs = [".venv", "venv", ".poetry", "dist"]

@@ -27,3 +27,8 @@ repos:
       - id: detect-secrets
         args: [--baseline, .secrets.baseline, --verbose]
         files: ^(frontend/.*\.ts|frontend/.*\.tsx|backend/.*\.py)$
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.5
+    hooks:
+      - id: bandit
+        args: [-c, backend/pyproject.toml, -r, backend]
