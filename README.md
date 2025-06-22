@@ -1,4 +1,6 @@
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/evalassist)
+![PyPI - Version](https://img.shields.io/pypi/v/evalassist)
+![GitHub License](https://img.shields.io/github/license/IBM/eval-assist)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10775/badge)](https://www.bestpractices.dev/projects/10775)
 
 # EvalAssist
 

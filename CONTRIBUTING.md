@@ -10,8 +10,11 @@ free to scratch it.
 
 To contribute code or documentation, please submit a [pull request](https://github.com/ibm/eval-assist/pulls).
 
+To report vulnerabilities privately, you can contact the authors by email (see [MAINTAINERS.md](MAINTAINERS.md)).
+
 A good way to familiarize yourself with the codebase and contribution process is
 to look for and tackle low-hanging fruits in the [issue tracker](https://github.com/ibm/eval-assist/issues).
+
 
 Look at the [Local Development Guide](https://github.com/IBM/eval-assist/blob/main/LOCAL_DEV_GUIDE.md) for instructions on setting up a local development environment.
 
