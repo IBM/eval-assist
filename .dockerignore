@@ -16,4 +16,4 @@ yarn-error.log*
 .pnpm-debug.log*
 pip-log.txt
 pip-delete-this-directory.txt
-*.db
+*.db*
