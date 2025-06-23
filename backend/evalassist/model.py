@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
+from sqlalchemy import Column, DateTime, func
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -9,7 +10,10 @@ class AppUser(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     email: str = Field(index=True, unique=True)
     name: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    # created_at: datetime.datetime = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
+    created_at: datetime = Field(
+        sa_column=Column(DateTime(), server_default=func.now(), nullable=False)
+    )
     stored_test_cases: List["StoredTestCase"] = Relationship(back_populates="app_user")
 
 
