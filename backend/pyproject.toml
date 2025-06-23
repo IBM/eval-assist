@@ -52,16 +52,10 @@ dependencies = [
     "litellm",
     "tenacity",
     "diskcache",
-    "datasets",
     "langchain",
-    "numpy",
     "openai",
     "pandas",
-    "scipy",
     "ibm_watsonx_ai",
-    "transformers",
-    "torch",
-    "accelerate",
     "unitxt",
     "nbconvert",
     "boto3",
@@ -84,6 +78,14 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 pre_commit = "*"
 bandit = { version = "*", extras = ["standard", "toml"] }
+
+
+[tool.poetry.group.local-inference]
+optional = true
+
+[tool.poetry.group.local-inference.dependencies]
+torch = "*"
+accelerate = "*"
 
 [project.scripts]
 eval-assist = "evalassist.cli:main"

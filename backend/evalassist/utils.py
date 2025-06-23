@@ -17,11 +17,9 @@ from ibm_watsonx_ai.wml_client_error import (
 )
 from langchain_core.exceptions import OutputParserException
 from openai import AuthenticationError, NotFoundError
-from torch import device
 from unitxt.inference import (
     CrossProviderInferenceEngine,
     HFAutoModelInferenceEngine,
-    TorchDeviceMixin,
     WMLInferenceEngineGeneration,
 )
 from unitxt.llm_as_judge import EvaluatorNameEnum, ModelProviderEnum
@@ -266,10 +264,17 @@ def get_evaluator_metadata_wrapper(
         )
 
 
-def get_default_torch_device(avoid_mps: bool = False) -> device:
-    device = TorchDeviceMixin().get_device_id()
+def get_default_torch_device(avoid_mps: bool = False):
+    try:
+        from unitxt.inference import TorchDeviceMixin
+
+        device = TorchDeviceMixin().get_device_id()
+        return device
+    except Exception:
+        raise ImportError(
+            'torch is not installed -by default-. Make sure you installed local inference dependencies with pip install "evalassist[local-inference]"'
+        )
     logger.debug(f"Detected device: {device}")
-    return device
 
 
 def init_evaluator_name(
