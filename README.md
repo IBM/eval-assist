@@ -60,6 +60,8 @@ eval-assist serve
 
 In all cases, after running the command, you can access the EvalAssist server at [http://localhost:8000](http://localhost:8000).
 
+EvalAssist can be configured through environment variables and command parameters. Take a look at the [configuration documentation](SYSTEM_CONFIGURATION.md).
+
 _Check out the tutorials to see how to [run evaluations](https://github.com/IBM/eval-assist/wiki#mini-tutorial-running-an-evaluation) and [generate synthetic data](https://github.com/IBM/eval-assist/wiki#mini-tutorial-generating-test-data)._
 
 ## Contributing
