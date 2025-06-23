@@ -198,6 +198,11 @@ spec:
               cpu: 4
               memory: 16Gi
           env:
+            - name: AUTHENTICATION_ENABLED
+              valueFrom:
+                secretKeyRef:
+                  name: ${CLUSTER_NAMESPACE}-secret
+                  key: AUTHENTICATION_ENABLED
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
