@@ -147,18 +147,16 @@ generation_length_to_sentence_count = {
 
 
 EVAL_ASSIST_DIR = Path(__file__).parent
-STATIC_DIR = Path(os.getenv("DATA_DIR", EVAL_ASSIST_DIR / "static"))
+STATIC_DIR = Path(os.getenv("STATIC_DIR", EVAL_ASSIST_DIR / "static"))
 DATA_DIR = Path(os.getenv("DATA_DIR", EVAL_ASSIST_DIR / "data"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 DEFAULT_DATABASE_URL = f"sqlite:///{DATA_DIR / 'evalassist.db'}"
-DATABASE_URL = os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URL)
+DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 
 DEFAULT_UNITXT_INFERENCE_ENGINE_CACHE_PATH = DATA_DIR / "inference_engine_cache"
 
-UNITXT_INFERENCE_ENGINE_CACHE_PATH = os.environ.get(
-    "UNITXT_INFERENCE_ENGINE_CACHE_PATH"
-)
+UNITXT_INFERENCE_ENGINE_CACHE_PATH = os.getenv("UNITXT_INFERENCE_ENGINE_CACHE_PATH")
 if UNITXT_INFERENCE_ENGINE_CACHE_PATH is None:
     UNITXT_INFERENCE_ENGINE_CACHE_PATH = DEFAULT_UNITXT_INFERENCE_ENGINE_CACHE_PATH / ""
     os.environ["UNITXT_INFERENCE_ENGINE_CACHE_PATH"] = str(
@@ -168,15 +166,13 @@ else:
     UNITXT_INFERENCE_ENGINE_CACHE_PATH = Path(UNITXT_INFERENCE_ENGINE_CACHE_PATH)
 UNITXT_INFERENCE_ENGINE_CACHE_PATH.mkdir(parents=True, exist_ok=True)
 
-UNITXT_CACHE_ENABLED = os.environ.get("UNITXT_CACHE_ENABLED", "true").lower() == "true"
-STORAGE_ENABLED = os.environ.get("STORAGE_ENABLED", "true").lower() == "true"
+UNITXT_CACHE_ENABLED = os.getenv("UNITXT_CACHE_ENABLED", "true").lower() == "true"
+STORAGE_ENABLED = os.getenv("STORAGE_ENABLED", "true").lower() == "true"
 os.environ["STORAGE_ENABLED"] = str(STORAGE_ENABLED)
 
-AUTHENTICATION_ENABLED = (
-    os.environ.get("AUTHENTICATION_ENABLED", "false").lower() == "true"
-)
+AUTHENTICATION_ENABLED = os.getenv("AUTHENTICATION_ENABLED", "false").lower() == "true"
 
-UVICORN_WORKERS = os.environ.get("UVICORN_WORKERS", "1")
+UVICORN_WORKERS = os.getenv("UVICORN_WORKERS", "1")
 try:
     UVICORN_WORKERS = int(UVICORN_WORKERS)
     if UVICORN_WORKERS < 1:
