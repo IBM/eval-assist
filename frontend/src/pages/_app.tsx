@@ -6,6 +6,7 @@ import Head from 'next/head'
 import '@styles/globals.scss'
 
 import { AppShell } from '@components/AppShell/AppShell'
+import { FeatureFlagsProvider } from '@providers/FeatureFlagsProvider'
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ session: Session }>) => {
   return (
@@ -35,11 +36,13 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ ses
         <link rel="icon" href="images/icon-32x32.png" type="image/png" />
         <link rel="icon" href="images/icon.svg" type="image/svg+xml" />
       </Head>
-      <SessionProvider session={session}>
-        <AppShell>
-          <Component {...pageProps} />
-        </AppShell>
-      </SessionProvider>
+      <FeatureFlagsProvider>
+        <SessionProvider session={session}>
+          <AppShell>
+            <Component {...pageProps} />
+          </AppShell>
+        </SessionProvider>
+      </FeatureFlagsProvider>
     </>
   )
 }

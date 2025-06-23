@@ -20,7 +20,6 @@ import classes from './AppHeader.module.scss'
 export const AppHeader = () => {
   const title = `${PLATFORM_NAME}`
   const { authenticationEnabled, isAuthenticated } = useAuthentication()
-
   return (
     <Header className={classes.root} aria-label={title}>
       <HeaderName prefix={''} style={{ cursor: 'pointer' }} href="/">
