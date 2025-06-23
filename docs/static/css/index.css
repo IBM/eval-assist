@@ -131,3 +131,12 @@ body {
   border: none !important;
   box-shadow: none !important;
 }
+
+.tabs-content > ul > li {
+  display: none;
+  list-style: none;
+}
+
+.tabs-content > ul > li.is-active {
+  display: block;
+}

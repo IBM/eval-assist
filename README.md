@@ -30,29 +30,35 @@ with their criteria, they can auto-generate a Notebook with Unitxt code to run b
 data sets based on their criteria definition. EvalAssist also includes a catalog of example test cases,
 exhibiting the use of LLM-as-a-judge across a variety of scenarios. Users can save their own test cases.
 
-## How to Install 🚀
+## How to Install
 
-### Installation via Python pip 🐍
+EvalAssist can be installed using various package managers. Before proceeding, ensure you're using **Python >= 3.10, <3.14** to avoid compatibility issues.
 
-EvalAssist can be installed using pip, the Python package installer. Before proceeding, ensure you're using **Python >= 3.10, <3.14** to avoid compatibility issues.
+### Installation via pip
 
-1. **Install EvalAssist**:
-   Open your terminal and run the following command to install EvalAssist:
+```bash
+python3 -m venv venv
+source venv/bin/activate # or venv\Scripts\activate.bat in Windows
+pip install evalassist
+eval-assist serve
+```
 
-   ```bash
-   pip install evalassist
-   ```
+### Installation via uv
 
-    _Note: It is recommended to install EvalAssist in an isolated Python environment using a tool like venv or conda._
+```bash
+uvx --python 3.11 --from evalassist eval-assist serve
+```
 
-2. **Running EvalAssist**:
-   After installation, you can start EvalAssist by executing:
+### Installation via conda
 
-   ```bash
-   eval-assist serve
-   ```
+```bash
+conda create -n evalassist python=3.11
+conda activate evalassist
+pip install evalassist
+eval-assist serve
+```
 
-This will start the EvalAssist server, which you can access at [http://localhost:8000](http://localhost:8000)
+In all cases, after running the command, you can access the EvalAssist server at [http://localhost:8000](http://localhost:8000).
 
 _Check out the tutorials to see how to [run evaluations](https://github.com/IBM/eval-assist/wiki#mini-tutorial-running-an-evaluation) and [generate synthetic data](https://github.com/IBM/eval-assist/wiki#mini-tutorial-generating-test-data)._
 

@@ -71,6 +71,9 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="static/css/index.css" />
 
+    <!-- <script src="bulma/bulma.js"></script> -->
+    <script src="bulma/tabs.js"></script>
+
     <!-- Font Awesome JS -->
     <script
       defer
@@ -88,20 +91,6 @@ https://ibm.github.io/eval-assist/ -->
       src="https://www.statcounter.com/counter/counter.js"
       async
     ></script>
-    <noscript
-      ><div class="statcounter">
-        <a
-          title="Web Analytics
-Made Easy - Statcounter"
-          href="https://statcounter.com/"
-          target="_blank"
-          ><img
-            class="statcounter"
-            src="https://c.statcounter.com/13142689/0/b702826e/1/"
-            alt="Web Analytics Made Easy - Statcounter"
-            referrerpolicy="no-referrer-when-downgrade"
-        /></a></div
-    ></noscript>
     <!-- End of Statcounter Code -->
   </head>
   <body>
@@ -140,6 +129,12 @@ Made Easy - Statcounter"
                 </span>
                 <span class="is-size-6 has-text-weight-light">Code</span>
               </a>
+              <a href="#get_started" class="button is-dark mr-0">
+                <span class="icon">
+                  <i class="fas fa-rocket"></i>
+                </span>
+                <span class="is-size-6 has-text-weight-light">Get Started</span>
+              </a>
               <a href="#publications" class="button is-dark mr-0">
                 <span class="icon">
                   <i class="fas fa-file-pdf"></i>
@@ -148,6 +143,7 @@ Made Easy - Statcounter"
                   >Publications</span
                 >
               </a>
+
               <a href="#team" class="button is-dark mr-0">
                 <span class="icon">
                   <i class="fas fa-user-group"></i>
@@ -157,8 +153,8 @@ Made Easy - Statcounter"
             </div>
           </div>
           <div class="columns is-centered">
-            <div class="column has-text-centered">
-              <div class="content has-text-justified">
+            <div class="column">
+              <div class="content">
                 <p class="is-size-5 has-text-weight-light">
                   EvalAssist is an application that simplifies using large
                   language models as evaluators (LLM-as-a-Judge) of the output
@@ -169,8 +165,7 @@ Made Easy - Statcounter"
                   evaluation library leveraging a multi-step prompt-chaining
                   approach to conduct evaluations. Once users are satisfied with
                   their criteria, they can generate a Jupyter notebook to run
-                  <a href="https://www.unitxt.ai/" target="_blank">Unitxt</a>
-                  evaluations of their criteria at scale.
+                  Unitxt evaluations of their criteria at scale.
                 </p>
               </div>
             </div>
@@ -205,7 +200,7 @@ Made Easy - Statcounter"
               <figure class="image">
                 <img
                   src="static/images/evalassist.gif"
-                  alt="EvalAssist Teaser Image"
+                  alt="A gif that showcase overall judge steps"
                 />
               </figure>
             </div>
@@ -234,7 +229,7 @@ Made Easy - Statcounter"
           <div class="column key-feature-image is-hidden-touch">
             <img
               src="static/images/Flexible_Methods.png"
-              alt="EvalAssist Teaser Image"
+              alt="Flexible methods"
               class="feature-image"
             />
           </div>
@@ -245,7 +240,7 @@ Made Easy - Statcounter"
           <div class="column key-feature-image is-hidden-touch">
             <img
               src="static/images/AI-Assisted_Criteria_Refinement.png"
-              alt="EvalAssist Teaser Image"
+              alt="AI-Assisted Criteria Refinement"
               class="feature-image"
             />
           </div>
@@ -272,7 +267,7 @@ Made Easy - Statcounter"
           <div class="column key-feature-image is-hidden-touch">
             <img
               src="static/images/Trustworthy_Results.png"
-              alt="EvalAssist Teaser Image"
+              alt="Trustworthy Results"
               class="feature-image"
             />
           </div>
@@ -282,7 +277,7 @@ Made Easy - Statcounter"
           <div class="column key-feature-image is-hidden-touch">
             <img
               src="static/images/Scalable_Toolkit.png"
-              alt="EvalAssist Teaser Image"
+              alt="Scalable Toolkit"
               class="feature-image"
             />
           </div>
@@ -316,7 +311,7 @@ Made Easy - Statcounter"
           <div class="column key-feature-image is-hidden-touch">
             <img
               src="static/images/Specialized_Models.png"
-              alt="EvalAssist Teaser Image"
+              alt="Diverse Models"
               class="feature-image"
             />
           </div>
@@ -326,7 +321,7 @@ Made Easy - Statcounter"
           <div class="column key-feature-image is-hidden-touch">
             <img
               src="static/images/Test_Case_Catalog.png"
-              alt="EvalAssist Teaser Image"
+              alt="Test Case Catalog"
               class="feature-image"
             />
           </div>
@@ -340,6 +335,92 @@ Made Easy - Statcounter"
             </p>
           </div>
         </div>
+      </div>
+    </section>
+    <section id="get_started" class="section pb-0">
+      <div class="container">
+        <h2
+          class="title has-text-weight-medium has-text-black has-text-centered pb-3"
+        >
+          Get Started
+        </h2>
+        <div class="tabs-wrapper">
+          <div class="tabs is-centered">
+            <ul>
+              <li class="is-active">
+                <a>pip</a>
+              </li>
+              <li>
+                <a>uv</a>
+              </li>
+              <li>
+                <a>conda</a>
+              </li>
+            </ul>
+          </div>
+          <div class="tabs-content">
+            <ul>
+              <li class="is-active">
+                <div class="content">
+                  <p class="is-size-5 has-text-weight-light"></p>
+                  <ul>
+                    <li class="pb-2">
+                      <strong>macOS/Linux:</strong>
+                      <pre>
+<code>python3 -m venv venv
+source venv/bin/activate
+pip install evalassist
+eval-assist serve</code></pre>
+                    </li>
+                    <li>
+                      <strong>Windows:</strong>
+                      <pre>
+<code>python3 -m venv venv
+venv\Scripts\activate.bat
+pip install evalassist
+eval-assist serve</code></pre>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <div class="content">
+                  <p class="is-size-5 has-text-weight-light"></p>
+                  <pre>
+<code>uvx --python 3.11 --from evalassist eval-assist serve</code>
+</pre>
+                </div>
+              </li>
+              <li>
+                <div class="content">
+                  <p class="is-size-5 has-text-weight-light"></p>
+                  <pre>
+<code>conda create -n evalassist python=3.11
+conda activate evalassist
+pip install evalassist
+eval-assist serve</code></pre>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <p class="is-size-5 has-text-weight-light pt-4">
+          This installs all necessary dependencies and starts EvalAssist. After
+          installation, you can access EvalAssist at
+          <a
+            href="http://localhost:8000"
+            rel="noopener noreferrer"
+            target="_blank"
+            >http://localhost:8000</a
+          >. For more detailed instructions and tutorials, check out our
+          <a
+            href="https://github.com/IBM/eval-assist?tab=readme-ov-file#how-to-install-"
+            rel="noopener noreferrer"
+            target="_blank"
+            >Installation Guide</a
+          >
+          .
+        </p>
       </div>
     </section>
 
