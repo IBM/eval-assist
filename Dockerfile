@@ -19,9 +19,6 @@ WORKDIR /app
 COPY backend/pyproject.toml backend/poetry.lock* /app/
 COPY backend/evalassist /app/evalassist
 RUN mkdir /app/evalassist/data && chmod 777 /app/evalassist/data
-RUN mkdir /app/evalassist/data && chmod 777 /app/evalassist/data
-RUN ls .
-RUN ls ./evalassist
 RUN pip install poetry \
     && poetry config virtualenvs.create false \
     && poetry install

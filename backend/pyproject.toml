@@ -87,6 +87,12 @@ optional = true
 torch = "*"
 accelerate = "*"
 
+[tool.poetry.group.postgresql]
+optional = true
+
+[tool.poetry.group.postgresql.dependencies]
+psycopg2-binary = "*"
+
 [project.scripts]
 eval-assist = "evalassist.cli:main"
 

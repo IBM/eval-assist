@@ -1,10 +1,10 @@
 FROM python:3.12-slim
 WORKDIR /app
-COPY . .
+COPY pyproject.toml poetry.lock* /app/
+COPY evalassist /app/evalassist
+RUN pip install poetry \
+    && poetry config virtualenvs.create false \
+    && poetry install
 
-ARG AUTHENTICATION_ENABLED
-ENV AUTHENTICATION_ENABLED $AUTHENTICATION_ENABLED
-
-RUN pip install --no-cache-dir -r requirements_lock.txt
 EXPOSE 8000
-CMD uvicorn evalassist.main:app --workers 8 --host 0.0.0.0 --port 8000 --timeout-keep-alive 120
+CMD ["eval-assist", "serve", "--host", "0.0.0.0", "--port", "8000"]
