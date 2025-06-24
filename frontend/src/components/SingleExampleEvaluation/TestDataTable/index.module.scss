@@ -45,6 +45,7 @@ $columns-3: 5fr 1fr 1fr 0;
   &:not(:last-child):not(.actionButtonBlock) {
     border-right: none;
   }
+  min-width: 125px;
 }
 
 .tableRow {
