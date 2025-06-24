@@ -17,24 +17,33 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install requirements
         working-directory: backend
         run: |
           pip install poetry
-          poetry install --with dev
-      - name: Install the pre-commit hooks
+          poetry install --with dev,testing
+
+      - name: Run pre-commit hooks
         working-directory: backend
-        run: poetry run python3 -m pre_commit install
-      - name: Validate all pre-commit verification were run correctly
-        working-directory: backend
-        run: poetry run python3 -m pre_commit run --all-files
-      - name: Try starting the server
+        run: |
+          poetry run pre-commit install
+          poetry run pre-commit run --all-files
+
+      - name: Start the server
         working-directory: backend
         run: |
           poetry run eval-assist serve & sleep 45
-      - name: Test that FastAPI app is running
+
+      - name: Health endpoint test
         run: |
           curl -f http://127.0.0.1:8000/health || (echo "App did not start correctly" && exit 1)
+
+      - name: Run pytest with coverage
+        working-directory: backend
+        run: |
+          poetry run pytest --cov=evalassist -q
+
       - name: Send failure message
         if: failure() # This step will only run if a previous step failed
         run: echo "The quality & security verification failed. This is likely due to not using pre-commit hooks please run 'pre-commit install' before any commit."
