@@ -25,6 +25,7 @@ from unitxt.inference import (
 from unitxt.llm_as_judge import EvaluatorNameEnum, ModelProviderEnum
 
 from .const import (
+    CUSTOM_MODELS_PATH,
     EXTENDED_EVALUATOR_TO_MODEL_ID,
     EXTENDED_EVALUATORS_METADATA,
     ExtendedEvaluatorMetadata,
@@ -51,17 +52,19 @@ def fill_unknown_template(template: str, value: str) -> str:
 
 
 def get_custom_models():
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    json_path = os.path.join(base_path, "..", "custom_models.json")
-    if not os.path.exists(json_path):
-        json_path = os.path.join(base_path, "..", "..", "custom_models.json")
-    if os.path.exists(json_path):
-        with open(json_path, "r", encoding="utf-8") as file:
+    if os.path.exists(CUSTOM_MODELS_PATH):
+        with open(CUSTOM_MODELS_PATH, "r", encoding="utf-8") as file:
             try:
                 custom_models = json.load(file)
+                from . import root_pkg_logger
+
+                root_pkg_logger.debug(
+                    "Loaded the following custom models",
+                    json.dumps(custom_models, indent=2),
+                )
                 return custom_models
             except Exception:
-                raise ValueError("The custom_models json format is wrong")
+                raise ValueError("${CUSTOM_MODELS_PATH} must be a valid json file")
     else:
         return []
 
@@ -406,13 +409,23 @@ def clean_object(results: dict | list):
         Union[dict, list]: The cleaned results.
     """
     if isinstance(results, list):
-        return [clean_object(x) for x in results]
-    cleaned = {
-        k: (v if not isinstance(v, dict) else clean_object(v))
-        for k, v in results.items()
-        if v is not None and not (isinstance(v, (list, dict)) and len(v) == 0)
-    }
-    # Remove the dictionary itself if it becomes empty
-    return {
-        k: v for k, v in cleaned.items() if not (isinstance(v, dict) and len(v) == 0)
-    }
+        cleaned_list = [
+            clean_object(x)
+            for x in results
+            if x is not None and not (isinstance(x, (list, dict)) and len(x) == 0)
+        ]
+        return cleaned_list
+    elif isinstance(results, dict):
+        cleaned = {
+            k: (v if not isinstance(v, dict) else clean_object(v))
+            for k, v in results.items()
+            if v is not None and not (isinstance(v, (list, dict)) and len(v) == 0)
+        }
+        # Remove the dictionary itself if it becomes empty
+        return {
+            k: v
+            for k, v in cleaned.items()
+            if not (isinstance(v, dict) and len(v) == 0)
+        }
+    else:
+        return results
