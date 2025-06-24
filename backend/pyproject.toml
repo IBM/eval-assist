@@ -80,6 +80,13 @@ pre_commit = "*"
 bandit = { version = "*", extras = ["standard", "toml"] }
 
 
+[tool.poetry.group.testing]
+optional = true
+
+[tool.poetry.group.testing.dependencies]
+httpx = "*"
+tox = "*"
+
 [tool.poetry.group.local-inference]
 optional = true
 
