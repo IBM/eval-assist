@@ -65,12 +65,10 @@ dependencies = [
     "sqlmodel",
 ]
 
-
 [tool.poetry]
-packages = [{ include = "evalassist" }]
+packages = [{ include = "evalassist", from = "src" }]
 include = [{ path = "evalassist/static/**/*", format = ["sdist", "wheel"] }]
 version = "0.0.0"
-
 
 [tool.poetry.group.dev]
 optional = true
@@ -79,13 +77,18 @@ optional = true
 pre_commit = "*"
 bandit = { version = "*", extras = ["standard", "toml"] }
 
-
 [tool.poetry.group.testing]
 optional = true
 
 [tool.poetry.group.testing.dependencies]
+pytest = "*"
 httpx = "*"
 tox = "*"
+pytest-cov = "*"
+
+[tool.pytest.ini_options]
+addopts = "--cov=evalassist"
+
 
 [tool.poetry.group.local-inference]
 optional = true
@@ -93,6 +96,7 @@ optional = true
 [tool.poetry.group.local-inference.dependencies]
 torch = "*"
 accelerate = "*"
+
 
 [tool.poetry.group.postgresql]
 optional = true
@@ -123,6 +127,5 @@ enable = true
 vcs = "git"
 metadata = false
 
-
 [tool.bandit]
-exclude_dirs = [".venv", "venv", ".poetry", "dist"]
+exclude_dirs = [".venv", "venv", ".poetry", "dist", "tests"]
