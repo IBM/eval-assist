@@ -34,6 +34,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          
         },
         {
           ...getEmptyUseCaseWithCriteria('user_message_social_bias', EvaluationType.DIRECT),
