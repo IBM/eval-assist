@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from typing import List, Optional
 
 from sqlalchemy import Column, DateTime, func
@@ -10,11 +10,11 @@ class AppUser(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     email: str = Field(index=True, unique=True)
     name: str
-    # created_at: datetime.datetime = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
-    created_at: datetime = Field(
+    created_at: datetime.datetime = Field(
         sa_column=Column(DateTime(), server_default=func.now(), nullable=False)
     )
     stored_test_cases: List["StoredTestCase"] = Relationship(back_populates="app_user")
+    log_records: List["LogRecord"] = Relationship(back_populates="app_user")
 
 
 class StoredTestCase(SQLModel, table=True):
@@ -31,3 +31,6 @@ class LogRecord(SQLModel, table=True):
     __tablename__ = "log_record"
     id: Optional[int] = Field(default=None, primary_key=True)
     data: str
+    user_id: int = Field(foreign_key="app_user.id")
+
+    app_user: Optional[AppUser] = Relationship(back_populates="log_records")

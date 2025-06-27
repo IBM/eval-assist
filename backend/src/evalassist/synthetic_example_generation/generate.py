@@ -283,10 +283,10 @@ class DirectActionGenerator:
 
         prompt = system_prompt
 
-        logger.debug(f"Prompt:\n{prompt}")
+        logger.debug(f"Direct AI action prompt:\n{prompt}")
 
         response = self.inference_engine.infer([{"source": prompt}])[0]
-        logger.debug(f"Response:\n{response}")
+        logger.debug(f"Direct AI action unparsed response:\n{response}")
 
         parsed_response = output_parser.parse(response)["response"]
 
@@ -497,7 +497,8 @@ class Generator:
             self.output_parser.parse(response) for response in responses
         ]
 
-        logger.debug(f"The generated parsed examples are:\n{parsed_responses}")
+        logger.debug(f"The generated unparsed examples are:\n{responses[0]}")
+        logger.debug(f"The generated parsed examples are:\n{parsed_responses[0]}")
 
         instances = [
             Instance(
@@ -722,7 +723,6 @@ class Generator:
         query = query_template.format()
 
         prompt = system_prompt + query
-
         response = self.inference_engine.infer([{"source": prompt}])[0]
 
         logger.debug(f"The prompt used for synthetic generation is:\n{prompt}")
@@ -760,6 +760,8 @@ class Generator:
         ]
         criteria_text = "\n".join(criteria_list)
         query = f"Describe a borderline case that lies between these criteria:\n\n{criteria_text}\n\nProvide a natural language description of what it means to be a borderline case among these criteria. Your description should mirror the style and format of the original criteria but describe the subtle ways in which the case partially satisfies multiple criteria while not fully satisfying any single one.\n\n{criteria_format_instructions}"
+        logger.debug(f"The borderline criteria generation prompt is \n{query}")
+
         borderline_criteria_unparsed = self.inference_engine.infer([{"source": query}])[
             0
         ]

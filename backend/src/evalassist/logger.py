@@ -20,6 +20,7 @@ ignored_endpoints = [
     "/default-credentials/",
     "/benchmarks/",
     "/domains-and-personas/",
+    "/feature-flags/",
 ]
 
 
@@ -49,7 +50,7 @@ def log_info(method, path, req_body, res_body, headers, runtime):
     if "user_id" in headers:
         record["user_id"] = int(headers.get("user_id"))
 
-    log_record = LogRecord(data=json.dumps(record))
+    log_record = LogRecord(data=json.dumps(record), user_id=headers.get("user_id"))
     with Session(engine) as session:
         session.add(log_record)
         session.commit()
