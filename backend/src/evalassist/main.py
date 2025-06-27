@@ -101,7 +101,7 @@ def get_session():
     else:
         raise HTTPException(
             status_code=400,
-            detail="The database engine is None, probably because STORAGE_ENABLED is set to false.",
+            detail=f"The database engine is None, probably because STORAGE_ENABLED is set to false. STORAGE_ENABLED={STORAGE_ENABLED}",
         )
 
 

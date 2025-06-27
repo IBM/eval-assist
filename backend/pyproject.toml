@@ -1,7 +1,7 @@
 
 [project]
 name = "evalassist"
-dynamic = ["version"]
+dynamic = []
 description = "EvalAssist is an open-source project that simplifies using large language models as evaluators (LLM-as-a-Judge) of the output of other large language models by supporting users in iteratively refining evaluation criteria in a web-based user experience."
 license = "Apache-2.0"                                                                                                                                                                                                                                                       # set your license here
 # readme = "README.md"
@@ -63,12 +63,13 @@ dependencies = [
     "click",
     "setuptools",
     "sqlmodel",
+    "alembic",
 ]
+version = "0.1.12.post10.dev0"
 
 [tool.poetry]
 packages = [{ include = "evalassist", from = "src" }]
 include = [{ path = "evalassist/static/**/*", format = ["sdist", "wheel"] }]
-version = "0.0.0"
 
 [tool.poetry.group.dev]
 optional = true
@@ -123,7 +124,7 @@ requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
 build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry-dynamic-versioning]
-enable = true
+enable = false
 vcs = "git"
 metadata = false
 
