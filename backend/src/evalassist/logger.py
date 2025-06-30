@@ -1,6 +1,7 @@
 import json
 import time
 from collections.abc import Callable
+from datetime import datetime
 
 from evalassist.model import LogRecord
 from fastapi import Request, Response
@@ -15,7 +16,7 @@ ignored_endpoints = [
     "/health",
     "/evaluators/",
     "/criterias/",
-    "/test_case/",
+    # "/test_case/",
     "/user/",
     "/default-credentials/",
     "/benchmarks/",
@@ -30,7 +31,7 @@ def log_info(method, path, req_body, res_body, headers, runtime):
     record = {
         "path": path,
         "method": method,
-        "timestamp": time.time(),
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "runtime": runtime,
     }
 
@@ -67,7 +68,6 @@ class LoggingRoute(APIRoute):
             end_timestamp = time.time()
             runtime = round(end_timestamp - start_timestamp, 2)
             tasks = response.background
-            request.headers
             task = BackgroundTask(
                 log_info,
                 request.method,
