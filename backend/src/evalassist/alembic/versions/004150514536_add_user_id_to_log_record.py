@@ -1,4 +1,4 @@
-"""Add user_id to log_record2
+"""Add user_id to log_record
 
 Revision ID: 004150514536
 Revises: 6da8778318cb

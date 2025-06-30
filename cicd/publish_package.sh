@@ -10,7 +10,7 @@ cd ..
 
 # 4. Move built frontend to backend/evalassist
 SRC="frontend/out"
-DST="backend/evalassist/static"
+DST="backend/src/evalassist/static"
 echo "📁 Moving built frontend from '$SRC' to '$DST' (overwriting)..."
 rm -rf "$DST"
 mv "$SRC" "$DST"

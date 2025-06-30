@@ -69,7 +69,16 @@ version = "0.1.12.post10.dev0"
 
 [tool.poetry]
 packages = [{ include = "evalassist", from = "src" }]
-include = [{ path = "evalassist/static/**/*", format = ["sdist", "wheel"] }]
+include = [
+    { path = "evalassist/static/**/*", format = [
+        "sdist",
+        "wheel",
+    ] },
+    { path = "evalassist/alembic.ini", format = [
+        "sdist",
+        "wheel",
+    ] },
+]
 
 [tool.poetry.group.dev]
 optional = true
