@@ -37,7 +37,7 @@ jobs:
 
       - name: Move built frontend to backend/evalassist/static
         run: |
-          mv frontend/out backend/evalassist/static
+          mv frontend/out backend/src/evalassist/static
 
       - name: Install backend dependencies
         working-directory: backend

@@ -58,9 +58,9 @@ function prepare() {
 function start_backend() {
   try {
     if (!isWindows) {
-      run("cd backend && poetry run python3 run_dev.py");
+      run("cd backend && poetry run eval-assist serve");
     } else {
-      run("cd backend && poetry run python run_dev.py");
+      run("cd backend && poetry run eval-assist serve");
     }
   } catch (err) {
     console.error("start_backend failed");
