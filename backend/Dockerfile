@@ -6,8 +6,5 @@ RUN pip install poetry \
     && poetry config virtualenvs.create false \
     && poetry install --with postgresql 
 
-COPY alembic.ini /app/
-COPY alembic /app/alembic
-
 EXPOSE 8000
 CMD ["eval-assist", "serve", "--host", "0.0.0.0", "--port", "8000"]
