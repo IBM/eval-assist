@@ -27,6 +27,7 @@ def serve(host: str, port: int, reload: bool):
         loop="asyncio",
         reload=reload,
         workers=UVICORN_WORKERS,
+        log_level="debug",
     )
 
 
