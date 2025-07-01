@@ -58,9 +58,9 @@ function prepare() {
 function start_backend() {
   try {
     if (!isWindows) {
-      run("cd backend && poetry run eval-assist serve");
+      run("cd backend && poetry run eval-assist serve --reload true");
     } else {
-      run("cd backend && poetry run eval-assist serve");
+      run("cd backend && poetry run eval-assist serve --reload true");
     }
   } catch (err) {
     console.error("start_backend failed");
