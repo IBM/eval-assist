@@ -348,7 +348,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
             instances: currentTestCase.instances,
             criteria: toSaveUseCase.criteria,
             type: toSaveUseCase.type,
-            pipeline: toSaveUseCase.evaluator,
+            evaluator: toSaveUseCase.evaluator,
             contextVariableNames: currentTestCase.contextVariableNames,
             responseVariableName: currentTestCase.responseVariableName,
             syntheticGenerationConfig: currentTestCase.syntheticGenerationConfig,
