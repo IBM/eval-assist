@@ -280,7 +280,11 @@ export const TestDataTable = ({ style, className }: Props) => {
                       setCurrentTestCase({ ...currentTestCase, responseVariableName: e.target.value })
                     }
                     color="blue"
-                    onEdit={() => setEditPairwiseResponseNameModalOpen(true)}
+                    onEdit={returnByPipelineType(
+                      currentTestCase.type,
+                      undefined,
+                      () => () => setEditPairwiseResponseNameModalOpen(true),
+                    )}
                   />
                   {currentTestCase.type == EvaluationType.PAIRWISE &&
                     (instances[0] as PairwiseInstance).responses.length > 2 && (
