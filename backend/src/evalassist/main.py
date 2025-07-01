@@ -540,7 +540,7 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     return run()
 
 
-@router.get("/version")
+@router.get("/version/")
 def get_version():
     """Retrieves the system version
 
