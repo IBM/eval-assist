@@ -31,6 +31,8 @@ from unitxt.llm_as_judge import (
     EvaluatorTypeEnum,
 )
 
+# Logging req/resp
+from .actions_logger import LoggingRoute
 from .api.common import (
     CriteriaAPI,
     CriteriaOptionAPI,
@@ -65,9 +67,6 @@ from .evaluators.unitxt import (
     GraniteGuardianEvaluator,
     PairwiseComparisonEvaluator,
 )
-
-# Logging req/resp
-from .logger import LoggingRoute
 from .model import AppUser, StoredTestCase
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
 
