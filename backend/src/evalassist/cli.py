@@ -17,7 +17,9 @@ def cli():
 @click.option("--port", default=8000, type=int, help="Port to bind to.")
 @click.option("--reload", default=False, type=bool, help="Reload on changes.")
 def serve(host: str, port: int, reload: bool):
-    logger.info(f"Starting EvalAssist on host {host} and port {port}...")
+    logger.info(
+        f"Starting EvalAssist on {'http://' if not host.startswith('http') else ''}{host}:{port}..."
+    )
     uvicorn.run(
         "evalassist.main:app",
         host=host,
