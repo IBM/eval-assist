@@ -16,42 +16,66 @@ ignored_endpoints = [
     "/health",
     "/evaluators/",
     "/criterias/",
-    # "/test_case/",
+    "/test_case/",
     "/user/",
     "/default-credentials/",
     "/benchmarks/",
     "/domains-and-personas/",
     "/feature-flags/",
+    "/version/",
 ]
+
+ignored_methods_per_endpoint = {"/test_case/": ["GET"]}
 
 
 def log_info(method, path, req_body, res_body, headers, runtime):
     if not STORAGE_ENABLED:
         return
+
+    if path in ignored_endpoints and (
+        path not in ignored_methods_per_endpoint
+        or method in ignored_methods_per_endpoint[path]
+    ):
+        return
+
     record = {
-        "path": path,
-        "method": method,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "runtime": runtime,
     }
 
-    if path in ignored_endpoints:
-        return
+    if path != "/log_user_action/":
+        # adapt non log user action endpoint calls
+        record["action"] = f"{method} {path.replace('/', '')}"
 
-    if req_body:
+        record_content = {}
+        if req_body:
+            req = json.loads(req_body.decode())
+            if "llm_provider_credentials" in req:
+                req["llm_provider_credentials"] = ""
+            try:
+                req["test_case"]["content"] = json.loads(req["test_case"]["content"])
+            except Exception:  # nosec B110
+                pass
+            record_content["request"] = req
+
+        if res_body:
+            res = json.loads(res_body.decode())
+            try:
+                res["content"] = json.loads(res["content"])
+            except Exception:  # nosec B110
+                pass
+            record_content["response"] = res
+
+        record["content"] = record_content
+    else:
         req = json.loads(req_body.decode())
-        if "llm_provider_credentials" in req:
-            req["llm_provider_credentials"] = ""
-        record["request"] = req
+        record["action"] = req["action"]
+        record["content"] = req["content"]
 
-    if res_body:
-        res = json.loads(res_body.decode())
-        record["response"] = res
+    log_record = LogRecord(
+        data=json.dumps(record), user_id=headers.get("user_id", None)
+    )
 
-    if "user_id" in headers:
-        record["user_id"] = int(headers.get("user_id"))
-
-    log_record = LogRecord(data=json.dumps(record), user_id=headers.get("user_id"))
     with Session(engine) as session:
         session.add(log_record)
         session.commit()
