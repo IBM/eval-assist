@@ -377,9 +377,9 @@ class Generator:
                 template=dedent("""\
                     You will be asked to generate an answer to a question according to the following requirements:
 
-                    Dimension: {dimension}
-                    Dimension description: {dimension_description}
-                    Target: {target}
+                    Criteria name: {dimension}
+                    Criteria description: {dimension_description}
+                    Criteria dimension target: {target}
                     {target_description_section}
 
                     Your task is to generate an answer that STRICTLY follows this requirement. This is for evaluation purposes.
@@ -416,9 +416,9 @@ class Generator:
                     You will be given some source text and will be asked to generate a summary according to a specific target criteria.
 
                     You should generate a summary that matches the following requirements:
-                    Dimension: {dimension}
-                    Dimension description: {dimension_description}
-                    Target: {target}
+                    Criteria name: {dimension}
+                    Criteria description: {dimension_description}
+                    Criteria dimension target: {target}
                     {target_description_section}
 
                     Your task is to generate a summary that STRICTLY follows this requirement. This is for evaluation purposes.
@@ -456,9 +456,9 @@ class Generator:
                 template=dedent("""\
                     You will be asked to generate a {response_name} according to the following requirements:
                     
-                    Dimension: {dimension}
-                    Dimension description: {dimension_description}
-                    Target: {target}
+                    Criteria: {dimension}
+                    Criteria description: {dimension_description}
+                    Criteria dimension target: {target}
                     {target_description_section}
                     
                     Your task is to generate a {response_name} that STRICTLY follows this requirement. This is for evaluation purposes.
@@ -570,7 +570,7 @@ class Generator:
             criteria_option_description = criteria_options_dict[criteria_option_name]
             if criteria_option_description:
                 target_description_section = (
-                    f"Target description: {criteria_option_description}"
+                    f"Criteria dimension description: {criteria_option_description}"
                 )
             else:
                 target_description_section = ""
@@ -680,7 +680,7 @@ class Generator:
                 - The generated context is intended to be used to generate a {response_name}.{task_section}{domain_section}{persona_section}"""),
             )
             task_section = (
-                f"- The generated context is part of a dataset that conforms to a {self.task.value} task.\n"
+                f"\n- The generated context is part of a dataset that conforms to a {self.task.value} task.\n"
                 if self.task is not None
                 else ""
             )
@@ -754,12 +754,13 @@ class Generator:
         criteria_format_instructions = criteria_output_parser.get_format_instructions()
 
         # form query
-        criteria_list = [
-            f"{i + 1}. {option.name}: {option.description}"
-            for i, option in enumerate(criteria_options)
+        criteria_options_list = [
+            f"{option.name}: {option.description}" for option in criteria_options
         ]
-        criteria_text = "\n".join(criteria_list)
-        query = f"Describe a borderline case that lies between these criteria:\n\n{criteria_text}\n\nProvide a natural language description of what it means to be a borderline case among these criteria. Your description should mirror the style and format of the original criteria but describe the subtle ways in which the case partially satisfies multiple criteria while not fully satisfying any single one.\n\n{criteria_format_instructions}"
+        criteria_options_section = "\n".join(criteria_options_list)
+
+        query = f"You will be provided with a criteria. The criteria is composed by a name, a description and a set of criteria options. Describe a borderline criteria option that lies between the criteria options\n\nCriteria name: {criteria.name}\nCriteria description: {criteria.description}\nCriteria options:\n{criteria_options_section}\n\nProvide a natural language description of what it means to be a borderline case among these criteria options. Your description should mirror the style and format of the original criteria options but describe the subtle ways in which the case partially satisfies multiple criteria while not fully satisfying any single one.\n\n{criteria_format_instructions}"
+
         logger.debug(f"The borderline criteria generation prompt is \n{query}")
 
         borderline_criteria_unparsed = self.inference_engine.infer([{"source": query}])[
