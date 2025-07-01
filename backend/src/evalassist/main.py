@@ -1,10 +1,12 @@
 import logging
 import os
+import traceback
 import uuid
 from typing import Optional, Union, cast
 
 import nbformat as nbf
 import nest_asyncio
+import pkg_resources
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -29,7 +31,6 @@ from unitxt.llm_as_judge import (
     EvaluatorTypeEnum,
 )
 
-from . import root_pkg_logger
 from .api.common import (
     CriteriaAPI,
     CriteriaOptionAPI,
@@ -52,6 +53,7 @@ from .api.types import DomainEnum, PersonaEnum
 from .benchmark.benchmark import get_all_benchmarks
 from .const import (
     AUTHENTICATION_ENABLED,
+    EVAL_ASSIST_DIR,
     EXTENDED_EVALUATORS_METADATA,
     STATIC_DIR,
     STORAGE_ENABLED,
@@ -81,7 +83,7 @@ from .utils import (
 )
 
 nest_asyncio.apply()
-
+logger = logging.getLogger(__name__)
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -90,6 +92,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def catch_exceptions(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except Exception:
+        traceback.print_exc()  # prints full stack trace in console
+        raise  # Reraise so FastAPI still returns the 500
+
 
 router = APIRouter(route_class=LoggingRoute)
 
@@ -389,7 +401,7 @@ def create_user_if_not_exist(
     user: CreateUserPostBody, session: Session = Depends(get_session)
 ):
     db_user = session.exec(select(AppUser).where(AppUser.email == user.email)).first()
-    root_pkg_logger.debug(f"Found user:\n{db_user}")
+    logger.debug(f"Found user:\n{db_user}")
     if db_user is None:
         db_user = AppUser(
             email=user.email,
@@ -398,7 +410,7 @@ def create_user_if_not_exist(
         session.add(db_user)
         session.commit()
         session.refresh(db_user)
-        root_pkg_logger.debug(f"User not found. Created user:\n{db_user}")
+        logger.debug(f"User not found. Created user:\n{db_user}")
     return db_user
 
 
@@ -414,11 +426,11 @@ def cleanup_file(filepath: str):
     """Safely remove a file after it has been served."""
     try:
         os.remove(filepath)
-        root_pkg_logger.debug(f"Deleted file: {filepath}")
+        logger.debug(f"Deleted file: {filepath}")
     except FileNotFoundError:
-        root_pkg_logger.debug(f"File not found for deletion: {filepath}")
+        logger.debug(f"File not found for deletion: {filepath}")
     except Exception as e:
-        root_pkg_logger.debug(f"Error deleting file: {filepath}, {e}")
+        logger.debug(f"Error deleting file: {filepath}, {e}")
 
 
 @router.post("/download-notebook/")
@@ -528,6 +540,38 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     return run()
 
 
+@router.get("/version")
+def get_version():
+    """Retrieves the system version
+
+    Git version is given priority, thus if git is installed
+    in the system and a .git folder is present, the output
+    of 'git describe' is returned. If that fails, the package
+    version is returned. If that fails too, the string 'not
+    available' is returned instead.
+
+    Returns:
+        an object with version and source fields
+    """
+    try:
+        # git is a dev dependency so import may fail
+        import git
+
+        repo = git.repo.Repo(EVAL_ASSIST_DIR.parent.parent.parent)
+        version = repo.git.describe(tags=True)
+        source = "git"
+    except Exception:
+        try:
+            version = pkg_resources.require("evalassist")[0].version
+            source = "pypi"
+        except Exception:
+            version = "Not available"
+            source = None
+            logging.warning("Could not get EvalAssist version")
+
+    return {"version": version, "source": source}
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     exc_str = f"{exc}".replace("\n", " ").replace("   ", " ")
@@ -541,5 +585,5 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 app.include_router(router)
 
 if os.path.exists(STATIC_DIR):
-    root_pkg_logger.debug(f"Serving static files from {STATIC_DIR}")
+    logger.debug(f"Serving static files from {STATIC_DIR}")
     app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

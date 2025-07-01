@@ -88,6 +88,7 @@ pre_commit = "*"
 bandit = { version = "*", extras = ["standard", "toml"] }
 flake8-pytest-style = "^2.1.0"
 flake8 = "^7.3.0"
+GitPython = "*"
 
 [tool.poetry.group.testing]
 optional = true
@@ -101,14 +102,12 @@ pytest-cov = "*"
 [tool.pytest.ini_options]
 addopts = "--cov=evalassist"
 
-
 [tool.poetry.group.local-inference]
 optional = true
 
 [tool.poetry.group.local-inference.dependencies]
 torch = "*"
 accelerate = "*"
-
 
 [tool.poetry.group.postgresql]
 optional = true

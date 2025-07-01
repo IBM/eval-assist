@@ -1,5 +1,7 @@
 import { PLATFORM_NAME } from 'src/constants'
 
+import { useEffect, useState } from 'react'
+
 import { signOut } from 'next-auth/react'
 import Image from 'next/image'
 
@@ -14,17 +16,28 @@ import {
 import { Document, LogoGithub, Logout } from '@carbon/react/icons'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
+import { useFetchUtils } from '@customHooks/useFetchUtils'
 
 import classes from './AppHeader.module.scss'
 
 export const AppHeader = () => {
   const title = `${PLATFORM_NAME}`
+  const { get } = useFetchUtils()
+  const [version, setVersion] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchVersion = async () =>
+      setVersion(((await (await get('version/')).json()) as { version: string; source: string }).version)
+    fetchVersion()
+  }, [get])
+
   const { authenticationEnabled, isAuthenticated } = useAuthentication()
+
   return (
     <Header className={classes.root} aria-label={title}>
       <HeaderName prefix={''} style={{ cursor: 'pointer' }} href="/">
         <Image width={16} height={16} src={`/images/icon.svg`} alt={'title'} style={{ marginRight: '0.25rem' }} />
-        {PLATFORM_NAME}
+        {PLATFORM_NAME} &nbsp;<p style={{ fontWeight: 100, fontSize: '0.75rem' }}>{version ? `(${version})` : ''}</p>
       </HeaderName>
 
       <HeaderGlobalBar>
