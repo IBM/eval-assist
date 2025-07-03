@@ -742,6 +742,8 @@ export const useTestCaseLibrary = () => {
                 'The summary includes minor and irrelevant details which add no value and the narrative is inconsistent and scattered.',
             },
           ],
+          predictionField: 'summary',
+          contextFields: ['article'],
         },
         evaluator: null,
         syntheticGenerationConfig: {
@@ -913,6 +915,8 @@ export const useTestCaseLibrary = () => {
               description: '',
             },
           ],
+          predictionField: 'response',
+          contextFields: [],
         } as CriteriaWithOptions,
         evaluator: null,
         syntheticGenerationConfig: {

@@ -221,11 +221,18 @@ def get_criterias():
                     CriteriaOptionAPI(name=o.name, description=o.description)
                     for o in c.options
                 ],
+                prediction_field=c.prediction_field,
+                context_fields=c.context_fields,
             )
             for c in DIRECT_CRITERIA
         ],
         "pairwise": [
-            CriteriaAPI(name=c.name, description=c.description)
+            CriteriaAPI(
+                name=c.name,
+                description=c.description,
+                prediction_field=c.prediction_field,
+                context_fields=c.context_fields,
+            )
             for c in PAIRWISE_CRITERIA
         ],
     }
