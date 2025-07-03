@@ -21,7 +21,7 @@ import {
 import { returnByPipelineType, toSnakeCase } from '@utils'
 
 import { useAppSidebarContext } from './AppSidebarProvider'
-import { useCriteriasContext } from './CriteriasProvider'
+import { useCriteriasContext } from './CriteriaProvider'
 import { useCurrentTestCase } from './CurrentTestCaseProvider'
 import { useModelProviderCredentials } from './ModelProviderCredentialsProvider'
 import { useToastContext } from './ToastProvider'
