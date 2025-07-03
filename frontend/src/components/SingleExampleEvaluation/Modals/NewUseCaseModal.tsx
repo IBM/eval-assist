@@ -6,7 +6,7 @@ import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
 import { Layer, Modal, Select, SelectItem } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
-import { useCriteriasContext } from '@providers/CriteriasProvider'
+import { useCriteriasContext } from '@providers/CriteriaProvider'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
 import { useToastContext } from '@providers/ToastProvider'

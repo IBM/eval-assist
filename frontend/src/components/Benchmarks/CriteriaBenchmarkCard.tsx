@@ -16,7 +16,7 @@ import {
 } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
-import { useCriteriasContext } from '@providers/CriteriasProvider'
+import { useCriteriasContext } from '@providers/CriteriaProvider'
 import { CriteriaBenchmark, EvaluationType, Version } from '@types'
 import { capitalizeFirstWord, toTitleCase } from '@utils'
 

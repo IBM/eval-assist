@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import { TaskEnum } from '@constants'
-import { useCriteriasContext } from '@providers/CriteriasProvider'
+import { useCriteriasContext } from '@providers/CriteriaProvider'
 import { generateId } from '@utils'
 
 import { Criteria, CriteriaWithOptions, DirectInstance, EvaluationType, PairwiseInstance, TestCase } from '../types'
