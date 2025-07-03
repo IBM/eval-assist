@@ -77,8 +77,12 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
         ),
       }
       setLoadingCriterias(false)
-      setDirectCriterias(parsedCriteria.direct.map((c) => ({ ...c, name: toSnakeCase(c.name) })))
-      setPairwiseCriterias(parsedCriteria.pairwise.map((c) => ({ ...c, name: toSnakeCase(c.name) })))
+      setDirectCriterias(
+        [...parsedCriteria.direct, ...notInUnitxtCriteria.direct].map((c) => ({ ...c, name: toSnakeCase(c.name) })),
+      )
+      setPairwiseCriterias(
+        [...parsedCriteria.pairwise, ...notInUnitxtCriteria.pairwise].map((c) => ({ ...c, name: toSnakeCase(c.name) })),
+      )
     }
     fetchData()
   }, [get])
