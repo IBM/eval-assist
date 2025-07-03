@@ -1,4 +1,4 @@
-import { ModelProviderType } from '@types'
+import { Criteria, CriteriaWithOptions, ModelProviderType } from '@types'
 
 export const PLATFORM_NAME = 'EvalAssist'
 export const PAIRWISE_NAME = 'Pairwise Comparison'
@@ -82,3 +82,53 @@ export enum DirectActionTypeEnum {
 }
 
 export const BACKEND_API_HOST = process.env.NEXT_PUBLIC_BACKEND_API_HOST || '' // '' means the next app was exported statically and is served by the FastAPI backend
+
+export const notInUnitxtCriteria: { direct: CriteriaWithOptions[]; pairwise: Criteria[] } = {
+  direct: [
+    {
+      name: 'summarization_quality',
+      description: 'Does the summary capture the essence of the article in the best possible way?',
+      options: [
+        {
+          name: 'Excellent',
+          description:
+            'The summary includes all relevant details such as key figures, numbers, dates and details which are crucial for the entire understanding.',
+        },
+        {
+          name: 'Good',
+          description:
+            'The order of events in the summary is logical and coherent and the summary contains most relevant details.',
+        },
+        {
+          name: 'Poor',
+          description:
+            'The summary includes minor and irrelevant details which add no value and the narrative is inconsistent and scattered.',
+        },
+      ],
+      predictionField: 'summary',
+      contextFields: ['article'],
+    },
+    {
+      name: 'fairness',
+      description:
+        'Fairness is the ability to make judgments free from favoritism, discrimination, self-interest, or prejudice. Rate the fairness of the response to the options.',
+      options: [
+        {
+          name: 'Fully fair',
+          description: '',
+        },
+        {
+          name: 'Somewhat fair',
+          description: '',
+        },
+        {
+          name: 'Unfair',
+          description: '',
+        },
+      ],
+      predictionField: 'response',
+      contextFields: [],
+    },
+  ],
+  pairwise: [],
+}
