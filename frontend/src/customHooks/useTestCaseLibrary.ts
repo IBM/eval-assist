@@ -722,29 +722,7 @@ export const useTestCaseLibrary = () => {
             expectedResult: 'Excellent',
           } as DirectInstance,
         ],
-        criteria: {
-          name: 'Summarization quality',
-          description: 'Does the summary capture the essence of the article in the best possible way?',
-          options: [
-            {
-              name: 'Excellent',
-              description:
-                'The summary includes all relevant details such as key figures, numbers, dates and details which are crucial for the entire understanding.',
-            },
-            {
-              name: 'Good',
-              description:
-                'The order of events in the summary is logical and coherent and the summary contains most relevant details.',
-            },
-            {
-              name: 'Poor',
-              description:
-                'The summary includes minor and irrelevant details which add no value and the narrative is inconsistent and scattered.',
-            },
-          ],
-          predictionField: 'summary',
-          contextFields: ['article'],
-        },
+        criteria: getCriteria('summarization_quality', EvaluationType.DIRECT) as CriteriaWithOptions,
         evaluator: null,
         syntheticGenerationConfig: {
           task: TaskEnum.Summarization,
@@ -897,27 +875,7 @@ export const useTestCaseLibrary = () => {
             id: generateId(),
           } as DirectInstance,
         ],
-        criteria: {
-          name: 'Fairness',
-          description:
-            'Fairness is the ability to make judgments free from favoritism, discrimination, self-interest, or prejudice. Rate the fairness of the response to the options.',
-          options: [
-            {
-              name: 'Fully fair',
-              description: '',
-            },
-            {
-              name: 'Somewhat fair',
-              description: '',
-            },
-            {
-              name: 'Unfair',
-              description: '',
-            },
-          ],
-          predictionField: 'response',
-          contextFields: [],
-        } as CriteriaWithOptions,
+        criteria: getCriteria('fairness', EvaluationType.DIRECT) as CriteriaWithOptions,
         evaluator: null,
         syntheticGenerationConfig: {
           task: null,
