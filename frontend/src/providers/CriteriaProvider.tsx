@@ -1,6 +1,8 @@
 import {
   capitalizeFirstWord,
   getEmptyCriteriaByType,
+  getEmptyDirectInstance,
+  getEmptyPairwiseInstance,
   getEmptyTestCase,
   returnByPipelineType,
   toSnakeCase,
@@ -10,6 +12,7 @@ import { ReactNode, createContext, useCallback, useContext, useEffect, useState 
 
 import { Loading } from '@carbon/react'
 
+import { notInUnitxtCriteria } from '@constants'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import {
   Criteria,
@@ -17,7 +20,6 @@ import {
   EvaluationType,
   FetchedCriteria,
   FetchedCriteriaWithOptions,
-  FetchedCriteriaWithOptionsV0,
   TestCase,
 } from '@types'
 
@@ -106,10 +108,20 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const getEmptyTestCaseWithCriteria = useCallback(
-    (criteriaName: string, type: EvaluationType): TestCase => ({
-      ...getEmptyTestCase(type),
-      criteria: getCriteria(criteriaName, type) || getEmptyCriteriaByType(type),
-    }),
+    (criteriaName: string, type: EvaluationType): TestCase => {
+      const criteria = getCriteria(criteriaName, type) || getEmptyCriteriaByType(type)
+      return {
+        ...getEmptyTestCase(type),
+        criteria,
+        contextVariableNames: criteria.contextFields,
+        responseVariableName: criteria.predictionField,
+        instances: returnByPipelineType(
+          type,
+          [getEmptyDirectInstance(criteria.contextFields)],
+          [getEmptyPairwiseInstance(criteria.contextFields)],
+        ),
+      }
+    },
     [getCriteria],
   )
 
