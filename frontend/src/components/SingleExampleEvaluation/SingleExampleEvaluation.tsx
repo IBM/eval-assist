@@ -38,18 +38,6 @@ export const SingleExampleEvaluation = () => {
 
   const { isRisksAndHarms } = useURLParamsContext()
 
-  const toHighlightWords = useMemo(() => {
-    return showingTestCase
-      ? {
-          contextVariables: currentTestCase?.instances[0]?.contextVariables.map((c) => c.name) || [],
-          responseVariableName: currentTestCase.responseVariableName,
-        }
-      : {
-          contextVariables: [],
-          responseVariableName: '',
-        }
-  }, [currentTestCase?.instances, currentTestCase.responseVariableName, showingTestCase])
-
   const { nonGraniteGuardianDirectEvaluators, nonGraniteGuardianPairwiseEvaluators, graniteGuardianEvaluators } =
     useEvaluatorOptionsContext()
 
@@ -76,7 +64,7 @@ export const SingleExampleEvaluation = () => {
   const { onSave } = useTestCaseActionsContext()
 
   useSaveShortcut({ onSave, changesDetected, isTestCaseSaved })
-
+  console.log(currentTestCase.contextVariableNames)
   return (
     <>
       <AppSidenavNew />
@@ -111,7 +99,6 @@ export const SingleExampleEvaluation = () => {
             <CriteriaView
               criteria={currentTestCase.criteria}
               setCriteria={(criteria) => setCurrentTestCase({ ...currentTestCase, criteria })}
-              toHighlightWords={toHighlightWords}
               type={currentTestCase.type}
               temporaryId={temporaryIdRef.current}
               style={{ marginBottom: '1rem' }}
