@@ -222,17 +222,40 @@ export interface Benchmark {
   tags: string[]
 }
 
+export type FetchedCriteriaWithOptionsV0 = {
+  name: string
+  description: string
+  options: CriteriaOptionV0[]
+  prediction_field: string
+  context_fields: string[]
+}
+
+export type FetchedCriteriaWithOptions = FetchedCriteriaWithOptionsV0
+
 export type CriteriaWithOptionsV0 = {
   name: string
   description: string
   options: CriteriaOptionV0[]
+  predictionField: string
+  contextFields: string[]
 }
 
 export type CriteriaWithOptions = CriteriaWithOptionsV0
 
+export interface FetchedCriteriaV0 {
+  name: string
+  description: string
+  prediction_field: string
+  context_fields: string[]
+}
+
+export type FetchedCriteria = FetchedCriteriaV0
+
 export interface CriteriaV0 {
   name: string
   description: string
+  predictionField: string
+  contextFields: string[]
 }
 
 export type Criteria = CriteriaV0
