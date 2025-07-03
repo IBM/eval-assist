@@ -11,7 +11,7 @@ export const useSaveShortcut = ({}: Props) => {
   const { isTestCaseSaved, changesDetected } = useCurrentTestCase()
   const { storageEnabled } = useFeatureFlags()
   const { onSave } = useTestCaseActionsContext()
-  const { setSaveUseCaseModalOpen } = useModalsContext()
+  const { setSaveTestCaseModalOpen } = useModalsContext()
   const onShortcut = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 's' && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
@@ -19,11 +19,11 @@ export const useSaveShortcut = ({}: Props) => {
         if (isTestCaseSaved && changesDetected) {
           onSave()
         } else {
-          setSaveUseCaseModalOpen(true)
+          setSaveTestCaseModalOpen(true)
         }
       }
     },
-    [changesDetected, isTestCaseSaved, onSave, setSaveUseCaseModalOpen],
+    [changesDetected, isTestCaseSaved, onSave, setSaveTestCaseModalOpen],
   )
 
   useEffect(() => {
@@ -31,5 +31,5 @@ export const useSaveShortcut = ({}: Props) => {
       document.addEventListener('keydown', onShortcut)
       return () => document.removeEventListener('keydown', onShortcut)
     }
-  }, [isTestCaseSaved, onSave, onShortcut, setSaveUseCaseModalOpen, storageEnabled])
+  }, [isTestCaseSaved, onSave, onShortcut, setSaveTestCaseModalOpen, storageEnabled])
 }

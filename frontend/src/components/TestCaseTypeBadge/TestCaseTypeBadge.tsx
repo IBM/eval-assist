@@ -7,7 +7,7 @@ import { CSSProperties } from 'react'
 import { Tag } from '@carbon/react'
 
 import { EvaluationType } from '../../types'
-import classes from './UseCaseTypeBadge.module.scss'
+import classes from './TestCaseTypeBadge.module.scss'
 
 interface Props {
   type: EvaluationType
@@ -16,7 +16,7 @@ interface Props {
   size?: 'sm' | 'md' | 'lg'
 }
 
-export const UseCaseTypeBadge = ({ type: currentType, style, className, size }: Props) => {
+export const TestCaseTypeBadge = ({ type: currentType, style, className, size }: Props) => {
   return (
     <div style={style} className={cx(className)}>
       <Tag className={classes['usecase-tag']} type="blue" size={size || 'md'}>

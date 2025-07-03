@@ -14,12 +14,12 @@ interface Props {
 
 export const EditTestCaseNameModal = ({ open, setOpen }: Props) => {
   const { currentTestCase, setCurrentTestCase } = useCurrentTestCase()
-  const { userTestCases: userUseCases, setUserTestCases: setUserUseCases } = useUserTestCasesContext()
+  const { userTestCases: userTestCases, setUserTestCases: setUserTestCases } = useUserTestCasesContext()
 
-  const [newUseCaseName, setNewUseCaseName] = useState(currentTestCase.name)
+  const [newTestCaseName, setNewTestCaseName] = useState(currentTestCase.name)
 
   useEffect(() => {
-    setNewUseCaseName(currentTestCase.name)
+    setNewTestCaseName(currentTestCase.name)
   }, [currentTestCase.name])
 
   return (
@@ -31,12 +31,12 @@ export const EditTestCaseNameModal = ({ open, setOpen }: Props) => {
       secondaryButtonText="Cancel"
       onRequestSubmit={(e) => {
         setOpen(false)
-        setCurrentTestCase({ ...currentTestCase, name: newUseCaseName })
-        setUserUseCases([
-          ...userUseCases.filter((u) => u.name !== currentTestCase.name),
+        setCurrentTestCase({ ...currentTestCase, name: newTestCaseName })
+        setUserTestCases([
+          ...userTestCases.filter((u) => u.name !== currentTestCase.name),
           {
-            ...(userUseCases.find((u) => u.name === currentTestCase.name) as TestCase),
-            name: newUseCaseName,
+            ...(userTestCases.find((u) => u.name === currentTestCase.name) as TestCase),
+            name: newTestCaseName,
           },
         ])
       }}
@@ -44,8 +44,8 @@ export const EditTestCaseNameModal = ({ open, setOpen }: Props) => {
     >
       <TextInput
         autoFocus
-        value={newUseCaseName}
-        onChange={(e: any) => setNewUseCaseName(e.target.value)}
+        value={newTestCaseName}
+        onChange={(e: any) => setNewTestCaseName(e.target.value)}
         id={'new-use-case-name-text-input'}
         labelText={'New name'}
       />

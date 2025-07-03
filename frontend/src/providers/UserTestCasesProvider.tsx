@@ -4,7 +4,7 @@ import { Loading } from '@carbon/react'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
+import { useParseFetchedTestCase } from '@customHooks/useParseFetchedTestCase'
 
 import { FetchedTestCase, TestCase } from '../types'
 import { useFeatureFlags } from './FeatureFlagsProvider'
@@ -29,7 +29,7 @@ export const UserTestCasesProvider = ({ children }: { children: ReactNode }) => 
   const { getUserName } = useAuthentication()
   const { storageEnabled } = useFeatureFlags()
   const { get } = useFetchUtils()
-  const { parseFetchedUseCase } = useParseFetchedUseCase()
+  const { parseFetchedTestCase } = useParseFetchedTestCase()
   useEffect(() => {
     const fetchTestCases = async () => {
       setLoadingTestCases(true)
@@ -37,7 +37,7 @@ export const UserTestCasesProvider = ({ children }: { children: ReactNode }) => 
         await get(`test_case/?user=${encodeURIComponent(getUserName())}`)
       ).json()
       const parsedFetchedUserTestCases = fetchedUserTestCases
-        .map((testCase) => parseFetchedUseCase(testCase))
+        .map((testCase) => parseFetchedTestCase(testCase))
         .filter((testCase) => testCase !== null) as TestCase[]
       setUserTestCases(parsedFetchedUserTestCases)
       setLoadingTestCases(false)
@@ -47,7 +47,7 @@ export const UserTestCasesProvider = ({ children }: { children: ReactNode }) => 
     } else {
       setUserTestCases([])
     }
-  }, [get, getUserName, parseFetchedUseCase, storageEnabled])
+  }, [get, getUserName, parseFetchedTestCase, storageEnabled])
 
   if (loadingTestCases || userTestCases === null) return <Loading withOverlay />
 

@@ -39,17 +39,17 @@ interface CurrentTestCaseContextValue {
   showingTestCase: boolean
   responses: string[] | string[][]
   currentTestCaseString: string
-  lastSavedUseCaseString: string
+  lastSavedTestCaseString: string
   setLastSavedTestCaseString: Dispatch<SetStateAction<string>>
   changesDetected: boolean
   isTestCaseSaved: boolean
   testCaseSelected: {
-    useCase: TestCase
+    testCase: TestCase
     subCatalogName: string | null
   } | null
   setTestCaseSelected: Dispatch<
     SetStateAction<{
-      useCase: TestCase
+      testCase: TestCase
       subCatalogName: string | null
     } | null>
   >
@@ -64,8 +64,8 @@ interface CurrentTestCaseContextValue {
   outdatedResultInstanceIds: string[]
   isInstanceResultOutdated: Record<string, boolean>
   updateURLFromTestCase: (
-    useCaseSelected: {
-      useCase: TestCase
+    testCaseSelected: {
+      testCase: TestCase
       subCatalogName: string | null
     } | null,
   ) => void
@@ -83,7 +83,7 @@ const CurrentTestCaseContext = createContext<CurrentTestCaseContextValue>({
   showingTestCase: false,
   responses: [],
   currentTestCaseString: '',
-  lastSavedUseCaseString: '',
+  lastSavedTestCaseString: '',
   setLastSavedTestCaseString: () => null,
   changesDetected: false,
   isTestCaseSaved: false,
@@ -104,8 +104,8 @@ export const useCurrentTestCase = () => {
 export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) => {
   const {
     isRisksAndHarms,
-    useCaseType,
-    useCaseId,
+    testCaseType,
+    testCaseId,
     subCatalogName,
     libraryTestCaseName,
     criteriaName,
@@ -114,10 +114,10 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
   } = useURLParamsContext()
   const { modelProviderCredentials, getAreRelevantCredentialsProvided, getProviderCredentials } =
     useModelProviderCredentials()
-  const { getEmptyUseCaseWithCriteria } = useCriteriasContext()
+  const { getEmptyTestCaseWithCriteria } = useCriteriasContext()
   const { directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
-  const { userTestCases: userUseCases } = useUserTestCasesContext()
-  const { allLibraryUseCases, harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
+  const { userTestCases: userTestCases } = useUserTestCasesContext()
+  const { allLibraryTestCases: allLibraryTestCases, harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
   const { post } = useFetchUtils()
 
   const getDefaultEvaluator = useCallback(
@@ -168,35 +168,36 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
       isRisksAndHarms,
       pairwiseEvaluators,
       directEvaluators,
-      useCaseType,
+      testCaseType,
     ],
   )
 
-  const [testCaseSelected, setTestCaseSelected] = useState<{ useCase: TestCase; subCatalogName: string | null } | null>(
-    null,
-  )
+  const [testCaseSelected, setTestCaseSelected] = useState<{
+    testCase: TestCase
+    subCatalogName: string | null
+  } | null>(null)
 
   const preloadedTestCase = useMemo(() => {
     let pu: TestCase | null
-    if (useCaseId !== null && userUseCases !== null) {
-      pu = userUseCases.find((userUseCase) => userUseCase.id === useCaseId) || null
-    } else if (libraryTestCaseName !== null && useCaseType !== null) {
+    if (testCaseId !== null && userTestCases !== null) {
+      pu = userTestCases.find((userTestCase) => userTestCase.id === testCaseId) || null
+    } else if (libraryTestCaseName !== null && testCaseType !== null) {
       if (isRisksAndHarms && subCatalogName !== null) {
         pu =
           harmsAndRisksLibraryTestCases[subCatalogName].find(
-            (libraryUseCase) => libraryUseCase.name === libraryTestCaseName,
+            (libraryTestCase) => libraryTestCase.name === libraryTestCaseName,
           ) || null
       } else {
         pu =
-          allLibraryUseCases.find(
-            (libraryUseCase) => libraryUseCase.name === libraryTestCaseName && libraryUseCase.type === useCaseType,
+          allLibraryTestCases.find(
+            (libraryTestCase) => libraryTestCase.name === libraryTestCaseName && libraryTestCase.type === testCaseType,
           ) || null
       }
-    } else if (useCaseType !== null && useCaseId === null && libraryTestCaseName === null) {
+    } else if (testCaseType !== null && testCaseId === null && libraryTestCaseName === null) {
       if (criteriaName !== null) {
-        pu = getEmptyUseCaseWithCriteria(criteriaName, useCaseType)
+        pu = getEmptyTestCaseWithCriteria(criteriaName, testCaseType)
       } else {
-        pu = getEmptyTestCase(useCaseType)
+        pu = getEmptyTestCase(testCaseType)
       }
     } else {
       pu = null
@@ -225,16 +226,16 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
 
     return pu
   }, [
-    useCaseId,
-    userUseCases,
+    testCaseId,
+    userTestCases,
     libraryTestCaseName,
-    useCaseType,
+    testCaseType,
     isRisksAndHarms,
     subCatalogName,
     harmsAndRisksLibraryTestCases,
-    allLibraryUseCases,
+    allLibraryTestCases,
     criteriaName,
-    getEmptyUseCaseWithCriteria,
+    getEmptyTestCaseWithCriteria,
     getDefaultEvaluator,
   ])
 
@@ -247,7 +248,7 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
     [showingTestCase, currentTestCase],
   )
 
-  const [lastSavedUseCaseString, setLastSavedTestCaseString] = useState<string>(currentTestCaseString)
+  const [lastSavedTestCaseString, setLastSavedTestCaseString] = useState<string>(currentTestCaseString)
 
   const responses = useMemo(
     () =>
@@ -262,8 +263,8 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
   )
 
   const changesDetected = useMemo(
-    () => showingTestCase && lastSavedUseCaseString !== currentTestCaseString && !isRisksAndHarms,
-    [showingTestCase, lastSavedUseCaseString, currentTestCaseString, isRisksAndHarms],
+    () => showingTestCase && lastSavedTestCaseString !== currentTestCaseString && !isRisksAndHarms,
+    [showingTestCase, lastSavedTestCaseString, currentTestCaseString, isRisksAndHarms],
   )
 
   const isTestCaseSaved = useMemo(() => currentTestCase !== null && currentTestCase.id !== null, [currentTestCase])
@@ -359,12 +360,12 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
   const { getQueryParamsFromTestCase } = useGetQueryParamsFromTestCase()
 
   const updateURLFromTestCase = useCallback(
-    (useCaseSelected: { useCase: TestCase; subCatalogName: string | null } | null) => {
+    (testCaseSelected: { testCase: TestCase; subCatalogName: string | null } | null) => {
       let urlChangePromise: Promise<boolean>
-      if (useCaseSelected !== null) {
+      if (testCaseSelected !== null) {
         // test case is a saved user test case
         urlChangePromise = changeTestCaseURL(
-          getQueryParamsFromTestCase(useCaseSelected.useCase, useCaseSelected.subCatalogName),
+          getQueryParamsFromTestCase(testCaseSelected.testCase, testCaseSelected.subCatalogName),
         )
       }
     },
@@ -380,7 +381,7 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
         showingTestCase,
         responses,
         currentTestCaseString,
-        lastSavedUseCaseString,
+        lastSavedTestCaseString,
         setLastSavedTestCaseString,
         changesDetected,
         isTestCaseSaved,

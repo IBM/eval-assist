@@ -17,17 +17,17 @@ import classes from './TwoLevelsPanel.module.scss'
 import sharedClasses from './shared.module.scss'
 
 interface Props {
-  onUseCaseClick: (useCase: TestCase) => void
+  onTestCaseClick: (testCase: TestCase) => void
   onClose: () => void
-  userUseCases: TestCase[]
+  userTestCases: TestCase[]
 }
 
-export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: Props) => {
-  const { useCaseId } = useURLParamsContext()
+export const SavedTestCasesPanel = ({ onClose, onTestCaseClick, userTestCases }: Props) => {
+  const { testCaseId } = useURLParamsContext()
 
   const selectedNode = useMemo(() => {
-    return useCaseId !== null ? [`${useCaseId}`] : []
-  }, [useCaseId])
+    return testCaseId !== null ? [`${testCaseId}`] : []
+  }, [testCaseId])
 
   const [expanded, setExpanded] = useState<{ direct: boolean; pairwise: boolean }>({
     direct: true,
@@ -35,12 +35,12 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
   })
 
   const directAssessmentTestCases = useMemo(
-    () => userUseCases.filter((u) => u.type === EvaluationType.DIRECT),
-    [userUseCases],
+    () => userTestCases.filter((u) => u.type === EvaluationType.DIRECT),
+    [userTestCases],
   )
   const pairwiseComparisonTestCases = useMemo(
-    () => userUseCases.filter((u) => u.type === EvaluationType.PAIRWISE),
-    [userUseCases],
+    () => userTestCases.filter((u) => u.type === EvaluationType.PAIRWISE),
+    [userTestCases],
   )
 
   const handleToggle = (key: 'direct' | 'pairwise') =>
@@ -60,7 +60,7 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
       <div className={classes.content}>
         <div className={classes.prompts}>
           <section className={classes.section}>
-            {userUseCases.length === 0 ? (
+            {userTestCases.length === 0 ? (
               <p className={classes['empty-message']}>No saved test cases</p>
             ) : (
               <div className={classes['tree-wrapper']}>
@@ -75,20 +75,20 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
                     {directAssessmentTestCases.length === 0 ? (
                       <p className={classes['empty-message']}>Empty</p>
                     ) : (
-                      directAssessmentTestCases.map((useCase) => (
+                      directAssessmentTestCases.map((testCase) => (
                         <TreeNode
                           onSelect={() => {
-                            onUseCaseClick(useCase)
+                            onTestCaseClick(testCase)
                           }}
-                          key={`${useCase.id}`}
-                          id={`${useCase.id}`}
+                          key={`${testCase.id}`}
+                          id={`${testCase.id}`}
                           selected={selectedNode}
                           renderIcon={DotMark}
                           className={cx(sharedClasses.hovered)}
                           label={
                             <div className={classes['tree-node-content']}>
-                              <span className={classes['tree-node-label']}>{useCase.name}</span>
-                              <LinkButton useCase={useCase} />
+                              <span className={classes['tree-node-label']}>{testCase.name}</span>
+                              <LinkButton testCase={testCase} />
                             </div>
                           }
                         />
@@ -105,20 +105,20 @@ export const SavedTestCasesPanel = ({ onClose, onUseCaseClick, userUseCases }: P
                     {pairwiseComparisonTestCases.length === 0 ? (
                       <p className={classes['empty-message']}>Empty</p>
                     ) : (
-                      pairwiseComparisonTestCases.map((useCase) => (
+                      pairwiseComparisonTestCases.map((testCase) => (
                         <TreeNode
                           onSelect={() => {
-                            onUseCaseClick(useCase)
+                            onTestCaseClick(testCase)
                           }}
-                          key={`${useCase.id}`}
-                          id={`${useCase.id}`}
+                          key={`${testCase.id}`}
+                          id={`${testCase.id}`}
                           selected={selectedNode}
                           renderIcon={DotMark}
                           className={cx(sharedClasses.hovered)}
                           label={
                             <div className={classes['tree-node-content']}>
-                              <span className={classes['tree-node-label']}>{useCase.name}</span>
-                              <LinkButton useCase={useCase} />
+                              <span className={classes['tree-node-label']}>{testCase.name}</span>
+                              <LinkButton testCase={testCase} />
                             </div>
                           }
                         />

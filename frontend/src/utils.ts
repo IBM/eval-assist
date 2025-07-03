@@ -46,11 +46,15 @@ export const getEmptyCriteriaWithTwoOptions = (): CriteriaWithOptions => ({
       description: '',
     },
   ],
+  predictionField: 'Response',
+  contextFields: ['Context'],
 })
 
 export const getEmptyCriteria = (): Criteria => ({
   name: '',
   description: '',
+  predictionField: 'Response',
+  contextFields: ['Context'],
 })
 
 export const getEmptyCriteriaByType = (type: EvaluationType): CriteriaWithOptions | Criteria =>

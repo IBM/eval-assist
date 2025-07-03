@@ -18,25 +18,25 @@ export const useGetQueryParamsFromTestCase = () => {
   )
 
   const getQueryParamsFromTestCase = useCallback(
-    (useCase: TestCase, subCatalogName: string | null) => {
+    (testCase: TestCase, subCatalogName: string | null) => {
       let params: { key: string; value: string }[] = []
       if (subCatalogName) {
         params.push({ key: 'subCatalogName', value: subCatalogName })
       }
-      if (useCase.id !== null) {
-        params = [{ key: 'id', value: `${useCase.id}` }]
+      if (testCase.id !== null) {
+        params = [{ key: 'id', value: `${testCase.id}` }]
       } else {
-        if (useCase.name !== '') {
-          params.push({ key: 'libraryTestCase', value: useCase.name })
-          params.push({ key: 'type', value: useCase.type })
+        if (testCase.name !== '') {
+          params.push({ key: 'libraryTestCase', value: testCase.name })
+          params.push({ key: 'type', value: testCase.type })
         } else {
           // used when redirected from benchmarks and test case doesnt exist in catalog
-          params.push({ key: 'type', value: useCase.type })
-          if (useCase.criteria.name !== '') {
-            params.push({ key: 'criteriaName', value: useCase.criteria.name })
+          params.push({ key: 'type', value: testCase.type })
+          if (testCase.criteria.name !== '') {
+            params.push({ key: 'criteriaName', value: testCase.criteria.name })
           }
         }
-        if (harmsAndRisksLibraryTestCasesNames.includes(useCase.name)) {
+        if (harmsAndRisksLibraryTestCasesNames.includes(testCase.name)) {
           params.push({ key: 'isRisksAndHarms', value: 'true' })
         } else {
           params.push({ key: 'isRisksAndHarms', value: 'false' })

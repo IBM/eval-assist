@@ -4,7 +4,7 @@ import { ReactNode, createContext, useCallback, useContext, useRef, useState } f
 
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { useParseFetchedUseCase } from '@customHooks/useParseFetchedUseCase'
+import { useParseFetchedTestCase } from '@customHooks/useParseFetchedTestCase'
 import {
   DirectInstance,
   DirectInstanceResult,
@@ -31,7 +31,7 @@ import { useUserTestCasesContext } from './UserTestCasesProvider'
 interface TestCaseActionsContextValue {
   runEvaluation: (evaluationIds: string[]) => Promise<void>
   onSave: () => Promise<void>
-  onSaveAs: (name: string, fromUseCase?: TestCase | undefined) => Promise<boolean>
+  onSaveAs: (name: string, fromTestCase?: TestCase | undefined) => Promise<boolean>
   onDeleteTestCase: () => Promise<void>
   evaluationRunning: boolean
   evaluationFailed: boolean
@@ -76,9 +76,9 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   const { getProviderCredentialsWithDefaults } = useModelProviderCredentials()
   const { deleteCustom, post, put } = useFetchUtils()
   const isEqualToCurrentTemporaryId = useCallback((id: string) => temporaryIdRef.current === id, [temporaryIdRef])
-  const { parseFetchedUseCase, CURRENT_FORMAT_VERSION } = useParseFetchedUseCase()
+  const { parseFetchedTestCase, CURRENT_FORMAT_VERSION } = useParseFetchedTestCase()
   const { getUserName } = useAuthentication()
-  const { userTestCases: userUseCases, setUserTestCases: setUserUseCases } = useUserTestCasesContext()
+  const { userTestCases: userTestCases, setUserTestCases: setUserTestCases } = useUserTestCasesContext()
   const { setSidebarTabSelected } = useAppSidebarContext()
   const [inProgressEvalToastId, setInProgressEvalToastId] = useState<string | null>(null)
 
@@ -286,7 +286,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
 
   const onSave = useCallback(async () => {
     if (currentTestCase === null) return
-    const savedUseCase: FetchedTestCase = await (
+    const savedTestCase: FetchedTestCase = await (
       await put('test_case/', {
         test_case: {
           name: currentTestCase.name,
@@ -307,14 +307,14 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       })
     ).json()
 
-    const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as TestCase
+    const parsedSavedTestCase = parseFetchedTestCase(savedTestCase) as TestCase
 
-    setCurrentTestCase(parsedSavedUseCase)
+    setCurrentTestCase(parsedSavedTestCase)
     // update test case in the test cases list
-    const i = userUseCases.findIndex((useCase) => useCase.id === currentTestCase.id)
-    setUserUseCases([...userUseCases.slice(0, i), parsedSavedUseCase, ...userUseCases.slice(i + 1)])
+    const i = userTestCases.findIndex((testCase) => testCase.id === currentTestCase.id)
+    setUserTestCases([...userTestCases.slice(0, i), parsedSavedTestCase, ...userTestCases.slice(i + 1)])
 
-    // update lastSavedUseCase
+    // update lastSavedTestCase
     setLastSavedTestCaseString(currentTestCaseString)
 
     // notify the user
@@ -329,26 +329,27 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
     currentTestCase,
     currentTestCaseString,
     getUserName,
-    parseFetchedUseCase,
+    parseFetchedTestCase,
     put,
     setCurrentTestCase,
     setLastSavedTestCaseString,
-    setUserUseCases,
-    userUseCases,
+    setUserTestCases,
+    userTestCases,
   ])
 
   const onSaveAs = useCallback(
-    async (name: string, fromUseCase?: TestCase) => {
+    async (name: string, fromTestCase?: TestCase) => {
       if (currentTestCase === null) return false
-      const toSaveUseCase = fromUseCase ?? currentTestCase
+      const toSaveTestCase = fromTestCase ?? currentTestCase
       const res = await put('test_case/', {
         test_case: {
           name: name,
           content: JSON.stringify({
             instances: currentTestCase.instances,
-            criteria: toSaveUseCase.criteria,
-            type: toSaveUseCase.type,
-            evaluator: toSaveUseCase.evaluator,
+            evaluator: toSaveTestCase.evaluator,
+            criteria: toSaveTestCase.criteria,
+            type: toSaveTestCase.type,
+            pipeline: toSaveTestCase.evaluator,
             contextVariableNames: currentTestCase.contextVariableNames,
             responseVariableName: currentTestCase.responseVariableName,
             syntheticGenerationConfig: currentTestCase.syntheticGenerationConfig,
@@ -370,25 +371,25 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         })
         return false
       } else {
-        const savedUseCase: FetchedTestCase = await res.json()
-        const parsedSavedUseCase = parseFetchedUseCase(savedUseCase) as TestCase
-        // useCaseSelected will be different from null when
+        const savedTestCase: FetchedTestCase = await res.json()
+        const parsedSavedTestCase = parseFetchedTestCase(savedTestCase) as TestCase
+        // testCaseSelected will be different from null when
         // save as is done before switching from an unsaved
         // test case that has changes detected
-        // if useCaseSelected is different from null
+        // if testCaseSelected is different from null
         // a rediction will be done to that selected test case
         if (testCaseSelected === null) {
-          updateURLFromTestCase({ useCase: parsedSavedUseCase, subCatalogName: null })
+          updateURLFromTestCase({ testCase: parsedSavedTestCase, subCatalogName: null })
           setSidebarTabSelected('user_test_cases')
         } else {
           updateURLFromTestCase(testCaseSelected)
         }
-        setUserUseCases([...userUseCases, parsedSavedUseCase])
+        setUserTestCases([...userTestCases, parsedSavedTestCase])
 
         // notify the user
         addToast({
           kind: 'success',
-          title: `Created test case '${parsedSavedUseCase.name}'`,
+          title: `Created test case '${parsedSavedTestCase.name}'`,
           timeout: 5000,
         })
       }
@@ -399,13 +400,13 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       addToast,
       currentTestCase,
       getUserName,
-      parseFetchedUseCase,
+      parseFetchedTestCase,
       put,
       setSidebarTabSelected,
-      setUserUseCases,
+      setUserTestCases,
       testCaseSelected,
       updateURLFromTestCase,
-      userUseCases,
+      userTestCases,
     ],
   )
 
@@ -419,7 +420,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       timeout: 5000,
     })
 
-    setUserUseCases(userUseCases.filter((u) => u.id !== currentTestCase.id))
+    setUserTestCases(userTestCases.filter((u) => u.id !== currentTestCase.id))
     changeTestCaseURL(null)
   }
 

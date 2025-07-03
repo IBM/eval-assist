@@ -27,24 +27,24 @@ export const AppSidenavNew = ({}: AppSidenavProps) => {
   const { storageEnabled } = useFeatureFlags()
   const { sidebarTabSelected: selected, setSidebarTabSelected: setSelected } = useAppSidebarContext()
   const { setConfirmationModalOpen, setEvaluationRunningModalOpen } = useModalsContext()
-  const { useCaseId } = useURLParamsContext()
+  const { testCaseId } = useURLParamsContext()
   const { changesDetected, setTestCaseSelected, updateURLFromTestCase } = useCurrentTestCase()
   const { evaluationRunning } = useTestCaseActionsContext()
-  const { userTestCases: userUseCases } = useUserTestCasesContext()
+  const { userTestCases: userTestCases } = useUserTestCasesContext()
 
-  const onUseCaseClick = (useCase: TestCase, subCatalogName?: string) => {
+  const onTestCaseClick = (testCase: TestCase, subCatalogName?: string) => {
     // if the usecase is already selected don't do nothing
-    if (useCaseId !== null && useCaseId === useCase.id) return
+    if (testCaseId !== null && testCaseId === testCase.id) return
     // if there are unsaved changes, let the user know that they may lose work
     if (changesDetected && storageEnabled) {
-      setTestCaseSelected({ useCase, subCatalogName: subCatalogName || null })
+      setTestCaseSelected({ testCase, subCatalogName: subCatalogName || null })
       setConfirmationModalOpen(true)
     } else if (evaluationRunning) {
-      setTestCaseSelected({ useCase, subCatalogName: subCatalogName || null })
+      setTestCaseSelected({ testCase, subCatalogName: subCatalogName || null })
       setEvaluationRunningModalOpen(true)
     } else {
       // no unsaved changes and model is not running update the current test case without modals
-      updateURLFromTestCase({ useCase, subCatalogName: subCatalogName || null })
+      updateURLFromTestCase({ testCase, subCatalogName: subCatalogName || null })
     }
   }
 
@@ -127,7 +127,7 @@ export const AppSidenavNew = ({}: AppSidenavProps) => {
       >
         {selected === 'library_test_cases' && (
           <ExampleCatalogPanel
-            onUseCaseClick={onUseCaseClick}
+            onTestCaseClick={onTestCaseClick}
             onClose={() => {
               setSelected(null)
             }}
@@ -143,11 +143,11 @@ export const AppSidenavNew = ({}: AppSidenavProps) => {
       >
         {selected === 'user_test_cases' && (
           <SavedTestCasesPanel
-            onUseCaseClick={onUseCaseClick}
+            onTestCaseClick={onTestCaseClick}
             onClose={() => {
               setSelected(null)
             }}
-            userUseCases={userUseCases}
+            userTestCases={userTestCases}
           />
         )}
       </div>
@@ -160,7 +160,7 @@ export const AppSidenavNew = ({}: AppSidenavProps) => {
       >
         {selected === 'risks_and_harms' && (
           <RiskAndHarmPanel
-            onUseCaseClick={onUseCaseClick}
+            onTestCaseClick={onTestCaseClick}
             onClose={() => {
               setSelected(null)
             }}
