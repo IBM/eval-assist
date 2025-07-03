@@ -576,6 +576,12 @@ def get_version():
         try:
             version = pkg_resources.require("evalassist")[0].version
             source = "pypi"
+
+            if version == "0.0.0":
+                # version is 0.0.0 in the toml only when
+                # evalassist is executed using poetry
+                # and the .git folder is not present in the root directory
+                raise ValueError("Invalid version")
         except Exception:
             version = "Not available"
             source = None
