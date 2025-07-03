@@ -21,11 +21,11 @@ export const AppSidebarProvider = ({ children }: { children: ReactNode }) => {
   const [sidebarTabSelected, setSidebarTabSelected] = useState<
     'user_test_cases' | 'library_test_cases' | 'risks_and_harms' | null
   >(null)
-  const { useCaseId, useCaseType, libraryTestCaseName, isRisksAndHarms } = useURLParamsContext()
-  const { userTestCases: userUseCases } = useUserTestCasesContext()
+  const { testCaseId, testCaseType, libraryTestCaseName, isRisksAndHarms } = useURLParamsContext()
+  const { userTestCases: userTestCases } = useUserTestCasesContext()
 
   useEffect(() => {
-    if (useCaseId !== null && userUseCases !== null) {
+    if (testCaseId !== null && userTestCases !== null) {
       setSidebarTabSelected('user_test_cases')
     } else if (libraryTestCaseName !== null && !isRisksAndHarms) {
       setSidebarTabSelected('library_test_cases')
@@ -34,7 +34,7 @@ export const AppSidebarProvider = ({ children }: { children: ReactNode }) => {
     } else {
       setSidebarTabSelected(null)
     }
-  }, [useCaseId, useCaseType, libraryTestCaseName, userUseCases, isRisksAndHarms])
+  }, [testCaseId, testCaseType, libraryTestCaseName, userTestCases, isRisksAndHarms])
   return (
     <AppSidebarContext.Provider
       value={{

@@ -7,12 +7,12 @@ import { generateId } from '@utils'
 import { Criteria, CriteriaWithOptions, DirectInstance, EvaluationType, PairwiseInstance, TestCase } from '../types'
 
 export const useTestCaseLibrary = () => {
-  const { getCriteria, getEmptyUseCaseWithCriteria } = useCriteriasContext()
-  const harmsAndRisksLibraryTestCases: { [useCaseCategory: string]: TestCase[] } = useMemo(
+  const { getCriteria, getEmptyTestCaseWithCriteria } = useCriteriasContext()
+  const harmsAndRisksLibraryTestCases: { [testCaseCategory: string]: TestCase[] } = useMemo(
     () => ({
       harmful_content_in_user_prompt: [
         {
-          ...getEmptyUseCaseWithCriteria('user_message_general_harm', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_general_harm', EvaluationType.DIRECT),
           name: 'general_harm',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -36,7 +36,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('user_message_social_bias', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_social_bias', EvaluationType.DIRECT),
           name: 'social_bias',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -61,7 +61,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('user_message_jailbreak', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_jailbreak', EvaluationType.DIRECT),
           name: 'jailbreak',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -86,7 +86,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('user_message_violence', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_violence', EvaluationType.DIRECT),
           name: 'violence',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -110,7 +110,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('user_message_profanity', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_profanity', EvaluationType.DIRECT),
           name: 'profanity',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -134,7 +134,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('user_message_unethical_behavior', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_unethical_behavior', EvaluationType.DIRECT),
           name: 'unethical_behavior',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -160,7 +160,7 @@ export const useTestCaseLibrary = () => {
       ],
       harmful_content_in_assistant_response: [
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_general_harm', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_general_harm', EvaluationType.DIRECT),
           name: 'general_harm',
           contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
@@ -190,7 +190,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_social_bias', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_social_bias', EvaluationType.DIRECT),
           name: 'social_bias',
           contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
@@ -221,7 +221,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_violence', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_violence', EvaluationType.DIRECT),
           name: 'violence',
           contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
@@ -252,7 +252,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_profanity', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_profanity', EvaluationType.DIRECT),
           name: 'profanity',
           contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
@@ -281,7 +281,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_unethical_behavior', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_unethical_behavior', EvaluationType.DIRECT),
           name: 'unethical_behavior',
           contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
@@ -313,7 +313,7 @@ export const useTestCaseLibrary = () => {
       ],
       rag_hallucination_risks: [
         {
-          ...getEmptyUseCaseWithCriteria('context_context_relevance', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('context_context_relevance', EvaluationType.DIRECT),
           name: 'context_relevance',
           contextVariableNames: ['User message', 'Assistant message'],
           responseVariableName: 'Context',
@@ -347,7 +347,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_groundedness', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_groundedness', EvaluationType.DIRECT),
           name: 'groundedness',
           contextVariableNames: ['Context', 'User message'],
           responseVariableName: 'Assistant message',
@@ -383,7 +383,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_answer_relevance', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_answer_relevance', EvaluationType.DIRECT),
           name: 'answer_relevance',
           contextVariableNames: ['Context', 'User message'],
           responseVariableName: 'Assistant message',
@@ -418,7 +418,7 @@ export const useTestCaseLibrary = () => {
         },
       ],
     }),
-    [getEmptyUseCaseWithCriteria],
+    [getEmptyTestCaseWithCriteria],
   )
 
   const directLibraryTestCases: TestCase[] = useMemo(
@@ -1162,7 +1162,7 @@ export const useTestCaseLibrary = () => {
     [getCriteria],
   )
 
-  const allLibraryUseCases = useMemo<TestCase[]>(
+  const allLibraryTestCases = useMemo<TestCase[]>(
     () => [
       ...pairwiseLibraryTestCases,
       ...directLibraryTestCases,
@@ -1175,6 +1175,6 @@ export const useTestCaseLibrary = () => {
     rubricLibraryTestCases: directLibraryTestCases,
     pairwiseLibraryTestCases,
     harmsAndRisksLibraryTestCases,
-    allLibraryUseCases,
+    allLibraryTestCases: allLibraryTestCases,
   }
 }

@@ -18,11 +18,11 @@ import classes from './ThreeLevelsPanel.module.scss'
 import sharedClasses from './shared.module.scss'
 
 interface Props {
-  onUseCaseClick: (useCase: TestCase) => void
+  onTestCaseClick: (testCase: TestCase) => void
   onClose: () => void
 }
 
-export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
+export const ExampleCatalogPanel = ({ onClose, onTestCaseClick }: Props) => {
   const { rubricLibraryTestCases, pairwiseLibraryTestCases } = useTestCaseLibrary()
 
   const [expanded, setExpanded] = useState<{ direct: boolean; pairwise: boolean } & { [key: string]: boolean }>({
@@ -45,10 +45,10 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
       [key]: !expanded[key],
     })
 
-  const onClick = (e: any, useCase: TestCase) => {
+  const onClick = (e: any, testCase: TestCase) => {
     e.stopPropagation()
     e.preventDefault()
-    onUseCaseClick(useCase)
+    onTestCaseClick(testCase)
   }
 
   return (
@@ -69,20 +69,20 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
               onToggle={() => handleToggle('direct')}
               isExpanded={expanded.direct}
             >
-              {rubricLibraryTestCases.map((useCase, i) => (
+              {rubricLibraryTestCases.map((testCase, i) => (
                 <TreeNode
                   className={cx(sharedClasses.hovered)}
                   label={
                     <div className={cx(classes.treeNodeContent)}>
-                      <span className={classes.treeNodeLabel}>{useCase.name}</span>
-                      <LinkButton useCase={useCase} />
+                      <span className={classes.treeNodeLabel}>{testCase.name}</span>
+                      <LinkButton testCase={testCase} />
                     </div>
                   }
-                  key={`${useCase.name}_direct`}
-                  id={`${useCase.name}_direct`}
+                  key={`${testCase.name}_direct`}
+                  id={`${testCase.name}_direct`}
                   selected={selectedNode}
                   renderIcon={DotMark}
-                  onClick={(e: any) => onClick(e, useCase)}
+                  onClick={(e: any) => onClick(e, testCase)}
                 />
               ))}
             </TreeNode>
@@ -93,19 +93,19 @@ export const ExampleCatalogPanel = ({ onClose, onUseCaseClick }: Props) => {
               onToggle={() => handleToggle('pairwise')}
               isExpanded={expanded.pairwise}
             >
-              {pairwiseLibraryTestCases.map((useCase, i) => (
+              {pairwiseLibraryTestCases.map((testCase, i) => (
                 <TreeNode
                   className={cx(sharedClasses.hovered)}
                   label={
                     <div className={classes['treeNodeContent']}>
-                      <span className={classes['treeNodeLabel']}>{useCase.name}</span>
-                      <LinkButton useCase={useCase} />
+                      <span className={classes['treeNodeLabel']}>{testCase.name}</span>
+                      <LinkButton testCase={testCase} />
                     </div>
                   }
-                  key={`${useCase.name}_pairwise`}
-                  id={`${useCase.name}_pairwise`}
+                  key={`${testCase.name}_pairwise`}
+                  id={`${testCase.name}_pairwise`}
                   renderIcon={DotMark}
-                  onClick={(e: any) => onClick(e, useCase)}
+                  onClick={(e: any) => onClick(e, testCase)}
                 />
               ))}
             </TreeNode>

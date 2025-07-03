@@ -7,8 +7,8 @@ import { useRouter } from 'next/router'
 import { EvaluationType, TestCase } from '../types'
 
 interface URLInfoContextValue {
-  useCaseId: number | null
-  useCaseType: EvaluationType | null
+  testCaseId: number | null
+  testCaseType: EvaluationType | null
   libraryTestCaseName: string | null
   isRisksAndHarms: boolean
   subCatalogName: string | null
@@ -25,8 +25,8 @@ interface URLInfoContextValue {
 }
 
 const URLParamsContext = createContext<URLInfoContextValue>({
-  useCaseId: null,
-  useCaseType: null,
+  testCaseId: null,
+  testCaseType: null,
   libraryTestCaseName: null,
   isRisksAndHarms: false,
   subCatalogName: null,
@@ -42,8 +42,8 @@ export const useURLParamsContext = () => {
 export const URLParamsProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter()
 
-  const useCaseId = useMemo(() => (router.query.id ? +router.query.id : null), [router.query.id])
-  const useCaseType = useMemo(
+  const testCaseId = useMemo(() => (router.query.id ? +router.query.id : null), [router.query.id])
+  const testCaseType = useMemo(
     () => (router.query.type ? (router.query.type as EvaluationType) : null),
     [router.query.type],
   )
@@ -87,8 +87,8 @@ export const URLParamsProvider = ({ children }: { children: ReactNode }) => {
   return (
     <URLParamsContext.Provider
       value={{
-        useCaseId,
-        useCaseType,
+        testCaseId,
+        testCaseType,
         libraryTestCaseName,
         isRisksAndHarms,
         subCatalogName,

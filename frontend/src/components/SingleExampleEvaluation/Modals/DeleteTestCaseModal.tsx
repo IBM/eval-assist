@@ -10,7 +10,7 @@ interface Props {
   setOpen: Dispatch<SetStateAction<boolean>>
 }
 
-export const DeleteUseCaseModal = ({ open, setOpen }: Props) => {
+export const DeleteTestCaseModal = ({ open, setOpen }: Props) => {
   const { currentTestCase } = useCurrentTestCase()
   const { onDeleteTestCase } = useTestCaseActionsContext()
   const [loadingStatus, setLoadingStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>(

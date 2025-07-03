@@ -2,28 +2,28 @@ import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 
 import { ChooseCodeGenerationType } from './Modals/ChooseCodeGenerationType'
-import { DeleteUseCaseModal } from './Modals/DeleteUseCaseModal'
+import { DeleteTestCaseModal } from './Modals/DeleteTestCaseModal'
 import { EditPairwiseResponseName } from './Modals/EditPairwiseResponseName'
 import { EditTestCaseNameModal } from './Modals/EditTestCaseNameModal'
 import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
 import { InstanceDetailsModal } from './Modals/InstanceDetailsModal'
 import { ModelProviderCredentialsModal } from './Modals/ModelProviderCredentialsModal'
-import { NewUseCaseModal } from './Modals/NewUseCaseModal'
+import { NewTestCaseModal } from './Modals/NewTestCaseModal'
 import { PromptModal } from './Modals/PromptModal'
-import { SaveAsUseCaseModal } from './Modals/SaveAsUseCaseModal'
-import { SwitchUseCaseModal } from './Modals/SwitchUseCaseModal'
+import { SaveAsTestCaseModal } from './Modals/SaveAsTestCaseModal'
+import { SwitchTestCaseModal } from './Modals/SwitchTestCaseModal'
 import { SyntheticGenerationModal } from './Modals/SyntheticGenerationModal'
 
 export const Modals = () => {
   const {
     confirmationModalOpen,
     setConfirmationModalOpen,
-    saveUseCaseModalOpen,
-    setSaveUseCaseModalOpen,
-    newUseCaseModalOpen,
-    setNewUseCaseModalOpen,
-    deleteUseCaseModalOpen,
-    setDeleteUseCaseModalOpen,
+    saveTestCaseModalOpen,
+    setSaveTestCaseModalOpen,
+    newTestCaseModalOpen,
+    setNewTestCaseModalOpen,
+    deleteTestCaseModalOpen,
+    setDeleteTestCaseModalOpen,
     editNameModalOpen,
     setEditNameModalOpen,
     resultDetailsModalOpen,
@@ -46,18 +46,18 @@ export const Modals = () => {
 
   return (
     <>
-      <NewUseCaseModal open={newUseCaseModalOpen} setOpen={setNewUseCaseModalOpen} />
+      <NewTestCaseModal open={newTestCaseModalOpen} setOpen={setNewTestCaseModalOpen} />
       {showingTestCase && (
         <>
-          <SwitchUseCaseModal
+          <SwitchTestCaseModal
             open={confirmationModalOpen}
             setOpen={setConfirmationModalOpen}
-            setSaveUseCaseModalOpen={setSaveUseCaseModalOpen}
+            setSaveTestCaseModalOpen={setSaveTestCaseModalOpen}
             setEvaluationRunningModalOpen={setEvaluationRunningModalOpen}
           />
-          <SaveAsUseCaseModal open={saveUseCaseModalOpen} setOpen={setSaveUseCaseModalOpen} />
+          <SaveAsTestCaseModal open={saveTestCaseModalOpen} setOpen={setSaveTestCaseModalOpen} />
 
-          <DeleteUseCaseModal open={deleteUseCaseModalOpen} setOpen={setDeleteUseCaseModalOpen} />
+          <DeleteTestCaseModal open={deleteTestCaseModalOpen} setOpen={setDeleteTestCaseModalOpen} />
           <EditTestCaseNameModal open={editNameModalOpen} setOpen={setEditNameModalOpen} />
           <EvaluationRunningModal open={evaluationRunningModalOpen} setOpen={setEvaluationRunningModalOpen} />
           <InstanceDetailsModal open={resultDetailsModalOpen} setOpen={setResultDetailsModalOpen} />

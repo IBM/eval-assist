@@ -320,17 +320,17 @@ def get_test_case(
     return test_case
 
 
-class PutUseCaseBody(BaseModel):
+class PutTestCaseBody(BaseModel):
     user: str
     test_case: StoredTestCase
 
 
-# from .schemas import PutUseCaseBody  # Make sure this is defined
+# from .schemas import PutTestCaseBody  # Make sure this is defined
 
 
 @router.put("/test_case/")
 def put_test_case(
-    request_body: PutUseCaseBody, session: Session = Depends(get_session)
+    request_body: PutTestCaseBody, session: Session = Depends(get_session)
 ):
     # Find user by email
     user = session.exec(
@@ -380,14 +380,14 @@ def put_test_case(
             return new_case
 
 
-class DeleteUseCaseBody(BaseModel):
+class DeleteTestCaseBody(BaseModel):
     test_case_id: int
 
 
 @router.delete("/test_case/")
 @router.delete("/test_case/")
 def delete_test_case(
-    request_body: DeleteUseCaseBody, session: Session = Depends(get_session)
+    request_body: DeleteTestCaseBody, session: Session = Depends(get_session)
 ):
     test_case = session.get(StoredTestCase, request_body.test_case_id)
     if not test_case:

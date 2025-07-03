@@ -13,14 +13,14 @@ import { useToastContext } from '@providers/ToastProvider'
 
 import { Criteria, CriteriaWithOptions, EvaluationType, TestCase } from '../../../types'
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'
-import classes from './NewUseCaseModal.module.scss'
+import classes from './NewTestCaseModal.module.scss'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
 }
 
-export const NewUseCaseModal = ({ open, setOpen }: Props) => {
+export const NewTestCaseModal = ({ open, setOpen }: Props) => {
   const { changesDetected, updateURLFromTestCase } = useCurrentTestCase()
 
   const [selectedType, setSelectedType] = useState<EvaluationType | null>(null)
@@ -30,25 +30,25 @@ export const NewUseCaseModal = ({ open, setOpen }: Props) => {
 
   const { addToast } = useToastContext()
 
-  const { directCriterias, pairwiseCriterias, getEmptyUseCaseWithCriteria } = useCriteriasContext()
+  const { directCriterias, pairwiseCriterias, getEmptyTestCaseWithCriteria } = useCriteriasContext()
 
   const onSubmit = async () => {
     if (directEvaluators !== null && pairwiseEvaluators !== null && selectedType !== null) {
       let toCreateTestCase: TestCase
       if (selectedCriteria !== null) {
-        toCreateTestCase = getEmptyUseCaseWithCriteria(selectedCriteria.name, selectedType)
+        toCreateTestCase = getEmptyTestCaseWithCriteria(selectedCriteria.name, selectedType)
       } else {
         toCreateTestCase = getEmptyTestCase(selectedType)
       }
       updateURLFromTestCase({
-        useCase: {
+        testCase: {
           ...toCreateTestCase,
           evaluator: selectedType === EvaluationType.DIRECT ? directEvaluators[0] : pairwiseEvaluators[0],
         },
         subCatalogName: null,
       })
     } else {
-      updateURLFromTestCase({ useCase: getEmptyTestCase(selectedType as EvaluationType), subCatalogName: null })
+      updateURLFromTestCase({ testCase: getEmptyTestCase(selectedType as EvaluationType), subCatalogName: null })
       addToast({
         kind: 'info',
         title: 'Evaluator options are not yet available',
