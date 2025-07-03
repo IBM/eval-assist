@@ -8,14 +8,14 @@ import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  setSaveUseCaseModalOpen: Dispatch<SetStateAction<boolean>>
+  setSaveTestCaseModalOpen: Dispatch<SetStateAction<boolean>>
   setEvaluationRunningModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
-export const SwitchUseCaseModal = ({
+export const SwitchTestCaseModal = ({
   open,
   setOpen,
-  setSaveUseCaseModalOpen,
+  setSaveTestCaseModalOpen,
   setEvaluationRunningModalOpen,
 }: Props) => {
   const { onSave, evaluationRunning } = useTestCaseActionsContext()
@@ -44,7 +44,7 @@ export const SwitchUseCaseModal = ({
   }
 
   const onSaveAsClick = () => {
-    setSaveUseCaseModalOpen(true)
+    setSaveTestCaseModalOpen(true)
     onClose()
     if (evaluationRunning) {
       setEvaluationRunningModalOpen(true)

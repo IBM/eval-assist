@@ -2,18 +2,17 @@ import { Dispatch, SetStateAction, useState } from 'react'
 
 import { Modal, TextInput } from '@carbon/react'
 
+import { TestCaseTypeBadge } from '@components/TestCaseTypeBadge/TestCaseTypeBadge'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
-
-import { UseCaseTypeBadge } from '../../UseCaseTypeBadge/UseCaseTypeBadge'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
 }
 
-export const SaveAsUseCaseModal = ({ open, setOpen }: Props) => {
-  const [useCaseName, setUseCaseName] = useState('')
+export const SaveAsTestCaseModal = ({ open, setOpen }: Props) => {
+  const [testCaseName, setTestCaseName] = useState('')
   const { currentTestCase } = useCurrentTestCase()
   const [loadingStatus, setLoadingStatus] = useState<'inactive' | 'active' | 'finished' | 'error' | undefined>(
     'inactive',
@@ -24,12 +23,12 @@ export const SaveAsUseCaseModal = ({ open, setOpen }: Props) => {
   const resetStatus = () => {
     setLoadingStatus('inactive')
     setOpen(false)
-    setUseCaseName('')
+    setTestCaseName('')
   }
 
   const onSubmit = async () => {
     setLoadingStatus('active')
-    const failed = !(await onSaveAs(useCaseName))
+    const failed = !(await onSaveAs(testCaseName))
     setLoadingStatus(failed ? 'inactive' : 'finished')
     setLoadingDescription(failed ? 'Saving...' : 'Saved!')
   }
@@ -40,7 +39,7 @@ export const SaveAsUseCaseModal = ({ open, setOpen }: Props) => {
       onRequestClose={resetStatus}
       modalHeading={
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-          Save Test Case <UseCaseTypeBadge style={{ marginLeft: '1rem' }} type={currentTestCase.type} />
+          Save Test Case <TestCaseTypeBadge style={{ marginLeft: '1rem' }} type={currentTestCase.type} />
         </div>
       }
       primaryButtonText="Confirm"
@@ -50,12 +49,12 @@ export const SaveAsUseCaseModal = ({ open, setOpen }: Props) => {
       secondaryButtonText="Cancel"
       shouldSubmitOnEnter
       onLoadingSuccess={resetStatus}
-      primaryButtonDisabled={useCaseName === ''}
+      primaryButtonDisabled={testCaseName === ''}
     >
       <TextInput
         data-modal-primary-focus
-        value={useCaseName}
-        onChange={(e: any) => setUseCaseName(e.target.value)}
+        value={testCaseName}
+        onChange={(e: any) => setTestCaseName(e.target.value)}
         id={'save-as-text-input'}
         labelText={'Name'}
       />

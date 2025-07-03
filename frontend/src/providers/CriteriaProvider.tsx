@@ -26,7 +26,7 @@ interface PipelineContextValue {
   pairwiseCriterias: Criteria[] | null
   loadingCriterias: boolean
   getCriteria: (name: string, type: EvaluationType) => CriteriaWithOptions | Criteria | null
-  getEmptyUseCaseWithCriteria: (criteriaName: string, type: EvaluationType) => TestCase
+  getEmptyTestCaseWithCriteria: (criteriaName: string, type: EvaluationType) => TestCase
 }
 
 const PipelineTypesContext = createContext<PipelineContextValue>({
@@ -34,7 +34,7 @@ const PipelineTypesContext = createContext<PipelineContextValue>({
   pairwiseCriterias: null,
   loadingCriterias: false,
   getCriteria: () => null,
-  getEmptyUseCaseWithCriteria: () => ({
+  getEmptyTestCaseWithCriteria: () => ({
     ...getEmptyTestCase(EvaluationType.DIRECT),
     criteria: getEmptyCriteriaByType(EvaluationType.DIRECT),
   }),
@@ -101,7 +101,7 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
     [directCriterias, pairwiseCriterias],
   )
 
-  const getEmptyUseCaseWithCriteria = useCallback(
+  const getEmptyTestCaseWithCriteria = useCallback(
     (criteriaName: string, type: EvaluationType): TestCase => ({
       ...getEmptyTestCase(type),
       criteria: getCriteria(criteriaName, type) || getEmptyCriteriaByType(type),
@@ -118,7 +118,7 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
         pairwiseCriterias,
         loadingCriterias,
         getCriteria,
-        getEmptyUseCaseWithCriteria,
+        getEmptyTestCaseWithCriteria,
       }}
     >
       {children}

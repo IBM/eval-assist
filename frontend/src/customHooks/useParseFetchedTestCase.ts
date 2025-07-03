@@ -5,16 +5,16 @@ import { FetchedTestCase, TestCase, TestCaseV0 } from '@types'
 
 // EXAMPLES
 // fetched test case is v0 and current is v1
-// parseFetchedUseCaseV0 -> parseFetchedUseCaseV0toV1
+// parseFetchedTestCaseV0 -> parseFetchedTestCaseV0toV1
 
 // fetched test case is v1 and current is v1
-// parseFetchedUseCaseV1
+// parseFetchedTestCaseV1
 
 // fetched test case is v0 and current is v4
-// parseFetchedUseCaseV0 -> parseFetchedUseCaseV0toV1 -> parseFetchedUseCaseV1toV2 -> parseFetchedUseCaseV2toV3 -> parseFetchedUseCaseV3toV4
+// parseFetchedTestCaseV0 -> parseFetchedTestCaseV0toV1 -> parseFetchedTestCaseV1toV2 -> parseFetchedTestCaseV2toV3 -> parseFetchedTestCaseV3toV4
 // fetched test case is v3 and current is v4
-// parseFetchedUseCaseV3 -> parseFetchedUseCaseV3toV4
-export const useParseFetchedUseCase = () => {
+// parseFetchedTestCaseV3 -> parseFetchedTestCaseV3toV4
+export const useParseFetchedTestCase = () => {
   const { directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
 
   // const parseDirectAssessmentResultsV0ToV1 = useCallback((results: DirectResultsV0): DirectResultsV1 | null => {
@@ -61,22 +61,22 @@ export const useParseFetchedUseCase = () => {
   //   [parseDirectAssessmentResultsV0ToV1, parsePairwiseComparisonResultsV0ToV1],
   // )
 
-  // const parseFetchedUseCaseV0 = useCallback((fetchedUseCase: Record<string, any>): TestCaseV0 => {
-  //   const type = fetchedUseCase['type']
-  //   const fetchedResults = fetchedUseCase.results
+  // const parseFetchedTestCaseV0 = useCallback((fetchedTestCase: Record<string, any>): TestCaseV0 => {
+  //   const type = fetchedTestCase['type']
+  //   const fetchedResults = fetchedTestCase.results
   //   return {
-  //     id: fetchedUseCase.id,
-  //     name: fetchedUseCase.name,
+  //     id: fetchedTestCase.id,
+  //     name: fetchedTestCase.name,
   //     type: type,
-  //     contextVariables: fetchedUseCase.contextVariables || [{ name: 'context', value: fetchedUseCase.context }],
-  //     responseVariableName: fetchedUseCase.responseVariableName || 'Response',
-  //     responses: fetchedUseCase.responses,
+  //     contextVariables: fetchedTestCase.contextVariables || [{ name: 'context', value: fetchedTestCase.context }],
+  //     responseVariableName: fetchedTestCase.responseVariableName || 'Response',
+  //     responses: fetchedTestCase.responses,
   //     criteria: returnByPipelineType(
   //       type,
-  //       fetchedUseCase.criteria ||
+  //       fetchedTestCase.criteria ||
   //         // for backward compatibility
-  //         fetchedUseCase.rubric,
-  //       fetchedUseCase.criteria,
+  //         fetchedTestCase.rubric,
+  //       fetchedTestCase.criteria,
   //     ),
   //     results: returnByPipelineType(
   //       type,
@@ -85,14 +85,14 @@ export const useParseFetchedUseCase = () => {
   //       // if this are old results, discard them
   //       fetchedResults === null ? null : 'ranking' in fetchedResults ? fetchedResults : null,
   //     ),
-  //     pipeline: fetchedUseCase.pipeline,
+  //     pipeline: fetchedTestCase.pipeline,
   //     expectedResults: returnByPipelineType(
   //       type,
-  //       fetchedUseCase.expectedResults,
+  //       fetchedTestCase.expectedResults,
   //       // old usecases had 'none' as the expected result
   //       // set those as ''
-  //       (fetchedUseCase.expectedResults as TestCaseV0['expectedResults'])?.map((expectedResult) =>
-  //         new Array((fetchedUseCase.responses as TestCaseV0['responses']).length)
+  //       (fetchedTestCase.expectedResults as TestCaseV0['expectedResults'])?.map((expectedResult) =>
+  //         new Array((fetchedTestCase.responses as TestCaseV0['responses']).length)
   //           .fill('')
   //           .map((_, i) => `${i + 1}`)
   //           .includes(expectedResult)
@@ -103,73 +103,73 @@ export const useParseFetchedUseCase = () => {
   //   }
 
   // // this version changes contextVariables from a list of {variable: string, value: string} to Record<string, string>
-  // const parseFetchedUseCaseV0ToV1 = useCallback(
-  //   (fetchedUseCase: TestCaseV0): UseCaseV1 => ({
-  //     ...fetchedUseCase,
+  // const parseFetchedTestCaseV0ToV1 = useCallback(
+  //   (fetchedTestCase: TestCaseV0): TestCaseV1 => ({
+  //     ...fetchedTestCase,
   //     // we are sure that by the time the usecases are being fetched
   //     // the pipelines have been already fetched (the provider is outer)
   //     // so casting them to Pipeline[] is safe
   //     pipeline:
   //       (
   //         returnByPipelineType<typeof directEvaluators, typeof pairwiseEvaluators>(
-  //           fetchedUseCase.type,
+  //           fetchedTestCase.type,
   //           directEvaluators,
   //           pairwiseEvaluators,
   //         ) as Evaluator[]
-  //       ).find((pipeline) => pipeline.name === fetchedUseCase.pipeline) ?? null,
+  //       ).find((pipeline) => pipeline.name === fetchedTestCase.pipeline) ?? null,
   //   }),
   //   [pairwiseEvaluators, directEvaluators],
   // )
   // }, [])
 
-  const parseFetchedUseCaseV0 = useCallback(
-    (fetchedUseCase: Record<string, any>): TestCaseV0 =>
+  const parseFetchedTestCaseV0 = useCallback(
+    (fetchedTestCase: Record<string, any>): TestCaseV0 =>
       ({
-        ...fetchedUseCase,
+        ...fetchedTestCase,
         // criteria was added contextFields and predictionField, so we fill them if they are not provided
         criteria: {
-          ...fetchedUseCase.criteria,
-          contextFields: fetchedUseCase.criteria.contextFields || fetchedUseCase.contextVariableNames,
-          predictionField: fetchedUseCase.criteria.predictionField || fetchedUseCase.responseVariableName,
+          ...fetchedTestCase.criteria,
+          contextFields: fetchedTestCase.criteria.contextFields || fetchedTestCase.contextVariableNames,
+          predictionField: fetchedTestCase.criteria.predictionField || fetchedTestCase.responseVariableName,
         },
       } as TestCaseV0),
     [],
   )
 
-  const useCaseParsingVersionToVersionFunctions: any[] = useMemo(() => [], [])
+  const testCaseParsingVersionToVersionFunctions: any[] = useMemo(() => [], [])
 
-  const useCaseParsingVersionFunctions = useMemo(() => [parseFetchedUseCaseV0], [parseFetchedUseCaseV0])
+  const testCaseParsingVersionFunctions = useMemo(() => [parseFetchedTestCaseV0], [parseFetchedTestCaseV0])
 
   const CURRENT_FORMAT_VERSION = useMemo(() => 0, [])
 
-  const parseFetchedUseCase = useCallback(
-    (fetchedUseCase: FetchedTestCase): TestCase | null => {
+  const parseFetchedTestCase = useCallback(
+    (fetchedTestCase: FetchedTestCase): TestCase | null => {
       const toParseObj: Record<string, any> = {
-        ...JSON.parse(fetchedUseCase.content),
-        id: fetchedUseCase.id,
-        name: fetchedUseCase.name,
+        ...JSON.parse(fetchedTestCase.content),
+        id: fetchedTestCase.id,
+        name: fetchedTestCase.name,
       }
 
       const version = (toParseObj.contentFormatVersion as number) || 0
       if (version > CURRENT_FORMAT_VERSION) {
-        console.log(`Discarding test case ${fetchedUseCase.name} because its newer than the current system version.`)
+        console.log(`Discarding test case ${fetchedTestCase.name} because its newer than the current system version.`)
         return null
       }
-      const readFetchedUseCase = useCaseParsingVersionFunctions[version]
+      const readFetchedTestCase = testCaseParsingVersionFunctions[version]
 
-      let parsedUseCase = readFetchedUseCase(toParseObj)
-      useCaseParsingVersionToVersionFunctions
+      let parsedTestCase = readFetchedTestCase(toParseObj)
+      testCaseParsingVersionToVersionFunctions
         .filter((_, i) => i >= version)
         .forEach((parsingFunc, i) => {
-          parsedUseCase = parsingFunc(parsedUseCase)
+          parsedTestCase = parsingFunc(parsedTestCase)
         })
-      return parsedUseCase as TestCase
+      return parsedTestCase as TestCase
     },
-    [CURRENT_FORMAT_VERSION, useCaseParsingVersionFunctions, useCaseParsingVersionToVersionFunctions],
+    [CURRENT_FORMAT_VERSION, testCaseParsingVersionFunctions, testCaseParsingVersionToVersionFunctions],
   )
 
   return {
-    parseFetchedUseCase,
+    parseFetchedTestCase,
     CURRENT_FORMAT_VERSION,
   }
 }

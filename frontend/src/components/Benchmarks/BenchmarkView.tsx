@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Breadcrumb, BreadcrumbItem, Button, Toggle } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
-import { UseCaseTypeBadge } from '@components/UseCaseTypeBadge/UseCaseTypeBadge'
+import { TestCaseTypeBadge } from '@components/TestCaseTypeBadge/TestCaseTypeBadge'
 import { capitalizeFirstWord } from '@utils'
 
 import { CriteriaBenchmarkCard } from './CriteriaBenchmarkCard'
@@ -49,7 +49,7 @@ export const BenchmarkView = () => {
               <h4>{capitalizeFirstWord(benchmark.name)}</h4>
 
               <div className={classes['vertical-divider']}></div>
-              <UseCaseTypeBadge type={benchmark.type} />
+              <TestCaseTypeBadge type={benchmark.type} />
             </div>
 
             <Toggle

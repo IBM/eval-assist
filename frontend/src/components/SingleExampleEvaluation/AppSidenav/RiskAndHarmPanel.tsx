@@ -19,11 +19,11 @@ import classes from './ThreeLevelsPanel.module.scss'
 import sharedClasses from './shared.module.scss'
 
 interface Props {
-  onUseCaseClick: (useCase: TestCase, subCatalogName?: string) => void
+  onTestCaseClick: (testCase: TestCase, subCatalogName?: string) => void
   onClose: () => void
 }
 
-export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
+export const RiskAndHarmPanel = ({ onClose, onTestCaseClick }: Props) => {
   const { harmsAndRisksLibraryTestCases } = useTestCaseLibrary()
 
   const [expanded, setExpanded] = useState<{ rubric: boolean; pairwise: boolean } & { [key: string]: boolean }>({
@@ -47,10 +47,10 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
       [key]: !expanded[key],
     })
 
-  const onClick = (e: any, useCase: TestCase, subCatalogName: string) => {
+  const onClick = (e: any, testCase: TestCase, subCatalogName: string) => {
     e.stopPropagation()
     e.preventDefault()
-    onUseCaseClick(useCase, subCatalogName)
+    onTestCaseClick(testCase, subCatalogName)
   }
 
   return (
@@ -64,7 +64,7 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
       <div className={classes.content}>
         <div className={classes.treeWrapper}>
           <TreeView label="" selected={selectedNode}>
-            {Object.entries(harmsAndRisksLibraryTestCases).map(([subCatalogName, useCases]) => (
+            {Object.entries(harmsAndRisksLibraryTestCases).map(([subCatalogName, testCases]) => (
               <TreeNode
                 label={capitalizeFirstWord(subCatalogName)}
                 onSelect={() => handleToggle(subCatalogName)}
@@ -73,19 +73,19 @@ export const RiskAndHarmPanel = ({ onClose, onUseCaseClick }: Props) => {
                 key={subCatalogName}
                 className={classes.treeCategory}
               >
-                {useCases.map((useCase, i) => (
+                {testCases.map((testCase, i) => (
                   <TreeNode
                     className={cx(sharedClasses.hovered)}
                     label={
                       <div className={classes['treeNodeContent']}>
-                        <span className={classes['treeNodeLabel']}>{toTitleCase(useCase.name)}</span>
-                        <LinkButton useCase={useCase} subCatalogName={subCatalogName} />
+                        <span className={classes['treeNodeLabel']}>{toTitleCase(testCase.name)}</span>
+                        <LinkButton testCase={testCase} subCatalogName={subCatalogName} />
                       </div>
                     }
-                    key={`${useCase.name}_${subCatalogName}`}
-                    id={`${useCase.name}_${subCatalogName}`}
+                    key={`${testCase.name}_${subCatalogName}`}
+                    id={`${testCase.name}_${subCatalogName}`}
                     renderIcon={DotMark}
-                    onClick={(e: any) => onClick(e, useCase, subCatalogName)}
+                    onClick={(e: any) => onClick(e, testCase, subCatalogName)}
                   />
                 ))}
               </TreeNode>
