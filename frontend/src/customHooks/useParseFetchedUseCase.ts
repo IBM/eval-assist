@@ -126,6 +126,12 @@ export const useParseFetchedUseCase = () => {
     (fetchedUseCase: Record<string, any>): TestCaseV0 =>
       ({
         ...fetchedUseCase,
+        // criteria was added contextFields and predictionField, so we fill them if they are not provided
+        criteria: {
+          ...fetchedUseCase.criteria,
+          contextFields: fetchedUseCase.criteria.contextFields || fetchedUseCase.contextVariableNames,
+          predictionField: fetchedUseCase.criteria.predictionField || fetchedUseCase.responseVariableName,
+        },
       } as TestCaseV0),
     [],
   )

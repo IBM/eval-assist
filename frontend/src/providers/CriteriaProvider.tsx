@@ -11,7 +11,15 @@ import { ReactNode, createContext, useCallback, useContext, useEffect, useState 
 import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { Criteria, CriteriaWithOptions, EvaluationType, TestCase } from '@types'
+import {
+  Criteria,
+  CriteriaWithOptions,
+  EvaluationType,
+  FetchedCriteria,
+  FetchedCriteriaWithOptions,
+  FetchedCriteriaWithOptionsV0,
+  TestCase,
+} from '@types'
 
 interface PipelineContextValue {
   directCriterias: CriteriaWithOptions[] | null
@@ -45,10 +53,32 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
     const fetchData = async () => {
       setLoadingCriterias(true)
       const response = await get('criterias/')
-      const data = await response.json()
+      const fetchedCriteria: { direct: FetchedCriteriaWithOptions[]; pairwise: FetchedCriteria[] } =
+        await response.json()
+      const parsedCriteria = {
+        direct: fetchedCriteria.direct.map(
+          (fetchedCriterion) =>
+            ({
+              name: fetchedCriterion.name,
+              description: fetchedCriterion.description,
+              options: fetchedCriterion.options,
+              predictionField: fetchedCriterion.prediction_field,
+              contextFields: fetchedCriterion.context_fields,
+            } as CriteriaWithOptions),
+        ),
+        pairwise: fetchedCriteria.pairwise.map(
+          (fetchedCriterion) =>
+            ({
+              name: fetchedCriterion.name,
+              description: fetchedCriterion.description,
+              predictionField: fetchedCriterion.prediction_field,
+              contextFields: fetchedCriterion.context_fields,
+            } as Criteria),
+        ),
+      }
       setLoadingCriterias(false)
-      setDirectCriterias(data.direct.map((c: CriteriaWithOptions) => ({ ...c, name: toSnakeCase(c.name) })))
-      setPairwiseCriterias(data.pairwise.map((c: Criteria) => ({ ...c, name: toSnakeCase(c.name) })))
+      setDirectCriterias(parsedCriteria.direct.map((c) => ({ ...c, name: toSnakeCase(c.name) })))
+      setPairwiseCriterias(parsedCriteria.pairwise.map((c) => ({ ...c, name: toSnakeCase(c.name) })))
     }
     fetchData()
   }, [get])
