@@ -13,17 +13,17 @@ import { TestCase } from '../../../types'
 import sharedClasses from './shared.module.scss'
 
 interface LinkButtonProps {
-  useCase: TestCase
+  testCase: TestCase
   subCatalogName?: string
   className?: string
 }
 
-export const LinkButton = ({ useCase, subCatalogName, className = '' }: LinkButtonProps) => {
+export const LinkButton = ({ testCase, subCatalogName, className = '' }: LinkButtonProps) => {
   const { getQueryParamsFromTestCase } = useGetQueryParamsFromTestCase()
 
   const urlParams = useMemo(
-    () => getQueryParamsFromTestCase(useCase, subCatalogName || null),
-    [getQueryParamsFromTestCase, subCatalogName, useCase],
+    () => getQueryParamsFromTestCase(testCase, subCatalogName || null),
+    [getQueryParamsFromTestCase, subCatalogName, testCase],
   )
 
   const queryParams = useMemo(() => stringifyQueryParams(urlParams), [urlParams])

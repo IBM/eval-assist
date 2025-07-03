@@ -221,11 +221,18 @@ def get_criterias():
                     CriteriaOptionAPI(name=o.name, description=o.description)
                     for o in c.options
                 ],
+                prediction_field=c.prediction_field,
+                context_fields=c.context_fields,
             )
             for c in DIRECT_CRITERIA
         ],
         "pairwise": [
-            CriteriaAPI(name=c.name, description=c.description)
+            CriteriaAPI(
+                name=c.name,
+                description=c.description,
+                prediction_field=c.prediction_field,
+                context_fields=c.context_fields,
+            )
             for c in PAIRWISE_CRITERIA
         ],
     }
@@ -313,17 +320,17 @@ def get_test_case(
     return test_case
 
 
-class PutUseCaseBody(BaseModel):
+class PutTestCaseBody(BaseModel):
     user: str
     test_case: StoredTestCase
 
 
-# from .schemas import PutUseCaseBody  # Make sure this is defined
+# from .schemas import PutTestCaseBody  # Make sure this is defined
 
 
 @router.put("/test_case/")
 def put_test_case(
-    request_body: PutUseCaseBody, session: Session = Depends(get_session)
+    request_body: PutTestCaseBody, session: Session = Depends(get_session)
 ):
     # Find user by email
     user = session.exec(
@@ -373,14 +380,14 @@ def put_test_case(
             return new_case
 
 
-class DeleteUseCaseBody(BaseModel):
+class DeleteTestCaseBody(BaseModel):
     test_case_id: int
 
 
 @router.delete("/test_case/")
 @router.delete("/test_case/")
 def delete_test_case(
-    request_body: DeleteUseCaseBody, session: Session = Depends(get_session)
+    request_body: DeleteTestCaseBody, session: Session = Depends(get_session)
 ):
     test_case = session.get(StoredTestCase, request_body.test_case_id)
     if not test_case:
@@ -563,6 +570,12 @@ def get_version():
         try:
             version = pkg_resources.require("evalassist")[0].version
             source = "pypi"
+
+            if version == "0.0.0":
+                # version is 0.0.0 in the toml only when
+                # evalassist is executed using poetry
+                # and the .git folder is not present in the root directory
+                raise ValueError("Invalid version")
         except Exception:
             version = "Not available"
             source = None

@@ -46,28 +46,36 @@ export const getEmptyCriteriaWithTwoOptions = (): CriteriaWithOptions => ({
       description: '',
     },
   ],
+  predictionField: 'Response',
+  contextFields: ['Context'],
 })
 
 export const getEmptyCriteria = (): Criteria => ({
   name: '',
   description: '',
+  predictionField: 'Response',
+  contextFields: ['Context'],
 })
 
 export const getEmptyCriteriaByType = (type: EvaluationType): CriteriaWithOptions | Criteria =>
   type === EvaluationType.DIRECT ? getEmptyCriteriaWithTwoOptions() : getEmptyCriteria()
 
-export const getEmptyInstance = (): Instance => ({
-  contextVariables: [{ name: 'context', value: '' }],
+export const getEmptyInstance = (contextVariableNames: string[] = ['context']): Instance => ({
+  contextVariables: contextVariableNames.map((cvn) => ({ name: cvn, value: '' })),
   expectedResult: '',
   result: null,
   id: generateId(),
 })
 
-export const getEmptyPairwiseInstance = (): PairwiseInstance => ({
-  ...getEmptyInstance(),
+export const getEmptyPairwiseInstance = (contextVariableNames?: string[]): PairwiseInstance => ({
+  ...getEmptyInstance(contextVariableNames),
   responses: ['', ''],
 })
-export const getEmptyDirectInstance = (): DirectInstance => ({ ...getEmptyInstance(), response: '', result: null })
+export const getEmptyDirectInstance = (contextVariableNames?: string[]): DirectInstance => ({
+  ...getEmptyInstance(contextVariableNames),
+  response: '',
+  result: null,
+})
 
 export const getEmptyTestCase = (type: EvaluationType): TestCase => ({
   id: null,

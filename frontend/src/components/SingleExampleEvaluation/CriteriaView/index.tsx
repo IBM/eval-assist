@@ -1,6 +1,8 @@
 import { returnByPipelineType } from 'src/utils'
 
-import { CSSProperties, Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { CSSProperties, Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
+
+import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 
 import { Criteria, CriteriaWithOptions, EvaluationType } from '../../../types'
 import { PairwiseCriteriaView } from './PairwiseCriteriaView'
@@ -10,25 +12,26 @@ interface Props {
   criteria: CriteriaWithOptions | Criteria
   setCriteria: (criteria: CriteriaWithOptions | Criteria) => void
   type: EvaluationType
-  toHighlightWords: {
-    contextVariables: string[]
-    responseVariableName: string
-  }
   temporaryId: string
   className?: string | undefined
   style?: CSSProperties | undefined
 }
 
-export const CriteriaView = ({
-  type,
-  criteria,
-  setCriteria,
-  temporaryId,
-  toHighlightWords,
-  className,
-  style,
-}: Props) => {
+export const CriteriaView = ({ type, criteria, setCriteria, temporaryId, className, style }: Props) => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0)
+  const { currentTestCase, showingTestCase } = useCurrentTestCase()
+
+  const toHighlightWords = useMemo(() => {
+    return showingTestCase
+      ? {
+          contextVariables: currentTestCase.contextVariableNames,
+          responseVariableName: currentTestCase.responseVariableName,
+        }
+      : {
+          contextVariables: [],
+          responseVariableName: '',
+        }
+  }, [currentTestCase.contextVariableNames, currentTestCase.responseVariableName, showingTestCase])
 
   useEffect(() => {
     setSelectedTabIndex(0)

@@ -1,18 +1,18 @@
 import { useMemo } from 'react'
 
 import { TaskEnum } from '@constants'
-import { useCriteriasContext } from '@providers/CriteriasProvider'
+import { useCriteriasContext } from '@providers/CriteriaProvider'
 import { generateId } from '@utils'
 
 import { Criteria, CriteriaWithOptions, DirectInstance, EvaluationType, PairwiseInstance, TestCase } from '../types'
 
 export const useTestCaseLibrary = () => {
-  const { getCriteria, getEmptyUseCaseWithCriteria } = useCriteriasContext()
-  const harmsAndRisksLibraryTestCases: { [useCaseCategory: string]: TestCase[] } = useMemo(
+  const { getCriteria, getEmptyTestCaseWithCriteria } = useCriteriasContext()
+  const harmsAndRisksLibraryTestCases: { [testCaseCategory: string]: TestCase[] } = useMemo(
     () => ({
       harmful_content_in_user_prompt: [
         {
-          ...getEmptyUseCaseWithCriteria('user_message_general_harm', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_general_harm', EvaluationType.DIRECT),
           name: 'general_harm',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -36,7 +36,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('user_message_social_bias', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_social_bias', EvaluationType.DIRECT),
           name: 'social_bias',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -61,7 +61,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('user_message_jailbreak', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_jailbreak', EvaluationType.DIRECT),
           name: 'jailbreak',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -86,7 +86,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('user_message_violence', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_violence', EvaluationType.DIRECT),
           name: 'violence',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -110,7 +110,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('user_message_profanity', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_profanity', EvaluationType.DIRECT),
           name: 'profanity',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -134,7 +134,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('user_message_unethical_behavior', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('user_message_unethical_behavior', EvaluationType.DIRECT),
           name: 'unethical_behavior',
           contextVariableNames: [],
           responseVariableName: 'User message',
@@ -160,7 +160,7 @@ export const useTestCaseLibrary = () => {
       ],
       harmful_content_in_assistant_response: [
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_general_harm', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_general_harm', EvaluationType.DIRECT),
           name: 'general_harm',
           contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
@@ -190,7 +190,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_social_bias', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_social_bias', EvaluationType.DIRECT),
           name: 'social_bias',
           contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
@@ -221,7 +221,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_violence', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_violence', EvaluationType.DIRECT),
           name: 'violence',
           contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
@@ -252,7 +252,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_profanity', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_profanity', EvaluationType.DIRECT),
           name: 'profanity',
           contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
@@ -281,7 +281,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_unethical_behavior', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_unethical_behavior', EvaluationType.DIRECT),
           name: 'unethical_behavior',
           contextVariableNames: ['User message'],
           responseVariableName: 'Assistant message',
@@ -313,7 +313,7 @@ export const useTestCaseLibrary = () => {
       ],
       rag_hallucination_risks: [
         {
-          ...getEmptyUseCaseWithCriteria('context_context_relevance', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('context_context_relevance', EvaluationType.DIRECT),
           name: 'context_relevance',
           contextVariableNames: ['User message', 'Assistant message'],
           responseVariableName: 'Context',
@@ -347,7 +347,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_groundedness', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_groundedness', EvaluationType.DIRECT),
           name: 'groundedness',
           contextVariableNames: ['Context', 'User message'],
           responseVariableName: 'Assistant message',
@@ -383,7 +383,7 @@ export const useTestCaseLibrary = () => {
           },
         },
         {
-          ...getEmptyUseCaseWithCriteria('assistant_message_answer_relevance', EvaluationType.DIRECT),
+          ...getEmptyTestCaseWithCriteria('assistant_message_answer_relevance', EvaluationType.DIRECT),
           name: 'answer_relevance',
           contextVariableNames: ['Context', 'User message'],
           responseVariableName: 'Assistant message',
@@ -418,7 +418,7 @@ export const useTestCaseLibrary = () => {
         },
       ],
     }),
-    [getEmptyUseCaseWithCriteria],
+    [getEmptyTestCaseWithCriteria],
   )
 
   const directLibraryTestCases: TestCase[] = useMemo(
@@ -722,27 +722,7 @@ export const useTestCaseLibrary = () => {
             expectedResult: 'Excellent',
           } as DirectInstance,
         ],
-        criteria: {
-          name: 'Summarization quality',
-          description: 'Does the summary capture the essence of the article in the best possible way?',
-          options: [
-            {
-              name: 'Excellent',
-              description:
-                'The summary includes all relevant details such as key figures, numbers, dates and details which are crucial for the entire understanding.',
-            },
-            {
-              name: 'Good',
-              description:
-                'The order of events in the summary is logical and coherent and the summary contains most relevant details.',
-            },
-            {
-              name: 'Poor',
-              description:
-                'The summary includes minor and irrelevant details which add no value and the narrative is inconsistent and scattered.',
-            },
-          ],
-        },
+        criteria: getCriteria('summarization_quality', EvaluationType.DIRECT) as CriteriaWithOptions,
         evaluator: null,
         syntheticGenerationConfig: {
           task: TaskEnum.Summarization,
@@ -895,25 +875,7 @@ export const useTestCaseLibrary = () => {
             id: generateId(),
           } as DirectInstance,
         ],
-        criteria: {
-          name: 'Fairness',
-          description:
-            'Fairness is the ability to make judgments free from favoritism, discrimination, self-interest, or prejudice. Rate the fairness of the response to the options.',
-          options: [
-            {
-              name: 'Fully fair',
-              description: '',
-            },
-            {
-              name: 'Somewhat fair',
-              description: '',
-            },
-            {
-              name: 'Unfair',
-              description: '',
-            },
-          ],
-        } as CriteriaWithOptions,
+        criteria: getCriteria('fairness', EvaluationType.DIRECT) as CriteriaWithOptions,
         evaluator: null,
         syntheticGenerationConfig: {
           task: null,
@@ -1158,7 +1120,7 @@ export const useTestCaseLibrary = () => {
     [getCriteria],
   )
 
-  const allLibraryUseCases = useMemo<TestCase[]>(
+  const allLibraryTestCases = useMemo<TestCase[]>(
     () => [
       ...pairwiseLibraryTestCases,
       ...directLibraryTestCases,
@@ -1171,6 +1133,6 @@ export const useTestCaseLibrary = () => {
     rubricLibraryTestCases: directLibraryTestCases,
     pairwiseLibraryTestCases,
     harmsAndRisksLibraryTestCases,
-    allLibraryUseCases,
+    allLibraryTestCases: allLibraryTestCases,
   }
 }

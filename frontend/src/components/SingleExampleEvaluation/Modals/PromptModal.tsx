@@ -6,7 +6,7 @@ import { Loading, Modal, Select, SelectItem } from '@carbon/react'
 
 import { HighlightTextArea } from '@components/HighlightTextArea'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { useCriteriasContext } from '@providers/CriteriasProvider'
+import { useCriteriasContext } from '@providers/CriteriaProvider'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useToastContext } from '@providers/ToastProvider'
 import { DirectInstance, EvaluationType } from '@types'

@@ -4,14 +4,14 @@ interface ModalsContextValue {
   confirmationModalOpen: boolean
   setConfirmationModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 
-  saveUseCaseModalOpen: boolean
-  setSaveUseCaseModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  saveTestCaseModalOpen: boolean
+  setSaveTestCaseModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 
-  newUseCaseModalOpen: boolean
-  setNewUseCaseModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  newTestCaseModalOpen: boolean
+  setNewTestCaseModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 
-  deleteUseCaseModalOpen: boolean
-  setDeleteUseCaseModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  deleteTestCaseModalOpen: boolean
+  setDeleteTestCaseModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 
   editNameModalOpen: boolean
   setEditNameModalOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -41,14 +41,14 @@ const ModalsContext = createContext<ModalsContextValue>({
   confirmationModalOpen: false,
   setConfirmationModalOpen: () => {},
 
-  saveUseCaseModalOpen: false,
-  setSaveUseCaseModalOpen: () => {},
+  saveTestCaseModalOpen: false,
+  setSaveTestCaseModalOpen: () => {},
 
-  newUseCaseModalOpen: false,
-  setNewUseCaseModalOpen: () => {},
+  newTestCaseModalOpen: false,
+  setNewTestCaseModalOpen: () => {},
 
-  deleteUseCaseModalOpen: false,
-  setDeleteUseCaseModalOpen: () => {},
+  deleteTestCaseModalOpen: false,
+  setDeleteTestCaseModalOpen: () => {},
 
   editNameModalOpen: false,
   setEditNameModalOpen: () => {},
@@ -81,9 +81,9 @@ export const useModalsContext = () => {
 
 export const ModalsProvider = ({ children }: { children: ReactNode }) => {
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
-  const [saveUseCaseModalOpen, setSaveUseCaseModalOpen] = useState(false)
-  const [newUseCaseModalOpen, setNewUseCaseModalOpen] = useState(false)
-  const [deleteUseCaseModalOpen, setDeleteUseCaseModalOpen] = useState(false)
+  const [saveTestCaseModalOpen, setSaveTestCaseModalOpen] = useState(false)
+  const [newTestCaseModalOpen, setNewTestCaseModalOpen] = useState(false)
+  const [deleteTestCaseModalOpen, setDeleteTestCaseModalOpen] = useState(false)
   const [editNameModalOpen, setEditNameModalOpen] = useState(false)
   const [resultDetailsModalOpen, setResultDetailsModalOpen] = useState(false)
   const [evaluationRunningModalOpen, setEvaluationRunningModalOpen] = useState(false)
@@ -99,14 +99,14 @@ export const ModalsProvider = ({ children }: { children: ReactNode }) => {
         confirmationModalOpen,
         setConfirmationModalOpen,
 
-        saveUseCaseModalOpen,
-        setSaveUseCaseModalOpen,
+        saveTestCaseModalOpen,
+        setSaveTestCaseModalOpen,
 
-        newUseCaseModalOpen,
-        setNewUseCaseModalOpen,
+        newTestCaseModalOpen,
+        setNewTestCaseModalOpen,
 
-        deleteUseCaseModalOpen,
-        setDeleteUseCaseModalOpen,
+        deleteTestCaseModalOpen,
+        setDeleteTestCaseModalOpen,
 
         editNameModalOpen,
         setEditNameModalOpen,
