@@ -189,13 +189,13 @@ results = evaluate(predictions=predictions, data=dataset)
 rows = []
 for i, result in enumerate(results):
     instance_scores = result['score']['instance']
-    criteria = json.loads(instance_scores[f'{instance_scores['score_name']}_criteria'])
+    criteria = json.loads(instance_scores[f\"{instance_scores['score_name']}_criteria\"])
     criteria_str = criteria['name'] if criteria['name'] != "" else criteria['description']
     rows.append({
         'prediction': predictions[i],
         'criteria': criteria_str,
         'score': instance_scores['score'],
-        'option': instance_scores[f'{instance_scores['score_name']}_selected_option']})
+        'option': instance_scores[f\"{instance_scores['score_name']}_selected_option\"]})
 results_df = pd.DataFrame(rows)
 results_df
 """
