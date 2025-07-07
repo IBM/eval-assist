@@ -4,8 +4,13 @@ import uuid
 from textwrap import dedent
 from typing import Optional
 
-from langchain.output_parsers import ResponseSchema, StructuredOutputParser
+from langchain.output_parsers import (
+    OutputFixingParser,
+    ResponseSchema,
+    StructuredOutputParser,
+)
 from langchain.prompts import PromptTemplate
+from langchain_core.runnables import RunnableLambda
 from unitxt.llm_as_judge import (
     CriteriaWithOptions,
     EvaluatorTypeEnum,
@@ -348,6 +353,13 @@ class Generator:
             },
         )
 
+        def llm_invoke(text: str) -> str:
+            # call your custom model here and return the raw text
+            response = self.inference_engine.infer([{"source": text.to_string()}])[0]
+            return response
+
+        self.llm_runnable = RunnableLambda(llm_invoke)
+
         system_prompt_input_variables = [
             "dimension",
             "dimension_description",
@@ -366,9 +378,11 @@ class Generator:
                     name=self.response_name, description="the answer to the question"
                 ),
             ]
-            self.output_parser = StructuredOutputParser.from_response_schemas(
-                response_schema
+            self.output_parser = OutputFixingParser.from_llm(
+                parser=StructuredOutputParser.from_response_schemas(response_schema),
+                llm=self.llm_runnable,
             )
+
             self.format_instructions = self.output_parser.get_format_instructions()
 
             # prompt templates
@@ -404,9 +418,12 @@ class Generator:
                     description=f"the {self.context_names[0]}'s summary",
                 ),
             ]
-            self.output_parser = StructuredOutputParser.from_response_schemas(
-                response_schema
+
+            self.output_parser = OutputFixingParser.from_llm(
+                parser=StructuredOutputParser.from_response_schemas(response_schema),
+                llm=self.llm_runnable,
             )
+
             self.format_instructions = self.output_parser.get_format_instructions()
 
             # prompt templates
@@ -446,9 +463,12 @@ class Generator:
                     description=f"the requested {self.response_name}",
                 ),
             ]
-            self.output_parser = StructuredOutputParser.from_response_schemas(
-                response_schema
+
+            self.output_parser = OutputFixingParser.from_llm(
+                parser=StructuredOutputParser.from_response_schemas(response_schema),
+                llm=self.llm_runnable,
             )
+
             self.format_instructions = self.output_parser.get_format_instructions()
 
             self.system_prompt_template = PromptTemplate(
@@ -458,15 +478,13 @@ class Generator:
                     
                     Criteria: {dimension}
                     Criteria description: {dimension_description}
-                    Criteria dimension target: {target}
+                    Criteria dimension target (the dimension that the generated {response_name} must comply with): {target}
                     {target_description_section}
                     
-                    Your task is to generate a {response_name} that STRICTLY follows this requirement. This is for evaluation purposes.
+                    Your task is to generate a {response_name} that STRICTLY follows these requirements. This is for evaluation purposes.
 
                     Important:
-                    {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
-                    - Make sure your response clearly demonstrates the described characteristics
-                    - Do not mention the criteria in your response - simply generate a response that embodies the characteristics
+                    {domain_section}{persona_section}{generation_length_section}- The {response_name} should be considered to be evaluated as '{target}' based on the criteria '{dimension}'
                     """),
             )
 
@@ -493,11 +511,12 @@ class Generator:
 
         logger.debug(f"The first prompt is: \n{prompts[0]}")
 
+        logger.debug(f"The generated unparsed examples are:\n{responses[0]}")
+
         parsed_responses = [
             self.output_parser.parse(response) for response in responses
         ]
 
-        logger.debug(f"The generated unparsed examples are:\n{responses[0]}")
         logger.debug(f"The generated parsed examples are:\n{parsed_responses[0]}")
 
         instances = [
@@ -710,7 +729,10 @@ class Generator:
                 for context_name in self.context_names
             ]
 
-        output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+        output_parser = OutputFixingParser.from_llm(
+            parser=StructuredOutputParser.from_response_schemas(response_schemas),
+            llm=self.llm_runnable,
+        )
 
         format_instructions = output_parser.get_format_instructions()
 
@@ -748,8 +770,9 @@ class Generator:
                 name="description", description="the description of borderline criteria"
             ),
         ]
-        criteria_output_parser = StructuredOutputParser.from_response_schemas(
-            response_schemas
+        criteria_output_parser = OutputFixingParser.from_llm(
+            parser=StructuredOutputParser.from_response_schemas(response_schemas),
+            llm=self.llm_runnable,
         )
         criteria_format_instructions = criteria_output_parser.get_format_instructions()
 
