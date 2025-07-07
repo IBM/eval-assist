@@ -52,6 +52,8 @@ class ExtendedEvaluatorMetadata(EvaluatorMetadata):
     name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
     custom_model_name: Optional[str] = None
     custom_model_path: Optional[str] = None
+    custom_params: Optional[dict] = None
+    provider_specific_params: Optional[dict] = None
     providers: list[ModelProviderEnum | ExtendedModelProviderEnum]
 
     def __init__(
@@ -60,10 +62,14 @@ class ExtendedEvaluatorMetadata(EvaluatorMetadata):
         providers: ModelProviderEnum | ExtendedModelProviderEnum,
         custom_model_name: Optional[str] = None,
         custom_model_path: Optional[str] = None,
+        custom_params: Optional[dict] = None,
+        provider_specific_params: Optional[dict] = None,
     ):
         super().__init__(name, providers)
         self.custom_model_name = custom_model_name
         self.custom_model_path = custom_model_path
+        self.custom_params = custom_params
+        self.provider_specific_params = provider_specific_params
 
 
 EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = [

@@ -56,11 +56,9 @@ def get_custom_models():
         with open(CUSTOM_MODELS_PATH, "r", encoding="utf-8") as file:
             try:
                 custom_models = json.load(file)
-                from . import root_pkg_logger
 
-                root_pkg_logger.debug(
-                    "Loaded the following custom models",
-                    json.dumps(custom_models, indent=2),
+                logger.debug(
+                    f"Loaded the following custom models:\n{json.dumps(custom_models, indent=2)}",
                 )
                 return custom_models
             except Exception:
@@ -85,6 +83,14 @@ def get_enum_by_value(value: str, enum: Enum) -> Enum:
         if enum_member.value == value:
             return enum_member
     return None
+
+
+def value_exists_in_enum(value: str, enum: Enum) -> bool:
+    try:
+        enum(value)
+        return True
+    except ValueError:
+        return False
 
 
 def get_local_hf_inference_engine_params(
@@ -127,9 +133,13 @@ def get_cross_inference_engine_params(
         provider = ModelProviderEnum.OPENAI
 
     if custom_params is not None:
-        inference_engine_params.update(custom_params)
+        inference_engine_params = dict_deep_merge(
+            inference_engine_params, custom_params
+        )
     if provider_specific_params is not None:
-        provider_specific_args.update(provider_specific_params)
+        provider_specific_args = dict_deep_merge(
+            provider_specific_args, provider_specific_params
+        )
     inference_engine_params["model"] = model_name
     inference_engine_params["provider"] = provider.value
     inference_engine_params["provider_specific_args"] = provider_specific_args
@@ -150,7 +160,6 @@ def get_cross_inference_engine(
         custom_params=custom_params,
         provider_specific_params=provider_specific_params,
     )
-
     return CrossProviderInferenceEngine(**inference_engine_params)
 
 
@@ -215,7 +224,6 @@ def get_inference_engine(
 
 def get_model_name_from_evaluator(
     evaluator_metadata: ExtendedEvaluatorMetadata,
-    provider: str,
 ) -> str:
     model_name = EXTENDED_EVALUATOR_TO_MODEL_ID.get(evaluator_metadata.name, None)
     return (
@@ -249,18 +257,28 @@ def get_evaluator_metadata_wrapper(
         ]:
             raise ValueError("The specified custom model was not found")
 
-        custom_model = [
-            custom_model
-            for custom_model in custom_models
-            if custom_model["name"] == custom_model_name
-        ][0]
+        custom_model = next(
+            iter(
+                custom_model
+                for custom_model in custom_models
+                if custom_model["name"] == custom_model_name
+            )
+        )
         return ExtendedEvaluatorMetadata(
             name=evaluator_name,
-            custom_model_name=custom_model["name"],
+            custom_model_name=custom_model["name"]
+            if "name" in custom_model
+            else custom_model["path"],
             custom_model_path=custom_model["path"],
+            custom_params=custom_model["custom_params"]
+            if "custom_params" in custom_model
+            else {},
+            provider_specific_params=custom_model["provider_specific_params"]
+            if "provider_specific_params" in custom_model
+            else {},
             providers=[
                 ExtendedModelProviderEnum(p)
-                if p in ExtendedModelProviderEnum
+                if value_exists_in_enum(p, ExtendedModelProviderEnum)
                 else ModelProviderEnum(p)
                 for p in custom_model["providers"]
             ],
@@ -429,3 +447,20 @@ def clean_object(results: dict | list):
         }
     else:
         return results
+
+
+def dict_deep_merge(a: dict, b: dict) -> dict:
+    """
+    Return a new dict that deep-merges b into a:
+      - Values from b overwrite those in a.
+      - Nested dicts are merged recursively.
+      - Other types simply get replaced.
+    """
+    result = a.copy()
+    for key, b_val in b.items():
+        a_val = result.get(key)
+        if isinstance(a_val, dict) and isinstance(b_val, dict):
+            result[key] = dict_deep_merge(a_val, b_val)
+        else:
+            result[key] = b_val
+    return result
