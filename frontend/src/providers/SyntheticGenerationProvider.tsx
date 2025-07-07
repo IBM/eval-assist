@@ -227,6 +227,9 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
           !criteriaOptionNames.every(
             (criteriaOptionName) =>
               criteriaOptionName in prevCurrentTestCase.syntheticGenerationConfig.perCriteriaOptionCount!,
+          ) ||
+          Object.keys(prevCurrentTestCase.syntheticGenerationConfig.perCriteriaOptionCount!).some(
+            (criteriaOptionName) => !(criteriaOptionName in criteriaOptionNames),
           )
         ) {
           const newSyntheticGenerationConfig = { ...prevCurrentTestCase.syntheticGenerationConfig }
