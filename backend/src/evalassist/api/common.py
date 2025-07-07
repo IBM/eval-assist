@@ -135,6 +135,8 @@ class CriteriaWithOptionsAPI(BaseModel):
     name: str
     description: str
     options: list[CriteriaOptionAPI]
+    prediction_field: Optional[str] = None
+    context_fields: Optional[list[str]] = None
 
 
 class SyntheticExampleGenerationRequest(BaseModel):

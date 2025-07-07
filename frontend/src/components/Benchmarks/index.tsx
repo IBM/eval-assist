@@ -1,4 +1,4 @@
-import { CriteriasProvider } from '@providers/CriteriasProvider'
+import { CriteriasProvider } from '@providers/CriteriaProvider'
 import { EvaluatorOptionsProvider } from '@providers/EvaluatorOptionsProvider'
 
 import { BenchmarkView } from './BenchmarkView'

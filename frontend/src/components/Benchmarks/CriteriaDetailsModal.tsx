@@ -19,15 +19,15 @@ interface Props {
 }
 
 export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) => {
-  const { allLibraryUseCases } = useTestCaseLibrary()
+  const { allLibraryTestCases: allLibraryTestCases } = useTestCaseLibrary()
 
   const onClose = () => {
     setOpen(false)
   }
 
   const getLibraryTestCaseNameFromCriteriaName = useCallback(
-    (criteriaName: string) => allLibraryUseCases.find((l) => l.criteria.name === criteriaName)?.name ?? null,
-    [allLibraryUseCases],
+    (criteriaName: string) => allLibraryTestCases.find((l) => l.criteria.name === criteriaName)?.name ?? null,
+    [allLibraryTestCases],
   )
 
   const getURLFromCriteriaName = useCallback(

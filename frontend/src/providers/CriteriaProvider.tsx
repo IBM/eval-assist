@@ -1,6 +1,8 @@
 import {
   capitalizeFirstWord,
   getEmptyCriteriaByType,
+  getEmptyDirectInstance,
+  getEmptyPairwiseInstance,
   getEmptyTestCase,
   returnByPipelineType,
   toSnakeCase,
@@ -10,15 +12,23 @@ import { ReactNode, createContext, useCallback, useContext, useEffect, useState 
 
 import { Loading } from '@carbon/react'
 
+import { notInUnitxtCriteria } from '@constants'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { Criteria, CriteriaWithOptions, EvaluationType, TestCase } from '@types'
+import {
+  Criteria,
+  CriteriaWithOptions,
+  EvaluationType,
+  FetchedCriteria,
+  FetchedCriteriaWithOptions,
+  TestCase,
+} from '@types'
 
 interface PipelineContextValue {
   directCriterias: CriteriaWithOptions[] | null
   pairwiseCriterias: Criteria[] | null
   loadingCriterias: boolean
   getCriteria: (name: string, type: EvaluationType) => CriteriaWithOptions | Criteria | null
-  getEmptyUseCaseWithCriteria: (criteriaName: string, type: EvaluationType) => TestCase
+  getEmptyTestCaseWithCriteria: (criteriaName: string, type: EvaluationType) => TestCase
 }
 
 const PipelineTypesContext = createContext<PipelineContextValue>({
@@ -26,7 +36,7 @@ const PipelineTypesContext = createContext<PipelineContextValue>({
   pairwiseCriterias: null,
   loadingCriterias: false,
   getCriteria: () => null,
-  getEmptyUseCaseWithCriteria: () => ({
+  getEmptyTestCaseWithCriteria: () => ({
     ...getEmptyTestCase(EvaluationType.DIRECT),
     criteria: getEmptyCriteriaByType(EvaluationType.DIRECT),
   }),
@@ -45,10 +55,36 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
     const fetchData = async () => {
       setLoadingCriterias(true)
       const response = await get('criterias/')
-      const data = await response.json()
+      const fetchedCriteria: { direct: FetchedCriteriaWithOptions[]; pairwise: FetchedCriteria[] } =
+        await response.json()
+      const parsedCriteria = {
+        direct: fetchedCriteria.direct.map(
+          (fetchedCriterion) =>
+            ({
+              name: fetchedCriterion.name,
+              description: fetchedCriterion.description,
+              options: fetchedCriterion.options,
+              predictionField: fetchedCriterion.prediction_field,
+              contextFields: fetchedCriterion.context_fields,
+            } as CriteriaWithOptions),
+        ),
+        pairwise: fetchedCriteria.pairwise.map(
+          (fetchedCriterion) =>
+            ({
+              name: fetchedCriterion.name,
+              description: fetchedCriterion.description,
+              predictionField: fetchedCriterion.prediction_field,
+              contextFields: fetchedCriterion.context_fields,
+            } as Criteria),
+        ),
+      }
       setLoadingCriterias(false)
-      setDirectCriterias(data.direct.map((c: CriteriaWithOptions) => ({ ...c, name: toSnakeCase(c.name) })))
-      setPairwiseCriterias(data.pairwise.map((c: Criteria) => ({ ...c, name: toSnakeCase(c.name) })))
+      setDirectCriterias(
+        [...parsedCriteria.direct, ...notInUnitxtCriteria.direct].map((c) => ({ ...c, name: toSnakeCase(c.name) })),
+      )
+      setPairwiseCriterias(
+        [...parsedCriteria.pairwise, ...notInUnitxtCriteria.pairwise].map((c) => ({ ...c, name: toSnakeCase(c.name) })),
+      )
     }
     fetchData()
   }, [get])
@@ -71,11 +107,21 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
     [directCriterias, pairwiseCriterias],
   )
 
-  const getEmptyUseCaseWithCriteria = useCallback(
-    (criteriaName: string, type: EvaluationType): TestCase => ({
-      ...getEmptyTestCase(type),
-      criteria: getCriteria(criteriaName, type) || getEmptyCriteriaByType(type),
-    }),
+  const getEmptyTestCaseWithCriteria = useCallback(
+    (criteriaName: string, type: EvaluationType): TestCase => {
+      const criteria = getCriteria(criteriaName, type) || getEmptyCriteriaByType(type)
+      return {
+        ...getEmptyTestCase(type),
+        criteria,
+        contextVariableNames: criteria.contextFields,
+        responseVariableName: criteria.predictionField,
+        instances: returnByPipelineType(
+          type,
+          [getEmptyDirectInstance(criteria.contextFields)],
+          [getEmptyPairwiseInstance(criteria.contextFields)],
+        ),
+      }
+    },
     [getCriteria],
   )
 
@@ -88,7 +134,7 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
         pairwiseCriterias,
         loadingCriterias,
         getCriteria,
-        getEmptyUseCaseWithCriteria,
+        getEmptyTestCaseWithCriteria,
       }}
     >
       {children}

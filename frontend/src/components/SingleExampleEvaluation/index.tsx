@@ -1,7 +1,7 @@
 import { EditorProvider } from '@components/HighlightTextArea/EditorProvider'
 import { AppSidebarProvider } from '@providers/AppSidebarProvider'
 import { BackendUserProvider } from '@providers/BackendUserProvider'
-import { CriteriasProvider } from '@providers/CriteriasProvider'
+import { CriteriasProvider } from '@providers/CriteriaProvider'
 import { CurrentTestCaseProvider } from '@providers/CurrentTestCaseProvider'
 import { EvaluatorOptionsProvider } from '@providers/EvaluatorOptionsProvider'
 import { ModalsProvider } from '@providers/ModalsProvider'

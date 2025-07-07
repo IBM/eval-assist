@@ -5,13 +5,13 @@ import { CSSProperties, useState } from 'react'
 import { Button, IconButton } from '@carbon/react'
 import { Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
+import { TestCaseTypeBadge } from '@components/TestCaseTypeBadge/TestCaseTypeBadge'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
 
-import { UseCaseTypeBadge } from '../UseCaseTypeBadge/UseCaseTypeBadge'
 import classes from './TestCaseOptions.module.scss'
 
 interface Props {
@@ -20,17 +20,17 @@ interface Props {
 }
 
 export const TestCaseOptions = ({ style, className }: Props) => {
-  const [savingUseCase, setSavingUseCase] = useState(false)
+  const [savingTestCase, setSavingTestCase] = useState(false)
   const { storageEnabled } = useFeatureFlags()
   const { currentTestCase, isTestCaseSaved, changesDetected } = useCurrentTestCase()
   const { isRisksAndHarms } = useURLParamsContext()
-  const { setDeleteUseCaseModalOpen, setSaveUseCaseModalOpen, setEditNameModalOpen, setSampleCodeTypeModalOpen } =
+  const { setDeleteTestCaseModalOpen, setSaveTestCaseModalOpen, setEditNameModalOpen, setSampleCodeTypeModalOpen } =
     useModalsContext()
   const { onSave } = useTestCaseActionsContext()
   const onSaveClick = async () => {
-    setSavingUseCase(true)
+    setSavingTestCase(true)
     await onSave()
-    setSavingUseCase(false)
+    setSavingTestCase(false)
   }
 
   return (
@@ -58,12 +58,12 @@ export const TestCaseOptions = ({ style, className }: Props) => {
           </IconButton>
         )}
         <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>
-        <UseCaseTypeBadge type={currentTestCase.type} style={{ paddingInline: '0.5rem' }} />
+        <TestCaseTypeBadge type={currentTestCase.type} style={{ paddingInline: '0.5rem' }} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         {storageEnabled && isTestCaseSaved && (
           <IconButton
-            disabled={savingUseCase || !changesDetected || isRisksAndHarms}
+            disabled={savingTestCase || !changesDetected || isRisksAndHarms}
             kind="ghost"
             onClick={onSaveClick}
             label={'Save'}
@@ -77,7 +77,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
             disabled={isRisksAndHarms}
             label={'Save as'}
             kind="ghost"
-            onClick={() => setSaveUseCaseModalOpen(true)}
+            onClick={() => setSaveTestCaseModalOpen(true)}
           >
             <WatsonHealthSaveImage />
           </IconButton>
@@ -110,7 +110,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
               disabled={!isTestCaseSaved}
               label={'Delete Test Case'}
               onClick={() => {
-                setDeleteUseCaseModalOpen(true)
+                setDeleteTestCaseModalOpen(true)
               }}
             >
               <TrashCan />

@@ -22,14 +22,14 @@ interface Props {}
 export const Landing = ({}: Props) => {
   const { isDarkMode } = useThemeContext()
   const { sidebarTabSelected, setSidebarTabSelected } = useAppSidebarContext()
-  const { setNewUseCaseModalOpen } = useModalsContext()
+  const { setNewTestCaseModalOpen } = useModalsContext()
   const { updateURLFromTestCase } = useCurrentTestCase()
   const createEmptyRubric = () => {
-    updateURLFromTestCase({ useCase: getEmptyTestCase(EvaluationType.DIRECT), subCatalogName: null })
+    updateURLFromTestCase({ testCase: getEmptyTestCase(EvaluationType.DIRECT), subCatalogName: null })
   }
 
   const createEmptyPairwise = () => {
-    updateURLFromTestCase({ useCase: getEmptyTestCase(EvaluationType.PAIRWISE), subCatalogName: null })
+    updateURLFromTestCase({ testCase: getEmptyTestCase(EvaluationType.PAIRWISE), subCatalogName: null })
   }
 
   const openTestCasesLibrary = () => {
@@ -49,7 +49,7 @@ export const Landing = ({}: Props) => {
         <Button
           renderIcon={Add}
           onClick={() => {
-            setNewUseCaseModalOpen(true)
+            setNewTestCaseModalOpen(true)
           }}
         >
           {'Create New Test Case'}

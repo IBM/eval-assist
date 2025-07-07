@@ -227,6 +227,9 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
           !criteriaOptionNames.every(
             (criteriaOptionName) =>
               criteriaOptionName in prevCurrentTestCase.syntheticGenerationConfig.perCriteriaOptionCount!,
+          ) ||
+          Object.keys(prevCurrentTestCase.syntheticGenerationConfig.perCriteriaOptionCount!).some(
+            (criteriaOptionName) => !(criteriaOptionName in criteriaOptionNames),
           )
         ) {
           const newSyntheticGenerationConfig = { ...prevCurrentTestCase.syntheticGenerationConfig }
@@ -340,21 +343,21 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
     })
   }, [addToast, currentTestCase, fetchSyntheticExamples, removeToast, setCurrentTestCase])
 
-  const { userTestCases: userUseCases } = useUserTestCasesContext()
-  const { allLibraryUseCases } = useTestCaseLibrary()
+  const { userTestCases: userTestCases } = useUserTestCasesContext()
+  const { allLibraryTestCases: allLibraryTestCases } = useTestCaseLibrary()
   const [hasGeneratedSyntheticMap, setHasGeneratedSyntheticMap, removeHasGeneratedSyntheticMap] = useLocalStorage<
     Record<string, boolean>
   >(
     'hasGeneratedSyntheticMap',
-    Object.fromEntries([...userUseCases, ...allLibraryUseCases].map((u) => [u.name, false])),
+    Object.fromEntries([...userTestCases, ...allLibraryTestCases].map((u) => [u.name, false])),
   )
 
   useEffect(() => {
     setHasGeneratedSyntheticMap((prev) => ({
       ...Object.fromEntries(Object.keys(prev).map((k) => [k, prev[k]])),
-      ...Object.fromEntries(userUseCases.map((u) => [u.name, false])),
+      ...Object.fromEntries(userTestCases.map((u) => [u.name, false])),
     }))
-  }, [setHasGeneratedSyntheticMap, userUseCases])
+  }, [setHasGeneratedSyntheticMap, userTestCases])
 
   return (
     <SyntheticGenerationContext.Provider
