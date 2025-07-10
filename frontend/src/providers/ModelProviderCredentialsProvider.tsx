@@ -11,7 +11,7 @@ const defaultWatsonxURL = 'https://us-south.ml.cloud.ibm.com'
 const defaultOllamaURL = 'http://localhost:11434/'
 
 const defaultCredentialStorage = {
-  [ModelProviderType.WATSONX]: { api_key: '', project_id: '', api_base: '' },
+  [ModelProviderType.WATSONX]: { api_key: '', project_id: '', space_id: '', api_base: '' },
   [ModelProviderType.OPENAI]: { api_key: '' },
   [ModelProviderType.OPENAI_LIKE]: { api_key: '', api_base: '' },
   [ModelProviderType.RITS]: { api_key: '' },
@@ -25,7 +25,7 @@ const defaultCredentialStorage = {
 }
 
 const defaultCrendentials = {
-  [ModelProviderType.WATSONX]: { api_key: '', project_id: '', api_base: defaultWatsonxURL },
+  [ModelProviderType.WATSONX]: { api_key: '', project_id: '', space_id: '', api_base: defaultWatsonxURL },
   [ModelProviderType.OPENAI]: { api_key: '' },
   [ModelProviderType.OPENAI_LIKE]: { api_key: '', api_base: '' },
   [ModelProviderType.RITS]: { api_key: '' },
@@ -37,6 +37,21 @@ const defaultCrendentials = {
   [ModelProviderType.REPLICATE]: { api_key: '' },
   [ModelProviderType.OLLAMA]: { api_base: '' },
 }
+
+const isCredentialOptional = {
+  [ModelProviderType.WATSONX]: { api_key: false, project_id: true, space_id: true, api_base: false },
+  [ModelProviderType.OPENAI]: { api_key: false },
+  [ModelProviderType.OPENAI_LIKE]: { api_key: false, api_base: false },
+  [ModelProviderType.RITS]: { api_key: false },
+  [ModelProviderType.AZURE]: { api_key: false, api_base: false },
+  [ModelProviderType.LOCAL_HF]: {},
+  [ModelProviderType.TOGETHER_AI]: { api_key: false },
+  [ModelProviderType.AWS]: { api_key: false },
+  [ModelProviderType.VERTEX_AI]: { api_key: false },
+  [ModelProviderType.REPLICATE]: { api_key: false },
+  [ModelProviderType.OLLAMA]: { api_base: true },
+}
+
 interface ModelProviderCredentialsContextValue {
   modelProviderCredentials: ModelProviderCredentials
   defaultCrendentials: ModelProviderCredentials
@@ -174,9 +189,13 @@ export const ModelProviderCredentialsProvider = ({ children }: { children: React
   const getAreRelevantCredentialsProvided = useCallback(
     (provider: ModelProviderType): boolean =>
       Object.keys(getProviderCredentials(provider)).every((key) => {
-        const credential = defaultCrendentials[provider]
-        // @ts-ignore
-        return getProviderCredentials(provider)[key] !== '' || defaultCrendentials[provider][key] !== ''
+        return (
+          // @ts-ignore
+          isCredentialOptional[provider][key] ||
+          getProviderCredentials(provider)[key] !== '' ||
+          // @ts-ignore
+          defaultCrendentials[provider][key] !== ''
+        )
       }),
     [getProviderCredentials],
   )
