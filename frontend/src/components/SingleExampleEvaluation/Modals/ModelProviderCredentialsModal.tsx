@@ -344,6 +344,19 @@ export const ModelProviderCredentialsModal = ({ open, setOpen }: Props) => {
                   className={classes.credentialInput}
                 />
                 <TextInput
+                  id={'watsonx-space-id-input'}
+                  labelText="Space ID"
+                  value={modelProviderCredentials.watsonx.space_id}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setModelProviderCredentials({
+                      ...modelProviderCredentials,
+                      watsonx: { ...modelProviderCredentials.watsonx, space_id: e.target.value },
+                    })
+                  }
+                  autoComplete="off"
+                  className={classes.credentialInput}
+                />
+                <TextInput
                   id={'watsonx-api-base-input'}
                   labelText="Base URL"
                   value={modelProviderCredentials.watsonx.api_base}

@@ -240,6 +240,7 @@ export type ModelProviderCredentials = {
   watsonx: {
     api_key: string
     project_id: string
+    space_id: string
     api_base: string
   }
   'open-ai': {
