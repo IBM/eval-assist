@@ -30,6 +30,7 @@ from ..const import (
     ExtendedModelProviderEnum,
 )
 from ..utils import (
+    dict_deep_merge,
     get_evaluator_metadata_wrapper,
     get_inference_engine,
     get_model_name_from_evaluator,
@@ -79,7 +80,8 @@ class Evaluator(ABC):
             "seed": 42,
             "temperature": 0,
         }
-        custom_params.update(self.evaluator_metadata.custom_params)
+
+        dict_deep_merge(custom_params, self.evaluator_metadata.custom_params)
 
         inference_engine = get_inference_engine(
             credentials,

@@ -449,13 +449,17 @@ def clean_object(results: dict | list):
         return results
 
 
-def dict_deep_merge(a: dict, b: dict) -> dict:
+def dict_deep_merge(a: dict | None, b: dict | None) -> dict:
     """
     Return a new dict that deep-merges b into a:
       - Values from b overwrite those in a.
       - Nested dicts are merged recursively.
       - Other types simply get replaced.
     """
+    if a is None:
+        return b
+    if b is None:
+        return a
     result = a.copy()
     for key, b_val in b.items():
         a_val = result.get(key)
