@@ -71,7 +71,6 @@ class DirectActionGenerator:
         )
         model_name = get_model_name_from_evaluator(
             evaluator_metadata,
-            self.provider,
         )
         self.inference_engine = get_inference_engine(
             self.llm_provider_credentials,
@@ -334,7 +333,6 @@ class Generator:
         )
         model_name = get_model_name_from_evaluator(
             evaluator_metadata,
-            self.provider,
         )
         self.inference_engine = get_inference_engine(
             self.llm_provider_credentials,

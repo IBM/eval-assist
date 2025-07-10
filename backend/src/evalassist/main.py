@@ -446,7 +446,7 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
     evaluator_metadata = get_evaluator_metadata_wrapper(
         evaluator_name, custom_model_name
     )
-    model_name = get_model_name_from_evaluator(evaluator_metadata, params.provider)
+    model_name = get_model_name_from_evaluator(evaluator_metadata)
     params.model_name = model_name
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
         nb = DirectEvaluationNotebook(params).generate_notebook()

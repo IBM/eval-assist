@@ -30,6 +30,7 @@ from ..const import (
     ExtendedModelProviderEnum,
 )
 from ..utils import (
+    dict_deep_merge,
     get_evaluator_metadata_wrapper,
     get_inference_engine,
     get_model_name_from_evaluator,
@@ -72,18 +73,22 @@ class Evaluator(ABC):
     ):
         model_name = get_model_name_from_evaluator(
             self.evaluator_metadata,
-            provider,
         )
+
+        custom_params = {
+            "use_cache": UNITXT_CACHE_ENABLED,
+            "seed": 42,
+            "temperature": 0,
+        }
+
+        dict_deep_merge(custom_params, self.evaluator_metadata.custom_params)
 
         inference_engine = get_inference_engine(
             credentials,
             provider,
             model_name,
-            custom_params={
-                "use_cache": UNITXT_CACHE_ENABLED,
-                "seed": 42,
-                "temperature": 0,
-            },
+            custom_params,
+            provider_specific_params=self.evaluator_metadata.provider_specific_params,
         )
 
         context_variables_list = [instance.context_variables for instance in instances]
@@ -353,7 +358,6 @@ class GraniteGuardianEvaluator(ABC):
         self.evaluator_metadata = get_evaluator_metadata_wrapper(self.evaluator_name)
         model_name = get_model_name_from_evaluator(
             self.evaluator_metadata,
-            provider,
         )
         inference_engine = get_inference_engine(
             credentials, provider, model_name, custom_params
