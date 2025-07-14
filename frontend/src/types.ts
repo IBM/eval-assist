@@ -178,22 +178,45 @@ export interface Dataset {
   description: string
 }
 
-export interface EvaluatorBenchmark {
-  evaluator_id: string // should be different from model_id, maybe add library version?
-  laaj_version: string
+export interface FetchedEvaluatorBenchmark {
+  name: string // should be different from model_id, maybe add library version?
   results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
+}
+
+export interface EvaluatorBenchmark {
+  name: string // should be different from model_id, maybe add library version?
+  results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
+}
+
+export interface FetchedCriteriaBenchmark {
+  name: string // must match one of criteriaLibrary (inherits pipeline type from benchmark object pipeline type) e.g. Temperature
+  catalog_criteria_name: string
+  evaluator_benchmarks: FetchedEvaluatorBenchmark[]
 }
 
 export interface CriteriaBenchmark {
   name: string // must match one of criteriaLibrary (inherits pipeline type from benchmark object pipeline type) e.g. Temperature
+  catalogCriteriaName: string
   evaluatorBenchmarks: EvaluatorBenchmark[]
+}
+
+export interface FetchedBenchmark {
+  name: string
+  description: string
+  catalog_url: string
+  readme_url?: string
+  type: EvaluationType
+  dataset: Dataset
+  criteria_benchmarks: FetchedCriteriaBenchmark[]
+  tags: string[]
 }
 
 export interface Benchmark {
   name: string
   description: string
-  link?: string
-  type: EvaluationType // rubric or pairwise
+  catalogUrl: string
+  readmeUrl?: string
+  type: EvaluationType
   dataset: Dataset
   criteriaBenchmarks: CriteriaBenchmark[]
   tags: string[]

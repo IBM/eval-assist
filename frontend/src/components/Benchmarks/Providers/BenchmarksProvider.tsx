@@ -3,14 +3,14 @@ import { ReactNode, createContext, useContext, useEffect, useState } from 'react
 import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
-import { Benchmark, EvaluationType } from '@types'
+import { Benchmark, EvaluationType, FetchedBenchmark } from '@types'
 
 interface BenchmarksContextValue {
-  benchmarks: Benchmark[]
+  benchmarks: Benchmark[] | null
 }
 
 const BenchmarksContext = createContext<BenchmarksContextValue>({
-  benchmarks: [],
+  benchmarks: null,
 })
 
 export const useBenchmarksContext = () => {
@@ -23,20 +23,41 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
   const { get } = useFetchUtils()
 
   useEffect(() => {
+    console.log('benchmarasdasdks')
     const getBenchmarks = async () => {
       setLoadingBenchmarks(true)
-      const benchmarks: Benchmark[] = await (await get('benchmarks/')).json()
+      const fetchedBenchmarks: FetchedBenchmark[] = await (await get('benchmarks/')).json()
+      const benchmarks: Benchmark[] = fetchedBenchmarks.map((fetchedBenchmark) => ({
+        name: fetchedBenchmark.name,
+        description: fetchedBenchmark.description,
+        catalogUrl: fetchedBenchmark.catalog_url,
+        readmeUrl: fetchedBenchmark.readme_url,
+        type: fetchedBenchmark.type,
+        dataset: fetchedBenchmark.dataset,
+        tags: fetchedBenchmark.tags,
+        criteriaBenchmarks: fetchedBenchmark.criteria_benchmarks.map((criteria_benchmarks) => ({
+          name: criteria_benchmarks.name,
+          catalogCriteriaName: criteria_benchmarks.catalog_criteria_name,
+          evaluatorBenchmarks: criteria_benchmarks.evaluator_benchmarks,
+        })),
+      }))
       benchmarks.sort((b1, b2) => b1.name.localeCompare(b2.name))
       benchmarks.forEach((benchmark) => {
         benchmark.criteriaBenchmarks.sort((c1, c2) => c1.name.localeCompare(c2.name))
       })
+      console.log('benchmarks')
+      console.log(benchmarks)
       setBenchmarks(benchmarks)
       setLoadingBenchmarks(false)
     }
+    console.log('benchmarks')
     getBenchmarks()
   }, [get])
 
-  if (loadingBenchmarks) return <Loading withOverlay />
+  if (loadingBenchmarks || benchmarks === null) return <Loading withOverlay />
+
+  console.log('here')
+  console.log(benchmarks)
 
   return (
     <BenchmarksContext.Provider

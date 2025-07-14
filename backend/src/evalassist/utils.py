@@ -8,6 +8,7 @@ import traceback
 from enum import Enum
 from typing import Optional
 
+import requests
 from botocore.exceptions import NoCredentialsError
 from fastapi import HTTPException
 from ibm_watsonx_ai.wml_client_error import (
@@ -429,3 +430,27 @@ def clean_object(results: dict | list):
         }
     else:
         return results
+
+
+def folder_exists_in_github_repo(owner, repo, folder_path, branch="main"):
+    """
+    Check if a folder exists in a GitHub repo.
+
+    Parameters:
+        owner (str): GitHub username or organization
+        repo (str): Repository name
+        folder_path (str): Path to folder in the repo (relative to root)
+        branch (str): Branch name (default: 'main')
+
+    Returns:
+        bool: True if folder exists, False otherwise
+    """
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{folder_path}?ref={branch}"
+    response = requests.get(url, timeout=5)
+
+    if response.status_code == 200:
+        # Make sure it's a directory
+        items = response.json()
+        return isinstance(items, list)
+    else:
+        return False

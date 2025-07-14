@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
-import { returnByPipelineType } from 'src/utils'
+import { capitalizeFirstWord, returnByPipelineType } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 
@@ -122,10 +122,14 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
                 )}
                 className={classes.nameLink}
               >
-                {displayedCriteria.highlighted ? <mark>{displayedCriteria.name}</mark> : displayedCriteria.name}
+                {displayedCriteria.highlighted ? (
+                  <mark>{capitalizeFirstWord(displayedCriteria.name)}</mark>
+                ) : (
+                  capitalizeFirstWord(displayedCriteria.name)
+                )}
               </Link>
             ) : (
-              <div>{displayedCriteria.name}</div>
+              <div>{capitalizeFirstWord(displayedCriteria.name)}</div>
             )}
           </ListItem>
         ))}

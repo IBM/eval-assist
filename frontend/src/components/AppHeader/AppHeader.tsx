@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { signOut } from 'next-auth/react'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 
 import {
   Header,
@@ -13,7 +14,7 @@ import {
   HeaderName,
   HeaderNavigation,
 } from '@carbon/react'
-import { Document, LogoGithub, Logout } from '@carbon/react/icons'
+import { Document, LogoGithub, Logout, QqPlot } from '@carbon/react/icons'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
@@ -24,6 +25,7 @@ export const AppHeader = () => {
   const title = `${PLATFORM_NAME}`
   const { get } = useFetchUtils()
   const [version, setVersion] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const fetchVersion = async () =>
@@ -48,12 +50,12 @@ export const AppHeader = () => {
               <Document style={{ marginLeft: '0.5rem' }} size={18} />
             </div>
           </HeaderMenuItem>
-          {/* <HeaderMenuItem href="/benchmarks" isActive={router.pathname.startsWith('/benchmarks')}>
+          <HeaderMenuItem href="/benchmarks" isActive={router.pathname.startsWith('/benchmarks')}>
             <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
               Benchmarks
               <QqPlot style={{ marginLeft: '0.5rem' }} size={18} />
             </div>
-          </HeaderMenuItem> */}
+          </HeaderMenuItem>
           <HeaderMenuItem href="https://github.com/IBM/eval-assist" target="_blank" rel="noopener noreferrer">
             <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
               Github

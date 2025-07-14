@@ -9,7 +9,7 @@ import { URLInfoProvider, useURLInfoContext } from './Providers/URLInfoProvider'
 const LandingOrBenchmarkView = () => {
   const { benchmark } = useURLInfoContext()
 
-  return benchmark !== null ? <BenchmarkView /> : <Landing />
+  return benchmark ? <BenchmarkView /> : <Landing />
 }
 
 export const Benchmarks = () => {
