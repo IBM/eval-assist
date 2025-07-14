@@ -32,9 +32,9 @@ const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps<{ ses
         <meta name="twitter:card" content="summary_large_image" />
 
         <meta name="keywords" content="LLM-as-a-Judge, EvalAssist, AI evaluation, large language models" />
-        <link rel="icon" href="favicon.ico" sizes="32x32" />
-        <link rel="icon" href="images/icon-32x32.png" type="image/png" />
-        <link rel="icon" href="images/icon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" href="/images/icon-32x32.png" type="image/png" />
+        <link rel="icon" href="/images/icon.svg" type="image/svg+xml" />
       </Head>
       <FeatureFlagsProvider>
         <SessionProvider session={session}>
