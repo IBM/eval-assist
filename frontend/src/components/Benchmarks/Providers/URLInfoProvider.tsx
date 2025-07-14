@@ -39,7 +39,7 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     const urlType: EvaluationType | null = router.query.type ? (router.query.type as EvaluationType) : null
     const criteriaName = router.query.criteriaName ? (router.query.criteriaName as string) : null
     if (urlBenchmark !== null && urlType !== null) {
-      const selectedBenchmark = benchmarks.find((b) => b.name === urlBenchmark && b.type === urlType) as Benchmark
+      const selectedBenchmark = benchmarks!.find((b) => b.name === urlBenchmark && b.type === urlType) as Benchmark
       return selectedBenchmark
     } else {
       return null

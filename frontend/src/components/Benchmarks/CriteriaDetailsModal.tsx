@@ -70,8 +70,8 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
               {criteria.options.map((option, i) => (
                 <ListItem key={i}>
                   <p>
-                    <span style={{ fontWeight: 500 }}>{option.name + ': '}</span>
-                    {option.description}
+                    <span style={{ fontWeight: 500 }}>{option.name}</span>
+                    {option.description ? `: ${option.description}` : ''}
                   </p>
                 </ListItem>
               ))}
@@ -84,6 +84,7 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
           kind="tertiary"
           href={getURLFromCriteriaName(criteria.name)}
           rel="noopener noreferrer"
+          target="_blank"
           className={classes.button}
         >
           {'Try it'}

@@ -1609,6 +1609,18 @@ files = [
 ]
 
 [[package]]
+name = "joblib"
+version = "1.5.1"
+description = "Lightweight pipelining with Python functions"
+optional = false
+python-versions = ">=3.9"
+groups = ["benchmarks"]
+files = [
+    {file = "joblib-1.5.1-py3-none-any.whl", hash = "sha256:4719a31f054c7d766948dcd83e9613686b27114f190f717cec7eaa2084f8a74a"},
+    {file = "joblib-1.5.1.tar.gz", hash = "sha256:f4f86e351f39fe3d0d32a9f2c3d8af1ee4cec285aafcb27003dda5205576b444"},
+]
+
+[[package]]
 name = "jsonpatch"
 version = "1.33"
 description = "Apply JSON-Patches (RFC 6902)"
@@ -2357,7 +2369,7 @@ version = "2.2.6"
 description = "Fundamental package for array computing in Python"
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "local-inference"]
+groups = ["main", "benchmarks", "local-inference"]
 markers = "python_version == \"3.10\""
 files = [
     {file = "numpy-2.2.6-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:b412caa66f72040e6d268491a59f2c43bf03eb6c96dd8f0307829feb7fa2b6fb"},
@@ -2423,7 +2435,7 @@ version = "2.3.1"
 description = "Fundamental package for array computing in Python"
 optional = false
 python-versions = ">=3.11"
-groups = ["main", "local-inference"]
+groups = ["main", "benchmarks", "local-inference"]
 markers = "python_version >= \"3.11\""
 files = [
     {file = "numpy-2.3.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:6ea9e48336a402551f52cd8f593343699003d2353daa4b72ce8d34f66b722070"},
@@ -4120,12 +4132,62 @@ testing = ["h5py (>=3.7.0)", "huggingface-hub (>=0.12.1)", "hypothesis (>=6.70.2
 torch = ["safetensors[numpy]", "torch (>=1.10)"]
 
 [[package]]
+name = "scikit-learn"
+version = "1.7.0"
+description = "A set of python modules for machine learning and data mining"
+optional = false
+python-versions = ">=3.10"
+groups = ["benchmarks"]
+files = [
+    {file = "scikit_learn-1.7.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:9fe7f51435f49d97bd41d724bb3e11eeb939882af9c29c931a8002c357e8cdd5"},
+    {file = "scikit_learn-1.7.0-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:d0c93294e1e1acbee2d029b1f2a064f26bd928b284938d51d412c22e0c977eb3"},
+    {file = "scikit_learn-1.7.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:bf3755f25f145186ad8c403312f74fb90df82a4dfa1af19dc96ef35f57237a94"},
+    {file = "scikit_learn-1.7.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2726c8787933add436fb66fb63ad18e8ef342dfb39bbbd19dc1e83e8f828a85a"},
+    {file = "scikit_learn-1.7.0-cp310-cp310-win_amd64.whl", hash = "sha256:e2539bb58886a531b6e86a510c0348afaadd25005604ad35966a85c2ec378800"},
+    {file = "scikit_learn-1.7.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:8ef09b1615e1ad04dc0d0054ad50634514818a8eb3ee3dee99af3bffc0ef5007"},
+    {file = "scikit_learn-1.7.0-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:7d7240c7b19edf6ed93403f43b0fcb0fe95b53bc0b17821f8fb88edab97085ef"},
+    {file = "scikit_learn-1.7.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:80bd3bd4e95381efc47073a720d4cbab485fc483966f1709f1fd559afac57ab8"},
+    {file = "scikit_learn-1.7.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9dbe48d69aa38ecfc5a6cda6c5df5abef0c0ebdb2468e92437e2053f84abb8bc"},
+    {file = "scikit_learn-1.7.0-cp311-cp311-win_amd64.whl", hash = "sha256:8fa979313b2ffdfa049ed07252dc94038def3ecd49ea2a814db5401c07f1ecfa"},
+    {file = "scikit_learn-1.7.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:c2c7243d34aaede0efca7a5a96d67fddaebb4ad7e14a70991b9abee9dc5c0379"},
+    {file = "scikit_learn-1.7.0-cp312-cp312-macosx_12_0_arm64.whl", hash = "sha256:9f39f6a811bf3f15177b66c82cbe0d7b1ebad9f190737dcdef77cfca1ea3c19c"},
+    {file = "scikit_learn-1.7.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:63017a5f9a74963d24aac7590287149a8d0f1a0799bbe7173c0d8ba1523293c0"},
+    {file = "scikit_learn-1.7.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0b2f8a0b1e73e9a08b7cc498bb2aeab36cdc1f571f8ab2b35c6e5d1c7115d97d"},
+    {file = "scikit_learn-1.7.0-cp312-cp312-win_amd64.whl", hash = "sha256:34cc8d9d010d29fb2b7cbcd5ccc24ffdd80515f65fe9f1e4894ace36b267ce19"},
+    {file = "scikit_learn-1.7.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:5b7974f1f32bc586c90145df51130e02267e4b7e77cab76165c76cf43faca0d9"},
+    {file = "scikit_learn-1.7.0-cp313-cp313-macosx_12_0_arm64.whl", hash = "sha256:014e07a23fe02e65f9392898143c542a50b6001dbe89cb867e19688e468d049b"},
+    {file = "scikit_learn-1.7.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e7e7ced20582d3a5516fb6f405fd1d254e1f5ce712bfef2589f51326af6346e8"},
+    {file = "scikit_learn-1.7.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1babf2511e6ffd695da7a983b4e4d6de45dce39577b26b721610711081850906"},
+    {file = "scikit_learn-1.7.0-cp313-cp313-win_amd64.whl", hash = "sha256:5abd2acff939d5bd4701283f009b01496832d50ddafa83c90125a4e41c33e314"},
+    {file = "scikit_learn-1.7.0-cp313-cp313t-macosx_10_13_x86_64.whl", hash = "sha256:e39d95a929b112047c25b775035c8c234c5ca67e681ce60d12413afb501129f7"},
+    {file = "scikit_learn-1.7.0-cp313-cp313t-macosx_12_0_arm64.whl", hash = "sha256:0521cb460426c56fee7e07f9365b0f45ec8ca7b2d696534ac98bfb85e7ae4775"},
+    {file = "scikit_learn-1.7.0-cp313-cp313t-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:317ca9f83acbde2883bd6bb27116a741bfcb371369706b4f9973cf30e9a03b0d"},
+    {file = "scikit_learn-1.7.0-cp313-cp313t-win_amd64.whl", hash = "sha256:126c09740a6f016e815ab985b21e3a0656835414521c81fc1a8da78b679bdb75"},
+    {file = "scikit_learn-1.7.0.tar.gz", hash = "sha256:c01e869b15aec88e2cdb73d27f15bdbe03bce8e2fb43afbe77c45d399e73a5a3"},
+]
+
+[package.dependencies]
+joblib = ">=1.2.0"
+numpy = ">=1.22.0"
+scipy = ">=1.8.0"
+threadpoolctl = ">=3.1.0"
+
+[package.extras]
+benchmark = ["matplotlib (>=3.5.0)", "memory_profiler (>=0.57.0)", "pandas (>=1.4.0)"]
+build = ["cython (>=3.0.10)", "meson-python (>=0.16.0)", "numpy (>=1.22.0)", "scipy (>=1.8.0)"]
+docs = ["Pillow (>=8.4.0)", "matplotlib (>=3.5.0)", "memory_profiler (>=0.57.0)", "numpydoc (>=1.2.0)", "pandas (>=1.4.0)", "plotly (>=5.14.0)", "polars (>=0.20.30)", "pooch (>=1.6.0)", "pydata-sphinx-theme (>=0.15.3)", "scikit-image (>=0.19.0)", "seaborn (>=0.9.0)", "sphinx (>=7.3.7)", "sphinx-copybutton (>=0.5.2)", "sphinx-design (>=0.5.0)", "sphinx-design (>=0.6.0)", "sphinx-gallery (>=0.17.1)", "sphinx-prompt (>=1.4.0)", "sphinx-remove-toctrees (>=1.0.0.post1)", "sphinxcontrib-sass (>=0.3.4)", "sphinxext-opengraph (>=0.9.1)", "towncrier (>=24.8.0)"]
+examples = ["matplotlib (>=3.5.0)", "pandas (>=1.4.0)", "plotly (>=5.14.0)", "pooch (>=1.6.0)", "scikit-image (>=0.19.0)", "seaborn (>=0.9.0)"]
+install = ["joblib (>=1.2.0)", "numpy (>=1.22.0)", "scipy (>=1.8.0)", "threadpoolctl (>=3.1.0)"]
+maintenance = ["conda-lock (==3.0.1)"]
+tests = ["matplotlib (>=3.5.0)", "mypy (>=1.15)", "numpydoc (>=1.2.0)", "pandas (>=1.4.0)", "polars (>=0.20.30)", "pooch (>=1.6.0)", "pyamg (>=4.2.1)", "pyarrow (>=12.0.0)", "pytest (>=7.1.2)", "pytest-cov (>=2.9.0)", "ruff (>=0.11.7)", "scikit-image (>=0.19.0)"]
+
+[[package]]
 name = "scipy"
 version = "1.15.3"
 description = "Fundamental algorithms for scientific computing in Python"
 optional = false
 python-versions = ">=3.10"
-groups = ["main"]
+groups = ["main", "benchmarks"]
 markers = "python_version == \"3.10\""
 files = [
     {file = "scipy-1.15.3-cp310-cp310-macosx_10_13_x86_64.whl", hash = "sha256:a345928c86d535060c9c2b25e71e87c39ab2f22fc96e9636bd74d1dbf9de448c"},
@@ -4190,7 +4252,7 @@ version = "1.16.0"
 description = "Fundamental algorithms for scientific computing in Python"
 optional = false
 python-versions = ">=3.11"
-groups = ["main"]
+groups = ["main", "benchmarks"]
 markers = "python_version >= \"3.11\""
 files = [
     {file = "scipy-1.16.0-cp311-cp311-macosx_10_14_x86_64.whl", hash = "sha256:deec06d831b8f6b5fb0b652433be6a09db29e996368ce5911faf673e78d20085"},
@@ -4502,6 +4564,18 @@ files = [
 [package.extras]
 doc = ["reno", "sphinx"]
 test = ["pytest", "tornado (>=4.5)", "typeguard"]
+
+[[package]]
+name = "threadpoolctl"
+version = "3.6.0"
+description = "threadpoolctl"
+optional = false
+python-versions = ">=3.9"
+groups = ["benchmarks"]
+files = [
+    {file = "threadpoolctl-3.6.0-py3-none-any.whl", hash = "sha256:43a0b8fd5a2928500110039e43a5eed8480b918967083ea48dc3ab9f13c4a7fb"},
+    {file = "threadpoolctl-3.6.0.tar.gz", hash = "sha256:8ab8b4aa3491d812b623328249fab5302a68d2d71745c8a4c719a2fcaba9f44e"},
+]
 
 [[package]]
 name = "tiktoken"
@@ -5353,4 +5427,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "e385aeb76a14fdc208a3b4bc1a6c4723f198c4cb1591838c9c301cb72f2c3f14"
+content-hash = "999eb4f80be2d0a6f3e8e7719cadc28d0513464e0af7f707f6e8af95294f4719"

@@ -14,12 +14,13 @@ import classes from './index.module.scss'
 
 export const Landing = () => {
   const { benchmarks } = useBenchmarksContext()
+  console.log(benchmarks)
   const [selectedTagItems, setSelectedTagItems] = useState<string[]>([])
   const [selectedBenchmarkItems, setSelectedBenchmarkItems] = useState<string[]>([])
   const [selectedCriteriaItems, setSelectedCriteriaItems] = useState<string[]>([])
 
   const filteredBenchmarks = useMemo(() => {
-    let result = [...benchmarks]
+    let result = [...benchmarks!]
 
     result =
       selectedBenchmarkItems.length === 0 ? result : result.filter((b) => selectedBenchmarkItems.includes(b.name))
@@ -53,7 +54,7 @@ export const Landing = () => {
 
   const allTags = useMemo(() => {
     const tags: string[] = []
-    benchmarks.forEach((benchmark) => {
+    benchmarks!.forEach((benchmark) => {
       benchmark.tags.forEach((tag) => {
         if (!tags.includes(tag)) {
           tags.push(tag)
@@ -66,7 +67,7 @@ export const Landing = () => {
 
   const criteriaList = useMemo(() => {
     const criterias: string[] = []
-    benchmarks.forEach((benchmark) =>
+    benchmarks!.forEach((benchmark) =>
       benchmark.criteriaBenchmarks.forEach(
         (criteriaBenchmark) => !criterias.includes(criteriaBenchmark.name) && criterias.push(criteriaBenchmark.name),
       ),
@@ -94,7 +95,7 @@ export const Landing = () => {
         <h3 className={cx(classes.title, classes.bottomDivider)}>Benchmarks</h3>
         <div className={landingClasses.filters}>
           <Filter
-            items={benchmarks.map((b) => b.name)}
+            items={benchmarks!.map((b) => b.name)}
             selectedItems={selectedBenchmarkItems}
             setSelectedItems={setSelectedBenchmarkItems}
             tagToColor={tagToColor}

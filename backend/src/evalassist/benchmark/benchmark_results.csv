@@ -1,0 +1,76 @@
+card,model,criteria,results,provider
+cards.judge_bench.toxic_chat.toxicity,llama3_3_70b,toxicity,"{'accuracy': 0.82, 'f1_macro': 0.7896213183730716}",watsonx
+cards.judge_bench.toxic_chat.toxicity,llama4_maverick,toxicity,"{'accuracy': 0.78, 'f1_macro': 0.7209538305428715}",rits
+cards.judge_bench.toxic_chat.toxicity,granite3_3_8b,toxicity,"{'accuracy': 0.76, 'f1_macro': 0.6710526315789473}",rits
+cards.judge_bench.toxic_chat.toxicity,deepseek_v3,toxicity,"{'accuracy': 0.84, 'f1_macro': 0.8095238095238095}",rits
+cards.judge_bench.toxic_chat.toxicity,llama4_scout,toxicity,"{'accuracy': 0.8, 'f1_macro': 0.751984126984127}",rits
+cards.judge_bench.toxic_chat.jailbreaking,llama3_3_70b,user_message_jailbreak,"{'accuracy': 0.52, 'f1_macro': 0.4485294117647059}",watsonx
+cards.judge_bench.toxic_chat.jailbreaking,llama4_maverick,user_message_jailbreak,"{'accuracy': 0.62, 'f1_macro': 0.5180111618467782}",rits
+cards.judge_bench.toxic_chat.jailbreaking,granite3_3_8b,user_message_jailbreak,"{'accuracy': 0.84, 'f1_macro': 0.7023809523809523}",rits
+cards.judge_bench.toxic_chat.jailbreaking,deepseek_v3,user_message_jailbreak,"{'accuracy': 0.74, 'f1_macro': 0.6081977094635322}",rits
+cards.judge_bench.toxic_chat.jailbreaking,llama4_scout,user_message_jailbreak,"{'accuracy': 0.8, 'f1_macro': 0.6612466124661247}",rits
+cards.judge_bench.inferential_strategies.sound_reasoning,llama3_3_70b,logical_validity_of_reasoning,"{'accuracy': 0.78, 'f1_macro': 0.8764044943820225}",watsonx
+cards.judge_bench.inferential_strategies.sound_reasoning,llama4_maverick,logical_validity_of_reasoning,"{'accuracy': 0.62, 'f1_macro': 0.7654320987654321}",rits
+cards.judge_bench.inferential_strategies.sound_reasoning,granite3_3_8b,logical_validity_of_reasoning,"{'accuracy': 0.02, 'f1_macro': 0.0392156862745098}",rits
+cards.judge_bench.inferential_strategies.sound_reasoning,deepseek_v3,logical_validity_of_reasoning,"{'accuracy': 0.96, 'f1_macro': 0.9795918367346939}",rits
+cards.judge_bench.inferential_strategies.sound_reasoning,llama4_scout,logical_validity_of_reasoning,"{'accuracy': 0.52, 'f1_macro': 0.6842105263157895}",rits
+cards.judge_bench.dices.safety,llama3_3_70b,assistant_message_general_harm,"{'accuracy': 0.82, 'f1_macro': 0.745906267645398}",watsonx
+cards.judge_bench.dices.safety,llama4_maverick,assistant_message_general_harm,"{'accuracy': 0.86, 'f1_macro': 0.7254901960784313}",rits
+cards.judge_bench.dices.safety,granite3_3_8b,assistant_message_general_harm,"{'accuracy': 0.8, 'f1_macro': 0.6612466124661247}",rits
+cards.judge_bench.dices.safety,deepseek_v3,assistant_message_general_harm,"{'accuracy': 0.72, 'f1_macro': 0.592074592074592}",rits
+cards.judge_bench.dices.safety,llama4_scout,assistant_message_general_harm,"{'accuracy': 0.76, 'f1_macro': 0.625}",rits
+cards.judge_bench.newswoom.relevance,llama3_3_70b,summarization_relevance,{'spearman': 0.4627375847977597},watsonx
+cards.judge_bench.newswoom.relevance,llama4_maverick,summarization_relevance,{'spearman': 0.5630363275635657},rits
+cards.judge_bench.newswoom.relevance,granite3_3_8b,summarization_relevance,{'spearman': 0.44559479619620285},rits
+cards.judge_bench.newswoom.relevance,deepseek_v3,summarization_relevance,{'spearman': 0.6075241908761195},rits
+cards.judge_bench.newswoom.relevance,llama4_scout,summarization_relevance,{'spearman': 0.440424966313866},rits
+cards.judge_bench.newswoom.coherence,llama3_3_70b,summarization_coherence,{'spearman': 0.3113907034106746},watsonx
+cards.judge_bench.newswoom.coherence,llama4_maverick,summarization_coherence,{'spearman': 0.36811906847372644},rits
+cards.judge_bench.newswoom.coherence,granite3_3_8b,summarization_coherence,{'spearman': 0.5513046193398936},rits
+cards.judge_bench.newswoom.coherence,deepseek_v3,summarization_coherence,{'spearman': 0.4722283379220366},rits
+cards.judge_bench.newswoom.coherence,llama4_scout,summarization_coherence,{'spearman': 0.38715670255711687},rits
+cards.judge_bench.newswoom.fluency,llama3_3_70b,summarization_fluency,{'spearman': 0.5685691629806916},watsonx
+cards.judge_bench.newswoom.fluency,llama4_maverick,summarization_fluency,{'spearman': 0.5836734668115333},rits
+cards.judge_bench.newswoom.fluency,granite3_3_8b,summarization_fluency,{'spearman': 0.3782972652832286},rits
+cards.judge_bench.newswoom.fluency,deepseek_v3,summarization_fluency,{'spearman': 0.5363240758647209},rits
+cards.judge_bench.newswoom.fluency,llama4_scout,summarization_fluency,{'spearman': 0.6143133936677417},rits
+cards.judge_bench.newswoom.informativeness,llama3_3_70b,summarization_informativeness,{'spearman': 0.35745369721186604},watsonx
+cards.judge_bench.newswoom.informativeness,llama4_maverick,summarization_informativeness,{'spearman': 0.45500176838284734},rits
+cards.judge_bench.newswoom.informativeness,granite3_3_8b,summarization_informativeness,{'spearman': 0.35599775698346425},rits
+cards.judge_bench.newswoom.informativeness,deepseek_v3,summarization_informativeness,{'spearman': 0.4734057993417494},rits
+cards.judge_bench.newswoom.informativeness,llama4_scout,summarization_informativeness,{'spearman': 0.5301443489106366},rits
+cards.judge_bench.roscoe.esnli.overall.missing_steps,llama3_3_70b,step_by_step_reasoning_missing_steps,"{'accuracy': 0.64, 'f1_macro': 0.6394230769230769}",watsonx
+cards.judge_bench.roscoe.esnli.overall.missing_steps,llama4_maverick,step_by_step_reasoning_missing_steps,"{'accuracy': 0.66, 'f1_macro': 0.6565656565656566}",rits
+cards.judge_bench.roscoe.esnli.overall.missing_steps,granite3_3_8b,step_by_step_reasoning_missing_steps,"{'accuracy': 0.46, 'f1_macro': 0.45978391356542614}",rits
+cards.judge_bench.roscoe.esnli.overall.missing_steps,deepseek_v3,step_by_step_reasoning_missing_steps,"{'accuracy': 0.46, 'f1_macro': 0.44191814799503926}",rits
+cards.judge_bench.roscoe.esnli.overall.missing_steps,llama4_scout,step_by_step_reasoning_missing_steps,"{'accuracy': 0.56, 'f1_macro': 0.5592948717948718}",rits
+cards.judge_bench.roscoe.esnli.overall.coherence,llama3_3_70b,step_by_step_reasoning_coherency,{'spearman': 0.29609199704737243},watsonx
+cards.judge_bench.roscoe.esnli.overall.coherence,llama4_maverick,step_by_step_reasoning_coherency,{'spearman': 0.4205212120534137},rits
+cards.judge_bench.roscoe.esnli.overall.coherence,granite3_3_8b,step_by_step_reasoning_coherency,{'spearman': -0.004780722314329828},rits
+cards.judge_bench.roscoe.esnli.overall.coherence,deepseek_v3,step_by_step_reasoning_coherency,{'spearman': 0.4179170682195691},rits
+cards.judge_bench.roscoe.esnli.overall.coherence,llama4_scout,step_by_step_reasoning_coherency,{'spearman': 0.3920423102743976},rits
+cards.judge_bench.roscoe.esnli.overall.overall_quality,llama3_3_70b,step_by_step_reasoning_overall_quality,{'spearman': 0.442955172887635},watsonx
+cards.judge_bench.roscoe.esnli.overall.overall_quality,llama4_maverick,step_by_step_reasoning_overall_quality,{'spearman': 0.5370576353471569},rits
+cards.judge_bench.roscoe.esnli.overall.overall_quality,granite3_3_8b,step_by_step_reasoning_overall_quality,{'spearman': 0.23234328902467197},rits
+cards.judge_bench.roscoe.esnli.overall.overall_quality,deepseek_v3,step_by_step_reasoning_overall_quality,{'spearman': 0.4901214278359172},rits
+cards.judge_bench.roscoe.esnli.overall.overall_quality,llama4_scout,step_by_step_reasoning_overall_quality,{'spearman': 0.47102477926945874},rits
+cards.judge_bench.roscoe.esnli.overall.contradiction,llama3_3_70b,step_by_step_reasoning_contradiction,"{'accuracy': 0.96, 'f1_macro': 0.7395833333333333}",watsonx
+cards.judge_bench.roscoe.esnli.overall.contradiction,llama4_maverick,step_by_step_reasoning_contradiction,"{'accuracy': 0.94, 'f1_macro': 0.6842105263157895}",rits
+cards.judge_bench.roscoe.esnli.overall.contradiction,granite3_3_8b,step_by_step_reasoning_contradiction,"{'accuracy': 0.86, 'f1_macro': 0.5726495726495726}",rits
+cards.judge_bench.roscoe.esnli.overall.contradiction,deepseek_v3,step_by_step_reasoning_contradiction,"{'accuracy': 0.94, 'f1_macro': 0.4845360824742268}",rits
+cards.judge_bench.roscoe.esnli.overall.contradiction,llama4_scout,step_by_step_reasoning_contradiction,"{'accuracy': 0.92, 'f1_macro': 0.6453900709219859}",rits
+cards.judge_bench.roscoe.esnli.overall.coherency,llama3_3_70b,step_by_step_reasoning_coherency,{'spearman': 0.29609199704737243},watsonx
+cards.judge_bench.roscoe.esnli.overall.coherency,llama4_maverick,step_by_step_reasoning_coherency,{'spearman': 0.4205212120534137},rits
+cards.judge_bench.roscoe.esnli.overall.coherency,granite3_3_8b,step_by_step_reasoning_coherency,{'spearman': -0.004780722314329828},rits
+cards.judge_bench.roscoe.esnli.overall.coherency,deepseek_v3,step_by_step_reasoning_coherency,{'spearman': 0.4179170682195691},rits
+cards.judge_bench.roscoe.esnli.overall.coherency,llama4_scout,step_by_step_reasoning_coherency,{'spearman': 0.3920423102743976},rits
+cards.judge_bench.roscoe.esnli.stepwise.arithmetic,llama3_3_70b,step_by_step_reasoning_arithmetic,"{'accuracy': 1.0, 'f1_macro': 1.0}",watsonx
+cards.judge_bench.roscoe.esnli.stepwise.arithmetic,llama4_maverick,step_by_step_reasoning_arithmetic,"{'accuracy': 1.0, 'f1_macro': 1.0}",rits
+cards.judge_bench.roscoe.esnli.stepwise.arithmetic,granite3_3_8b,step_by_step_reasoning_arithmetic,"{'accuracy': 1.0, 'f1_macro': 1.0}",rits
+cards.judge_bench.roscoe.esnli.stepwise.arithmetic,deepseek_v3,step_by_step_reasoning_arithmetic,"{'accuracy': 1.0, 'f1_macro': 1.0}",rits
+cards.judge_bench.roscoe.esnli.stepwise.arithmetic,llama4_scout,step_by_step_reasoning_arithmetic,"{'accuracy': 1.0, 'f1_macro': 1.0}",rits
+cards.judge_bench.roscoe.esnli.stepwise.repetition,llama3_3_70b,step_by_step_reasoning_repetition,"{'accuracy': 0.82, 'f1_macro': 0.9010989010989011}",watsonx
+cards.judge_bench.roscoe.esnli.stepwise.repetition,llama4_maverick,step_by_step_reasoning_repetition,"{'accuracy': 0.62, 'f1_macro': 0.7654320987654321}",rits
+cards.judge_bench.roscoe.esnli.stepwise.repetition,granite3_3_8b,step_by_step_reasoning_repetition,"{'accuracy': 0.08, 'f1_macro': 0.14814814814814814}",rits
+cards.judge_bench.roscoe.esnli.stepwise.repetition,deepseek_v3,step_by_step_reasoning_repetition,"{'accuracy': 0.44, 'f1_macro': 0.6111111111111112}",rits
+cards.judge_bench.roscoe.esnli.stepwise.repetition,llama4_scout,step_by_step_reasoning_repetition,"{'accuracy': 0.34, 'f1_macro': 0.5074626865671642}",rits

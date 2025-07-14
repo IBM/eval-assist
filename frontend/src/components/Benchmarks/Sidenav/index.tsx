@@ -9,6 +9,7 @@ import { TreeNode, TreeView } from '@carbon/react'
 import { IbmEngineeringSystemsDesignRhapsodyModelManager, List } from '@carbon/react/icons'
 
 import { Benchmark, CriteriaBenchmark, EvaluationType } from '@types'
+import { capitalizeFirstWord } from '@utils'
 
 import { useBenchmarksContext } from '../Providers/BenchmarksProvider'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
@@ -17,21 +18,29 @@ import classes from './index.module.scss'
 export const BenchmarkSidenav = () => {
   const { benchmarks } = useBenchmarksContext()
   const { benchmark, selectedCriteriaName, updateURLFromBenchmark } = useURLInfoContext()
-  const rubricBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === EvaluationType.DIRECT), [benchmarks])
-  const pairwiseBenchmarks = useMemo(() => benchmarks.filter((b) => b.type === EvaluationType.PAIRWISE), [benchmarks])
-  const [typeExpanded, setTypeExpanded] = useState<{ rubric: boolean; pairwise: boolean }>({
-    rubric: true,
+  const directBenchmarks = useMemo(
+    () => benchmarks?.filter((b) => b.type === EvaluationType.DIRECT) || [],
+    [benchmarks],
+  )
+  const pairwiseBenchmarks = useMemo(
+    () => benchmarks?.filter((b) => b.type === EvaluationType.PAIRWISE) || [],
+    [benchmarks],
+  )
+  const [typeExpanded, setTypeExpanded] = useState<{ direct: boolean; pairwise: boolean }>({
+    direct: true,
     pairwise: true,
   })
   const [benchmarkExpanded, setBenchmarkExpanded] = useState<{ [key: string]: boolean }>(() => {
     const initialState: { [key: string]: boolean } = {}
-    benchmarks.forEach((b) => {
-      initialState[`${b?.name}_${b?.type}`] = false
-    })
+    if (benchmarks) {
+      benchmarks.forEach((b) => {
+        initialState[`${b?.name}_${b?.type}`] = false
+      })
+    }
     return initialState
   })
 
-  const handleTypeToggle = (key: 'rubric' | 'pairwise') =>
+  const handleTypeToggle = (key: 'direct' | 'pairwise') =>
     setTypeExpanded({
       ...typeExpanded,
       [key]: !typeExpanded[key],
@@ -44,7 +53,7 @@ export const BenchmarkSidenav = () => {
     })
 
   useEffect(() => {
-    if (benchmark !== null && selectedCriteriaName !== null) {
+    if (benchmark && selectedCriteriaName !== null) {
       if (!benchmarkExpanded[`${benchmark.name}_${benchmark.type}`])
         setBenchmarkExpanded({
           ...benchmarkExpanded,
@@ -54,13 +63,11 @@ export const BenchmarkSidenav = () => {
   }, [benchmark, benchmarkExpanded, selectedCriteriaName])
 
   const selectedBenchmarkId = useMemo(() => {
-    return benchmark !== null ? [`${benchmark.name}_${benchmark.type}`] : []
+    return benchmark ? [`${benchmark.name}_${benchmark.type}`] : []
   }, [benchmark])
 
   const selectedCritiaBenchmarkId = useMemo(() => {
-    return benchmark !== null && selectedCriteriaName
-      ? [`${selectedCriteriaName}_${benchmark.name}_${benchmark.type}`]
-      : []
+    return benchmark && selectedCriteriaName ? [`${selectedCriteriaName}_${benchmark.name}_${benchmark.type}`] : []
   }, [benchmark, selectedCriteriaName])
 
   const onBenchmarkClick = (e: any, benchmark: Benchmark) => {
@@ -93,11 +100,11 @@ export const BenchmarkSidenav = () => {
                     id={'tree-view'}
                   >
                     <TreeNode
-                      id={'rubric'}
+                      id={'direct'}
                       label={DIRECT_NAME}
-                      onSelect={() => handleTypeToggle('rubric')}
-                      onToggle={() => handleTypeToggle('rubric')}
-                      isExpanded={typeExpanded['rubric']}
+                      onSelect={() => handleTypeToggle('direct')}
+                      onToggle={() => handleTypeToggle('direct')}
+                      isExpanded={typeExpanded['direct']}
                       selected={
                         selectedBenchmarkId.length > 0 &&
                         selectedCritiaBenchmarkId.length > 0 &&
@@ -106,32 +113,34 @@ export const BenchmarkSidenav = () => {
                           : selectedBenchmarkId
                       }
                     >
-                      {rubricBenchmarks.map((rubricBenchmark, i) => (
+                      {directBenchmarks.map((directBenchmark, i) => (
                         <TreeNode
                           label={
                             <div className={classes['tree-node-content']}>
-                              <span className={classes['tree-node-label']}>{rubricBenchmark.name}</span>
+                              <span className={classes['tree-node-label']}>
+                                {capitalizeFirstWord(directBenchmark.name)}
+                              </span>
                             </div>
                           }
-                          key={`${rubricBenchmark.name}_rubric`}
-                          id={`${rubricBenchmark.name}_rubric`}
-                          onClick={(e: any) => onBenchmarkClick(e, rubricBenchmark)}
-                          onToggle={() => handleBenchmarkToggle(`${rubricBenchmark.name}_rubric`)}
-                          isExpanded={benchmarkExpanded[`${rubricBenchmark.name}_rubric`]}
+                          key={`${directBenchmark.name}_direct`}
+                          id={`${directBenchmark.name}_direct`}
+                          onClick={(e: any) => onBenchmarkClick(e, directBenchmark)}
+                          onToggle={() => handleBenchmarkToggle(`${directBenchmark.name}_direct`)}
+                          isExpanded={benchmarkExpanded[`${directBenchmark.name}_direct`]}
                           selected={selectedCritiaBenchmarkId}
                         >
-                          {rubricBenchmark.criteriaBenchmarks.map((criteriaBenchmark, i) => (
+                          {directBenchmark.criteriaBenchmarks.map((criteriaBenchmark, i) => (
                             <TreeNode
                               label={
                                 <div className={classes['tree-node-content']}>
                                   <span
                                     className={cx(classes['tree-node-label'], classes['tree-node-label-indent'])}
-                                  >{`- ${criteriaBenchmark.name}`}</span>
+                                  >{`${capitalizeFirstWord(criteriaBenchmark.name)}`}</span>
                                 </div>
                               }
-                              key={`${criteriaBenchmark.name}_${rubricBenchmark.name}_rubric`}
-                              id={`${criteriaBenchmark.name}_${rubricBenchmark.name}_rubric`}
-                              onClick={(e: any) => onBenchmarkCriteriaClick(e, rubricBenchmark, criteriaBenchmark)}
+                              key={`${criteriaBenchmark.name}_${directBenchmark.name}_direct`}
+                              id={`${criteriaBenchmark.name}_${directBenchmark.name}_direct`}
+                              onClick={(e: any) => onBenchmarkCriteriaClick(e, directBenchmark, criteriaBenchmark)}
                               selected={selectedCritiaBenchmarkId}
                             />
                           ))}
@@ -149,7 +158,9 @@ export const BenchmarkSidenav = () => {
                         <TreeNode
                           label={
                             <div className={classes['tree-node-content']}>
-                              <span className={classes['tree-node-label']}>{pairwiseBenchmark.name}</span>
+                              <span className={classes['tree-node-label']}>
+                                {capitalizeFirstWord(pairwiseBenchmark.name)}
+                              </span>
                             </div>
                           }
                           key={`${pairwiseBenchmark.name}_pairwise`}
@@ -164,7 +175,7 @@ export const BenchmarkSidenav = () => {
                                 <div className={classes['tree-node-content']}>
                                   <span
                                     className={cx(classes['tree-node-label'], classes['tree-node-label-indent'])}
-                                  >{`- ${criteriaBenchmark.name}`}</span>
+                                  >{`${capitalizeFirstWord(criteriaBenchmark.name)}`}</span>
                                 </div>
                               }
                               key={`${criteriaBenchmark.name}_${pairwiseBenchmark.name}_pairwise`}

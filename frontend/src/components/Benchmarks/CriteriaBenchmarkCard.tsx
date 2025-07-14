@@ -18,6 +18,7 @@ import { Information } from '@carbon/react/icons'
 
 import { useCriteriasContext } from '@providers/CriteriasProvider'
 import { CriteriaBenchmark, EvaluationType, Version } from '@types'
+import { capitalizeFirstWord, toTitleCase } from '@utils'
 
 import classes from './CriteriaBenchmarkCard.module.scss'
 import { CriteriaDetailsModal } from './CriteriaDetailsModal'
@@ -30,9 +31,10 @@ interface Props {
 }
 
 const beatutifyName: { [key: string]: string } = {
-  agreement: 'Agreement',
+  accuracy: 'Accuracy',
   p_bias: 'Positional bias',
   pearson: 'Pearson',
+  f1_macro: 'F1 macro',
 }
 
 export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: Props) => {
@@ -41,8 +43,8 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
   const [criteriaDetailsModal, setCriteriaDetailsModal] = useState(false)
   const [showAllVersions, setShowAllVersions] = useState(true)
   const criteria = useMemo(
-    () => getCriteria(criteriaBenchmark.name, benchmark?.type as EvaluationType),
-    [benchmark?.type, criteriaBenchmark.name, getCriteria],
+    () => getCriteria(criteriaBenchmark.catalogCriteriaName, benchmark?.type as EvaluationType),
+    [benchmark?.type, criteriaBenchmark.catalogCriteriaName, getCriteria],
   )
 
   const benchmarkMetrics = useMemo(() => {
@@ -83,30 +85,32 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
     return betterResult
   }
 
-  const parseResult = (metric: string, result: number): number | string =>
-    metric === 'agreement' || metric === 'p_bias' ? metricToPercentageString(result) : result
+  const parseResult = (metric: string, result: number): number | string => {
+    return Math.round(result * 100) / 100
+  }
 
   // removes old benchmarks, i.e. evaluator benchmarks of old llm-as-a-judge version
   const newestEvaluators = useMemo(
     () =>
-      criteriaBenchmark.evaluatorBenchmarks.filter((e) => {
-        const repeatedEvaluators = criteriaBenchmark.evaluatorBenchmarks.filter(
-          (ev) => ev.evaluator_id === e.evaluator_id,
-        )
+      // criteriaBenchmark.evaluatorBenchmarks.filter((e) => {
+      //   const repeatedEvaluators = criteriaBenchmark.evaluatorBenchmarks.filter(
+      //     (ev) => ev.evaluator_id === e.evaluator_id,
+      //   )
 
-        repeatedEvaluators.sort((a, b) => {
-          return new Version(b.laaj_version) > new Version(a.laaj_version) ? 1 : -1
-        })
+      //   repeatedEvaluators.sort((a, b) => {
+      //     return new Version(b.laaj_version) > new Version(a.laaj_version) ? 1 : -1
+      //   })
 
-        return e.laaj_version === repeatedEvaluators[0].laaj_version
-      }),
+      //   return e.laaj_version === repeatedEvaluators[0].laaj_version
+      // }),
+      criteriaBenchmark.evaluatorBenchmarks,
     [criteriaBenchmark.evaluatorBenchmarks],
   )
 
   const displayedEvaluators = useMemo(
     () =>
       (showAllVersions ? criteriaBenchmark.evaluatorBenchmarks : newestEvaluators).sort((a, b) =>
-        a.evaluator_id.localeCompare(b.evaluator_id),
+        a.name.localeCompare(b.name),
       ),
     [criteriaBenchmark.evaluatorBenchmarks, newestEvaluators, showAllVersions],
   )
@@ -117,7 +121,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
         <Tile className={cx(className, classes.root)} style={style}>
           <div className={classes.criteriaHeader}>
             <div className={classes.criteriaInfo}>
-              <h5>{`Criteria: ${criteriaBenchmark.name}`}</h5>
+              <h5>{`Criteria: ${capitalizeFirstWord(criteriaBenchmark.name)}`}</h5>
               {criteria !== null && (
                 <Link
                   onClick={() => setCriteriaDetailsModal(true)}
@@ -127,7 +131,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
                 </Link>
               )}
             </div>
-            <Toggle
+            {/* <Toggle
               labelText={'Show all versions'}
               toggled={showAllVersions}
               onToggle={() => setShowAllVersions(!showAllVersions)}
@@ -135,7 +139,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
               hideLabel
               id={`toggle-expected-result-${criteriaBenchmark.name}`}
               className={classes.toggle}
-            />
+            /> */}
           </div>
 
           <div className={cx(classes.table)}>
@@ -152,7 +156,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
                 {displayedEvaluators.map((evaluatorBenchmark, i) => (
                   <TableRow key={i}>
                     {/* <TableCell>{`${evaluatorBenchmark.evaluator_id} (v${evaluatorBenchmark.laaj_version})`}</TableCell> */}
-                    <TableCell>{`${evaluatorBenchmark.evaluator_id} (${evaluatorBenchmark.laaj_version})`}</TableCell>
+                    <TableCell>{toTitleCase(evaluatorBenchmark.name)}</TableCell>
                     {benchmarkMetrics.map((metric) => (
                       <TableCell
                         key={metric}
