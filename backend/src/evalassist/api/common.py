@@ -38,7 +38,7 @@ class Instance(BaseModel):
 
 class EvaluationRequestModel(BaseModel):
     provider: ModelProviderEnum | ExtendedModelProviderEnum
-    llm_provider_credentials: dict[str, str]
+    llm_provider_credentials: dict[str, Optional[str]]
     evaluator_name: str
     type: EvaluatorTypeEnum
     instances: list[Instance]
