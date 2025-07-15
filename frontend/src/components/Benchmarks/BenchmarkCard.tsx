@@ -109,7 +109,7 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
   return (
     <Tile className={cx(classes.root, { [classes['card-white-mode']]: !!!isDarkMode() })} onClick={onClick}>
       <div className={classes['title-row']}>
-        <h5 className={classes.title}>{benchmark.name}</h5>
+        <h5 className={classes.title}>{capitalizeFirstWord(benchmark.name)}</h5>
       </div>
       <UnorderedList className={classes.list}>
         {displayedCriterias.map((displayedCriteria, i) => (

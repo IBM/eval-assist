@@ -28,28 +28,31 @@ interface Props {
   criteriaBenchmark: CriteriaBenchmark
   className?: string
   style?: CSSProperties
+  showCorrelationColumns: boolean
 }
 
 const beatutifyName: { [key: string]: string } = {
   accuracy: 'Accuracy',
-  p_bias: 'Positional bias',
+  positional_bias_rate: 'Positional bias rate',
   pearson: 'Pearson',
   f1_macro: 'F1 macro',
 }
 
-export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: Props) => {
+export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumns, className, style }: Props) => {
   const { benchmark } = useURLInfoContext()
   const { getCriteria } = useCriteriasContext()
   const [criteriaDetailsModal, setCriteriaDetailsModal] = useState(false)
-  const [showAllVersions, setShowAllVersions] = useState(true)
+  // const [showAllVersions, setShowAllVersions] = useState(true)
   const criteria = useMemo(
     () => getCriteria(criteriaBenchmark.catalogCriteriaName, benchmark?.type as EvaluationType),
     [benchmark?.type, criteriaBenchmark.catalogCriteriaName, getCriteria],
   )
 
   const benchmarkMetrics = useMemo(() => {
-    return Object.keys(criteriaBenchmark.evaluatorBenchmarks[0].results)
-  }, [criteriaBenchmark.evaluatorBenchmarks])
+    return Object.keys(criteriaBenchmark.evaluatorBenchmarks[0].results).filter(
+      (metric) => showCorrelationColumns || !metric.startsWith('corr'),
+    )
+  }, [criteriaBenchmark.evaluatorBenchmarks, showCorrelationColumns])
 
   const benchmarkMetricsHeaders = useMemo(
     () =>
@@ -69,7 +72,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
             </Tooltip>
           </div>
         ) : (
-          beatutifyName[metric]
+          beatutifyName[metric] || capitalizeFirstWord(metric)
         ),
       ),
     [benchmarkMetrics],
@@ -77,7 +80,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
 
   const metricToPercentageString = (metricValue: number) => Math.round(metricValue * 1000) / 10 + '%'
 
-  const smallerIsBetter = (metricName: string) => metricName === 'p_bias'
+  const smallerIsBetter = (metricName: string) => metricName === 'positional_bias_rate'
 
   const getBetterResult = (results: number[], metricName: string) => {
     const aggregationFunction = smallerIsBetter(metricName) ? Math.min : Math.max
@@ -86,7 +89,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
   }
 
   const parseResult = (metric: string, result: number): number | string => {
-    return Math.round(result * 100) / 100
+    return result !== null ? Math.round(result * 100) / 100 : '-'
   }
 
   // removes old benchmarks, i.e. evaluator benchmarks of old llm-as-a-judge version
@@ -108,11 +111,8 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
   )
 
   const displayedEvaluators = useMemo(
-    () =>
-      (showAllVersions ? criteriaBenchmark.evaluatorBenchmarks : newestEvaluators).sort((a, b) =>
-        a.name.localeCompare(b.name),
-      ),
-    [criteriaBenchmark.evaluatorBenchmarks, newestEvaluators, showAllVersions],
+    () => criteriaBenchmark.evaluatorBenchmarks.sort((a, b) => a.name.localeCompare(b.name)),
+    [criteriaBenchmark.evaluatorBenchmarks],
   )
 
   return (
@@ -131,15 +131,6 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, className, style }: P
                 </Link>
               )}
             </div>
-            {/* <Toggle
-              labelText={'Show all versions'}
-              toggled={showAllVersions}
-              onToggle={() => setShowAllVersions(!showAllVersions)}
-              size="sm"
-              hideLabel
-              id={`toggle-expected-result-${criteriaBenchmark.name}`}
-              className={classes.toggle}
-            /> */}
           </div>
 
           <div className={cx(classes.table)}>

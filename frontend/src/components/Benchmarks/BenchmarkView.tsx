@@ -1,10 +1,10 @@
 import cx from 'classnames'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Breadcrumb, BreadcrumbItem, Button } from '@carbon/react'
+import { Breadcrumb, BreadcrumbItem, Button, Toggle } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
 import { UseCaseTypeBadge } from '@components/UseCaseTypeBadge/UseCaseTypeBadge'
@@ -17,6 +17,7 @@ import classes from './index.module.scss'
 
 export const BenchmarkView = () => {
   const { benchmark, selectedCriteriaName } = useURLInfoContext()
+  const [showCorrelationColumns, setShowCorrelationColumns] = useState(false)
 
   const benchmarkCriterias = useMemo(
     () =>
@@ -44,10 +45,22 @@ export const BenchmarkView = () => {
           <h3 className={cx(classes.title, classes.bottomDivider)}>Benchmarks</h3>
 
           <div className={cx(classes.bottomDivider, classes.benchmarkHeader)}>
-            <h4>{capitalizeFirstWord(benchmark.name)}</h4>
+            <div className={classes.benchmarkTile}>
+              <h4>{capitalizeFirstWord(benchmark.name)}</h4>
 
-            <div className={classes['vertical-divider']}></div>
-            <UseCaseTypeBadge type={benchmark.type} />
+              <div className={classes['vertical-divider']}></div>
+              <UseCaseTypeBadge type={benchmark.type} />
+            </div>
+
+            <Toggle
+              labelText={'Show correlation columns'}
+              toggled={showCorrelationColumns}
+              onToggle={() => setShowCorrelationColumns((prev) => !prev)}
+              size="sm"
+              hideLabel
+              id={`toggle-expected-result`}
+              className={classes.toggle}
+            />
           </div>
           {/* <div className={classes.benchmarkContent}>
             <h4 className={classes.benchmarkDescriptionTitle}>Description</h4>
@@ -56,11 +69,15 @@ export const BenchmarkView = () => {
           </div> */}
           <div
             className={cx(classes.criteriaBenchmark, {
-              [classes.multipleRows]: benchmarkCriterias.length > 1,
+              [classes.multipleColumns]: benchmarkCriterias.length > 1 && !showCorrelationColumns,
             })}
           >
             {benchmarkCriterias.map((criteriaBenchmark, i) => (
-              <CriteriaBenchmarkCard criteriaBenchmark={criteriaBenchmark} key={i} />
+              <CriteriaBenchmarkCard
+                criteriaBenchmark={criteriaBenchmark}
+                key={i}
+                showCorrelationColumns={showCorrelationColumns}
+              />
             ))}
           </div>
           <div>

@@ -23,7 +23,6 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
   const { get } = useFetchUtils()
 
   useEffect(() => {
-    console.log('benchmarasdasdks')
     const getBenchmarks = async () => {
       setLoadingBenchmarks(true)
       const fetchedBenchmarks: FetchedBenchmark[] = await (await get('benchmarks/')).json()
@@ -45,19 +44,13 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
       benchmarks.forEach((benchmark) => {
         benchmark.criteriaBenchmarks.sort((c1, c2) => c1.name.localeCompare(c2.name))
       })
-      console.log('benchmarks')
-      console.log(benchmarks)
       setBenchmarks(benchmarks)
       setLoadingBenchmarks(false)
     }
-    console.log('benchmarks')
     getBenchmarks()
   }, [get])
 
   if (loadingBenchmarks || benchmarks === null) return <Loading withOverlay />
-
-  console.log('here')
-  console.log(benchmarks)
 
   return (
     <BenchmarksContext.Provider
