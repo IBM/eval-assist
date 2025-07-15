@@ -39,8 +39,16 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   padding-bottom: 1rem;
   margin-bottom: 1rem;
+}
+
+.benchmarkTile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .breadcrumb {
@@ -69,7 +77,7 @@
     column-gap: 2rem;
   }
 
-  .multipleRows {
+  .multipleColumns {
     grid-template-columns: 1fr;
   }
 }
@@ -82,7 +90,7 @@
     column-gap: 2rem;
   }
 
-  .multipleRows {
+  .multipleColumns {
     grid-template-columns: 1fr 1fr;
   }
 }
