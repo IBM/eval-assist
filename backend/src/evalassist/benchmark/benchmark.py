@@ -154,20 +154,25 @@ def run_single_model_card(card: str, dataset, model: str, api_key: str):
             cache_batch_size=BATCH_SIZE,
         )
         predictions = metric_inference_engine.infer(dataset)
+        # Extract the criteria name from the first prediction
         criteria_name = json.loads(
             predictions[0][
                 next(iter([key for key in predictions[0] if key.endswith("_criteria")]))
             ]
         )["name"]
 
+        # Calculate positional bias rate
         positional_bias = [p[f"{criteria_name}_positional_bias"] for p in predictions]
         positional_bias_rate = sum(positional_bias) / len(positional_bias)
 
+        # Evaluate the predictions against the dataset
         parsed_predictions = [p[criteria_name] for p in predictions]
         results = evaluate(predictions=parsed_predictions, data=dataset)
 
+        # Extract metric names from the evaluation results
         metric_names = [m.split(".")[1] for m in results[0]["metrics"]]
 
+        # Parse the evaluation results into a dictionary
         parsed_results = {
             metric_name: float(
                 results.global_scores[
@@ -176,6 +181,7 @@ def run_single_model_card(card: str, dataset, model: str, api_key: str):
             )
             for metric_name in metric_names
         }
+        # Store the positional bias rate in the parsed results
         parsed_results["positional_bias_rate"] = positional_bias_rate
         criteria = cast(
             CriteriaWithOptions,
