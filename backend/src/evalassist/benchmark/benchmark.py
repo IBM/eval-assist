@@ -194,12 +194,15 @@ def run_single_model_card(card: str, dataset, model: str, api_key: str):
         if len(criteria.context_fields) > 0:
             has_context = True
 
+        # Initialize lists to store agreements and inspection rows
         agreements = []
         inspect_rows = []
         for i, (d, p) in enumerate(zip(dataset, predictions)):
+            # Extract task data from the dataset
             task_data = json.loads(d["task_data"])
             responses_to_evaluate.append(task_data[prediction_field])
 
+            # Determine if the ground truth is categorical or not
             if "label_value" in task_data:
                 is_ground_truth_categorical = True
                 ground_truth_score = task_data["label_value"]
@@ -207,59 +210,59 @@ def run_single_model_card(card: str, dataset, model: str, api_key: str):
                 is_ground_truth_categorical = False
                 ground_truth_score = task_data["mean_score"]
 
+            # Get the predicted score
             pred_score = parsed_predictions[i]
 
+            # Calculate agreement between ground truth and prediction
             agreements.append(
                 (pred_score == ground_truth_score)
                 if is_ground_truth_categorical
                 else 1 - abs(pred_score - ground_truth_score)
             )
 
-            # if (is_ground_truth_categorical and ground_truth != pred) or (
-            #     not is_ground_truth_categorical and abs(ground_truth - pred) > 0.2
-            # ):
-            if True:
-                context = {
-                    k[len(criteria_name) + 1 :] if k != criteria_name else "score": v
-                    for k, v in p.items()
-                }
-                criteria_json = criteria.to_dict()
-                del criteria_json["__type__"]
-                for option in criteria_json["options"]:
-                    del option["__type__"]
-                answer_selection_messages = [
-                    message["content"]
-                    for message in context["prompts"]["option_selection"]
-                ]
-                answer_selection_messages.append(context["option_selection_completion"])
-                whole_conversation = "\n\n\n".join(answer_selection_messages)
+            # Process the prediction and context
+            context = {
+                k[len(criteria_name) + 1 :] if k != criteria_name else "score": v
+                for k, v in p.items()
+            }
+            criteria_json = criteria.to_dict()
+            del criteria_json["__type__"]
+            for option in criteria_json["options"]:
+                del option["__type__"]
+            answer_selection_messages = [
+                message["content"] for message in context["prompts"]["option_selection"]
+            ]
+            answer_selection_messages.append(context["option_selection_completion"])
+            whole_conversation = "\n\n\n".join(answer_selection_messages)
 
-                inverse_option_map = {v: k for k, v in criteria.option_map.items()}
-                ground_truth = None
-                if is_ground_truth_categorical:
-                    ground_truth = inverse_option_map[ground_truth_score]
-                pred = inverse_option_map[pred_score]
+            # Map prediction and ground truth to their corresponding labels
+            inverse_option_map = {v: k for k, v in criteria.option_map.items()}
+            ground_truth = None
+            if is_ground_truth_categorical:
+                ground_truth = inverse_option_map[ground_truth_score]
+            pred = inverse_option_map[pred_score]
 
-                raw_context = json.dumps(context)
-                if has_context:
-                    raw_context_lens.append(
-                        sum([len(task_data[c]) for c in criteria.context_fields])
-                    )
-                inspect_row = {
-                    "card": ".".join(card.split(".")[2:]),
-                    "model": model,
-                    "ground_truth_score": ground_truth_score,
-                    "judge_prediction_score": pred_score,
-                    "ground_truth": ground_truth,
-                    "judge_prediction": pred,
-                    "criteria": criteria,
-                    "judge_reasoning": whole_conversation,
-                    "positional_bias": "Detected"
-                    if context["positional_bias"]
-                    else "Not detected",
-                    "raw_context": raw_context,
-                }
-                inspect_rows.append(inspect_row)
+            # Store the raw context and inspection row
+            raw_context = json.dumps(context)
+            if has_context:
+                raw_context_lens.append(
+                    sum([len(task_data[c]) for c in criteria.context_fields])
+                )
+            inspect_row = {
+                "card": ".".join(card.split(".")[2:]),
+                "model": model,
+                "ground_truth_score": ground_truth_score,
+                "judge_prediction_score": pred_score,
+                "ground_truth": ground_truth,
+                "judge_prediction": pred,
+                "criteria": criteria,
+                "judge_reasoning": whole_conversation,
+                "positional_bias": "Detected"
+                if context["positional_bias"]
+                else "Not detected",
+                "raw_context": raw_context,
+            }
+            inspect_rows.append(inspect_row)
     except Exception as e:
         logger.critical("FAILED!!")
         logger.critical(e)
@@ -327,8 +330,10 @@ def run_benchmarks():
 
     The results are saved to CSV files specified by RESULTS_FILE_PATH and INSPECT_FILE_PATH.
     """
+    # Create a cycle of API keys to use for benchmarking
     api_key_cycle = cycle(RITS_API_KEYS)
 
+    # List of models to benchmark
     models = [
         "rits.llama3_3_70b",
         "rits.llama4_maverick",
@@ -338,15 +343,19 @@ def run_benchmarks():
     ]
 
     try:
+        # Load previously run results from CSV
         ran_results_df = pd.read_csv(RESULTS_FILE_PATH)
     except Exception:
+        # Initialize an empty DataFrame if the CSV doesn't exist
         ran_results_df = pd.DataFrame(
             columns=["card", "model", "criteria", "results", "provider"]
         )
 
     try:
+        # Load inspection data from CSV
         inspect_df = pd.read_csv(INSPECT_FILE_PATH)
     except Exception:
+        # Initialize an empty DataFrame if the CSV doesn't exist
         inspect_df = pd.DataFrame(
             columns=[
                 "card",
@@ -359,36 +368,46 @@ def run_benchmarks():
                 "raw_context",
             ]
         )
+
+    # Get a list of previously run card-model pairs
     ran_cards_models = [
         (card, model)
         for card, model in zip(
             ran_results_df["card"].to_list(), ran_results_df["model"].to_list()
         )
     ]
+
+    # Create a process pool executor with the specified maximum workers
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = []
         for card in get_judgebench_cards():
+            # Load the dataset for the current card
             dataset = load_dataset(
                 card=card, split="test", loader_limit=200, use_cache=True
             )
             for model in models:
+                # Skip if the benchmark has already been run
                 if (card, model.split(".")[1]) in ran_cards_models:
                     print(f"Benchmark {card}/{model} already run")
                     continue
+                # Submit the task to the executor
                 futures.append(
                     executor.submit(
                         run_single_model_card, card, dataset, model, next(api_key_cycle)
                     )
                 )
 
+        # Process the results as they become available
         for future in as_completed(futures):
             benchmark_result, inspect_rows = future.result()
             if benchmark_result is not None:
+                # Append the benchmark result to the DataFrame and save to CSV
                 ran_results_df = pd.concat(
                     [ran_results_df, pd.DataFrame([benchmark_result])]
                 )
                 ran_results_df.to_csv(RESULTS_FILE_PATH, index=False)
             if inspect_rows:
+                # Append the inspection rows to the DataFrame and save to CSV
                 inspect_df = pd.concat([inspect_df, pd.DataFrame(inspect_rows)])
                 inspect_df.to_csv(INSPECT_FILE_PATH, index=False)
     print("Done running benchmarks")
