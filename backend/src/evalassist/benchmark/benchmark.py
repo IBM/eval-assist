@@ -19,6 +19,17 @@ RESULTS_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "benchmark_results.csv"
 INSPECT_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "to_inspect.csv"
 
 
+def add_tag_to_result(results, keyword, tag_or_tags):
+    for k in results.keys():
+        print("results[k]")
+        print(results[k])
+        if keyword in results[k]["name"]:
+            if isinstance(tag_or_tags, list):
+                results[k]["tags"].extend(tag_or_tags)
+            else:
+                results[k]["tags"].append(tag_or_tags)
+
+
 def get_all_benchmarks():
     try:
         df = pd.read_csv(RESULTS_FILE_PATH)
@@ -42,9 +53,6 @@ def get_all_benchmarks():
                 readme_url = f"https://github.com/dmg-illc/JUDGE-BENCH/blob/master/data/{dataset_name}/README.md"
             if not exists:
                 readme_url = None
-            tags = []
-            if "roscoe" in card:
-                tags.append("Reasoning")
 
             benchmark_results = {
                 "name": benchmark_name,
@@ -52,7 +60,7 @@ def get_all_benchmarks():
                 "catalog_url": f"https://www.unitxt.ai/en/latest/catalog/catalog.{card}.html",
                 "readme_url": readme_url,
                 "type": EvaluatorTypeEnum.DIRECT,
-                "tags": tags,
+                "tags": [],
                 "criteria_benchmarks": {},
             }
 
@@ -79,6 +87,12 @@ def get_all_benchmarks():
         if model not in criteria_benchmark["evaluator_benchmarks"]:
             model_results = {"name": model, "results": json.loads(row["results"])}
             criteria_benchmark["evaluator_benchmarks"][model] = model_results
+
+    add_tag_to_result(results, "roscoe", "reasoning")
+    add_tag_to_result(results, "wmt", "translation")
+    add_tag_to_result(results, "cola", "grammar")
+    # add_tag_to_result(results, 'cola', 'grammar')
+
     return results
 
 
