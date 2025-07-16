@@ -1,4 +1,5 @@
 import json
+import logging
 import math
 import os
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -17,6 +18,10 @@ from unitxt.settings_utils import get_constants
 
 RESULTS_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "benchmark_results.csv"
 INSPECT_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "to_inspect.csv"
+MAX_WORKERS = 20
+BATCH_SIZE = 25
+
+logger = logging.getLogger(__name__)
 
 
 def add_tag_to_result(results, keyword, tag_or_tags):
@@ -122,121 +127,124 @@ def get_judgebench_cards():
 
 def run_single_model_card(card, dataset, model, api_key):
     print("Running card:", card, "with model:", model)
-    evaluator_params = (
-        "[criteria_field=criteria,context_fields=None,include_prompts_in_result=true]"
-    )
-    metric = f"metrics.llm_as_judge.direct.{model}{evaluator_params}"
-    metric = fetch_artifact(metric)[0]
-    judge = cast(LLMJudge, metric)
-    inference_engine = cast(LiteLLMInferenceEngine, judge.inference_engine)
-    inference_engine.cache_batch_size = 50
-    if api_key:
-        inference_engine.credentials = {"api_key": api_key}
-    judge.inference_engine = inference_engine
-    metric_inference_engine = MetricInferenceEngine(
-        metric=judge,
-        cache_batch_size=25,
-    )
-    predictions = metric_inference_engine.infer(dataset)
-    criteria_name = json.loads(
-        predictions[0][
-            next(iter([key for key in predictions[0] if key.endswith("_criteria")]))
-        ]
-    )["name"]
-
-    positional_bias = [p[f"{criteria_name}_positional_bias"] for p in predictions]
-    positional_bias_rate = sum(positional_bias) / len(positional_bias)
-
-    parsed_predictions = [p[criteria_name] for p in predictions]
-    results = evaluate(predictions=parsed_predictions, data=dataset)
-
-    metric_names = [m.split(".")[1] for m in results[0]["metrics"]]
-
-    parsed_results = {
-        metric_name: float(
-            results.global_scores[
-                metric_name if metric_name != "spearman" else "spearmanr"
-            ]
+    try:
+        evaluator_params = "[criteria_field=criteria,context_fields=None,include_prompts_in_result=true]"
+        metric = f"metrics.llm_as_judge.direct.{model}{evaluator_params}"
+        metric = fetch_artifact(metric)[0]
+        judge = cast(LLMJudge, metric)
+        inference_engine = cast(LiteLLMInferenceEngine, judge.inference_engine)
+        inference_engine.cache_batch_size = BATCH_SIZE * 2  # because of positional bias
+        if api_key:
+            inference_engine.credentials = {"api_key": api_key}
+        judge.inference_engine = inference_engine
+        metric_inference_engine = MetricInferenceEngine(
+            metric=judge,
+            cache_batch_size=BATCH_SIZE,
         )
-        for metric_name in metric_names
-    }
-    parsed_results["positional_bias_rate"] = positional_bias_rate
-    criteria = cast(
-        CriteriaWithOptions,
-        fetch_artifact(predictions[0][f"{criteria_name}_criteria"])[0],
-    )
-    prediction_field = criteria.prediction_field
-    responses_to_evaluate = []
-    raw_context_lens = []
-    has_context = False
-    if len(criteria.context_fields) > 0:
-        has_context = True
-
-    agreements = []
-    inspect_rows = []
-    for i, (d, p) in enumerate(zip(dataset, predictions)):
-        task_data = json.loads(d["task_data"])
-        responses_to_evaluate.append(task_data[prediction_field])
-
-        if "label_value" in task_data:
-            is_ground_truth_categorical = True
-            ground_truth_score = task_data["label_value"]
-        else:
-            is_ground_truth_categorical = False
-            ground_truth_score = task_data["mean_score"]
-
-        pred_score = parsed_predictions[i]
-
-        agreements.append(
-            (pred_score == ground_truth_score)
-            if is_ground_truth_categorical
-            else 1 - abs(pred_score - ground_truth_score)
-        )
-
-        # if (is_ground_truth_categorical and ground_truth != pred) or (
-        #     not is_ground_truth_categorical and abs(ground_truth - pred) > 0.2
-        # ):
-        if True:
-            context = {
-                k[len(criteria_name) + 1 :] if k != criteria_name else "score": v
-                for k, v in p.items()
-            }
-            criteria_json = criteria.to_dict()
-            del criteria_json["__type__"]
-            for option in criteria_json["options"]:
-                del option["__type__"]
-            answer_selection_messages = [
-                message["content"] for message in context["prompts"]["option_selection"]
+        predictions = metric_inference_engine.infer(dataset)
+        criteria_name = json.loads(
+            predictions[0][
+                next(iter([key for key in predictions[0] if key.endswith("_criteria")]))
             ]
-            answer_selection_messages.append(context["option_selection_completion"])
-            whole_conversation = "\n\n\n".join(answer_selection_messages)
+        )["name"]
 
-            inverse_option_map = {v: k for k, v in criteria.option_map.items()}
-            ground_truth = None
-            if is_ground_truth_categorical:
-                ground_truth = inverse_option_map[ground_truth_score]
-            pred = inverse_option_map[pred_score]
+        positional_bias = [p[f"{criteria_name}_positional_bias"] for p in predictions]
+        positional_bias_rate = sum(positional_bias) / len(positional_bias)
 
-            raw_context = json.dumps(context)
-            if has_context:
-                raw_context_lens.append(
-                    sum([len(task_data[c]) for c in criteria.context_fields])
-                )
-            inspect_row = {
-                "card": ".".join(card.split(".")[2:]),
-                "model": model,
-                "ground_truth_score": ground_truth_score,
-                "judge_prediction_score": pred_score,
-                "ground_truth": ground_truth,
-                "judge_prediction": pred,
-                "criteria": criteria,
-                "judge_reasoning": whole_conversation,
-                "positional_bias": "Detected"
-                if context["positional_bias"]
-                else "Not detected",
-                "raw_context": raw_context,
-            }
-            inspect_rows.append(inspect_row)
+        parsed_predictions = [p[criteria_name] for p in predictions]
+        results = evaluate(predictions=parsed_predictions, data=dataset)
+
+        metric_names = [m.split(".")[1] for m in results[0]["metrics"]]
+
+        parsed_results = {
+            metric_name: float(
+                results.global_scores[
+                    metric_name if metric_name != "spearman" else "spearmanr"
+                ]
+            )
+            for metric_name in metric_names
+        }
+        parsed_results["positional_bias_rate"] = positional_bias_rate
+        criteria = cast(
+            CriteriaWithOptions,
+            fetch_artifact(predictions[0][f"{criteria_name}_criteria"])[0],
+        )
+        prediction_field = criteria.prediction_field
+        responses_to_evaluate = []
+        raw_context_lens = []
+        has_context = False
+        if len(criteria.context_fields) > 0:
+            has_context = True
+
+        agreements = []
+        inspect_rows = []
+        for i, (d, p) in enumerate(zip(dataset, predictions)):
+            task_data = json.loads(d["task_data"])
+            responses_to_evaluate.append(task_data[prediction_field])
+
+            if "label_value" in task_data:
+                is_ground_truth_categorical = True
+                ground_truth_score = task_data["label_value"]
+            else:
+                is_ground_truth_categorical = False
+                ground_truth_score = task_data["mean_score"]
+
+            pred_score = parsed_predictions[i]
+
+            agreements.append(
+                (pred_score == ground_truth_score)
+                if is_ground_truth_categorical
+                else 1 - abs(pred_score - ground_truth_score)
+            )
+
+            # if (is_ground_truth_categorical and ground_truth != pred) or (
+            #     not is_ground_truth_categorical and abs(ground_truth - pred) > 0.2
+            # ):
+            if True:
+                context = {
+                    k[len(criteria_name) + 1 :] if k != criteria_name else "score": v
+                    for k, v in p.items()
+                }
+                criteria_json = criteria.to_dict()
+                del criteria_json["__type__"]
+                for option in criteria_json["options"]:
+                    del option["__type__"]
+                answer_selection_messages = [
+                    message["content"]
+                    for message in context["prompts"]["option_selection"]
+                ]
+                answer_selection_messages.append(context["option_selection_completion"])
+                whole_conversation = "\n\n\n".join(answer_selection_messages)
+
+                inverse_option_map = {v: k for k, v in criteria.option_map.items()}
+                ground_truth = None
+                if is_ground_truth_categorical:
+                    ground_truth = inverse_option_map[ground_truth_score]
+                pred = inverse_option_map[pred_score]
+
+                raw_context = json.dumps(context)
+                if has_context:
+                    raw_context_lens.append(
+                        sum([len(task_data[c]) for c in criteria.context_fields])
+                    )
+                inspect_row = {
+                    "card": ".".join(card.split(".")[2:]),
+                    "model": model,
+                    "ground_truth_score": ground_truth_score,
+                    "judge_prediction_score": pred_score,
+                    "ground_truth": ground_truth,
+                    "judge_prediction": pred,
+                    "criteria": criteria,
+                    "judge_reasoning": whole_conversation,
+                    "positional_bias": "Detected"
+                    if context["positional_bias"]
+                    else "Not detected",
+                    "raw_context": raw_context,
+                }
+                inspect_rows.append(inspect_row)
+    except Exception as e:
+        logger.critical("FAILED!!")
+        logger.critical(e)
 
     responses_to_evaluate_lens = [len(r) for r in responses_to_evaluate]
     corr_reponse_length_with_accuracy = float(
@@ -331,7 +339,7 @@ def run_benchmarks():
             ran_results_df["card"].to_list(), ran_results_df["model"].to_list()
         )
     ]
-    with ProcessPoolExecutor(max_workers=10) as executor:
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = []
         for card in get_judgebench_cards():
             dataset = load_dataset(
