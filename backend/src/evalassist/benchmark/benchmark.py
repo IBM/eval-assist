@@ -125,7 +125,19 @@ def get_judgebench_cards():
     return judgebench_cards
 
 
-def run_single_model_card(card, dataset, model, api_key):
+def run_single_model_card(card: str, dataset, model: str, api_key: str):
+    """
+    Runs a single benchmark card with the specified model and API key.
+
+    Args:
+        card (str): The name of the benchmark card to run.
+        dataset: The dataset to use for benchmarking.
+        model (str): The name of the model to use for benchmarking.
+        api_key (str): The API key to use for the model.
+
+    Returns:
+        tuple: A tuple containing the benchmark result and inspection rows.
+    """
     print("Running card:", card, "with model:", model)
     try:
         evaluator_params = "[criteria_field=criteria,context_fields=None,include_prompts_in_result=true]"
@@ -301,6 +313,14 @@ def run_single_model_card(card, dataset, model, api_key):
 
 def run_benchmarks():
     RITS_API_KEYS = [None]
+    """
+    Runs multiple benchmarks in parallel using a process pool executor.
+
+    This function retrieves a list of JudgeBench cards, loads the corresponding datasets,
+    and then submits tasks to the executor to run each benchmark with different models.
+
+    The results are saved to CSV files specified by RESULTS_FILE_PATH and INSPECT_FILE_PATH.
+    """
     api_key_cycle = cycle(RITS_API_KEYS)
 
     models = [
