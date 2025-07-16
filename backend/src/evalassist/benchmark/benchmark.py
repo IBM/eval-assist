@@ -115,6 +115,7 @@ def run_single_model_card(card, dataset, model, api_key):
     metric = fetch_artifact(metric)[0]
     judge = cast(LLMJudge, metric)
     inference_engine = cast(LiteLLMInferenceEngine, judge.inference_engine)
+    inference_engine.cache_batch_size = 50
     if api_key:
         inference_engine.credentials = {"api_key": api_key}
     judge.inference_engine = inference_engine
