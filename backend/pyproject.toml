@@ -56,7 +56,7 @@ dependencies = [
     "openai",
     "pandas",
     "ibm_watsonx_ai",
-    "unitxt",
+    "unitxt==1.26.3",
     "nbconvert",
     "boto3",
     "ollama",
@@ -108,6 +108,7 @@ addopts = "--cov=evalassist"
 
 
 
+
 [tool.poetry.group.local-inference]
 optional = true
 
@@ -121,11 +122,13 @@ accelerate = "*"
 
 
 
+
 [tool.poetry.group.postgresql]
 optional = true
 
 [tool.poetry.group.postgresql.dependencies]
 psycopg2-binary = "*"
+
 
 
 
