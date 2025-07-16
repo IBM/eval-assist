@@ -42,6 +42,9 @@ def get_all_benchmarks():
                 readme_url = f"https://github.com/dmg-illc/JUDGE-BENCH/blob/master/data/{dataset_name}/README.md"
             if not exists:
                 readme_url = None
+            tags = []
+            if "roscoe" in card:
+                tags.append("Reasoning")
 
             benchmark_results = {
                 "name": benchmark_name,
@@ -49,7 +52,7 @@ def get_all_benchmarks():
                 "catalog_url": f"https://www.unitxt.ai/en/latest/catalog/catalog.{card}.html",
                 "readme_url": readme_url,
                 "type": EvaluatorTypeEnum.DIRECT,
-                "tags": [],
+                "tags": tags,
                 "criteria_benchmarks": {},
             }
 
@@ -317,7 +320,7 @@ def run_benchmarks():
         futures = []
         for card in get_judgebench_cards():
             dataset = load_dataset(
-                card=card, split="test", loader_limit=100, use_cache=True
+                card=card, split="test", loader_limit=200, use_cache=True
             )
             for model in models:
                 if (card, model.split(".")[1]) in ran_cards_models:
