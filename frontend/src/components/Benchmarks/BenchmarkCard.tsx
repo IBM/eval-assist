@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
-import { capitalizeFirstWord, returnByPipelineType } from 'src/utils'
+import { capitalizeFirstWord, returnByPipelineType, toTitleCase } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 
@@ -146,7 +146,7 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
           <TagBadge
             className={classes.badge}
             key={i}
-            name={tag}
+            name={toTitleCase(tag)}
             color={tagToColor[tag]}
             size="md"
             onClick={(e) => onTagClick(e, tag)}
