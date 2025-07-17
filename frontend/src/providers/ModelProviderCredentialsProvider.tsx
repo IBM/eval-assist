@@ -206,7 +206,7 @@ export const ModelProviderCredentialsProvider = ({ children }: { children: React
         Object.keys(getProviderCredentials(provider)).map((key) => [
           key,
           // @ts-ignore
-          getProviderCredentials(provider)[key] || defaultCrendentials[provider][key] || null,
+          getProviderCredentials(provider)[key] || defaultCrendentials[provider][key],
         ]),
       )
     },
