@@ -117,11 +117,22 @@ def get_cross_inference_engine_params(
         }
         # if project_id was not provided and space_id is provided prepend watsonx/deployment/ to the model name
         if (
-            inference_engine_params["credentials"]["space_id"]
+            "space_id" in inference_engine_params["credentials"]
+            and inference_engine_params["credentials"]["space_id"]
+        ) and (
+            "project_id" in inference_engine_params["credentials"]
             and not inference_engine_params["credentials"]["project_id"]
         ):
-            model_name = "watsonx/deployment/" + model_name
-
+            # try to use cross inferentece engine to get model map
+            model_map = CrossProviderInferenceEngine.provider_model_map["watsonx"]
+            if model_name in model_map:
+                model_name = model_map[model_name]
+                splitted_model_name = model_name.split("/")
+                model_name = "/".join(
+                    [splitted_model_name[0], "deployment", *splitted_model_name[1:]]
+                )
+            else:
+                model_name = "watsonx/deployment/" + model_name
     if (
         provider == ModelProviderEnum.AZURE
         or provider == ExtendedModelProviderEnum.OPENAI_LIKE
