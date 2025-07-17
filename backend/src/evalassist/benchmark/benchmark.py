@@ -12,14 +12,25 @@ from evalassist.utils import folder_exists_in_github_repo
 from scipy.stats import pearsonr
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
-from unitxt.inference import LiteLLMInferenceEngine, MetricInferenceEngine
-from unitxt.llm_as_judge import CriteriaWithOptions, EvaluatorTypeEnum, LLMJudge
+from unitxt.inference import CrossProviderInferenceEngine, MetricInferenceEngine
+from unitxt.llm_as_judge import CriteriaWithOptions, EvaluatorTypeEnum, LLMJudgeDirect
 from unitxt.settings_utils import get_constants
 
 RESULTS_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "benchmark_results.csv"
 INSPECT_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "to_inspect.csv"
-MAX_WORKERS = 20
+MAX_WORKERS = 10
 BATCH_SIZE = 25
+RITS_API_KEYS = [None]
+# List of models to benchmark
+MODELS = [
+    "llama-3-3-70b-instruct",
+    "llama-4-scout",
+    "llama-4-maverick",
+    "granite-3-3-8b-instruct",
+    "deepseek-v3",
+    "phi-4",
+    "mistral-small-instruct",
+]
 
 logger = logging.getLogger(__name__)
 
@@ -140,15 +151,19 @@ def run_single_model_card(card: str, dataset, model: str, api_key: str):
     """
     print("Running card:", card, "with model:", model)
     try:
-        evaluator_params = "[criteria_field=criteria,context_fields=None,include_prompts_in_result=true]"
-        metric = f"metrics.llm_as_judge.direct.{model}{evaluator_params}"
-        metric = fetch_artifact(metric)[0]
-        judge = cast(LLMJudge, metric)
-        inference_engine = cast(LiteLLMInferenceEngine, judge.inference_engine)
-        inference_engine.cache_batch_size = BATCH_SIZE * 2  # because of positional bias
-        if api_key:
-            inference_engine.credentials = {"api_key": api_key}
-        judge.inference_engine = inference_engine
+        judge = LLMJudgeDirect(
+            criteria_field="criteria",
+            context_fields=None,
+            include_prompts_in_result=True,
+            inference_engine=CrossProviderInferenceEngine(
+                model=model,
+                provider="rits",
+                temperature=0,
+                max_tokens=1024,
+                cache_batch_size=BATCH_SIZE * 2,
+                credentials={"api_key": api_key} if api_key else None,
+            ),
+        )
         metric_inference_engine = MetricInferenceEngine(
             metric=judge,
             cache_batch_size=BATCH_SIZE,
@@ -263,65 +278,66 @@ def run_single_model_card(card: str, dataset, model: str, api_key: str):
                 "raw_context": raw_context,
             }
             inspect_rows.append(inspect_row)
+
+        responses_to_evaluate_lens = [len(r) for r in responses_to_evaluate]
+        corr_reponse_length_with_accuracy = float(
+            pearsonr(agreements, responses_to_evaluate_lens).correlation
+        )
+        corr_context_length_with_accuracy = (
+            float(pearsonr(agreements, raw_context_lens).correlation)
+            if has_context
+            else None
+        )
+        corr_response_length_with_pos_bias = float(
+            pearsonr(positional_bias, responses_to_evaluate_lens).correlation
+        )
+        corr_context_length_with_pos_bias = (
+            float(pearsonr(positional_bias, raw_context_lens).correlation)
+            if has_context
+            else None
+        )
+        parsed_results["corr_reponse_length/accuracy"] = (
+            corr_reponse_length_with_accuracy
+            if corr_reponse_length_with_accuracy is None
+            or not math.isnan(corr_reponse_length_with_accuracy)
+            else None
+        )
+        parsed_results["corr_context_length/accuracy"] = (
+            corr_context_length_with_accuracy
+            if corr_context_length_with_accuracy is None
+            or not math.isnan(corr_context_length_with_accuracy)
+            else None
+        )
+        parsed_results["corr_response_length/pos_bias"] = (
+            corr_response_length_with_pos_bias
+            if corr_response_length_with_pos_bias is None
+            or not math.isnan(corr_response_length_with_pos_bias)
+            else None
+        )
+        parsed_results["corr_context_length/pos_bias"] = (
+            corr_context_length_with_pos_bias
+            if corr_context_length_with_pos_bias is None
+            or not math.isnan(corr_context_length_with_pos_bias)
+            else None
+        )
+
+        benchmark_result = {
+            "card": card,
+            "model": model,
+            "provider": "rits",
+            "criteria": criteria_name,
+            "results": json.dumps(parsed_results),
+        }
+
+        return benchmark_result, inspect_rows
+
     except Exception as e:
         logger.critical("FAILED!!")
         logger.critical(e)
-
-    responses_to_evaluate_lens = [len(r) for r in responses_to_evaluate]
-    corr_reponse_length_with_accuracy = float(
-        pearsonr(agreements, responses_to_evaluate_lens).correlation
-    )
-    corr_context_length_with_accuracy = (
-        float(pearsonr(agreements, raw_context_lens).correlation)
-        if has_context
-        else None
-    )
-    corr_response_length_with_pos_bias = float(
-        pearsonr(positional_bias, responses_to_evaluate_lens).correlation
-    )
-    corr_context_length_with_pos_bias = (
-        float(pearsonr(positional_bias, raw_context_lens).correlation)
-        if has_context
-        else None
-    )
-    parsed_results["corr_reponse_length/accuracy"] = (
-        corr_reponse_length_with_accuracy
-        if corr_reponse_length_with_accuracy is None
-        or not math.isnan(corr_reponse_length_with_accuracy)
-        else None
-    )
-    parsed_results["corr_context_length/accuracy"] = (
-        corr_context_length_with_accuracy
-        if corr_context_length_with_accuracy is None
-        or not math.isnan(corr_context_length_with_accuracy)
-        else None
-    )
-    parsed_results["corr_response_length/pos_bias"] = (
-        corr_response_length_with_pos_bias
-        if corr_response_length_with_pos_bias is None
-        or not math.isnan(corr_response_length_with_pos_bias)
-        else None
-    )
-    parsed_results["corr_context_length/pos_bias"] = (
-        corr_context_length_with_pos_bias
-        if corr_context_length_with_pos_bias is None
-        or not math.isnan(corr_context_length_with_pos_bias)
-        else None
-    )
-
-    benchmark_result = {
-        "card": card,
-        "model": model.split(".")[1],
-        "provider": model.split(".")[0],
-        "criteria": criteria_name,
-        "results": json.dumps(parsed_results),
-    }
-
-    return benchmark_result, inspect_rows
+        return None, None
 
 
 def run_benchmarks():
-    RITS_API_KEYS = [None]
     """
     Runs multiple benchmarks in parallel using a process pool executor.
 
@@ -332,15 +348,6 @@ def run_benchmarks():
     """
     # Create a cycle of API keys to use for benchmarking
     api_key_cycle = cycle(RITS_API_KEYS)
-
-    # List of models to benchmark
-    models = [
-        "rits.llama3_3_70b",
-        "rits.llama4_maverick",
-        "rits.granite3_3_8b",
-        "rits.deepseek_v3",
-        "rits.llama4_scout",
-    ]
 
     try:
         # Load previously run results from CSV
@@ -385,9 +392,9 @@ def run_benchmarks():
             dataset = load_dataset(
                 card=card, split="test", loader_limit=200, use_cache=True
             )
-            for model in models:
+            for model in MODELS:
                 # Skip if the benchmark has already been run
-                if (card, model.split(".")[1]) in ran_cards_models:
+                if (card, model) in ran_cards_models:
                     print(f"Benchmark {card}/{model} already run")
                     continue
                 # Submit the task to the executor
