@@ -25,6 +25,9 @@ class ExtendedEvaluatorNameEnum(Enum):
     GRANITE_GUARDIAN3_2_5B = "Granite Guardian 3.2 5B"
     LLAMA_3_3_70B_FREE = "Llama 3.3 70B Free"
     DEEPSEEK_R1_DISTILLED_LLAMA_70B_FREE = "DeepSeek R1 Distilled Llama 70B Free"
+    PHI4 = "Phi-4"
+    MIXTRAL_SMALL = "Mixtral Small"
+    MIXTRAL_MEDIUM = "Mixtral Medium"
     CUSTOM = "custom"
 
 
@@ -45,6 +48,9 @@ EXTENDED_EVALUATOR_TO_MODEL_ID = {
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B: "ibm-granite/granite-guardian-3.2-5b",
     ExtendedEvaluatorNameEnum.LLAMA_3_3_70B_FREE: "llama-3-3-70b-instruct-free",
     ExtendedEvaluatorNameEnum.DEEPSEEK_R1_DISTILLED_LLAMA_70B_FREE: "deepseek-r1-distilled-llama-70b-free",
+    ExtendedEvaluatorNameEnum.PHI4: "phi4",
+    ExtendedEvaluatorNameEnum.MIXTRAL_SMALL: "mistral-small-instruct",
+    ExtendedEvaluatorNameEnum.MIXTRAL_MEDIUM: "mistral-medium-instruct",
 }
 
 
@@ -91,6 +97,14 @@ EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = [
     ),
     ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.LLAMA_3_3_70B_FREE, [ModelProviderEnum.TOGETHER_AI]
+    ),
+    ExtendedEvaluatorMetadata(ExtendedEvaluatorNameEnum.PHI4, [ModelProviderEnum.RITS]),
+    ExtendedEvaluatorMetadata(
+        ExtendedEvaluatorNameEnum.MIXTRAL_SMALL,
+        [ModelProviderEnum.RITS, ModelProviderEnum.WATSONX],
+    ),
+    ExtendedEvaluatorMetadata(
+        ExtendedEvaluatorNameEnum.MIXTRAL_MEDIUM, [ModelProviderEnum.WATSONX]
     ),
 ]
 
