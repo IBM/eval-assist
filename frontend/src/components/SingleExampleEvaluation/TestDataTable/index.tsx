@@ -62,10 +62,10 @@ export const TestDataTable = ({ style, className }: Props) => {
 
   const gridClasses = useMemo(
     () => ({
-      [classes.columns2]: !resultsAvailable,
-      [classes.columns3]: resultsAvailable,
+      [classes.columns2]: !resultsAvailable && !evaluationRunning,
+      [classes.columns3]: resultsAvailable || evaluationRunning,
     }),
-    [resultsAvailable],
+    [evaluationRunning, resultsAvailable],
   )
 
   const noPositionalBias = useMemo(() => {
@@ -262,7 +262,7 @@ export const TestDataTable = ({ style, className }: Props) => {
                 {returnByPipelineType(currentTestCase.type, 'Expected result', 'Expected winner')}
               </strong>
             </div>
-            {resultsAvailable && (
+            {(resultsAvailable || evaluationRunning) && (
               <div className={cx(classes.blockElement, classes.headerBlock)}>
                 <strong className={classes.headerTypography}>
                   {returnByPipelineType(currentTestCase.type, 'Generated result', 'Generated winner')}
@@ -308,7 +308,9 @@ export const TestDataTable = ({ style, className }: Props) => {
               ))}
             </div>
             <div className={cx(classes.blockElement, classes.subHeaderBlock)} />
-            {resultsAvailable && <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>}
+            {(resultsAvailable || evaluationRunning) && (
+              <div className={cx(classes.blockElement, classes.subHeaderBlock)}></div>
+            )}
           </div>
 
           {currentInstances.length === 0 && (

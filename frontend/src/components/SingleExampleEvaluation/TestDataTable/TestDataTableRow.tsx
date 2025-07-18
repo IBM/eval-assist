@@ -308,7 +308,7 @@ export const TestDataTableRow = ({
                   </div>
                 </div>
               </>
-            ) : resultsAvailable ? (
+            ) : resultsAvailable || evaluationRunning ? (
               <div className={cx(classes.blockElement, classes.resultBlock)} tabIndex={-1}>
                 {evaluationRunning && isInstanceEvaluationRunning && (
                   <div className={classes.inlineLoadingContainer}>
