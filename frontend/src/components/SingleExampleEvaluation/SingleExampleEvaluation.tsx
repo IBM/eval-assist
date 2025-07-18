@@ -64,7 +64,7 @@ export const SingleExampleEvaluation = () => {
   const { onSave } = useTestCaseActionsContext()
 
   useSaveShortcut({ onSave, changesDetected, isTestCaseSaved })
-
+  console.log(currentTestCase.contextVariableNames)
   return (
     <>
       <AppSidenavNew />
