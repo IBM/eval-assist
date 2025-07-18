@@ -21,6 +21,7 @@ from openai import AuthenticationError, NotFoundError
 from unitxt.inference import (
     CrossProviderInferenceEngine,
     HFAutoModelInferenceEngine,
+    WMLInferenceEngineChat,
     WMLInferenceEngineGeneration,
 )
 from unitxt.llm_as_judge import EvaluatorNameEnum, ModelProviderEnum
@@ -160,19 +161,51 @@ def get_watsonx_inference_engine(
     provider: ModelProviderEnum,
     model_name: EvaluatorNameEnum,
     custom_params: dict = None,
+    use_chat: bool = True,
 ):
+    converted_model_name = "/".join(
+        CrossProviderInferenceEngine.provider_model_map["watsonx"][model_name].split(
+            "/"
+        )[1:]
+    )
     inference_engine_params = {
-        "max_new_tokens": 1024,
+        "max_tokens": 1024,
         "credentials": {
             "api_key": credentials["api_key"],
-            "project_id": credentials["project_id"],
             "url": credentials["api_base"],
         },
-        "model_name": model_name,
+        "model_name": converted_model_name,
     }
+
     if custom_params is not None:
         inference_engine_params.update(custom_params)
-    return WMLInferenceEngineGeneration(**inference_engine_params)
+
+    if "project_id" in credentials and credentials["project_id"] is not None:
+        inference_engine_params["credentials"]["project_id"] = credentials["project_id"]
+    elif "space_id" in credentials and credentials["space_id"] is not None:
+        inference_engine_params["credentials"]["space_id"] = credentials["space_id"]
+    else:
+        raise ValueError("Must provide either project_id or space_id")
+
+    if "seed" in custom_params and not use_chat:
+        inference_engine_params["random_seed"] = inference_engine_params["seed"]
+        del inference_engine_params["seed"]
+
+    if not use_chat:
+        if "seed" in inference_engine_params:
+            inference_engine_params["random_seed"] = inference_engine_params["seed"]
+            del inference_engine_params["seed"]
+        if "max_tokens" in inference_engine_params:
+            inference_engine_params["max_new_tokens"] = inference_engine_params[
+                "max_tokens"
+            ]
+            del inference_engine_params["max_tokens"]
+
+    return (
+        WMLInferenceEngineChat(**inference_engine_params)
+        if use_chat
+        else WMLInferenceEngineGeneration(**inference_engine_params)
+    )
 
 
 preloaded_hf_models = {}
@@ -205,9 +238,12 @@ def get_inference_engine(
 ):
     if provider == ExtendedModelProviderEnum.LOCAL_HF:
         return get_hf_inference_engine(model_name, custom_params)
-    if provider == ModelProviderEnum.WATSONX and "granite-guardian" in model_name:
+    if provider == ModelProviderEnum.WATSONX and (
+        "granite-guardian" in model_name or "space_id" in credentials
+    ):
+        use_chat = "granite-guardian" not in model_name  # uses probs
         return get_watsonx_inference_engine(
-            credentials, provider, model_name, custom_params
+            credentials, provider, model_name, custom_params, use_chat
         )
     return get_cross_inference_engine(
         credentials, provider, model_name, custom_params, provider_specific_params

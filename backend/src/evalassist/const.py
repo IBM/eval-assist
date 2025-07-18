@@ -40,7 +40,7 @@ EXTENDED_INFERENCE_ENGINE_NAME_TO_CLASS = {
 EXTENDED_EVALUATOR_TO_MODEL_ID = {
     **EVALUATOR_TO_MODEL_ID,
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B: "ibm/granite-guardian-3-2b",
-    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "ibm/granite-guardian-3-8b",
+    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "granite-guardian-3-8b",
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B: "ibm-granite/granite-guardian-3.2-3b-a800m",
     ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B: "ibm-granite/granite-guardian-3.2-5b",
     ExtendedEvaluatorNameEnum.LLAMA_3_3_70B_FREE: "llama-3-3-70b-instruct-free",
