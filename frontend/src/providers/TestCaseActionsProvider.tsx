@@ -131,9 +131,15 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         }
       }
 
-      const toEvaluateInstances: Instance[] = currentTestCase.instances.filter((instance) =>
-        evaluationIds.includes(instance.id),
-      )
+      const toEvaluateInstances: Instance[] = currentTestCase.instances
+        .filter((instance) => evaluationIds.includes(instance.id))
+        .filter((instance) =>
+          returnByPipelineType(
+            currentTestCase.type,
+            () => (instance as DirectInstance).response !== '',
+            () => (instance as PairwiseInstance).responses.some((r) => r !== ''),
+          ),
+        )
 
       const toEvaluateInstancesParsed = toEvaluateInstances.map((instance) => ({
         context_variables: instance.contextVariables.reduce(
