@@ -6,7 +6,6 @@ from typing import Optional, Union, cast
 
 import nbformat as nbf
 import nest_asyncio
-import pkg_resources
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -581,7 +580,9 @@ def get_version():
         source = "git"
     except Exception:
         try:
-            version = pkg_resources.require("evalassist")[0].version
+            from importlib.metadata import version
+
+            version = version("evelassist")
             source = "pypi"
 
             if version == "0.0.0":
