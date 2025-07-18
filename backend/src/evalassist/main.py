@@ -590,7 +590,7 @@ def get_version():
                 # and the .git folder is not present in the root directory
                 raise ValueError("Invalid version")
         except Exception:
-            version = "Not available"
+            version = None
             source = None
             logging.warning("Could not get EvalAssist version")
 

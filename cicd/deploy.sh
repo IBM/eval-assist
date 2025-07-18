@@ -192,11 +192,11 @@ spec:
             - containerPort: 8000
           resources:
             limits:
-              cpu: 8
-              memory: 32Gi
-            requests:
               cpu: 4
-              memory: 16Gi
+              memory: 8Gi
+            requests:
+              cpu: 2
+              memory: 4Gi
           env:
             - name: AUTHENTICATION_ENABLED
               valueFrom:
