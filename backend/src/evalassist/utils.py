@@ -160,7 +160,7 @@ def get_watsonx_inference_engine(
     credentials: dict[str, str],
     provider: ModelProviderEnum,
     model_name: EvaluatorNameEnum,
-    custom_params: dict = None,
+    custom_params: Optional[dict] = None,
     use_chat: bool = True,
 ):
     converted_model_name = "/".join(
@@ -187,7 +187,7 @@ def get_watsonx_inference_engine(
     else:
         raise ValueError("Must provide either project_id or space_id")
 
-    if "seed" in custom_params and not use_chat:
+    if "seed" in inference_engine_params and not use_chat:
         inference_engine_params["random_seed"] = inference_engine_params["seed"]
         del inference_engine_params["seed"]
 
