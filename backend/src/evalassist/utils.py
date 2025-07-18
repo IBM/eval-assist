@@ -115,12 +115,6 @@ def get_cross_inference_engine_params(
         provider_specific_args[ModelProviderEnum.WATSONX] = {
             "max_requests_per_second": 7
         }
-        # if project_id was not provided and space_id is provided prepend watsonx/deployment/ to the model name
-        if (
-            inference_engine_params["credentials"]["space_id"]
-            and not inference_engine_params["credentials"]["project_id"]
-        ):
-            model_name = "watsonx/deployment/" + model_name
 
     if (
         provider == ModelProviderEnum.AZURE
