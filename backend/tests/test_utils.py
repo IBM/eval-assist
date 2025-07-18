@@ -92,7 +92,7 @@ def test_get_inference_engine():
         get_inference_engine(
             credentials,
             ModelProviderEnum.WATSONX,
-            "ibm-granite/granite-guardian-3.2-5b",
+            "granite-guardian-3-8b",
         ),
         WMLInferenceEngineGeneration,
     )
