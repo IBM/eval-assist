@@ -107,24 +107,13 @@ addopts = "--cov=evalassist"
 
 
 
-
-
-
-
-
-
 [tool.poetry.group.local-inference]
 optional = true
 
 [tool.poetry.group.local-inference.dependencies]
 torch = "*"
 accelerate = "*"
-
-
-
-
-
-
+transformers = "*"
 
 
 
@@ -136,12 +125,6 @@ optional = true
 
 [tool.poetry.group.postgresql.dependencies]
 psycopg2-binary = "*"
-
-
-
-
-
-
 
 
 
