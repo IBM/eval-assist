@@ -6,6 +6,7 @@ import { Dispatch, SetStateAction, useCallback } from 'react'
 import { Button, Layer, ListItem, Modal, UnorderedList } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
+import { CriteriaInfo } from '@components/CriteriaInfo'
 import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 import { Criteria, CriteriaWithOptions, EvaluationType } from '@types'
 
@@ -52,32 +53,7 @@ export const CriteriaDetailsModal = ({ criteria, type, open, setOpen }: Props) =
       className={classes.root}
     >
       <Layer style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        <p>
-          <strong>{'Name: '}</strong> {criteria.name}
-        </p>
-
-        <p>
-          <strong>{'Criteria: '}</strong>
-          {criteria.description}
-        </p>
-
-        {isInstanceOfCriteriaWithOptions(criteria) && (
-          <div>
-            <p style={{ marginBottom: '0.25rem' }}>
-              <strong>Options:</strong>
-            </p>
-            <UnorderedList className={classes.list}>
-              {criteria.options.map((option, i) => (
-                <ListItem key={i}>
-                  <p>
-                    <span style={{ fontWeight: 500 }}>{option.name}</span>
-                    {option.description ? `: ${option.description}` : ''}
-                  </p>
-                </ListItem>
-              ))}
-            </UnorderedList>
-          </div>
-        )}
+        <CriteriaInfo criteria={criteria} />
 
         <Button
           renderIcon={Launch}
