@@ -11,7 +11,7 @@ import classes from './index.module.scss'
 
 interface Props {
   value: string
-  onChange: ((event: ChangeEvent<HTMLInputElement>) => void) | undefined
+  onChange?: ((event: ChangeEvent<HTMLInputElement>) => void) | undefined
   setActive?: () => void
   setInactive?: () => void
   i?: number

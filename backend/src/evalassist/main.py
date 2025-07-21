@@ -573,8 +573,13 @@ def get_version():
     """
     try:
         # git is a dev dependency so import may fail
-        import git
-
+        try:
+            import git
+        except ImportError as e:
+            logger.error(
+                "Make sure you installed evalassis's dev dependency with poetry install --with dev"
+            )
+            raise e
         repo = git.repo.Repo(EVAL_ASSIST_DIR.parent.parent.parent)
         version = repo.git.describe(tags=True)
         source = "git"
