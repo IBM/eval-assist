@@ -71,7 +71,7 @@ function start_frontend() {
   const rawUrl =
     process.env.NEXT_PUBLIC_BACKEND_API_HOST || "http://localhost:8000";
   const strippedHost = rawUrl.replace(/^https?:\/\//, ""); // Remove http:// or https://
-  run(`npx wait-on http-get://${strippedHost}/health`);
+  run(`npx wait-on http-get://${strippedHost}/api/health`);
   run("cd frontend && npm run dev");
 }
 
