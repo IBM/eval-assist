@@ -608,7 +608,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 
-app.include_router(router)
+app.include_router(router, prefix="/api")
 
 if os.path.exists(STATIC_DIR):
     logger.debug(f"Serving static files from {STATIC_DIR}")

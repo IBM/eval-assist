@@ -16,8 +16,7 @@ export const useFetchUtils = () => {
       if (!isFormData) {
         headers['Content-Type'] = contentType
       }
-
-      return await fetch(`${BACKEND_API_HOST}/${path}`, {
+      return await fetch(`${BACKEND_API_HOST}/api/${path}`, {
         headers,
         method: method,
         body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
