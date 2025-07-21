@@ -37,7 +37,7 @@ jobs:
 
       - name: Health endpoint test
         run: |
-          curl -f http://127.0.0.1:8000/health || (echo "App did not start correctly" && exit 1)
+          curl -f http://127.0.0.1:8000/api/health || (echo "App did not start correctly" && exit 1)
 
       - name: Run pytest with coverage
         working-directory: backend
