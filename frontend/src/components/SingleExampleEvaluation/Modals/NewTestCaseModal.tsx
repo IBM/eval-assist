@@ -6,6 +6,7 @@ import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
 import { Layer, Modal, Select, SelectItem } from '@carbon/react'
 import { Warning } from '@carbon/react/icons'
 
+import { CriteriaInfo } from '@components/CriteriaInfo'
 import { useCriteriasContext } from '@providers/CriteriaProvider'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
@@ -140,6 +141,7 @@ export const NewTestCaseModal = ({ open, setOpen }: Props) => {
             ))}
           </Select>
         )}
+        {selectedCriteria && <CriteriaInfo criteria={selectedCriteria} includeName={false} />}
         {changesDetected && (
           <div className={classes['danger-text']}>
             <Warning />
