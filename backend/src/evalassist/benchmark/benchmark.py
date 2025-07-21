@@ -2,13 +2,13 @@ import json
 import logging
 import math
 import os
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from itertools import cycle
 from typing import cast
 
 import pandas as pd
 from evalassist.const import EVAL_ASSIST_DIR
-from evalassist.utils import folder_exists_in_github_repo
+from evalassist.utils import folder_exists_in_github_repo, log_runtime
 from scipy.stats import pearsonr
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
@@ -37,13 +37,43 @@ logger = logging.getLogger(__name__)
 
 def add_tag_to_result(results, keyword, tag_or_tags):
     for k in results.keys():
-        print("results[k]")
-        print(results[k])
         if keyword in results[k]["name"]:
             if isinstance(tag_or_tags, list):
                 results[k]["tags"].extend(tag_or_tags)
             else:
                 results[k]["tags"].append(tag_or_tags)
+
+
+def get_readme_url(dataset_name):
+    exists = folder_exists_in_github_repo(
+        "dmg-illc", "JUDGE-BENCH", f"data/{dataset_name}", "master"
+    )
+    readme_url = f"https://github.com/dmg-illc/JUDGE-BENCH/blob/master/data/{dataset_name}/README.md"
+    return exists, readme_url
+
+
+def get_benchmark_readme_url(benchmark_name):
+    dataset_name = benchmark_name.split(".")[0]
+    futures = []
+    with ThreadPoolExecutor(2) as executor:
+        for option in [dataset_name, dataset_name.replace("_", "-")]:
+            futures.append(executor.submit(get_readme_url, option))
+    for future in as_completed(futures):
+        exists, readme_url = future.result()
+        if exists:
+            return benchmark_name, readme_url
+    return benchmark_name, None
+
+
+@log_runtime
+def add_benchmark_readme_urls(results):
+    futures = []
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        for benchmark_name in results.keys():
+            futures.append(executor.submit(get_benchmark_readme_url, benchmark_name))
+    for future in as_completed(futures):
+        benchmark_name, readme_url = future.result()
+        results[benchmark_name]["readme_url"] = readme_url
 
 
 def get_all_benchmarks():
@@ -56,25 +86,10 @@ def get_all_benchmarks():
         card = row["card"]
         benchmark_name = ".".join(card.split(".")[2:-1])
         if benchmark_name not in results:
-            dataset_name = card.split(".")[2]
-            exists = folder_exists_in_github_repo(
-                "dmg-illc", "JUDGE-BENCH", f"data/{dataset_name}", "master"
-            )
-            readme_url = f"https://github.com/dmg-illc/JUDGE-BENCH/blob/master/data/{dataset_name}/README.md"
-            if not exists:
-                dataset_name = card.split(".")[2].replace("_", "-")
-                exists = folder_exists_in_github_repo(
-                    "dmg-illc", "JUDGE-BENCH", f"data/{dataset_name}", "master"
-                )
-                readme_url = f"https://github.com/dmg-illc/JUDGE-BENCH/blob/master/data/{dataset_name}/README.md"
-            if not exists:
-                readme_url = None
-
             benchmark_results = {
                 "name": benchmark_name,
                 "description": "",
                 "catalog_url": f"https://www.unitxt.ai/en/latest/catalog/catalog.{card}.html",
-                "readme_url": readme_url,
                 "type": EvaluatorTypeEnum.DIRECT,
                 "tags": [],
                 "criteria_benchmarks": {},
@@ -103,6 +118,8 @@ def get_all_benchmarks():
         if model not in criteria_benchmark["evaluator_benchmarks"]:
             model_results = {"name": model, "results": json.loads(row["results"])}
             criteria_benchmark["evaluator_benchmarks"][model] = model_results
+
+    add_benchmark_readme_urls(results)
 
     add_tag_to_result(results, "roscoe", "reasoning")
     add_tag_to_result(results, "wmt", "translation")
