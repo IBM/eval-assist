@@ -28,6 +28,7 @@ from unitxt.llm_as_judge import EvaluatorNameEnum, ModelProviderEnum
 
 from .const import (
     CUSTOM_MODELS_PATH,
+    EVAL_ASSIST_DIR,
     EXTENDED_EVALUATOR_TO_MODEL_ID,
     EXTENDED_EVALUATORS_METADATA,
     ExtendedEvaluatorMetadata,
@@ -490,3 +491,36 @@ def folder_exists_in_github_repo(owner, repo, folder_path, branch="main"):
         return isinstance(items, list)
     else:
         return False
+
+
+def get_system_version():
+    try:
+        # git is a dev dependency so import may fail
+        try:
+            import git
+        except ImportError as e:
+            logger.error(
+                "Make sure you installed evalassis's dev dependency with poetry install --with dev"
+            )
+            raise e
+        repo = git.repo.Repo(EVAL_ASSIST_DIR.parent.parent.parent)
+        version = repo.git.describe(tags=True)
+        source = "git"
+    except Exception:
+        try:
+            from importlib.metadata import version
+
+            version = version("evelassist")
+            source = "pypi"
+
+            if version == "0.0.0":
+                # version is 0.0.0 in the toml only when
+                # evalassist is executed using poetry
+                # and the .git folder is not present in the root directory
+                raise ValueError("Invalid version")
+        except Exception:
+            version = None
+            source = None
+            logging.warning("Could not get EvalAssist version")
+
+    return {"version": version, "source": source}

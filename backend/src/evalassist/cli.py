@@ -3,6 +3,7 @@ import logging
 import click
 import uvicorn
 from evalassist.const import UVICORN_WORKERS
+from evalassist.utils import get_system_version
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,8 @@ def serve(host: str, port: int, reload: bool):
 
 @cli.command()
 def version():
-    click.echo("EvalAssist v0.1.11")
+    version_info = get_system_version()
+    click.echo(f"EvalAssist {version_info['version']} (from {version_info['source']})")
 
 
 def main():

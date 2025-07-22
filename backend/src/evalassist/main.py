@@ -55,7 +55,6 @@ from .api.types import DomainEnum, PersonaEnum
 from .benchmark.benchmark import get_all_benchmarks
 from .const import (
     AUTHENTICATION_ENABLED,
-    EVAL_ASSIST_DIR,
     EXTENDED_EVALUATORS_METADATA,
     STATIC_DIR,
     STORAGE_ENABLED,
@@ -78,6 +77,7 @@ from .utils import (
     get_evaluator_metadata_wrapper,
     get_inference_engine,
     get_model_name_from_evaluator,
+    get_system_version,
     handle_llm_generation_exceptions,
     init_evaluator_name,
 )
@@ -597,36 +597,7 @@ def get_version():
     Returns:
         an object with version and source fields
     """
-    try:
-        # git is a dev dependency so import may fail
-        try:
-            import git
-        except ImportError as e:
-            logger.error(
-                "Make sure you installed evalassis's dev dependency with poetry install --with dev"
-            )
-            raise e
-        repo = git.repo.Repo(EVAL_ASSIST_DIR.parent.parent.parent)
-        version = repo.git.describe(tags=True)
-        source = "git"
-    except Exception:
-        try:
-            from importlib.metadata import version
-
-            version = version("evelassist")
-            source = "pypi"
-
-            if version == "0.0.0":
-                # version is 0.0.0 in the toml only when
-                # evalassist is executed using poetry
-                # and the .git folder is not present in the root directory
-                raise ValueError("Invalid version")
-        except Exception:
-            version = None
-            source = None
-            logging.warning("Could not get EvalAssist version")
-
-    return {"version": version, "source": source}
+    return get_system_version()
 
 
 @app.exception_handler(RequestValidationError)
