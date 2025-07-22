@@ -36,6 +36,7 @@ from .api.common import (
     CriteriaAPI,
     CriteriaOptionAPI,
     CriteriaWithOptionsAPI,
+    CustomModelRequest,
     DirectAIActionRequest,
     DirectAIActionResponse,
     DirectEvaluationRequestModel,
@@ -73,11 +74,11 @@ from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNot
 from .synthetic_example_generation.generate import DirectActionGenerator, Generator
 from .utils import (
     clean_object,
-    get_custom_models,
     get_evaluator_metadata_wrapper,
     get_inference_engine,
     get_model_name_from_evaluator,
     get_system_version,
+    get_system_custom_models,
     handle_llm_generation_exceptions,
     init_evaluator_name,
 )
@@ -146,7 +147,7 @@ def get_health() -> HealthCheck:
     "/feature-flags/",
     response_model=FeatureFlagsModel,
 )
-def get_feature_flags() -> HealthCheck:
+def get_feature_flags():
     return {
         "authentication_enabled": AUTHENTICATION_ENABLED,
         "storage_enabled": STORAGE_ENABLED,
@@ -154,19 +155,40 @@ def get_feature_flags() -> HealthCheck:
 
 
 @router.get("/evaluators/", response_model=EvaluatorsResponseModel)
-def get_evaluators():
+def get_evaluators(user_email: str, session: Session = Depends(get_session)):
     """Get the list of available pipelines, as supported by llm-as-a-judge library"""
     evaluators = [
         EvaluatorMetadataAPI(**e.__dict__) for e in EXTENDED_EVALUATORS_METADATA
     ]
-    custom_models = get_custom_models()
-    for custom_model in custom_models:
+    # Add custom models set by the system admin
+    system_custom_models = get_system_custom_models()
+    for custom_model in system_custom_models:
         evaluators.append(
             EvaluatorMetadataAPI(
                 name=custom_model["name"], providers=custom_model["providers"]
             )
         )
-    return EvaluatorsResponseModel(evaluators=evaluators)
+
+    statement = select(StoredTestCase).join(AppUser).where(AppUser.email == user_email)
+    test_cases = session.exec(statement).all()
+    return test_cases
+    # # Add custom models set by the user
+    # user = db.appuser.find_unique(where={"email": user_email})
+    # if user is not None:
+    #     user_custom_models = db.custommodel.find_many(where={"user_id": user.id})
+
+    # for custom_model in user_custom_models:
+    #     evaluators.append(
+    #         EvaluatorMetadataAPI(
+    #             name=custom_model.name, providers=[custom_model.provider]
+    #         )
+    #     )
+
+    # print("user")
+    # print(user)
+    # print("user_custom_models")
+    # print(user_custom_models)
+    # return EvaluatorsResponseModel(evaluators=evaluators)
 
 
 @router.get("/default-credentials/", response_model=dict[str, dict[str, str]])
@@ -250,9 +272,9 @@ def get_prompt(req: DirectEvaluationRequestModel):
     return res
 
 
-@router.post("/test-model/")
-async def test_model(req: TestModelRequestModel):
-    evaluator_name, custom_model_name = init_evaluator_name(req.evaluator_name)
+@router.post("/test-model-connection/")
+async def test_model_connection(req: TestModelRequestModel):
+    evaluator_name, custom_model_name = init_evaluator_name(req.model_name)
     model_name = get_model_name_from_evaluator(
         get_evaluator_metadata_wrapper(evaluator_name, custom_model_name),
         req.provider,
@@ -321,17 +343,17 @@ async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequest
     return run()
 
 
+# used to log varying user actions
+@router.post("/log_user_action/")
+def log_user_action():
+    pass
+
+
 @router.get("/test_case/")
 def get_test_cases(user: str, session: Session = Depends(get_session)):
     statement = select(StoredTestCase).join(AppUser).where(AppUser.email == user)
     test_cases = session.exec(statement).all()
     return test_cases
-
-
-# used to log varying user actions
-@router.post("/log_user_action/")
-def log_user_action():
-    pass
 
 
 @router.get("/test_case/{test_case_id}/")
@@ -530,8 +552,28 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
 @router.get(
     "/domains-and-personas/", response_model=dict[DomainEnum, list[PersonaEnum]]
 )
-def get_domain_persona_map():
+def get_domain_persona_map(req: CustomModelRequest):
     return domain_persona_map
+
+
+# @router.post("/custom-model/")
+# def add_custom_model(req: CustomModelRequest):
+#     user = db.appuser.find_unique(where={"email": req.user_email})
+#     try:
+#         res = db.custommodel.create(
+#             data={
+#                 "name": req.model,
+#                 "provider": req.provider,
+#                 "user_id": user.id,
+#             }
+#         )
+#         return res.id
+
+#     except Exception as e:
+#         root_pkg_logger.error(f"Error creating custom model: {e}")
+#         raise HTTPException(
+#             status_code=500, detail=f"Error creating custom model: {str(e)}"
+#         )
 
 
 @router.post("/direct-ai-action/", response_model=DirectAIActionResponse)

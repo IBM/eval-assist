@@ -7,10 +7,10 @@ from evalassist.utils import (
     clean_object,
     convert_model_name_wx_to_hf,
     fill_unknown_template,
-    get_custom_models,
     get_default_torch_device,
     get_enum_by_value,
     get_inference_engine,
+    get_system_custom_models,
     handle_exception,
 )
 from unitxt.inference import CrossProviderInferenceEngine, WMLInferenceEngineGeneration
@@ -35,12 +35,12 @@ def test_get_custom_models():
             "builtins.open", new_callable=mock_open, read_data='{"model1": "path1"}'
         ):
             mock_exists.return_value = True
-            assert get_custom_models() == {"model1": "path1"}
+            assert get_system_custom_models() == {"model1": "path1"}
 
     # Test when file does not exist
     with patch("os.path.exists") as mock_exists:
         mock_exists.return_value = False
-        assert get_custom_models() == []
+        assert get_system_custom_models() == []
 
 
 def test_convert_model_name_wx_to_hf():

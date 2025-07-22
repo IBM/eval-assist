@@ -1,6 +1,8 @@
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 
+import { AddCustomModel } from './AddCustomModel'
+import { AddCustomModelModal } from './Modals/AddCustomModelModal'
 import { ChooseCodeGenerationType } from './Modals/ChooseCodeGenerationType'
 import { DeleteTestCaseModal } from './Modals/DeleteTestCaseModal'
 import { EditPairwiseResponseName } from './Modals/EditPairwiseResponseName'
@@ -40,6 +42,8 @@ export const Modals = () => {
     setmodelProviderCrendentialsModalOpen,
     editPairwiseResponseNameModalOpen,
     setEditPairwiseResponseNameModalOpen,
+    addCustomModelModalOpen,
+    setAddCustomModelModalOpen,
   } = useModalsContext()
 
   const { showingTestCase } = useCurrentTestCase()
@@ -74,6 +78,7 @@ export const Modals = () => {
             open={editPairwiseResponseNameModalOpen}
             setOpen={setEditPairwiseResponseNameModalOpen}
           />
+          <AddCustomModelModal open={addCustomModelModalOpen} setOpen={setAddCustomModelModalOpen} />
         </>
       )}
     </>

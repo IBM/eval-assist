@@ -55,7 +55,7 @@ def fill_unknown_template(template: str, value: str) -> str:
     return template
 
 
-def get_custom_models():
+def get_system_custom_models():
     if os.path.exists(CUSTOM_MODELS_PATH):
         with open(CUSTOM_MODELS_PATH, "r", encoding="utf-8") as file:
             try:
@@ -308,11 +308,11 @@ def get_evaluator_metadata_wrapper(
             )
         return evaluator_search[0]
     else:
-        custom_models = get_custom_models()
-        if custom_model_name not in [
-            custom_model["name"] for custom_model in custom_models
-        ]:
-            raise ValueError("The specified custom model was not found")
+        custom_models = get_system_custom_models()
+        # if custom_model_name not in [
+        #     custom_model["name"] for custom_model in custom_models
+        # ]:
+        #     raise ValueError("The specified custom model was not found")
 
         custom_model = [
             custom_model

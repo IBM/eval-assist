@@ -9,13 +9,15 @@ import { Add, Password, WarningFilled } from '@carbon/react/icons'
 
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
+import { useTestModelConnection } from '@customHooks/useTestModelConnection'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
 
-import { Evaluator } from '../../types'
+import { Evaluator, ModelProviderType } from '../../types'
+import { AddCustomModel } from './AddCustomModel'
 import { AppSidenavNew } from './AppSidenav'
 import { ConnectionTest } from './ConnectionTest'
 import { CriteriaView } from './CriteriaView'
@@ -189,6 +191,7 @@ export const SingleExampleEvaluation = () => {
                   </>
                 }
               />
+              <AddCustomModel />
             </div>
             <div style={{ marginBottom: '1rem' }} className={classes['left-padding']}>
               <strong>Test data</strong>
