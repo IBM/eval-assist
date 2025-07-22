@@ -63,6 +63,7 @@ export const NewTestCaseModal = ({ open, setOpen }: Props) => {
   const resetStatus = () => {
     setOpen(false)
     setSelectedType(null)
+    setSelectedCriteria(null)
   }
 
   const sortedCriterias = useMemo(() => {
