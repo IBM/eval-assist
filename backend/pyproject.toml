@@ -56,7 +56,7 @@ dependencies = [
     "openai",
     "pandas",
     "ibm_watsonx_ai",
-    "unitxt==1.26.3",
+    "unitxt>=1.26.4",
     "nbconvert",
     "boto3",
     "ollama",
