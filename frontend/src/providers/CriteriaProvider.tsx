@@ -100,6 +100,12 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
       if (criteria) {
         const aux = { ...criteria }
         aux.name = capitalizeFirstWord(criteria.name)
+        if (!aux.contextFields) {
+          aux.contextFields = ['Context']
+        }
+        if (!aux.predictionField) {
+          aux.predictionField = 'Response'
+        }
         return aux
       }
       return null
@@ -109,16 +115,18 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
 
   const getEmptyTestCaseWithCriteria = useCallback(
     (criteriaName: string, type: EvaluationType): TestCase => {
+      console.log('getEmptyTestCaseWithCriteria')
       const criteria = getCriteria(criteriaName, type) || getEmptyCriteriaByType(type)
+      const contextFields = criteria.contextFields
       return {
         ...getEmptyTestCase(type),
         criteria,
-        contextVariableNames: criteria.contextFields,
+        contextVariableNames: contextFields,
         responseVariableName: criteria.predictionField,
         instances: returnByPipelineType(
           type,
-          [getEmptyDirectInstance(criteria.contextFields)],
-          [getEmptyPairwiseInstance(criteria.contextFields)],
+          [getEmptyDirectInstance(contextFields)],
+          [getEmptyPairwiseInstance(contextFields, 2)],
         ),
       }
     },

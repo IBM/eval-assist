@@ -33,9 +33,15 @@ export const isInstanceOfCriteriaWithOptions = (obj: any): obj is CriteriaWithOp
 export const isInstanceOfCriteria = (obj: any): obj is Criteria =>
   typeof obj.name === 'string' && typeof obj.description === 'string'
 
-export const getEmptyCriteriaWithTwoOptions = (): CriteriaWithOptions => ({
+export const getEmptyCriteria = (): Criteria => ({
   name: '',
   description: '',
+  predictionField: 'Response',
+  contextFields: ['Context'],
+})
+
+export const getEmptyCriteriaWithTwoOptions = (): CriteriaWithOptions => ({
+  ...getEmptyCriteria(),
   options: [
     {
       name: '',
@@ -46,56 +52,57 @@ export const getEmptyCriteriaWithTwoOptions = (): CriteriaWithOptions => ({
       description: '',
     },
   ],
-  predictionField: 'Response',
-  contextFields: ['Context'],
-})
-
-export const getEmptyCriteria = (): Criteria => ({
-  name: '',
-  description: '',
-  predictionField: 'Response',
-  contextFields: ['Context'],
 })
 
 export const getEmptyCriteriaByType = (type: EvaluationType): CriteriaWithOptions | Criteria =>
   type === EvaluationType.DIRECT ? getEmptyCriteriaWithTwoOptions() : getEmptyCriteria()
 
-export const getEmptyInstance = (contextVariableNames: string[] = ['context']): Instance => ({
-  contextVariables: contextVariableNames.map((cvn) => ({ name: cvn, value: '' })),
-  expectedResult: '',
-  result: null,
-  id: generateId(),
-})
+export const getEmptyInstance = (contextVariableNames: string[]): Instance => {
+  return {
+    contextVariables: contextVariableNames.map((cvn) => ({ name: cvn, value: '' })),
+    expectedResult: '',
+    result: null,
+    id: generateId(),
+  }
+}
 
-export const getEmptyPairwiseInstance = (contextVariableNames?: string[]): PairwiseInstance => ({
-  ...getEmptyInstance(contextVariableNames),
-  responses: ['', ''],
-})
-export const getEmptyDirectInstance = (contextVariableNames?: string[]): DirectInstance => ({
+export const getEmptyPairwiseInstance = (contextVariableNames: string[], systemCount: number): PairwiseInstance => {
+  return {
+    ...getEmptyInstance(contextVariableNames),
+    responses: new Array(systemCount).fill(''),
+  }
+}
+export const getEmptyDirectInstance = (contextVariableNames: string[]): DirectInstance => ({
   ...getEmptyInstance(contextVariableNames),
   response: '',
-  result: null,
 })
 
-export const getEmptyTestCase = (type: EvaluationType): TestCase => ({
-  id: null,
-  name: '',
-  type,
-  instances: returnByPipelineType(type, [getEmptyDirectInstance()], [getEmptyPairwiseInstance()]),
-  criteria: getEmptyCriteriaWithTwoOptions(),
-  evaluator: null,
-  contextVariableNames: ['Context'],
-  responseVariableName: 'Response',
-  syntheticGenerationConfig: {
-    task: null,
-    domain: null,
-    persona: null,
-    generationLength: null,
+export const getEmptyTestCase = (type: EvaluationType, criteria?: Criteria): TestCase => {
+  const c = criteria ?? returnByPipelineType(type, getEmptyCriteriaWithTwoOptions, getEmptyCriteria)
+  return {
+    id: null,
+    name: '',
+    type,
+    instances: returnByPipelineType(
+      type,
+      [getEmptyDirectInstance(c.contextFields)],
+      [getEmptyPairwiseInstance(c.contextFields, 2)],
+    ),
+    criteria: criteria ?? returnByPipelineType(type, getEmptyCriteriaWithTwoOptions, getEmptyCriteria),
     evaluator: null,
-    perCriteriaOptionCount: null,
-    borderlineCount: null,
-  },
-})
+    contextVariableNames: c.contextFields,
+    responseVariableName: c.predictionField,
+    syntheticGenerationConfig: {
+      task: null,
+      domain: null,
+      persona: null,
+      generationLength: null,
+      evaluator: null,
+      perCriteriaOptionCount: null,
+      borderlineCount: null,
+    },
+  }
+}
 
 export const getEmptyExpectedResults = (count: number) => {
   return new Array(count).fill(null).map((_) => '')
@@ -103,11 +110,11 @@ export const getEmptyExpectedResults = (count: number) => {
 
 export const returnByPipelineType = <T = any, S = any>(
   type: EvaluationType,
-  returnIfRubric: T | (() => T),
+  returnIfDirect: T | (() => T),
   returnIfPairwise: S | (() => S),
 ): T | S => {
   if (EvaluationType.DIRECT === type) {
-    return typeof returnIfRubric === 'function' ? (returnIfRubric as () => T)() : returnIfRubric
+    return typeof returnIfDirect === 'function' ? (returnIfDirect as () => T)() : returnIfDirect
   } else if (EvaluationType.PAIRWISE == type) {
     return typeof returnIfPairwise === 'function' ? (returnIfPairwise as () => S)() : returnIfPairwise
   } else {
