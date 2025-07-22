@@ -510,7 +510,7 @@ def get_system_version():
         try:
             from importlib.metadata import version
 
-            version = version("evelassist")
+            version = version("evalassist")
             source = "pypi"
 
             if version == "0.0.0":
