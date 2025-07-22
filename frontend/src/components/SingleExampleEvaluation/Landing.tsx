@@ -24,11 +24,12 @@ export const Landing = ({}: Props) => {
   const { sidebarTabSelected, setSidebarTabSelected } = useAppSidebarContext()
   const { setNewTestCaseModalOpen } = useModalsContext()
   const { updateURLFromTestCase } = useCurrentTestCase()
-  const createEmptyRubric = () => {
+
+  const createEmptyDirectTestCase = () => {
     updateURLFromTestCase({ testCase: getEmptyTestCase(EvaluationType.DIRECT), subCatalogName: null })
   }
 
-  const createEmptyPairwise = () => {
+  const createEmptyPairwiseTestCase = () => {
     updateURLFromTestCase({ testCase: getEmptyTestCase(EvaluationType.PAIRWISE), subCatalogName: null })
   }
 
@@ -82,9 +83,9 @@ export const Landing = ({}: Props) => {
           title={DIRECT_NAME}
           description={'Select an answer based on the criteria for the question'}
           imageSrc="rubric_helper"
-          onClick={createEmptyRubric}
+          onClick={createEmptyDirectTestCase}
           actionButton={
-            <Button renderIcon={ArrowRight} kind="ghost" onClick={createEmptyRubric}>
+            <Button renderIcon={ArrowRight} kind="ghost" onClick={createEmptyDirectTestCase}>
               {'Try it'}
             </Button>
           }
@@ -96,9 +97,9 @@ export const Landing = ({}: Props) => {
           title={PAIRWISE_NAME}
           description={'Compare to choose the which response is better'}
           imageSrc="pairwise_helper"
-          onClick={createEmptyPairwise}
+          onClick={createEmptyPairwiseTestCase}
           actionButton={
-            <Button renderIcon={ArrowRight} kind="ghost" onClick={createEmptyPairwise}>
+            <Button renderIcon={ArrowRight} kind="ghost" onClick={createEmptyPairwiseTestCase}>
               {'Try it'}
             </Button>
           }

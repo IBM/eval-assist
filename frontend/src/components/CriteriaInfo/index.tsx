@@ -43,24 +43,28 @@ export const CriteriaInfo = ({ criteria, includeName = true }: Props) => {
         </div>
       )}
 
-      <div className={classes.tagsSection}>
-        <p>
-          <strong>{'Response variable: '}</strong>
-        </p>
-        <EditableTag value={criteria.predictionField} color={'blue'} isEditable={false} />
-      </div>
-      <div className={classes.tagsSection}>
-        <p>
-          <strong>{'Context variables:'}&nbsp;</strong>
-        </p>
-        {criteria.contextFields.length ? (
-          criteria.contextFields.map((contextField, i) => (
-            <EditableTag value={contextField} color={'purple'} isEditable={false} key={i} />
-          ))
-        ) : (
-          <p>{'No context fields required for this criteria'}</p>
-        )}
-      </div>
+      {criteria.predictionField && (
+        <div className={classes.tagsSection}>
+          <p>
+            <strong>{'Response variable: '}</strong>
+          </p>
+          <EditableTag value={criteria.predictionField} color={'blue'} isEditable={false} />
+        </div>
+      )}
+      {criteria.contextFields && (
+        <div className={classes.tagsSection}>
+          <p>
+            <strong>{'Context variables:'}&nbsp;</strong>
+          </p>
+          {criteria.contextFields.length ? (
+            criteria.contextFields.map((contextField, i) => (
+              <EditableTag value={contextField} color={'purple'} isEditable={false} key={i} />
+            ))
+          ) : (
+            <p>{'No context fields required for this criteria'}</p>
+          )}
+        </div>
+      )}
     </div>
   )
 }
