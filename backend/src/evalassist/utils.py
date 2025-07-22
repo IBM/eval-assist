@@ -500,7 +500,7 @@ def get_system_version():
             import git
         except ImportError as e:
             logger.error(
-                "Make sure you installed evalassis's dev dependency with poetry install --with dev"
+                "Make sure you installed EvalAssist's dev dependencies with poetry install --with dev"
             )
             raise e
         repo = git.repo.Repo(EVAL_ASSIST_DIR.parent.parent.parent)
@@ -518,9 +518,10 @@ def get_system_version():
                 # evalassist is executed using poetry
                 # and the .git folder is not present in the root directory
                 raise ValueError("Invalid version")
-        except Exception:
+        except Exception as e:
             version = None
             source = None
+            print(e)
             logging.warning("Could not get EvalAssist version")
 
     return {"version": version, "source": source}

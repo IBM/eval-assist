@@ -32,7 +32,7 @@ exhibiting the use of LLM-as-a-judge across a variety of scenarios. Users can sa
 
 ## How to Install
 
-EvalAssist can be installed using various package managers. Before proceeding, ensure you're using **Python >= 3.10, <3.14** to avoid compatibility issues.
+EvalAssist can be installed using various package managers. Before proceeding, ensure you're using **Python >= 3.10, <3.14** to avoid compatibility issues. Make sure to set `DATA_DIR` to avoid data loss (i.e. `export DATA_DIR="~/.eval_assist"`).
 
 ### Installation via pip
 
