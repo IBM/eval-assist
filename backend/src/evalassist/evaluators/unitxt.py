@@ -36,7 +36,7 @@ from ..utils import (
 )
 
 
-class Evaluator(ABC):
+class UnitxtEvaluator(ABC):
     evaluator_type: EvaluatorTypeEnum
 
     def __init__(
@@ -123,7 +123,7 @@ class Evaluator(ABC):
         return results
 
 
-class DirectAssessmentEvaluator(Evaluator):
+class DirectAssessmentEvaluator(UnitxtEvaluator):
     def __init__(
         self,
         evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
@@ -167,7 +167,7 @@ class DirectAssessmentEvaluator(Evaluator):
         return results
 
 
-class PairwiseComparisonEvaluator(Evaluator):
+class PairwiseComparisonEvaluator(UnitxtEvaluator):
     def __init__(
         self,
         evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,

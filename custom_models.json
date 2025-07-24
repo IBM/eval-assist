@@ -1,0 +1,19 @@
+[
+    {
+        "name": "AAAAA",
+        "path": "mistral-small-instruct",
+        "providers": [
+            "rits"
+        ],
+        "custom_params": {
+            "credentials": {
+                "url": "https://us-south.ml.cloud.ibm.com",
+                "apikey": "",
+                "project_id": "",
+                "space_id": ""
+            },
+            "temperature": 0,
+            "use_cache": false
+        }
+    }
+]

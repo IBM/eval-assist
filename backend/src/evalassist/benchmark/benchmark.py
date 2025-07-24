@@ -2,12 +2,14 @@ import json
 import logging
 import math
 import os
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import cycle
 from typing import cast
 
 import pandas as pd
+from evalassist.api.common import Instance
 from evalassist.const import EVAL_ASSIST_DIR
+from evalassist.evaluators.experimental import ExperimentalDirectJudge
 from evalassist.utils import folder_exists_in_github_repo, log_runtime
 from scipy.stats import pearsonr
 from unitxt.api import evaluate, load_dataset
@@ -19,18 +21,19 @@ from unitxt.settings_utils import get_constants
 RESULTS_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "benchmark_results.csv"
 INSPECT_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "to_inspect.csv"
 MAX_WORKERS = 10
-BATCH_SIZE = 25
+BATCH_SIZE = 50
 RITS_API_KEYS = [None]
 # List of models to benchmark
 MODELS = [
-    "llama-3-3-70b-instruct",
-    "llama-4-scout",
+    # "llama-3-3-70b-instruct",
+    # "llama-4-scout",
     "llama-4-maverick",
-    "granite-3-3-8b-instruct",
-    "deepseek-v3",
-    "phi-4",
-    "mistral-small-instruct",
+    # "granite-3-3-8b-instruct",
+    # "deepseek-v3",
+    # "phi-4",
+    # "mistral-small-instruct",
 ]
+INSTANCES_PER_DATASET = 50
 
 logger = logging.getLogger(__name__)
 
@@ -115,9 +118,15 @@ def get_all_benchmarks():
             criteria_benchmark_name
         ]
         model = row["model"]
-        if model not in criteria_benchmark["evaluator_benchmarks"]:
-            model_results = {"name": model, "results": json.loads(row["results"])}
-            criteria_benchmark["evaluator_benchmarks"][model] = model_results
+        annotation = row["annotation"]
+        model_annotation = f"{model}_{annotation}"
+        if model_annotation not in criteria_benchmark["evaluator_benchmarks"]:
+            model_results = {
+                "name": model,
+                "annotation": annotation,
+                "results": json.loads(row["results"]),
+            }
+            criteria_benchmark["evaluator_benchmarks"][model_annotation] = model_results
 
     add_benchmark_readme_urls(results)
 
@@ -151,6 +160,88 @@ def get_judgebench_cards():
                 judgebench_cards.append(f"cards.judge_bench.{dotted_path}")
 
     return judgebench_cards
+
+
+def run_single_model_card_experimental(card: str, dataset, model: str, api_key: str):
+    """
+    Runs a single benchmark card with the specified model and API key.
+
+    Args:
+        card (str): The name of the benchmark card to run.
+        dataset: The dataset to use for benchmarking.
+        model (str): The name of the model to use for benchmarking.
+        api_key (str): The API key to use for the model.
+
+    Returns:
+        tuple: A tuple containing the benchmark result and inspection rows.
+    """
+    print("Running card:", card, "with model:", model)
+    criteria: CriteriaWithOptions = cast(
+        CriteriaWithOptions,
+        fetch_artifact(json.loads(dataset[0]["task_data"])["criteria"])[0],
+    )
+    judge = ExperimentalDirectJudge(
+        inference_engine=CrossProviderInferenceEngine(
+            model=model,
+            provider="rits",
+            temperature=0,
+            max_tokens=1024,
+            cache_batch_size=BATCH_SIZE * 2,
+            credentials={"api_key": api_key} if api_key else None,
+            data_classification_policy=["public"],
+        ),
+        criteria=criteria,
+    )
+    task_data_list = [json.loads(d["task_data"]) for d in dataset]
+
+    parsed_dataset = [
+        Instance(
+            context_variables={k: task_data[k] for k in criteria.context_fields},
+            response=task_data[criteria.prediction_field],
+            response_variable_name=criteria.prediction_field,
+            metadata=None,
+            expected_result="",
+            id="",
+        )
+        for task_data in task_data_list
+    ]
+
+    predictions = judge.evaluate(parsed_dataset)
+    prediction_scores = [criteria.option_map[p] for p in predictions]
+    # Extract the criteria name from the first prediction
+
+    positional_bias_rate = None
+
+    results = evaluate(predictions=prediction_scores, data=dataset)
+
+    # Extract metric names from the evaluation results
+    metric_names = [m.split(".")[1] for m in results[0]["metrics"]]
+
+    # Parse the evaluation results into a dictionary
+    parsed_results: dict[str, float | None] = {
+        metric_name: float(
+            results.global_scores[
+                metric_name if metric_name != "spearman" else "spearmanr"
+            ]
+        )
+        for metric_name in metric_names
+    }
+    parsed_results["positional_bias_rate"] = positional_bias_rate
+    parsed_results["corr_reponse_length/accuracy"] = None
+    parsed_results["corr_context_length/accuracy"] = None
+    parsed_results["corr_response_length/pos_bias"] = None
+    parsed_results["corr_context_length/pos_bias"] = None
+
+    benchmark_result = {
+        "card": card,
+        "model": model,
+        "provider": "rits",
+        "annotation": "experimental",
+        "criteria": criteria.name,
+        "results": json.dumps(parsed_results),
+    }
+
+    return benchmark_result, None
 
 
 def run_single_model_card(card: str, dataset, model: str, api_key: str):
@@ -342,6 +433,7 @@ def run_single_model_card(card: str, dataset, model: str, api_key: str):
             "card": card,
             "model": model,
             "provider": "rits",
+            "annotation": "1.26.4",
             "criteria": criteria_name,
             "results": json.dumps(parsed_results),
         }
@@ -372,7 +464,7 @@ def run_benchmarks():
     except Exception:
         # Initialize an empty DataFrame if the CSV doesn't exist
         ran_results_df = pd.DataFrame(
-            columns=["card", "model", "criteria", "results", "provider"]
+            columns=["card", "model", "criteria", "results", "provider", "annotation"]
         )
 
     try:
@@ -395,29 +487,63 @@ def run_benchmarks():
 
     # Get a list of previously run card-model pairs
     ran_cards_models = [
-        (card, model)
-        for card, model in zip(
-            ran_results_df["card"].to_list(), ran_results_df["model"].to_list()
+        (card, model, annotation)
+        for card, model, annotation in zip(
+            ran_results_df["card"].to_list(),
+            ran_results_df["model"].to_list(),
+            ran_results_df["annotation"].to_list(),
         )
     ]
 
     # Create a process pool executor with the specified maximum workers
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         futures = []
         for card in get_judgebench_cards():
             # Load the dataset for the current card
             dataset = load_dataset(
-                card=card, split="test", loader_limit=200, use_cache=True
+                card=card,
+                split="test",
+                loader_limit=INSTANCES_PER_DATASET,
+                use_cache=True,
             )
             for model in MODELS:
                 # Skip if the benchmark has already been run
-                if (card, model) in ran_cards_models:
-                    print(f"Benchmark {card}/{model} already run")
-                    continue
+                if (card, model, "1.26.4") not in ran_cards_models:
+                    # Submit the task to the executor
+                    futures.append(
+                        executor.submit(
+                            run_single_model_card,
+                            card,
+                            dataset,
+                            model,
+                            next(api_key_cycle),
+                        )
+                    )
+                else:
+                    print(f"Benchmark {card}/{model}/1.26.4 already run")
+
+                if (card, model, "experimental") not in ran_cards_models:
+                    # Submit the task to the executor
+                    futures.append(
+                        executor.submit(
+                            run_single_model_card_experimental,
+                            card,
+                            dataset,
+                            model,
+                            next(api_key_cycle),
+                        )
+                    )
+                else:
+                    print(f"Benchmark {card}/{model}/experimental already run")
+
                 # Submit the task to the executor
                 futures.append(
                     executor.submit(
-                        run_single_model_card, card, dataset, model, next(api_key_cycle)
+                        run_single_model_card_experimental,
+                        card,
+                        dataset,
+                        model,
+                        next(api_key_cycle),
                     )
                 )
 

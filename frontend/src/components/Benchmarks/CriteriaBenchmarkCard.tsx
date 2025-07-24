@@ -147,7 +147,9 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
                 {displayedEvaluators.map((evaluatorBenchmark, i) => (
                   <TableRow key={i}>
                     {/* <TableCell>{`${evaluatorBenchmark.evaluator_id} (v${evaluatorBenchmark.laaj_version})`}</TableCell> */}
-                    <TableCell>{toTitleCase(evaluatorBenchmark.name)}</TableCell>
+                    <TableCell>
+                      {toTitleCase(`${evaluatorBenchmark.name} (${evaluatorBenchmark.annotation})`)}
+                    </TableCell>
                     {benchmarkMetrics.map((metric) => (
                       <TableCell
                         key={metric}
