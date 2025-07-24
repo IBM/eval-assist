@@ -6,7 +6,7 @@ import re
 import time
 import traceback
 from enum import Enum
-from typing import Optional
+from typing import Optional, Type
 
 import requests
 from botocore.exceptions import NoCredentialsError
@@ -21,6 +21,7 @@ from openai import AuthenticationError, NotFoundError
 from unitxt.inference import (
     CrossProviderInferenceEngine,
     HFAutoModelInferenceEngine,
+    LiteLLMInferenceEngine,
     WMLInferenceEngineChat,
     WMLInferenceEngineGeneration,
 )
@@ -112,9 +113,10 @@ def get_cross_inference_engine_params(
         "max_tokens": 1024,
         "seed": 42,
         "credentials": credentials.copy(),
+        "provider": provider,
     }
     if provider == ModelProviderEnum.WATSONX:
-        provider_specific_args[ModelProviderEnum.WATSONX] = {
+        provider_specific_args[ModelProviderEnum.WATSONX.value] = {
             "max_requests_per_second": 7
         }
 
@@ -125,6 +127,25 @@ def get_cross_inference_engine_params(
         inference_engine_params["credentials"]["api_base"] = fill_unknown_template(
             credentials["api_base"], model_name
         )
+
+    is_model_supported_by_cross_inference = (
+        provider.value in CrossProviderInferenceEngine.provider_model_map
+        and model_name
+        in CrossProviderInferenceEngine.provider_model_map[provider.value]
+    )
+    cross_inference_litellm_keys = [
+        provider
+        for provider, klass in CrossProviderInferenceEngine._provider_to_base_class.items()
+        if klass == LiteLLMInferenceEngine
+    ]
+    if (
+        not is_model_supported_by_cross_inference
+        and provider.value in cross_inference_litellm_keys
+        and not model_name.startswith(provider.value)
+    ):
+        # LiteLLM expects the model_name to start with the provider
+        # If the user provided a custom model_name that uses litellm, adapt it to start with the provider
+        model_name = provider.value + "/" + model_name
 
     elif provider == ExtendedModelProviderEnum.OPENAI_LIKE:
         provider = ModelProviderEnum.OPENAI
@@ -240,7 +261,9 @@ def get_inference_engine(
     if provider == ExtendedModelProviderEnum.LOCAL_HF:
         return get_hf_inference_engine(model_name, custom_params)
     if provider == ModelProviderEnum.WATSONX and (
-        "granite-guardian" in model_name or "space_id" in credentials
+        "granite-guardian" in model_name
+        or "space_id" in credentials
+        and credentials["space_id"]
     ):
         use_chat = "granite-guardian" not in model_name  # uses probs
         return get_watsonx_inference_engine(
@@ -261,6 +284,10 @@ def get_model_name_from_evaluator(
         if evaluator_metadata.custom_model_path is not None
         else model_name
     )
+
+
+def get_enum_values(e: Type[Enum]):
+    return [member.value for member in e]
 
 
 def get_evaluator_metadata_wrapper(
@@ -292,16 +319,22 @@ def get_evaluator_metadata_wrapper(
             for custom_model in custom_models
             if custom_model["name"] == custom_model_name
         ][0]
+        providers: list[ModelProviderEnum | ExtendedModelProviderEnum] = []
+        for p in providers:
+            try:
+                providers.append(
+                    ExtendedModelProviderEnum(p)
+                    if get_enum_values(ExtendedModelProviderEnum)
+                    else ModelProviderEnum(p)
+                )
+            except Exception as e:
+                print(e)
+
         return ExtendedEvaluatorMetadata(
             name=evaluator_name,
             custom_model_name=custom_model["name"],
             custom_model_path=custom_model["path"],
-            providers=[
-                ExtendedModelProviderEnum(p)
-                if p in ExtendedModelProviderEnum
-                else ModelProviderEnum(p)
-                for p in custom_model["providers"]
-            ],
+            providers=providers,
         )
 
 

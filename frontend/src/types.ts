@@ -180,11 +180,13 @@ export interface Dataset {
 
 export interface FetchedEvaluatorBenchmark {
   name: string // should be different from model_id, maybe add library version?
+  annotation: string
   results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
 }
 
 export interface EvaluatorBenchmark {
   name: string // should be different from model_id, maybe add library version?
+  annotation: string
   results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
 }
 
