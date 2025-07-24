@@ -63,7 +63,7 @@ class ExtendedEvaluatorMetadata(EvaluatorMetadata):
     def __init__(
         self,
         name,
-        providers: ModelProviderEnum | ExtendedModelProviderEnum,
+        providers: list[ModelProviderEnum | ExtendedModelProviderEnum],
         custom_model_name: Optional[str] = None,
         custom_model_path: Optional[str] = None,
     ):
