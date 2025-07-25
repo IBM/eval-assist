@@ -11,7 +11,6 @@ import { Evaluator } from '@types'
 import classes from './ConnectionTest.module.scss'
 
 interface Props {
-  model: Evaluator
 }
 
 export const ConnectionTest = ({ model }: Props) => {
