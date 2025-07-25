@@ -228,7 +228,7 @@ export const TestDataTableRow = ({
                   id="text-area-model-output"
                   onChange={(e) => setContextVariableValue(e.target.value, i)}
                   labelText={''}
-                  placeholder={`The ${contextVariable.name}`}
+                  placeholder={contextVariable.name ? `The ${contextVariable.name}` : 'Context'}
                   key={i}
                   onFocus={setActive}
                   onBlur={setInactive}
