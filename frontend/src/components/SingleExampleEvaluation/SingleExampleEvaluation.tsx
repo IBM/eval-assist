@@ -151,7 +151,7 @@ export const SingleExampleEvaluation = () => {
                     >
                       {'How do evaluators work?'}
                     </Link>
-                    <ConnectionTest model={currentTestCase.evaluator!} />
+                    <ConnectionTest model={currentTestCase.evaluator} />
                   </>
                 }
               />
@@ -183,7 +183,7 @@ export const SingleExampleEvaluation = () => {
                       target="_blank"
                       href="https://github.com/IBM/eval-assist/wiki#refining-criteria-with-synthetic-data"
                     >
-                      {'Why is synthetic generation?'}
+                      {'What is synthetic generation?'}
                     </Link>
                     <ConnectionTest model={currentTestCase.syntheticGenerationConfig.evaluator!} />
                   </>

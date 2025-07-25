@@ -11,6 +11,7 @@ import { Evaluator } from '@types'
 import classes from './ConnectionTest.module.scss'
 
 interface Props {
+  model: Evaluator | null
 }
 
 export const ConnectionTest = ({ model }: Props) => {
@@ -21,6 +22,7 @@ export const ConnectionTest = ({ model }: Props) => {
   const { post } = useFetchUtils()
 
   const testModelConnection = useCallback(async () => {
+    if (!model) return
     setTestingModelConnection(true)
     const response = await post('test-model/', {
       provider: model.provider,
@@ -41,7 +43,7 @@ export const ConnectionTest = ({ model }: Props) => {
   }, [model, getProviderCredentialsWithDefaults, post])
 
   return !testingModelConnection && !showingTestingModelConnectionSuccess ? (
-    <Link style={{ cursor: 'pointer' }} renderIcon={ConnectionSignal} onClick={testModelConnection}>
+    <Link disabled={!model} style={{ cursor: 'pointer' }} renderIcon={ConnectionSignal} onClick={testModelConnection}>
       {'Test connection'}
     </Link>
   ) : testingModelConnection ? (
