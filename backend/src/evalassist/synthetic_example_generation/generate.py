@@ -349,7 +349,10 @@ class Generator:
                 "use_cache": False,
                 "seed": None,
                 "max_tokens": 1200,
-                "temperature": 1,
+                "temperature": 1.0,
+                "top_p": 0.9,
+                "frequency_penalty": 1.0,
+                "presence_penalty": 1.5,
             },
         )
 
