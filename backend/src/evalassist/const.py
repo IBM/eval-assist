@@ -212,3 +212,10 @@ root_pkg_logger.debug(f"STORAGE_ENABLED: {STORAGE_ENABLED}")
 root_pkg_logger.debug(f"AUTHENTICATION_ENABLED: {AUTHENTICATION_ENABLED}")
 root_pkg_logger.debug(f"UVICORN_WORKERS: {UVICORN_WORKERS}")
 root_pkg_logger.debug(f"CUSTOM_MODELS_PATH: {CUSTOM_MODELS_PATH}")
+
+
+UNITXT_JUDGE_PARAMS = {
+    "use_cache": UNITXT_CACHE_ENABLED,
+    "seed": 42,
+    "temperature": 0,
+}
