@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Literal
 
 import nbformat as nbf
+from evalassist.const import UNITXT_JUDGE_PARAMS
 
 from .api.common import NotebookParams
 from .utils import get_cross_inference_engine_params
@@ -24,6 +25,7 @@ class EvaluationNotebookGenerator(ABC):
             credentials=params.credentials,
             provider=params.provider,
             model_name=params.model_name,
+            custom_params=UNITXT_JUDGE_PARAMS,
         )
         self.input_fields = {k: "str" for k in params.context_variables[0].keys()}
         self.context_fields = list(params.context_variables[0].keys())

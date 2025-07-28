@@ -25,7 +25,7 @@ from ..api.common import (
     PairwiseResultModel,
 )
 from ..const import (
-    UNITXT_CACHE_ENABLED,
+    UNITXT_JUDGE_PARAMS,
     ExtendedEvaluatorNameEnum,
     ExtendedModelProviderEnum,
 )
@@ -79,11 +79,7 @@ class Evaluator(ABC):
             credentials,
             provider,
             model_name,
-            custom_params={
-                "use_cache": UNITXT_CACHE_ENABLED,
-                "seed": 42,
-                "temperature": 0,
-            },
+            custom_params=UNITXT_JUDGE_PARAMS,
         )
 
         context_variables_list = [instance.context_variables for instance in instances]
