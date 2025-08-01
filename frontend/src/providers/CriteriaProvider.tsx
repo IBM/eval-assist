@@ -115,7 +115,6 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
 
   const getEmptyTestCaseWithCriteria = useCallback(
     (criteriaName: string, type: EvaluationType): TestCase => {
-      console.log('getEmptyTestCaseWithCriteria')
       const criteria = getCriteria(criteriaName, type) || getEmptyCriteriaByType(type)
       const contextFields = criteria.contextFields
       return {

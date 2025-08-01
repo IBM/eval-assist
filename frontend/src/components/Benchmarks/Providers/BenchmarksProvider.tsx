@@ -30,7 +30,7 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
         name: fetchedBenchmark.name,
         description: fetchedBenchmark.description,
         catalogUrl: fetchedBenchmark.catalog_url,
-        readmeUrl: fetchedBenchmark.readme_url,
+        url: fetchedBenchmark.url,
         type: fetchedBenchmark.type,
         dataset: fetchedBenchmark.dataset,
         tags: fetchedBenchmark.tags,
@@ -42,7 +42,11 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
       }))
       benchmarks.sort((b1, b2) => b1.name.localeCompare(b2.name))
       benchmarks.forEach((benchmark) => {
-        benchmark.criteriaBenchmarks.sort((c1, c2) => c1.name.localeCompare(c2.name))
+        benchmark.criteriaBenchmarks.sort((c1, c2) => {
+          if (c1.name === 'overall') return -1
+          if (c2.name === 'overall') return 1
+          return c1.name.localeCompare(c2.name)
+        })
       })
       setBenchmarks(benchmarks)
       setLoadingBenchmarks(false)

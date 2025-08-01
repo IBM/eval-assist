@@ -6,7 +6,7 @@ import { Dispatch, SetStateAction } from 'react'
 import { FilterableMultiSelect } from '@carbon/react'
 
 import { BadgeColor } from '@types'
-import { capitalizeFirstWord } from '@utils'
+import { splitDotsAndCapitalizeFirstWord } from '@utils'
 
 import classes from './Filter.module.scss'
 import { TagBadge } from './TagBadge'
@@ -44,12 +44,12 @@ export const Filter = ({ items, selectedItems, setSelectedItems, tagToColor, tit
           onChange={onSelectionChanged}
           selectionFeedback="top-after-reopen"
           id={'filter-multiselect'}
-          itemToString={(i: string) => capitalizeFirstWord(i)}
+          itemToString={(i: string) => splitDotsAndCapitalizeFirstWord(i)}
         />
       </div>
       <div className={classes.selectedItems}>
         {selectedItems.map((tag, i) => (
-          <TagBadge key={i} name={capitalizeFirstWord(tag)} color={tagToColor[tag]} size="md" />
+          <TagBadge key={i} name={splitDotsAndCapitalizeFirstWord(tag)} color={tagToColor[tag]} size="md" />
         ))}
       </div>
     </div>

@@ -8,7 +8,7 @@ import { Breadcrumb, BreadcrumbItem, Button, Toggle } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
 import { TestCaseTypeBadge } from '@components/TestCaseTypeBadge/TestCaseTypeBadge'
-import { capitalizeFirstWord } from '@utils'
+import { splitDotsAndCapitalizeFirstWord } from '@utils'
 
 import { CriteriaBenchmarkCard } from './CriteriaBenchmarkCard'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
@@ -46,7 +46,7 @@ export const BenchmarkView = () => {
 
           <div className={cx(classes.bottomDivider, classes.benchmarkHeader)}>
             <div className={classes.benchmarkTile}>
-              <h4>{capitalizeFirstWord(benchmark.name)}</h4>
+              <h4>{splitDotsAndCapitalizeFirstWord(benchmark.name)}</h4>
 
               <div className={classes['vertical-divider']}></div>
               <TestCaseTypeBadge type={benchmark.type} />
@@ -90,14 +90,8 @@ export const BenchmarkView = () => {
             >
               {'Unitxt catalog'}
             </Button>
-            {benchmark.readmeUrl && (
-              <Button
-                href={benchmark.readmeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                kind={'ghost'}
-                renderIcon={Launch}
-              >
+            {benchmark.url && (
+              <Button href={benchmark.url} target="_blank" rel="noopener noreferrer" kind={'ghost'} renderIcon={Launch}>
                 {'Dataset description'}
               </Button>
             )}

@@ -205,6 +205,9 @@ export const toTitleCase = (inputString: string) => {
 
 const acronyms = ['rag', 'rqa']
 
+export const splitDotsAndCapitalizeFirstWord = (inputString: string) =>
+  inputString.split('.').map(capitalizeFirstWord).join(' - ')
+
 export const capitalizeFirstWord = (inputString: string) => {
   return inputString
     .split('_')
