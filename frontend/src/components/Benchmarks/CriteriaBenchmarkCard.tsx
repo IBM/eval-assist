@@ -18,7 +18,7 @@ import { Information } from '@carbon/react/icons'
 
 import { useCriteriasContext } from '@providers/CriteriaProvider'
 import { CriteriaBenchmark, EvaluationType, Version } from '@types'
-import { capitalizeFirstWord, toTitleCase } from '@utils'
+import { splitDotsAndCapitalizeFirstWord, toTitleCase } from '@utils'
 
 import classes from './CriteriaBenchmarkCard.module.scss'
 import { CriteriaDetailsModal } from './CriteriaDetailsModal'
@@ -72,7 +72,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
             </Tooltip>
           </div>
         ) : (
-          beatutifyName[metric] || capitalizeFirstWord(metric)
+          beatutifyName[metric] || splitDotsAndCapitalizeFirstWord(metric)
         ),
       ),
     [benchmarkMetrics],
@@ -121,7 +121,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
         <Tile className={cx(className, classes.root)} style={style}>
           <div className={classes.criteriaHeader}>
             <div className={classes.criteriaInfo}>
-              <h5>{`Criteria: ${capitalizeFirstWord(criteriaBenchmark.name)}`}</h5>
+              <h5>{`Criteria: ${splitDotsAndCapitalizeFirstWord(criteriaBenchmark.name)}`}</h5>
               {criteria !== null && (
                 <Link
                   onClick={() => setCriteriaDetailsModal(true)}
@@ -147,7 +147,9 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
                 {displayedEvaluators.map((evaluatorBenchmark, i) => (
                   <TableRow key={i}>
                     {/* <TableCell>{`${evaluatorBenchmark.evaluator_id} (v${evaluatorBenchmark.laaj_version})`}</TableCell> */}
-                    <TableCell>{toTitleCase(evaluatorBenchmark.name)}</TableCell>
+                    <TableCell>
+                      {toTitleCase(`${evaluatorBenchmark.name} (${evaluatorBenchmark.annotation})`)}
+                    </TableCell>
                     {benchmarkMetrics.map((metric) => (
                       <TableCell
                         key={metric}

@@ -52,8 +52,9 @@ export const Landing = () => {
   }, [benchmarks, selectedBenchmarkItems, selectedCriteriaItems, selectedTagItems])
 
   const allTags = useMemo(() => {
+    if (!benchmarks) return []
     const tags: string[] = []
-    benchmarks!.forEach((benchmark) => {
+    benchmarks.forEach((benchmark) => {
       benchmark.tags.forEach((tag) => {
         if (!tags.includes(tag)) {
           tags.push(tag)
@@ -78,10 +79,10 @@ export const Landing = () => {
     [key: string]: BadgeColor
   } = useMemo(() => {
     const dict: { [key: string]: BadgeColor } = {}
-    dict[DIRECT_NAME] = 'blue'
-    dict[PAIRWISE_NAME] = 'purple'
+    dict[DIRECT_NAME] = badgeColorsArray[0]
+    dict[PAIRWISE_NAME] = badgeColorsArray[1]
     allTags.forEach((tag, i) => {
-      const color = badgeColorsArray[i % badgeColorsArray.length]
+      const color = badgeColorsArray[(i + 2) % badgeColorsArray.length]
       dict[tag] = color
     })
     return dict

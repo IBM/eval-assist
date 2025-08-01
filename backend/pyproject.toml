@@ -102,17 +102,6 @@ pytest-cov = "*"
 [tool.pytest.ini_options]
 addopts = "--cov=evalassist"
 
-
-
-
-
-
-
-
-
-
-
-
 [tool.poetry.group.local-inference]
 optional = true
 
@@ -121,32 +110,11 @@ torch = "*"
 accelerate = "*"
 transformers = "*"
 
-
-
-
-
-
-
-
-
-
-
-
 [tool.poetry.group.postgresql]
 optional = true
 
 [tool.poetry.group.postgresql.dependencies]
 psycopg2-binary = "*"
-
-
-
-
-
-
-
-
-
-
 
 
 [tool.poetry.group.benchmarks]

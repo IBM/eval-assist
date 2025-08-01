@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
-import { capitalizeFirstWord, returnByPipelineType, toTitleCase } from 'src/utils'
+import { returnByPipelineType, splitDotsAndCapitalizeFirstWord, toTitleCase } from 'src/utils'
 
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 
@@ -32,7 +32,6 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
   const onClick = () => {
     updateURLFromBenchmark(benchmark)
   }
-
   const displayedCriterias = useMemo<{ name: string; highlighted: boolean; clickable: boolean }[]>(() => {
     const allCriterias = benchmark.criteriaBenchmarks
     const maximumListLength = 5
@@ -41,6 +40,7 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
       highlighted: false,
       clickable: false,
     }
+
     if (allCriterias.length >= maximumListLength) {
       if (selectedCriteriaItems.length === 0) {
         return [
@@ -83,7 +83,7 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
                   highlighted: false,
                   clickable: true,
                 })),
-            ].toSorted((a, b) => a.name.localeCompare(b.name)),
+            ],
             threeDotsItem,
           ]
         }
@@ -109,7 +109,7 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
   return (
     <Tile className={cx(classes.root, { [classes['card-white-mode']]: !!!isDarkMode() })} onClick={onClick}>
       <div className={classes['title-row']}>
-        <h5 className={classes.title}>{capitalizeFirstWord(benchmark.name)}</h5>
+        <h5 className={classes.title}>{splitDotsAndCapitalizeFirstWord(benchmark.name)}</h5>
       </div>
       <UnorderedList className={classes.list}>
         {displayedCriterias.map((displayedCriteria, i) => (
@@ -123,13 +123,13 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
                 className={classes.nameLink}
               >
                 {displayedCriteria.highlighted ? (
-                  <mark>{capitalizeFirstWord(displayedCriteria.name)}</mark>
+                  <mark>{splitDotsAndCapitalizeFirstWord(displayedCriteria.name)}</mark>
                 ) : (
-                  capitalizeFirstWord(displayedCriteria.name)
+                  splitDotsAndCapitalizeFirstWord(displayedCriteria.name)
                 )}
               </Link>
             ) : (
-              <div>{capitalizeFirstWord(displayedCriteria.name)}</div>
+              <div>{displayedCriteria.name}</div>
             )}
           </ListItem>
         ))}

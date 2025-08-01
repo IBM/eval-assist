@@ -461,8 +461,8 @@ def get_benchmarks():
         benchmark_data["criteria_benchmarks"] = list(
             benchmark_data["criteria_benchmarks"].values()
         )
+        benchmark_data["name"] = benchmark_data["display_name"]
         fetched_results.append(benchmark_data)
-
     return fetched_results
 
 

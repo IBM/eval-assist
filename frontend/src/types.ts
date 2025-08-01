@@ -179,13 +179,13 @@ export interface Dataset {
 }
 
 export interface FetchedEvaluatorBenchmark {
-  name: string // should be different from model_id, maybe add library version?
+  name: string
   annotation: string
   results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
 }
 
 export interface EvaluatorBenchmark {
-  name: string // should be different from model_id, maybe add library version?
+  name: string
   annotation: string
   results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
 }
@@ -206,7 +206,7 @@ export interface FetchedBenchmark {
   name: string
   description: string
   catalog_url: string
-  readme_url?: string
+  url?: string
   type: EvaluationType
   dataset: Dataset
   criteria_benchmarks: FetchedCriteriaBenchmark[]
@@ -217,7 +217,7 @@ export interface Benchmark {
   name: string
   description: string
   catalogUrl: string
-  readmeUrl?: string
+  url?: string
   type: EvaluationType
   dataset: Dataset
   criteriaBenchmarks: CriteriaBenchmark[]
@@ -280,7 +280,7 @@ export class Version {
   }
 }
 
-export const badgeColorsArray = ['red', 'magenta', 'cyan', 'teal', 'green', 'blue', 'purple'] as const
+export const badgeColorsArray = ['blue', 'purple', 'red', 'teal', 'green', 'magenta', 'cyan'] as const
 
 export type BadgeColor = (typeof badgeColorsArray)[number]
 

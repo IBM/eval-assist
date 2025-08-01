@@ -9,7 +9,7 @@ import { TreeNode, TreeView } from '@carbon/react'
 import { IbmEngineeringSystemsDesignRhapsodyModelManager, List } from '@carbon/react/icons'
 
 import { Benchmark, CriteriaBenchmark, EvaluationType } from '@types'
-import { capitalizeFirstWord } from '@utils'
+import { splitDotsAndCapitalizeFirstWord } from '@utils'
 
 import { useBenchmarksContext } from '../Providers/BenchmarksProvider'
 import { useURLInfoContext } from '../Providers/URLInfoProvider'
@@ -118,7 +118,7 @@ export const BenchmarkSidenav = () => {
                           label={
                             <div className={classes['tree-node-content']}>
                               <span className={classes['tree-node-label']}>
-                                {capitalizeFirstWord(directBenchmark.name)}
+                                {splitDotsAndCapitalizeFirstWord(directBenchmark.name)}
                               </span>
                             </div>
                           }
@@ -135,7 +135,7 @@ export const BenchmarkSidenav = () => {
                                 <div className={classes['tree-node-content']}>
                                   <span
                                     className={cx(classes['tree-node-label'], classes['tree-node-label-indent'])}
-                                  >{`${capitalizeFirstWord(criteriaBenchmark.name)}`}</span>
+                                  >{`${splitDotsAndCapitalizeFirstWord(criteriaBenchmark.name)}`}</span>
                                 </div>
                               }
                               key={`${criteriaBenchmark.name}_${directBenchmark.name}_direct`}
@@ -159,7 +159,7 @@ export const BenchmarkSidenav = () => {
                           label={
                             <div className={classes['tree-node-content']}>
                               <span className={classes['tree-node-label']}>
-                                {capitalizeFirstWord(pairwiseBenchmark.name)}
+                                {splitDotsAndCapitalizeFirstWord(pairwiseBenchmark.name)}
                               </span>
                             </div>
                           }
@@ -175,7 +175,7 @@ export const BenchmarkSidenav = () => {
                                 <div className={classes['tree-node-content']}>
                                   <span
                                     className={cx(classes['tree-node-label'], classes['tree-node-label-indent'])}
-                                  >{`${capitalizeFirstWord(criteriaBenchmark.name)}`}</span>
+                                  >{`${splitDotsAndCapitalizeFirstWord(criteriaBenchmark.name)}`}</span>
                                 </div>
                               }
                               key={`${criteriaBenchmark.name}_${pairwiseBenchmark.name}_pairwise`}
