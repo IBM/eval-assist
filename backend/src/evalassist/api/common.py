@@ -53,12 +53,16 @@ class PairwiseInstance(Instance):
     responses: list[str]
 
 
-class DirectInstanceDTO(DirectInstance):
+class InstanceDTO(Instance):
     id: str
 
 
-class PairwiseInstanceDTO(PairwiseInstance):
-    id: str
+class DirectInstanceDTO(DirectInstance, InstanceDTO):
+    pass
+
+
+class PairwiseInstanceDTO(PairwiseInstance, InstanceDTO):
+    pass
 
 
 class EvaluationRequest(BaseModel):
@@ -81,14 +85,6 @@ class EvaluationRequest(BaseModel):
     #             raise HTTPException(status_code=400, detail="Context variable names can't be empty.")
     #     return context_variables
 
-    @field_validator("evaluator_name")
-    def validate_pipeline(cls, evaluator_name):
-        if not evaluator_name:
-            raise HTTPException(
-                status_code=400, detail="A valid pipeline name is required."
-            )
-        return evaluator_name
-
 
 class PairwiseEvaluationRequest(EvaluationRequest):
     criteria: CriteriaDTO
@@ -107,6 +103,25 @@ class PairwiseEvaluationRequest(EvaluationRequest):
     #     raise HTTPException(status_code=400, detail="Responses can't be an empty string.")
 
     # return responses
+
+
+class DirectEvaluationRequestModel(EvaluationRequest):
+    criteria: CriteriaWithOptionsDTO
+
+    # @validator("responses", pre=True, always=True)
+    # def validate_responses_length(cls, responses):
+    #     # if len(responses) == 0:
+    #     #     raise HTTPException(status_code=400, detail="At least one response is required to evaluate.")
+
+    #     all_valid = True
+    #     for r in responses:
+    #         if len(r.strip()) == 0:
+    #             all_valid = False
+    #             break
+    #     if not all_valid:
+    #         raise HTTPException(status_code=400, detail="Responses can't be an empty string.")
+
+    #     return responses
 
 
 class SingleSystemPairwiseResult(BaseModel):
@@ -146,6 +161,10 @@ class NotebookParams(BaseModel):
     plain_python_script: bool
 
 
+# class DownloadTestCaseParams(BaseModel):
+#     test_case: TestCase
+
+
 class SyntheticExampleGenerationRequest(BaseModel):
     provider: ModelProviderEnum | ExtendedModelProviderEnum
     llm_provider_credentials: dict[str, Optional[str]]
@@ -158,25 +177,6 @@ class SyntheticExampleGenerationRequest(BaseModel):
     persona: Optional[PersonaEnum]
     per_criteria_option_count: dict[str, int]
     borderline_count: int
-
-
-class DirectEvaluationRequestModel(EvaluationRequest):
-    criteria: CriteriaWithOptionsDTO
-
-    # @validator("responses", pre=True, always=True)
-    # def validate_responses_length(cls, responses):
-    #     # if len(responses) == 0:
-    #     #     raise HTTPException(status_code=400, detail="At least one response is required to evaluate.")
-
-    #     all_valid = True
-    #     for r in responses:
-    #         if len(r.strip()) == 0:
-    #             all_valid = False
-    #             break
-    #     if not all_valid:
-    #         raise HTTPException(status_code=400, detail="Responses can't be an empty string.")
-
-    #     return responses
 
 
 class DirectPositionalBias(BaseModel):
