@@ -1,4 +1,5 @@
 import json
+import re
 from abc import ABC, abstractmethod
 from typing import Literal
 
@@ -161,8 +162,13 @@ criteria = CriteriaWithOptions.from_obj(criteria)
 """
 
     def get_setup_code(self):
-        return f"""metric = LLMJudgeDirect(
-    inference_engine=CrossProviderInferenceEngine(**{json.dumps(self.inference_engine_params, indent=4)}),
+        params = re.sub(
+            r"\btrue\b", "True", json.dumps(self.inference_engine_params, indent=4)
+        )
+        return f"""
+inference_engine = CrossProviderInferenceEngine(**{params})
+metric = LLMJudgeDirect(
+    inference_engine=inference_engine,
     criteria=criteria,
     context_fields={self.context_fields},
     criteria_field="criteria",
@@ -191,13 +197,13 @@ results = evaluate(predictions=predictions, data=dataset)
 rows = []
 for i, result in enumerate(results):
     instance_scores = result['score']['instance']
-    criteria = json.loads(instance_scores[f\"{instance_scores['score_name']}_criteria\"])
+    criteria = json.loads(instance_scores[f"{instance_scores['score_name']}_criteria"])
     criteria_str = criteria['name'] if criteria['name'] != "" else criteria['description']
     rows.append({
         'prediction': predictions[i],
         'criteria': criteria_str,
         'score': instance_scores['score'],
-        'option': instance_scores[f\"{instance_scores['score_name']}_selected_option\"]})
+        'option': instance_scores[f"{instance_scores['score_name']}_selected_option"]})
 results_df = pd.DataFrame(rows)
 results_df
 """

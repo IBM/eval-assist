@@ -3,7 +3,7 @@
         "name": "My custom model",
         "path": "/path/to/the/model",
         "providers": [
-            "local_hf"
+            "hf-local"
         ]
     }
 ]

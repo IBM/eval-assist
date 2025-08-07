@@ -18,7 +18,7 @@ import {
   PairwiseInstanceResult,
   TestCase,
 } from '@types'
-import { returnByPipelineType, toSnakeCase } from '@utils'
+import { parseCriteriaForBackend, returnByPipelineType, toSnakeCase } from '@utils'
 
 import { useAppSidebarContext } from './AppSidebarProvider'
 import { useCriteriasContext } from './CriteriaProvider'
@@ -109,7 +109,8 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       // was changed during the evaluation request
       const temporaryIdSnapshot = temporaryIdRef.current
       let response
-      const parsedCriteria = { ...currentTestCase.criteria }
+      const parsedCriteria = parseCriteriaForBackend(currentTestCase.criteria)
+
       if (isRisksAndHarms) {
         // check if criteria description changed and criteria name didn't
         const harmsAndRiskCriteria = getCriteria(toSnakeCase(currentTestCase.criteria.name), EvaluationType.DIRECT)
@@ -146,12 +147,11 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
           (acc, item, index) => ({ ...acc, [item.name]: item.value }),
           {},
         ),
-        response: returnByPipelineType(
+        [returnByPipelineType(currentTestCase.type, 'response', 'responses')]: returnByPipelineType(
           currentTestCase.type,
           () => (instance as DirectInstance).response,
           () => (instance as PairwiseInstance).responses,
         ),
-        response_variable_name: currentTestCase.responseVariableName,
         id: instance.id,
         expected_result: instance.expectedResult,
         is_synthetic: instance.metadata?.synthetic_generation ? true : false,
@@ -178,7 +178,6 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         provider: currentTestCase.evaluator?.provider,
         criteria: parsedCriteria,
         type: currentTestCase.type,
-        response_variable_name: currentTestCase.responseVariableName,
       }
       body['llm_provider_credentials'] = getProviderCredentialsWithDefaults(currentTestCase.evaluator!.provider)
 
@@ -235,6 +234,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
                 explanation: fetchedInstanceResult.result.explanation,
                 positionalBias: fetchedInstanceResult.result.positional_bias,
                 certainty: fetchedInstanceResult.result.certainty,
+                metadata: fetchedInstanceResult.result.metadata,
               }
               updatedInstances.find((instance) => instance.id === fetchedInstanceResult.id)!.result = instanceResult
             },
@@ -301,8 +301,6 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
             criteria: currentTestCase.criteria,
             type: currentTestCase.type,
             evaluator: currentTestCase.evaluator,
-            contextVariableNames: currentTestCase.contextVariableNames,
-            responseVariableName: currentTestCase.responseVariableName,
             syntheticGenerationConfig: currentTestCase.syntheticGenerationConfig,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
           }),
@@ -356,8 +354,6 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
             criteria: toSaveTestCase.criteria,
             type: toSaveTestCase.type,
             pipeline: toSaveTestCase.evaluator,
-            contextVariableNames: currentTestCase.contextVariableNames,
-            responseVariableName: currentTestCase.responseVariableName,
             syntheticGenerationConfig: currentTestCase.syntheticGenerationConfig,
             contentFormatVersion: CURRENT_FORMAT_VERSION,
           }),

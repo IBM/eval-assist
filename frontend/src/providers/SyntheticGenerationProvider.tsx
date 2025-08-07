@@ -18,7 +18,7 @@ import { useTestCaseLibrary } from '@customHooks/useTestCaseLibrary'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useToastContext } from '@providers/ToastProvider'
 import { CriteriaWithOptions, DirectInstance } from '@types'
-import { returnByPipelineType } from '@utils'
+import { parseCriteriaForBackend, returnByPipelineType } from '@utils'
 
 import { useUserTestCasesContext } from './UserTestCasesProvider'
 
@@ -258,9 +258,7 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
       llm_provider_credentials: currentGenerationProviderCredentials,
       evaluator_name: currentTestCase.syntheticGenerationConfig.evaluator?.name,
       type: currentTestCase.type,
-      criteria: currentTestCase.criteria,
-      response_variable_name: currentTestCase.responseVariableName,
-      context_variables_names: currentTestCase.contextVariableNames,
+      criteria: parseCriteriaForBackend(currentTestCase.criteria),
       generation_length: currentTestCase.syntheticGenerationConfig.generationLength,
       task: currentTestCase.syntheticGenerationConfig.task,
       domain: currentTestCase.syntheticGenerationConfig.domain,

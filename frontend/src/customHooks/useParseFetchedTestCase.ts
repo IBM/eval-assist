@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
-import { FetchedTestCase, TestCase, TestCaseV0 } from '@types'
+import { FetchedTestCase, TestCase, TestCaseV0, TestCaseV1 } from '@types'
 
 // EXAMPLES
 // fetched test case is v0 and current is v1
@@ -102,26 +102,6 @@ export const useParseFetchedTestCase = () => {
   //     ),
   //   }
 
-  // // this version changes contextVariables from a list of {variable: string, value: string} to Record<string, string>
-  // const parseFetchedTestCaseV0ToV1 = useCallback(
-  //   (fetchedTestCase: TestCaseV0): TestCaseV1 => ({
-  //     ...fetchedTestCase,
-  //     // we are sure that by the time the usecases are being fetched
-  //     // the pipelines have been already fetched (the provider is outer)
-  //     // so casting them to Pipeline[] is safe
-  //     pipeline:
-  //       (
-  //         returnByPipelineType<typeof directEvaluators, typeof pairwiseEvaluators>(
-  //           fetchedTestCase.type,
-  //           directEvaluators,
-  //           pairwiseEvaluators,
-  //         ) as Evaluator[]
-  //       ).find((pipeline) => pipeline.name === fetchedTestCase.pipeline) ?? null,
-  //   }),
-  //   [pairwiseEvaluators, directEvaluators],
-  // )
-  // }, [])
-
   const parseFetchedTestCaseV0 = useCallback(
     (fetchedTestCase: Record<string, any>): TestCaseV0 =>
       ({
@@ -136,11 +116,38 @@ export const useParseFetchedTestCase = () => {
     [],
   )
 
-  const testCaseParsingVersionToVersionFunctions: any[] = useMemo(() => [], [])
+  const parseFetchedTestCaseV0ToV1 = useCallback(
+    (fetchedTestCase: TestCaseV0): TestCaseV1 => ({
+      ...fetchedTestCase,
+      // criteria was added contextFields and predictionField, so we fill them if they are not provided
+      criteria: {
+        ...fetchedTestCase.criteria,
+        contextFields: fetchedTestCase.criteria.contextFields || fetchedTestCase.contextVariableNames,
+        predictionField: fetchedTestCase.criteria.predictionField || fetchedTestCase.responseVariableName,
+      },
+    }),
+    [],
+  )
 
-  const testCaseParsingVersionFunctions = useMemo(() => [parseFetchedTestCaseV0], [parseFetchedTestCaseV0])
+  const parseFetchedTestCaseV1 = useCallback(
+    (fetchedTestCase: Record<string, any>): TestCaseV1 =>
+      ({
+        ...fetchedTestCase,
+      } as TestCaseV1),
+    [],
+  )
 
-  const CURRENT_FORMAT_VERSION = useMemo(() => 0, [])
+  const testCaseParsingVersionToVersionFunctions: any[] = useMemo(
+    () => [parseFetchedTestCaseV0ToV1],
+    [parseFetchedTestCaseV0ToV1],
+  )
+
+  const testCaseParsingVersionFunctions = useMemo(
+    () => [parseFetchedTestCaseV0, parseFetchedTestCaseV1],
+    [parseFetchedTestCaseV0, parseFetchedTestCaseV1],
+  )
+
+  const CURRENT_FORMAT_VERSION = useMemo(() => 1, [])
 
   const parseFetchedTestCase = useCallback(
     (fetchedTestCase: FetchedTestCase): TestCase | null => {
@@ -156,7 +163,6 @@ export const useParseFetchedTestCase = () => {
         return null
       }
       const readFetchedTestCase = testCaseParsingVersionFunctions[version]
-
       let parsedTestCase = readFetchedTestCase(toParseObj)
       testCaseParsingVersionToVersionFunctions
         .filter((_, i) => i >= version)

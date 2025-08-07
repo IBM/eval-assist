@@ -127,7 +127,7 @@ export const notInUnitxtCriteria: { direct: CriteriaWithOptions[]; pairwise: Cri
         },
       ],
       predictionField: 'response',
-      contextFields: [],
+      contextFields: ['Context'],
     },
   ],
   pairwise: [],

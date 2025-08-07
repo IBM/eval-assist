@@ -16,6 +16,7 @@ interface Props {
 
 export const ConnectionTest = ({ model }: Props) => {
   const [testingModelConnection, setTestingModelConnection] = useState(false)
+  const [testingModelConnectionMessage, setTestingModelConnectionMessage] = useState('Testing model connection.')
   const [modelConnectionStatus, setModelConnectionStatus] = useState<'success' | 'failure' | null>(null)
   const [showingTestingModelConnectionSuccess, setShowingTestingModelConnectionSuccess] = useState(false)
   const { getProviderCredentialsWithDefaults } = useModelProviderCredentials()
@@ -24,11 +25,19 @@ export const ConnectionTest = ({ model }: Props) => {
   const testModelConnection = useCallback(async () => {
     if (!model) return
     setTestingModelConnection(true)
+    const setTestingModelConnectionIntervalId = setInterval(
+      () =>
+        setTestingModelConnectionMessage((prev) =>
+          prev.lastIndexOf('...') > 0 ? prev.slice(0, prev.length - 2) : prev + '.',
+        ),
+      500,
+    )
     const response = await post('test-model/', {
       provider: model.provider,
       llm_provider_credentials: getProviderCredentialsWithDefaults(model.provider),
       evaluator_name: model.name,
     })
+    clearInterval(setTestingModelConnectionIntervalId)
     if (response.ok) {
       setModelConnectionStatus('success')
     } else {
@@ -47,7 +56,7 @@ export const ConnectionTest = ({ model }: Props) => {
       {'Test connection'}
     </Link>
   ) : testingModelConnection ? (
-    <p className={classes.connectionTestingFont}>{'Testing model connection...'}</p>
+    <p className={classes.connectionTestingFont}>{testingModelConnectionMessage}</p>
   ) : showingTestingModelConnectionSuccess ? (
     <div className={classes.successConnectionContainer}>
       {modelConnectionStatus == 'success' ? (

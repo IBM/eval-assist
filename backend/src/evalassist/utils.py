@@ -6,10 +6,12 @@ import re
 import time
 import traceback
 from enum import Enum
-from typing import Optional, Type
+from typing import Any
 
 import requests
 from botocore.exceptions import NoCredentialsError
+from datasets import IterableDataset
+from evalassist.api.common import DirectInstance
 from fastapi import HTTPException
 from ibm_watsonx_ai.wml_client_error import (
     ApiRequestFailure,
@@ -21,11 +23,12 @@ from openai import AuthenticationError, NotFoundError
 from unitxt.inference import (
     CrossProviderInferenceEngine,
     HFAutoModelInferenceEngine,
+    InferenceEngine,
     LiteLLMInferenceEngine,
     WMLInferenceEngineChat,
     WMLInferenceEngineGeneration,
 )
-from unitxt.llm_as_judge import EvaluatorNameEnum, ModelProviderEnum
+from unitxt.llm_as_judge import Criteria, EvaluatorNameEnum, ModelProviderEnum
 
 from .const import (
     CUSTOM_MODELS_PATH,
@@ -105,8 +108,8 @@ def get_cross_inference_engine_params(
     credentials: dict,
     provider: ModelProviderEnum,
     model_name: str,
-    custom_params: dict = None,
-    provider_specific_params: dict = None,
+    custom_params: dict | None = None,
+    provider_specific_params: dict | None = None,
 ):
     provider_specific_args = {}
     inference_engine_params = {
@@ -133,11 +136,13 @@ def get_cross_inference_engine_params(
         and model_name
         in CrossProviderInferenceEngine.provider_model_map[provider.value]
     )
+
     cross_inference_litellm_keys = [
         provider
         for provider, klass in CrossProviderInferenceEngine._provider_to_base_class.items()
         if klass == LiteLLMInferenceEngine
     ]
+
     if (
         not is_model_supported_by_cross_inference
         and provider.value in cross_inference_litellm_keys
@@ -157,6 +162,13 @@ def get_cross_inference_engine_params(
     inference_engine_params["model"] = model_name
     inference_engine_params["provider"] = provider.value
     inference_engine_params["provider_specific_args"] = provider_specific_args
+
+    if provider == ExtendedModelProviderEnum.HF_LOCAL:
+        if "seed" in inference_engine_params:
+            del inference_engine_params["seed"]
+        if "credentials" in inference_engine_params:
+            del inference_engine_params["credentials"]
+
     return inference_engine_params
 
 
@@ -164,8 +176,8 @@ def get_cross_inference_engine(
     credentials: dict[str, str],
     provider: ModelProviderEnum,
     model_name: EvaluatorNameEnum,
-    custom_params: dict = None,
-    provider_specific_params: dict = None,
+    custom_params: dict | None = None,
+    provider_specific_params: dict | None = None,
 ):
     inference_engine_params = get_cross_inference_engine_params(
         credentials=credentials,
@@ -182,7 +194,7 @@ def get_watsonx_inference_engine(
     credentials: dict[str, str],
     provider: ModelProviderEnum,
     model_name: EvaluatorNameEnum,
-    custom_params: Optional[dict] = None,
+    custom_params: dict | None = None,
     use_chat: bool = True,
 ):
     converted_model_name = "/".join(
@@ -235,7 +247,7 @@ preloaded_hf_models = {}
 
 def get_hf_inference_engine(
     model_name: str,
-    custom_params: Optional[dict] = None,
+    custom_params: dict | None = None,
 ):
     global preloaded_hf_models
     if model_name in preloaded_hf_models:
@@ -246,24 +258,25 @@ def get_hf_inference_engine(
         params = get_local_hf_inference_engine_params(model_name)
         if custom_params is not None:
             params.update(custom_params)
+        if "seed" in params:
+            del params["seed"]
         hf_model = HFAutoModelInferenceEngine(**params)
         preloaded_hf_models[model_name] = hf_model
         return hf_model
 
 
 def get_inference_engine(
-    credentials: dict[str, Optional[str]],
+    credentials: dict[str, str | None],
     provider: ModelProviderEnum | ExtendedModelProviderEnum,
     model_name: str,
-    custom_params: Optional[dict] = None,
-    provider_specific_params: Optional[dict] = None,
-):
-    if provider == ExtendedModelProviderEnum.LOCAL_HF:
-        return get_hf_inference_engine(model_name, custom_params)
+    custom_params: dict | None = None,
+    provider_specific_params: dict | None = None,
+) -> InferenceEngine:
+    # if provider == ExtendedModelProviderEnum.LOCAL_HF:
+    #     return get_hf_inference_engine(model_name, custom_params)
     if provider == ModelProviderEnum.WATSONX and (
         "granite-guardian" in model_name
-        or "space_id" in credentials
-        and credentials["space_id"]
+        or ("space_id" in credentials and credentials["space_id"])
     ):
         use_chat = "granite-guardian" not in model_name  # uses probs
         return get_watsonx_inference_engine(
@@ -286,13 +299,13 @@ def get_model_name_from_evaluator(
     )
 
 
-def get_enum_values(e: Type[Enum]):
+def get_enum_values(e: type[Enum]):
     return [member.value for member in e]
 
 
 def get_evaluator_metadata_wrapper(
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
-    custom_model_name: Optional[str] = None,
+    custom_model_name: str | None = None,
 ) -> ExtendedEvaluatorMetadata:
     if evaluator_name.name != ExtendedEvaluatorNameEnum.CUSTOM.name:
         evaluator_search = [
@@ -352,14 +365,14 @@ def get_default_torch_device(avoid_mps: bool = False):
 
 
 def init_evaluator_name(
-    evaluator_name: str,
-) -> tuple[ExtendedEvaluatorNameEnum, Optional[str]]:
+    evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str,
+) -> tuple[ExtendedEvaluatorNameEnum, str | None]:
     evaluator_name_as_enum = get_enum_by_value(evaluator_name, EvaluatorNameEnum)
     if evaluator_name_as_enum is None:
         evaluator_name_as_enum = get_enum_by_value(
             evaluator_name, ExtendedEvaluatorNameEnum
         )
-    custom_model_name = None
+
     if evaluator_name_as_enum is not None:
         return (evaluator_name_as_enum, None)
 
@@ -558,3 +571,48 @@ def get_system_version():
             logging.warning("Could not get EvalAssist version")
 
     return {"version": version, "source": source}
+
+
+def unitxt_dataset_to_evalassist_instances(
+    dataset: IterableDataset,
+    criteria: Criteria,
+) -> list[DirectInstance]:
+    if criteria.prediction_field is None:
+        raise ValueError(
+            "The criteria.prediction_field is None. It must be set to retrieve the response to evaluate from the task_data"
+        )
+    task_data_list = [json.loads(d["task_data"]) for d in dataset]
+    return [
+        DirectInstance(
+            context_variables={k: task_data[k] for k in criteria.context_fields},
+            response=task_data[criteria.prediction_field],
+            metadata=None,
+        )
+        for task_data in task_data_list
+    ]
+
+
+def get_inference_engine_from_judge_metadata(
+    evaluator_name: ExtendedEvaluatorNameEnum,
+    custom_model_name: str | None,
+    provider: ModelProviderEnum | ExtendedModelProviderEnum,
+    llm_provider_credentials: dict[str, str | None],
+    custom_params: dict[str, Any] | None = None,
+):
+    """
+    Get an inference engine from evaluator's data.
+    """
+    evaluator_metadata = get_evaluator_metadata_wrapper(
+        evaluator_name,
+        custom_model_name,
+    )
+    model_name = get_model_name_from_evaluator(
+        evaluator_metadata,
+        provider,
+    )
+    return get_inference_engine(
+        credentials=llm_provider_credentials,
+        provider=provider,
+        model_name=model_name,
+        custom_params=custom_params,
+    )

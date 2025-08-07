@@ -1,7 +1,6 @@
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 from unitxt.inference import HFAutoModelInferenceEngine
 from unitxt.llm_as_judge import (
@@ -19,53 +18,59 @@ from .api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
 class ExtendedEvaluatorNameEnum(Enum):
     """This enums adds models that are not present in the original unitxt EvaluatorNameEnum"""
 
-    GRANITE_GUARDIAN3_1_2B = "Granite Guardian 3.1 2B"
-    GRANITE_GUARDIAN3_1_8B = "Granite Guardian 3.1 8B"
-    GRANITE_GUARDIAN3_2_3B = "Granite Guardian 3.2 3B"
-    GRANITE_GUARDIAN3_2_5B = "Granite Guardian 3.2 5B"
+    GRANITE_GUARDIAN3_1_2B = "Granite Guardian 3.1 2b"
+    GRANITE_GUARDIAN3_1_8B = "Granite Guardian 3.1 8b"
+    GRANITE_GUARDIAN3_2_3B = "Granite Guardian 3.2 3b"
+    GRANITE_GUARDIAN3_2_5B = "Granite Guardian 3.2 5b"
+    GRANITE_GUARDIAN3_3_8B = "Granite Guardian 3.3 8b"
     LLAMA_3_3_70B_FREE = "Llama 3.3 70B Free"
     DEEPSEEK_R1_DISTILLED_LLAMA_70B_FREE = "DeepSeek R1 Distilled Llama 70B Free"
     PHI4 = "Phi-4"
     MIXTRAL_SMALL = "Mixtral Small"
     MIXTRAL_MEDIUM = "Mixtral Medium"
+    GPT_OSS_20B = "GPT OSS 20b"
+    GPT_OSS_120B = "GPT OSS 120b"
     CUSTOM = "custom"
 
 
 class ExtendedModelProviderEnum(str, Enum):
-    LOCAL_HF = "local_hf"
+    HF_LOCAL = "hf-local"
     OPENAI_LIKE = "open-ai-like"
 
 
 EXTENDED_INFERENCE_ENGINE_NAME_TO_CLASS = {
-    ExtendedModelProviderEnum.LOCAL_HF: HFAutoModelInferenceEngine,
+    ExtendedModelProviderEnum.HF_LOCAL: HFAutoModelInferenceEngine,
 }
 
 EXTENDED_EVALUATOR_TO_MODEL_ID = {
     **EVALUATOR_TO_MODEL_ID,
-    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B: "ibm/granite-guardian-3-2b",
-    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "granite-guardian-3-8b",
-    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B: "ibm-granite/granite-guardian-3.2-3b-a800m",
-    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B: "ibm-granite/granite-guardian-3.2-5b",
+    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B: "granite-guardian-3-1-2b",
+    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B: "granite-guardian-3-1-8b",
+    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B: "granite-guardian-3-2-3b",
+    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B: "granite-guardian-3-2-5b",
+    ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_3_8B: "granite-guardian-3-3-8b",
     ExtendedEvaluatorNameEnum.LLAMA_3_3_70B_FREE: "llama-3-3-70b-instruct-free",
     ExtendedEvaluatorNameEnum.DEEPSEEK_R1_DISTILLED_LLAMA_70B_FREE: "deepseek-r1-distilled-llama-70b-free",
     ExtendedEvaluatorNameEnum.PHI4: "phi4",
     ExtendedEvaluatorNameEnum.MIXTRAL_SMALL: "mistral-small-instruct",
     ExtendedEvaluatorNameEnum.MIXTRAL_MEDIUM: "mistral-medium-instruct",
+    ExtendedEvaluatorNameEnum.GPT_OSS_20B: "gpt-oss-20b",
+    ExtendedEvaluatorNameEnum.GPT_OSS_120B: "gpt-oss-120b",
 }
 
 
 class ExtendedEvaluatorMetadata(EvaluatorMetadata):
     name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
-    custom_model_name: Optional[str] = None
-    custom_model_path: Optional[str] = None
+    custom_model_name: str | None = None
+    custom_model_path: str | None = None
     providers: list[ModelProviderEnum | ExtendedModelProviderEnum]
 
     def __init__(
         self,
         name,
         providers: list[ModelProviderEnum | ExtendedModelProviderEnum],
-        custom_model_name: Optional[str] = None,
-        custom_model_path: Optional[str] = None,
+        custom_model_name: str | None = None,
+        custom_model_path: str | None = None,
     ):
         super().__init__(name, providers)
         self.custom_model_name = custom_model_name
@@ -77,19 +82,27 @@ EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = [
 ] + [
     ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_2B,
-        [ModelProviderEnum.WATSONX, ExtendedModelProviderEnum.LOCAL_HF],
+        [ModelProviderEnum.WATSONX, ExtendedModelProviderEnum.HF_LOCAL],
     ),
     ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_1_8B,
-        [ModelProviderEnum.WATSONX, ExtendedModelProviderEnum.LOCAL_HF],
+        [ModelProviderEnum.WATSONX, ExtendedModelProviderEnum.HF_LOCAL],
     ),
     ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_3B,
-        [ExtendedModelProviderEnum.LOCAL_HF],
+        [ExtendedModelProviderEnum.HF_LOCAL, ModelProviderEnum.RITS],
     ),
     ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_2_5B,
-        [ExtendedModelProviderEnum.LOCAL_HF],
+        [
+            ModelProviderEnum.WATSONX,
+            ExtendedModelProviderEnum.HF_LOCAL,
+            ModelProviderEnum.RITS,
+        ],
+    ),
+    ExtendedEvaluatorMetadata(
+        ExtendedEvaluatorNameEnum.GRANITE_GUARDIAN3_3_8B,
+        [ExtendedModelProviderEnum.HF_LOCAL, ModelProviderEnum.RITS],
     ),
     ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.DEEPSEEK_R1_DISTILLED_LLAMA_70B_FREE,
@@ -105,6 +118,12 @@ EXTENDED_EVALUATORS_METADATA: list[ExtendedEvaluatorMetadata] = [
     ),
     ExtendedEvaluatorMetadata(
         ExtendedEvaluatorNameEnum.MIXTRAL_MEDIUM, [ModelProviderEnum.WATSONX]
+    ),
+    ExtendedEvaluatorMetadata(
+        ExtendedEvaluatorNameEnum.GPT_OSS_20B, [ModelProviderEnum.RITS]
+    ),
+    ExtendedEvaluatorMetadata(
+        ExtendedEvaluatorNameEnum.GPT_OSS_120B, [ModelProviderEnum.RITS]
     ),
 ]
 
@@ -218,4 +237,21 @@ UNITXT_JUDGE_PARAMS = {
     "use_cache": UNITXT_CACHE_ENABLED,
     "seed": 42,
     "temperature": 0,
+}
+
+DIRECT_ACTION_PARAMS = {
+    "use_cache": False,
+    "seed": None,
+    "max_tokens": 200,
+    "temperature": 0.7,
+}
+
+SYNTHETIC_DATA_GENERATION_PARAMS = {
+    "use_cache": False,
+    "seed": None,
+    "max_tokens": 1200,
+    "temperature": 1.0,
+    "top_p": 0.9,
+    "frequency_penalty": 1.0,
+    "presence_penalty": 1.5,
 }

@@ -68,7 +68,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                 {currentTestCase.type === EvaluationType.DIRECT && (
                   <>
                     <p>
-                      <strong>{`${toTitleCase(currentTestCase.responseVariableName)}:`}</strong>
+                      <strong>{`${toTitleCase(currentTestCase.criteria.predictionField)}:`}</strong>
                     </p>
                     <p>{(selectedInstance as DirectInstance).response}</p>
                   </>
@@ -78,7 +78,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                   (selectedInstance as PairwiseInstance).responses.map((response, i) => (
                     <Fragment key={`response-${i}`}>
                       <p>
-                        <strong>{`${toTitleCase(currentTestCase.responseVariableName)} ${i + 1}`}</strong>
+                        <strong>{`${toTitleCase(currentTestCase.criteria.predictionField)} ${i + 1}`}</strong>
                       </p>
                       <p>{response}</p>
                     </Fragment>
@@ -147,6 +147,18 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                             </div>
                           </>
                         )}
+                        {selectedInstance.result.metadata && (
+                          <>
+                            {Object.entries(selectedInstance.result.metadata).map(([k, v]) => (
+                              <>
+                                <p>
+                                  <strong>{`${capitalizeFirstWord(k)}:`}</strong>
+                                </p>
+                                <p style={{ whiteSpace: 'pre-line' }}>{capitalizeFirstWord(v)}</p>
+                              </>
+                            ))}
+                          </>
+                        )}
                       </>
                     )}
 
@@ -157,9 +169,9 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                             <p key={'expected-result-title'}>
                               <strong>{'Expected winner: '}</strong>
                             </p>
-                            <p key={'expected-result-value'}>{`${toTitleCase(currentTestCase.responseVariableName)} ${
-                              selectedInstance.expectedResult
-                            }`}</p>
+                            <p key={'expected-result-value'}>{`${toTitleCase(
+                              currentTestCase.criteria.predictionField,
+                            )} ${selectedInstance.expectedResult}`}</p>
                           </Fragment>
                         )}
 
@@ -191,7 +203,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                 <ArrowRight style={{ justifySelf: 'start' }} size={16} />
                                 <p style={{ justifySelf: 'start' }}>
                                   {` ${toTitleCase(
-                                    currentTestCase.responseVariableName,
+                                    currentTestCase.criteria.predictionField,
                                   )} ${key} (Winrate: ${toPercentage(
                                     (selectedInstance.result as PairwiseInstanceResult)[key].winrate,
                                   )})`}
@@ -210,13 +222,13 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                           {positionalBiasDetected ? 'Detected' : 'Not detected'}
                         </p>
                         <p key={'instance-per-response-title'}>
-                          <strong>{`Per ${currentTestCase.responseVariableName.toLocaleLowerCase()} results: `}</strong>
+                          <strong>{`Per ${currentTestCase.criteria.predictionField.toLocaleLowerCase()} results: `}</strong>
                         </p>
                         <Accordion className={classes.accordionFullWidth}>
                           {Object.entries(selectedInstance.result as PairwiseInstanceResult).map(
                             ([key, responseResults], j) => (
                               <AccordionItem
-                                title={`${toTitleCase(currentTestCase.responseVariableName)} ${key}`}
+                                title={`${toTitleCase(currentTestCase.criteria.predictionField)} ${key}`}
                                 key={j}
                                 open={openedPerReponseResults[j]}
                                 onClick={() => {
@@ -247,7 +259,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                             <p key={i} className={classes.explanation}>
                                               <strong>{`${
                                                 responseResults.contestResults[i] ? 'Won' : 'Lost'
-                                              } against ${toTitleCase(currentTestCase.responseVariableName)} ${
+                                              } against ${toTitleCase(currentTestCase.criteria.predictionField)} ${
                                                 responseResults.comparedTo[i]
                                               }: `}</strong>
                                             </p>

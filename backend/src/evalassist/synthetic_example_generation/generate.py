@@ -2,7 +2,6 @@ import logging
 import os
 import uuid
 from textwrap import dedent
-from typing import Optional
 
 from langchain.output_parsers import (
     OutputFixingParser,
@@ -11,13 +10,13 @@ from langchain.output_parsers import (
 )
 from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnableLambda
-from unitxt.llm_as_judge import (
-    CriteriaWithOptions,
-    EvaluatorTypeEnum,
-    ModelProviderEnum,
-)
+from unitxt.inference import InferenceEngine
 
-from ..api.common import CriteriaWithOptionsAPI, DirectAIActionRequest, Instance
+from ..api.common import (
+    CriteriaWithOptionsDTO,
+    DirectAIActionRequest,
+    DirectInstanceDTO,
+)
 from ..api.types import (
     DirectActionTypeEnum,
     DomainEnum,
@@ -25,17 +24,8 @@ from ..api.types import (
     PersonaEnum,
     TaskEnum,
 )
-from ..const import (
-    ExtendedEvaluatorNameEnum,
-    ExtendedModelProviderEnum,
-    generation_length_to_sentence_count,
-)
-from ..utils import (
-    get_evaluator_metadata_wrapper,
-    get_inference_engine,
-    get_model_name_from_evaluator,
-    to_snake_case,
-)
+from ..const import generation_length_to_sentence_count
+from ..utils import to_snake_case
 
 logger = logging.getLogger(__name__)
 
@@ -53,42 +43,14 @@ def get_data_path(task: TaskEnum, domain: DomainEnum):
 class DirectActionGenerator:
     def __init__(
         self,
-        provider: ModelProviderEnum | ExtendedModelProviderEnum,
-        custom_model_name: Optional[str],
-        llm_provider_credentials: dict[str, str],
-        evaluator_name: ExtendedEvaluatorNameEnum,
-        type: EvaluatorTypeEnum,
         action: DirectActionTypeEnum,
-        prompt: Optional[str],
+        prompt: str | None,
+        inference_engine: InferenceEngine,
     ):
-        self.provider = provider
-        self.llm_provider_credentials = llm_provider_credentials
-        self.custom_model_name = custom_model_name
-        self.evaluator_name = evaluator_name
-        self.type = type
         self.action = action
         self.prompt = prompt
-
+        self.inference_engine = inference_engine
         # intialize model
-        evaluator_metadata = get_evaluator_metadata_wrapper(
-            self.evaluator_name,
-            self.custom_model_name,
-        )
-        model_name = get_model_name_from_evaluator(
-            evaluator_metadata,
-            self.provider,
-        )
-        self.inference_engine = get_inference_engine(
-            self.llm_provider_credentials,
-            self.provider,
-            model_name,
-            custom_params={
-                "use_cache": False,
-                "seed": None,
-                "max_tokens": 200,
-                "temperature": 0.7,
-            },
-        )
 
         self.action_third_person_dict = {
             DirectActionTypeEnum.REPHRASE: "rephrases",
@@ -301,59 +263,30 @@ class DirectActionGenerator:
 class Generator:
     def __init__(
         self,
-        provider: ModelProviderEnum | ExtendedModelProviderEnum,
-        custom_model_name: Optional[str],
-        llm_provider_credentials: dict[str, str],
-        evaluator_name: ExtendedEvaluatorNameEnum,
-        type: EvaluatorTypeEnum,
-        criteria: CriteriaWithOptionsAPI,
-        response_variable_name: str,
-        context_variables_names: list[str],
-        generation_length: Optional[GenerationLengthEnum],
-        task: Optional[TaskEnum],
-        domain: Optional[DomainEnum],
-        persona: Optional[PersonaEnum],
+        inference_engine: InferenceEngine,
+        criteria: CriteriaWithOptionsDTO,
+        generation_length: GenerationLengthEnum | None,
+        task: TaskEnum | None,
+        domain: DomainEnum | None,
+        persona: PersonaEnum | None,
         per_criteria_option_count: dict[str, int],
         borderline_count: int,
     ):
-        self.provider = provider
-        self.llm_provider_credentials = llm_provider_credentials
-        self.custom_model_name = custom_model_name
-        self.evaluator_name = evaluator_name
-        self.type = type
-        self.criteria = criteria
-        self.response_name = response_variable_name
-        self.context_names = context_variables_names
+        self.inference_engine = inference_engine
+        self.criteria: CriteriaWithOptionsDTO = criteria
         self.generation_length = generation_length
         self.task = task
         self.domain = domain
         self.persona = persona
         self.per_criteria_option_count = per_criteria_option_count
         self.borderline_count = borderline_count
-        self.has_context_variables = len(self.context_names) > 0
-
-        # intialize model
-        evaluator_metadata = get_evaluator_metadata_wrapper(
-            self.evaluator_name,
-            self.custom_model_name,
-        )
-        model_name = get_model_name_from_evaluator(
-            evaluator_metadata,
-            self.provider,
-        )
-        self.inference_engine = get_inference_engine(
-            self.llm_provider_credentials,
-            self.provider,
-            model_name,
-            custom_params={
-                "use_cache": False,
-                "seed": None,
-                "max_tokens": 1200,
-                "temperature": 1.0,
-                "top_p": 0.9,
-                "frequency_penalty": 1.0,
-                "presence_penalty": 1.5,
-            },
+        self.has_context_variables = (
+            len(
+                self.criteria.context_fields
+                if self.criteria.context_fields is not None
+                else []
+            )
+            > 0
         )
 
         def llm_invoke(text: str) -> str:
@@ -378,12 +311,14 @@ class Generator:
             # response schema
             response_schema = [
                 ResponseSchema(
-                    name=self.response_name, description="the answer to the question"
+                    name=self.criteria.prediction_field,
+                    description="the answer to the question",
                 ),
             ]
             self.output_parser = OutputFixingParser.from_llm(
                 parser=StructuredOutputParser.from_response_schemas(response_schema),
                 llm=self.llm_runnable,
+                max_retries=3,
             )
 
             self.format_instructions = self.output_parser.get_format_instructions()
@@ -417,14 +352,15 @@ class Generator:
             # response schema
             response_schema = [
                 ResponseSchema(
-                    name=self.response_name,
-                    description=f"the {self.context_names[0]}'s summary",
+                    name=self.criteria.context_fields[0],
+                    description=f"the {self.criteria.context_fields[0]}'s summary",
                 ),
             ]
 
             self.output_parser = OutputFixingParser.from_llm(
                 parser=StructuredOutputParser.from_response_schemas(response_schema),
                 llm=self.llm_runnable,
+                max_retries=3,
             )
 
             self.format_instructions = self.output_parser.get_format_instructions()
@@ -455,21 +391,22 @@ class Generator:
                 template="Please summarize the following {summary_context_name}:{context_section}\n\n{format_instructions}\nDon't forget to enclose the {summary_context_name} value in double quotes.",
                 partial_variables={
                     "format_instructions": self.format_instructions,
-                    "context_name": self.context_names[0],
-                    "summary_context_name": self.context_names[0],
+                    "context_name": self.criteria.context_fields[0],
+                    "summary_context_name": self.criteria.context_fields[0],
                 },
             )
         elif self.task == TaskEnum.TEXT_GENERATION or self.task is None:
             response_schema = [
                 ResponseSchema(
-                    name=self.response_name,
-                    description=f"the requested {self.response_name}",
+                    name=self.criteria.prediction_field,
+                    description=f"the requested {self.criteria.prediction_field}",
                 ),
             ]
 
             self.output_parser = OutputFixingParser.from_llm(
                 parser=StructuredOutputParser.from_response_schemas(response_schema),
                 llm=self.llm_runnable,
+                max_retries=3,
             )
 
             self.format_instructions = self.output_parser.get_format_instructions()
@@ -496,7 +433,7 @@ class Generator:
                 template="Please generate a {response_name}{context_section}\n\n{format_instructions}",
                 partial_variables={
                     "format_instructions": self.format_instructions,
-                    "response_name": self.response_name.lower(),
+                    "response_name": self.criteria.prediction_field.lower(),
                 },
             )
         else:
@@ -523,13 +460,11 @@ class Generator:
         logger.debug(f"The generated parsed examples are:\n{parsed_responses[0]}")
 
         instances = [
-            Instance(
+            DirectInstanceDTO(
                 context_variables=context,
                 # response=parsed_responses[i][self.response_name],
                 response=next(iter(parsed_responses[i].values())),
-                response_variable_name=self.response_name,
                 metadata=metadatas[i],
-                expected_result="",
                 id=str(uuid.uuid4()),
             )
             for i in range(len(parsed_responses))
@@ -540,7 +475,7 @@ class Generator:
     def _format_prompts(self):
         prompts, metadatas = [], []
 
-        criteria: CriteriaWithOptions = self.criteria
+        criteria: CriteriaWithOptionsDTO = self.criteria
         criteria_options_dict = {
             option.name: option.description for option in criteria.options
         }
@@ -556,7 +491,7 @@ class Generator:
             )
 
         if self.domain is not None:
-            domain_section = f"- The generated {self.response_name.lower()} is going to be evaluated on the {self.domain.value} domain\n"
+            domain_section = f"- The generated {self.criteria.prediction_field.lower()} is going to be evaluated on the {self.domain.value} domain\n"
         else:
             domain_section = ""
 
@@ -566,7 +501,7 @@ class Generator:
             persona_section = ""
 
         if self.generation_length is not None:
-            generation_length_section = f"- The generated {self.response_name.lower()}'s length should be {self.generation_length.value.lower()} ({generation_length_to_sentence_count[self.generation_length]} long).\n"
+            generation_length_section = f"- The generated {self.criteria.prediction_field.lower()}'s length should be {self.generation_length.value.lower()} ({generation_length_to_sentence_count[self.generation_length]} long).\n"
         else:
             generation_length_section = ""
 
@@ -578,10 +513,13 @@ class Generator:
                 self.task == TaskEnum.SUMMARIZATION
                 or self.task == TaskEnum.QUESTION_ANSWERING
             ):
-                context_section = f"\n{context[self.context_names[0]]}"
+                context_section = f"\n{context[self.criteria.context_fields[0]]}"
             else:
                 context_placeholders = "\n".join(
-                    [f"{name}: {context[name]}" for name in self.context_names]
+                    [
+                        f"{name}: {context[name]}"
+                        for name in self.criteria.context_fields
+                    ]
                 )
                 context_section = (
                     f" based on the following context:\n\n{context_placeholders}"
@@ -602,7 +540,7 @@ class Generator:
                 "dimension_description": self.criteria.description,
                 "target": criteria_option_name,
                 "target_description_section": target_description_section,
-                "response_name": self.response_name.lower(),
+                "response_name": self.criteria.prediction_field.lower(),
                 "domain_section": domain_section,
                 "persona_section": persona_section,
                 "generation_length_section": generation_length_section,
@@ -717,10 +655,10 @@ class Generator:
                 else ""
             )
             system_prompt = system_prompt_template.format(
-                context_names=", ".join(self.context_names),
+                context_names=", ".join(self.criteria.context_fields),
                 criteria=self.criteria.name,
                 criteria_description=self.criteria.description,
-                response_name=self.response_name,
+                response_name=self.criteria.prediction_field,
                 task_section=task_section,
                 domain_section=domain_section,
                 persona_section=persona_section,
@@ -729,12 +667,13 @@ class Generator:
                 ResponseSchema(
                     name=context_name, description=f"the {context_name} to generate"
                 )
-                for context_name in self.context_names
+                for context_name in self.criteria.context_fields
             ]
 
         output_parser = OutputFixingParser.from_llm(
             parser=StructuredOutputParser.from_response_schemas(response_schemas),
             llm=self.llm_runnable,
+            max_retries=3,
         )
 
         format_instructions = output_parser.get_format_instructions()
@@ -755,11 +694,11 @@ class Generator:
 
         parsed_response = output_parser.parse(response)
         if self.task == TaskEnum.SUMMARIZATION:
-            parsed_response = {self.context_names[0]: parsed_response["text"]}
+            parsed_response = {self.criteria.context_fields[0]: parsed_response["text"]}
 
         return parsed_response
 
-    def _get_borderline_criteria(self, criteria: CriteriaWithOptions):
+    def _get_borderline_criteria(self, criteria: CriteriaWithOptionsDTO):
         criteria_options = criteria.options
         if len(criteria_options) < 2:
             raise ValueError(
@@ -776,6 +715,7 @@ class Generator:
         criteria_output_parser = OutputFixingParser.from_llm(
             parser=StructuredOutputParser.from_response_schemas(response_schemas),
             llm=self.llm_runnable,
+            max_retries=3,
         )
         criteria_format_instructions = criteria_output_parser.get_format_instructions()
 
@@ -789,9 +729,8 @@ class Generator:
 
         logger.debug(f"The borderline criteria generation prompt is \n{query}")
 
-        borderline_criteria_unparsed = self.inference_engine.infer([{"source": query}])[
-            0
-        ]
+        res = self.inference_engine.infer([{"source": query}])
+        borderline_criteria_unparsed = res[0]
         logger.debug(
             f"The unparsed borderline criteria is:\n{borderline_criteria_unparsed}"
         )

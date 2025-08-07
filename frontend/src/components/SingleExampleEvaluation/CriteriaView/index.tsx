@@ -24,14 +24,14 @@ export const CriteriaView = ({ type, criteria, setCriteria, temporaryId, classNa
   const toHighlightWords = useMemo(() => {
     return showingTestCase
       ? {
-          contextVariables: currentTestCase.contextVariableNames,
-          responseVariableName: currentTestCase.responseVariableName,
+          contextVariables: criteria.contextFields,
+          responseVariableName: currentTestCase.criteria.predictionField,
         }
       : {
           contextVariables: [],
           responseVariableName: '',
         }
-  }, [currentTestCase.contextVariableNames, currentTestCase.responseVariableName, showingTestCase])
+  }, [criteria.contextFields, currentTestCase.criteria.predictionField, showingTestCase])
 
   useEffect(() => {
     setSelectedTabIndex(0)

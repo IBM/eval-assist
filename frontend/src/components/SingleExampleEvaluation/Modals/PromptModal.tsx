@@ -33,7 +33,7 @@ export const PromptModal = ({ open, setOpen }: Props) => {
         const parsedCriteria = { ...currentTestCase.criteria }
         // check if criteria description changed and criteria name didn't
         const harmsAndRiskCriteria = getCriteria(
-          `${toSnakeCase(currentTestCase.criteria.name)}>${toSnakeCase(currentTestCase.responseVariableName)}`,
+          `${toSnakeCase(currentTestCase.criteria.name)}>${toSnakeCase(currentTestCase.criteria.predictionField)}`,
           EvaluationType.DIRECT,
         )
         if (
@@ -58,13 +58,11 @@ export const PromptModal = ({ open, setOpen }: Props) => {
               {},
             ),
             prediction: (instance as DirectInstance).response,
-            prediction_variable_name: currentTestCase.responseVariableName,
           })),
           evaluator_name: currentTestCase.evaluator?.name,
           provider: currentTestCase.evaluator?.provider,
           criteria: parsedCriteria,
           type: currentTestCase.type,
-          response_variable_name: currentTestCase.responseVariableName,
           llm_provider_credentials: {},
         }
 

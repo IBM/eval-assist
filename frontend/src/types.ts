@@ -10,6 +10,7 @@ export interface DirectInstanceResultV0 {
     explanation: string
   }
   explanation: string
+  metadata?: FetchedDirectInstanceResultV0['metadata']
 }
 
 export type DirectInstanceResult = DirectInstanceResultV0
@@ -39,6 +40,7 @@ export interface FetchedDirectInstanceResultV0 {
     option: string
     explanation: string
   }
+  metadata?: { [key: string]: string }
 }
 
 export type FetchedDirectInstanceResultWithId = {
@@ -117,6 +119,8 @@ export type PairwiseInstance = PairwiseInstanceV0
 
 type ContextVariableV0 = { name: string; value: string }
 
+export type ContextVariable = ContextVariableV0
+
 export interface SyntheticGenerationConfig {
   task: TaskEnum | null
   domain: DomainEnum | null
@@ -132,14 +136,16 @@ export interface TestCaseV0 {
   name: string
   type: EvaluationType
   responseVariableName: string
+  contextVariableNames: string[]
   evaluator: Evaluator | null
-  criteria: CriteriaV0 | CriteriaWithOptionsV0
+  criteria: CriteriaV1 | CriteriaWithOptionsV1
   instances: InstanceV0[]
   syntheticGenerationConfig: SyntheticGenerationConfig
-  contextVariableNames: string[]
 }
 
-export type TestCase = TestCaseV0
+export interface TestCaseV1 extends Omit<TestCaseV0, 'responseVariableName' | 'contextVariableNames'> {}
+
+export type TestCase = TestCaseV1
 
 export enum EvaluationType {
   DIRECT = 'direct',
@@ -152,7 +158,7 @@ export enum ModelProviderType {
   OPENAI_LIKE = 'open-ai-like',
   RITS = 'rits',
   AZURE = 'azure',
-  LOCAL_HF = 'local_hf',
+  LOCAL_HF = 'hf-local',
   TOGETHER_AI = 'together-ai',
   AWS = 'aws',
   VERTEX_AI = 'vertex-ai',
@@ -224,25 +230,32 @@ export interface Benchmark {
   tags: string[]
 }
 
-export type FetchedCriteriaWithOptionsV0 = {
+export interface FetchedCriteriaWithOptionsV0 extends FetchedCriteriaV0 {
   name: string
   description: string
   options: CriteriaOptionV0[]
+}
+
+export interface FetchedCriteriaWithOptionsV1 extends FetchedCriteriaWithOptionsV0 {
   prediction_field: string
   context_fields: string[]
 }
 
 export type FetchedCriteriaWithOptions = FetchedCriteriaWithOptionsV0
 
-export type CriteriaWithOptionsV0 = {
+export interface CriteriaWithOptionsV0 extends CriteriaV0 {
   name: string
   description: string
   options: CriteriaOptionV0[]
-  predictionField: string
-  contextFields: string[]
 }
 
-export type CriteriaWithOptions = CriteriaWithOptionsV0
+export interface CriteriaWithOptionsV1 extends CriteriaV1 {
+  name: string
+  description: string
+  options: CriteriaOptionV0[]
+}
+
+export type CriteriaWithOptions = CriteriaWithOptionsV1
 
 export interface FetchedCriteriaV0 {
   name: string
@@ -251,16 +264,24 @@ export interface FetchedCriteriaV0 {
   context_fields: string[]
 }
 
-export type FetchedCriteria = FetchedCriteriaV0
-
-export interface CriteriaV0 {
-  name: string
-  description: string
+export interface FetchedCriteriaV1 extends FetchedCriteriaV0 {
   predictionField: string
   contextFields: string[]
 }
 
-export type Criteria = CriteriaV0
+export type FetchedCriteria = FetchedCriteriaV1
+
+export interface CriteriaV0 {
+  name: string
+  description: string
+}
+
+export interface CriteriaV1 extends CriteriaV0 {
+  predictionField: string
+  contextFields: string[]
+}
+
+export type Criteria = CriteriaV1
 
 export class Version {
   version: string
@@ -305,7 +326,7 @@ export type ModelProviderCredentials = {
     api_key: string
     api_base: string
   }
-  local_hf: {}
+  'hf-local': {}
   'together-ai': {
     api_key: string
   }
