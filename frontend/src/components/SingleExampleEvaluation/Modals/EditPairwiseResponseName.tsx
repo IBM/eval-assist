@@ -14,11 +14,11 @@ interface Props {
 export const EditPairwiseResponseName = ({ open, setOpen }: Props) => {
   const { currentTestCase, setCurrentTestCase } = useCurrentTestCase()
 
-  const [responseVariableName, setResponseVariableName] = useState(currentTestCase.responseVariableName)
+  const [responseVariableName, setResponseVariableName] = useState(currentTestCase.criteria.predictionField)
 
   useEffect(() => {
-    setResponseVariableName(currentTestCase.responseVariableName)
-  }, [currentTestCase.responseVariableName])
+    setResponseVariableName(currentTestCase.criteria.predictionField)
+  }, [currentTestCase.criteria.predictionField])
 
   return (
     <Modal
@@ -28,7 +28,10 @@ export const EditPairwiseResponseName = ({ open, setOpen }: Props) => {
       primaryButtonText="Confirm"
       secondaryButtonText="Cancel"
       onRequestSubmit={(e) => {
-        setCurrentTestCase({ ...currentTestCase, responseVariableName })
+        setCurrentTestCase({
+          ...currentTestCase,
+          criteria: { ...currentTestCase.criteria, predictionField: responseVariableName },
+        })
         setOpen(false)
       }}
       shouldSubmitOnEnter

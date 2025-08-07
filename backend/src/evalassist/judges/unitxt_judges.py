@@ -1,108 +1,99 @@
-from abc import ABC
-from typing import Any, List, Optional, cast
+from abc import ABC, abstractmethod
+from collections.abc import Sequence
+from typing import Any, Generic, List, cast
 
+from evalassist.judges.base import (
+    CriteriaTypeBar,
+    DirectInstance,
+    DirectJudge,
+    InstanceTypeVar,
+    Judge,
+    PairwiseJudge,
+    ReturnVarType,
+)
 from unitxt.api import evaluate, load_dataset
 from unitxt.blocks import Task, TaskCard
 from unitxt.llm_as_judge import (
     Criteria,
     CriteriaWithOptions,
-    EvaluatorNameEnum,
-    EvaluatorTypeEnum,
     LLMJudgeDirect,
     LLMJudgePairwise,
     LoadCriteria,
     LoadCriteriaWithOptions,
-    ModelProviderEnum,
 )
 from unitxt.loaders import LoadFromDictionary
+from unitxt.metric_utils import EvaluationResults
 from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
 from ..api.common import (
+    DirectInstanceResult,
     DirectPositionalBias,
-    DirectResultModel,
-    Instance,
-    PairwiseResultModel,
-)
-from ..const import (
-    UNITXT_JUDGE_PARAMS,
-    ExtendedEvaluatorNameEnum,
-    ExtendedModelProviderEnum,
-)
-from ..utils import (
-    get_evaluator_metadata_wrapper,
-    get_inference_engine,
-    get_model_name_from_evaluator,
+    PairwiseInstance,
+    PairwiseInstanceResult,
+    SingleSystemPairwiseResult,
 )
 
 
-class UnitxtEvaluator(ABC):
-    evaluator_type: EvaluatorTypeEnum
+class UnitxtJudge(
+    Judge[InstanceTypeVar, CriteriaTypeBar, ReturnVarType],
+    ABC,
+    Generic[InstanceTypeVar, CriteriaTypeBar, ReturnVarType],
+):
+    @abstractmethod
+    def get_preprocess_steps(self) -> list[Any]: ...
 
-    def __init__(
-        self,
-        evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
-        custom_model_name: Optional[str] = None,
-    ):
-        self.evaluator_metadata = get_evaluator_metadata_wrapper(
-            evaluator_name, custom_model_name
-        )
+    @abstractmethod
+    def get_prediction_type(self) -> type: ...
 
-    def get_preprocess_steps(self):
-        raise NotImplementedError("This method must be implemented.")
+    @abstractmethod
+    def get_evaluator_klass(self) -> type: ...
 
-    def parse_results(self, dataset):
-        raise NotImplementedError("This method must be implemented.")
-
-    def get_prediction_type(self):
-        raise NotImplementedError("This method must be implemented.")
-
-    def get_evaluator_klass(self):
-        raise NotImplementedError("This method must be implemented.")
-
-    def get_predictions(self, instances: list[Instance]) -> list[str | list[str]]:
-        return [instance.response for instance in instances]
+    @abstractmethod
+    def parse_results(self, dataset) -> List[ReturnVarType]: ...
 
     def evaluate(
         self,
-        instances: list[Instance],
-        criteria: Criteria | CriteriaWithOptions,
-        provider: ModelProviderEnum | ExtendedModelProviderEnum,
-        credentials: dict[str, str],
-    ):
-        model_name = get_model_name_from_evaluator(
-            self.evaluator_metadata,
-            provider,
-        )
+        instances: Sequence[InstanceTypeVar],
+    ) -> Sequence[ReturnVarType]:
+        if (
+            self.criteria.prediction_field is None
+            or self.criteria.context_fields is None
+        ):
+            raise ValueError(
+                "EvalAssist uses the new LLM Judge API, where the predictions and context fields are provided in the criteria definition. Make sure to adhere to it."
+            )
 
-        inference_engine = get_inference_engine(
-            credentials,
-            provider,
-            model_name,
-            custom_params=UNITXT_JUDGE_PARAMS,
-        )
+        predictions = self.get_predictions(instances)
 
-        context_variables_list = [instance.context_variables for instance in instances]
+        task_data: list[dict[str, str | list[str]]] = [
+            {**instance.context_variables, self.criteria.prediction_field: prediction}
+            for instance, prediction in zip(instances, predictions)
+        ]
 
-        evalutor_params = {
-            "inference_engine": inference_engine,
-            "context_fields": list(context_variables_list[0].keys()),
+        evaluator_params = {
+            "inference_engine": self.inference_engine,
+            "context_fields": [],
             "criteria_field": "criteria",
             "generate_summaries": False,
+            "criteria": self.criteria,
         }
 
         input_fields = {
-            input_field: str for input_field in context_variables_list[0].keys()
+            context_field: str for context_field in self.criteria.context_fields
         }
-        metric = self.get_evaluator_klass()(**evalutor_params)
-        data = {"test": context_variables_list}
-        data["test"] = [{**d, "judgement": criteria} for d in data["test"]]
+        input_fields[self.criteria.prediction_field] = self.get_prediction_type()
+
+        metric = self.get_evaluator_klass()(**evaluator_params)
+
+        data = {"test": [{**c, "judgement": self.criteria} for c in task_data]}
+
         card = TaskCard(
             loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
             preprocess_steps=self.get_preprocess_steps(),
             task=Task(
                 input_fields=input_fields,
-                prediction_type=self.get_prediction_type(),
+                # prediction_type=self.get_prediction_type(),
                 metrics=[metric],
                 reference_fields={"criteria": Any},
                 default_template=NullTemplate(),
@@ -110,24 +101,18 @@ class UnitxtEvaluator(ABC):
         )
 
         dataset = load_dataset(card=card, split="test")
-        predictions = self.get_predictions(instances)
-        evaluated_dataset = evaluate(predictions=predictions, data=dataset)
-        per_instance_result = self.parse_results(evaluated_dataset)
-        results = []
-        for instance_result, instance in zip(per_instance_result, instances):
-            results.append({"id": instance.id, "result": instance_result})
-        return results
+        evaluated_dataset: EvaluationResults = evaluate(data=dataset)
+        per_instance_results: list[ReturnVarType] = self.parse_results(
+            evaluated_dataset
+        )
+
+        return per_instance_results
 
 
-class DirectAssessmentEvaluator(UnitxtEvaluator):
-    def __init__(
-        self,
-        evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
-        custom_model_name: Optional[str] = None,
-    ):
-        super().__init__(evaluator_name, custom_model_name)
-        self.evaluator_type = EvaluatorTypeEnum.DIRECT
-
+class UnitxtDirectJudge(
+    UnitxtJudge[DirectInstance, CriteriaWithOptions, DirectInstanceResult],
+    DirectJudge,
+):
     def get_preprocess_steps(self):
         return [LoadCriteriaWithOptions(field="judgement", to_field="criteria")]
 
@@ -137,7 +122,7 @@ class DirectAssessmentEvaluator(UnitxtEvaluator):
     def get_evaluator_klass(self):
         return LLMJudgeDirect
 
-    def parse_results(self, dataset) -> list[DirectResultModel]:
+    def parse_results(self, dataset) -> list[DirectInstanceResult]:
         results = []
         prefix = dataset[0]["score"]["instance"]["score_name"]
         for instance in dataset:
@@ -154,7 +139,7 @@ class DirectAssessmentEvaluator(UnitxtEvaluator):
                 ]
 
             results.append(
-                DirectResultModel(
+                DirectInstanceResult(
                     option=instance_score[f"{prefix}_selected_option"],
                     explanation=instance_score[f"{prefix}_assessment"],
                     positional_bias=positional_bias,
@@ -163,15 +148,10 @@ class DirectAssessmentEvaluator(UnitxtEvaluator):
         return results
 
 
-class PairwiseComparisonEvaluator(UnitxtEvaluator):
-    def __init__(
-        self,
-        evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum,
-        custom_model_name: Optional[str] = None,
-    ):
-        super().__init__(evaluator_name, custom_model_name)
-        self.evaluator_type = EvaluatorTypeEnum.PAIRWISE
-
+class UnitxtPairwiseJudge(
+    UnitxtJudge[PairwiseInstance, Criteria, PairwiseInstanceResult],
+    PairwiseJudge,
+):
     def get_preprocess_steps(self):
         return [LoadCriteria(field="judgement", to_field="criteria")]
 
@@ -182,41 +162,36 @@ class PairwiseComparisonEvaluator(UnitxtEvaluator):
         return LLMJudgePairwise
 
     def parse_results(self, dataset):
-        results = []
+        results: list[PairwiseInstanceResult] = []
         for instance in dataset:
             score = instance["score"]["instance"]
 
-            parsed_score = {}
+            parsed_score: dict[str, SingleSystemPairwiseResult] = {}
             for key in score.keys():
                 outer_key = key.split("_")[0]
                 if outer_key not in ["score", "criteria"]:
-                    parsed_score[outer_key] = PairwiseResultModel(
-                        **{
-                            "contest_results": score[f"{outer_key}_contest_results"],
-                            "compared_to": score[f"{outer_key}_compared_to"],
-                            "explanations": score[f"{outer_key}_assessments"],
-                            "positional_bias": score[f"{outer_key}_positional_bias"],
-                            "winrate": score[f"{outer_key}_winrate"],
-                            "ranking": score[f"{outer_key}_ranking"],
-                            "selections": score[f"{outer_key}_selections"],
-                        }
+                    parsed_score[outer_key] = SingleSystemPairwiseResult(
+                        contest_results=score[f"{outer_key}_contest_results"],
+                        compared_to=score[f"{outer_key}_compared_to"],
+                        explanations=score[f"{outer_key}_assessments"],
+                        positional_bias=score[f"{outer_key}_positional_bias"],
+                        winrate=score[f"{outer_key}_winrate"],
+                        ranking=score[f"{outer_key}_ranking"],
+                        selections=score[f"{outer_key}_selections"],
                     )
-            results.append(parsed_score)
-
+            results.append(PairwiseInstanceResult(parsed_score))
         return results
 
 
-class GraniteGuardianEvaluator(ABC):
-    evaluator_type: EvaluatorTypeEnum = EvaluatorTypeEnum.DIRECT
+class GraniteGuardianJudge(
+    DirectJudge,
+):
     field_map = {
         "user_message_field": "user_message",
         "assistant_message_field": "assistant_message",
         "context_field": "context",
         "tools_field": "tools",
     }
-
-    def __init__(self, name: ExtendedEvaluatorNameEnum):
-        self.evaluator_name = name
 
     def get_harms_and_risks_result_description(
         self, evaluated_component, criteria_name
@@ -237,29 +212,23 @@ class GraniteGuardianEvaluator(ABC):
 
         return messages[criteria_name]
 
-    def get_predictions(self, instances: list[Instance]) -> list[str | list[str]]:
-        return [instance.response for instance in instances]
-
-    def get_prompt(self, risk_name, instances) -> str:
+    def get_prompt(self, risk_name, instances) -> list[str]:
         risk_name = self.get_risk_name(risk_name)
         predictions = self.get_predictions(instances)
 
-        context_variables_list = self.get_context_variables(
+        context_variables_list = self.get_unitxt_dataset(
             instances=instances, predictions=predictions
         )
         input_fields = self.get_input_fields(context_variables_list)
-        granite_guardian_class = self.getEvaluatorClass(
+        granite_guardian_class: type[GraniteGuardianBase] = self.getEvaluatorClass(
             self.infer_risk_type(
                 risk_name=risk_name, field_map=self.field_map, input_fields=input_fields
             )
         )
 
-        metric = cast(
-            GraniteGuardianBase,
-            granite_guardian_class(
-                risk_name=risk_name,
-                **self.field_map,
-            ),
+        metric = granite_guardian_class(
+            risk_name=risk_name,
+            **self.field_map,
         )
 
         return [
@@ -267,15 +236,13 @@ class GraniteGuardianEvaluator(ABC):
             for context_variables in context_variables_list
         ]
 
-    def parse_results(
-        self, dataset, response_variable_name: str
-    ) -> list[DirectResultModel]:
+    def parse_results(self, dataset) -> list[DirectInstanceResult]:
         results = []
         for instance in dataset:
             risk_name: str = instance["score"]["instance"]["score_name"]
             instance_score = instance["score"]["instance"]
             explanation = self.get_harms_and_risks_result_description(
-                response_variable_name.replace("_", " "),
+                cast(str, self.criteria.prediction_field).replace("_", " "),
                 risk_name.lower().replace(" ", "_"),
             )
 
@@ -289,7 +256,7 @@ class GraniteGuardianEvaluator(ABC):
                 raise ValueError("Granite Guardian evaluation failed")
 
             results.append(
-                DirectResultModel(
+                DirectInstanceResult(
                     option=instance_score[f"{risk_name}_label"],
                     explanation=explanation,
                     positional_bias=positional_bias,
@@ -309,58 +276,50 @@ class GraniteGuardianEvaluator(ABC):
 
         return risk_name if risk_name != "general_harm" else "harm"
 
-    def get_context_variables(
-        self, instances: list[Instance], predictions: list[str]
+    def get_unitxt_dataset(
+        self, instances: Sequence[DirectInstance], predictions: list[str]
     ) -> list[dict[str, str]]:
         context_variables_list = [instance.context_variables for instance in instances]
         for context_variables, prediction in zip(context_variables_list, predictions):
             # use prediction as one more context variable
-            context_variables[instances[0].response_variable_name] = prediction
+            if self.criteria.prediction_field is not None:
+                context_variables[cast(str, self.criteria.prediction_field)] = (
+                    prediction
+                )
+            else:
+                context_variables["response"] = prediction
 
         return [
             {k.lower().replace(" ", "_"): v for k, v in context_variables.items()}
             for context_variables in context_variables_list
         ]
 
-    def get_input_fields(self, context_variables_list: list[dict[str, str]]):
+    def get_input_fields(
+        self, context_variables_list: list[dict[str, str]]
+    ) -> dict[str, type[str]]:
         return {input_field: str for input_field in context_variables_list[0].keys()}
 
     def evaluate(
         self,
-        criteria: Criteria | CriteriaWithOptions,
-        provider: ModelProviderEnum,
-        credentials: dict[str, str],
-        instances: list[Instance],
-    ):
-        risk_name = self.get_risk_name(criteria.name)
+        instances: Sequence[DirectInstance],
+    ) -> Sequence[DirectInstanceResult]:
+        risk_name = self.get_risk_name(self.criteria.name)
         predictions = self.get_predictions(instances)
-        context_variables_list = self.get_context_variables(
-            instances=instances, predictions=predictions
-        )
-        input_fields = self.get_input_fields(context_variables_list)
+        dataset = self.get_unitxt_dataset(instances=instances, predictions=predictions)
+        input_fields = self.get_input_fields(dataset)
 
-        granite_guardian_class = self.getEvaluatorClass(
+        granite_guardian_class: type[GraniteGuardianBase] = self.getEvaluatorClass(
             self.infer_risk_type(
                 risk_name=risk_name, field_map=self.field_map, input_fields=input_fields
             )
         )
 
-        custom_params = {}
-        self.evaluator_metadata = get_evaluator_metadata_wrapper(self.evaluator_name)
-        model_name = get_model_name_from_evaluator(
-            self.evaluator_metadata,
-            provider,
-        )
-        inference_engine = get_inference_engine(
-            credentials, provider, model_name, custom_params
-        )
-
         metric = granite_guardian_class(
             risk_name=risk_name,
             **self.field_map,
-            inference_engine=inference_engine,
+            inference_engine=self.inference_engine,
         )
-        data = {"test": context_variables_list}
+        data = {"test": dataset}
 
         card = TaskCard(
             loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
@@ -374,24 +333,24 @@ class GraniteGuardianEvaluator(ABC):
         )
 
         dataset = load_dataset(card=card, split="test")
-        evaluated_dataset = evaluate(predictions=[0.0 for _ in dataset], data=dataset)
+        evaluated_dataset: EvaluationResults = evaluate(predictions=None, data=dataset)
 
-        per_instance_result = self.parse_results(
-            evaluated_dataset, instances[0].response_variable_name
+        per_instance_result: list[DirectInstanceResult] = self.parse_results(
+            evaluated_dataset
         )
-        results = []
-        for instance_result, instance in zip(per_instance_result, instances):
-            results.append({"id": instance.id, "result": instance_result})
-        return results
+        return per_instance_result
 
     def infer_risk_type(
-        self, risk_name: str, field_map: dict[str, str], input_fields: dict[str, str]
+        self,
+        risk_name: str,
+        field_map: dict[str, str],
+        input_fields: dict[str, type[str]],
     ) -> RiskType:
         """
         Infers the RiskType based on the risk_name and the provided input fields keys.
         """
 
-        available_risks = GraniteGuardianBase.available_risks
+        available_risks: dict[RiskType, list[str]] = GraniteGuardianBase.available_risks
 
         if risk_name in available_risks[RiskType.ASSISTANT_MESSAGE]:
             if field_map["assistant_message_field"] in input_fields:
@@ -409,5 +368,5 @@ class GraniteGuardianEvaluator(ABC):
 
         return RiskType.CUSTOM_RISK
 
-    def getEvaluatorClass(self, risk_type: RiskType) -> GraniteGuardianBase:
+    def getEvaluatorClass(self, risk_type: RiskType) -> type[GraniteGuardianBase]:
         return RISK_TYPE_TO_CLASS[risk_type]

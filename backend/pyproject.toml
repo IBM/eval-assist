@@ -56,7 +56,7 @@ dependencies = [
     "openai",
     "pandas",
     "ibm_watsonx_ai",
-    "unitxt>=1.26.4",
+    "unitxt>=1.26.6",
     "nbconvert",
     "boto3",
     "ollama",
@@ -102,6 +102,11 @@ pytest-cov = "*"
 [tool.pytest.ini_options]
 addopts = "--cov=evalassist"
 
+
+
+
+
+
 [tool.poetry.group.local-inference]
 optional = true
 
@@ -110,11 +115,20 @@ torch = "*"
 accelerate = "*"
 transformers = "*"
 
+
+
+
+
+
 [tool.poetry.group.postgresql]
 optional = true
 
 [tool.poetry.group.postgresql.dependencies]
 psycopg2-binary = "*"
+
+
+
+
 
 
 [tool.poetry.group.benchmarks]

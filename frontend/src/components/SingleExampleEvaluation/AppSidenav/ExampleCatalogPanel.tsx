@@ -23,7 +23,7 @@ interface Props {
 }
 
 export const ExampleCatalogPanel = ({ onClose, onTestCaseClick }: Props) => {
-  const { rubricLibraryTestCases, pairwiseLibraryTestCases } = useTestCaseLibrary()
+  const { directLibraryTestCases: rubricLibraryTestCases, pairwiseLibraryTestCases } = useTestCaseLibrary()
 
   const [expanded, setExpanded] = useState<{ direct: boolean; pairwise: boolean } & { [key: string]: boolean }>({
     direct: true,

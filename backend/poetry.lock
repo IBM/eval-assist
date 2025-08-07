@@ -5010,18 +5010,18 @@ files = [
 
 [[package]]
 name = "unitxt"
-version = "1.26.4"
+version = "1.26.6"
 description = "Load any mixture of text to text data in one line of code"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "unitxt-1.26.4-py3-none-any.whl", hash = "sha256:1d3ef0f1c11a01cbcb7b54621daf1a75a2a17356d2e3e950234d66328f0c84cd"},
-    {file = "unitxt-1.26.4.tar.gz", hash = "sha256:b7729514a1438dae0217b47238c6cf842aaae74112c056dd3427828f34025568"},
+    {file = "unitxt-1.26.6-py3-none-any.whl", hash = "sha256:b4051ff8b5168006a7f506bed3fe145ce58760be421e6ddfb8cb0d0470d25b1e"},
+    {file = "unitxt-1.26.6.tar.gz", hash = "sha256:f8e1639f881c5d4bedc287ada37e00800708e8ec587a01dd30ecb362cb0de7e8"},
 ]
 
 [package.dependencies]
-datasets = ">=2.16.0,<4.0"
+datasets = ">=2.16.0"
 diskcache = "*"
 evaluate = "*"
 scipy = ">=1.10.1"
@@ -5501,4 +5501,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "cc66cc6105da3e541fce0800db20ec71e472f49460786bf875517c9c9f8b00a0"
+content-hash = "ac08b19f49503134caacec9220c44e0e90037ceb4ef5776db60ae79aa9598e10"

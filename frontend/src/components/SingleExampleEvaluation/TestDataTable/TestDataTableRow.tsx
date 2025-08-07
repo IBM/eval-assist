@@ -38,7 +38,6 @@ interface Props {
   type: EvaluationType
   addInstance: (instance: Instance) => void
   resultsAvailable: boolean
-  responseVariableName: string
   runEvaluation: (evaluationIds: string[]) => Promise<void>
 }
 
@@ -54,7 +53,6 @@ export const TestDataTableRow = ({
   setInstance,
   addInstance,
   removeInstance,
-  responseVariableName,
   type,
   resultsAvailable,
   runEvaluation,
@@ -110,9 +108,9 @@ export const TestDataTableRow = ({
         type,
         () => (criteria as CriteriaWithOptions).options.map((option) => ({ value: option.name, text: option.name })),
 
-        () => responses.map((_, i) => ({ text: `${toTitleCase(responseVariableName)} ${i + 1}`, value: i + 1 })),
+        () => responses.map((_, i) => ({ text: `${toTitleCase(criteria.predictionField)} ${i + 1}`, value: i + 1 })),
       ).filter((option) => option.text !== ''),
-    [type, criteria, responses, responseVariableName],
+    [type, criteria, responses],
   )
 
   const positionalBiasDetected = useMemo(() => {
@@ -218,7 +216,7 @@ export const TestDataTableRow = ({
                     onBlur={setInactive}
                     className={cx(classes.blockElement)}
                     instanceId={instance.id}
-                    fieldName={responseVariableName}
+                    fieldName={criteria.predictionField}
                   />
                 </div>
               ))}
@@ -277,7 +275,7 @@ export const TestDataTableRow = ({
                           {returnByPipelineType(
                             type,
                             result.result,
-                            `${toTitleCase(responseVariableName)} ${pairwiseWinnerIndex! + 1}`,
+                            `${toTitleCase(criteria.predictionField)} ${pairwiseWinnerIndex! + 1}`,
                           )}
                         </strong>
                       </div>

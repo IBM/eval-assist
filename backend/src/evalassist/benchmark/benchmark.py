@@ -4,15 +4,23 @@ import math
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import cycle
+from typing import cast
 
 import pandas as pd
+from evalassist.api.common import DirectInstance
 from evalassist.const import EVAL_ASSIST_DIR
-from evalassist.utils import folder_exists_in_github_repo
+from evalassist.judges.synthetic_persona_direct_judge import (
+    ExperimentalSimpleDirectJudge,
+)
+from evalassist.utils import (
+    folder_exists_in_github_repo,
+    unitxt_dataset_to_evalassist_instances,
+)
 from scipy.stats import pearsonr, spearmanr
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
 from unitxt.inference import CrossProviderInferenceEngine, MetricInferenceEngine
-from unitxt.llm_as_judge import EvaluatorTypeEnum, LLMJudgeDirect
+from unitxt.llm_as_judge import CriteriaWithOptions, EvaluatorTypeEnum, LLMJudgeDirect
 from unitxt.settings_utils import get_constants
 
 RESULTS_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "benchmark_results.csv"
@@ -183,6 +191,104 @@ def get_judgebench_cards():
 
 
 inference_engines = {}
+
+
+def run_single_model_card_experimental(
+    card: str,
+    dataset,
+    model: str,
+    generate_synthetic_persona: bool,
+    inference_engine: CrossProviderInferenceEngine,
+):
+    """
+    Runs a single benchmark card with the specified model and API key.
+
+    Args:
+        card (str): The name of the benchmark card to run.
+        dataset: The dataset to use for benchmarking.
+        model (str): The name of the model to use for benchmarking.
+        api_key (str): The API key to use for the model.
+
+    Returns:
+        tuple: A tuple containing the benchmark result and inspection rows.
+    """
+    print(
+        "Running card:",
+        card,
+        "with model:",
+        model,
+        "generate_synthetic_persona: ",
+        generate_synthetic_persona,
+    )
+
+    criteria: CriteriaWithOptions = cast(
+        CriteriaWithOptions,
+        fetch_artifact(json.loads(dataset[0]["task_data"])["criteria"])[0],
+    )
+
+    judge = ExperimentalSimpleDirectJudge(
+        inference_engine=inference_engine,
+        criteria=criteria,
+        generate_synthetic_persona=generate_synthetic_persona,
+    )
+
+    parsed_dataset: list[DirectInstance] = unitxt_dataset_to_evalassist_instances(
+        dataset, criteria
+    )
+
+    predictions = judge.evaluate(parsed_dataset)
+    prediction_scores = [criteria.option_map[p] for p in predictions]
+    # Extract the criteria name from the first prediction
+
+    judge.criteria.options.reverse()
+    positional_bias_predictions = judge.evaluate(parsed_dataset)
+
+    positional_bias_rate = 1 - (
+        sum(x == y for x, y in zip(predictions, positional_bias_predictions))
+        / len(predictions)
+    )
+
+    results = evaluate(predictions=prediction_scores, data=dataset)
+
+    # Extract metric names from the evaluation results
+    metric_names = [m.split(".")[1] for m in results[0]["metrics"]]
+
+    # Parse the evaluation results into a dictionary
+    parsed_results: dict[str, float | None] = {
+        metric_name: float(
+            results.global_scores[
+                metric_name if metric_name != "spearman" else "spearmanr"
+            ]
+        )
+        for metric_name in metric_names
+    }
+    parsed_results["positional_bias_rate"] = positional_bias_rate
+    parsed_results["corr_reponse_length/accuracy"] = None
+    parsed_results["corr_context_length/accuracy"] = None
+    parsed_results["corr_response_length/pos_bias"] = None
+    parsed_results["corr_context_length/pos_bias"] = None
+
+    benchmark_result = {
+        "card": card,
+        "model": model,
+        "provider": "rits",
+        "annotation": "experimental"
+        + ("_with_persona" if generate_synthetic_persona else ""),
+        "criteria": criteria.name,
+        "results": json.dumps(clean_nan(parsed_results)),
+    }
+
+    print(
+        "Finished unning card:",
+        card,
+        "with model:",
+        model,
+        "generate_synthetic_persona: ",
+        generate_synthetic_persona,
+    )
+
+    return benchmark_result, None
+
 
 metric_map = {
     "pearson": "pearsonr",

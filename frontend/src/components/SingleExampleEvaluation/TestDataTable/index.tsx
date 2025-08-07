@@ -85,7 +85,7 @@ export const TestDataTable = ({ style, className }: Props) => {
 
   const addEmptyRow = () => {
     let newEmptyInstance: Instance = {
-      contextVariables: currentTestCase.contextVariableNames.map((contextVariableName) => ({
+      contextVariables: currentTestCase.criteria.contextFields.map((contextVariableName) => ({
         name: contextVariableName,
         value: '',
       })),
@@ -116,7 +116,10 @@ export const TestDataTable = ({ style, className }: Props) => {
         ...instance,
         contextVariables: [...instance.contextVariables, { name: '', value: '' }],
       })),
-      contextVariableNames: [...currentTestCase.contextVariableNames, ''],
+      criteria: {
+        ...currentTestCase.criteria,
+        contextFields: [...currentTestCase.criteria.contextFields, ''],
+      },
     })
   }
 
@@ -142,11 +145,14 @@ export const TestDataTable = ({ style, className }: Props) => {
           ...instance.contextVariables.slice(index + 1),
         ],
       })),
-      contextVariableNames: [
-        ...currentTestCase.contextVariableNames.slice(0, index),
-        newValue,
-        ...currentTestCase.contextVariableNames.slice(index + 1),
-      ],
+      criteria: {
+        ...currentTestCase.criteria,
+        contextFields: [
+          ...currentTestCase.criteria.contextFields.slice(0, index),
+          newValue,
+          ...currentTestCase.criteria.contextFields.slice(index + 1),
+        ],
+      },
     })
   }
 
@@ -159,7 +165,10 @@ export const TestDataTable = ({ style, className }: Props) => {
 
       setCurrentTestCase({
         ...currentTestCase,
-        contextVariableNames: currentTestCase.contextVariableNames.filter((_, i) => i !== indexToDelete),
+        criteria: {
+          ...currentTestCase.criteria,
+          contextFields: currentTestCase.criteria.contextFields.filter((_, i) => i !== indexToDelete),
+        },
         instances: updatedInstances,
       })
     },
@@ -215,13 +224,13 @@ export const TestDataTable = ({ style, className }: Props) => {
     () =>
       returnByPipelineType<string[], string[]>(
         currentTestCase.type,
-        () => [currentTestCase.responseVariableName],
+        () => [currentTestCase.criteria.predictionField],
         () =>
           (instances[0] as PairwiseInstance).responses.map(
-            (_, i) => `${currentTestCase.responseVariableName} ${i + 1}`,
+            (_, i) => `${currentTestCase.criteria.predictionField} ${i + 1}`,
           ),
       ),
-    [currentTestCase.responseVariableName, currentTestCase.type, instances],
+    [currentTestCase.criteria.predictionField, currentTestCase.type, instances],
   )
 
   const onGenerateSyntheticDataClick = useCallback(() => {
@@ -250,7 +259,7 @@ export const TestDataTable = ({ style, className }: Props) => {
               <strong className={cx(classes.headerTypography)}>{'Test data'}</strong>
               {currentTestCase.type === EvaluationType.PAIRWISE && (
                 <Button kind="ghost" size="sm" renderIcon={Add} onClick={addResponse} disabled={evaluationRunning}>
-                  {`Add ${toTitleCase(currentTestCase.responseVariableName)}`}
+                  {`Add ${toTitleCase(currentTestCase.criteria.predictionField)}`}
                 </Button>
               )}
               <Button kind="ghost" size="sm" renderIcon={Add} onClick={addContextVariable} disabled={evaluationRunning}>
@@ -277,7 +286,10 @@ export const TestDataTable = ({ style, className }: Props) => {
                   <EditableTag
                     value={reponseName}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      setCurrentTestCase({ ...currentTestCase, responseVariableName: e.target.value })
+                      setCurrentTestCase({
+                        ...currentTestCase,
+                        criteria: { ...currentTestCase.criteria, predictionField: e.target.value },
+                      })
                     }
                     color="blue"
                     onEdit={returnByPipelineType(
@@ -294,7 +306,7 @@ export const TestDataTable = ({ style, className }: Props) => {
                     )}
                 </div>
               ))}
-              {currentTestCase.contextVariableNames.map((contextVariableName, i) => (
+              {currentTestCase.criteria.contextFields.map((contextVariableName, i) => (
                 <div key={i} className={cx(classes.blockElement, classes.subHeaderBlock)}>
                   <EditableTag
                     value={contextVariableName}
@@ -336,7 +348,6 @@ export const TestDataTable = ({ style, className }: Props) => {
               type={currentTestCase.type}
               addInstance={addInstance}
               resultsAvailable={resultsAvailable}
-              responseVariableName={currentTestCase.responseVariableName}
               runEvaluation={runEvaluation}
             />
           ))}

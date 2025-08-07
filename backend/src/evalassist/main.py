@@ -2,10 +2,12 @@ import logging
 import os
 import traceback
 import uuid
-from typing import Optional, Union, cast
+from collections.abc import Sequence
+from typing import cast
 
 import nbformat as nbf
 import nest_asyncio
+from evalassist.api.common import DirectInstanceDTO
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -21,6 +23,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlmodel import Session, select
+from unitxt.inference import InferenceEngine
 from unitxt.llm_as_judge import (
     DIRECT_CRITERIA,
     PAIRWISE_CRITERIA,
@@ -33,18 +36,19 @@ from unitxt.llm_as_judge import (
 # Logging req/resp
 from .actions_logger import LoggingRoute
 from .api.common import (
-    CriteriaAPI,
-    CriteriaOptionAPI,
-    CriteriaWithOptionsAPI,
+    CriteriaDTO,
+    CriteriaOptionDTO,
+    CriteriaWithOptionsDTO,
     DirectAIActionRequest,
     DirectAIActionResponse,
     DirectEvaluationRequestModel,
-    DirectResponseModel,
+    DirectInstance,
+    EvaluationResultDTO,
     FeatureFlagsModel,
-    Instance,
+    InstanceResultDTO,
     NotebookParams,
-    PairwiseEvaluationRequestModel,
-    PairwiseResponseModel,
+    PairwiseEvaluationRequest,
+    PairwiseInstance,
     SyntheticExampleGenerationRequest,
     TestModelRequestModel,
 )
@@ -55,16 +59,19 @@ from .api.types import DomainEnum, PersonaEnum
 from .benchmark.benchmark import get_all_benchmarks
 from .const import (
     AUTHENTICATION_ENABLED,
+    DIRECT_ACTION_PARAMS,
     EXTENDED_EVALUATORS_METADATA,
     STATIC_DIR,
     STORAGE_ENABLED,
+    SYNTHETIC_DATA_GENERATION_PARAMS,
+    UNITXT_JUDGE_PARAMS,
     domain_persona_map,
 )
 from .database import engine  # Assumes you have engine/session setup
-from .evaluators.unitxt import (
-    DirectAssessmentEvaluator,
-    GraniteGuardianEvaluator,
-    PairwiseComparisonEvaluator,
+from .judges.unitxt_judges import (
+    GraniteGuardianJudge,
+    UnitxtDirectJudge,
+    UnitxtPairwiseJudge,
 )
 from .model import AppUser, StoredTestCase
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
@@ -75,7 +82,7 @@ from .utils import (
     clean_object,
     get_custom_models,
     get_evaluator_metadata_wrapper,
-    get_inference_engine,
+    get_inference_engine_from_judge_metadata,
     get_model_name_from_evaluator,
     get_system_version,
     handle_llm_generation_exceptions,
@@ -146,7 +153,7 @@ def get_health() -> HealthCheck:
     "/feature-flags/",
     response_model=FeatureFlagsModel,
 )
-def get_feature_flags() -> HealthCheck:
+def get_feature_flags() -> dict[str, bool]:
     return {
         "authentication_enabled": AUTHENTICATION_ENABLED,
         "storage_enabled": STORAGE_ENABLED,
@@ -210,16 +217,22 @@ def get_default_credentials():
     return res
 
 
-@router.get("/criterias/")
-def get_criterias():
+@router.get("/criteria/")
+def get_criterias() -> dict[str, list[CriteriaWithOptionsDTO] | list[CriteriaDTO]]:
     """Get the list of available criterias"""
+    for c in [*DIRECT_CRITERIA, *PAIRWISE_CRITERIA]:
+        if c.context_fields is None or c.prediction_field is None:
+            raise ValueError(
+                "EvalAssist uses the new LLM Judge API, where the predictions and context fields are provided in the criteria definition. Make sure to adhere to it."
+            )
+
     return {
         "direct": [
-            CriteriaWithOptionsAPI(
+            CriteriaWithOptionsDTO(
                 name=c.name,
                 description=c.description,
                 options=[
-                    CriteriaOptionAPI(name=o.name, description=o.description)
+                    CriteriaOptionDTO(name=o.name, description=o.description)
                     for o in c.options
                 ],
                 prediction_field=c.prediction_field,
@@ -228,7 +241,7 @@ def get_criterias():
             for c in DIRECT_CRITERIA
         ],
         "pairwise": [
-            CriteriaAPI(
+            CriteriaDTO(
                 name=c.name,
                 description=c.description,
                 prediction_field=c.prediction_field,
@@ -241,7 +254,7 @@ def get_criterias():
 
 @router.post("/prompt/", response_model=list[str])
 def get_prompt(req: DirectEvaluationRequestModel):
-    evaluator = GraniteGuardianEvaluator(req.evaluator_name)
+    evaluator = GraniteGuardianJudge(req.evaluator_name)
 
     res = evaluator.get_prompt(
         instances=req.instances,
@@ -253,16 +266,14 @@ def get_prompt(req: DirectEvaluationRequestModel):
 @router.post("/test-model/")
 async def test_model(req: TestModelRequestModel):
     evaluator_name, custom_model_name = init_evaluator_name(req.evaluator_name)
-    model_name = get_model_name_from_evaluator(
-        get_evaluator_metadata_wrapper(evaluator_name, custom_model_name),
-        req.provider,
+
+    inference_engine: InferenceEngine = get_inference_engine_from_judge_metadata(
+        evaluator_name=evaluator_name,
+        custom_model_name=custom_model_name,
+        provider=req.provider,
+        llm_provider_credentials=req.llm_provider_credentials,
     )
-    inference_engine = get_inference_engine(
-        req.llm_provider_credentials,
-        req.provider,
-        model_name,
-        custom_params={"max_tokens": 1, "use_cache": False},
-    )
+
     try:
         inference_engine.infer([{"source": "Ok?"}])[0]
         return HealthCheck(status="OK")
@@ -274,49 +285,64 @@ async def test_model(req: TestModelRequestModel):
         )
 
 
-@router.post(
-    "/evaluate/", response_model=Union[DirectResponseModel, PairwiseResponseModel]
-)
-async def evaluate(req: DirectEvaluationRequestModel | PairwiseEvaluationRequestModel):
+@router.post("/evaluate/", response_model=EvaluationResultDTO)
+async def evaluate(
+    req: DirectEvaluationRequestModel | PairwiseEvaluationRequest,
+) -> EvaluationResultDTO:
     evaluator_name, custom_model_name = init_evaluator_name(req.evaluator_name)
 
     @handle_llm_generation_exceptions
     def run():
+        inference_engine: InferenceEngine = get_inference_engine_from_judge_metadata(
+            evaluator_name=evaluator_name,
+            custom_model_name=custom_model_name,
+            provider=req.provider,
+            llm_provider_credentials=req.llm_provider_credentials,
+            custom_params=UNITXT_JUDGE_PARAMS,
+        )
+
         if req.type == EvaluatorTypeEnum.DIRECT:
+            criteria = CriteriaWithOptions(
+                name=req.criteria.name,
+                description=req.criteria.description,
+                options=[
+                    CriteriaOption(name=o.name, description=o.description)
+                    for o in cast(CriteriaWithOptionsDTO, req.criteria).options
+                ],
+                prediction_field=req.criteria.prediction_field,
+                context_fields=req.criteria.context_fields,
+            )
             if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
-                evaluator = GraniteGuardianEvaluator(evaluator_name)
-            else:
-                evaluator = DirectAssessmentEvaluator(evaluator_name, custom_model_name)
-            criteria = (
-                CriteriaWithOptions(
-                    name=req.criteria.name,
-                    description=req.criteria.description,
-                    options=[
-                        CriteriaOption(name=o.name, description=o.description)
-                        for o in cast(CriteriaWithOptionsAPI, req.criteria).options
-                    ],
+                evaluator = GraniteGuardianJudge(
+                    criteria, inference_engine=inference_engine
                 )
-                if not isinstance(req.criteria, str)
-                else req.criteria
+            else:
+                evaluator = UnitxtDirectJudge(
+                    criteria,
+                    inference_engine=inference_engine,
+                )
+            per_instance_result = evaluator.evaluate(
+                instances=cast(Sequence[DirectInstance], req.instances),
             )
         else:
-            evaluator = PairwiseComparisonEvaluator(evaluator_name, custom_model_name)
-            criteria = (
-                Criteria(name=req.criteria.name, description=req.criteria.description)
-                if not isinstance(req.criteria, str)
-                else req.criteria
+            criteria = Criteria(
+                name=req.criteria.name,
+                description=req.criteria.description,
+                prediction_field=req.criteria.prediction_field,
+                context_fields=req.criteria.context_fields,
+            )
+            evaluator = UnitxtPairwiseJudge(criteria, inference_engine)
+
+            per_instance_result = evaluator.evaluate(
+                instances=cast(Sequence[PairwiseInstance], req.instances),
             )
 
-        res = evaluator.evaluate(
-            instances=req.instances,
-            criteria=criteria,
-            credentials=req.llm_provider_credentials,
-            provider=req.provider,
-        )
-        if req.type == EvaluatorTypeEnum.DIRECT:
-            return DirectResponseModel(results=res)
-        else:
-            return PairwiseResponseModel(results=res)
+        # Add the id to each instance result
+        res = []
+        for instance_result, instance in zip(per_instance_result, req.instances):
+            res.append(InstanceResultDTO(id=instance.id, result=instance_result))
+
+        return EvaluationResultDTO(results=res)
 
     return run()
 
@@ -410,7 +436,6 @@ class DeleteTestCaseBody(BaseModel):
 
 
 @router.delete("/test_case/")
-@router.delete("/test_case/")
 def delete_test_case(
     request_body: DeleteTestCaseBody, session: Session = Depends(get_session)
 ):
@@ -424,7 +449,7 @@ def delete_test_case(
 
 class CreateUserPostBody(BaseModel):
     email: str
-    name: Optional[str] = None
+    name: str | None = None
 
 
 @router.post("/user/")
@@ -541,37 +566,42 @@ def perform_direct_ai_action(params: DirectAIActionRequest):
     # initialize generator and generate response
     @handle_llm_generation_exceptions
     def run():
+        inference_engine = get_inference_engine_from_judge_metadata(
+            evaluator_name,
+            custom_model_name,
+            params.provider,
+            params.llm_provider_credentials,
+            custom_params=DIRECT_ACTION_PARAMS,
+        )
+
         direct_action_generator = DirectActionGenerator(
-            evaluator_name=evaluator_name,
-            custom_model_name=custom_model_name,
-            provider=params.provider,
-            llm_provider_credentials=params.llm_provider_credentials,
-            type=params.type,
             action=params.action,
             prompt=params.prompt,
+            inference_engine=inference_engine,
         )
         return DirectAIActionResponse(result=direct_action_generator.generate(params))
 
     return run()
 
 
-@router.post("/synthetic-examples/", response_model=list[Instance])
+@router.post("/synthetic-examples/", response_model=list[DirectInstanceDTO])
 def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
     # populate config
     evaluator_name, custom_model_name = init_evaluator_name(params.evaluator_name)
+    inference_engine = get_inference_engine_from_judge_metadata(
+        evaluator_name,
+        custom_model_name,
+        params.provider,
+        params.llm_provider_credentials,
+        custom_params=SYNTHETIC_DATA_GENERATION_PARAMS,
+    )
 
     # initialize generator and generate response
     @handle_llm_generation_exceptions
-    def run():
+    def run() -> list[DirectInstanceDTO]:
         generator = Generator(
-            evaluator_name=evaluator_name,
-            custom_model_name=custom_model_name,
-            provider=params.provider,
-            llm_provider_credentials=params.llm_provider_credentials,
-            type=params.type,
-            criteria=params.criteria,
-            response_variable_name=params.response_variable_name,
-            context_variables_names=params.context_variables_names,
+            inference_engine=inference_engine,
+            criteria=cast(CriteriaWithOptionsDTO, params.criteria),
             generation_length=params.generation_length,
             task=params.task,
             domain=params.domain,

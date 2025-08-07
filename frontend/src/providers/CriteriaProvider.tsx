@@ -54,27 +54,27 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoadingCriterias(true)
-      const response = await get('criterias/')
+      const response = await get('criteria/')
       const fetchedCriteria: { direct: FetchedCriteriaWithOptions[]; pairwise: FetchedCriteria[] } =
         await response.json()
       const parsedCriteria = {
         direct: fetchedCriteria.direct.map(
           (fetchedCriterion) =>
             ({
-              name: fetchedCriterion.name,
+              name: capitalizeFirstWord(fetchedCriterion.name),
               description: fetchedCriterion.description,
               options: fetchedCriterion.options,
-              predictionField: fetchedCriterion.prediction_field,
-              contextFields: fetchedCriterion.context_fields,
+              predictionField: capitalizeFirstWord(fetchedCriterion.prediction_field),
+              contextFields: fetchedCriterion.context_fields.map((c) => capitalizeFirstWord(c)),
             } as CriteriaWithOptions),
         ),
         pairwise: fetchedCriteria.pairwise.map(
           (fetchedCriterion) =>
             ({
-              name: fetchedCriterion.name,
+              name: capitalizeFirstWord(fetchedCriterion.name),
               description: fetchedCriterion.description,
-              predictionField: fetchedCriterion.prediction_field,
-              contextFields: fetchedCriterion.context_fields,
+              predictionField: capitalizeFirstWord(fetchedCriterion.prediction_field),
+              contextFields: fetchedCriterion.context_fields.map((c) => capitalizeFirstWord(c)),
             } as Criteria),
         ),
       }
@@ -120,8 +120,6 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
       return {
         ...getEmptyTestCase(type),
         criteria,
-        contextVariableNames: contextFields,
-        responseVariableName: criteria.predictionField,
         instances: returnByPipelineType(
           type,
           [getEmptyDirectInstance(contextFields)],

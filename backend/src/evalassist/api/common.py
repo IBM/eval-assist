@@ -1,7 +1,7 @@
-from typing import Any, Optional
+from typing import Any, Optional, Sequence
 
 from fastapi import HTTPException
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, RootModel, field_validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
 
 from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
@@ -14,9 +14,11 @@ from .types import (
 )
 
 
-class CriteriaModel(BaseModel):
+class CriteriaDTO(BaseModel):
     name: str
     description: str
+    prediction_field: str
+    context_fields: list[str]
 
     @field_validator("description")
     def validate_criteria(cls, description):
@@ -27,21 +29,44 @@ class CriteriaModel(BaseModel):
         return description
 
 
+class CriteriaOptionDTO(BaseModel):
+    name: str
+    description: str
+
+
+class CriteriaWithOptionsDTO(CriteriaDTO):
+    name: str
+    description: str
+    options: list[CriteriaOptionDTO]
+
+
 class Instance(BaseModel):
-    id: str
     context_variables: dict[str, str]
-    response: str | list[str]
-    response_variable_name: Optional[str]
-    metadata: Optional[dict[str, Any]] = None
-    expected_result: str
+    metadata: dict[str, Any] | None = None
 
 
-class EvaluationRequestModel(BaseModel):
+class DirectInstance(Instance):
+    response: str
+
+
+class PairwiseInstance(Instance):
+    responses: list[str]
+
+
+class DirectInstanceDTO(DirectInstance):
+    id: str
+
+
+class PairwiseInstanceDTO(PairwiseInstance):
+    id: str
+
+
+class EvaluationRequest(BaseModel):
     provider: ModelProviderEnum | ExtendedModelProviderEnum
-    llm_provider_credentials: dict[str, Optional[str]]
+    llm_provider_credentials: dict[str, str | None]
     evaluator_name: str
     type: EvaluatorTypeEnum
-    instances: list[Instance]
+    instances: Sequence[DirectInstanceDTO] | Sequence[PairwiseInstanceDTO]
 
     # @validator("llm_provider_credentials", pre=True, always=True)
     # def validate_api_key(cls, key):
@@ -65,17 +90,8 @@ class EvaluationRequestModel(BaseModel):
         return evaluator_name
 
 
-class PairwiseCriteriaModel(CriteriaModel):
-    pass
-
-
-class CriteriaAPI(BaseModel):
-    name: str
-    description: str
-
-
-class PairwiseEvaluationRequestModel(EvaluationRequestModel):
-    criteria: PairwiseCriteriaModel
+class PairwiseEvaluationRequest(EvaluationRequest):
+    criteria: CriteriaDTO
 
     # @validator("responses", pre=True, always=True)
     # def validate_responses_length(cls, responses):
@@ -93,7 +109,7 @@ class PairwiseEvaluationRequestModel(EvaluationRequestModel):
     # return responses
 
 
-class PairwiseResultModel(BaseModel):
+class SingleSystemPairwiseResult(BaseModel):
     contest_results: list[bool]
     compared_to: list[int]
     explanations: list[str]
@@ -104,13 +120,17 @@ class PairwiseResultModel(BaseModel):
     selections: list[str]
 
 
-class PairwiseInstanceResultModel(BaseModel):
+class PairwiseInstanceResult(RootModel):
+    root: dict[str, SingleSystemPairwiseResult]
+
+
+class PairwiseInstanceResultDTO(BaseModel):
     id: str
-    result: dict[str, PairwiseResultModel]
+    result: PairwiseInstanceResult
 
 
-class PairwiseResponseModel(BaseModel):
-    results: list[PairwiseInstanceResultModel]
+class PairwiseResultDTO(BaseModel):
+    results: list[PairwiseInstanceResultDTO]
 
 
 class NotebookParams(BaseModel):
@@ -126,27 +146,12 @@ class NotebookParams(BaseModel):
     plain_python_script: bool
 
 
-class CriteriaOptionAPI(BaseModel):
-    name: str
-    description: str
-
-
-class CriteriaWithOptionsAPI(BaseModel):
-    name: str
-    description: str
-    options: list[CriteriaOptionAPI]
-    prediction_field: Optional[str] = None
-    context_fields: Optional[list[str]] = None
-
-
 class SyntheticExampleGenerationRequest(BaseModel):
     provider: ModelProviderEnum | ExtendedModelProviderEnum
     llm_provider_credentials: dict[str, Optional[str]]
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
     type: EvaluatorTypeEnum
-    criteria: CriteriaWithOptionsAPI | PairwiseCriteriaModel
-    response_variable_name: str
-    context_variables_names: list[str]
+    criteria: CriteriaWithOptionsDTO | CriteriaDTO
     generation_length: Optional[GenerationLengthEnum]
     task: Optional[TaskEnum]
     domain: Optional[DomainEnum]
@@ -155,32 +160,8 @@ class SyntheticExampleGenerationRequest(BaseModel):
     borderline_count: int
 
 
-class RubricOptionModel(BaseModel):
-    option: str
-    description: str
-
-    # @validator('option', pre=True, always=True)
-    # def validate_option(cls, option):
-    #     if len(option.strip()) == 0:
-    #         raise HTTPException(status_code=400, detail="Invalid criteria, empty rubric answers are not allowed.")
-    #     return option
-
-
-class RubricCriteriaModel(CriteriaModel):
-    options: list[RubricOptionModel]
-
-    @field_validator("options")
-    def validate_options_length(cls, options):
-        if len(options) < 2:
-            raise HTTPException(
-                status_code=400, detail="Rubrics require a minimum of 2 options."
-            )
-        return options
-
-
-class DirectEvaluationRequestModel(EvaluationRequestModel):
-    criteria: CriteriaWithOptionsAPI | str
-    response_variable_name: str
+class DirectEvaluationRequestModel(EvaluationRequest):
+    criteria: CriteriaWithOptionsDTO
 
     # @validator("responses", pre=True, always=True)
     # def validate_responses_length(cls, responses):
@@ -204,19 +185,33 @@ class DirectPositionalBias(BaseModel):
     explanation: str = ""
 
 
-class DirectResultModel(BaseModel):
+class DirectInstanceResult(BaseModel):
     option: str
     explanation: str
     positional_bias: DirectPositionalBias
+    metadata: dict[str, Any] | None = None
 
 
-class DirectInstanceResultModel(BaseModel):
+class DirectInstanceResultDTO(BaseModel):
     id: str
-    result: DirectResultModel
+    result: DirectInstanceResult
 
 
-class DirectResponseModel(BaseModel):
-    results: list[DirectInstanceResultModel]
+class InstanceResultDTO(BaseModel):
+    id: str
+    result: DirectInstanceResult | PairwiseInstanceResult
+
+
+class DirectResultDTO(BaseModel):
+    results: list[DirectInstanceResultDTO]
+
+
+class InstanceResult(RootModel):
+    root: DirectInstanceResultDTO | PairwiseInstanceResultDTO
+
+
+class EvaluationResultDTO(BaseModel):
+    results: list[InstanceResultDTO]
 
 
 class TestModelRequestModel(BaseModel):

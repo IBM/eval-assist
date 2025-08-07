@@ -27,11 +27,16 @@ export const isInstanceOfPairwiseResult = (obj: any): obj is PairwiseInstanceRes
 export const isInstanceOfCriteriaWithOptions = (obj: any): obj is CriteriaWithOptions =>
   typeof obj.name === 'string' &&
   typeof obj.description === 'string' &&
+  typeof obj.predictionField === 'string' &&
+  typeof obj.contextFields === 'object' &&
   obj.options !== undefined &&
   obj.options.every((o: CriteriaOption) => isInstanceOfOption(o))
 
 export const isInstanceOfCriteria = (obj: any): obj is Criteria =>
-  typeof obj.name === 'string' && typeof obj.description === 'string'
+  typeof obj.name === 'string' &&
+  typeof obj.description === 'string' &&
+  typeof obj.predictionField === 'string' &&
+  typeof obj.contextFields === 'string'
 
 export const getEmptyCriteria = (): Criteria => ({
   name: '',
@@ -90,8 +95,6 @@ export const getEmptyTestCase = (type: EvaluationType, criteria?: Criteria): Tes
     ),
     criteria: criteria ?? returnByPipelineType(type, getEmptyCriteriaWithTwoOptions, getEmptyCriteria),
     evaluator: null,
-    contextVariableNames: c.contextFields,
-    responseVariableName: c.predictionField,
     syntheticGenerationConfig: {
       task: null,
       domain: null,
@@ -282,3 +285,20 @@ export const getSelectionPosition = (input: HTMLInputElement | HTMLTextAreaEleme
 
 export const generateId = () =>
   typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : uuidv4()
+
+export const parseCriteriaForBackend = (criteria: Criteria) => {
+  const res = {
+    name: criteria.name,
+    description: criteria.description,
+    prediction_field: criteria.predictionField,
+    context_fields: criteria.contextFields,
+  }
+  if (isInstanceOfCriteriaWithOptions(criteria)) {
+    const withOptions = {
+      ...res,
+      options: criteria.options,
+    }
+    return withOptions
+  }
+  return res
+}

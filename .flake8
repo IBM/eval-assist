@@ -5,3 +5,5 @@ select = C,E,F,W,B,B950,PT
 extend-ignore = E501,E203,W503,W605
 per-file-ignores =
     backend/src/evalassist/synthetic_example_generation/generate.py: W293
+    backend/src/evalassist/judges/base.py: E704
+    backend/src/evalassist/judges/unitxt_judges.py: E704

@@ -31,7 +31,8 @@ interface Props {
 
 export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
   const { currentTestCase, setCurrentTestCase } = useCurrentTestCase()
-  const { contextVariableNames, responseVariableName, syntheticGenerationConfig } = currentTestCase
+  const { syntheticGenerationConfig, criteria } = currentTestCase
+  const { predictionField, contextFields } = criteria
 
   const {
     tasksOptions,
@@ -61,10 +62,10 @@ export const SyntheticGenerationModal = ({ open, setOpen }: Props) => {
 
   const defaultTaskIndication = useMemo(
     () =>
-      `Generic synthetic generation task. EvalAssit will generate the context variables (${contextVariableNames
+      `Generic synthetic generation task. EvalAssit will generate the context variables (${contextFields
         .map((x) => "'" + x + "'")
-        .join(', ')}) and the '${responseVariableName}'`,
-    [contextVariableNames, responseVariableName],
+        .join(', ')}) and the '${predictionField}'`,
+    [contextFields, predictionField],
   )
 
   const onRequestSubmit = useCallback(() => {
