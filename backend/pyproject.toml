@@ -69,14 +69,10 @@ dependencies = [
 [tool.poetry]
 packages = [{ include = "evalassist", from = "src" }]
 include = [
-    { path = "evalassist/static/**/*", format = [
-        "sdist",
-        "wheel",
-    ] },
-    { path = "evalassist/alembic.ini", format = [
-        "sdist",
-        "wheel",
-    ] },
+    { path = "evalassist/static/**/*", format = "sdist" },
+    { path = "evalassist/static/**/*", format = "wheel" },
+    { path = "evalassist/alembic.ini", format = "sdist" },
+    { path = "evalassist/alembic.ini", format = "wheel" },
 ]
 version = "0.0.0"
 
@@ -105,8 +101,6 @@ addopts = "--cov=evalassist"
 
 
 
-
-
 [tool.poetry.group.local-inference]
 optional = true
 
@@ -118,15 +112,11 @@ transformers = "*"
 
 
 
-
-
 [tool.poetry.group.postgresql]
 optional = true
 
 [tool.poetry.group.postgresql.dependencies]
 psycopg2-binary = "*"
-
-
 
 
 
