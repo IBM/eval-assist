@@ -86,7 +86,7 @@ export const BACKEND_API_HOST = process.env.NEXT_PUBLIC_BACKEND_API_HOST || '' /
 export const notInUnitxtCriteria: { direct: CriteriaWithOptions[]; pairwise: Criteria[] } = {
   direct: [
     {
-      name: 'summarization_quality',
+      name: 'Summarization quality',
       description: 'Does the summary capture the essence of the article in the best possible way?',
       options: [
         {
@@ -105,8 +105,8 @@ export const notInUnitxtCriteria: { direct: CriteriaWithOptions[]; pairwise: Cri
             'The summary includes minor and irrelevant details which add no value and the narrative is inconsistent and scattered.',
         },
       ],
-      predictionField: 'summary',
-      contextFields: ['article'],
+      predictionField: 'Summary',
+      contextFields: ['Article'],
     },
     {
       name: 'fairness',
@@ -126,7 +126,7 @@ export const notInUnitxtCriteria: { direct: CriteriaWithOptions[]; pairwise: Cri
           description: '',
         },
       ],
-      predictionField: 'response',
+      predictionField: 'Response',
       contextFields: ['Context'],
     },
   ],

@@ -7,6 +7,7 @@ from typing import cast
 
 import nbformat as nbf
 import nest_asyncio
+import pandas as pd
 from evalassist.api.common import DirectInstanceDTO
 from fastapi import (
     APIRouter,
@@ -23,13 +24,11 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlmodel import Session, select
-from unitxt.inference import InferenceEngine
+from unitxt.inference import InferenceEngine, MockInferenceEngine
 from unitxt.llm_as_judge import (
     DIRECT_CRITERIA,
     PAIRWISE_CRITERIA,
     Criteria,
-    CriteriaOption,
-    CriteriaWithOptions,
     EvaluatorTypeEnum,
 )
 
@@ -41,14 +40,16 @@ from .api.common import (
     CriteriaWithOptionsDTO,
     DirectAIActionRequest,
     DirectAIActionResponse,
-    DirectEvaluationRequestModel,
     DirectInstance,
+    DownloadTestCaseBody,
+    DownloadTestDataBody,
+    EvaluationRequest,
     EvaluationResultDTO,
     FeatureFlagsModel,
     InstanceResultDTO,
     NotebookParams,
-    PairwiseEvaluationRequest,
     PairwiseInstance,
+    PutTestCaseBody,
     SyntheticExampleGenerationRequest,
     TestModelRequestModel,
 )
@@ -64,6 +65,7 @@ from .const import (
     STATIC_DIR,
     STORAGE_ENABLED,
     SYNTHETIC_DATA_GENERATION_PARAMS,
+    TEMPORARY_FILES_FOLDER,
     UNITXT_JUDGE_PARAMS,
     domain_persona_map,
 )
@@ -80,6 +82,7 @@ from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNot
 from .synthetic_example_generation.generate import DirectActionGenerator, Generator
 from .utils import (
     clean_object,
+    criteria_with_options_DTO_to_BO_mapper,
     get_custom_models,
     get_evaluator_metadata_wrapper,
     get_inference_engine_from_judge_metadata,
@@ -253,8 +256,14 @@ def get_criterias() -> dict[str, list[CriteriaWithOptionsDTO] | list[CriteriaDTO
 
 
 @router.post("/prompt/", response_model=list[str])
-def get_prompt(req: DirectEvaluationRequestModel):
-    evaluator = GraniteGuardianJudge(req.evaluator_name)
+def get_prompt(req: EvaluationRequest):
+    mock_inference_engine = MockInferenceEngine()
+    evaluator = GraniteGuardianJudge(
+        criteria=criteria_with_options_DTO_to_BO_mapper(
+            cast(CriteriaWithOptionsDTO, req.criteria)
+        ),
+        inference_engine=mock_inference_engine,
+    )
 
     res = evaluator.get_prompt(
         instances=req.instances,
@@ -287,7 +296,7 @@ async def test_model(req: TestModelRequestModel):
 
 @router.post("/evaluate/", response_model=EvaluationResultDTO)
 async def evaluate(
-    req: DirectEvaluationRequestModel | PairwiseEvaluationRequest,
+    req: EvaluationRequest,
 ) -> EvaluationResultDTO:
     evaluator_name, custom_model_name = init_evaluator_name(req.evaluator_name)
 
@@ -302,15 +311,8 @@ async def evaluate(
         )
 
         if req.type == EvaluatorTypeEnum.DIRECT:
-            criteria = CriteriaWithOptions(
-                name=req.criteria.name,
-                description=req.criteria.description,
-                options=[
-                    CriteriaOption(name=o.name, description=o.description)
-                    for o in cast(CriteriaWithOptionsDTO, req.criteria).options
-                ],
-                prediction_field=req.criteria.prediction_field,
-                context_fields=req.criteria.context_fields,
+            criteria = criteria_with_options_DTO_to_BO_mapper(
+                cast(CriteriaWithOptionsDTO, req.criteria)
             )
             if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
                 evaluator = GraniteGuardianJudge(
@@ -369,14 +371,6 @@ def get_test_case(
     if not test_case:
         raise HTTPException(status_code=404, detail="Test case not found")
     return test_case
-
-
-class PutTestCaseBody(BaseModel):
-    user: str
-    test_case: StoredTestCase
-
-
-# from .schemas import PutTestCaseBody  # Make sure this is defined
 
 
 @router.put("/test_case/")
@@ -524,18 +518,18 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
         nb = PairwiseEvaluationNotebook(params).generate_notebook()
     from nbconvert import PythonExporter
 
+    result_content_file = nb
     if params.plain_python_script:
         script, _ = PythonExporter().from_notebook_node(nb)
-    result_content_file = nb if not params.plain_python_script else script
-    root_folder = "generated_code"
-    if not os.path.exists(os.path.join(root_folder)):
-        os.mkdir(os.path.join(root_folder))
+        result_content_file = script
     file_format = {"ipynb" if not params.plain_python_script else "py"}
-    file_path = os.path.join(root_folder, f"{uuid.uuid4().hex}.{file_format}")
+    file_path = os.path.join(
+        TEMPORARY_FILES_FOLDER, f"generated_notebook_{uuid.uuid4().hex}.{file_format}"
+    )
 
     with open(file_path, "w") as f:
         if params.plain_python_script:
-            f.write(result_content_file)
+            f.write(cast(str, result_content_file))
         else:
             nbf.write(result_content_file, f)
 
@@ -549,6 +543,52 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
         file_path,
         media_type=media_type,
         filename=f"{params.evaluator_type}_generated_{'notebook' if not params.plain_python_script else 'script'}.{file_format}",
+    )
+
+
+@router.post("/download-test-case/")
+def download_test_case(params: DownloadTestCaseBody, background_tasks: BackgroundTasks):
+    # in the csv I want the instances:
+    test_case: StoredTestCase = params.test_case
+    file_path = os.path.join(
+        TEMPORARY_FILES_FOLDER, f"test_case_{uuid.uuid4().hex}.json"
+    )
+
+    with open(file_path, "w") as f:
+        f.write(test_case.model_dump_json(indent=2))
+
+    background_tasks.add_task(cleanup_file, file_path)
+    return FileResponse(
+        file_path,
+        media_type="json",
+        filename="test_case.json",
+    )
+
+
+@router.post("/download-test-data/")
+def download_test_data(params: DownloadTestDataBody, background_tasks: BackgroundTasks):
+    # in the csv I want the instances:
+    instances = params.instances
+    rows = [
+        {
+            **i.context_variables,
+            params.prediction_field: i.get_prediction(),
+            "expected_result": i.expected_result,
+        }
+        for i in instances
+    ]
+
+    df = pd.DataFrame(rows)
+    file_path = os.path.join(
+        TEMPORARY_FILES_FOLDER, f"test_data_{uuid.uuid4().hex}.csv"
+    )
+    df.to_csv(file_path, index=False)
+
+    background_tasks.add_task(cleanup_file, file_path)
+    return FileResponse(
+        file_path,
+        media_type="csv",
+        filename="eval_assist_test_data.csv",
     )
 
 

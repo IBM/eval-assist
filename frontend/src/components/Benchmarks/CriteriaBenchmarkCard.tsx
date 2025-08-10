@@ -2,22 +2,11 @@ import cx from 'classnames'
 
 import { CSSProperties, useMemo, useState } from 'react'
 
-import {
-  Link,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Tile,
-  Toggle,
-  Tooltip,
-} from '@carbon/react'
+import { Link, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tile, Tooltip } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
 import { useCriteriasContext } from '@providers/CriteriaProvider'
-import { CriteriaBenchmark, EvaluationType, Version } from '@types'
+import { CriteriaBenchmark, EvaluationType } from '@types'
 import { splitDotsAndCapitalizeFirstWord, toTitleCase } from '@utils'
 
 import classes from './CriteriaBenchmarkCard.module.scss'
@@ -47,6 +36,8 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
     () => getCriteria(criteriaBenchmark.catalogCriteriaName, benchmark?.type as EvaluationType),
     [benchmark?.type, criteriaBenchmark.catalogCriteriaName, getCriteria],
   )
+
+  console.log(criteriaBenchmark.catalogCriteriaName)
 
   const benchmarkMetrics = useMemo(() => {
     return Object.keys(criteriaBenchmark.evaluatorBenchmarks[0].results).filter(

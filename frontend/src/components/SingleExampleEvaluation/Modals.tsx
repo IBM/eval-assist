@@ -6,6 +6,8 @@ import { DeleteTestCaseModal } from './Modals/DeleteTestCaseModal'
 import { EditPairwiseResponseName } from './Modals/EditPairwiseResponseName'
 import { EditTestCaseNameModal } from './Modals/EditTestCaseNameModal'
 import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
+import { UploadTestCaseModal } from './Modals/ImportTestCaseModal'
+import { UploadTestDataModal } from './Modals/ImportTestDataModal'
 import { InstanceDetailsModal } from './Modals/InstanceDetailsModal'
 import { ModelProviderCredentialsModal } from './Modals/ModelProviderCredentialsModal'
 import { NewTestCaseModal } from './Modals/NewTestCaseModal'
@@ -22,6 +24,10 @@ export const Modals = () => {
     setSaveTestCaseModalOpen,
     newTestCaseModalOpen,
     setNewTestCaseModalOpen,
+    importTestCaseModalOpen,
+    setImportTestCaseModalOpen,
+    importTestDataModalOpen,
+    setImportTestDataModalOpen,
     deleteTestCaseModalOpen,
     setDeleteTestCaseModalOpen,
     editNameModalOpen,
@@ -47,6 +53,7 @@ export const Modals = () => {
   return (
     <>
       <NewTestCaseModal open={newTestCaseModalOpen} setOpen={setNewTestCaseModalOpen} />
+      <UploadTestCaseModal open={importTestCaseModalOpen} setOpen={setImportTestCaseModalOpen} />
       {showingTestCase && (
         <>
           <SwitchTestCaseModal
@@ -74,6 +81,7 @@ export const Modals = () => {
             open={editPairwiseResponseNameModalOpen}
             setOpen={setEditPairwiseResponseNameModalOpen}
           />
+          <UploadTestDataModal open={importTestDataModalOpen} setOpen={setImportTestDataModalOpen} />
         </>
       )}
     </>

@@ -1,5 +1,7 @@
+from abc import ABC, abstractmethod
 from typing import Any, Optional, Sequence
 
+from evalassist.database import StoredTestCase
 from fastapi import HTTPException
 from pydantic import BaseModel, RootModel, field_validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
@@ -40,17 +42,27 @@ class CriteriaWithOptionsDTO(CriteriaDTO):
     options: list[CriteriaOptionDTO]
 
 
-class Instance(BaseModel):
+class Instance(BaseModel, ABC):
     context_variables: dict[str, str]
+    expected_result: str
     metadata: dict[str, Any] | None = None
+
+    @abstractmethod
+    def get_prediction(self) -> Any: ...  # noqa: E704
 
 
 class DirectInstance(Instance):
     response: str
 
+    def get_prediction(self):
+        return self.response
+
 
 class PairwiseInstance(Instance):
     responses: list[str]
+
+    def get_prediction(self):
+        return self.responses
 
 
 class InstanceDTO(Instance):
@@ -71,57 +83,7 @@ class EvaluationRequest(BaseModel):
     evaluator_name: str
     type: EvaluatorTypeEnum
     instances: Sequence[DirectInstanceDTO] | Sequence[PairwiseInstanceDTO]
-
-    # @validator("llm_provider_credentials", pre=True, always=True)
-    # def validate_api_key(cls, key):
-    #     if not key:
-    #         raise HTTPException(status_code=400, detail="API credentials are required.")
-    #     return key
-
-    # @validator("context_variables", pre=True, always=True)
-    # def validate_context_variables_key(cls, context_variables):
-    #     for context_variable_name in context_variables.keys():
-    #         if context_variable_name == "":
-    #             raise HTTPException(status_code=400, detail="Context variable names can't be empty.")
-    #     return context_variables
-
-
-class PairwiseEvaluationRequest(EvaluationRequest):
-    criteria: CriteriaDTO
-
-    # @validator("responses", pre=True, always=True)
-    # def validate_responses_length(cls, responses):
-    #     # if len(responses) < 2:
-    #     #     raise HTTPException(status_code=400, detail="At least two responses are required to evaluate.")
-
-    # all_valid = True
-    # for r in responses:
-    #     if len(r.strip()) == 0:
-    #         all_valid = False
-    #         break
-    # if not all_valid:
-    #     raise HTTPException(status_code=400, detail="Responses can't be an empty string.")
-
-    # return responses
-
-
-class DirectEvaluationRequestModel(EvaluationRequest):
-    criteria: CriteriaWithOptionsDTO
-
-    # @validator("responses", pre=True, always=True)
-    # def validate_responses_length(cls, responses):
-    #     # if len(responses) == 0:
-    #     #     raise HTTPException(status_code=400, detail="At least one response is required to evaluate.")
-
-    #     all_valid = True
-    #     for r in responses:
-    #         if len(r.strip()) == 0:
-    #             all_valid = False
-    #             break
-    #     if not all_valid:
-    #         raise HTTPException(status_code=400, detail="Responses can't be an empty string.")
-
-    #     return responses
+    criteria: CriteriaDTO | CriteriaWithOptionsDTO
 
 
 class SingleSystemPairwiseResult(BaseModel):
@@ -238,3 +200,17 @@ class DirectAIActionResponse(BaseModel):
 class FeatureFlagsModel(BaseModel):
     authentication_enabled: bool
     storage_enabled: bool
+
+
+class PutTestCaseBody(BaseModel):
+    user: str
+    test_case: StoredTestCase
+
+
+class DownloadTestCaseBody(BaseModel):
+    test_case: StoredTestCase
+
+
+class DownloadTestDataBody(BaseModel):
+    instances: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
+    prediction_field: str

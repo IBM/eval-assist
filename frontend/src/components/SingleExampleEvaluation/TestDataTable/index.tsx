@@ -4,7 +4,7 @@ import { generateId, returnByPipelineType, toTitleCase } from 'src/utils'
 import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Button, IconButton, InlineLoading, PaginationNav, Toggle } from '@carbon/react'
-import { Add, AiGenerate, Save, SettingsAdjust, TrashCan } from '@carbon/react/icons'
+import { Add, AiGenerate, Download, Save, SettingsAdjust, TrashCan } from '@carbon/react/icons'
 
 import { EditableTag } from '@components/EditableTag'
 import { INSTANCES_PER_PAGE } from '@constants'
@@ -34,8 +34,12 @@ interface Props {
 export const TestDataTable = ({ style, className }: Props) => {
   const { currentTestCase, setCurrentTestCase, setSelectedInstance } = useCurrentTestCase()
   const { evaluationRunning, evaluatingInstanceIds } = useTestCaseActionsContext()
-  const { setResultDetailsModalOpen, setSyntheticGenerationModalOpen, setEditPairwiseResponseNameModalOpen } =
-    useModalsContext()
+  const {
+    setResultDetailsModalOpen,
+    setSyntheticGenerationModalOpen,
+    setEditPairwiseResponseNameModalOpen,
+    setImportTestDataModalOpen,
+  } = useModalsContext()
   const { loadingSyntheticExamples } = useSyntheticGeneration()
   const instancesPerPage = useMemo(() => INSTANCES_PER_PAGE, [])
   const instances = useMemo(() => currentTestCase.instances, [currentTestCase.instances])
@@ -226,9 +230,11 @@ export const TestDataTable = ({ style, className }: Props) => {
         currentTestCase.type,
         () => [currentTestCase.criteria.predictionField],
         () =>
-          (instances[0] as PairwiseInstance).responses.map(
-            (_, i) => `${currentTestCase.criteria.predictionField} ${i + 1}`,
-          ),
+          instances.length
+            ? (instances[0] as PairwiseInstance).responses.map(
+                (_, i) => `${currentTestCase.criteria.predictionField} ${i + 1}`,
+              )
+            : [],
       ),
     [currentTestCase.criteria.predictionField, currentTestCase.type, instances],
   )
@@ -396,6 +402,11 @@ export const TestDataTable = ({ style, className }: Props) => {
                   </IconButton>
                 </div>
               ) : null}
+            </div>
+            <div className={cx(classes.actionButton)}>
+              <Button kind="tertiary" size="sm" renderIcon={Download} onClick={() => setImportTestDataModalOpen(true)}>
+                {'Import test data'}
+              </Button>
             </div>
           </div>
         </div>

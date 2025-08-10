@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid'
 import { useMemo, useRef } from 'react'
 
 import { Button, Link } from '@carbon/react'
-import { Add, Password, WarningFilled } from '@carbon/react/icons'
+import { Add, Password, Upload, WarningFilled } from '@carbon/react/icons'
 
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useSaveShortcut } from '@customHooks/useSaveShortcut'
@@ -32,7 +32,11 @@ export const SingleExampleEvaluation = () => {
   const { currentTestCase, setCurrentTestCase, changesDetected, isTestCaseSaved, showingTestCase } =
     useCurrentTestCase()
 
-  const { setNewTestCaseModalOpen, setmodelProviderCrendentialsModalOpen } = useModalsContext()
+  const {
+    setNewTestCaseModalOpen,
+    setImportTestCaseModalOpen: setUploadTestCaseModalOpen,
+    setmodelProviderCrendentialsModalOpen,
+  } = useModalsContext()
 
   // we are ignoring client side rendering to be able to use useSessionStorage
   const { areRelevantCredentialsProvided } = useCurrentTestCase()
@@ -86,15 +90,27 @@ export const SingleExampleEvaluation = () => {
               className={cx(classes['bottom-divider'], classes['left-padding'])}
             >
               <h3>Evaluation sandbox</h3>
-              <Button
-                kind="tertiary"
-                onClick={() => {
-                  setNewTestCaseModalOpen(true)
-                }}
-                renderIcon={Add}
-              >
-                {'New Test Case'}
-              </Button>
+              <div>
+                <Button
+                  style={{ marginRight: '0.25rem' }}
+                  kind="tertiary"
+                  onClick={() => {
+                    setNewTestCaseModalOpen(true)
+                  }}
+                  renderIcon={Add}
+                >
+                  {'New Test Case'}
+                </Button>
+                <Button
+                  kind="tertiary"
+                  onClick={() => {
+                    setUploadTestCaseModalOpen(true)
+                  }}
+                  renderIcon={Upload}
+                >
+                  {'Import Test Case'}
+                </Button>
+              </div>
             </div>
             <TestCaseOptions style={{ marginBottom: '1rem' }} className={classes['left-padding']} />
             <CriteriaView

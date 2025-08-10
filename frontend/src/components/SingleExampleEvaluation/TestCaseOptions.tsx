@@ -3,9 +3,11 @@ import { toTitleCase } from 'src/utils'
 import { CSSProperties, useState } from 'react'
 
 import { Button, IconButton } from '@carbon/react'
-import { Download, Edit, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
+import { Csv, Download, Edit, Json, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
 import { TestCaseTypeBadge } from '@components/TestCaseTypeBadge/TestCaseTypeBadge'
+import { useDownloadTestCase } from '@customHooks/useDownloadTestCase'
+import { useDownloadTestData } from '@customHooks/useDownloadTestData'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
@@ -27,10 +29,22 @@ export const TestCaseOptions = ({ style, className }: Props) => {
   const { setDeleteTestCaseModalOpen, setSaveTestCaseModalOpen, setEditNameModalOpen, setSampleCodeTypeModalOpen } =
     useModalsContext()
   const { onSave } = useTestCaseActionsContext()
+
+  const { downloadTestCase } = useDownloadTestCase()
+  const { downloadTestData } = useDownloadTestData()
+
   const onSaveClick = async () => {
     setSavingTestCase(true)
     await onSave()
     setSavingTestCase(false)
+  }
+
+  const onDownloadTestCaseClick = () => {
+    downloadTestCase()
+  }
+
+  const onDownloadTestDataClick = () => {
+    downloadTestData()
   }
 
   return (
@@ -102,6 +116,17 @@ export const TestCaseOptions = ({ style, className }: Props) => {
             {'Donwload as code'}
           </Button>
         )}
+        <IconButton
+          // disabled={isRisksAndHarms}
+          kind="ghost"
+          label={'Download Test Case'}
+          onClick={onDownloadTestCaseClick}
+        >
+          <Json />
+        </IconButton>
+        <IconButton kind="ghost" label={'Download Test Data'} onClick={onDownloadTestDataClick}>
+          <Csv />
+        </IconButton>
         {storageEnabled && (
           <>
             <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>

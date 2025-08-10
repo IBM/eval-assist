@@ -310,12 +310,13 @@ def parse_card_results(card, dataset, model, judge_predictions):
     try:
         task_data_list = [json.loads(d["task_data"]) for d in dataset]
         criteria_names = [
-            fetch_artifact(td["criteria"])[0].name for td in task_data_list
+            cast(CriteriaWithOptions, fetch_artifact(td["criteria"])[0]).name
+            for td in task_data_list
         ]
         unique_criteria_names = list(set(criteria_names))
         # the following condition not always holds because although an llm judge evaluation with multiple criteria the score is llm_judge, if it happens that a specific batch happens to have just a criteria is wont be called llm_as_judge even if the dataset has multiple criterias
         # scores_criteria_name = unique_criteria_names[0] if all(c == criteria_names[0] for c in unique_criteria_names) else "llm_as_judge"
-        score_criteria_names = [
+        score_criteria_names: list[str] = [
             "_".join(
                 next(
                     iter([k for k in list(p.keys()) if k.endswith("_criteria")])

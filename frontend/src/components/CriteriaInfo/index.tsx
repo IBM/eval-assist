@@ -1,3 +1,5 @@
+import cx from 'classnames'
+
 import { ListItem, UnorderedList } from '@carbon/react'
 
 import { EditableTag } from '@components/EditableTag'
@@ -9,11 +11,12 @@ import classes from './index.module.scss'
 interface Props {
   criteria: Criteria | CriteriaWithOptions
   includeName?: boolean
+  className?: string
 }
 
-export const CriteriaInfo = ({ criteria, includeName = true }: Props) => {
+export const CriteriaInfo = ({ className, criteria, includeName = true }: Props) => {
   return (
-    <div className={classes.container}>
+    <div className={cx(className, classes.container)}>
       {includeName && (
         <p>
           <strong>{'Name: '}</strong> {capitalizeFirstWord(criteria.name)}
