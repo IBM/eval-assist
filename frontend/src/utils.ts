@@ -1,3 +1,4 @@
+import Papa from 'papaparse'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
@@ -301,4 +302,58 @@ export const parseCriteriaForBackend = (criteria: Criteria) => {
     return withOptions
   }
   return res
+}
+
+export const parseInstanceForBackend = (instance: Instance, type: EvaluationType) => {
+  return {
+    context_variables: instance.contextVariables.reduce(
+      (acc, item, index) => ({ ...acc, [item.name]: item.value }),
+      {},
+    ),
+    [returnByPipelineType(type, 'response', 'responses')]: returnByPipelineType(
+      type,
+      () => (instance as DirectInstance).response,
+      () => (instance as PairwiseInstance).responses,
+    ),
+    id: instance.id,
+    expected_result: instance.expectedResult,
+    is_synthetic: instance.metadata?.synthetic_generation ? true : false,
+  }
+}
+
+export const readJsonFile = <T = any>(file: Blob): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string
+        resolve(JSON.parse(text))
+      } catch (err) {
+        reject(err)
+      }
+    }
+    reader.onerror = () => reject(reader.error)
+    reader.readAsText(file)
+  })
+}
+
+export const readCsvFile = <T = any>(file: Blob): Promise<T[]> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string
+        const parsed = Papa.parse<T>(text, { header: true, skipEmptyLines: true, delimiter: ',' })
+        if (parsed.errors.length) {
+          reject(parsed.errors)
+        } else {
+          resolve(parsed.data)
+        }
+      } catch (err) {
+        reject(err)
+      }
+    }
+    reader.onerror = () => reject(reader.error)
+    reader.readAsText(file)
+  })
 }

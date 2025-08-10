@@ -5,7 +5,7 @@ import { getEmptyTestCase } from 'src/utils'
 import { Dispatch, SetStateAction } from 'react'
 
 import { Button } from '@carbon/react'
-import { Add, ArrowRight, Launch, View } from '@carbon/react/icons'
+import { Add, ArrowRight, Launch, Upload, View } from '@carbon/react/icons'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
@@ -22,7 +22,7 @@ interface Props {}
 export const Landing = ({}: Props) => {
   const { isDarkMode } = useThemeContext()
   const { sidebarTabSelected, setSidebarTabSelected } = useAppSidebarContext()
-  const { setNewTestCaseModalOpen } = useModalsContext()
+  const { setNewTestCaseModalOpen, setImportTestCaseModalOpen: setUploadTestCaseModalOpen } = useModalsContext()
   const { updateURLFromTestCase } = useCurrentTestCase()
 
   const createEmptyDirectTestCase = () => {
@@ -47,14 +47,27 @@ export const Landing = ({}: Props) => {
     <div className={classes.root}>
       <div className={classes.header}>
         <h2 className={classes.heading}>{`Welcome${user && user.name ? ', ' + user.name : ''}`}</h2>
-        <Button
-          renderIcon={Add}
-          onClick={() => {
-            setNewTestCaseModalOpen(true)
-          }}
-        >
-          {'Create New Test Case'}
-        </Button>
+        <div>
+          <Button
+            style={{ marginRight: '0.25rem' }}
+            kind="tertiary"
+            onClick={() => {
+              setNewTestCaseModalOpen(true)
+            }}
+            renderIcon={Add}
+          >
+            {'New Test Case'}
+          </Button>
+          <Button
+            kind="tertiary"
+            onClick={() => {
+              setUploadTestCaseModalOpen(true)
+            }}
+            renderIcon={Upload}
+          >
+            {'Import Test Case'}
+          </Button>
+        </div>
       </div>
       {/* <p className={classes.description}>{'New features'}</p>
       <div

@@ -10,6 +10,12 @@ interface ModalsContextValue {
   newTestCaseModalOpen: boolean
   setNewTestCaseModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 
+  importTestCaseModalOpen: boolean
+  setImportTestCaseModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+
+  importTestDataModalOpen: boolean
+  setImportTestDataModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+
   deleteTestCaseModalOpen: boolean
   setDeleteTestCaseModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 
@@ -47,6 +53,12 @@ const ModalsContext = createContext<ModalsContextValue>({
   newTestCaseModalOpen: false,
   setNewTestCaseModalOpen: () => {},
 
+  importTestCaseModalOpen: false,
+  setImportTestCaseModalOpen: () => {},
+
+  importTestDataModalOpen: false,
+  setImportTestDataModalOpen: () => {},
+
   deleteTestCaseModalOpen: false,
   setDeleteTestCaseModalOpen: () => {},
 
@@ -83,6 +95,8 @@ export const ModalsProvider = ({ children }: { children: ReactNode }) => {
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false)
   const [saveTestCaseModalOpen, setSaveTestCaseModalOpen] = useState(false)
   const [newTestCaseModalOpen, setNewTestCaseModalOpen] = useState(false)
+  const [importTestCaseModalOpen, setImportTestCaseModalOpen] = useState(false)
+  const [importTestDataModalOpen, setImportTestDataModalOpen] = useState(false)
   const [deleteTestCaseModalOpen, setDeleteTestCaseModalOpen] = useState(false)
   const [editNameModalOpen, setEditNameModalOpen] = useState(false)
   const [resultDetailsModalOpen, setResultDetailsModalOpen] = useState(false)
@@ -104,6 +118,12 @@ export const ModalsProvider = ({ children }: { children: ReactNode }) => {
 
         newTestCaseModalOpen,
         setNewTestCaseModalOpen,
+
+        importTestCaseModalOpen,
+        setImportTestCaseModalOpen,
+
+        importTestDataModalOpen,
+        setImportTestDataModalOpen,
 
         deleteTestCaseModalOpen,
         setDeleteTestCaseModalOpen,

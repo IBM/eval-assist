@@ -14,6 +14,7 @@ import { useToastContext } from '@providers/ToastProvider'
 
 import { Criteria, CriteriaWithOptions, EvaluationType, TestCase } from '../../../types'
 import { PipelineOptionCard } from '../Card/PipelineOptionCard'
+import { TestCaseUpload } from '../TestCaseUpload'
 import classes from './NewTestCaseModal.module.scss'
 
 interface Props {

@@ -18,7 +18,7 @@ import {
   PairwiseInstanceResult,
   TestCase,
 } from '@types'
-import { parseCriteriaForBackend, returnByPipelineType, toSnakeCase } from '@utils'
+import { parseCriteriaForBackend, parseInstanceForBackend, returnByPipelineType, toSnakeCase } from '@utils'
 
 import { useAppSidebarContext } from './AppSidebarProvider'
 import { useCriteriasContext } from './CriteriaProvider'
@@ -37,6 +37,7 @@ interface TestCaseActionsContextValue {
   evaluationFailed: boolean
   evaluatingInstanceIds: string[]
   cancelEvaluation: () => void
+  getTestCaseAsJson: (testCase: TestCase) => FetchedTestCase
 }
 
 const TestCaseActionsContext = createContext<TestCaseActionsContextValue>({
@@ -48,6 +49,12 @@ const TestCaseActionsContext = createContext<TestCaseActionsContextValue>({
   evaluationRunning: false,
   evaluationFailed: false,
   evaluatingInstanceIds: [],
+  getTestCaseAsJson: (testCase: TestCase) => ({
+    id: -1,
+    user_id: -1,
+    content: '',
+    name: '',
+  }),
 })
 
 export const useTestCaseActionsContext = () => {
@@ -81,6 +88,26 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   const { userTestCases: userTestCases, setUserTestCases: setUserTestCases } = useUserTestCasesContext()
   const { setSidebarTabSelected } = useAppSidebarContext()
   const [inProgressEvalToastId, setInProgressEvalToastId] = useState<string | null>(null)
+
+  const getTestCaseAsJson = useCallback(
+    (testCase: TestCase): FetchedTestCase => {
+      return {
+        name: testCase.name,
+        content: JSON.stringify({
+          instances: testCase.instances,
+          evaluator: testCase.evaluator,
+          criteria: testCase.criteria,
+          type: testCase.type,
+          pipeline: testCase.evaluator,
+          syntheticGenerationConfig: testCase.syntheticGenerationConfig,
+          contentFormatVersion: CURRENT_FORMAT_VERSION,
+        }),
+        user_id: -1, // set at the fetchUtils hook
+        id: testCase.id || -1,
+      }
+    },
+    [CURRENT_FORMAT_VERSION],
+  )
 
   const cancelEvaluation = useCallback(() => {
     temporaryIdRef.current = uuid()
@@ -142,20 +169,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
           ),
         )
 
-      const toEvaluateInstancesParsed = toEvaluateInstances.map((instance) => ({
-        context_variables: instance.contextVariables.reduce(
-          (acc, item, index) => ({ ...acc, [item.name]: item.value }),
-          {},
-        ),
-        [returnByPipelineType(currentTestCase.type, 'response', 'responses')]: returnByPipelineType(
-          currentTestCase.type,
-          () => (instance as DirectInstance).response,
-          () => (instance as PairwiseInstance).responses,
-        ),
-        id: instance.id,
-        expected_result: instance.expectedResult,
-        is_synthetic: instance.metadata?.synthetic_generation ? true : false,
-      }))
+      const toEvaluateInstancesParsed = toEvaluateInstances.map((i) => parseInstanceForBackend(i, currentTestCase.type))
 
       if (toEvaluateInstancesParsed.length === 0) {
         removeToast(inProgressEvalToastId)
@@ -292,21 +306,10 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
 
   const onSave = useCallback(async () => {
     if (currentTestCase === null) return
+    const parsedToSaveTestCase = getTestCaseAsJson(currentTestCase)
     const savedTestCase: FetchedTestCase = await (
       await put('test_case/', {
-        test_case: {
-          name: currentTestCase.name,
-          content: JSON.stringify({
-            instances: currentTestCase.instances,
-            criteria: currentTestCase.criteria,
-            type: currentTestCase.type,
-            evaluator: currentTestCase.evaluator,
-            syntheticGenerationConfig: currentTestCase.syntheticGenerationConfig,
-            contentFormatVersion: CURRENT_FORMAT_VERSION,
-          }),
-          user_id: -1,
-          id: currentTestCase.id,
-        } as FetchedTestCase,
+        test_case: parsedToSaveTestCase,
         user: getUserName(),
       })
     ).json()
@@ -328,10 +331,10 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       timeout: 5000,
     })
   }, [
-    CURRENT_FORMAT_VERSION,
     addToast,
     currentTestCase,
     currentTestCaseString,
+    getTestCaseAsJson,
     getUserName,
     parseFetchedTestCase,
     put,
@@ -345,21 +348,10 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
     async (name: string, fromTestCase?: TestCase) => {
       if (currentTestCase === null) return false
       const toSaveTestCase = fromTestCase ?? currentTestCase
+      const parsedToSaveTestCase = getTestCaseAsJson(toSaveTestCase)
+      parsedToSaveTestCase.name = name
       const res = await put('test_case/', {
-        test_case: {
-          name: name,
-          content: JSON.stringify({
-            instances: currentTestCase.instances,
-            evaluator: toSaveTestCase.evaluator,
-            criteria: toSaveTestCase.criteria,
-            type: toSaveTestCase.type,
-            pipeline: toSaveTestCase.evaluator,
-            syntheticGenerationConfig: currentTestCase.syntheticGenerationConfig,
-            contentFormatVersion: CURRENT_FORMAT_VERSION,
-          }),
-          user_id: -1,
-          id: -1,
-        } as FetchedTestCase,
+        test_case: parsedToSaveTestCase,
         user: getUserName(),
       })
       if (!res.ok) {
@@ -398,9 +390,9 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       return true
     },
     [
-      CURRENT_FORMAT_VERSION,
       addToast,
       currentTestCase,
+      getTestCaseAsJson,
       getUserName,
       parseFetchedTestCase,
       put,
@@ -434,6 +426,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         onSaveAs,
         onDeleteTestCase,
         cancelEvaluation,
+        getTestCaseAsJson,
         evaluationRunning,
         evaluationFailed,
         evaluatingInstanceIds,

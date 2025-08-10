@@ -4,6 +4,7 @@ import { Loading } from '@carbon/react'
 
 import { useFetchUtils } from '@customHooks/useFetchUtils'
 import { Benchmark, EvaluationType, FetchedBenchmark } from '@types'
+import { capitalizeFirstWord } from '@utils'
 
 interface BenchmarksContextValue {
   benchmarks: Benchmark[] | null
@@ -36,7 +37,7 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
         tags: fetchedBenchmark.tags,
         criteriaBenchmarks: fetchedBenchmark.criteria_benchmarks.map((criteria_benchmarks) => ({
           name: criteria_benchmarks.name,
-          catalogCriteriaName: criteria_benchmarks.catalog_criteria_name,
+          catalogCriteriaName: capitalizeFirstWord(criteria_benchmarks.catalog_criteria_name),
           evaluatorBenchmarks: criteria_benchmarks.evaluator_benchmarks,
         })),
       }))

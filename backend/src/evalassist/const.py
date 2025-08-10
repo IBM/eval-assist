@@ -185,6 +185,8 @@ DATA_DIR = Path(os.getenv("DATA_DIR", EVAL_ASSIST_DIR / "data")).expanduser()
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 DEFAULT_DATABASE_URL = f"sqlite:////{DATA_DIR / 'evalassist.db'}"
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
+TEMPORARY_FILES_FOLDER = EVAL_ASSIST_DIR / "temporary_files"
+TEMPORARY_FILES_FOLDER.mkdir(parents=True, exist_ok=True)
 
 DEFAULT_UNITXT_INFERENCE_ENGINE_CACHE_PATH = DATA_DIR / "inference_engine_cache"
 

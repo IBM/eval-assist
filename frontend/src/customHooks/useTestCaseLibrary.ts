@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { TaskEnum } from '@constants'
 import { useCriteriasContext } from '@providers/CriteriaProvider'
@@ -474,7 +474,7 @@ export const useTestCaseLibrary = () => {
             {
               contextVariables: [
                 {
-                  name: 'Question',
+                  name: 'question',
                   value: 'What are the benefits of drinking green tea?',
                 },
               ],
@@ -557,10 +557,10 @@ export const useTestCaseLibrary = () => {
           instances: [
             {
               contextVariables: [
-                {
-                  name: 'Context',
-                  value: 'Im having a problem at work :(',
-                },
+                // {
+                //   name: 'Context',
+                //   value: 'Im having a problem at work :(',
+                // },
               ],
               response: "Just get over it already, it's not that big of a deal.",
               result: null,
@@ -569,10 +569,10 @@ export const useTestCaseLibrary = () => {
             } as DirectInstance,
             {
               contextVariables: [
-                {
-                  name: 'Context',
-                  value: 'Im having a problem at work :(',
-                },
+                // {
+                //   name: 'Context',
+                //   value: 'Im having a problem at work :(',
+                // },
               ],
               response:
                 "I can see that you're going through a tough time. I'm here for you if you want to talk about it or if there's anything I can do to support you.",
@@ -1097,6 +1097,30 @@ export const useTestCaseLibrary = () => {
     ],
     [harmsAndRisksLibraryTestCases, pairwiseLibraryTestCases, directLibraryTestCases],
   )
+
+  const eqSet = (xs: Set<any>, ys: Set<any>) => xs.size === ys.size && [...xs].every((x) => ys.has(x))
+
+  // check that the context of the instances of each test case match the criteria context fields
+  useEffect(() => {
+    const illegalTestCases: TestCase[] = []
+    for (const testCase of allLibraryTestCases) {
+      for (const instance of testCase.instances) {
+        const instanceContextVariables = new Set(instance.contextVariables.map((c) => c.name))
+        const contextFields = new Set(testCase.criteria.contextFields)
+        if (!eqSet(instanceContextVariables, contextFields)) {
+          illegalTestCases.push(testCase)
+          break
+        }
+      }
+    }
+
+    if (illegalTestCases.length > 0) {
+      console.warn(
+        'The context variable of the following test cases are inconsistent with the context fields that the criteria expects',
+        illegalTestCases,
+      )
+    }
+  }, [allLibraryTestCases])
 
   return {
     directLibraryTestCases,

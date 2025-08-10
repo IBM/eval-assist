@@ -15,8 +15,6 @@ import { FetchedTestCase, TestCase, TestCaseV0, TestCaseV1 } from '@types'
 // fetched test case is v3 and current is v4
 // parseFetchedTestCaseV3 -> parseFetchedTestCaseV3toV4
 export const useParseFetchedTestCase = () => {
-  const { directEvaluators, pairwiseEvaluators } = useEvaluatorOptionsContext()
-
   // const parseDirectAssessmentResultsV0ToV1 = useCallback((results: DirectResultsV0): DirectResultsV1 | null => {
   //   return (
   //     results?.map((r) => ({
@@ -150,18 +148,23 @@ export const useParseFetchedTestCase = () => {
   const CURRENT_FORMAT_VERSION = useMemo(() => 1, [])
 
   const parseFetchedTestCase = useCallback(
-    (fetchedTestCase: FetchedTestCase): TestCase | null => {
-      const toParseObj: Record<string, any> = {
-        ...JSON.parse(fetchedTestCase.content),
-        id: fetchedTestCase.id,
-        name: fetchedTestCase.name,
+    (fetchedTestCase: FetchedTestCase): TestCase => {
+      let toParseObj: Record<string, any>
+      try {
+        toParseObj = {
+          ...JSON.parse(fetchedTestCase.content),
+          id: fetchedTestCase.id,
+          name: fetchedTestCase.name,
+        }
+      } catch {
+        throw Error("The json file either doesn't have a content field or its value is not a valid json,")
       }
 
       const version = (toParseObj.contentFormatVersion as number) || 0
-      if (version > CURRENT_FORMAT_VERSION) {
-        console.log(`Discarding test case ${fetchedTestCase.name} because its newer than the current system version.`)
-        return null
-      }
+      // if (version > CURRENT_FORMAT_VERSION) {
+      //   console.log(`Discarding test case ${fetchedTestCase.name} because its newer than the current system version.`)
+      //   return null
+      // }
       const readFetchedTestCase = testCaseParsingVersionFunctions[version]
       let parsedTestCase = readFetchedTestCase(toParseObj)
       testCaseParsingVersionToVersionFunctions
@@ -171,7 +174,7 @@ export const useParseFetchedTestCase = () => {
         })
       return parsedTestCase as TestCase
     },
-    [CURRENT_FORMAT_VERSION, testCaseParsingVersionFunctions, testCaseParsingVersionToVersionFunctions],
+    [testCaseParsingVersionFunctions, testCaseParsingVersionToVersionFunctions],
   )
 
   return {

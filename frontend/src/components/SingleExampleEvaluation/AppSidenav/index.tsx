@@ -30,7 +30,7 @@ export const AppSidenavNew = ({}: AppSidenavProps) => {
   const { testCaseId } = useURLParamsContext()
   const { changesDetected, setTestCaseSelected, updateURLFromTestCase } = useCurrentTestCase()
   const { evaluationRunning } = useTestCaseActionsContext()
-  const { userTestCases: userTestCases } = useUserTestCasesContext()
+  const { userTestCases } = useUserTestCasesContext()
 
   const onTestCaseClick = (testCase: TestCase, subCatalogName?: string) => {
     // if the usecase is already selected don't do nothing
