@@ -109,7 +109,7 @@ export const notInUnitxtCriteria: { direct: CriteriaWithOptions[]; pairwise: Cri
       contextFields: ['Article'],
     },
     {
-      name: 'fairness',
+      name: 'Fairness',
       description:
         'Fairness is the ability to make judgments free from favoritism, discrimination, self-interest, or prejudice. Rate the fairness of the response to the options.',
       options: [

@@ -2,57 +2,50 @@ import logging
 import random
 from collections.abc import Sequence
 from textwrap import dedent
-from typing import cast
+from typing import Any, cast
 
 from langchain.output_parsers import OutputFixingParser
 from langchain.prompts import PromptTemplate
 from langchain_core.exceptions import OutputParserException
-from langchain_core.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
 from unitxt.inference import CrossProviderInferenceEngine, InferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions
 
 from ..api.common import DirectInstance, DirectInstanceResult, DirectPositionalBias
-from .base import DirectJudge, LangchainRunnableJudge
+from .base import DirectJudge, UnitxtInferenceLangchainRunnable
 
 logger = logging.getLogger(__name__)
 
 
-class ExperimentalSimpleDirectJudge(DirectJudge, LangchainRunnableJudge):
+class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
     generate_synthetic_persona: bool
 
     def __init__(
         self,
-        criteria: CriteriaWithOptions,
         inference_engine: InferenceEngine,
         generate_synthetic_persona=False,
     ):
         super().__init__(
-            criteria=criteria,
             inference_engine=inference_engine,
         )
         self.generate_synthetic_persona = generate_synthetic_persona
 
-    def generate_persona(self, instance_str):
+    def get_name(self) -> str:
+        return "simple"
+
+    def generate_persona(self, instance_str, criterion: CriteriaWithOptions):
         class SyntheticPersona(BaseModel):
             persona_name: str = Field(
                 ...,
-                description=f"The persona that will evaluate a {self.criteria.prediction_field} based on the criteria {self.criteria.name}",
+                description=f"The persona that will evaluate a {criterion.prediction_field} based on the criteria {criterion.name}",
             )
             persona_description: str = Field(
                 ...,
                 description="The description of why the <persona_name> is ideal to perform the evaluation. Don't include the the initial 'you'",
             )
 
-        # output_parser: OutputFixingParser[SyntheticPersona] = (
-        #     OutputFixingParser.from_llm(
-        #         llm=self.get_runnable_lambda(),
-        #         parser=PydanticOutputParser(pydantic_object=SyntheticPersona),
-        #         max_retries=3,
-        #     )
-        # )
         output_parser: OutputFixingParser[SyntheticPersona] = (
-            self.get_output_fixing_parser(SyntheticPersona)
+            self.get_pydantic_output_fixing_parser(SyntheticPersona)
         )
 
         format_instruction = output_parser.get_format_instructions()
@@ -60,10 +53,10 @@ class ExperimentalSimpleDirectJudge(DirectJudge, LangchainRunnableJudge):
         template = PromptTemplate(
             input_variables=[],
             partial_variables={
-                "criteria_name": self.criteria.name,
-                "criteria_description": self.criteria.description,
+                "criteria_name": criterion.name,
+                "criteria_description": criterion.description,
                 "criteria_options": "\n".join(
-                    [f"{o.name}: {o.description}" for o in self.criteria.options]
+                    [f"{o.name}: {o.description}" for o in criterion.options]
                 ),
                 "instance_example": instance_str,
                 "format_instruction": format_instruction,
@@ -103,32 +96,40 @@ class ExperimentalSimpleDirectJudge(DirectJudge, LangchainRunnableJudge):
         print(persona)
         return persona.persona_name, persona.persona_description
 
-    def evaluate(
+    def _run(
         self,
         instances: Sequence[DirectInstance],
+        criteria: Sequence[CriteriaWithOptions],
     ) -> list[DirectInstanceResult]:
-        class DynamicOutputJudgeModel(BaseModel):
-            assessment: str = Field(..., description="CoT assessment")
-            selected_option: str = Field(
-                ...,
-                description=f"The chosen option. Any of {', '.join([o.name for o in self.criteria.options])}",
+        output_parsers: list[OutputFixingParser] = []
+        format_instructions_list = []
+        criteria_options_list = []
+        classes = []
+        for criterion in criteria:
+
+            class DynamicOutputJudgeModel(BaseModel):
+                assessment: str = Field(..., description="Step by step assessment")
+                selected_option: str = Field(
+                    ...,
+                    description=f"The chosen option. Any of {', '.join([o.name for o in criterion.options])}",
+                )
+
+            classes.append(DynamicOutputJudgeModel)
+
+            output_parser: OutputFixingParser[DynamicOutputJudgeModel] = (
+                self.get_pydantic_output_fixing_parser(DynamicOutputJudgeModel)
             )
+            output_parsers.append(output_parser)
 
-        parser: PydanticOutputParser[DynamicOutputJudgeModel] = PydanticOutputParser(
-            pydantic_object=DynamicOutputJudgeModel
-        )
-        output_parser: OutputFixingParser[DynamicOutputJudgeModel] = (
-            OutputFixingParser.from_llm(
-                parser=parser, llm=self.get_runnable_lambda(), max_retries=3
+            format_instructions: str = output_parser.get_format_instructions()
+            format_instructions_list.append(format_instructions)
+
+            criteria_options: str = "\n- ".join(
+                [f"{option.name}: {option.description}" for option in criterion.options]
             )
-        )
+            criteria_options = "- " + criteria_options
 
-        format_instructions: str = output_parser.get_format_instructions()
-
-        criteria_options: str = "\n- ".join(
-            [f"{option.name}: {option.description}" for option in self.criteria.options]
-        )
-        criteria_options = "- " + criteria_options
+            criteria_options_list.append(criteria_options)
 
         predictions: list[str] = [i.response for i in instances]
         context_variables_list: list[dict[str, str]] = [
@@ -138,12 +139,17 @@ class ExperimentalSimpleDirectJudge(DirectJudge, LangchainRunnableJudge):
             "\n".join(f"{k}: {v}" for k, v in c.items()) for c in context_variables_list
         ]
 
+        context_sections: list[str] = [
+            "\n\n### Context\n" + c + "\n" for c in str_context_variables_list
+        ]
+
         if self.generate_synthetic_persona:
             persona_name, persona_description = self.generate_persona(
                 instance_str="Context:\n"
                 + str_context_variables_list[0]
-                + f"\n{self.criteria.prediction_field} to evaluate: "
-                + cast(str, predictions[0])
+                + "\nText to evaluate: "
+                + cast(str, predictions[0]),
+                criterion=criteria[0],
             )
         else:
             persona_name, persona_description = (
@@ -152,12 +158,15 @@ class ExperimentalSimpleDirectJudge(DirectJudge, LangchainRunnableJudge):
             )
 
         prompt_template = PromptTemplate(
-            input_variables=["text_to_evaluate", "context_section"],
+            input_variables=[
+                "text_to_evaluate",
+                "context_section",
+                "criteria_name",
+                "criteria_description",
+                "criteria_options",
+                "format_instructions",
+            ],
             partial_variables={
-                "format_instructions": format_instructions,
-                "criteria_options": criteria_options,
-                "criteria_name": self.criteria.name,
-                "criteria_description": self.criteria.description,
                 "persona_name": persona_name,
                 "persona_description": persona_description,
             },
@@ -188,15 +197,22 @@ class ExperimentalSimpleDirectJudge(DirectJudge, LangchainRunnableJudge):
             ),
         )
 
-        context_sections: list[str] = [
-            "\n\n### Context\n" + c + "\n" for c in str_context_variables_list
-        ]
         prompts: list[str] = [
             prompt_template.format(
                 text_to_evaluate=prediction,
                 context_section=context_section,
+                criteria_name=criterion.name,
+                criteria_description=criterion.description,
+                criteria_options=criterion_options,
+                format_instructions=format_instructions,
             )
-            for prediction, context_section in zip(predictions, context_sections)
+            for prediction, context_section, criterion, criterion_options, format_instructions in zip(
+                predictions,
+                context_sections,
+                criteria,
+                criteria_options_list,
+                format_instructions_list,
+            )
         ]
 
         responses: list[str] = cast(
@@ -208,17 +224,20 @@ class ExperimentalSimpleDirectJudge(DirectJudge, LangchainRunnableJudge):
                 ]
             ),
         )
-        parsed_responses: list[DynamicOutputJudgeModel] = []
-        for response in responses:
+        parsed_responses: list[Any] = []
+
+        for response, output_parser, klass, criterion in zip(
+            responses, output_parsers, classes, criteria
+        ):
             try:
                 parsed_response = output_parser.parse(completion=response)
             except OutputParserException:
                 logger.debug(
-                    f"Selected random option for model {self.inference_engine.get_engine_id()}"
+                    f"Selected random option for model {self.inference_engine.get_engine_id()} because it was unable to generate a chosen option"
                 )
-                parsed_response = DynamicOutputJudgeModel(
+                parsed_response = klass(
                     selected_option=random.choice(
-                        [o.name for o in self.criteria.options]  # nosec
+                        [o.name for o in criterion.options]  # nosec
                     ),
                     assessment="",
                 )

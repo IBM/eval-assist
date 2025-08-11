@@ -9,6 +9,7 @@ import nbformat as nbf
 import nest_asyncio
 import pandas as pd
 from evalassist.api.common import DirectInstanceDTO
+from evalassist.judges.synthetic_persona_direct_judge import SimpleDirectJudge
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -70,11 +71,7 @@ from .const import (
     domain_persona_map,
 )
 from .database import engine  # Assumes you have engine/session setup
-from .judges.unitxt_judges import (
-    GraniteGuardianJudge,
-    UnitxtDirectJudge,
-    UnitxtPairwiseJudge,
-)
+from .judges.unitxt_judges import GraniteGuardianJudge, UnitxtPairwiseJudge
 from .model import AppUser, StoredTestCase
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
 
@@ -238,8 +235,8 @@ def get_criterias() -> dict[str, list[CriteriaWithOptionsDTO] | list[CriteriaDTO
                     CriteriaOptionDTO(name=o.name, description=o.description)
                     for o in c.options
                 ],
-                prediction_field=c.prediction_field,
-                context_fields=c.context_fields,
+                prediction_field=cast(str, c.prediction_field),
+                context_fields=cast(list[str], c.context_fields),
             )
             for c in DIRECT_CRITERIA
         ],
@@ -247,8 +244,8 @@ def get_criterias() -> dict[str, list[CriteriaWithOptionsDTO] | list[CriteriaDTO
             CriteriaDTO(
                 name=c.name,
                 description=c.description,
-                prediction_field=c.prediction_field,
-                context_fields=c.context_fields,
+                prediction_field=cast(str, c.prediction_field),
+                context_fields=cast(list[str], c.context_fields),
             )
             for c in PAIRWISE_CRITERIA
         ],
@@ -259,15 +256,15 @@ def get_criterias() -> dict[str, list[CriteriaWithOptionsDTO] | list[CriteriaDTO
 def get_prompt(req: EvaluationRequest):
     mock_inference_engine = MockInferenceEngine()
     evaluator = GraniteGuardianJudge(
-        criteria=criteria_with_options_DTO_to_BO_mapper(
-            cast(CriteriaWithOptionsDTO, req.criteria)
-        ),
         inference_engine=mock_inference_engine,
     )
 
     res = evaluator.get_prompt(
         instances=req.instances,
         risk_name=req.criteria.name,
+        criterion=criteria_with_options_DTO_to_BO_mapper(
+            cast(CriteriaWithOptionsDTO, req.criteria)
+        ),
     )
     return res
 
@@ -309,22 +306,24 @@ async def evaluate(
             llm_provider_credentials=req.llm_provider_credentials,
             custom_params=UNITXT_JUDGE_PARAMS,
         )
-
+        if req.criteria.prediction_field is None or req.criteria.context_fields is None:
+            raise ValueError(
+                "EvalAssist uses the new LLM Judge API, where the predictions and context fields are provided in the criteria definition. Make sure to adhere to it."
+            )
         if req.type == EvaluatorTypeEnum.DIRECT:
             criteria = criteria_with_options_DTO_to_BO_mapper(
                 cast(CriteriaWithOptionsDTO, req.criteria)
             )
             if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
-                evaluator = GraniteGuardianJudge(
-                    criteria, inference_engine=inference_engine
-                )
+                evaluator = GraniteGuardianJudge(inference_engine=inference_engine)
             else:
-                evaluator = UnitxtDirectJudge(
-                    criteria,
+                evaluator = SimpleDirectJudge(
                     inference_engine=inference_engine,
                 )
             per_instance_result = evaluator.evaluate(
                 instances=cast(Sequence[DirectInstance], req.instances),
+                criteria=criteria,
+                check_positional_bias=True,
             )
         else:
             criteria = Criteria(
@@ -333,10 +332,12 @@ async def evaluate(
                 prediction_field=req.criteria.prediction_field,
                 context_fields=req.criteria.context_fields,
             )
-            evaluator = UnitxtPairwiseJudge(criteria, inference_engine)
+            evaluator = UnitxtPairwiseJudge(inference_engine)
 
             per_instance_result = evaluator.evaluate(
                 instances=cast(Sequence[PairwiseInstance], req.instances),
+                criteria=criteria,
+                check_positional_bias=True,
             )
 
         # Add the id to each instance result
@@ -381,8 +382,11 @@ def put_test_case(
     user = session.exec(
         select(AppUser).where(AppUser.email == request_body.user)
     ).first()
-    if not user:
+    if user is None:
         raise HTTPException(status_code=404, detail="User not found")
+
+    if user.id is None:
+        raise ValueError("User must have an ID at this point")
 
     # Try to find the test case by id and user_id
     found = session.exec(

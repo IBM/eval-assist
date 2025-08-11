@@ -44,7 +44,7 @@ class CriteriaWithOptionsDTO(CriteriaDTO):
 
 class Instance(BaseModel, ABC):
     context_variables: dict[str, str]
-    expected_result: str
+    expected_result: str | None = None
     metadata: dict[str, Any] | None = None
 
     @abstractmethod

@@ -5,7 +5,6 @@ import {
   getEmptyPairwiseInstance,
   getEmptyTestCase,
   returnByPipelineType,
-  toSnakeCase,
 } from 'src/utils'
 
 import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from 'react'
@@ -79,12 +78,8 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
         ),
       }
       setLoadingCriterias(false)
-      setDirectCriterias(
-        [...parsedCriteria.direct, ...notInUnitxtCriteria.direct].map((c) => ({ ...c, name: toSnakeCase(c.name) })),
-      )
-      setPairwiseCriterias(
-        [...parsedCriteria.pairwise, ...notInUnitxtCriteria.pairwise].map((c) => ({ ...c, name: toSnakeCase(c.name) })),
-      )
+      setDirectCriterias([...parsedCriteria.direct, ...notInUnitxtCriteria.direct])
+      setPairwiseCriterias([...parsedCriteria.pairwise, ...notInUnitxtCriteria.pairwise])
     }
     fetchData()
   }, [get])
@@ -92,10 +87,10 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
   const getCriteria = useCallback(
     (name: string, type: EvaluationType): CriteriaWithOptions | Criteria | null => {
       if (!directCriterias || !pairwiseCriterias) return null
-      const criteria = returnByPipelineType(type, directCriterias, pairwiseCriterias).find((c) => c.name === name) as
-        | CriteriaWithOptions
-        | Criteria
-        | undefined
+      // console.log(directCriterias)
+      const criteria = returnByPipelineType(type, directCriterias, pairwiseCriterias).find(
+        (c) => c.name === name || c.name === capitalizeFirstWord(name),
+      ) as CriteriaWithOptions | Criteria | undefined
 
       if (criteria) {
         const aux = { ...criteria }
