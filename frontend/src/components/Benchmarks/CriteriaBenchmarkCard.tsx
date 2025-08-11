@@ -37,8 +37,6 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
     [benchmark?.type, criteriaBenchmark.catalogCriteriaName, getCriteria],
   )
 
-  console.log(criteriaBenchmark.catalogCriteriaName)
-
   const benchmarkMetrics = useMemo(() => {
     return Object.keys(criteriaBenchmark.evaluatorBenchmarks[0].results).filter(
       (metric) => showCorrelationColumns || !metric.startsWith('corr'),
@@ -102,7 +100,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
   )
 
   const displayedEvaluators = useMemo(
-    () => criteriaBenchmark.evaluatorBenchmarks.sort((a, b) => a.name.localeCompare(b.name)),
+    () => criteriaBenchmark.evaluatorBenchmarks.sort((a, b) => a.model.localeCompare(b.model)),
     [criteriaBenchmark.evaluatorBenchmarks],
   )
 
@@ -122,6 +120,9 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
                 </Link>
               )}
             </div>
+            <p
+              style={{ paddingTop: '0.5rem', fontStyle: 'italic', color: 'gray' }}
+            >{`Number of instances: ${criteriaBenchmark.datasetLen}`}</p>
           </div>
 
           <div className={cx(classes.table)}>
@@ -138,9 +139,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
                 {displayedEvaluators.map((evaluatorBenchmark, i) => (
                   <TableRow key={i}>
                     {/* <TableCell>{`${evaluatorBenchmark.evaluator_id} (v${evaluatorBenchmark.laaj_version})`}</TableCell> */}
-                    <TableCell>
-                      {toTitleCase(`${evaluatorBenchmark.name} (${evaluatorBenchmark.annotation})`)}
-                    </TableCell>
+                    <TableCell>{toTitleCase(`${evaluatorBenchmark.model} (${evaluatorBenchmark.judge})`)}</TableCell>
                     {benchmarkMetrics.map((metric) => (
                       <TableCell
                         key={metric}

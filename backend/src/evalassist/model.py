@@ -9,8 +9,9 @@ class AppUser(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     email: str = Field(index=True, unique=True)
     name: str
-    created_at: datetime.datetime = Field(
-        sa_column=Column(DateTime(), server_default=func.now(), nullable=False)
+    created_at: datetime.datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(), server_default=func.now(), nullable=False),
     )
     stored_test_cases: list["StoredTestCase"] = Relationship(back_populates="app_user")
     log_records: list["LogRecord"] = Relationship(back_populates="app_user")

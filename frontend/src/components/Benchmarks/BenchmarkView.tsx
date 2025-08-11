@@ -67,19 +67,6 @@ export const BenchmarkView = () => {
             <p className={classes.benchmarkDescription}>{benchmark.description}</p>
             <br></br>
           </div> */}
-          <div
-            className={cx(classes.criteriaBenchmark, {
-              [classes.multipleColumns]: benchmarkCriterias.length > 1 && !showCorrelationColumns,
-            })}
-          >
-            {benchmarkCriterias.map((criteriaBenchmark, i) => (
-              <CriteriaBenchmarkCard
-                criteriaBenchmark={criteriaBenchmark}
-                key={i}
-                showCorrelationColumns={showCorrelationColumns}
-              />
-            ))}
-          </div>
           <div>
             <Button
               href={benchmark.catalogUrl}
@@ -95,6 +82,19 @@ export const BenchmarkView = () => {
                 {'Dataset description'}
               </Button>
             )}
+          </div>
+          <div
+            className={cx(classes.criteriaBenchmark, {
+              [classes.multipleColumns]: benchmarkCriterias.length > 1 && !showCorrelationColumns,
+            })}
+          >
+            {benchmarkCriterias.map((criteriaBenchmark, i) => (
+              <CriteriaBenchmarkCard
+                criteriaBenchmark={criteriaBenchmark}
+                key={i}
+                showCorrelationColumns={showCorrelationColumns}
+              />
+            ))}
           </div>
         </div>
       </>

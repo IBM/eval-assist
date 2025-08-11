@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 
 from evalassist.judges.base import DirectJudge, PairwiseJudge
+from evalassist.utils import Criteria, CriteriaWithOptions
 
 from ..api.common import (
     DirectInstance,
@@ -13,12 +14,17 @@ from ..api.common import (
 
 
 class DummyDirectJudge(DirectJudge):
-    def evaluate(
-        self, instances: Sequence[DirectInstance]
+    def get_name(self) -> str:
+        return "dummy"
+
+    def _run(
+        self,
+        instances: Sequence[DirectInstance],
+        criteria: Sequence[CriteriaWithOptions],
     ) -> Sequence[DirectInstanceResult]:
         return [
             DirectInstanceResult(
-                option=self.criteria.options[0].name,
+                option=criteria[0].options[0].name,
                 explanation="explanation",
                 positional_bias=DirectPositionalBias(
                     detected=False,
@@ -29,8 +35,14 @@ class DummyDirectJudge(DirectJudge):
 
 
 class DummyPairwiseJudge(PairwiseJudge):
-    def evaluate(
-        self, instances: Sequence[PairwiseInstance]
+    def get_name(self) -> str:
+        return "dummy"
+
+    def _evaluate(
+        self,
+        instances: Sequence[PairwiseInstance],
+        criteria: Sequence[Criteria],
+        check_positional_bias: bool,
     ) -> Sequence[PairwiseInstanceResult]:
         results: list[PairwiseInstanceResult] = []
         systems_per_instance = len(instances[0].responses) - 1

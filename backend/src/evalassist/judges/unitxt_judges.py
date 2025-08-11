@@ -52,41 +52,67 @@ class UnitxtJudge(
     @abstractmethod
     def parse_results(self, dataset) -> List[ReturnVarType]: ...
 
-    def evaluate(
-        self,
-        instances: Sequence[InstanceTypeVar],
+    def get_name(self) -> str:
+        return "unitxt"
+
+    def _run(
+        self, instances: Sequence[InstanceTypeVar], criteria: Sequence[CriteriaTypeBar]
     ) -> Sequence[ReturnVarType]:
-        if (
-            self.criteria.prediction_field is None
-            or self.criteria.context_fields is None
-        ):
-            raise ValueError(
-                "EvalAssist uses the new LLM Judge API, where the predictions and context fields are provided in the criteria definition. Make sure to adhere to it."
-            )
+        # unitxt has a fixed task input fields, so we will add all of them in case different criterias have different prediction and/or context fields
+        all_context_fields: set[str] = set(
+            [
+                list_item
+                for listt in [
+                    (
+                        c.context_fields
+                        if c.context_fields is not None
+                        else list(i.context_variables.keys())
+                    )
+                    for i, c in zip(instances, criteria)
+                ]
+                for list_item in listt
+            ]
+        )
+
+        all_prediction_fields: set[str] = set(
+            [cast(str, c.prediction_field) for c in criteria]
+        )
 
         predictions = self.get_predictions(instances)
-
-        task_data: list[dict[str, str | list[str]]] = [
-            {**instance.context_variables, self.criteria.prediction_field: prediction}
-            for instance, prediction in zip(instances, predictions)
-        ]
 
         evaluator_params = {
             "inference_engine": self.inference_engine,
             "context_fields": [],
             "criteria_field": "criteria",
             "generate_summaries": False,
-            "criteria": self.criteria,
+            "check_positional_bias": False,
+            "include_prompts_in_result": True,
         }
-
-        input_fields = {
-            context_field: str for context_field in self.criteria.context_fields
-        }
-        input_fields[self.criteria.prediction_field] = self.get_prediction_type()
-
         metric = self.get_evaluator_klass()(**evaluator_params)
 
-        data = {"test": [{**c, "judgement": self.criteria} for c in task_data]}
+        input_fields = {field: str for field in all_context_fields}
+
+        input_fields.update(
+            {field: self.get_prediction_type() for field in all_prediction_fields}
+        )
+
+        task_data: list[dict[str, str | list[str]]] = [
+            {
+                **instance.context_variables,
+                cast(str, criterion.prediction_field): prediction,
+            }
+            for instance, prediction, criterion in zip(instances, predictions, criteria)
+        ]
+
+        task_data = [
+            {
+                k: (td[k] if k in td else "")
+                for k in all_context_fields.union(all_prediction_fields)
+            }
+            for td in task_data
+        ]
+
+        data = {"test": [{**td, "judgement": c} for td, c in zip(task_data, criteria)]}
 
         card = TaskCard(
             loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
@@ -127,16 +153,17 @@ class UnitxtDirectJudge(
         prefix = dataset[0]["score"]["instance"]["score_name"]
         for instance in dataset:
             instance_score = instance["score"]["instance"]
-            positional_bias = DirectPositionalBias(
-                detected=instance_score[f"{prefix}_positional_bias"],
-            )
-            if positional_bias.detected:
-                positional_bias.option = instance_score[
-                    f"{prefix}_positional_bias_selected_option"
-                ]
-                positional_bias.explanation = instance_score[
-                    f"{prefix}_positional_bias_assessment"
-                ]
+            # positional_bias = DirectPositionalBias(
+            #     detected=instance_score[f"{prefix}_positional_bias"],
+            # )
+            # if positional_bias.detected:
+            #     positional_bias.option = instance_score[
+            #         f"{prefix}_positional_bias_selected_option"
+            #     ]
+            #     positional_bias.explanation = instance_score[
+            #         f"{prefix}_positional_bias_assessment"
+            #     ]
+            positional_bias = DirectPositionalBias(detected=False)
 
             results.append(
                 DirectInstanceResult(
@@ -174,7 +201,9 @@ class UnitxtPairwiseJudge(
                         contest_results=score[f"{outer_key}_contest_results"],
                         compared_to=score[f"{outer_key}_compared_to"],
                         explanations=score[f"{outer_key}_assessments"],
-                        positional_bias=score[f"{outer_key}_positional_bias"],
+                        positional_bias=[
+                            False
+                        ],  # score[f"{outer_key}_positional_bias"], we calculate the positional bias outside unitxt now
                         winrate=score[f"{outer_key}_winrate"],
                         ranking=score[f"{outer_key}_ranking"],
                         selections=score[f"{outer_key}_selections"],
@@ -186,6 +215,9 @@ class UnitxtPairwiseJudge(
 class GraniteGuardianJudge(
     DirectJudge,
 ):
+    def get_name(self) -> str:
+        return "Granite Guardian"
+
     field_map = {
         "user_message_field": "user_message",
         "assistant_message_field": "assistant_message",
@@ -212,12 +244,16 @@ class GraniteGuardianJudge(
 
         return messages[criteria_name]
 
-    def get_prompt(self, risk_name, instances) -> list[str]:
+    def get_prompt(
+        self, risk_name, instances, criterion: CriteriaWithOptions
+    ) -> list[str]:
         risk_name = self.get_risk_name(risk_name)
         predictions = self.get_predictions(instances)
 
         context_variables_list = self.get_unitxt_dataset(
-            instances=instances, predictions=predictions
+            instances=instances,
+            predictions=predictions,
+            criteria=[criterion] * len(instances),
         )
         input_fields = self.get_input_fields(context_variables_list)
         granite_guardian_class: type[GraniteGuardianBase] = self.getEvaluatorClass(
@@ -236,13 +272,15 @@ class GraniteGuardianJudge(
             for context_variables in context_variables_list
         ]
 
-    def parse_results(self, dataset) -> list[DirectInstanceResult]:
+    def parse_results(
+        self, dataset, criteria: Sequence[CriteriaWithOptions]
+    ) -> list[DirectInstanceResult]:
         results = []
-        for instance in dataset:
+        for instance, criterion in zip(dataset, criteria):
             risk_name: str = instance["score"]["instance"]["score_name"]
             instance_score = instance["score"]["instance"]
             explanation = self.get_harms_and_risks_result_description(
-                cast(str, self.criteria.prediction_field).replace("_", " "),
+                cast(str, criterion.prediction_field).replace("_", " "),
                 risk_name.lower().replace(" ", "_"),
             )
 
@@ -277,15 +315,18 @@ class GraniteGuardianJudge(
         return risk_name if risk_name != "general_harm" else "harm"
 
     def get_unitxt_dataset(
-        self, instances: Sequence[DirectInstance], predictions: list[str]
+        self,
+        instances: Sequence[DirectInstance],
+        predictions: list[str],
+        criteria: Sequence[CriteriaWithOptions],
     ) -> list[dict[str, str]]:
         context_variables_list = [instance.context_variables for instance in instances]
-        for context_variables, prediction in zip(context_variables_list, predictions):
+        for context_variables, prediction, criterion in zip(
+            context_variables_list, predictions, criteria
+        ):
             # use prediction as one more context variable
-            if self.criteria.prediction_field is not None:
-                context_variables[cast(str, self.criteria.prediction_field)] = (
-                    prediction
-                )
+            if criterion.prediction_field is not None:
+                context_variables[cast(str, criterion.prediction_field)] = prediction
             else:
                 context_variables["response"] = prediction
 
@@ -299,23 +340,28 @@ class GraniteGuardianJudge(
     ) -> dict[str, type[str]]:
         return {input_field: str for input_field in context_variables_list[0].keys()}
 
-    def evaluate(
+    def _run(
         self,
         instances: Sequence[DirectInstance],
+        criteria: Sequence[CriteriaWithOptions],
     ) -> Sequence[DirectInstanceResult]:
-        risk_name = self.get_risk_name(self.criteria.name)
+        risk_names = [self.get_risk_name(criterion.name) for criterion in criteria]
         predictions = self.get_predictions(instances)
-        dataset = self.get_unitxt_dataset(instances=instances, predictions=predictions)
+        dataset = self.get_unitxt_dataset(
+            instances=instances, predictions=predictions, criteria=criteria
+        )
         input_fields = self.get_input_fields(dataset)
 
         granite_guardian_class: type[GraniteGuardianBase] = self.getEvaluatorClass(
             self.infer_risk_type(
-                risk_name=risk_name, field_map=self.field_map, input_fields=input_fields
+                risk_name=risk_names[0],
+                field_map=self.field_map,
+                input_fields=input_fields,
             )
         )
 
         metric = granite_guardian_class(
-            risk_name=risk_name,
+            risk_name=risk_names[0],
             **self.field_map,
             inference_engine=self.inference_engine,
         )
@@ -336,7 +382,7 @@ class GraniteGuardianJudge(
         evaluated_dataset: EvaluationResults = evaluate(predictions=None, data=dataset)
 
         per_instance_result: list[DirectInstanceResult] = self.parse_results(
-            evaluated_dataset
+            dataset=evaluated_dataset, criteria=criteria
         )
         return per_instance_result
 

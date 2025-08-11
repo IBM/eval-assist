@@ -5,8 +5,9 @@ import os
 import re
 import time
 import traceback
+from collections.abc import Sequence
 from enum import Enum
-from typing import Any
+from typing import Any, cast
 
 import requests
 from botocore.exceptions import NoCredentialsError
@@ -93,7 +94,7 @@ def convert_model_name_wx_to_hf(wx_model_name):
         return wx_model_name
 
 
-def get_enum_by_value(value: str, enum: Enum) -> Enum:
+def get_enum_by_value(value: str, enum: type[Enum]) -> Enum | None:
     for enum_member in enum:
         if enum_member.value == value:
             return enum_member
@@ -581,20 +582,24 @@ def get_system_version():
 
 def unitxt_dataset_to_evalassist_instances(
     dataset: IterableDataset,
-    criteria: Criteria,
+    criteria: Sequence[Criteria],
 ) -> list[DirectInstance]:
-    if criteria.prediction_field is None:
+    if any(
+        criterion.prediction_field is None or criterion.context_fields is None
+        for criterion in criteria
+    ):
         raise ValueError(
             "The criteria.prediction_field is None. It must be set to retrieve the response to evaluate from the task_data"
         )
     task_data_list = [json.loads(d["task_data"]) for d in dataset]
     return [
         DirectInstance(
-            context_variables={k: task_data[k] for k in criteria.context_fields},
-            response=task_data[criteria.prediction_field],
-            metadata=None,
+            context_variables={
+                k: task_data[k] for k in cast(list, criterion.context_fields)
+            },
+            response=task_data[criterion.prediction_field],
         )
-        for task_data in task_data_list
+        for task_data, criterion in zip(task_data_list, criteria)
     ]
 
 

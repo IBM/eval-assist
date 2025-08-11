@@ -101,6 +101,8 @@ addopts = "--cov=evalassist"
 
 
 
+
+
 [tool.poetry.group.local-inference]
 optional = true
 
@@ -112,11 +114,15 @@ transformers = "*"
 
 
 
+
+
 [tool.poetry.group.postgresql]
 optional = true
 
 [tool.poetry.group.postgresql.dependencies]
 psycopg2-binary = "*"
+
+
 
 
 

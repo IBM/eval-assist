@@ -185,26 +185,28 @@ export interface Dataset {
 }
 
 export interface FetchedEvaluatorBenchmark {
-  name: string
-  annotation: string
+  model: string
+  judge: string
   results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
 }
 
 export interface EvaluatorBenchmark {
-  name: string
-  annotation: string
+  model: string
+  judge: string
   results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
 }
 
 export interface FetchedCriteriaBenchmark {
   name: string // must match one of criteriaLibrary (inherits pipeline type from benchmark object pipeline type) e.g. Temperature
   catalog_criteria_name: string
+  dataset_len: number
   evaluator_benchmarks: FetchedEvaluatorBenchmark[]
 }
 
 export interface CriteriaBenchmark {
   name: string // must match one of criteriaLibrary (inherits pipeline type from benchmark object pipeline type) e.g. Temperature
   catalogCriteriaName: string
+  datasetLen: number
   evaluatorBenchmarks: EvaluatorBenchmark[]
 }
 

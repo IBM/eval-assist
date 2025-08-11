@@ -35,10 +35,11 @@ export const BenchmarksProvider = ({ children }: { children: ReactNode }) => {
         type: fetchedBenchmark.type,
         dataset: fetchedBenchmark.dataset,
         tags: fetchedBenchmark.tags,
-        criteriaBenchmarks: fetchedBenchmark.criteria_benchmarks.map((criteria_benchmarks) => ({
-          name: criteria_benchmarks.name,
-          catalogCriteriaName: capitalizeFirstWord(criteria_benchmarks.catalog_criteria_name),
-          evaluatorBenchmarks: criteria_benchmarks.evaluator_benchmarks,
+        criteriaBenchmarks: fetchedBenchmark.criteria_benchmarks.map((criteria_benchmark) => ({
+          name: criteria_benchmark.name,
+          catalogCriteriaName: capitalizeFirstWord(criteria_benchmark.catalog_criteria_name),
+          evaluatorBenchmarks: criteria_benchmark.evaluator_benchmarks,
+          datasetLen: criteria_benchmark.dataset_len,
         })),
       }))
       benchmarks.sort((b1, b2) => b1.name.localeCompare(b2.name))
