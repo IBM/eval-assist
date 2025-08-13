@@ -1,9 +1,11 @@
 # from typing import Sequence, cast
 # from evalassist.api.common import DirectInstance, DirectInstanceResult
 # from evalassist.judges.synthetic_persona_direct_judge import SimpleDirectJudge
+# from evalassist.judges.unitxt_judges import UnitxtDirectJudge
 # from unitxt.inference import InferenceEngine, CrossProviderInferenceEngine
 # from unitxt.llm_as_judge import CriteriaWithOptions
 # from unitxt.artifact import fetch_artifact
+# from unitxt.llm_as_judge_constants import CriteriaOption
 
 # def test_judges_multiple_criteria():
 #     inference_engine = CrossProviderInferenceEngine(
@@ -32,3 +34,15 @@
 #     print(results)
 #     assert results[0].option == "Excellent"
 #     assert results[1].option == "4"
+
+# def test_judges_str_params():
+#     inference_engine = CrossProviderInferenceEngine(
+#         model="llama-3-3-70b-instruct",
+#         provider="rits",
+#     )
+#     judge = UnitxtDirectJudge(inference_engine=inference_engine)
+#     results = judge.evaluate(
+#         instances=["Refer to the DTO or visit the BO please"],
+#         criteria="Is the text self explainable?"
+#     )
+#     assert results[0].option == "No"

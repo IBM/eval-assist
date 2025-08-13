@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from typing import Any, Generic, List, cast
 
 from evalassist.judges.base import (
-    CriteriaTypeBar,
+    CriteriaTypeVar,
     DirectInstance,
     DirectJudge,
     InstanceTypeVar,
@@ -36,9 +36,9 @@ from ..api.common import (
 
 
 class UnitxtJudge(
-    Judge[InstanceTypeVar, CriteriaTypeBar, ReturnVarType],
+    Judge[InstanceTypeVar, CriteriaTypeVar, ReturnVarType],
     ABC,
-    Generic[InstanceTypeVar, CriteriaTypeBar, ReturnVarType],
+    Generic[InstanceTypeVar, CriteriaTypeVar, ReturnVarType],
 ):
     @abstractmethod
     def get_preprocess_steps(self) -> list[Any]: ...
@@ -56,7 +56,7 @@ class UnitxtJudge(
         return "unitxt"
 
     def _run(
-        self, instances: Sequence[InstanceTypeVar], criteria: Sequence[CriteriaTypeBar]
+        self, instances: Sequence[InstanceTypeVar], criteria: Sequence[CriteriaTypeVar]
     ) -> Sequence[ReturnVarType]:
         # unitxt has a fixed task input fields, so we will add all of them in case different criterias have different prediction and/or context fields
         all_context_fields: set[str] = set(
@@ -96,6 +96,7 @@ class UnitxtJudge(
             {field: self.get_prediction_type() for field in all_prediction_fields}
         )
 
+        # add the context fields
         task_data: list[dict[str, str | list[str]]] = [
             {
                 **instance.context_variables,
@@ -103,6 +104,8 @@ class UnitxtJudge(
             }
             for instance, prediction, criterion in zip(instances, predictions, criteria)
         ]
+
+        # add the context fields as empty strings in case different criteria provide diffent context names or prediction_field names
 
         task_data = [
             {
