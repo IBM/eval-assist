@@ -9,7 +9,6 @@ import nbformat as nbf
 import nest_asyncio
 import pandas as pd
 from evalassist.api.common import DirectInstanceDTO
-from evalassist.judges.synthetic_persona_direct_judge import SimpleDirectJudge
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -58,7 +57,7 @@ from .api.common import (
 # API type definitions
 from .api.pipelines import EvaluatorMetadataAPI, EvaluatorsResponseModel
 from .api.types import DomainEnum, PersonaEnum
-from .benchmark.benchmark import get_all_benchmarks
+from .benchmark.benchmark import UnitxtDirectJudge, get_all_benchmarks
 from .const import (
     AUTHENTICATION_ENABLED,
     DIRECT_ACTION_PARAMS,
@@ -317,7 +316,7 @@ async def evaluate(
             if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
                 evaluator = GraniteGuardianJudge(inference_engine=inference_engine)
             else:
-                evaluator = SimpleDirectJudge(
+                evaluator = UnitxtDirectJudge(
                     inference_engine=inference_engine,
                 )
             per_instance_result = evaluator.evaluate(
