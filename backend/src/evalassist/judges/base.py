@@ -120,6 +120,14 @@ class Judge(
         )
         return results
 
+    def __call__(
+        self,
+        instances: Sequence[InstanceTypeVar] | Sequence[str] | Sequence[list[str]],
+        criteria: CriteriaTypeVar | Sequence[CriteriaTypeVar] | str,
+        check_positional_bias: bool = False,
+    ) -> Sequence[ReturnVarType]:
+        return self.evaluate(instances, criteria, check_positional_bias)
+
     @abstractmethod
     def _evaluate(
         self,
