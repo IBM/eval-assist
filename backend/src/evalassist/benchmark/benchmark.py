@@ -77,7 +77,7 @@ def get_judgebench_readme_url(dataset_name):
 
 
 def add_judgebench_readme_url(benchmark_name):
-    dataset_name = benchmark_name.split(".")[0]
+    dataset_name = benchmark_name.split("/")[1]
     futures = []
     with ThreadPoolExecutor(2) as executor:
         for option in [dataset_name, dataset_name.replace("_", "-")]:
@@ -387,7 +387,7 @@ def run_single_model_card(
         load_dataset(
             card=card,
             split="test",
-            loader_limit=INSTANCES_PER_DATASET,
+            loader_limit=INSTANCES_PER_DATASET if "biggen" not in card else None,
             use_cache=True,
         ),
     )
