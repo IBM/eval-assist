@@ -485,8 +485,8 @@ def run_benchmarks():
         futures = []
         for card in all_benchmarks:
             # Load the dataset for the current card
-            # if not 'biggen' in card:
-            #     continue
+            if card in ["esnli", "drop"]:
+                continue
             for model in MODELS:
                 for judge_class in JUDGES:
                     if model in inference_engines:
