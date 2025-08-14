@@ -14,7 +14,7 @@ from evalassist.api.common import DirectInstance, DirectInstanceResult
 from evalassist.const import EVAL_ASSIST_DIR
 from evalassist.judges.base import DirectJudge
 from evalassist.judges.synthetic_persona_direct_judge import SimpleDirectJudge
-from evalassist.judges.thesis_atithesis_direct_judge import ThesisAntithesislDirectJudge
+from evalassist.judges.thesis_atithesis_direct_judge import ThesisAntithesisDirectJudge
 from evalassist.judges.unitxt_judges import UnitxtDirectJudge
 from evalassist.utils import (
     folder_exists_in_github_repo,
@@ -47,7 +47,7 @@ MODELS = [
 JUDGES: list[type[DirectJudge]] = [
     UnitxtDirectJudge,
     SimpleDirectJudge,
-    ThesisAntithesislDirectJudge,
+    ThesisAntithesisDirectJudge,
 ]
 
 logger = logging.getLogger(__name__)

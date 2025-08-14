@@ -10,7 +10,7 @@ from ..api.common import DirectInstance, DirectInstanceResult, DirectPositionalB
 from .base import DirectJudge, UnitxtInferenceLangchainRunnable
 
 
-class ThesisAntithesislDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
+class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
     def get_name(self) -> str:
         return "thesis_untithesis"
 
