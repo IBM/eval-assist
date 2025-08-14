@@ -31,7 +31,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         self.generate_synthetic_persona = generate_synthetic_persona
 
     def get_name(self) -> str:
-        return "simple"
+        return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}"
 
     def generate_persona(self, instance_str, criterion: CriteriaWithOptions):
         class SyntheticPersona(BaseModel):
