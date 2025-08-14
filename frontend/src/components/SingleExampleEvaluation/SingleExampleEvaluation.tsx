@@ -8,7 +8,7 @@ import { Button, Link } from '@carbon/react'
 import { Add, Password, Upload, WarningFilled } from '@carbon/react/icons'
 
 import { useBeforeOnload } from '@customHooks/useBeforeOnload'
-import { useSaveShortcut } from '@customHooks/useSaveShortcut'
+import { useShortcuts } from '@customHooks/useShortcuts'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
@@ -27,6 +27,7 @@ import { Modals } from './Modals'
 import classes from './SingleExampleEvaluation.module.scss'
 import { TestCaseOptions } from './TestCaseOptions'
 import { TestDataTable } from './TestDataTable'
+import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 
 export const SingleExampleEvaluation = () => {
   const { currentTestCase, setCurrentTestCase, changesDetected, isTestCaseSaved, showingTestCase } =
@@ -67,8 +68,9 @@ export const SingleExampleEvaluation = () => {
   useBeforeOnload(changesDetected)
   const temporaryIdRef = useRef(uuid())
   const { onSave } = useTestCaseActionsContext()
+  const { storageEnabled } = useFeatureFlags()
 
-  useSaveShortcut({ onSave, changesDetected, isTestCaseSaved })
+  useShortcuts({ onSave, changesDetected, isTestCaseSaved })
 
   return (
     <>
@@ -101,7 +103,7 @@ export const SingleExampleEvaluation = () => {
                 >
                   {'New Test Case'}
                 </Button>
-                <Button
+                {storageEnabled && <Button
                   kind="tertiary"
                   onClick={() => {
                     setUploadTestCaseModalOpen(true)
@@ -109,7 +111,7 @@ export const SingleExampleEvaluation = () => {
                   renderIcon={Upload}
                 >
                   {'Import Test Case'}
-                </Button>
+                </Button>}
               </div>
             </div>
             <TestCaseOptions style={{ marginBottom: '1rem' }} className={classes['left-padding']} />
