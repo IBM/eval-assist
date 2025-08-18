@@ -91,7 +91,7 @@ class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable)
                 ### First Evaluation Stage:
                 For each option of the criterion, provide a CoT step-by-step reasoning explaining why the text *would* fit that option. If there is no supporting evidence, respond with "No arguments.". If in doubt, provide the arguments anyway.
 
-                Please reply in the following JSON format:
+                ### Output format
                 {format_instructions}
             """,
                 ),
@@ -172,6 +172,7 @@ class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable)
                 Available options:
                 {criteria_option_names}
 
+                ### Output format
                 {format_instructions}
             """,
             ),
@@ -288,6 +289,7 @@ class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable)
                     - Provide a brief rationale for why the text fails to match **Option {option_one}**.
                     - Provide a brief rationale for why the text fails to match **Option {option_two}**.
 
+                    ### Output format
                     {format_instructions}
                 """,
                 ),
@@ -384,6 +386,7 @@ class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable)
                     **Text to evaluate**:
                     {text_to_evaluate}
 
+                    ### Output format
                     {format_instructions}
                 """,
                 ),
