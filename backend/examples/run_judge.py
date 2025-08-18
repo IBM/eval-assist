@@ -1,4 +1,4 @@
-from evalassist.judges.unitxt_judges import UnitxtDirectJudge
+from evalassist.judges import UnitxtDirectJudge
 from unitxt.inference import CrossProviderInferenceEngine
 
 judge = UnitxtDirectJudge(

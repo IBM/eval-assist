@@ -12,10 +12,12 @@ import pandas as pd
 from datasets import IterableDataset
 from evalassist.api.common import DirectInstance, DirectInstanceResult
 from evalassist.const import EVAL_ASSIST_DIR
+from evalassist.judges import (
+    PersonaDirectJudge,
+    ThesisAntithesisDirectJudge,
+    UnitxtDirectJudge,
+)
 from evalassist.judges.base import DirectJudge
-from evalassist.judges.synthetic_persona_direct_judge import SimpleDirectJudge
-from evalassist.judges.thesis_atithesis_direct_judge import ThesisAntithesisDirectJudge
-from evalassist.judges.unitxt_judges import UnitxtDirectJudge
 from evalassist.utils import (
     folder_exists_in_github_repo,
     unitxt_dataset_to_evalassist_instances,
@@ -46,7 +48,7 @@ MODELS = [
 ]
 JUDGES: list[type[DirectJudge]] = [
     UnitxtDirectJudge,
-    SimpleDirectJudge,
+    PersonaDirectJudge,
     ThesisAntithesisDirectJudge,
 ]
 

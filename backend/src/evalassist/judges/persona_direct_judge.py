@@ -17,7 +17,7 @@ from .base import DirectJudge, UnitxtInferenceLangchainRunnable
 logger = logging.getLogger(__name__)
 
 
-class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
+class PersonaDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
     generate_synthetic_persona: bool
 
     def __init__(
@@ -192,6 +192,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
                 ### Text to evaluate
                 {text_to_evaluate}
 
+                ### Output format
                 {format_instructions}
             """,
             ),
