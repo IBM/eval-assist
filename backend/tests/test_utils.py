@@ -2,7 +2,10 @@ from enum import Enum
 from unittest.mock import mock_open, patch
 
 import pytest
-from evalassist.const import EXTENDED_EVALUATORS_METADATA, ExtendedEvaluatorNameEnum
+from evalassist.extended_unitxt import (
+    EXTENDED_EVALUATORS_METADATA,
+    ExtendedEvaluatorNameEnum,
+)
 from evalassist.utils import (
     clean_object,
     convert_model_name_wx_to_hf,

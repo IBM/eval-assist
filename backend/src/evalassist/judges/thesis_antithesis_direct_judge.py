@@ -2,9 +2,9 @@ from collections.abc import Sequence
 from textwrap import dedent
 from typing import Any, cast
 
-from evalassist.utils import CriteriaWithOptions
 from langchain.output_parsers import OutputFixingParser, ResponseSchema
 from langchain.prompts import PromptTemplate
+from unitxt.llm_as_judge import CriteriaWithOptions
 
 from ..api.common import DirectInstance, DirectInstanceResult, DirectPositionalBias
 from .base import DirectJudge, UnitxtInferenceLangchainRunnable

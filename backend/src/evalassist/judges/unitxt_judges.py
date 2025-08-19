@@ -2,15 +2,6 @@ from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from typing import Any, Generic, List, cast
 
-from evalassist.judges.base import (
-    CriteriaTypeVar,
-    DirectInstance,
-    DirectJudge,
-    InstanceTypeVar,
-    Judge,
-    PairwiseJudge,
-    ReturnVarType,
-)
 from unitxt.api import evaluate, load_dataset
 from unitxt.blocks import Task, TaskCard
 from unitxt.llm_as_judge import (
@@ -32,6 +23,15 @@ from ..api.common import (
     PairwiseInstance,
     PairwiseInstanceResult,
     SingleSystemPairwiseResult,
+)
+from .base import (
+    CriteriaTypeVar,
+    DirectInstance,
+    DirectJudge,
+    InstanceTypeVar,
+    Judge,
+    PairwiseJudge,
+    ReturnVarType,
 )
 
 

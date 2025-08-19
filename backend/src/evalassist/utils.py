@@ -37,9 +37,8 @@ from unitxt.llm_as_judge import (
     ModelProviderEnum,
 )
 
-from .const import (
-    CUSTOM_MODELS_PATH,
-    EVAL_ASSIST_DIR,
+from .const import CUSTOM_MODELS_PATH, EVAL_ASSIST_DIR
+from .extended_unitxt import (
     EXTENDED_EVALUATOR_TO_MODEL_ID,
     EXTENDED_EVALUATORS_METADATA,
     ExtendedEvaluatorMetadata,

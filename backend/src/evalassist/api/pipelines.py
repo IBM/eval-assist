@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from unitxt.llm_as_judge import EvaluatorNameEnum, ModelProviderEnum
 
-from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
+from ..extended_unitxt import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 
 
 class EvaluatorMetadataAPI(BaseModel):
