@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Sequence
+from collections.abc import Sequence
+from typing import Any
 
-from evalassist.database import StoredTestCase
 from fastapi import HTTPException
 from pydantic import BaseModel, RootModel, field_validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
 
-from ..const import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
+from ..database import StoredTestCase
+from ..extended_unitxt import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
 from .types import (
     DirectActionTypeEnum,
     DomainEnum,
@@ -119,7 +120,7 @@ class NotebookParams(BaseModel):
     context_variables: list[dict[str, str]]
     credentials: dict[str, str]
     evaluator_type: EvaluatorTypeEnum
-    model_name: Optional[str] = None
+    model_name: str | None = None
     plain_python_script: bool
 
 
@@ -129,14 +130,14 @@ class NotebookParams(BaseModel):
 
 class SyntheticExampleGenerationRequest(BaseModel):
     provider: ModelProviderEnum | ExtendedModelProviderEnum
-    llm_provider_credentials: dict[str, Optional[str]]
+    llm_provider_credentials: dict[str, str | None]
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
     type: EvaluatorTypeEnum
     criteria: CriteriaWithOptionsDTO | CriteriaDTO
-    generation_length: Optional[GenerationLengthEnum]
-    task: Optional[TaskEnum]
-    domain: Optional[DomainEnum]
-    persona: Optional[PersonaEnum]
+    generation_length: GenerationLengthEnum | None
+    task: TaskEnum | None
+    domain: DomainEnum | None
+    persona: PersonaEnum | None
     per_criteria_option_count: dict[str, int]
     borderline_count: int
 
@@ -178,7 +179,7 @@ class EvaluationResultDTO(BaseModel):
 
 class TestModelRequestModel(BaseModel):
     provider: ModelProviderEnum | ExtendedModelProviderEnum
-    llm_provider_credentials: dict[str, Optional[str]]
+    llm_provider_credentials: dict[str, str | None]
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
 
 
@@ -186,9 +187,9 @@ class DirectAIActionRequest(BaseModel):
     action: DirectActionTypeEnum
     selection: str
     text: str
-    prompt: Optional[str] = None
+    prompt: str | None = None
     provider: ModelProviderEnum | ExtendedModelProviderEnum
-    llm_provider_credentials: dict[str, Optional[str]]
+    llm_provider_credentials: dict[str, str | None]
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum | str
     type: EvaluatorTypeEnum
 

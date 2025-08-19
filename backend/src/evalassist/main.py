@@ -61,7 +61,6 @@ from .benchmark.benchmark import UnitxtDirectJudge, get_all_benchmarks
 from .const import (
     AUTHENTICATION_ENABLED,
     DIRECT_ACTION_PARAMS,
-    EXTENDED_EVALUATORS_METADATA,
     STATIC_DIR,
     STORAGE_ENABLED,
     SYNTHETIC_DATA_GENERATION_PARAMS,
@@ -70,6 +69,7 @@ from .const import (
     domain_persona_map,
 )
 from .database import engine  # Assumes you have engine/session setup
+from .extended_unitxt import EXTENDED_EVALUATORS_METADATA
 from .judges.unitxt_judges import GraniteGuardianJudge, UnitxtPairwiseJudge
 from .model import AppUser, StoredTestCase
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook

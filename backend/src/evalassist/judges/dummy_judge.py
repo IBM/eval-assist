@@ -1,7 +1,6 @@
 from collections.abc import Sequence
 
-from evalassist.judges.base import DirectJudge, PairwiseJudge
-from evalassist.utils import Criteria, CriteriaWithOptions
+from unitxt.llm_as_judge import Criteria, CriteriaWithOptions
 
 from ..api.common import (
     DirectInstance,
@@ -11,6 +10,7 @@ from ..api.common import (
     PairwiseInstanceResult,
     SingleSystemPairwiseResult,
 )
+from .base import DirectJudge, PairwiseJudge
 
 
 class DummyDirectJudge(DirectJudge):
