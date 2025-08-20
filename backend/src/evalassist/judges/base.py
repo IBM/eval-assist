@@ -102,6 +102,7 @@ class Judge(
             raise ValueError(
                 f"The provided criteria list must be equal in length with the instances. {len(criteria)} != {len(instances)}"
             )
+        print(criteria)
         parsed_criteria: Sequence[CriteriaTypeVar] | Sequence[str]
         if isinstance(criteria, str):
             parsed_criteria = [criteria] * len(instances)
@@ -214,9 +215,27 @@ class DirectJudge(
                 )
                 for i in range(cast(int, results_len))
             ]
-            return results
         else:
-            return self._run(instances=instances, criteria=criteria)
+            results = self._run(instances=instances, criteria=criteria)
+
+        # add numeric scores if possible
+        for r, c in zip(results, criteria):
+            score: float | None = None
+            if c.option_map is not None:
+                score = c.option_map.get(r.option, None)
+                if score is None:
+                    raise ValueError(
+                        f"An option map was provided in the criteria but the option chosen by the evaluator ({r.option}) wasn't found in the option map ({c.option_map})."
+                    )
+            else:
+                try:
+                    # try to use the option name as the numeric score
+                    score = float(r.option)
+                except (ValueError, TypeError):
+                    pass
+            r.score = score
+
+        return results
 
     def _get_instances_from_str(
         self, instances: Sequence[DirectInstance] | Sequence[str] | Sequence[list[str]]
@@ -247,12 +266,16 @@ class DirectJudge(
         if isinstance(criteria, Sequence) and all(isinstance(x, str) for x in criteria):
             return [
                 CriteriaWithOptions(
-                    name="llm_judge",
+                    name="",
                     description=description,
                     options=[
                         CriteriaOption(name="Yes", description=""),
                         CriteriaOption(name="No", description=""),
                     ],
+                    option_map={
+                        "Yes": 1.0,
+                        "No": 0.0,
+                    },
                     prediction_field="response",
                 )
                 for description in cast(Sequence[str], criteria)
@@ -263,6 +286,7 @@ class DirectJudge(
                     name=criterion.name,
                     description=criterion.description,
                     options=criterion.options,
+                    option_map=criterion.option_map,
                     prediction_field=criterion.prediction_field,
                 )
                 for criterion in cast(Sequence[CriteriaWithOptions], criteria)
@@ -378,7 +402,7 @@ class PairwiseJudge(Judge[PairwiseInstance, Criteria, PairwiseInstanceResult], A
         if isinstance(criteria, Sequence) and all(isinstance(x, str) for x in criteria):
             return [
                 CriteriaWithOptions(
-                    name="llm_judge",
+                    name="",
                     description=description,
                 )
                 for description in cast(Sequence[str], criteria)

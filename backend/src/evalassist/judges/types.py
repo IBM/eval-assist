@@ -50,6 +50,8 @@ class DirectPositionalBias(BaseModel):
 
 class DirectInstanceResult(BaseModel):
     option: str
+    score: float | None = None
     explanation: str
+    feedback: str | None = None
     positional_bias: DirectPositionalBias
     metadata: dict[str, Any] | None = None

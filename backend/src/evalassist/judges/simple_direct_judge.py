@@ -23,12 +23,18 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
     def __init__(
         self,
         inference_engine: InferenceEngine,
-        generate_synthetic_persona=False,
+        generate_synthetic_persona: bool = False,
+        judge_description_prompt: str | None = None,
     ):
         super().__init__(
             inference_engine=inference_engine,
         )
+        if generate_synthetic_persona and judge_description_prompt:
+            raise ValueError(
+                "Either provide set generate_synthetic_persona to False or don't provide a judge_description_prompt."
+            )
         self.generate_synthetic_persona = generate_synthetic_persona
+        self.judge_description_prompt = judge_description_prompt
 
     def get_name(self) -> str:
         return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}"
@@ -53,7 +59,9 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         template = PromptTemplate(
             input_variables=[],
             partial_variables={
-                "criteria_name": criterion.name,
+                "criteria_name_section": f"Criteria name: {criterion.name}"
+                if criterion.name
+                else "",
                 "criteria_description": criterion.description,
                 "criteria_options": "\n".join(
                     [f"{o.name}: {o.description}" for o in criterion.options]
@@ -66,9 +74,8 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
                     Your task is to generate a persona that is the most appropriate to evaluate a text based on the following criteria.
                     You will be provided with the criteria name, description and options and an example instance.
 
-
                     ### Criterion:
-                    Name: {criteria_name}
+                    {criteria_name_section}
                     Description: {criteria_description}
                     Options:
                     {criteria_options}
@@ -109,6 +116,10 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
 
             class DynamicOutputJudgeModel(BaseModel):
                 assessment: str = Field(..., description="Step by step assessment")
+                feedback: str = Field(
+                    ...,
+                    description=f"Actionable suggestions that would help improve the evaluated {criterion.prediction_field if criterion.prediction_field is not None else 'response'} based on the assessment",
+                )
                 selected_option: str = Field(
                     ...,
                     description=f"The chosen option. Any of {', '.join([o.name for o in criterion.options])}",
@@ -135,61 +146,71 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         context_variables_list: list[dict[str, str]] = [
             instance.context_variables for instance in instances
         ]
-        str_context_variables_list: list[str] = [
-            "\n".join(f"{k}: {v}" for k, v in c.items()) for c in context_variables_list
+        str_context_variables_list: list[str | None] = [
+            "\n".join(f"{k}: {v}" for k, v in c.items()) if len(c) else None
+            for c in context_variables_list
         ]
 
         context_sections: list[str] = [
-            "\n\n### Context\n" + c + "\n" for c in str_context_variables_list
+            ("\n\n### Context\n" + c + "\n") if c is not None else ""
+            for c in str_context_variables_list
         ]
-
-        if self.generate_synthetic_persona:
-            persona_name, persona_description = self.generate_persona(
-                instance_str="Context:\n"
-                + str_context_variables_list[0]
-                + "\nText to evaluate: "
-                + cast(str, predictions[0]),
-                criterion=criteria[0],
-            )
+        judge_description_section: str
+        if self.judge_description_prompt:
+            judge_description_section = self.judge_description_prompt
         else:
-            persona_name, persona_description = (
-                "an evaluator",
-                "an expert on evaluating text based on a rubric",
+            if self.generate_synthetic_persona:
+                persona_name, persona_description = self.generate_persona(
+                    instance_str=("Context:\n" + str_context_variables_list[0])
+                    if str_context_variables_list[0]
+                    else "" + "\nText to evaluate: " + cast(str, predictions[0]),
+                    criterion=criteria[0],
+                )
+            else:
+                persona_name, persona_description = (
+                    "an evaluator",
+                    "an expert on evaluating text based on a rubric",
+                )
+            judge_description_section = (
+                f"You are {persona_name}. You {persona_description}."
             )
 
         prompt_template = PromptTemplate(
             input_variables=[
                 "text_to_evaluate",
                 "context_section",
-                "criteria_name",
+                "criteria_name_section",
                 "criteria_description",
                 "criteria_options",
                 "format_instructions",
+                "prediction_field",
             ],
             partial_variables={
-                "persona_name": persona_name,
-                "persona_description": persona_description,
+                "judge_description_section": judge_description_section,
             },
             template=dedent(
                 text="""\
-                You are {persona_name}. You {persona_description}. You will be given:
+                {judge_description_section}
+
+                You will be given:
                 - **Criterion** (name, description, options)
                 - **Optional context**
-                - **A text** to evaluate
+                - **The {prediction_field}** to evaluate
 
-                Your job:
+                ### Important steps:
                 1. Think step-by‑step through your reasoning about which option best fits.
                 2. Write your full chain‑of‑thought *only* inside the `assessment` JSON field.
-                3. The chain-of-thought should last no more than three paragraphs (6 to 8 sentences) and use markdown.
-                4. At the end, set `"selected_option"` to one of the provided options based on the assessment.
+                3. The chain-of-thought should use markdown code for easier reading and parsing.
+                4. Set `"selected_option"` to one of the provided options based on the assessment.
+                5. At the end, provide "feedback" consisting of actionable suggestions that would help improve the evaluated {prediction_field}. Unlike the assessment, which explains the reasoning behind the judgment, the feedback should focus on guiding refinement. For example, in creative writing, it could suggest improving clarity, coherence, or narrative flow. In analytical tasks, it could recommend strengthening evidence, refining arguments, or correcting inaccuracies. Keep feedback concise and specific enough to support iterative improvement.
 
                 ### Criterion:
-                Name: {criteria_name}
+                {criteria_name_section}
                 Description: {criteria_description}
                 Options:
                 {criteria_options}{context_section}
 
-                ### Text to evaluate
+                ### The {prediction_field} to evaluate
                 {text_to_evaluate}
 
                 ### Output format
@@ -202,10 +223,15 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
             prompt_template.format(
                 text_to_evaluate=prediction,
                 context_section=context_section,
-                criteria_name=criterion.name,
+                criteria_name_section=f"Criteria name: {criterion.name}"
+                if criterion.name
+                else "",
                 criteria_description=criterion.description,
                 criteria_options=criterion_options,
                 format_instructions=format_instructions,
+                prediction_field=criterion.prediction_field
+                if criterion.prediction_field is not None
+                else "response",
             )
             for prediction, context_section, criterion, criterion_options, format_instructions in zip(
                 predictions,
@@ -246,21 +272,21 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
             parsed_responses.append(parsed_response)
         explanations: list[str] = [r.assessment for r in parsed_responses]
         selected_options: list[str] = [r.selected_option for r in parsed_responses]
+        feedbacks: list[str] = [r.feedback for r in parsed_responses]
 
         return [
             DirectInstanceResult(
                 option=selected_option,
                 explanation=explanation,
+                feedback=feedback,
                 positional_bias=DirectPositionalBias(
                     detected=False,
                 ),
                 metadata={
-                    "generated_persona_name": persona_name,
-                    "generated_persona_description": persona_description,
                     "prompt": prompt,
                 },
             )
-            for selected_option, explanation, prompt in zip(
-                selected_options, explanations, prompts
+            for selected_option, explanation, feedback, prompt in zip(
+                selected_options, explanations, feedbacks, prompts
             )
         ]
