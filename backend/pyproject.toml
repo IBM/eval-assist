@@ -63,7 +63,7 @@ dev = [
     "pytest",
     "httpx",
     "tox",
-    "pytest",
+    "pytest-cov",
 ]
 webapp = [
     "litellm",     
