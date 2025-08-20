@@ -11,13 +11,13 @@ from pydantic import BaseModel, Field
 from unitxt.inference import CrossProviderInferenceEngine, InferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions
 
-from ..api.common import DirectInstance, DirectInstanceResult, DirectPositionalBias
 from .base import DirectJudge, UnitxtInferenceLangchainRunnable
+from .types import DirectInstance, DirectInstanceResult, DirectPositionalBias
 
 logger = logging.getLogger(__name__)
 
 
-class PersonaDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
+class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
     generate_synthetic_persona: bool
 
     def __init__(

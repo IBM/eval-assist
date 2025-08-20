@@ -2,14 +2,14 @@ from collections.abc import Sequence
 from textwrap import dedent
 from typing import cast
 
-from evalassist.judges.base import DirectJudge, UnitxtInferenceLangchainRunnable
-from evalassist.utils import CriteriaWithOptions
 from langchain.output_parsers import OutputFixingParser
 from langchain.prompts import PromptTemplate
 from pydantic import BaseModel, Field
 from unitxt.inference import InferenceEngine
+from unitxt.llm_as_judge import CriteriaWithOptions
 
-from ..api.common import DirectInstance, DirectInstanceResult, DirectPositionalBias
+from .base import DirectJudge, UnitxtInferenceLangchainRunnable
+from .types import DirectInstance, DirectInstanceResult, DirectPositionalBias
 
 
 class CustomPromptDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):

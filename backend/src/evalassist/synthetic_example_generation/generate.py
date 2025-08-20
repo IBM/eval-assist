@@ -12,13 +12,11 @@ from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnableLambda
 from unitxt.inference import InferenceEngine
 
-from ..api.common import (
+from ..api_types import (
     CriteriaWithOptionsDTO,
+    DirectActionTypeEnum,
     DirectAIActionRequest,
     DirectInstanceDTO,
-)
-from ..api.types import (
-    DirectActionTypeEnum,
     DomainEnum,
     GenerationLengthEnum,
     PersonaEnum,
