@@ -39,14 +39,14 @@ EvalAssist can be installed using various package managers. Before proceeding, e
 ```bash
 python3 -m venv venv
 source venv/bin/activate # or venv\Scripts\activate.bat in Windows
-pip install evalassist[webapp]
+pip install 'evalassist[webapp]'
 eval-assist serve
 ```
 
 ### Installation via uv
 
 ```bash
-uvx --python 3.11 --from evalassist[webapp] eval-assist serve
+uvx --python 3.11 --from 'evalassist[webapp]' eval-assist serve
 ```
 
 ### Installation via conda
@@ -54,7 +54,7 @@ uvx --python 3.11 --from evalassist[webapp] eval-assist serve
 ```bash
 conda create -n evalassist python=3.11
 conda activate evalassist
-pip install evalassist[webapp]
+pip install 'evalassist[webapp]'
 eval-assist serve
 ```
 

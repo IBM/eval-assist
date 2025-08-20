@@ -8,6 +8,7 @@ from typing import cast
 import nbformat as nbf
 import nest_asyncio
 import pandas as pd
+from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -63,7 +64,6 @@ from .const import (
     STORAGE_ENABLED,
     SYNTHETIC_DATA_GENERATION_PARAMS,
     TEMPORARY_FILES_FOLDER,
-    UNITXT_JUDGE_PARAMS,
     domain_persona_map,
 )
 from .database import engine  # Assumes you have engine/session setup
@@ -302,7 +302,7 @@ async def evaluate(
             custom_model_name=custom_model_name,
             provider=req.provider,
             llm_provider_credentials=req.llm_provider_credentials,
-            custom_params=UNITXT_JUDGE_PARAMS,
+            custom_params=DEFAULT_JUDGE_INFERENCE_PARAMS,
         )
         if req.criteria.prediction_field is None or req.criteria.context_fields is None:
             raise ValueError(

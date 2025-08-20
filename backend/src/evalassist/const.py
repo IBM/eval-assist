@@ -112,12 +112,6 @@ logger.debug(f"UVICORN_WORKERS: {UVICORN_WORKERS}")
 logger.debug(f"CUSTOM_MODELS_PATH: {CUSTOM_MODELS_PATH}")
 
 
-UNITXT_JUDGE_PARAMS = {
-    "use_cache": UNITXT_CACHE_ENABLED,
-    "seed": 42,
-    "temperature": 0,
-}
-
 DIRECT_ACTION_PARAMS = {
     "use_cache": False,
     "seed": None,
