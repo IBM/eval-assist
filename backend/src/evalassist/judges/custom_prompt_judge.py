@@ -61,6 +61,12 @@ class CustomPromptDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
                 """\
 {prompt}
 
+Important:
+1. Think step-by‑step through your reasoning about which option best fits.
+2. Write your full chain‑of‑thought *only* inside the `assessment` JSON field.
+3. The chain-of-thought should last no more than three paragraphs (6 to 8 sentences) and use markdown.
+4. At the end, set `"selected_option"` to one of the provided options based on the assessment.
+
 You will be given:
 - **Criterion** (name, description, options)
 - **Optional context**
