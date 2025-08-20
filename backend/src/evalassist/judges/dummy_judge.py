@@ -2,7 +2,8 @@ from collections.abc import Sequence
 
 from unitxt.llm_as_judge import Criteria, CriteriaWithOptions
 
-from ..api.common import (
+from .base import DirectJudge, PairwiseJudge
+from .types import (
     DirectInstance,
     DirectInstanceResult,
     DirectPositionalBias,
@@ -10,7 +11,6 @@ from ..api.common import (
     PairwiseInstanceResult,
     SingleSystemPairwiseResult,
 )
-from .base import DirectJudge, PairwiseJudge
 
 
 class DummyDirectJudge(DirectJudge):

@@ -12,7 +12,6 @@ from typing import Any, cast
 import requests
 from botocore.exceptions import NoCredentialsError
 from datasets import IterableDataset
-from evalassist.api.common import CriteriaWithOptionsDTO, DirectInstance
 from fastapi import HTTPException
 from ibm_watsonx_ai.wml_client_error import (
     ApiRequestFailure,
@@ -37,6 +36,7 @@ from unitxt.llm_as_judge import (
     ModelProviderEnum,
 )
 
+from .api_types import CriteriaWithOptionsDTO
 from .const import CUSTOM_MODELS_PATH, EVAL_ASSIST_DIR
 from .extended_unitxt import (
     EXTENDED_EVALUATOR_TO_MODEL_ID,
@@ -45,6 +45,7 @@ from .extended_unitxt import (
     ExtendedEvaluatorNameEnum,
     ExtendedModelProviderEnum,
 )
+from .judges.types import DirectInstance
 
 logger = logging.getLogger(__name__)
 

@@ -10,24 +10,22 @@ from typing import Any, cast
 
 import pandas as pd
 from datasets import IterableDataset
-from evalassist.api.common import DirectInstance, DirectInstanceResult
-from evalassist.const import EVAL_ASSIST_DIR
-from evalassist.judges import (
-    PersonaDirectJudge,
-    ThesisAntithesisDirectJudge,
-    UnitxtDirectJudge,
-)
-from evalassist.judges.base import DirectJudge
-from evalassist.utils import (
-    folder_exists_in_github_repo,
-    unitxt_dataset_to_evalassist_instances,
-)
 from scipy.stats import pearsonr, spearmanr
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
 from unitxt.inference import CrossProviderInferenceEngine, InferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions, EvaluatorTypeEnum
 from unitxt.settings_utils import get_constants
+
+from ..const import EVAL_ASSIST_DIR
+from ..judges import (
+    DirectJudge,
+    SimpleDirectJudge,
+    ThesisAntithesisDirectJudge,
+    UnitxtDirectJudge,
+)
+from ..judges.types import DirectInstance, DirectInstanceResult
+from ..utils import folder_exists_in_github_repo, unitxt_dataset_to_evalassist_instances
 
 RESULTS_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "benchmark_results.csv"
 CACHE_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "benchmark_results_cache.csv"
@@ -48,7 +46,7 @@ MODELS = [
 ]
 JUDGES: list[type[DirectJudge]] = [
     UnitxtDirectJudge,
-    PersonaDirectJudge,
+    SimpleDirectJudge,
     ThesisAntithesisDirectJudge,
 ]
 

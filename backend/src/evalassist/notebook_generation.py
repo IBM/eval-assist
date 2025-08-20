@@ -6,7 +6,7 @@ from typing import Literal
 import nbformat as nbf
 from evalassist.const import UNITXT_JUDGE_PARAMS
 
-from .api.common import NotebookParams
+from .api_types import NotebookParams
 from .utils import get_cross_inference_engine_params
 
 

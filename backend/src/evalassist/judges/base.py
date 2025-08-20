@@ -15,7 +15,7 @@ from pydantic import BaseModel
 from unitxt.inference import CrossProviderInferenceEngine, InferenceEngine
 from unitxt.llm_as_judge import Criteria, CriteriaOption, CriteriaWithOptions
 
-from ..api.common import (
+from .types import (
     DirectInstance,
     DirectInstanceResult,
     DirectPositionalBias,

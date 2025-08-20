@@ -2,10 +2,9 @@ import logging
 import os
 from pathlib import Path
 
-from .api.types import DomainEnum, GenerationLengthEnum, PersonaEnum
+from .api_types import DomainEnum, GenerationLengthEnum, PersonaEnum
 
 logger = logging.getLogger(__name__)
-
 
 domain_persona_map = {
     DomainEnum.NEWS_MEDIA_DOMAIN: [

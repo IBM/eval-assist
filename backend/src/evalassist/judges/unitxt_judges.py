@@ -17,13 +17,6 @@ from unitxt.metric_utils import EvaluationResults
 from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
-from ..api.common import (
-    DirectInstanceResult,
-    DirectPositionalBias,
-    PairwiseInstance,
-    PairwiseInstanceResult,
-    SingleSystemPairwiseResult,
-)
 from .base import (
     CriteriaTypeVar,
     DirectInstance,
@@ -32,6 +25,13 @@ from .base import (
     Judge,
     PairwiseJudge,
     ReturnVarType,
+)
+from .types import (
+    DirectInstanceResult,
+    DirectPositionalBias,
+    PairwiseInstance,
+    PairwiseInstanceResult,
+    SingleSystemPairwiseResult,
 )
 
 

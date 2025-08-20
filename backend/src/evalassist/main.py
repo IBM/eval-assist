@@ -8,7 +8,6 @@ from typing import cast
 import nbformat as nbf
 import nest_asyncio
 import pandas as pd
-from evalassist.api.common import DirectInstanceDTO
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -34,29 +33,28 @@ from unitxt.llm_as_judge import (
 
 # Logging req/resp
 from .actions_logger import LoggingRoute
-from .api.common import (
+from .api_types import (
     CriteriaDTO,
     CriteriaOptionDTO,
     CriteriaWithOptionsDTO,
     DirectAIActionRequest,
     DirectAIActionResponse,
-    DirectInstance,
+    DirectInstanceDTO,
+    DomainEnum,
     DownloadTestCaseBody,
     DownloadTestDataBody,
     EvaluationRequest,
     EvaluationResultDTO,
+    EvaluatorMetadataAPI,
+    EvaluatorsResponseModel,
     FeatureFlagsModel,
     InstanceResultDTO,
     NotebookParams,
-    PairwiseInstance,
+    PersonaEnum,
     PutTestCaseBody,
     SyntheticExampleGenerationRequest,
     TestModelRequestModel,
 )
-
-# API type definitions
-from .api.pipelines import EvaluatorMetadataAPI, EvaluatorsResponseModel
-from .api.types import DomainEnum, PersonaEnum
 from .benchmark.benchmark import UnitxtDirectJudge, get_all_benchmarks
 from .const import (
     AUTHENTICATION_ENABLED,
@@ -70,6 +68,7 @@ from .const import (
 )
 from .database import engine  # Assumes you have engine/session setup
 from .extended_unitxt import EXTENDED_EVALUATORS_METADATA
+from .judges.types import DirectInstance, PairwiseInstance
 from .judges.unitxt_judges import GraniteGuardianJudge, UnitxtPairwiseJudge
 from .model import AppUser, StoredTestCase
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook

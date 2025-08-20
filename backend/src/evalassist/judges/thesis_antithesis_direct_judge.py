@@ -6,8 +6,8 @@ from langchain.output_parsers import OutputFixingParser, ResponseSchema
 from langchain.prompts import PromptTemplate
 from unitxt.llm_as_judge import CriteriaWithOptions
 
-from ..api.common import DirectInstance, DirectInstanceResult, DirectPositionalBias
 from .base import DirectJudge, UnitxtInferenceLangchainRunnable
+from .types import DirectInstance, DirectInstanceResult, DirectPositionalBias
 
 
 class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
