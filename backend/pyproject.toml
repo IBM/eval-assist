@@ -4,7 +4,6 @@ name = "evalassist"
 dynamic = ["version"]
 description = "EvalAssist is an open-source project that simplifies using large language models as evaluators (LLM-as-a-Judge) of the output of other large language models by supporting users in iteratively refining evaluation criteria in a web-based user experience."
 license = "Apache-2.0"                                                                                                                                                                                                                                                       # set your license here
-# readme = "README.md"
 requires-python = ">=3.10,<3.14"
 authors = [
     { name = "Martín Santillán Cooper", email = "martinsantillancooper@gmail.com" },
@@ -12,7 +11,7 @@ authors = [
 keywords = ["LLM", "evaluation", "LLM-as-a-Judge", "AI-evaluation"]
 classifiers = [
     # Project maturity
-    "Development Status :: 4 - Beta", # Assuming the project is in beta stage
+    "Development Status :: 4 - Beta",
 
     # Intended audience
     "Intended Audience :: Developers",
@@ -20,7 +19,7 @@ classifiers = [
     "Intended Audience :: End Users/Desktop",
 
     # License
-    "License :: OSI Approved :: Apache Software License", # Assuming MIT License
+    "License :: OSI Approved :: Apache Software License",
 
     # Supported Python versions
     "Programming Language :: Python :: 3",
@@ -42,31 +41,7 @@ classifiers = [
     "Framework :: Jupyter",
 ]
 
-dependencies = [
-    "fastapi",
-    "pydantic",
-    "uvicorn",
-    "nest_asyncio",
-    "python-dotenv",
-    "nbformat",
-    "litellm",
-    "tenacity",
-    "diskcache",
-    "langchain",
-    "openai",
-    "pandas",
-    "ibm_watsonx_ai",
-    "unitxt>=1.26.6",
-    "nbconvert",
-    "boto3",
-    "ollama",
-    "click",
-    "setuptools",
-    "sqlmodel",
-    "alembic",
-]
 
-[tool.poetry]
 packages = [{ include = "evalassist", from = "src" }]
 include = [
     { path = "evalassist/static/**/*", format = "sdist" },
@@ -76,74 +51,49 @@ include = [
 ]
 version = "0.0.0"
 
-[tool.poetry.group.dev]
-optional = true
+dependencies = ["pydantic", "langchain", "unitxt>=1.26.6"]
 
-[tool.poetry.group.dev.dependencies]
-pre_commit = "*"
-bandit = { version = "*", extras = ["standard", "toml"] }
-flake8-pytest-style = "^2.1.0"
-flake8 = "^7.3.0"
-GitPython = "*"
-
-[tool.poetry.group.testing]
-optional = true
-
-[tool.poetry.group.testing.dependencies]
-pytest = "*"
-httpx = "*"
-tox = "*"
-pytest-cov = "*"
+[project.optional-dependencies]
+dev = [
+    "pre_commit",
+    "bandit[standard,toml]",
+    "flake8-pytest-style ",
+    "flake8 ",
+    "GitPython",
+    "pytest",
+    "httpx",
+    "tox",
+    "pytest",
+]
+webapp = [
+    "litellm",     
+    "openai",     
+    "ollama",     
+    "ibm_watsonx_ai",     
+    "fastapi",     
+    "uvicorn",     
+    "nest_asyncio",     
+    "nbformat",     
+    "tenacity",     
+    "diskcache",     
+    "pandas",     
+    "nbconvert",     
+    "boto3",     
+    "click",     
+    "setuptools",     
+    "sqlmodel",     
+    "alembic",     
+]
+benchmarks=["scikit-learn"]
+postgresql=["psycopg2-binary"]
+local-inference=[
+    "torch",
+    "accelerate",
+    "transformers",
+]
 
 [tool.pytest.ini_options]
 addopts = "--cov=evalassist"
-
-
-
-
-
-
-
-
-
-
-[tool.poetry.group.local-inference]
-optional = true
-
-[tool.poetry.group.local-inference.dependencies]
-torch = "*"
-accelerate = "*"
-transformers = "*"
-
-
-
-
-
-
-
-
-
-
-[tool.poetry.group.postgresql]
-optional = true
-
-[tool.poetry.group.postgresql.dependencies]
-psycopg2-binary = "*"
-
-
-
-
-
-
-
-
-
-
-[tool.poetry.group.benchmarks]
-optional = true
-
-[tool.poetry.group.benchmarks.dependencies]
-scikit-learn = "*"
 
 [project.scripts]
 eval-assist = "evalassist.cli:main"

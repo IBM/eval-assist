@@ -23,7 +23,7 @@ function install_backend() {
   try {
     run("npm run check:python");
     run(
-      "cd backend && python3 -m pip install --upgrade pip poetry && poetry install --with dev"
+      "cd backend && python3 -m pip install --upgrade pip poetry && poetry install --extras 'dev webapp'"
     );
     run("npm run prepare");
   } catch (err) {
