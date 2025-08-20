@@ -22,7 +22,7 @@ jobs:
         working-directory: backend
         run: |
           pip install poetry
-          poetry install --with dev,testing
+          poetry install --extras 'dev webapp'
 
       - name: Run pre-commit hooks
         working-directory: backend
