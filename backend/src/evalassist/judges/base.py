@@ -102,7 +102,6 @@ class Judge(
             raise ValueError(
                 f"The provided criteria list must be equal in length with the instances. {len(criteria)} != {len(instances)}"
             )
-        print(criteria)
         parsed_criteria: Sequence[CriteriaTypeVar] | Sequence[str]
         if isinstance(criteria, str):
             parsed_criteria = [criteria] * len(instances)
