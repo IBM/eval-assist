@@ -100,7 +100,6 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         )
         parsed_response = output_parser.parse(response)
         persona = parsed_response
-        print(persona)
         return persona.persona_name, persona.persona_description
 
     def _run(
