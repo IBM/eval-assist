@@ -13,7 +13,11 @@ export interface DirectInstanceResultV0 {
   metadata?: FetchedDirectInstanceResultV0['metadata']
 }
 
-export type DirectInstanceResult = DirectInstanceResultV0
+export interface DirectInstanceResultV1 extends DirectInstanceResultV0 {
+  feedback?: string
+}
+
+export type DirectInstanceResult = DirectInstanceResultV1
 
 export interface PerResponsePairwiseResultV0 {
   contestResults: boolean[]
@@ -43,12 +47,16 @@ export interface FetchedDirectInstanceResultV0 {
   metadata?: { [key: string]: string }
 }
 
-export type FetchedDirectInstanceResultWithId = {
-  id: string
-  result: FetchedDirectInstanceResultV0
+export interface FetchedDirectInstanceResultV1 extends FetchedDirectInstanceResultV0 {
+  feedback?: string
 }
 
-export type FetchedDirectInstanceResult = FetchedDirectInstanceResultV0
+export type FetchedDirectInstanceResultWithId = {
+  id: string
+  result: FetchedDirectInstanceResultV1
+}
+
+export type FetchedDirectInstanceResult = FetchedDirectInstanceResultV1
 
 export type FetchedDirectResultsV0 = FetchedDirectInstanceResultWithId[]
 export type FetchedDirectResults = FetchedDirectResultsV0

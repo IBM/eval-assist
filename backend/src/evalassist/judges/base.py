@@ -186,6 +186,7 @@ class DirectJudge(
                 DirectInstanceResult(
                     option=results[i].option,
                     explanation=results[i].explanation,
+                    feedback=results[i].feedback,
                     metadata=results[i].metadata,
                     positional_bias=DirectPositionalBias(
                         detected=results[i].option != results[i + results_len].option,

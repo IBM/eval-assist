@@ -2,6 +2,7 @@ import cx from 'classnames'
 import { capitalizeFirstWord, getOrdinalSuffix, returnByPipelineType, toPercentage, toTitleCase } from 'src/utils'
 
 import { Dispatch, Fragment, SetStateAction, useEffect, useMemo, useState } from 'react'
+import React from 'react'
 import Markdown from 'react-markdown'
 
 import { Accordion, AccordionItem, Layer, ListItem, Modal, Tooltip, UnorderedList } from '@carbon/react'
@@ -49,7 +50,6 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
       return setOpenedPerReponseResults([])
     setOpenedPerReponseResults(Object.keys(selectedInstance.result as PairwiseInstanceResult).map((_) => false))
   }, [currentTestCase.type, selectedInstance])
-
   return (
     selectedInstance !== null && (
       <Modal open={open} onRequestClose={onClose} passiveModal size="lg" modalHeading={`Instance details`}>
@@ -119,6 +119,16 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                         <div>
                           <Markdown>{(selectedInstance.result as DirectInstanceResult).explanation}</Markdown>
                         </div>
+                        {(selectedInstance.result as DirectInstanceResult).feedback && (
+                          <>
+                            <p>
+                              <strong>Feedback:</strong>
+                            </p>
+                            <div>
+                              <Markdown>{(selectedInstance.result as DirectInstanceResult).feedback}</Markdown>
+                            </div>
+                          </>
+                        )}
                         {/* <p>{(selectedInstance.result as DirectInstanceResult).explanation}</p> */}
                         <p>
                           <strong>{'Positional bias:'}</strong>
@@ -149,13 +159,13 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                         )}
                         {selectedInstance.result.metadata && (
                           <>
-                            {Object.entries(selectedInstance.result.metadata).map(([k, v]) => (
-                              <>
+                            {Object.entries(selectedInstance.result.metadata).map(([k, v], i) => (
+                              <React.Fragment key={i}>
                                 <p>
                                   <strong>{`${capitalizeFirstWord(k)}:`}</strong>
                                 </p>
                                 <p style={{ whiteSpace: 'pre-line' }}>{capitalizeFirstWord(v)}</p>
-                              </>
+                              </React.Fragment>
                             ))}
                           </>
                         )}
@@ -289,7 +299,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                   </>
                 </div>
               ) : (
-                <p>{'There are no available results.'}</p>
+                <p>{'There are no results available.'}</p>
               )}
             </AccordionItem>
             {selectedInstance.metadata && 'synthetic_generation' in selectedInstance.metadata && (

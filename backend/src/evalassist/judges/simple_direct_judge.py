@@ -279,7 +279,7 @@ class SimpleDirectJudge(
             )
         ]
 
-        responses: list[str] = cast(
+        unparsed_responses: list[str] = cast(
             list[str],
             self.inference_engine.infer(
                 dataset=[
@@ -291,7 +291,7 @@ class SimpleDirectJudge(
         parsed_responses: list[Any] = []
 
         for response, output_parser, klass, criterion in zip(
-            responses, output_parsers, classes, criteria
+            unparsed_responses, output_parsers, classes, criteria
         ):
             try:
                 parsed_response = output_parser.parse(completion=response)
@@ -312,10 +312,9 @@ class SimpleDirectJudge(
         feedbacks: list[str | None] = [
             None
             if not self.generate_feedback
-            else (r.feedback if r.feedback != "" else None)
+            else (r.feedback if r.feedback != "" else "Nothing to improve.")
             for r in parsed_responses
         ]
-
         return [
             DirectInstanceResult(
                 option=selected_option,
@@ -324,11 +323,9 @@ class SimpleDirectJudge(
                 positional_bias=DirectPositionalBias(
                     detected=False,
                 ),
-                metadata={
-                    "prompt": prompt,
-                },
+                metadata={"prompt": prompt, "unparsed_response": unparsed_response},
             )
-            for selected_option, explanation, feedback, prompt in zip(
-                selected_options, explanations, feedbacks, prompts
+            for selected_option, explanation, feedback, prompt, unparsed_response in zip(
+                selected_options, explanations, feedbacks, prompts, unparsed_responses
             )
         ]
