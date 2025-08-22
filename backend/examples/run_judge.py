@@ -8,17 +8,20 @@ judge = SimpleDirectJudge(
         provider="watsonx",
         **DEFAULT_JUDGE_INFERENCE_PARAMS,
     ),
+    generate_feedback=True,
 )
 
 results = judge(
-    instances=["Refer to the DTO or visit the BO please"],
-    criteria="Is the text self-explanatory?",  # Create yes/no direct assessment criteria",
+    instances=[
+        "Use the API client to fetch data from the server and the cache to store frequently accessed results for faster performance."
+    ],
+    criteria="Is the text self-explanatory and self-contained?",  # Create yes/no direct assessment criteria",
 )
 
 # providing criteria="Is the response self-explanatory?" is equal to the following criteria defintion
 # criteria = CriteriaWithOptions(
 #     name="self-explanatory",
-#     description="Is the text self-explanatory?",
+#     description="Is the text self-explanatory and self-contained?",
 #     options=[
 #         CriteriaOption(name="Yes", description=""),
 #         CriteriaOption(name="No", description=""),
@@ -40,18 +43,22 @@ No / 0.0
 print("\n### Explanation")
 print(results[0].explanation)
 """
-To determine if the text is self-explanatory, let's break it down:
-## Step 1: Understanding the Text
-The given text is 'Refer to the DTO or visit the BO please'.
-## Step 2: Analyzing for Self-Explanatory Criteria
-A self-explanatory text should be clear and understandable without needing additional information.
-## Step 3: Evaluating the Text
-The text mentions 'DTO' and 'BO' without explaining what these abbreviations stand for. For someone unfamiliar with these terms, the text would not be clear.
-## Step 4: Conclusion
-Given that the text uses undefined abbreviations, it requires external knowledge to understand, making it not self-explanatory.
+To evaluate if the text is self-explanatory and self-contained, let's break down the key components of the given response and the context provided by the criterion.
+### Understanding the Criterion
+The criterion asks if the text can be understood on its own without needing additional information. This means the text should clearly convey its message, include all necessary details, and not require the reader to refer to external sources to comprehend it.
+
+### Analyzing the Response
+The response provided is: 'Use the API client to fetch data from the server and the cache to store frequently accessed results for faster performance.'
+- **Clarity**: The response clearly states the use of an API client for fetching data and a cache for storing frequently accessed results. This implies an understanding of how to potentially improve performance by reducing the need for repeated requests to the server.
+- **Self-containment**: The response does not explicitly define what an API client or a cache is, nor does it detail how these components interact within a system. It assumes the reader has a basic understanding of these terms and their functions in software development.
+- **Explanatory Nature**: While the response gives a directive, it lacks explanatory depth. For someone unfamiliar with API clients or caching mechanisms, the response might not provide enough information to implement the suggested approach effectively.
+
+### Conclusion
+Given the analysis, the response is not fully self-explanatory for all potential readers, especially those without a background in software development or familiarity with the terms used. It does provide a clear directive but lacks the depth needed for a comprehensive understanding without additional context or knowledge.
 """
 
 print("\n### Feedback")
 print(results[0].feedback)
 """
-To improve, consider defining abbreviations or providing context so the text can stand alone without requiring external information for clarity."""
+To improve, consider adding a brief explanation of key terms like 'API client' and 'cache,' and perhaps provide a simple example or context in which this approach is beneficial. This would enhance the response's clarity and usefulness for a broader audience.
+"""

@@ -1,6 +1,7 @@
 import functools
 import json
 import logging
+import math
 import os
 import re
 import time
@@ -9,7 +10,6 @@ from collections.abc import Sequence
 from enum import Enum
 from typing import Any, cast
 
-import requests
 from botocore.exceptions import NoCredentialsError
 from datasets import IterableDataset
 from fastapi import HTTPException
@@ -522,30 +522,6 @@ def clean_object(results: dict | list):
         return results
 
 
-def folder_exists_in_github_repo(owner, repo, folder_path, branch="main"):
-    """
-    Check if a folder exists in a GitHub repo.
-
-    Parameters:
-        owner (str): GitHub username or organization
-        repo (str): Repository name
-        folder_path (str): Path to folder in the repo (relative to root)
-        branch (str): Branch name (default: 'main')
-
-    Returns:
-        bool: True if folder exists, False otherwise
-    """
-    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{folder_path}?ref={branch}"
-    response = requests.get(url, timeout=5)
-
-    if response.status_code == 200:
-        # Make sure it's a directory
-        items = response.json()
-        return isinstance(items, list)
-    else:
-        return False
-
-
 def get_system_version():
     try:
         # git is a dev dependency so import may fail
@@ -642,3 +618,13 @@ def criteria_with_options_DTO_to_BO_mapper(
         prediction_field=criteria.prediction_field,
         context_fields=criteria.context_fields,
     )
+
+
+def convert_nan_to_none(obj):
+    if isinstance(obj, float) and math.isnan(obj):
+        return None
+    elif isinstance(obj, dict):
+        return {k: convert_nan_to_none(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_nan_to_none(v) for v in obj]
+    return obj
