@@ -1,0 +1,101 @@
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+import requests
+from unitxt.settings_utils import get_constants
+
+
+def folder_exists_in_github_repo(owner, repo, folder_path, branch="main"):
+    """
+    Check if a folder exists in a GitHub repo.
+
+    Parameters:
+        owner (str): GitHub username or organization
+        repo (str): Repository name
+        folder_path (str): Path to folder in the repo (relative to root)
+        branch (str): Branch name (default: 'main')
+
+    Returns:
+        bool: True if folder exists, False otherwise
+    """
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{folder_path}?ref={branch}"
+    response = requests.get(url, timeout=5)
+
+    if response.status_code == 200:
+        # Make sure it's a directory
+        items = response.json()
+        return isinstance(items, list)
+    else:
+        return False
+
+
+def add_tag_to_result(results, keyword, tag_or_tags):
+    for k in results.keys():
+        if keyword in results[k]["display_name"]:
+            if isinstance(tag_or_tags, list):
+                results[k]["tags"].extend(tag_or_tags)
+            else:
+                results[k]["tags"].append(tag_or_tags)
+
+
+def add_url_to_result(results, keyword, url):
+    for k in results.keys():
+        if keyword in results[k]["display_name"]:
+            results[k]["url"] = url
+
+
+def get_judgebench_readme_url(dataset_name):
+    exists = folder_exists_in_github_repo(
+        "dmg-illc", "JUDGE-BENCH", f"data/{dataset_name}", "master"
+    )
+    readme_url = f"https://github.com/dmg-illc/JUDGE-BENCH/blob/master/data/{dataset_name}/README.md"
+    return exists, readme_url
+
+
+def add_judgebench_readme_url(benchmark_name):
+    dataset_name = benchmark_name.split("/")[1]
+    futures = []
+    with ThreadPoolExecutor(2) as executor:
+        for option in [dataset_name, dataset_name.replace("_", "-")]:
+            futures.append(executor.submit(get_judgebench_readme_url, option))
+    for future in as_completed(futures):
+        exists, readme_url = future.result()
+        if exists:
+            return benchmark_name, readme_url
+    return benchmark_name, None
+
+
+def add_judgebench_readme_urls(results):
+    futures = []
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        for benchmark_name in results.keys():
+            futures.append(executor.submit(add_judgebench_readme_url, benchmark_name))
+    for future in as_completed(futures):
+        benchmark_name, readme_url = future.result()
+        results[benchmark_name]["url"] = readme_url
+
+
+def get_judgebench_cards():
+    constants = get_constants()
+    if constants is None:
+        raise ValueError("Error getting unitxt cards: constanst is None")
+    judgebench_dir = os.path.join(
+        constants.catalog_dir,  # ignore type
+        "cards",
+        "judge_bench",
+    )
+
+    judgebench_cards = []
+
+    for dirpath, _, filenames in os.walk(judgebench_dir):
+        for file in filenames:
+            if file.endswith(".json"):
+                # Get the relative path without the .json extension
+                relative_path = os.path.relpath(
+                    os.path.join(dirpath, file), judgebench_dir
+                )
+                without_extension = os.path.splitext(relative_path)[0]
+                dotted_path = without_extension.replace(os.path.sep, ".")
+                judgebench_cards.append(f"cards.judge_bench.{dotted_path}")
+
+    return judgebench_cards
