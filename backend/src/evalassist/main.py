@@ -8,6 +8,7 @@ from typing import cast
 import nbformat as nbf
 import nest_asyncio
 import pandas as pd
+from evalassist.judges import UnitxtDirectJudge
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from fastapi import (
     APIRouter,
@@ -56,7 +57,7 @@ from .api_types import (
     SyntheticExampleGenerationRequest,
     TestModelRequestModel,
 )
-from .benchmark.benchmark import UnitxtDirectJudge, get_all_benchmarks
+from .benchmark import get_all_benchmarks
 from .const import (
     AUTHENTICATION_ENABLED,
     DIRECT_ACTION_PARAMS,
