@@ -11,13 +11,19 @@ from pydantic import BaseModel, Field
 from unitxt.inference import CrossProviderInferenceEngine, InferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions
 
-from .base import DirectJudge, UnitxtInferenceLangchainRunnable
+from .base import (
+    DirectJudge,
+    UnitxtInferenceEngineMixin,
+    UnitxtInferenceLangchainRunnable,
+)
 from .types import DirectInstance, DirectInstanceResult, DirectPositionalBias
 
 logger = logging.getLogger(__name__)
 
 
-class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
+class SimpleDirectJudge(
+    DirectJudge, UnitxtInferenceLangchainRunnable, UnitxtInferenceEngineMixin
+):
     generate_synthetic_persona: bool
 
     def __init__(
@@ -25,6 +31,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         inference_engine: InferenceEngine,
         generate_synthetic_persona: bool = False,
         judge_description_prompt: str | None = None,
+        generate_feedback: bool = False,
     ):
         super().__init__(
             inference_engine=inference_engine,
@@ -35,14 +42,15 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
             )
         self.generate_synthetic_persona = generate_synthetic_persona
         self.judge_description_prompt = judge_description_prompt
+        self.generate_feedback = generate_feedback
 
     def get_name(self) -> str:
-        return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}"
+        return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}"
 
     def generate_persona(self, instance_str, criterion: CriteriaWithOptions):
         class SyntheticPersona(BaseModel):
             persona_name: str = Field(
-                ...,
+                default=...,
                 description=f"The persona that will evaluate a {criterion.prediction_field} based on the criteria {criterion.name}",
             )
             persona_description: str = Field(
@@ -111,20 +119,34 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         format_instructions_list = []
         criteria_options_list = []
         classes = []
+        feedback_step_sections = []
+        prediction_fields = []
         for criterion in criteria:
 
             class DynamicOutputJudgeModel(BaseModel):
                 assessment: str = Field(..., description="Step by step assessment")
-                feedback: str = Field(
-                    ...,
-                    description=f"Actionable suggestions that would help improve the evaluated {criterion.prediction_field if criterion.prediction_field is not None else 'response'} based on the assessment",
-                )
                 selected_option: str = Field(
                     ...,
                     description=f"The chosen option. Any of {', '.join([o.name for o in criterion.options])}",
                 )
+                feedback: str = Field(
+                    default="",
+                    description=f"Actionable suggestions that would help improve the evaluated {criterion.prediction_field if criterion.prediction_field is not None else 'response'} based on the assessment",
+                )
 
-            classes.append(DynamicOutputJudgeModel)
+            class DynamicOutputJudgeModelWithFeedback(DynamicOutputJudgeModel):
+                feedback: str = Field(
+                    default="",
+                    description=f"Actionable suggestions that would help improve the evaluated {criterion.prediction_field if criterion.prediction_field is not None else 'response'} based on the assessment",
+                )
+
+            output_model_klass = (
+                DynamicOutputJudgeModelWithFeedback
+                if self.generate_feedback
+                else DynamicOutputJudgeModel
+            )
+
+            classes.append(output_model_klass)
 
             output_parser: OutputFixingParser[DynamicOutputJudgeModel] = (
                 self.get_pydantic_output_fixing_parser(DynamicOutputJudgeModel)
@@ -140,6 +162,20 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
             criteria_options = "- " + criteria_options
 
             criteria_options_list.append(criteria_options)
+
+            prediction_field = (
+                criterion.prediction_field
+                if criterion.prediction_field is not None
+                else "response"
+            )
+            prediction_fields.append(prediction_field)
+
+            feedback_step_section = (
+                f'5. At the end, provide "feedback" consisting of actionable suggestions that would help improve the evaluated {prediction_field}. Unlike the assessment, which explains the reasoning behind the judgment, the feedback should focus on guiding refinement. For example, in creative writing, it could suggest improving clarity, coherence, or narrative flow. In analytical tasks, it could recommend strengthening evidence, refining arguments, or correcting inaccuracies. Keep feedback concise and specific enough to support iterative improvement. If you consider that the {prediction_field} is optimal, leave the "feedback" field empty ("")'
+                if self.generate_feedback
+                else ""
+            )
+            feedback_step_sections.append(feedback_step_section)
 
         predictions: list[str] = [i.response for i in instances]
         context_variables_list: list[dict[str, str]] = [
@@ -183,6 +219,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
                 "criteria_options",
                 "format_instructions",
                 "prediction_field",
+                "feedback_step_section",
             ],
             partial_variables={
                 "judge_description_section": judge_description_section,
@@ -201,7 +238,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
                 2. Write your full chain‑of‑thought *only* inside the `assessment` JSON field.
                 3. The chain-of-thought should use markdown code for easier reading and parsing.
                 4. Set `"selected_option"` to one of the provided options based on the assessment.
-                5. At the end, provide "feedback" consisting of actionable suggestions that would help improve the evaluated {prediction_field}. Unlike the assessment, which explains the reasoning behind the judgment, the feedback should focus on guiding refinement. For example, in creative writing, it could suggest improving clarity, coherence, or narrative flow. In analytical tasks, it could recommend strengthening evidence, refining arguments, or correcting inaccuracies. Keep feedback concise and specific enough to support iterative improvement.
+                {feedback_step_section}
 
                 ### Criterion:
                 {criteria_name_section}
@@ -228,16 +265,17 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
                 criteria_description=criterion.description,
                 criteria_options=criterion_options,
                 format_instructions=format_instructions,
-                prediction_field=criterion.prediction_field
-                if criterion.prediction_field is not None
-                else "response",
+                prediction_field=prediction_field,
+                feedback_step_section=feedback_step_section,
             )
-            for prediction, context_section, criterion, criterion_options, format_instructions in zip(
+            for prediction, context_section, criterion, criterion_options, format_instructions, prediction_field, feedback_step_section in zip(
                 predictions,
                 context_sections,
                 criteria,
                 criteria_options_list,
                 format_instructions_list,
+                prediction_fields,
+                feedback_step_sections,
             )
         ]
 
@@ -271,7 +309,12 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
             parsed_responses.append(parsed_response)
         explanations: list[str] = [r.assessment for r in parsed_responses]
         selected_options: list[str] = [r.selected_option for r in parsed_responses]
-        feedbacks: list[str] = [r.feedback for r in parsed_responses]
+        feedbacks: list[str | None] = [
+            None
+            if not self.generate_feedback
+            else (r.feedback if r.feedback != "" else None)
+            for r in parsed_responses
+        ]
 
         return [
             DirectInstanceResult(
