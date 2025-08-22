@@ -45,17 +45,18 @@ class DummyPairwiseJudge(PairwiseJudge):
         check_positional_bias: bool,
     ) -> Sequence[PairwiseInstanceResult]:
         results: list[PairwiseInstanceResult] = []
-        systems_per_instance = len(instances[0].responses) - 1
+        systems_per_instance = len(instances[0].responses)
+        comparisons_per_instance = systems_per_instance - 1
         for i, instance in enumerate(instances):
             instance_result: dict[str, SingleSystemPairwiseResult] = {}
             instance_result[f"system_{i}"] = SingleSystemPairwiseResult(
-                contest_results=[True for _ in range(systems_per_instance)],
-                compared_to=[True for _ in range(systems_per_instance)],
-                explanations=["Explanations" for _ in range(systems_per_instance)],
-                positional_bias=[False for _ in range(systems_per_instance)],
+                contest_results=[True for _ in range(comparisons_per_instance)],
+                compared_to=[True for _ in range(comparisons_per_instance)],
+                explanations=["Explanations" for _ in range(comparisons_per_instance)],
+                positional_bias=[False for _ in range(comparisons_per_instance)],
                 winrate=1.0,
                 ranking=1,
-                selections=["1" for _ in range(systems_per_instance)],
+                selections=["1" for _ in range(comparisons_per_instance)],
             )
             results.append(PairwiseInstanceResult(instance_result))
         return results

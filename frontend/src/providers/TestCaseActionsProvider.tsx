@@ -246,6 +246,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
                 option: fetchedInstanceResult.result.option,
                 positionalBiasOption: fetchedInstanceResult.result.positional_bias_option,
                 explanation: fetchedInstanceResult.result.explanation,
+                feedback: fetchedInstanceResult.result.feedback,
                 positionalBias: fetchedInstanceResult.result.positional_bias,
                 certainty: fetchedInstanceResult.result.certainty,
                 metadata: fetchedInstanceResult.result.metadata,
