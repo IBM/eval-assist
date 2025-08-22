@@ -25,6 +25,7 @@ from .base import (
     Judge,
     PairwiseJudge,
     ReturnVarType,
+    UnitxtInferenceEngineMixin,
 )
 from .types import (
     DirectInstanceResult,
@@ -39,6 +40,7 @@ class UnitxtJudge(
     Judge[InstanceTypeVar, CriteriaTypeVar, ReturnVarType],
     ABC,
     Generic[InstanceTypeVar, CriteriaTypeVar, ReturnVarType],
+    UnitxtInferenceEngineMixin,
 ):
     @abstractmethod
     def get_preprocess_steps(self) -> list[Any]: ...

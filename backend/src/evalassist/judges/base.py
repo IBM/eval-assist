@@ -40,40 +40,21 @@ class JudgeDescriptor:
 
 
 @dataclass
-class InferenceEngineMixin:
+class UnitxtInferenceEngineMixin:
     inference_engine: InferenceEngine
 
 
 class Judge(
-    ABC, Generic[InstanceTypeVar, CriteriaTypeVar, ReturnVarType], InferenceEngineMixin
+    ABC,
+    Generic[InstanceTypeVar, CriteriaTypeVar, ReturnVarType],
+    UnitxtInferenceEngineMixin,
 ):
     """
     Abstract base class for all judges.
 
     A *judge* evaluates one or more ``Instance`` objects against a set of
     ``Criteria`` and returns a result specific to the concrete implementation.
-
-    Attributes
-    ----------
-    inference_engine: InferenceEngine
-        The engine used to query LLMs.
     """
-
-    inference_engine: InferenceEngine
-
-    def __init__(
-        self,
-        inference_engine: InferenceEngine,
-    ) -> None:
-        """
-        Initialise a judge.
-
-        Parameters
-        ----------
-        inference_engine : InferenceEngine
-            The inference engine that will be used to call the LLM.
-        """
-        self.inference_engine = inference_engine
 
     def get_inference_engine_id(self) -> str:
         """Return the identifier of the underlying inference engine."""
@@ -413,7 +394,7 @@ class PairwiseJudge(Judge[PairwiseInstance, Criteria, PairwiseInstanceResult], A
 # ----------------------------------------------------------------------
 # Helper mix‑in for judges that use LangChain runnables
 # ----------------------------------------------------------------------
-class UnitxtInferenceLangchainRunnable(InferenceEngineMixin):
+class UnitxtInferenceLangchainRunnable(UnitxtInferenceEngineMixin):
     def _get_runnable_lambda(self) -> RunnableLambda[StringPromptValue, str]:
         """
         Create a LangChain ``RunnableLambda`` that forwards the prompt to the
