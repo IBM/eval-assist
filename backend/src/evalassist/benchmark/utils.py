@@ -19,13 +19,19 @@ def folder_exists_in_github_repo(owner, repo, folder_path, branch="main"):
         bool: True if folder exists, False otherwise
     """
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{folder_path}?ref={branch}"
-    response = requests.get(url, timeout=5)
-
-    if response.status_code == 200:
-        # Make sure it's a directory
-        items = response.json()
-        return isinstance(items, list)
-    else:
+    try:
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            # Make sure it's a directory
+            items = response.json()
+            return isinstance(items, list)
+        else:
+            return False
+    except (
+        requests.exceptions.ReadTimeout,
+        requests.exceptions.Timeout,
+        requests.exceptions.RequestException,
+    ):
         return False
 
 
