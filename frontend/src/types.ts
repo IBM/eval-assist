@@ -15,6 +15,7 @@ export interface DirectInstanceResultV0 {
 
 export interface DirectInstanceResultV1 extends DirectInstanceResultV0 {
   feedback?: string
+  score?: number
 }
 
 export type DirectInstanceResult = DirectInstanceResultV1
@@ -49,6 +50,7 @@ export interface FetchedDirectInstanceResultV0 {
 
 export interface FetchedDirectInstanceResultV1 extends FetchedDirectInstanceResultV0 {
   feedback?: string
+  score?: number
 }
 
 export type FetchedDirectInstanceResultWithId = {
