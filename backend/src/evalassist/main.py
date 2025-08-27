@@ -318,6 +318,7 @@ async def evaluate(
             else:
                 evaluator = SimpleDirectJudge(
                     inference_engine=inference_engine,
+                    generate_feedback=True,
                 )
             per_instance_result = evaluator.evaluate(
                 instances=cast(Sequence[DirectInstance], req.instances),
