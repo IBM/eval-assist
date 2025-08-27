@@ -2,6 +2,8 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
+from evalassist.judges import DirectJudge
+from unitxt.inference import CrossProviderInferenceEngine
 from unitxt.settings_utils import get_constants
 
 
@@ -105,3 +107,32 @@ def get_judgebench_cards():
                 judgebench_cards.append(f"cards.judge_bench.{dotted_path}")
 
     return judgebench_cards
+
+
+def get_judge_from_config(
+    kwargs: tuple[type[DirectJudge], dict, dict, str],
+    inference_engines={},
+) -> DirectJudge:
+    judge_klass, judge_kwargs, inference_engine_kwargs, model = kwargs
+    temperature = (
+        inference_engine_kwargs["temperature"]
+        if "temperature" in inference_engine_kwargs
+        else 0.0
+    )
+    key = f"{model}{str(temperature)}"
+    if key in inference_engines:
+        inference_engine = inference_engines[key]
+    else:
+        inference_engine = CrossProviderInferenceEngine(
+            model=model,
+            provider="rits",
+            temperature=temperature,
+            max_tokens=2048,
+            data_classification_policy=["public"],
+        )
+        inference_engines[key] = inference_engine
+
+    return judge_klass(
+        inference_engine=inference_engine,
+        **judge_kwargs,
+    )

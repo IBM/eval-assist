@@ -240,3 +240,17 @@ class EvaluatorMetadataAPI(BaseModel):
 class EvaluatorsResponseModel(BaseModel):
     # model_config = ConfigDict(arbitrary_types_allowed=True)
     evaluators: list[EvaluatorMetadataAPI]
+
+
+class FixInstanceRequest(BaseModel):
+    provider: ModelProviderEnum | ExtendedModelProviderEnum
+    llm_provider_credentials: dict[str, str | None]
+    evaluator_name: str
+    type: EvaluatorTypeEnum
+    instance: DirectInstanceDTO
+    criteria: CriteriaWithOptionsDTO
+    result: DirectInstanceResult
+
+
+class FixInstanceResponse(BaseModel):
+    fixed_response: str
