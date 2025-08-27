@@ -8,8 +8,6 @@ from typing import cast
 import nbformat as nbf
 import nest_asyncio
 import pandas as pd
-from evalassist.judges import SimpleDirectJudge
-from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -50,6 +48,8 @@ from .api_types import (
     EvaluatorMetadataAPI,
     EvaluatorsResponseModel,
     FeatureFlagsModel,
+    FixInstanceRequest,
+    FixInstanceResponse,
     InstanceResultDTO,
     NotebookParams,
     PersonaEnum,
@@ -69,6 +69,8 @@ from .const import (
 )
 from .database import engine  # Assumes you have engine/session setup
 from .extended_unitxt import EXTENDED_EVALUATORS_METADATA
+from .judges import SimpleDirectJudge
+from .judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from .judges.types import DirectInstance, PairwiseInstance
 from .judges.unitxt_judges import GraniteGuardianJudge, UnitxtPairwiseJudge
 from .model import AppUser, StoredTestCase
@@ -303,7 +305,9 @@ async def evaluate(
             custom_model_name=custom_model_name,
             provider=req.provider,
             llm_provider_credentials=req.llm_provider_credentials,
-            custom_params=DEFAULT_JUDGE_INFERENCE_PARAMS,
+            custom_params={
+                **DEFAULT_JUDGE_INFERENCE_PARAMS,
+            },
         )
         if req.criteria.prediction_field is None or req.criteria.context_fields is None:
             raise ValueError(
@@ -682,6 +686,43 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     return JSONResponse(
         content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
     )
+
+
+@router.post("/fix-instance/", response_model=FixInstanceResponse)
+async def fix_instance(
+    req: FixInstanceRequest,
+) -> FixInstanceResponse:
+    evaluator_name, custom_model_name = init_evaluator_name(req.evaluator_name)
+    inference_engine: InferenceEngine = get_inference_engine_from_judge_metadata(
+        evaluator_name=evaluator_name,
+        custom_model_name=custom_model_name,
+        provider=req.provider,
+        llm_provider_credentials=req.llm_provider_credentials,
+        custom_params=SYNTHETIC_DATA_GENERATION_PARAMS,
+    )
+    context = "\n".join(
+        [f"{k}: {v}" for k, v in req.instance.context_variables.items()]
+    )
+    if len(context):
+        context = f"### Context\n{context}\n"
+    prompt = f"""
+Fix the following text based on the feedback
+
+{context}
+
+### Text
+{req.instance.response}
+
+### Feedback
+{req.result.feedback}
+
+Only respond with the fixed text, not titles.
+
+Fixed text:
+
+"""
+    result = inference_engine([{"source": prompt}])
+    return FixInstanceResponse(fixed_response=result[0])
 
 
 app.include_router(router, prefix="/api")

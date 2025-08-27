@@ -34,12 +34,12 @@
 .actionButtonsContainer {
   position: absolute;
   top: 0;
-  left: -27px;
+  left: -22px;
   display: flex;
   flex-direction: column;
   height: 100%;
   justify-content: flex-start;
-  gap: 0.7rem;
+  // gap: 0.3rem;
   padding-top: 0.75rem;
   opacity: 0;
   transition: opacity $duration-slow-01;

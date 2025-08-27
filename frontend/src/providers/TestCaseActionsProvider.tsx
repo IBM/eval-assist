@@ -38,6 +38,7 @@ interface TestCaseActionsContextValue {
   evaluatingInstanceIds: string[]
   cancelEvaluation: () => void
   getTestCaseAsJson: (testCase: TestCase) => FetchedTestCase
+  fixInstance: (instanceId: string) => Promise<void>
 }
 
 const TestCaseActionsContext = createContext<TestCaseActionsContextValue>({
@@ -55,6 +56,7 @@ const TestCaseActionsContext = createContext<TestCaseActionsContextValue>({
     content: '',
     name: '',
   }),
+  fixInstance: (instanceId: string) => Promise.resolve(),
 })
 
 export const useTestCaseActionsContext = () => {
@@ -124,7 +126,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   }, [addToast, inProgressEvalToastId, removeToast])
 
   const runEvaluation = useCallback(
-    async (evaluationIds: string[]) => {
+    async (instanceIds: string[]) => {
       if (currentTestCase === null) return
       const inProgressEvalToastId = addToast({
         title: 'Running evaluation...',
@@ -160,7 +162,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       }
 
       const toEvaluateInstances: Instance[] = currentTestCase.instances
-        .filter((instance) => evaluationIds.includes(instance.id))
+        .filter((instance) => instanceIds.includes(instance.id))
         .filter((instance) =>
           returnByPipelineType(
             currentTestCase.type,
@@ -420,6 +422,64 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
     changeTestCaseURL(null)
   }
 
+  const fixInstance = useCallback(
+    async (instanceId: string) => {
+      const toFixInstance = currentTestCase.instances.find((instance) => instanceId === instance.id)
+      if (!toFixInstance) return
+      const type = currentTestCase.type
+      const parsedToFixInstance = parseInstanceForBackend(toFixInstance, type)
+      const result = toFixInstance?.result as DirectInstanceResult
+      const parsedCriteria = parseCriteriaForBackend(currentTestCase.criteria)
+      const provider = currentTestCase.evaluator!.provider
+      const llmProviderCredentials = getProviderCredentialsWithDefaults(provider)
+      const evaluatorName = currentTestCase.evaluator?.name
+      if (!result) return
+
+      const body = {
+        provider: provider,
+        llm_provider_credentials: llmProviderCredentials,
+        evaluator_name: evaluatorName,
+        type: type,
+        instance: parsedToFixInstance,
+        criteria: parsedCriteria,
+        result: {
+          option: result.option,
+          score: null,
+          explanation: result.explanation,
+          feedback: result.feedback,
+          positional_bias: {
+            detected: result.positionalBias.detected,
+            option: result.positionalBias.option,
+            explanation: result.positionalBias.explanation,
+          },
+          metadata: result.metadata,
+        },
+      }
+      const fixingInProgressToastId = addToast({
+        kind: 'info',
+        title: 'Fixing instance.',
+      })
+      const fixedText = ((await (await post('fix-instance/', body)).json()) as { fixed_response: string })[
+        'fixed_response'
+      ]
+      removeToast(fixingInProgressToastId)
+      setCurrentTestCase(() => {
+        // used to filter the instances to update if one or more instances were deleted while the evaluation was running
+        const instances: DirectInstance[] = (currentTestCase.instances as DirectInstance[]).map(
+          (instance: DirectInstance) => ({
+            ...instance,
+            response: instance.id === instanceId ? fixedText : instance.response,
+          }),
+        )
+        return {
+          ...currentTestCase,
+          instances: instances,
+        }
+      })
+    },
+    [currentTestCase, getProviderCredentialsWithDefaults, post, setCurrentTestCase],
+  )
+
   return (
     <TestCaseActionsContext.Provider
       value={{
@@ -429,6 +489,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         onDeleteTestCase,
         cancelEvaluation,
         getTestCaseAsJson,
+        fixInstance,
         evaluationRunning,
         evaluationFailed,
         evaluatingInstanceIds,
