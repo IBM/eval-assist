@@ -29,7 +29,6 @@ from .base import (
 )
 from .types import (
     DirectInstanceResult,
-    DirectPositionalBias,
     PairwiseInstance,
     PairwiseInstanceResult,
     SingleSystemPairwiseResult,
@@ -158,23 +157,12 @@ class UnitxtDirectJudge(
         prefix = dataset[0]["score"]["instance"]["score_name"]
         for instance in dataset:
             instance_score = instance["score"]["instance"]
-            # positional_bias = DirectPositionalBias(
-            #     detected=instance_score[f"{prefix}_positional_bias"],
-            # )
-            # if positional_bias.detected:
-            #     positional_bias.option = instance_score[
-            #         f"{prefix}_positional_bias_selected_option"
-            #     ]
-            #     positional_bias.explanation = instance_score[
-            #         f"{prefix}_positional_bias_assessment"
-            #     ]
-            positional_bias = DirectPositionalBias(detected=False)
 
             results.append(
                 DirectInstanceResult(
                     option=instance_score[f"{prefix}_selected_option"],
                     explanation=instance_score[f"{prefix}_assessment"],
-                    positional_bias=positional_bias,
+                    positional_bias=None,
                 )
             )
         return results
@@ -206,9 +194,7 @@ class UnitxtPairwiseJudge(
                         contest_results=score[f"{outer_key}_contest_results"],
                         compared_to=score[f"{outer_key}_compared_to"],
                         explanations=score[f"{outer_key}_assessments"],
-                        positional_bias=[
-                            False
-                        ],  # score[f"{outer_key}_positional_bias"], we calculate the positional bias outside unitxt now
+                        positional_bias=None,  # score[f"{outer_key}_positional_bias"], we calculate the positional bias outside unitxt now
                         winrate=score[f"{outer_key}_winrate"],
                         ranking=score[f"{outer_key}_ranking"],
                         selections=score[f"{outer_key}_selections"],
@@ -290,9 +276,6 @@ class GraniteGuardianJudge(
             )
 
             instance_score = instance["score"]["instance"]
-            positional_bias = DirectPositionalBias(
-                detected=False, option="", explanation=""
-            )
             selected_option = instance_score[f"{risk_name}_label"]
 
             if selected_option is None:
@@ -302,7 +285,7 @@ class GraniteGuardianJudge(
                 DirectInstanceResult(
                     option=instance_score[f"{risk_name}_label"],
                     explanation=explanation,
-                    positional_bias=positional_bias,
+                    positional_bias=None,
                 )
             )
         return results
