@@ -128,12 +128,14 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                             {(selectedInstance.result as DirectInstanceResult).explanation}
                           </Markdown>
                         </div>
-                        {(selectedInstance.result as DirectInstanceResult).feedback && (
+                        {(selectedInstance.result as DirectInstanceResult).feedback !== null && (
                           <>
                             <p>
                               <strong>Feedback:</strong>
                             </p>
-                            <div>{(selectedInstance.result as DirectInstanceResult).feedback}</div>
+                            <div>
+                              {(selectedInstance.result as DirectInstanceResult).feedback || 'Nothing to improve.'}
+                            </div>
                           </>
                         )}
                         {(selectedInstance.result as DirectInstanceResult).score && (
