@@ -457,7 +457,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       }
       const fixingInProgressToastId = addToast({
         kind: 'info',
-        title: 'Fixing instance.',
+        title: 'Fixing instance...',
       })
       const fixedText = ((await (await post('fix-instance/', body)).json()) as { fixed_response: string })[
         'fixed_response'

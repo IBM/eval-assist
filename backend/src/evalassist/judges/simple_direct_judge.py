@@ -390,10 +390,7 @@ class SimpleDirectJudge(
         explanations: list[str] = [r.assessment for r in parsed_responses]
         selected_options: list[str] = [r.selected_option for r in parsed_responses]
         feedbacks: list[str | None] = [
-            None
-            if not self.generate_feedback
-            else (r.feedback if r.feedback != "" else "Nothing to improve.")
-            for r in parsed_responses
+            None if not self.generate_feedback else r.feedback for r in parsed_responses
         ]
         return [
             DirectInstanceResult(
