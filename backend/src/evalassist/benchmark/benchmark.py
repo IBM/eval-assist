@@ -3,7 +3,6 @@ import logging
 import traceback
 from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from itertools import cycle
 from typing import Any, cast
 
 import pandas as pd
@@ -11,7 +10,6 @@ from datasets import IterableDataset
 from scipy.stats import pearsonr, spearmanr
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
-from unitxt.inference import CrossProviderInferenceEngine, InferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions, EvaluatorTypeEnum
 
 from ..const import EVAL_ASSIST_DIR
@@ -24,6 +22,7 @@ from .utils import (
     add_judgebench_readme_urls,
     add_tag_to_result,
     add_url_to_result,
+    get_judge_from_config,
     get_judgebench_cards,
 )
 
@@ -121,7 +120,6 @@ metric_map = {
 def parse_card_results(
     card: str,
     dataset: IterableDataset,
-    model: str,
     results: Sequence[DirectInstanceResult],
     prediction_scores: list[str],
     judge: DirectJudge,
@@ -181,7 +179,7 @@ def parse_card_results(
         "evalassist_criteria_name": "several_criteria"
         if len(unique_criteria_names) > 1
         else criteria_names[0],
-        "model": model,
+        "model": judge.get_inference_engine_id(),
         "provider": "rits",
         "results": json.dumps(convert_nan_to_none(parsed_results)),
         "dataset_len": str(len(dataset)),
@@ -227,7 +225,7 @@ def parse_card_results(
             ) / len(criteria_name_positional_bias_detected_list)
             criteria_name_benchmark_result = {
                 "card": card,
-                "model": model,
+                "model": judge.get_inference_engine_id(),
                 "benchmark_name": benchmark_name,
                 "dataset_name": dataset_name,
                 "judge": judge.get_name(),
@@ -265,7 +263,6 @@ def parse_card_results(
 
 def run_single_model_card(
     card: str,
-    model: str,
     judge: DirectJudge,
     instances_per_dataset: int | None = None,
 ):
@@ -284,8 +281,8 @@ def run_single_model_card(
     print(
         "Running card:",
         card,
-        "with model:",
-        model,
+        "with judge:",
+        judge.get_descriptor(),
     )
     dataset: IterableDataset = cast(
         IterableDataset,
@@ -327,13 +324,12 @@ def run_single_model_card(
         benchmark_results, cache = parse_card_results(
             card=card,
             dataset=dataset,
-            model=model,
             results=results,
             prediction_scores=prediction_scores,
             judge=judge,
             criteria=criteria,
         )
-        print("Finished running card:", card, "with model:", model)
+        print("Finished running card:", card, "with judge:", judge.get_descriptor())
 
         return benchmark_results
     except Exception:
@@ -342,13 +338,11 @@ def run_single_model_card(
 
 
 def run_benchmarks(
-    models: list[str],
-    judges: list[type[DirectJudge]],
+    judge_configs: list[tuple[type[DirectJudge], dict, dict, str]],
     max_workers: int,
-    batch_size: int,
-    rits_api_keys: list[str] | None,
     instances_per_dataset: int | None,
     dataset_keyword_filters: list[str] | None = None,
+    dataset_keyword_selectors: list[str] | None = None,
 ):
     """
 
@@ -359,10 +353,8 @@ def run_benchmarks(
 
     The results are saved to CSV files specified by RESULTS_FILE_PATH and INSPECT_FILE_PATH.
     """
-    inference_engines: dict[str, InferenceEngine] = {}
 
     # Create a cycle of API keys to use for benchmarking
-    api_key_cycle = cycle(rits_api_keys if rits_api_keys is not None else [None])
     all_benchmarks = [
         "cards.biggen_bench.results.human_eval",
     ] + get_judgebench_cards()
@@ -401,48 +393,36 @@ def run_benchmarks(
         futures = []
         for card in all_benchmarks:
             # Load the dataset for the current card
-            if dataset_keyword_filters is not None and not any(
+            if dataset_keyword_filters is not None and any(
                 x in card for x in dataset_keyword_filters
             ):
                 continue
-            for model in models:
-                for judge_class in judges:
-                    if model in inference_engines:
-                        inference_engine = inference_engines[model]
-                    else:
-                        api_key = next(api_key_cycle)
-                        inference_engine = CrossProviderInferenceEngine(
-                            model=model,
-                            provider="rits",
-                            temperature=0,
-                            max_tokens=2048,
-                            # use_cache=True,
-                            # cache_batch_size=BATCH_SIZE,
-                            credentials={"api_key": api_key}
-                            if api_key is not None
-                            else None,
-                            data_classification_policy=["public"],
-                        )
-                        inference_engines[model] = inference_engine
+            if dataset_keyword_selectors is not None and not any(
+                x in card for x in dataset_keyword_selectors
+            ):
+                continue
+            for judge_config in judge_configs:
+                judge = get_judge_from_config(judge_config)
 
-                    judge = judge_class(inference_engine)
-
-                    # Skip if the benchmark has already been run
-                    if (card, model, judge.get_name()) not in ran_cards_models:
-                        # Submit the task to the executor
-                        futures.append(
-                            executor.submit(
-                                run_single_model_card,
-                                card,
-                                model,
-                                judge,
-                                instances_per_dataset,
-                            )
+                # Skip if the benchmark has already been run
+                if (
+                    card,
+                    judge.get_inference_engine_id(),
+                    judge.get_name(),
+                ) not in ran_cards_models:
+                    # Submit the task to the executor
+                    futures.append(
+                        executor.submit(
+                            run_single_model_card,
+                            card,
+                            judge,
+                            instances_per_dataset,
                         )
-                    else:
-                        print(
-                            f"Benchmark {card}/{model}/{judge.get_name()} already ran"
-                        )
+                    )
+                else:
+                    print(
+                        f"Benchmark {card}/{judge.get_descriptor()}/{judge.get_name()} already ran"
+                    )
         # Process the results as they become available
         for future in as_completed(futures):
             print("Adding results")

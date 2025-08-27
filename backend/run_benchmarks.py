@@ -1,15 +1,16 @@
+from itertools import cycle
+
 from evalassist.benchmark import run_benchmarks
-from evalassist.judges import DirectJudge, SimpleDirectJudge
+from evalassist.judges import DirectJudge, SimpleDirectJudge, UnitxtDirectJudge
 
 if __name__ == "__main__":
     MAX_WORKERS = 15
-    BATCH_SIZE = 50
+    BATCH_SIZE = 25
     RITS_API_KEYS = None
-    INSTANCES_PER_DATASET = None
-
+    INSTANCES_PER_DATASET = 400
     # List of models to benchmark
     MODELS = [
-        "gpt-oss-120b",
+        # "gpt-oss-120b",
         "llama-3-3-70b-instruct",
         "llama-4-scout",
         "llama-4-maverick",
@@ -18,21 +19,65 @@ if __name__ == "__main__":
         "phi-4",
         "mistral-small-instruct",
     ]
+    api_key_cycle = cycle(RITS_API_KEYS if RITS_API_KEYS is not None else [None])
 
-    # List of judges to benchmark
-    JUDGES: list[type[DirectJudge]] = [
-        # UnitxtDirectJudge,
-        SimpleDirectJudge,
-        # ThesisAntithesisDirectJudge,
+    inference_engines = {}
+    JUDGE_CONFIGS: list[tuple[type[DirectJudge], dict, dict]] = [
+        # (
+        #     SimpleDirectJudge,
+        #     {
+        #         "generate_synthetic_persona": True,
+        #         "use_self_consistency": True,
+        #     },
+        #     {
+        #         'temperature': 0.3,
+        #     },
+        # ),
+        # (
+        #     SimpleDirectJudge,
+        #     {
+        #         "generate_synthetic_persona": False,
+        #         "use_self_consistency": True,
+        #     },
+        #     {
+        #         'temperature': 0.3,
+        #     },
+        # ),
+        # (
+        #     SimpleDirectJudge,
+        #     {
+        #         "generate_synthetic_persona": True,
+        #         "use_self_consistency": False,
+        #     },
+        #     {
+        #         'temperature': 0.0,
+        #     },
+        # ),
+        (
+            SimpleDirectJudge,
+            {
+                "generate_synthetic_persona": False,
+                "use_self_consistency": False,
+            },
+            {
+                "temperature": 0.0,
+            },
+        ),
+        (UnitxtDirectJudge, {}, {}),
+        # (ThesisAntithesisDirectJudge, {}, {}),
     ]
+    JUDGE_CONFIGS_WITH_MODEL: list[tuple[type[DirectJudge], dict, dict, str]] = []
+    for judge_config in JUDGE_CONFIGS:
+        for model in MODELS:
+            new_tuple = judge_config + (model,)
+            JUDGE_CONFIGS_WITH_MODEL.append(new_tuple)
+
     run_benchmarks(
-        models=MODELS,
-        judges=JUDGES,
+        judge_configs=JUDGE_CONFIGS_WITH_MODEL,
         max_workers=MAX_WORKERS,
-        batch_size=BATCH_SIZE,
-        rits_api_keys=RITS_API_KEYS,
         instances_per_dataset=INSTANCES_PER_DATASET,
-        dataset_keyword_filters=["biggen"],
+        dataset_keyword_filters=["drop", "esnli"],
+        # dataset_keyword_selectors=["biggen"],
     )
     # model = "granite-3-3-8b-instruct"
     # inference_engine = CrossProviderInferenceEngine(
