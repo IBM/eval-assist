@@ -100,7 +100,10 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
   )
 
   const displayedEvaluators = useMemo(
-    () => criteriaBenchmark.evaluatorBenchmarks.sort((a, b) => a.model.localeCompare(b.model)),
+    () =>
+      criteriaBenchmark.evaluatorBenchmarks.sort((a, b) =>
+        a.model.localeCompare(b.model) !== 0 ? a.model.localeCompare(b.model) : a.judge.localeCompare(b.judge),
+      ),
     [criteriaBenchmark.evaluatorBenchmarks],
   )
 

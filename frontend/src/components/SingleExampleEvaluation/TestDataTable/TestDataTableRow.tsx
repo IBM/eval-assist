@@ -8,6 +8,7 @@ import { ArrowRight, Trophy } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 
 import {
   Criteria,
@@ -58,7 +59,7 @@ export const TestDataTableRow = ({
   runEvaluation,
 }: Props) => {
   const { outdatedResultInstanceIds } = useCurrentTestCase()
-
+  const { fixInstance } = useTestCaseActionsContext()
   const isResultOutdated = useMemo(
     () => outdatedResultInstanceIds.includes(instance.id),
     [instance.id, outdatedResultInstanceIds],
@@ -173,6 +174,7 @@ export const TestDataTableRow = ({
         onEvaluateInstance={() => {
           runEvaluation([instance.id])
         }}
+        onFixInstance={instance.result?.feedback ? () => fixInstance(instance.id) : null}
         removeEnabled={!readOnly}
       >
         {({ setActive, setInactive }) => (

@@ -3,7 +3,7 @@ import cx from 'classnames'
 import { useState } from 'react'
 
 import { Tooltip } from '@carbon/react'
-import { Maximize, Play, Replicate, TrashCan } from '@carbon/react/icons'
+import { Maximize, Play, Replicate, Tools, TrashCan } from '@carbon/react/icons'
 
 import classes from './RemovableSection.module.scss'
 
@@ -12,6 +12,7 @@ interface Props {
   onExpand: () => void
   onDuplicate: () => void
   onEvaluateInstance: () => void
+  onFixInstance: (() => void) | null
   removeEnabled?: boolean
   children: (arg: { setActive: () => void; setInactive: () => void }) => JSX.Element
 }
@@ -21,11 +22,12 @@ export default function RemovableSection({
   onExpand,
   onDuplicate,
   onEvaluateInstance,
+  onFixInstance,
   removeEnabled,
   children,
 }: Props) {
   const [active, setActive] = useState(false)
-
+  const optionButtonsCount = onFixInstance ? 5 : 4
   return (
     <div className={cx(classes.container)}>
       <div className={classes.outline} />
@@ -34,7 +36,10 @@ export default function RemovableSection({
         setInactive: () => setActive(false),
       })}
 
-      <div className={cx(classes.actionButtonsContainer)}>
+      <div
+        className={cx(classes.actionButtonsContainer)}
+        style={{ gap: optionButtonsCount === 4 ? '0.7rem' : '0.3rem' }}
+      >
         <Tooltip label="Duplicate" align="top">
           <button
             aria-label="Duplicate"
@@ -47,6 +52,20 @@ export default function RemovableSection({
             <Replicate />
           </button>
         </Tooltip>
+        {onFixInstance && (
+          <Tooltip label="Fix" align="left">
+            <button
+              aria-label="Fix instance"
+              className={cx(classes.actionButton, {
+                [classes.active]: active,
+              })}
+              onClick={onFixInstance}
+              tabIndex={-1}
+            >
+              <Tools />
+            </button>
+          </Tooltip>
+        )}
         <Tooltip label="Evaluate" align="left">
           <button
             aria-label="Evaluate"
