@@ -53,5 +53,5 @@ class DirectInstanceResult(BaseModel):
     score: float | None = None
     explanation: str
     feedback: str | None = None
-    positional_bias: DirectPositionalBias
+    positional_bias: DirectPositionalBias | None = None
     metadata: dict[str, Any] | None = None
