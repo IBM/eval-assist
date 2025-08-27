@@ -3,7 +3,7 @@ import { capitalizeFirstWord, getOrdinalSuffix, returnByPipelineType, toPercenta
 
 import { Dispatch, Fragment, SetStateAction, useEffect, useMemo, useState } from 'react'
 import React from 'react'
-import Markdown from 'react-markdown'
+import Markdown, { Components } from 'react-markdown'
 
 import { Accordion, AccordionItem, Layer, ListItem, Modal, Tooltip, UnorderedList } from '@carbon/react'
 import { ArrowRight, Warning } from '@carbon/react/icons'
@@ -45,11 +45,18 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
 
   const [openedPerReponseResults, setOpenedPerReponseResults] = useState<boolean[]>([])
 
+  const markdownHeadingConf: Components = {
+    h1: ({ node, ...props }) => <h3 {...props} />,
+    h2: ({ node, ...props }) => <h4 {...props} />,
+    h3: ({ node, ...props }) => <h5 {...props} />,
+  }
+
   useEffect(() => {
     if (selectedInstance === null || currentTestCase.type === EvaluationType.DIRECT || !selectedInstance.result)
       return setOpenedPerReponseResults([])
     setOpenedPerReponseResults(Object.keys(selectedInstance.result as PairwiseInstanceResult).map((_) => false))
   }, [currentTestCase.type, selectedInstance])
+
   return (
     selectedInstance !== null && (
       <Modal open={open} onRequestClose={onClose} passiveModal size="lg" modalHeading={`Instance details`}>
@@ -116,17 +123,25 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                         <p>
                           <strong>Explanation:</strong>
                         </p>
-                        <div>
-                          <Markdown>{(selectedInstance.result as DirectInstanceResult).explanation}</Markdown>
+                        <div className="markdown">
+                          <Markdown components={markdownHeadingConf}>
+                            {(selectedInstance.result as DirectInstanceResult).explanation}
+                          </Markdown>
                         </div>
                         {(selectedInstance.result as DirectInstanceResult).feedback && (
                           <>
                             <p>
                               <strong>Feedback:</strong>
                             </p>
-                            <div>
-                              <Markdown>{(selectedInstance.result as DirectInstanceResult).feedback}</Markdown>
-                            </div>
+                            <div>{(selectedInstance.result as DirectInstanceResult).feedback}</div>
+                          </>
+                        )}
+                        {(selectedInstance.result as DirectInstanceResult).score && (
+                          <>
+                            <p>
+                              <strong>Score:</strong>
+                            </p>
+                            <div>{(selectedInstance.result as DirectInstanceResult).score?.toString()}</div>
                           </>
                         )}
                         {/* <p>{(selectedInstance.result as DirectInstanceResult).explanation}</p> */}
@@ -151,7 +166,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                               <strong>{'Positional bias explanation:'}</strong>
                             </p>
                             <div>
-                              <Markdown>
+                              <Markdown components={markdownHeadingConf}>
                                 {(selectedInstance.result as DirectInstanceResult).positionalBias.explanation}
                               </Markdown>
                             </div>
@@ -274,7 +289,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                               }: `}</strong>
                                             </p>
                                             <div>
-                                              <Markdown>{explanation}</Markdown>
+                                              <Markdown components={markdownHeadingConf}>{explanation}</Markdown>
                                             </div>
                                             <br />
                                           </div>
