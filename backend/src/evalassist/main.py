@@ -8,7 +8,7 @@ from typing import cast
 import nbformat as nbf
 import nest_asyncio
 import pandas as pd
-from evalassist.judges import UnitxtDirectJudge
+from evalassist.judges import SimpleDirectJudge
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from fastapi import (
     APIRouter,
@@ -316,7 +316,7 @@ async def evaluate(
             if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
                 evaluator = GraniteGuardianJudge(inference_engine=inference_engine)
             else:
-                evaluator = UnitxtDirectJudge(
+                evaluator = SimpleDirectJudge(
                     inference_engine=inference_engine,
                 )
             per_instance_result = evaluator.evaluate(

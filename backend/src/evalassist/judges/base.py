@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, TypeVar, cast
@@ -39,9 +40,17 @@ class JudgeDescriptor:
     inference_engine_id: str
 
 
-@dataclass
 class UnitxtInferenceEngineMixin:
     inference_engine: InferenceEngine
+
+    def __init__(
+        self,
+        inference_engine,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.inference_engine = inference_engine
 
 
 class Judge(
@@ -56,9 +65,20 @@ class Judge(
     ``Criteria`` and returns a result specific to the concrete implementation.
     """
 
+    use_self_consistency: bool
+
+    def __init__(
+        self,
+        use_self_consistency: bool = False,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.use_self_consistency = use_self_consistency
+
     def get_inference_engine_id(self) -> str:
         """Return the identifier of the underlying inference engine."""
-        return self.inference_engine.get_engine_id()
+        return "_".join(self.inference_engine.get_engine_id().split("_")[:-1])
 
     def get_ai_message_from_prompt(
         self, prompt: str, role: Literal["system", "user", "assistant"] = "user"
@@ -94,11 +114,20 @@ class Judge(
         parsed_criteria = self._get_parsed_criteria(parsed_criteria)
         parsed_instances = self._get_instances_from_str(instances)
 
+        if self.use_self_consistency:
+            parsed_instances = [
+                instance for instance in parsed_instances for _ in range(3)
+            ]
+            parsed_criteria = [
+                criterion for criterion in parsed_criteria for _ in range(3)
+            ]
+
         results: Sequence[ReturnVarType] = self._evaluate(
             instances=parsed_instances,
             criteria=parsed_criteria,
             check_positional_bias=check_positional_bias,
         )
+
         return results
 
     def __call__(
@@ -107,7 +136,11 @@ class Judge(
         criteria: CriteriaTypeVar | Sequence[CriteriaTypeVar] | str,
         check_positional_bias: bool = False,
     ) -> Sequence[ReturnVarType]:
-        return self.evaluate(instances, criteria, check_positional_bias)
+        return self.evaluate(
+            instances=instances,
+            criteria=criteria,
+            check_positional_bias=check_positional_bias,
+        )
 
     @abstractmethod
     def _evaluate(
@@ -216,6 +249,23 @@ class DirectJudge(
                     pass
             r.score = score
 
+        if self.use_self_consistency:
+            # apply majority voting for each of the three evaluation
+            parsed_results = []
+            for i in range(0, len(results), 3):
+                selected_options = [results[i].option for j in range(i, i + 3)]
+                most_common_option = Counter(selected_options).most_common(1)[0][0]
+                index_of_most_common = selected_options.index(most_common_option)
+                to_update_result_index = i + index_of_most_common
+                results[to_update_result_index].option = most_common_option
+                results[to_update_result_index].score = (
+                    sum(r.score for r in results[i : i + 3]) / 3
+                    if all(r.score is not None for r in results[i : i + 3])
+                    else None
+                )  # type: ignore
+                parsed_results.append(results[to_update_result_index])
+            return parsed_results
+
         return results
 
     def _get_instances_from_str(
@@ -290,6 +340,20 @@ class DirectJudge(
 
 
 class PairwiseJudge(Judge[PairwiseInstance, Criteria, PairwiseInstanceResult], ABC):
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(
+            *args,
+            **kwargs,
+        )
+        if self.use_self_consistency:
+            raise ValueError(
+                "Self consistency is not supported on pairwise comparison judges yet.s"
+            )
+
     def _evaluate(
         self,
         instances: Sequence[PairwiseInstance],
@@ -350,7 +414,7 @@ class PairwiseJudge(Judge[PairwiseInstance, Criteria, PairwiseInstanceResult], A
 
     def get_descriptor(self) -> JudgeDescriptor:
         return JudgeDescriptor(
-            self.get_name(), "pairwise", self.inference_engine.get_engine_id()
+            self.get_name(), "pairwise", self.get_inference_engine_id()
         )
 
     def _get_instances_from_str(
