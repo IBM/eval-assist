@@ -7,10 +7,11 @@ from typing import Any, cast
 
 import pandas as pd
 from datasets import IterableDataset
+from evalassist.judges import Criteria
 from scipy.stats import pearsonr, spearmanr
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
-from unitxt.llm_as_judge import CriteriaWithOptions, EvaluatorTypeEnum
+from unitxt.llm_as_judge import CriteriaWithOptions
 
 from ..const import EVAL_ASSIST_DIR
 from ..judges import DirectJudge
@@ -55,7 +56,7 @@ def get_all_benchmarks():
                 + dataset_name,
                 "description": "",
                 "catalog_url": f"https://www.unitxt.ai/en/latest/catalog/catalog.{card}.html",
-                "type": EvaluatorTypeEnum.DIRECT,
+                "type": "direct",
                 "tags": [benchmark_name],
                 "criteria_benchmarks": {},
             }
@@ -120,12 +121,19 @@ metric_map = {
 def parse_card_results(
     card: str,
     dataset: IterableDataset,
+    instances: list[DirectInstance],
     results: Sequence[DirectInstanceResult],
-    prediction_scores: list[str],
     judge: DirectJudge,
-    criteria: list[CriteriaWithOptions],
 ) -> tuple[list[dict[str, str]], dict[Any, Any]]:
-    criteria_names = [criterion.name for criterion in criteria]
+    criteria_names = [result.criteria.name for result in results]
+
+    if any(result.score is None for result in results):
+        raise ValueError("Score is None!")
+
+    prediction_scores: list[float] = [cast(float, result.score) for result in results]
+
+    str_prediction_scores = [str(p) for p in prediction_scores]
+
     # biggen benchmark's criteria's name is composed by the capability and the task, we only keep the capability
     if "biggen" in card:
         criteria_names = [
@@ -137,11 +145,14 @@ def parse_card_results(
     # scores_criteria_name = unique_criteria_names[0] if all(c == criteria_names[0] for c in unique_criteria_names) else "llm_as_judge"
 
     # Calculate positional bias rate
-    positional_bias_rate = sum([r.positional_bias.detected for r in results]) / len(
-        results
-    )
+    positional_bias_rate = sum(
+        [
+            r.positional_bias.detected if r.positional_bias is not None else False
+            for r in results
+        ]
+    ) / len(results)
 
-    evaluation_results = evaluate(predictions=prediction_scores, data=dataset)
+    evaluation_results = evaluate(predictions=str_prediction_scores, data=dataset)
 
     # Extract metric names from the evaluation results
     metric_names = [m.split(".")[1] for m in evaluation_results[0]["metrics"]]
@@ -204,6 +215,8 @@ def parse_card_results(
                     criteria_name_predictions.append(prediction_scores[i])
                     criteria_name_positional_bias_detected_list.append(
                         results[i].positional_bias.detected
+                        if results[i].positional_bias is not None
+                        else False  # type: ignore
                     )
             per_criteria_results: dict[str, float] = {}
             for metric in metric_names:
@@ -294,15 +307,12 @@ def run_single_model_card(
         ),
     )
     try:
-        criteria: list[CriteriaWithOptions] = [
-            cast(
-                CriteriaWithOptions,
-                CriteriaWithOptions.from_dict(
-                    cast(
-                        CriteriaWithOptions,
-                        fetch_artifact(json.loads(d["task_data"])["criteria"])[0],
-                    ).to_dict()
-                ),
+        criteria: list[Criteria] = [
+            Criteria.from_unitxt_criteria(
+                cast(
+                    CriteriaWithOptions,
+                    fetch_artifact(json.loads(d["task_data"])["criteria"])[0],
+                )
             )
             for d in dataset
         ]
@@ -315,19 +325,12 @@ def run_single_model_card(
             parsed_dataset, criteria, check_positional_bias=True
         )
 
-        prediction_scores = [
-            cast(dict[str, str], c.option_map)[p.option]
-            for p, c in zip(results, criteria)
-        ]
-        # Extract the criteria name from the first prediction
-
         benchmark_results, cache = parse_card_results(
             card=card,
             dataset=dataset,
+            instances=parsed_dataset,
             results=results,
-            prediction_scores=prediction_scores,
             judge=judge,
-            criteria=criteria,
         )
         print("Finished running card:", card, "with judge:", judge.get_descriptor())
 

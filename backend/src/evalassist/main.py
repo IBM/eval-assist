@@ -24,12 +24,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlmodel import Session, select
 from unitxt.inference import InferenceEngine, MockInferenceEngine
-from unitxt.llm_as_judge import (
-    DIRECT_CRITERIA,
-    PAIRWISE_CRITERIA,
-    Criteria,
-    EvaluatorTypeEnum,
-)
+from unitxt.llm_as_judge import DIRECT_CRITERIA, PAIRWISE_CRITERIA, EvaluatorTypeEnum
 
 # Logging req/resp
 from .actions_logger import LoggingRoute
@@ -69,7 +64,7 @@ from .const import (
 )
 from .database import engine  # Assumes you have engine/session setup
 from .extended_unitxt import EXTENDED_EVALUATORS_METADATA
-from .judges import SimpleDirectJudge
+from .judges import Criteria, SimpleDirectJudge
 from .judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from .judges.types import DirectInstance, PairwiseInstance
 from .judges.unitxt_judges import GraniteGuardianJudge, UnitxtPairwiseJudge
@@ -336,7 +331,7 @@ async def evaluate(
                 prediction_field=req.criteria.prediction_field,
                 context_fields=req.criteria.context_fields,
             )
-            evaluator = UnitxtPairwiseJudge(inference_engine)
+            evaluator = UnitxtPairwiseJudge(inference_engine=inference_engine)
 
             per_instance_result = evaluator.evaluate(
                 instances=cast(Sequence[PairwiseInstance], req.instances),
@@ -579,7 +574,7 @@ def download_test_data(params: DownloadTestDataBody, background_tasks: Backgroun
     instances = params.instances
     rows = [
         {
-            **i.context,
+            **(i.context if i.context is not None else {}),
             params.prediction_field: i.get_prediction(),
             "expected_result": i.expected_result,
         }
@@ -700,7 +695,11 @@ async def fix_instance(
         llm_provider_credentials=req.llm_provider_credentials,
         custom_params=SYNTHETIC_DATA_GENERATION_PARAMS,
     )
-    context = "\n".join([f"{k}: {v}" for k, v in req.instance.context.items()])
+    context = (
+        "\n".join([f"{k}: {v}" for k, v in req.instance.context.items()])
+        if req.instance.context is not None
+        else []
+    )
     if len(context):
         context = f"### Context\n{context}\n"
     prompt = f"""
@@ -720,7 +719,7 @@ Fixed text:
 
 """
     result = inference_engine([{"source": prompt}])
-    return FixInstanceResponse(fixed_response=result[0])
+    return FixInstanceResponse(fixed_response=cast(str, result[0]))
 
 
 app.include_router(router, prefix="/api")

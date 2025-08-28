@@ -1,13 +1,15 @@
 from collections.abc import Sequence
 from typing import Literal
 
-from unitxt.llm_as_judge import Criteria, CriteriaWithOptions
-
-from .base import DirectJudge, PairwiseInstance, PairwiseInstanceResult, PairwiseJudge
-from .types import (
+from . import (
+    Criteria,
     DirectInstance,
     DirectInstanceResult,
+    DirectJudge,
     DirectPositionalBias,
+    PairwiseInstance,
+    PairwiseInstanceResult,
+    PairwiseJudge,
     SingleSystemPairwiseResult,
 )
 
@@ -23,7 +25,7 @@ class MPrometheusDirectJudge(DirectJudge):
     def get_name(self) -> str:
         return "prometheus"
 
-    def _validate_criteria(self, criteria: Sequence[CriteriaWithOptions]):
+    def _validate_criteria(self, criteria: Sequence[Criteria]):
         for criterion in criteria:
             if len(criterion.options) != 5:
                 raise ValueError(
@@ -40,7 +42,7 @@ class MPrometheusDirectJudge(DirectJudge):
     def _run(
         self,
         instances: Sequence[DirectInstance],
-        criteria: Sequence[CriteriaWithOptions],
+        criteria: Sequence[Criteria],
     ) -> Sequence[DirectInstanceResult]:
         from prometheus_eval import PrometheusEval
         from prometheus_eval.prompts import (
@@ -85,6 +87,7 @@ class MPrometheusDirectJudge(DirectJudge):
 
         return [
             DirectInstanceResult(
+                criteria=criterion,
                 option=criterion.options[score - 1].name,
                 score=score,
                 explanation=feedback,

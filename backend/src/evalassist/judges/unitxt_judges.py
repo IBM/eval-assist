@@ -3,10 +3,10 @@ from collections.abc import Sequence
 from typing import Any, Generic, List, cast
 
 from unitxt.api import evaluate, load_dataset
+from unitxt.artifact import fetch_artifact
 from unitxt.blocks import Task, TaskCard
+from unitxt.llm_as_judge import CriteriaWithOptions as UnitxtCriteriaWithOptions
 from unitxt.llm_as_judge import (
-    Criteria,
-    CriteriaWithOptions,
     LLMJudgeDirect,
     LLMJudgePairwise,
     LoadCriteria,
@@ -18,8 +18,6 @@ from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
 from .base import (
-    CriteriaTypeVar,
-    DirectInstance,
     DirectJudge,
     InstanceTypeVar,
     Judge,
@@ -28,6 +26,8 @@ from .base import (
     UnitxtInferenceEngineMixin,
 )
 from .types import (
+    Criteria,
+    DirectInstance,
     DirectInstanceResult,
     PairwiseInstance,
     PairwiseInstanceResult,
@@ -36,9 +36,9 @@ from .types import (
 
 
 class UnitxtJudge(
-    Judge[InstanceTypeVar, CriteriaTypeVar, ReturnVarType],
+    Judge[InstanceTypeVar, ReturnVarType],
     ABC,
-    Generic[InstanceTypeVar, CriteriaTypeVar, ReturnVarType],
+    Generic[InstanceTypeVar, ReturnVarType],
     UnitxtInferenceEngineMixin,
 ):
     @abstractmethod
@@ -57,7 +57,7 @@ class UnitxtJudge(
         return "unitxt"
 
     def _run(
-        self, instances: Sequence[InstanceTypeVar], criteria: Sequence[CriteriaTypeVar]
+        self, instances: Sequence[InstanceTypeVar], criteria: Sequence[Criteria]
     ) -> Sequence[ReturnVarType]:
         # unitxt has a fixed task input fields, so we will add all of them in case different criterias have different prediction and/or context fields
         all_context_fields: set[str] = set(
@@ -115,8 +115,12 @@ class UnitxtJudge(
             }
             for td in task_data
         ]
-
-        data = {"test": [{**td, "judgement": c} for td, c in zip(task_data, criteria)]}
+        data = {
+            "test": [
+                {**td, "judgement": c.to_unitxt_criteria()}
+                for td, c in zip(task_data, criteria)
+            ]
+        }
 
         card = TaskCard(
             loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
@@ -140,7 +144,7 @@ class UnitxtJudge(
 
 
 class UnitxtDirectJudge(
-    UnitxtJudge[DirectInstance, CriteriaWithOptions, DirectInstanceResult],
+    UnitxtJudge[DirectInstance, DirectInstanceResult],
     DirectJudge,
 ):
     def get_preprocess_steps(self):
@@ -160,6 +164,12 @@ class UnitxtDirectJudge(
 
             results.append(
                 DirectInstanceResult(
+                    criteria=Criteria.from_unitxt_criteria(
+                        cast(
+                            UnitxtCriteriaWithOptions,
+                            fetch_artifact(instance_score[f"{prefix}_criteria"])[0],
+                        )
+                    ),
                     option=instance_score[f"{prefix}_selected_option"],
                     explanation=instance_score[f"{prefix}_assessment"],
                     positional_bias=None,
@@ -169,7 +179,7 @@ class UnitxtDirectJudge(
 
 
 class UnitxtPairwiseJudge(
-    UnitxtJudge[PairwiseInstance, Criteria, PairwiseInstanceResult],
+    UnitxtJudge[PairwiseInstance, PairwiseInstanceResult],
     PairwiseJudge,
 ):
     def get_preprocess_steps(self):
@@ -235,9 +245,7 @@ class GraniteGuardianJudge(
 
         return messages[criteria_name]
 
-    def get_prompt(
-        self, risk_name, instances, criterion: CriteriaWithOptions
-    ) -> list[str]:
+    def get_prompt(self, risk_name, instances, criterion: Criteria) -> list[str]:
         risk_name = self.get_risk_name(risk_name)
         predictions = self.get_predictions(instances)
 
@@ -264,7 +272,7 @@ class GraniteGuardianJudge(
         ]
 
     def parse_results(
-        self, dataset, criteria: Sequence[CriteriaWithOptions]
+        self, dataset, criteria: Sequence[Criteria]
     ) -> list[DirectInstanceResult]:
         results = []
         for instance, criterion in zip(dataset, criteria):
@@ -283,6 +291,7 @@ class GraniteGuardianJudge(
 
             results.append(
                 DirectInstanceResult(
+                    criteria=criterion,
                     option=instance_score[f"{risk_name}_label"],
                     explanation=explanation,
                     positional_bias=None,
@@ -306,7 +315,7 @@ class GraniteGuardianJudge(
         self,
         instances: Sequence[DirectInstance],
         predictions: list[str],
-        criteria: Sequence[CriteriaWithOptions],
+        criteria: Sequence[Criteria],
     ) -> list[dict[str, str]]:
         contexts = [
             instance.context if instance.context is not None else {}
@@ -332,7 +341,7 @@ class GraniteGuardianJudge(
     def _run(
         self,
         instances: Sequence[DirectInstance],
-        criteria: Sequence[CriteriaWithOptions],
+        criteria: Sequence[Criteria],
     ) -> Sequence[DirectInstanceResult]:
         risk_names = [self.get_risk_name(criterion.name) for criterion in criteria]
         predictions = self.get_predictions(instances)
