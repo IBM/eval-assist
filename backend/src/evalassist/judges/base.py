@@ -90,7 +90,7 @@ class Judge(
 
     def evaluate(
         self,
-        instances: Sequence[InstanceTypeVar] | Sequence[str] | Sequence[list[str]],
+        instances: Sequence[InstanceTypeVar] | Sequence[str],
         criteria: CriteriaTypeVar | Sequence[CriteriaTypeVar] | str,
         check_positional_bias: bool = False,
     ) -> Sequence[ReturnVarType]:
@@ -132,7 +132,7 @@ class Judge(
 
     def __call__(
         self,
-        instances: Sequence[InstanceTypeVar] | Sequence[str] | Sequence[list[str]],
+        instances: Sequence[InstanceTypeVar] | Sequence[str],
         criteria: CriteriaTypeVar | Sequence[CriteriaTypeVar] | str,
         check_positional_bias: bool = False,
     ) -> Sequence[ReturnVarType]:
