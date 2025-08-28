@@ -291,7 +291,7 @@ export const SyntheticGenerationProvider = ({ children }: { children: ReactNode 
 
     const unparsedGeneratedInstances = await response.json()
     const generatedInstances: DirectInstance[] = unparsedGeneratedInstances.map((unparsedGeneratedInstance: any) => ({
-      contextVariables: Object.entries(unparsedGeneratedInstance.context_variables).map(([name, value]) => ({
+      contextVariables: Object.entries(unparsedGeneratedInstance.context).map(([name, value]) => ({
         name,
         value,
       })),

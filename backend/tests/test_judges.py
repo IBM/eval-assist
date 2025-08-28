@@ -3,7 +3,7 @@
 # from evalassist.judges.synthetic_persona_direct_judge import SimpleDirectJudge
 # from evalassist.judges.unitxt_judges import UnitxtDirectJudge
 # from unitxt.inference import InferenceEngine, CrossProviderInferenceEngine
-# from unitxt.llm_as_judge import CriteriaWithOptions
+# from evalassist.judges import Criteria
 # from unitxt.artifact import fetch_artifact
 # from unitxt.llm_as_judge_constants import CriteriaOption
 

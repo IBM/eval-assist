@@ -14,9 +14,10 @@ from langchain_core.prompt_values import StringPromptValue
 from langchain_core.runnables import RunnableLambda
 from pydantic import BaseModel
 from unitxt.inference import CrossProviderInferenceEngine, InferenceEngine
-from unitxt.llm_as_judge import Criteria, CriteriaOption, CriteriaWithOptions
 
 from .types import (
+    Criteria,
+    CriteriaOption,
     DirectInstance,
     DirectInstanceResult,
     DirectPositionalBias,
@@ -29,15 +30,17 @@ from .types import (
 # Core abstract judge definition
 # ----------------------------------------------------------------------
 InstanceTypeVar = TypeVar("InstanceTypeVar", bound=Instance)
-CriteriaTypeVar = TypeVar("CriteriaTypeVar", bound=Criteria)
 ReturnVarType = TypeVar("ReturnVarType")
 
 
 @dataclass
 class JudgeDescriptor:
     name: str
-    evalType: Literal["direct", "pairwise"]
+    eval_type: Literal["direct", "pairwise"]
     inference_engine_id: str
+
+    def __str__(self) -> str:
+        return f"{self.name}-{self.eval_type}-{self.inference_engine_id}"
 
 
 class UnitxtInferenceEngineMixin:
@@ -55,7 +58,7 @@ class UnitxtInferenceEngineMixin:
 
 class Judge(
     ABC,
-    Generic[InstanceTypeVar, CriteriaTypeVar, ReturnVarType],
+    Generic[InstanceTypeVar, ReturnVarType],
     UnitxtInferenceEngineMixin,
 ):
     """
@@ -91,7 +94,7 @@ class Judge(
     def evaluate(
         self,
         instances: Sequence[InstanceTypeVar] | Sequence[str],
-        criteria: CriteriaTypeVar | Sequence[CriteriaTypeVar] | str,
+        criteria: Criteria | Sequence[Criteria] | str,
         check_positional_bias: bool = False,
     ) -> Sequence[ReturnVarType]:
         """Run the judge on a batch of instances and return the results."""
@@ -103,7 +106,7 @@ class Judge(
             raise ValueError(
                 f"The provided criteria list must be equal in length with the instances. {len(criteria)} != {len(instances)}"
             )
-        parsed_criteria: Sequence[CriteriaTypeVar] | Sequence[str]
+        parsed_criteria: Sequence[Criteria] | Sequence[str]
         if isinstance(criteria, str):
             parsed_criteria = [criteria] * len(instances)
         elif isinstance(criteria, Sequence):
@@ -133,7 +136,7 @@ class Judge(
     def __call__(
         self,
         instances: Sequence[InstanceTypeVar] | Sequence[str],
-        criteria: CriteriaTypeVar | Sequence[CriteriaTypeVar] | str,
+        criteria: Criteria | Sequence[Criteria] | str,
         check_positional_bias: bool = False,
     ) -> Sequence[ReturnVarType]:
         return self.evaluate(
@@ -146,7 +149,7 @@ class Judge(
     def _evaluate(
         self,
         instances: Sequence[InstanceTypeVar],
-        criteria: Sequence[CriteriaTypeVar],
+        criteria: Sequence[Criteria],
         check_positional_bias: bool,
     ) -> Sequence[ReturnVarType]: ...
 
@@ -154,7 +157,7 @@ class Judge(
     def _run(
         self,
         instances: Sequence[InstanceTypeVar],
-        criteria: Sequence[CriteriaTypeVar],
+        criteria: Sequence[Criteria],
     ) -> Sequence[ReturnVarType]: ...
 
     @abstractmethod
@@ -164,8 +167,8 @@ class Judge(
 
     @abstractmethod
     def _get_parsed_criteria(
-        self, criteria: Sequence[CriteriaTypeVar] | Sequence[str]
-    ) -> Sequence[CriteriaTypeVar]: ...
+        self, criteria: Sequence[Criteria] | Sequence[str]
+    ) -> Sequence[Criteria]: ...
 
     @abstractmethod
     def get_predictions(self, instances: Sequence[InstanceTypeVar]) -> Any:
@@ -186,13 +189,11 @@ class Judge(
 # ----------------------------------------------------------------------
 # Concrete abstract subclasses for the two main evaluation modes
 # ----------------------------------------------------------------------
-class DirectJudge(
-    Judge[DirectInstance, CriteriaWithOptions, DirectInstanceResult], ABC
-):
+class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
     def _evaluate(
         self,
         instances: Sequence[DirectInstance],
-        criteria: Sequence[CriteriaWithOptions],
+        criteria: Sequence[Criteria],
         check_positional_bias: bool = False,
     ) -> Sequence[DirectInstanceResult]:
         if check_positional_bias:
@@ -201,10 +202,9 @@ class DirectJudge(
                 criteria=[
                     *criteria,
                     *[
-                        CriteriaWithOptions(
+                        Criteria(
                             name=criterion.name,
                             description=criterion.description,
-                            option_map=criterion.option_map,
                             prediction_field=criterion.prediction_field,
                             context_fields=criterion.context_fields,
                             options=list(reversed(criterion.options)),
@@ -217,6 +217,7 @@ class DirectJudge(
             results_len: int = int(len(results) / 2)
             results = [
                 DirectInstanceResult(
+                    criteria=results[i].criteria,
                     option=results[i].option,
                     explanation=results[i].explanation,
                     feedback=results[i].feedback,
@@ -233,15 +234,9 @@ class DirectJudge(
             results = self._run(instances=instances, criteria=criteria)
 
         # add numeric scores if possible
-        for r, c in zip(results, criteria):
-            score: float | None = None
-            if c.option_map is not None:
-                score = c.option_map.get(r.option, None)
-                if score is None:
-                    raise ValueError(
-                        f"An option map was provided in the criteria but the option chosen by the evaluator ({r.option}) wasn't found in the option map ({c.option_map})."
-                    )
-            else:
+        for r in results:
+            score: float | None = r.criteria.get_score_from_option(r.option)
+            if score is None:
                 try:
                     # try to use the option name as the numeric score
                     score = float(r.option)
@@ -292,42 +287,37 @@ class DirectJudge(
         return parsed_instances
 
     def _get_parsed_criteria(
-        self, criteria: Sequence[CriteriaWithOptions] | Sequence[str]
-    ) -> Sequence[CriteriaWithOptions]:
+        self, criteria: Sequence[Criteria] | Sequence[str]
+    ) -> Sequence[Criteria]:
         if isinstance(criteria, Sequence) and all(isinstance(x, str) for x in criteria):
             return [
-                CriteriaWithOptions(
+                Criteria(
                     name="",
                     description=description,
                     options=[
-                        CriteriaOption(name="Yes", description=""),
-                        CriteriaOption(name="No", description=""),
+                        CriteriaOption(name="Yes", description="", score=1.0),
+                        CriteriaOption(name="No", description="", score=0.0),
                     ],
-                    option_map={
-                        "Yes": 1.0,
-                        "No": 0.0,
-                    },
                     prediction_field="response",
                 )
                 for description in cast(Sequence[str], criteria)
             ]
         else:
             return [
-                CriteriaWithOptions(
+                Criteria(
                     name=criterion.name,
                     description=criterion.description,
                     options=criterion.options,
-                    option_map=criterion.option_map,
                     prediction_field=criterion.prediction_field,
                 )
-                for criterion in cast(Sequence[CriteriaWithOptions], criteria)
+                for criterion in cast(Sequence[Criteria], criteria)
             ]
 
     @abstractmethod
     def _run(
         self,
         instances: Sequence[DirectInstance],
-        criteria: Sequence[CriteriaWithOptions],
+        criteria: Sequence[Criteria],
     ) -> Sequence[DirectInstanceResult]: ...
 
     def get_predictions(self, instances: Sequence[DirectInstance]) -> list[str]:
@@ -339,7 +329,7 @@ class DirectJudge(
         )
 
 
-class PairwiseJudge(Judge[PairwiseInstance, Criteria, PairwiseInstanceResult], ABC):
+class PairwiseJudge(Judge[PairwiseInstance, PairwiseInstanceResult], ABC):
     def __init__(
         self,
         *args,
@@ -446,14 +436,14 @@ class PairwiseJudge(Judge[PairwiseInstance, Criteria, PairwiseInstanceResult], A
     ) -> Sequence[Criteria]:
         if isinstance(criteria, Sequence) and all(isinstance(x, str) for x in criteria):
             return [
-                CriteriaWithOptions(
+                Criteria(
                     name="",
                     description=description,
                 )
                 for description in cast(Sequence[str], criteria)
             ]
         else:
-            return cast(Sequence[CriteriaWithOptions], criteria)
+            return cast(Sequence[Criteria], criteria)
 
 
 # ----------------------------------------------------------------------
