@@ -19,17 +19,13 @@ results = judge(
 )
 
 # providing criteria="Is the response self-explanatory?" is equal to the following criteria defintion
-# criteria = CriteriaWithOptions(
+# criteria = Criteria(
 #     name="self-explanatory",
 #     description="Is the text self-explanatory and self-contained?",
 #     options=[
-#         CriteriaOption(name="Yes", description=""),
-#         CriteriaOption(name="No", description=""),
+#         CriteriaOption(name="Yes", description="", score=1.0),
+#         CriteriaOption(name="No", description="", score=0.0),
 #     ],
-#     option_map={
-#         "Yes": 1.0,
-#         "No": 0.0,
-#     },
 #     prediction_field="response",
 # )
 
