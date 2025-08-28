@@ -32,9 +32,9 @@ class MPrometheusDirectJudge(DirectJudge):
 
     def _validate_instances(self, instances: Sequence[DirectInstance]):
         for instance in instances:
-            if "instruction" not in instance.context_variables:
+            if instance.context is not None and "instruction" not in instance.context:
                 raise ValueError(
-                    f'Prometheus models expect an instruction. Include an "instruction" context variable in each instance. Found context variables: {list(instance.context_variables.keys())}'
+                    f'Prometheus models expect an instruction. Include an "instruction" context variable in each instance. Found context variables: {list(instance.context.keys())}'
                 )
 
     def _run(
@@ -66,7 +66,8 @@ class MPrometheusDirectJudge(DirectJudge):
         ]
 
         instructions = [
-            instance.context_variables["instruction"] for instance in instances
+            instance.context["instruction"] if instance.context is not None else ""
+            for instance in instances
         ]
         responses = [instance.response for instance in instances]
 
@@ -108,9 +109,9 @@ class MPrometheusPairwiseJudge(PairwiseJudge):
 
     def _validate_instances(self, instances: Sequence[PairwiseInstance]):
         for instance in instances:
-            if "instruction" not in instance.context_variables:
+            if instance.context is not None and "instruction" not in instance.context:
                 raise ValueError(
-                    f'Prometheus models expect an instruction. Include an "instruction" context variable in each instance. Found context variables: {list(instance.context_variables.keys())}'
+                    f'Prometheus models expect an instruction. Include an "instruction" context variable in each instance. Found context variables: {list(instance.context.keys())}'
                 )
             if len(instance.responses) != 2:
                 raise ValueError(
@@ -129,7 +130,8 @@ class MPrometheusPairwiseJudge(PairwiseJudge):
         self._validate_instances(instances)
 
         instructions = [
-            instance.context_variables["instruction"] for instance in instances
+            instance.context["instruction"] if instance.context is not None else ""
+            for instance in instances
         ]
         responses_A = [instance.responses[0] for instance in instances]
         responses_B = [instance.responses[1] for instance in instances]

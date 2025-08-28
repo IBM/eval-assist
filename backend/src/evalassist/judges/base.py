@@ -259,7 +259,7 @@ class DirectJudge(
                 to_update_result_index = i + index_of_most_common
                 results[to_update_result_index].option = most_common_option
                 results[to_update_result_index].score = (
-                    sum(r.score for r in results[i : i + 3]) / 3
+                    sum(cast(float, r.score) for r in results[i : i + 3]) / 3
                     if all(r.score is not None for r in results[i : i + 3])
                     else None
                 )  # type: ignore
@@ -279,7 +279,7 @@ class DirectJudge(
                 Sequence[DirectInstance],
                 [
                     DirectInstance(
-                        context_variables={},
+                        context={},
                         expected_result=None,
                         metadata=None,
                         response=i,
@@ -366,7 +366,7 @@ class PairwiseJudge(Judge[PairwiseInstance, Criteria, PairwiseInstanceResult], A
                     *instances,
                     *[
                         PairwiseInstance(
-                            context_variables=i.context_variables,
+                            context=i.context,
                             expected_result=i.expected_result,
                             metadata=i.metadata,
                             responses=list(reversed(i.responses)),
@@ -429,7 +429,7 @@ class PairwiseJudge(Judge[PairwiseInstance, Criteria, PairwiseInstanceResult], A
                 Sequence[PairwiseInstance],
                 [
                     PairwiseInstance(
-                        context_variables={},
+                        context={},
                         expected_result=None,
                         metadata=None,
                         responses=i,

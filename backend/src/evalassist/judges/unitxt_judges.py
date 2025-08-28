@@ -67,7 +67,7 @@ class UnitxtJudge(
                     (
                         c.context_fields
                         if c.context_fields is not None
-                        else list(i.context_variables.keys())
+                        else (list(i.context.keys()) if i.context is not None else {})
                     )
                     for i, c in zip(instances, criteria)
                 ]
@@ -100,7 +100,7 @@ class UnitxtJudge(
         # add the context fields
         task_data: list[dict[str, str | list[str]]] = [
             {
-                **instance.context_variables,
+                **(instance.context if instance.context is not None else {}),
                 cast(str, criterion.prediction_field): prediction,
             }
             for instance, prediction, criterion in zip(instances, predictions, criteria)
@@ -308,19 +308,20 @@ class GraniteGuardianJudge(
         predictions: list[str],
         criteria: Sequence[CriteriaWithOptions],
     ) -> list[dict[str, str]]:
-        context_variables_list = [instance.context_variables for instance in instances]
-        for context_variables, prediction, criterion in zip(
-            context_variables_list, predictions, criteria
-        ):
+        contexts = [
+            instance.context if instance.context is not None else {}
+            for instance in instances
+        ]
+        for context, prediction, criterion in zip(contexts, predictions, criteria):
             # use prediction as one more context variable
             if criterion.prediction_field is not None:
-                context_variables[cast(str, criterion.prediction_field)] = prediction
+                context[cast(str, criterion.prediction_field)] = prediction
             else:
-                context_variables["response"] = prediction
+                context["response"] = prediction
 
         return [
             {k.lower().replace(" ", "_"): v for k, v in context_variables.items()}
-            for context_variables in context_variables_list
+            for context_variables in contexts
         ]
 
     def get_input_fields(

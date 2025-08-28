@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     instances = [
         PairwiseInstance(
-            context_variables={
+            context={
                 "instruction": "Struggling with a recent break-up, a person opens up about the intense feelings of loneliness and sadness. They ask for advice on how to cope with the heartbreak and move forward in life."
             },
             responses=[
