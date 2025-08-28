@@ -4,7 +4,7 @@ from evalassist.benchmark import run_benchmarks
 from evalassist.judges import DirectJudge, SimpleDirectJudge, UnitxtDirectJudge
 
 if __name__ == "__main__":
-    MAX_WORKERS = 15
+    MAX_WORKERS = 5
     BATCH_SIZE = 25
     RITS_API_KEYS = None
     INSTANCES_PER_DATASET = 400
