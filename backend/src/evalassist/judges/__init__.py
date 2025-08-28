@@ -1,4 +1,5 @@
 from .base import DirectJudge, Judge, PairwiseJudge
+from .const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from .dummy_judge import DummyDirectJudge, DummyPairwiseJudge
 from .simple_direct_judge import SimpleDirectJudge
 from .thesis_antithesis_direct_judge import ThesisAntithesisDirectJudge
@@ -30,4 +31,5 @@ __all__: list[str] = [
     "PairwiseInstanceResult",
     "DirectPositionalBias",
     "DirectInstanceResult",
+    "DEFAULT_JUDGE_INFERENCE_PARAMS",
 ]
