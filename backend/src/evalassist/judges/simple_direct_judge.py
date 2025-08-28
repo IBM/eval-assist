@@ -9,14 +9,13 @@ from langchain.prompts import PromptTemplate
 from langchain_core.exceptions import OutputParserException
 from pydantic import BaseModel, Field, field_validator
 from unitxt.inference import InferenceEngine
-from unitxt.llm_as_judge import CriteriaWithOptions
 
 from .base import (
     DirectJudge,
     UnitxtInferenceEngineMixin,
     UnitxtInferenceLangchainRunnable,
 )
-from .types import DirectInstance, DirectInstanceResult
+from .types import Criteria, DirectInstance, DirectInstanceResult
 
 logger = logging.getLogger(__name__)
 
@@ -54,20 +53,18 @@ class SimpleDirectJudge(
         self,
         context_sections: list[str],
         predictions: list[str],
-        criteria: Sequence[CriteriaWithOptions],
+        criteria: Sequence[Criteria],
     ) -> list[tuple[str, str]]:
-        unique_criteria_instance: list[tuple[CriteriaWithOptions, tuple[str, str]]] = (
-            list(
-                {
-                    criterion.name: (criterion, (context_section, prediction))
-                    for criterion, context_section, prediction in zip(
-                        criteria, context_sections, predictions
-                    )
-                }.values()
-            )
+        unique_criteria_instance: list[tuple[Criteria, tuple[str, str]]] = list(
+            {
+                criterion.name: (criterion, (context_section, prediction))
+                for criterion, context_section, prediction in zip(
+                    criteria, context_sections, predictions
+                )
+            }.values()
         )
         unique_criteria, instance_examples = zip(*unique_criteria_instance)  # type: ignore
-        unique_criteria: list[CriteriaWithOptions] = list(unique_criteria)
+        unique_criteria: list[Criteria] = list(unique_criteria)
         instance_examples: list[tuple[str, str]] = list(instance_examples)
 
         instance_examples_str = [
@@ -187,7 +184,7 @@ class SimpleDirectJudge(
     def _run(
         self,
         instances: Sequence[DirectInstance],
-        criteria: Sequence[CriteriaWithOptions],
+        criteria: Sequence[Criteria],
     ) -> list[DirectInstanceResult]:
         output_parsers: list[OutputFixingParser] = []
         format_instructions_list = []
@@ -395,13 +392,19 @@ class SimpleDirectJudge(
         ]
         return [
             DirectInstanceResult(
+                criteria=criterion,
                 option=selected_option,
                 explanation=explanation,
                 feedback=feedback,
                 positional_bias=None,
                 metadata={"prompt": prompt, "unparsed_response": unparsed_response},
             )
-            for selected_option, explanation, feedback, prompt, unparsed_response in zip(
-                selected_options, explanations, feedbacks, prompts, unparsed_responses
+            for selected_option, explanation, feedback, prompt, unparsed_response, criterion in zip(
+                selected_options,
+                explanations,
+                feedbacks,
+                prompts,
+                unparsed_responses,
+                criteria,
             )
         ]

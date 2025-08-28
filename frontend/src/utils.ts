@@ -306,10 +306,7 @@ export const parseCriteriaForBackend = (criteria: Criteria) => {
 
 export const parseInstanceForBackend = (instance: Instance, type: EvaluationType) => {
   return {
-    context_variables: instance.contextVariables.reduce(
-      (acc, item, index) => ({ ...acc, [item.name]: item.value }),
-      {},
-    ),
+    context: instance.contextVariables.reduce((acc, item, index) => ({ ...acc, [item.name]: item.value }), {}),
     [returnByPipelineType(type, 'response', 'responses')]: returnByPipelineType(
       type,
       () => (instance as DirectInstance).response,

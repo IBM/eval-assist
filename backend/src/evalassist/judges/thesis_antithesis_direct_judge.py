@@ -4,10 +4,9 @@ from typing import Any, cast
 
 from langchain.output_parsers import OutputFixingParser, ResponseSchema
 from langchain.prompts import PromptTemplate
-from unitxt.llm_as_judge import CriteriaWithOptions
 
 from .base import DirectJudge, UnitxtInferenceLangchainRunnable
-from .types import DirectInstance, DirectInstanceResult, DirectPositionalBias
+from .types import Criteria, DirectInstance, DirectInstanceResult, DirectPositionalBias
 
 
 class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
@@ -17,7 +16,7 @@ class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable)
     def _run(
         self,
         instances: Sequence[DirectInstance],
-        criteria: Sequence[CriteriaWithOptions],
+        criteria: Sequence[Criteria],
     ) -> list[DirectInstanceResult]:
         # # make it easier for models to create json object
         # for option in cast(CriteriaWithOptions, self.criteria).options:
@@ -488,6 +487,7 @@ class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable)
             j += 1
         return [
             DirectInstanceResult(
+                criteria=criterion,
                 option=selected_option,
                 explanation=explanation,
                 positional_bias=DirectPositionalBias(
@@ -495,7 +495,7 @@ class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable)
                 ),
                 metadata={"Number of stages": str(stages_count)},
             )
-            for selected_option, explanation, stages_count in zip(
-                selected_options, explanations, amount_of_stages
+            for selected_option, explanation, stages_count, criterion in zip(
+                selected_options, explanations, amount_of_stages, criteria
             )
         ]

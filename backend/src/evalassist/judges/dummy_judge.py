@@ -1,9 +1,8 @@
 from collections.abc import Sequence
 
-from unitxt.llm_as_judge import Criteria, CriteriaWithOptions
-
 from .base import DirectJudge, PairwiseJudge
 from .types import (
+    Criteria,
     DirectInstance,
     DirectInstanceResult,
     DirectPositionalBias,
@@ -20,10 +19,11 @@ class DummyDirectJudge(DirectJudge):
     def _run(
         self,
         instances: Sequence[DirectInstance],
-        criteria: Sequence[CriteriaWithOptions],
+        criteria: Sequence[Criteria],
     ) -> Sequence[DirectInstanceResult]:
         return [
             DirectInstanceResult(
+                criteria=criteria[0],
                 option=criteria[0].options[0].name,
                 explanation="explanation",
                 positional_bias=DirectPositionalBias(

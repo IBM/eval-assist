@@ -1,8 +1,4 @@
-from evalassist.judges.mprometheus_judge import (
-    MPrometheusPairwiseJudge,
-    PairwiseInstance,
-)
-from unitxt.llm_as_judge import Criteria
+from evalassist.judges import Criteria, MPrometheusPairwiseJudge, PairwiseInstance
 
 if __name__ == "__main__":
     judge = MPrometheusPairwiseJudge(m_prometheus_b_params=3)
