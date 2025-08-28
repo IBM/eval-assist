@@ -570,9 +570,7 @@ def unitxt_dataset_to_evalassist_instances(
     task_data_list = [json.loads(d["task_data"]) for d in dataset]
     return [
         DirectInstance(
-            context_variables={
-                k: task_data[k] for k in cast(list, criterion.context_fields)
-            },
+            context={k: task_data[k] for k in cast(list, criterion.context_fields)},
             response=task_data[criterion.prediction_field],
         )
         for task_data, criterion in zip(task_data_list, criteria)

@@ -579,7 +579,7 @@ def download_test_data(params: DownloadTestDataBody, background_tasks: Backgroun
     instances = params.instances
     rows = [
         {
-            **i.context_variables,
+            **i.context,
             params.prediction_field: i.get_prediction(),
             "expected_result": i.expected_result,
         }
@@ -700,9 +700,7 @@ async def fix_instance(
         llm_provider_credentials=req.llm_provider_credentials,
         custom_params=SYNTHETIC_DATA_GENERATION_PARAMS,
     )
-    context = "\n".join(
-        [f"{k}: {v}" for k, v in req.instance.context_variables.items()]
-    )
+    context = "\n".join([f"{k}: {v}" for k, v in req.instance.context.items()])
     if len(context):
         context = f"### Context\n{context}\n"
     prompt = f"""

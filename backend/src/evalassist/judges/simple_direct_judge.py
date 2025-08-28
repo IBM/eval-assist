@@ -257,7 +257,8 @@ class SimpleDirectJudge(
 
         predictions: list[str] = [i.response for i in instances]
         context_variables_list: list[dict[str, str]] = [
-            instance.context_variables for instance in instances
+            instance.context if instance.context is not None else {}
+            for instance in instances
         ]
         str_context_variables_list: list[str | None] = [
             "\n\n".join(f"- {k}: {v}" for k, v in c.items()) if len(c) else None

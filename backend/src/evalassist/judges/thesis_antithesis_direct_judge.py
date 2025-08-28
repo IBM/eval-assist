@@ -61,7 +61,10 @@ class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable)
         ]
 
         predictions: list[str] = [i.response for i in instances]
-        context_variables_list = [instance.context_variables for instance in instances]
+        context_variables_list = [
+            instance.context if instance.context is not None else {}
+            for instance in instances
+        ]
         str_context_variables_list = [
             "\n".join(f"{k}: {v}" for k, v in c.items()) for c in context_variables_list
         ]

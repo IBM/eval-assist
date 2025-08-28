@@ -459,7 +459,7 @@ class Generator:
 
         instances = [
             DirectInstanceDTO(
-                context_variables=context,
+                context=context,
                 # response=parsed_responses[i][self.response_name],
                 response=next(iter(parsed_responses[i].values())),
                 metadata=metadatas[i],
