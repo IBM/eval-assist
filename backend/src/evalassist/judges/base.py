@@ -185,6 +185,9 @@ class Judge(
         """Get the name of the judge"""
         ...
 
+    def __str__(self):
+        return str(self.get_descriptor())
+
 
 # ----------------------------------------------------------------------
 # Concrete abstract subclasses for the two main evaluation modes

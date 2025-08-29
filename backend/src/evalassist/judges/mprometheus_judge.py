@@ -1,15 +1,14 @@
 from collections.abc import Sequence
 from typing import Literal
 
-from . import (
+from .base import DirectJudge, PairwiseJudge
+from .types import (
     Criteria,
     DirectInstance,
     DirectInstanceResult,
-    DirectJudge,
     DirectPositionalBias,
     PairwiseInstance,
     PairwiseInstanceResult,
-    PairwiseJudge,
     SingleSystemPairwiseResult,
 )
 

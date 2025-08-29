@@ -22,7 +22,7 @@ EvalAssist provides a set of environment variables and command parameter that al
 
 - **NEXT_PUBLIC_BACKEND_API_HOST**: Specifies the URL of the backend. Only required if the frontend is deployed separately as a Next.js app. Defaults to `''` (empty string)
 
-- **CUSTOM_MODELS_PATH**: The path to the custom models. Look at [this example](backend/custom_models_example.json). Defaults to `${EVALASSIST_DIR}/custom_models.json`
+- **CUSTOM_MODELS_PATH**: The path to the custom models. Look at [this example](backend/custom_models_example.json). Defaults to `${EVAL_ASSIST_DIR}/custom_models.json`
 
 ## Commmand parameter variable configuration
 

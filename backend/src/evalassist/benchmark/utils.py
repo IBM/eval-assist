@@ -1,10 +1,13 @@
 import os
+import sqlite3
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
-from evalassist.judges import DirectJudge
 from unitxt.inference import CrossProviderInferenceEngine
 from unitxt.settings_utils import get_constants
+
+from ..const import EVAL_ASSIST_DIR
+from ..judges import DirectJudge
 
 
 def folder_exists_in_github_repo(owner, repo, folder_path, branch="main"):
@@ -128,6 +131,7 @@ def get_judge_from_config(
             provider="rits",
             temperature=temperature,
             max_tokens=2048,
+            cache_batch_size=50,
             data_classification_policy=["public"],
         )
         inference_engines[key] = inference_engine
@@ -136,3 +140,42 @@ def get_judge_from_config(
         inference_engine=inference_engine,
         **judge_kwargs,
     )
+
+
+def save_results_to_sqlite(result_backup: list[dict]):
+    db_path = EVAL_ASSIST_DIR / "benchmark" / "results_backup.db"
+    conn = sqlite3.connect(db_path)
+    cur = conn.cursor()
+
+    # Create table if it doesn’t exist
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS evaluations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        judge TEXT NOT NULL,
+        model TEXT,
+        card TEXT NOT NULL,
+        sample_index INTEGER NOT NULL,
+        instance TEXT,
+        result TEXT,
+        prediction REAL,
+        ground_truth REAL,
+        failed BOOLEAN,
+        UNIQUE(judge, model, card, sample_index) ON CONFLICT REPLACE
+    )
+    """)
+
+    cur.executemany(
+        """
+    INSERT INTO evaluations (
+        judge, model, card, sample_index,
+        instance, result, prediction, ground_truth, failed
+    ) VALUES (
+        :judge, :model, :card, :sample_index,
+        :instance, :result, :prediction, :ground_truth, :failed
+    )
+    """,
+        result_backup,
+    )
+
+    conn.commit()
+    conn.close()

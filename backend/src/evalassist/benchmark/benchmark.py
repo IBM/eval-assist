@@ -25,6 +25,7 @@ from .utils import (
     add_url_to_result,
     get_judge_from_config,
     get_judgebench_cards,
+    save_results_to_sqlite,
 )
 
 RESULTS_FILE_PATH = EVAL_ASSIST_DIR / "benchmark" / "benchmark_results.csv"
@@ -214,9 +215,9 @@ def parse_card_results(
                     criteria_name_ground_truth.append(ground_truth[i])
                     criteria_name_predictions.append(prediction_scores[i])
                     criteria_name_positional_bias_detected_list.append(
-                        results[i].positional_bias.detected
+                        results[i].positional_bias.detected  # type: ignore
                         if results[i].positional_bias is not None
-                        else False  # type: ignore
+                        else False
                     )
             per_criteria_results: dict[str, float] = {}
             for metric in metric_names:
@@ -250,27 +251,24 @@ def parse_card_results(
             }
             benchmark_results.append(criteria_name_benchmark_result)
 
-    # cache = {
-    #     "card": card,  # if there are several criteria, we have to add the overall result
-    #     "model": model,
-    #     "provider": "rits",
-    #     "annotation": "1.26.4",
-    #     "benchmark_criteria_name": "overall"
-    #     if len(unique_criteria_names) > 1
-    #     else card.split(".")[-1],
-    #     "evalassist_criteria_name": ""
-    #     if len(unique_score_criteria_names) > 0
-    #     else unique_score_criteria_names[0],
-    #     "raw_results": json.dumps(
-    #         {
-    #             "ground_truth": ground_truth,
-    #             "predictions": parsed_predictions,
-    #             "pos_bias": positional_bias_detected_list,
-    #             "criteria_names": criteria_names,
-    #             "selected_options": selected_options,
-    #         }
-    #     ),
-    # }
+    result_backup: list[dict] = [
+        {
+            "card": card,
+            "judge": judge.get_descriptor().name,
+            "model": judge.get_descriptor().inference_engine_id,
+            "sample_index": i,
+            "instance": instance.model_dump_json(indent=4),
+            "result": result.model_dump_json(indent=4),
+            "prediction": prediction,
+            "ground_truth": target,
+            "failed": prediction != target,
+        }
+        for i, (prediction, target, instance, result) in enumerate(
+            zip(prediction_scores, ground_truth, instances, results)
+        )
+    ]
+
+    save_results_to_sqlite(result_backup)
     return benchmark_results, {}
 
 
