@@ -4,10 +4,10 @@ from evalassist.benchmark import run_benchmarks
 from evalassist.judges import DirectJudge, SimpleDirectJudge, UnitxtDirectJudge
 
 if __name__ == "__main__":
-    MAX_WORKERS = 5
+    MAX_WORKERS = 7
     BATCH_SIZE = 25
     RITS_API_KEYS = None
-    INSTANCES_PER_DATASET = 400
+    INSTANCES_PER_DATASET = 200
     # List of models to benchmark
     MODELS = [
         # "gpt-oss-120b",
@@ -76,8 +76,8 @@ if __name__ == "__main__":
         judge_configs=JUDGE_CONFIGS_WITH_MODEL,
         max_workers=MAX_WORKERS,
         instances_per_dataset=INSTANCES_PER_DATASET,
-        dataset_keyword_filters=["drop", "esnli"],
-        # dataset_keyword_selectors=["biggen"],
+        dataset_keyword_filters=["drop", "esnli", "biggen"],
+        # dataset_keyword_selectors=["cola"],
     )
     # model = "granite-3-3-8b-instruct"
     # inference_engine = CrossProviderInferenceEngine(
