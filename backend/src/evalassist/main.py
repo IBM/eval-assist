@@ -470,22 +470,7 @@ def create_user_if_not_exist(
 @router.get("/benchmarks/")
 def get_benchmarks():
     benchmarks_results = get_all_benchmarks()
-    fetched_results = []
-    for benchmark_name, benchmark_data in benchmarks_results.items():
-        fetched_criteria_benchmarks = []
-        for criteria_name, criteria_benchmark_data in benchmark_data[
-            "criteria_benchmarks"
-        ].items():
-            criteria_benchmark_data["evaluator_benchmarks"] = list(
-                criteria_benchmark_data["evaluator_benchmarks"].values()
-            )
-            fetched_criteria_benchmarks.append(criteria_benchmark_data)
-        benchmark_data["criteria_benchmarks"] = list(
-            benchmark_data["criteria_benchmarks"].values()
-        )
-        benchmark_data["name"] = benchmark_data["display_name"]
-        fetched_results.append(benchmark_data)
-    return fetched_results
+    return benchmarks_results
 
 
 def cleanup_file(filepath: str):

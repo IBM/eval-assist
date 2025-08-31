@@ -32,8 +32,13 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
   const onClick = () => {
     updateURLFromBenchmark(benchmark)
   }
+
+  const allCriteriaNames = useMemo(
+    () => Object.keys(benchmark.groupByFieldsToValues['criteria']),
+    [benchmark.groupByFieldsToValues],
+  )
+
   const displayedCriterias = useMemo<{ name: string; highlighted: boolean; clickable: boolean }[]>(() => {
-    const allCriterias = benchmark.criteriaBenchmarks
     const maximumListLength = 5
     const threeDotsItem = {
       name: '...',
@@ -41,22 +46,24 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
       clickable: false,
     }
 
-    if (allCriterias.length >= maximumListLength) {
+    if (allCriteriaNames.length >= maximumListLength) {
       if (selectedCriteriaItems.length === 0) {
         return [
-          ...allCriterias.slice(0, maximumListLength).map((c) => ({
-            name: c.name,
+          ...allCriteriaNames.slice(0, maximumListLength).map((criteriaName) => ({
+            name: criteriaName,
             highlighted: false,
             clickable: true,
           })),
           threeDotsItem,
         ]
       } else {
-        const currentBenchmarkSelectedCriterias = allCriterias.filter((c) => selectedCriteriaItems.includes(c.name))
+        const currentBenchmarkSelectedCriterias = allCriteriaNames.filter((criteriaName) =>
+          selectedCriteriaItems.includes(criteriaName),
+        )
         if (currentBenchmarkSelectedCriterias.length >= maximumListLength) {
           return [
-            ...currentBenchmarkSelectedCriterias.map((c) => ({
-              name: c.name,
+            ...currentBenchmarkSelectedCriterias.map((criteriaName) => ({
+              name: criteriaName,
               highlighted: true,
               clickable: true,
             })),
@@ -65,21 +72,21 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
         } else {
           return [
             ...[
-              ...currentBenchmarkSelectedCriterias.map((c) => ({
-                name: c.name,
+              ...currentBenchmarkSelectedCriterias.map((criteriaName) => ({
+                name: criteriaName,
                 highlighted: true,
                 clickable: true,
               })),
-              ...allCriterias
+              ...allCriteriaNames
                 .filter(
-                  (c) =>
+                  (criteriaName) =>
                     !currentBenchmarkSelectedCriterias
-                      .map((selectedCriteria) => selectedCriteria.name)
-                      .includes(c.name),
+                      .map((selectedCriteria) => selectedCriteria)
+                      .includes(criteriaName),
                 )
                 .slice(0, maximumListLength - currentBenchmarkSelectedCriterias.length)
-                .map((c) => ({
-                  name: c.name,
+                .map((criteriaName) => ({
+                  name: criteriaName,
                   highlighted: false,
                   clickable: true,
                 })),
@@ -89,13 +96,13 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
         }
       }
     } else {
-      return allCriterias.map((c) => ({
-        name: c.name,
-        highlighted: selectedCriteriaItems.includes(c.name),
+      return allCriteriaNames.map((criteriaName) => ({
+        name: criteriaName,
+        highlighted: selectedCriteriaItems.includes(criteriaName),
         clickable: true,
       }))
     }
-  }, [benchmark.criteriaBenchmarks, selectedCriteriaItems])
+  }, [allCriteriaNames, selectedCriteriaItems])
 
   const onTagClick = useCallback(
     (e: React.MouseEvent<Element, MouseEvent>, tag: string) => {
@@ -118,7 +125,7 @@ export const BenchmarkCard = ({ benchmark, tagToColor, selectedCriteriaItems, se
               <Link
                 href={getURLFromBenchmark(
                   benchmark,
-                  benchmark.criteriaBenchmarks.find((c) => c.name === displayedCriteria.name),
+                  allCriteriaNames.find((criteriaName) => criteriaName === displayedCriteria.name),
                 )}
                 className={classes.nameLink}
               >

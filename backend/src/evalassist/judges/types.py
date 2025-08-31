@@ -45,12 +45,6 @@ class PairwiseInstanceResult(RootModel):
     root: dict[str, SingleSystemPairwiseResult]
 
 
-class DirectPositionalBias(BaseModel):
-    detected: bool
-    option: str = ""
-    explanation: str = ""
-
-
 class CriteriaOption(BaseModel):
     name: str
     description: str
@@ -119,11 +113,16 @@ class Criteria(BaseModel):
         return res
 
 
+class DirectPositionalBias(BaseModel):
+    detected: bool
+    result: "DirectInstanceResult | None" = None
+
+
 class DirectInstanceResult(BaseModel):
     criteria: Criteria
     option: str
     score: float | None = None
     explanation: str
     feedback: str | None = None
-    positional_bias: DirectPositionalBias | None = None
     metadata: dict[str, Any] | None = None
+    positional_bias: DirectPositionalBias | None = None

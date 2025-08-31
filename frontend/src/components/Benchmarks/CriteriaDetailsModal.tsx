@@ -1,9 +1,6 @@
-import cx from 'classnames'
-import { isInstanceOfCriteriaWithOptions } from 'src/utils'
-
 import { Dispatch, SetStateAction, useCallback } from 'react'
 
-import { Button, Layer, ListItem, Modal, UnorderedList } from '@carbon/react'
+import { Button, Layer, Modal } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
 import { CriteriaInfo } from '@components/CriteriaInfo'

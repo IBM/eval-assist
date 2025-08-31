@@ -6,7 +6,6 @@ from .types import (
     Criteria,
     DirectInstance,
     DirectInstanceResult,
-    DirectPositionalBias,
     PairwiseInstance,
     PairwiseInstanceResult,
     SingleSystemPairwiseResult,
@@ -90,9 +89,6 @@ class MPrometheusDirectJudge(DirectJudge):
                 option=criterion.options[score - 1].name,
                 score=score,
                 explanation=feedback,
-                positional_bias=DirectPositionalBias(
-                    detected=False,
-                ),
             )
             for feedback, score, criterion in zip(feedbacks, scores, criteria)
         ]

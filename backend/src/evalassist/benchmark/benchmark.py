@@ -2,13 +2,11 @@ import json
 import logging
 import traceback
 from collections.abc import Sequence
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Any, cast
+from concurrent.futures import ThreadPoolExecutor
+from typing import cast
 
-import pandas as pd
 from datasets import IterableDataset
 from evalassist.judges import Criteria
-from scipy.stats import pearsonr, spearmanr
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
 from unitxt.llm_as_judge import CriteriaWithOptions
@@ -17,14 +15,15 @@ from ..const import EVAL_ASSIST_DIR
 from ..judges import DirectJudge
 from ..judges.types import DirectInstance, DirectInstanceResult
 from ..utils import convert_nan_to_none, unitxt_dataset_to_evalassist_instances
-
-# from .utils import *
 from .utils import (
     add_judgebench_readme_urls,
     add_tag_to_result,
     add_url_to_result,
+    get_benchmark_results_as_df,
     get_judge_from_config,
     get_judgebench_cards,
+    is_result_available,
+    save_evaluation_backup_to_sqlite,
     save_results_to_sqlite,
 )
 
@@ -35,82 +34,84 @@ logger = logging.getLogger(__name__)
 
 
 def get_all_benchmarks():
-    try:
-        df = pd.read_csv(RESULTS_FILE_PATH)
-    except FileNotFoundError:
-        return {}
-    results = {}
+    df = get_benchmark_results_as_df()
+    benchmarks = {}
     for row in df.to_dict(orient="records"):
-        card = row["card"]
-        benchmark_name = row["benchmark_name"]
-        dataset_name = row["dataset_name"]
-        benchmark_criteria_name = row["benchmark_criteria_name"]
-        dataset_len = row["dataset_len"]
-        row_id = "/".join([benchmark_name, dataset_name])
-        if row_id not in results:
+        card: str = row["card"]
+        benchmark_name: str = row["benchmark_name"]
+        dataset_name: str = row["dataset_name"]
+        judge: str = row["judge"]
+        model: str = row["model"]
+        results: str = row["results"]
+        dataset_len: str = row["dataset_len"]
+        group_by_field: str = (
+            row["group_by_field"] if row["group_by_value"] is not None else "overall"
+        )
+        group_by_value: str = (
+            row["group_by_value"] if row["group_by_field"] is not None else "overall"
+        )
+        benchmark_id = benchmark_name + "/" + dataset_name
+
+        if benchmark_id not in benchmarks:
             benchmark_results = {
                 "benchmark_name": benchmark_name,
                 "dataset_name": dataset_name,
                 "display_name": (
                     benchmark_name + "." if benchmark_name != "judge_bench" else ""
                 )
-                + dataset_name,
+                + dataset_name,  # don't include the benchmark name in the display name if it is judge_bench
                 "description": "",
                 "catalog_url": f"https://www.unitxt.ai/en/latest/catalog/catalog.{card}.html",
                 "type": "direct",
                 "tags": [benchmark_name],
-                "criteria_benchmarks": {},
+                "group_by_fields": {},
             }
 
-            results[row_id] = benchmark_results
+            benchmarks[benchmark_id] = benchmark_results
 
-        benchmark_results = results[row_id]
+        benchmark_results = benchmarks[benchmark_id]
 
-        if benchmark_criteria_name not in benchmark_results["criteria_benchmarks"]:
-            criteria_benchmark = {
-                "evaluator_benchmarks": {},
-                "name": benchmark_criteria_name,
-                "catalog_criteria_name": row["evalassist_criteria_name"],
+        if group_by_field not in benchmark_results["group_by_fields"]:
+            benchmark_results["group_by_fields"][group_by_field] = {}
+
+        group_by_field_results = benchmark_results["group_by_fields"][group_by_field]
+
+        if group_by_value not in group_by_field_results:
+            group_by_value_results = {
+                "judge_results": {},
                 "dataset_len": dataset_len,
+                "group_by_value": group_by_value,
             }
-            benchmark_results["criteria_benchmarks"][benchmark_criteria_name] = (
-                criteria_benchmark
-            )
+            group_by_field_results[group_by_value] = group_by_value_results
 
-        criteria_benchmark = benchmark_results["criteria_benchmarks"][
-            benchmark_criteria_name
-        ]
-        model = row["model"]
-        judge = row["judge"]
-        model_judge = f"{model}_{judge}"
-        if model_judge not in criteria_benchmark["evaluator_benchmarks"]:
-            model_results = {
-                "model": model,
-                "judge": judge,
-                "results": json.loads(row["results"]),
-            }
-            criteria_benchmark["evaluator_benchmarks"][model_judge] = model_results
+        group_by_value_results = group_by_field_results[group_by_value]
+        judge_model_key = f"{judge}/{model}"
+        group_by_value_results["judge_results"][judge_model_key] = {
+            "model": model,
+            "judge": judge,
+            "results": json.loads(results),
+        }
 
     # add benchmark to the name if it only has one dataset
     datasets_per_benchmarks = {}
-    for r in results.values():
+    for r in benchmarks.values():
         if r["benchmark_name"] not in datasets_per_benchmarks:
             datasets_per_benchmarks[r["benchmark_name"]] = []
         if r["dataset_name"] not in datasets_per_benchmarks[r["benchmark_name"]]:
             datasets_per_benchmarks[r["benchmark_name"]].append(r["dataset_name"])
 
-    add_judgebench_readme_urls(results)
-    add_tag_to_result(results, "roscoe", "reasoning")
-    add_tag_to_result(results, "wmt", "translation")
-    add_tag_to_result(results, "cola", "grammar")
+    add_judgebench_readme_urls(benchmarks)
+    add_tag_to_result(benchmarks, "roscoe", "reasoning")
+    add_tag_to_result(benchmarks, "wmt", "translation")
+    add_tag_to_result(benchmarks, "cola", "grammar")
 
     add_url_to_result(
-        results,
+        benchmarks,
         "biggen",
         "https://huggingface.co/datasets/prometheus-eval/BiGGen-Bench-Results/viewer/default/human_eval",
     )
 
-    return results
+    return benchmarks
 
 
 metric_map = {
@@ -119,13 +120,13 @@ metric_map = {
 }
 
 
-def parse_card_results(
+def parse_and_store_results(
     card: str,
     dataset: IterableDataset,
     instances: list[DirectInstance],
     results: Sequence[DirectInstanceResult],
     judge: DirectJudge,
-) -> tuple[list[dict[str, str]], dict[Any, Any]]:
+):
     criteria_names = [result.criteria.name for result in results]
 
     if any(result.score is None for result in results):
@@ -134,16 +135,6 @@ def parse_card_results(
     prediction_scores: list[float] = [cast(float, result.score) for result in results]
 
     str_prediction_scores = [str(p) for p in prediction_scores]
-
-    # biggen benchmark's criteria's name is composed by the capability and the task, we only keep the capability
-    if "biggen" in card:
-        criteria_names = [
-            criteria_name.split("-")[0] for criteria_name in criteria_names
-        ]
-
-    unique_criteria_names = list(set(criteria_names))
-    # the condition of the following line not always holds because although an llm judge evaluation with multiple criteria the score is llm_judge, if it happens that a specific batch happens to have just a single criterion is wont be called llm_as_judge even if the dataset has multiple criterias
-    # scores_criteria_name = unique_criteria_names[0] if all(c == criteria_names[0] for c in unique_criteria_names) else "llm_as_judge"
 
     # Calculate positional bias rate
     positional_bias_rate = sum(
@@ -180,82 +171,62 @@ def parse_card_results(
         if benchmark_name.startswith("judge_bench")
         else criteria_names[0]
     )
-    benchmark_result: dict[str, str] = {
+    benchmark_result = {
         "card": card,  # if there are several criteria, we have to add the overall result
         "benchmark_name": benchmark_name,
         "dataset_name": dataset_name,
         "judge": judge.get_name(),
-        "benchmark_criteria_name": "overall"
-        if len(unique_criteria_names) > 1
-        else benchmark_criteria_name,
-        "evalassist_criteria_name": "several_criteria"
-        if len(unique_criteria_names) > 1
-        else criteria_names[0],
         "model": judge.get_inference_engine_id(),
-        "provider": "rits",
         "results": json.dumps(convert_nan_to_none(parsed_results)),
-        "dataset_len": str(len(dataset)),
+        "dataset_len": str(evaluation_results.global_scores["num_of_instances"]),
+        "group_by_field": None,
+        "group_by_value": None,
     }
 
-    benchmark_results: list[dict[str, str]] = []
+    benchmark_results: list = []
     benchmark_results.append(benchmark_result)
 
-    # Add all the results for each criteria
-    ground_truth = [float(d["target"]) for d in dataset]
-    if len(unique_criteria_names) > 1:
-        # the dataset has many criteria
-        # add one entry per criteria
-        # manually calculate the metrics
-        for criteria_name in unique_criteria_names:
-            criteria_name_ground_truth = []
-            criteria_name_predictions = []
-            criteria_name_positional_bias_detected_list = []
-            for i, c in enumerate(criteria_names):
-                if c == criteria_name:
-                    criteria_name_ground_truth.append(ground_truth[i])
-                    criteria_name_predictions.append(prediction_scores[i])
-                    criteria_name_positional_bias_detected_list.append(
-                        results[i].positional_bias.detected  # type: ignore
-                        if results[i].positional_bias is not None
-                        else False
-                    )
-            per_criteria_results: dict[str, float] = {}
-            for metric in metric_names:
-                if metric == "spearman":
-                    res = spearmanr(
-                        criteria_name_predictions, criteria_name_ground_truth
-                    )
-                    metric_result: float = res.correlation  # type: ignore
-                elif metric == "pearson":
-                    res = pearsonr(
-                        criteria_name_predictions, criteria_name_ground_truth
-                    )
-                    metric_result = res.correlation
-                else:
-                    raise Exception(f"Metric {metric} not implemented")
-                per_criteria_results[metric] = float(metric_result)
-            per_criteria_results["positional_bias_rate"] = sum(
-                criteria_name_positional_bias_detected_list
-            ) / len(criteria_name_positional_bias_detected_list)
-            criteria_name_benchmark_result = {
-                "card": card,
-                "model": judge.get_inference_engine_id(),
+    for (
+        group_by_field,
+        group_by_field_scores,
+    ) in evaluation_results.groups_scores.items():
+        for group_by_value, group_by_value_scores in group_by_field_scores.items():
+            parsed_results = {
+                metric_name: float(
+                    group_by_value_scores[metric_map.get(metric_name, metric_name)]
+                )
+                for metric_name in metric_names
+            }
+            parsed_results["positional_bias_rate"] = None
+            group_by_field_corrected = (
+                group_by_field if group_by_field != "criteria/name" else "criteria"
+            )
+            benchmark_result: dict[str, str] = {
+                "card": card,  # if there are several criteria, we have to add the overall result
                 "benchmark_name": benchmark_name,
                 "dataset_name": dataset_name,
                 "judge": judge.get_name(),
-                "benchmark_criteria_name": criteria_name,
-                "evalassist_criteria_name": criteria_name,
-                "provider": "rits",
-                "results": json.dumps(convert_nan_to_none(per_criteria_results)),
-                "dataset_len": str(len(criteria_name_ground_truth)),
+                "model": judge.get_inference_engine_id(),
+                "results": json.dumps(convert_nan_to_none(parsed_results)),
+                "dataset_len": str(group_by_value_scores["num_of_instances"]),
+                "group_by_field": group_by_field_corrected,
+                "group_by_value": group_by_value,
             }
-            benchmark_results.append(criteria_name_benchmark_result)
+            if (
+                group_by_field_corrected == "criteria"
+                and benchmark_name == " biggen_bench"
+            ):
+                benchmark_result["group_by_value"] = benchmark_result[
+                    "group_by_value"
+                ].split("-")[0]  # we leave the task and discard the capability
+            benchmark_results.append(benchmark_result)
 
+    ground_truth = [float(d["target"]) for d in dataset]
     result_backup: list[dict] = [
         {
             "card": card,
             "judge": judge.get_descriptor().name,
-            "model": judge.get_descriptor().inference_engine_id,
+            "model": judge.get_inference_engine_id(),
             "sample_index": i,
             "instance": instance.model_dump_json(indent=4),
             "result": result.model_dump_json(indent=4),
@@ -268,8 +239,20 @@ def parse_card_results(
         )
     ]
 
-    save_results_to_sqlite(result_backup)
-    return benchmark_results, {}
+    # there is only one grouped by result: so the list contains the overall result and a single criteria result, we keep the later
+    # and set the benchmark criteria name from the card name
+    if len(benchmark_results) == 2:
+        benchmark_results = [benchmark_results[1]]
+        benchmark_criteria_name = (
+            card.split(".")[-1]
+            if benchmark_name.startswith("judge_bench")
+            else criteria_names[0]
+        )
+        benchmark_results[0]["group_by_value"] = benchmark_criteria_name
+
+    save_evaluation_backup_to_sqlite(result_backup)
+    save_results_to_sqlite(benchmark_results)
+    # return benchmark_results
 
 
 def run_single_model_card(
@@ -295,16 +278,35 @@ def run_single_model_card(
         "with judge:",
         judge.get_descriptor(),
     )
-    dataset: IterableDataset = cast(
-        IterableDataset,
-        load_dataset(
-            card=card,
-            split="test",
-            loader_limit=instances_per_dataset,
-            use_cache=True,
-        ),
-    )
+
     try:
+        try:
+            group_by_fields = ["criteria/name"]
+            if "biggen" in card:
+                group_by_fields = group_by_fields + ["language", "capability"]
+
+            dataset: IterableDataset = cast(
+                IterableDataset,
+                load_dataset(
+                    card=card,
+                    split="test",
+                    loader_limit=instances_per_dataset,
+                    use_cache=True,
+                    group_by=group_by_fields,
+                ),
+            )
+        except ValueError:
+            group_by_fields[0] = "criteria"
+            dataset: IterableDataset = cast(
+                IterableDataset,
+                load_dataset(
+                    card=card,
+                    split="test",
+                    loader_limit=instances_per_dataset,
+                    use_cache=True,
+                    group_by=group_by_fields,
+                ),
+            )
         criteria: list[Criteria] = [
             Criteria.from_unitxt_criteria(
                 cast(
@@ -319,11 +321,11 @@ def run_single_model_card(
             dataset, criteria
         )
 
-        results: Sequence[DirectInstanceResult] = judge.evaluate(
+        results: Sequence[DirectInstanceResult] = judge(
             parsed_dataset, criteria, check_positional_bias=True
         )
 
-        benchmark_results, cache = parse_card_results(
+        parse_and_store_results(
             card=card,
             dataset=dataset,
             instances=parsed_dataset,
@@ -331,8 +333,6 @@ def run_single_model_card(
             judge=judge,
         )
         print("Finished running card:", card, "with judge:", judge.get_descriptor())
-
-        return benchmark_results
     except Exception:
         print(f"FAILED! judege: {str(judge.get_descriptor())}")
         print(traceback.format_exc())
@@ -360,36 +360,6 @@ def run_benchmarks(
         "cards.biggen_bench.results.human_eval",
     ] + get_judgebench_cards()
 
-    try:
-        # Load previously run results from CSV
-        ran_results_df = pd.read_csv(RESULTS_FILE_PATH)
-    except Exception:
-        # Initialize an empty DataFrame if the CSV doesn't exist
-        ran_results_df = pd.DataFrame(
-            columns=[
-                "card",
-                "model",
-                "benchmark_name",
-                "dataset_name",
-                "benchmark_criteria_name",
-                "evalassist_criteria_name",
-                "results",
-                "provider",
-                "judge",
-                "dataset_len",
-            ]
-        )
-
-    # Get a list of previously run card-model pairs
-    ran_cards_models = [
-        (card, model, judge)
-        for card, model, judge in zip(
-            ran_results_df["card"].to_list(),
-            ran_results_df["model"].to_list(),
-            ran_results_df["judge"].to_list(),
-        )
-    ]
-
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = []
         for card in all_benchmarks:
@@ -406,11 +376,11 @@ def run_benchmarks(
                 judge = get_judge_from_config(judge_config)
 
                 # Skip if the benchmark has already been run
-                if (
-                    card,
-                    judge.get_inference_engine_id(),
+                if not is_result_available(
                     judge.get_name(),
-                ) not in ran_cards_models:
+                    judge.get_inference_engine_id(),
+                    card,
+                ):
                     # Submit the task to the executor
                     futures.append(
                         executor.submit(
@@ -424,14 +394,4 @@ def run_benchmarks(
                     print(
                         f"Benchmark {card}/{judge.get_descriptor()}/{judge.get_name()} already ran"
                     )
-        # Process the results as they become available
-        for future in as_completed(futures):
-            print("Adding results")
-            benchmark_results = future.result()
-            if benchmark_results is not None:
-                # Append the benchmark result to the DataFrame and save to CSV
-                ran_results_df = pd.concat(
-                    [ran_results_df, pd.DataFrame(benchmark_results)]
-                )
-                ran_results_df.to_csv(RESULTS_FILE_PATH, index=False, na_rep="null")
     print("Done running benchmarks")

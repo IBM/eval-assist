@@ -189,46 +189,53 @@ export interface FetchedEvaluatorV0 {
 
 export type FetchedEvaluator = FetchedEvaluatorV0
 
-export interface Dataset {
-  name: string
-  description: string
-}
-
-export interface FetchedEvaluatorBenchmark {
-  model: string
+export type FetchedJudgeResult = {
   judge: string
-  results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
-}
-
-export interface EvaluatorBenchmark {
   model: string
-  judge: string
-  results: { [key: string]: number } // dict of [metric, result] e.g. {[p_bias, 0.2]}
+  results: { [key: string]: number }
 }
 
-export interface FetchedCriteriaBenchmark {
-  name: string // must match one of criteriaLibrary (inherits pipeline type from benchmark object pipeline type) e.g. Temperature
-  catalog_criteria_name: string
-  dataset_len: number
-  evaluator_benchmarks: FetchedEvaluatorBenchmark[]
+export type FetchedGroupByValueResult = {
+  dataset_len: string
+  group_by_value: string
+  judge_results: {
+    [key: string]: FetchedJudgeResult
+  }
 }
 
-export interface CriteriaBenchmark {
-  name: string // must match one of criteriaLibrary (inherits pipeline type from benchmark object pipeline type) e.g. Temperature
-  catalogCriteriaName: string
-  datasetLen: number
-  evaluatorBenchmarks: EvaluatorBenchmark[]
+export type FetchedGroupByValueResults = {
+  [key: string]: FetchedGroupByValueResult
 }
 
 export interface FetchedBenchmark {
-  name: string
+  display_name: string
   description: string
   catalog_url: string
   url?: string
   type: EvaluationType
-  dataset: Dataset
-  criteria_benchmarks: FetchedCriteriaBenchmark[]
+  dataset_name: string
   tags: string[]
+  group_by_fields: {
+    [key: string]: FetchedGroupByValueResults
+  }
+}
+
+export type JudgeResult = {
+  judge: string
+  model: string
+  results: { [key: string]: number }
+}
+
+export type GroupByValueResult = {
+  datasetLen: string
+  groupByValue: string
+  judgeResults: {
+    [key: string]: JudgeResult
+  }
+}
+
+export type GroupByValueResults = {
+  [key: string]: GroupByValueResult
 }
 
 export interface Benchmark {
@@ -237,9 +244,11 @@ export interface Benchmark {
   catalogUrl: string
   url?: string
   type: EvaluationType
-  dataset: Dataset
-  criteriaBenchmarks: CriteriaBenchmark[]
+  dataset: string
   tags: string[]
+  groupByFieldsToValues: {
+    [key: string]: GroupByValueResults
+  }
 }
 
 export interface FetchedCriteriaWithOptionsV0 extends FetchedCriteriaV0 {

@@ -1,33 +1,43 @@
 import cx from 'classnames'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
-import { Breadcrumb, BreadcrumbItem, Button, Toggle } from '@carbon/react'
+import { Breadcrumb, BreadcrumbItem, Button, Select, SelectItem } from '@carbon/react'
 import { Launch } from '@carbon/react/icons'
 
 import { TestCaseTypeBadge } from '@components/TestCaseTypeBadge/TestCaseTypeBadge'
-import { splitDotsAndCapitalizeFirstWord } from '@utils'
+import { capitalizeFirstWord, splitDotsAndCapitalizeFirstWord } from '@utils'
 
-import { CriteriaBenchmarkCard } from './CriteriaBenchmarkCard'
+import benchmarkClasses from './BenchmarkView.module.scss'
+import { GroupByValueResultCard } from './GroupByValueResultCard'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
 import { BenchmarkSidenav } from './Sidenav'
 import classes from './index.module.scss'
 
 export const BenchmarkView = () => {
   const { benchmark, selectedCriteriaName } = useURLInfoContext()
-  const [showCorrelationColumns, setShowCorrelationColumns] = useState(false)
 
-  const benchmarkCriterias = useMemo(
-    () =>
-      (selectedCriteriaName === null
-        ? benchmark?.criteriaBenchmarks
-        : benchmark?.criteriaBenchmarks.filter(
-            (criteriaBenchmark) => criteriaBenchmark.name === selectedCriteriaName,
-          )) || [],
-    [benchmark?.criteriaBenchmarks, selectedCriteriaName],
+  const groupByFieldOptions = useMemo(
+    () => (benchmark ? Object.keys(benchmark.groupByFieldsToValues) : []),
+    [benchmark],
   )
+
+  const [selectedGroupByField, setSelectedGroupByField] = useState<string>('criteria')
+
+  useEffect(() => {
+    setSelectedGroupByField('criteria')
+  }, [benchmark])
+
+  const groupByValueToResults = useMemo(() => {
+    if (!benchmark) {
+      return []
+    }
+    return selectedGroupByField in benchmark.groupByFieldsToValues
+      ? benchmark.groupByFieldsToValues[selectedGroupByField]
+      : []
+  }, [benchmark, selectedGroupByField])
 
   return (
     benchmark !== null && (
@@ -51,48 +61,62 @@ export const BenchmarkView = () => {
               <div className={classes['vertical-divider']}></div>
               <TestCaseTypeBadge type={benchmark.type} />
             </div>
-
-            <Toggle
-              labelText={'Show correlation columns'}
-              toggled={showCorrelationColumns}
-              onToggle={() => setShowCorrelationColumns((prev) => !prev)}
-              size="sm"
-              hideLabel
-              id={`toggle-expected-result`}
-              className={classes.toggle}
-            />
           </div>
           {/* <div className={classes.benchmarkContent}>
             <h4 className={classes.benchmarkDescriptionTitle}>Description</h4>
             <p className={classes.benchmarkDescription}>{benchmark.description}</p>
             <br></br>
           </div> */}
-          <div>
-            <Button
-              href={benchmark.catalogUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              kind={'ghost'}
-              renderIcon={Launch}
-            >
-              {'Unitxt catalog'}
-            </Button>
-            {benchmark.url && (
-              <Button href={benchmark.url} target="_blank" rel="noopener noreferrer" kind={'ghost'} renderIcon={Launch}>
-                {'Dataset description'}
+          <div className={benchmarkClasses['benchmark-actions-container']}>
+            <div className={benchmarkClasses['benchmark-buttons-container']}>
+              <Button
+                href={benchmark.catalogUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                kind={'ghost'}
+                renderIcon={Launch}
+              >
+                {'Unitxt catalog'}
               </Button>
-            )}
+              {benchmark.url && (
+                <Button
+                  href={benchmark.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  kind={'ghost'}
+                  renderIcon={Launch}
+                >
+                  {'Dataset description'}
+                </Button>
+              )}
+            </div>
+
+            <Select
+              id={'groupByFieldOption-selector'}
+              labelText={'Select an option to group results'}
+              onChange={(e) => setSelectedGroupByField(e.target.value)}
+              value={selectedGroupByField}
+              inline
+              className={benchmarkClasses['benchmark-groupby-select']}
+              readOnly={groupByFieldOptions.length === 1}
+            >
+              <SelectItem key={'Empty'} text={''} value={''} />
+              {groupByFieldOptions.map((groupByFieldOption, i) => (
+                <SelectItem key={i} text={capitalizeFirstWord(groupByFieldOption)} value={groupByFieldOption} />
+              ))}
+            </Select>
           </div>
           <div
             className={cx(classes.criteriaBenchmark, {
-              [classes.multipleColumns]: benchmarkCriterias.length > 1 && !showCorrelationColumns,
+              [classes.multipleColumns]: Object.keys(groupByValueToResults).length > 1,
             })}
           >
-            {benchmarkCriterias.map((criteriaBenchmark, i) => (
-              <CriteriaBenchmarkCard
-                criteriaBenchmark={criteriaBenchmark}
+            {Object.entries(groupByValueToResults).map(([groupByValue, groupByValueResult], i) => (
+              <GroupByValueResultCard
+                groupByField={selectedGroupByField}
+                groupByValue={groupByValue}
+                groupByValueResult={groupByValueResult}
                 key={i}
-                showCorrelationColumns={showCorrelationColumns}
               />
             ))}
           </div>

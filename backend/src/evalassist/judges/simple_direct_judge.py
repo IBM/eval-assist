@@ -1,6 +1,7 @@
 import logging
 import random
 from collections.abc import Sequence
+from concurrent.futures import ThreadPoolExecutor
 from textwrap import dedent
 from typing import Any, cast
 
@@ -45,6 +46,26 @@ class SimpleDirectJudge(
         self.generate_synthetic_persona = generate_synthetic_persona
         self.judge_description_prompt = judge_description_prompt
         self.generate_feedback = generate_feedback
+
+    def parse_response(self, unparsed_response, output_parser, klass, criterion):
+        metadata = {}
+        try:
+            parsed_response = output_parser.parse(completion=unparsed_response)
+            metadata["failed_generation"] = False
+        except OutputParserException as e:
+            logger.debug(
+                f"Selected random option for model {self.inference_engine.get_engine_id()} because it was unable to generate a chosen option"
+            )
+            parsed_response = klass(
+                selected_option=random.choice(
+                    [o.name for o in criterion.options]  # nosec
+                ),
+                assessment="",
+            )
+            metadata["failed_generation"] = True
+            metadata["failed_generation_original_output"] = unparsed_response
+            metadata["failed_generation_final_output"] = e.llm_output
+        return parsed_response, metadata
 
     def get_name(self) -> str:
         return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}{'_with_self_consistency' if self.use_self_consistency else ''}"
@@ -368,23 +389,28 @@ class SimpleDirectJudge(
         )
         parsed_responses: list[Any] = []
 
-        for response, output_parser, klass, criterion in zip(
-            unparsed_responses, output_parsers, classes, criteria
-        ):
-            try:
-                parsed_response = output_parser.parse(completion=response)
-            except OutputParserException:
-                logger.debug(
-                    f"Selected random option for model {self.inference_engine.get_engine_id()} because it was unable to generate a chosen option"
-                )
-                parsed_response = klass(
-                    selected_option=random.choice(
-                        [o.name for o in criterion.options]  # nosec
-                    ),
-                    assessment="",
+        futures = []
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            for unparsed_response, output_parser, klass, criterion in zip(
+                unparsed_responses, output_parsers, classes, criteria
+            ):
+                futures.append(
+                    executor.submit(
+                        self.parse_response,
+                        unparsed_response,
+                        output_parser,
+                        klass,
+                        criterion,
+                    )
                 )
 
+        parsed_responses = []
+        parsing_metadatas = []
+        for future in futures:
+            parsed_response, metadata = future.result()
             parsed_responses.append(parsed_response)
+            parsing_metadatas.append(metadata)
+
         explanations: list[str] = [r.assessment for r in parsed_responses]
         selected_options: list[str] = [r.selected_option for r in parsed_responses]
         feedbacks: list[str | None] = [
@@ -397,14 +423,19 @@ class SimpleDirectJudge(
                 explanation=explanation,
                 feedback=feedback,
                 positional_bias=None,
-                metadata={"prompt": prompt, "unparsed_response": unparsed_response},
+                metadata={
+                    **parsing_metadata,
+                    "prompt": prompt,
+                    "unparsed_response": unparsed_response,
+                },
             )
-            for selected_option, explanation, feedback, prompt, unparsed_response, criterion in zip(
+            for selected_option, explanation, feedback, prompt, unparsed_response, criterion, parsing_metadata in zip(
                 selected_options,
                 explanations,
                 feedbacks,
                 prompts,
                 unparsed_responses,
                 criteria,
+                parsing_metadatas,
             )
         ]
