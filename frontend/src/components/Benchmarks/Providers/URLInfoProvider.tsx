@@ -4,15 +4,15 @@ import { ReactNode, createContext, useCallback, useContext, useMemo, useState } 
 
 import { useRouter } from 'next/router'
 
-import { Benchmark, CriteriaBenchmark, EvaluationType } from '@types'
+import { Benchmark, EvaluationType } from '@types'
 
 import { useBenchmarksContext } from './BenchmarksProvider'
 
 interface URLInfoContextValue {
   benchmark: Benchmark | null
   selectedCriteriaName: string | null
-  getURLFromBenchmark: (benchmark: Benchmark, criteriaBenchmark?: CriteriaBenchmark) => string
-  updateURLFromBenchmark: (benchmark: Benchmark, criteriaBenchmark?: CriteriaBenchmark) => void
+  getURLFromBenchmark: (benchmark: Benchmark, criterianame?: string) => string
+  updateURLFromBenchmark: (benchmark: Benchmark, criterianame?: string) => void
 }
 
 const URLInfoContext = createContext<URLInfoContextValue>({
@@ -46,15 +46,15 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [benchmarks, router.query.benchmark, router.query.criteriaName, router.query.type])
 
-  const getURLFromBenchmark = useCallback((benchmark: Benchmark, criteriaBenchmark?: CriteriaBenchmark) => {
+  const getURLFromBenchmark = useCallback((benchmark: Benchmark, criterianame?: string) => {
     const paramsArray = [
       { key: 'benchmark', value: benchmark.name },
       { key: 'type', value: benchmark.type },
     ]
-    if (criteriaBenchmark !== undefined) {
+    if (criterianame !== undefined) {
       paramsArray.push({
         key: 'criteriaName',
-        value: criteriaBenchmark.name,
+        value: criterianame,
       })
     }
     const paramsString = stringifyQueryParams(paramsArray)
@@ -62,8 +62,8 @@ export const URLInfoProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const updateURLFromBenchmark = useCallback(
-    (benchmark: Benchmark, criteriaBenchmark?: CriteriaBenchmark) => {
-      const newUrl = getURLFromBenchmark(benchmark, criteriaBenchmark)
+    (benchmark: Benchmark, criterianame?: string) => {
+      const newUrl = getURLFromBenchmark(benchmark, criterianame)
       router.push(newUrl, newUrl, {
         shallow: true,
       })

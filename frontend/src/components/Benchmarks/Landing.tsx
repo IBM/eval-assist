@@ -14,16 +14,20 @@ import classes from './index.module.scss'
 
 export const Landing = () => {
   const { benchmarks } = useBenchmarksContext()
+  console.log(benchmarks)
   const [selectedTagItems, setSelectedTagItems] = useState<string[]>([])
   const [selectedBenchmarkItems, setSelectedBenchmarkItems] = useState<string[]>([])
   const [selectedCriteriaItems, setSelectedCriteriaItems] = useState<string[]>([])
 
   const filteredBenchmarks = useMemo(() => {
-    let result = [...benchmarks!]
+    if (!benchmarks) return []
+    let result = [...benchmarks]
 
+    // filter by benchmark
     result =
       selectedBenchmarkItems.length === 0 ? result : result.filter((b) => selectedBenchmarkItems.includes(b.name))
 
+    // filter by tag
     result =
       selectedTagItems.length === 0
         ? result
@@ -39,12 +43,13 @@ export const Landing = () => {
             })
           })
 
+    // filter by criteria
     result =
       selectedCriteriaItems.length === 0
         ? result
         : result.filter((b) =>
             selectedCriteriaItems.every((selectedCriteria) =>
-              b.criteriaBenchmarks.map((criteriaBenchmark) => criteriaBenchmark.name).includes(selectedCriteria),
+              Object.keys(b.groupByFieldsToValues['criteria']).includes(selectedCriteria),
             ),
           )
 
@@ -65,15 +70,15 @@ export const Landing = () => {
     return tags
   }, [benchmarks])
 
-  const criteriaList = useMemo(() => {
-    const criterias: string[] = []
-    benchmarks!.forEach((benchmark) =>
-      benchmark.criteriaBenchmarks.forEach(
-        (criteriaBenchmark) => !criterias.includes(criteriaBenchmark.name) && criterias.push(criteriaBenchmark.name),
-      ),
-    )
-    return criterias
-  }, [benchmarks])
+  const criteriaList = useMemo(
+    () =>
+      benchmarks
+        ? Array.from(
+            new Set(benchmarks.map((benchmark) => Object.keys(benchmark.groupByFieldsToValues['criteria'])).flat()),
+          )
+        : [],
+    [benchmarks],
+  )
 
   const tagToColor: {
     [key: string]: BadgeColor

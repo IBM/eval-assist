@@ -36,7 +36,6 @@ export const Filter = ({ items, selectedItems, setSelectedItems, tagToColor, tit
           marginRight: '1rem',
         }}
       >
-        {/* @ts-ignore */}
         <FilterableMultiSelect
           titleText={title}
           items={items}

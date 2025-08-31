@@ -50,5 +50,6 @@ certificates
 inference_engine_cache
 
 *.db*
+!benchmark_results.db
 
 backend/src/evalassist/benchmark/to_inspect.csv

@@ -6,9 +6,8 @@ import { useEffect, useMemo, useState } from 'react'
 // carbon doesnt yet have types of TreeView
 // @ts-ignore
 import { TreeNode, TreeView } from '@carbon/react'
-import { IbmEngineeringSystemsDesignRhapsodyModelManager, List } from '@carbon/react/icons'
 
-import { Benchmark, CriteriaBenchmark, EvaluationType } from '@types'
+import { Benchmark, EvaluationType } from '@types'
 import { splitDotsAndCapitalizeFirstWord } from '@utils'
 
 import { useBenchmarksContext } from '../Providers/BenchmarksProvider'
@@ -76,10 +75,10 @@ export const BenchmarkSidenav = () => {
     updateURLFromBenchmark(benchmark)
   }
 
-  const onBenchmarkCriteriaClick = (e: any, benchmark: Benchmark, criteriaBenchmark: CriteriaBenchmark) => {
+  const onBenchmarkCriteriaClick = (e: any, benchmark: Benchmark, criteriaName: string) => {
     e.stopPropagation()
     e.preventDefault()
-    updateURLFromBenchmark(benchmark, criteriaBenchmark)
+    updateURLFromBenchmark(benchmark, criteriaName)
   }
 
   return (
@@ -129,18 +128,18 @@ export const BenchmarkSidenav = () => {
                           isExpanded={benchmarkExpanded[`${directBenchmark.name}_direct`]}
                           selected={selectedCritiaBenchmarkId}
                         >
-                          {directBenchmark.criteriaBenchmarks.map((criteriaBenchmark, i) => (
+                          {Object.keys(directBenchmark.groupByFieldsToValues['criteria']).map((criteriaName, i) => (
                             <TreeNode
                               label={
                                 <div className={classes['tree-node-content']}>
                                   <span
                                     className={cx(classes['tree-node-label'], classes['tree-node-label-indent'])}
-                                  >{`${splitDotsAndCapitalizeFirstWord(criteriaBenchmark.name)}`}</span>
+                                  >{`${splitDotsAndCapitalizeFirstWord(criteriaName)}`}</span>
                                 </div>
                               }
-                              key={`${criteriaBenchmark.name}_${directBenchmark.name}_direct`}
-                              id={`${criteriaBenchmark.name}_${directBenchmark.name}_direct`}
-                              onClick={(e: any) => onBenchmarkCriteriaClick(e, directBenchmark, criteriaBenchmark)}
+                              key={`${criteriaName}_${directBenchmark.name}_direct`}
+                              id={`${criteriaName}_${directBenchmark.name}_direct`}
+                              onClick={(e: any) => onBenchmarkCriteriaClick(e, directBenchmark, criteriaName)}
                               selected={selectedCritiaBenchmarkId}
                             />
                           ))}
@@ -169,18 +168,18 @@ export const BenchmarkSidenav = () => {
                           onToggle={() => handleBenchmarkToggle(`${pairwiseBenchmark.name}_pairwise`)}
                           isExpanded={benchmarkExpanded[`${pairwiseBenchmark.name}_pairwise`]}
                         >
-                          {pairwiseBenchmark.criteriaBenchmarks.map((criteriaBenchmark, i) => (
+                          {Object.keys(pairwiseBenchmark.groupByFieldsToValues['criteria']).map((criteriaName, i) => (
                             <TreeNode
                               label={
                                 <div className={classes['tree-node-content']}>
                                   <span
                                     className={cx(classes['tree-node-label'], classes['tree-node-label-indent'])}
-                                  >{`${splitDotsAndCapitalizeFirstWord(criteriaBenchmark.name)}`}</span>
+                                  >{`${splitDotsAndCapitalizeFirstWord(criteriaName)}`}</span>
                                 </div>
                               }
-                              key={`${criteriaBenchmark.name}_${pairwiseBenchmark.name}_pairwise`}
-                              id={`${criteriaBenchmark.name}_${pairwiseBenchmark.name}_pairwise`}
-                              onClick={(e: any) => onBenchmarkCriteriaClick(e, pairwiseBenchmark, criteriaBenchmark)}
+                              key={`${criteriaName}_${pairwiseBenchmark.name}_pairwise`}
+                              id={`${criteriaName}_${pairwiseBenchmark.name}_pairwise`}
+                              onClick={(e: any) => onBenchmarkCriteriaClick(e, pairwiseBenchmark, criteriaName)}
                             />
                           ))}
                         </TreeNode>

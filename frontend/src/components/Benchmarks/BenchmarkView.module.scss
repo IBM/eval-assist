@@ -1,4 +1,16 @@
-.vertical-divider {
-  width: 1px;
-  background-color: $border-subtle-00;
+.benchmark-actions-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.benchmark-buttons-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.benchmark-groupby-select {
+  max-width: 300px;
 }

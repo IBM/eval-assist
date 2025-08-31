@@ -2,22 +2,22 @@ import cx from 'classnames'
 
 import { CSSProperties, useMemo, useState } from 'react'
 
-import { Link, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tile, Tooltip } from '@carbon/react'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tile, Tooltip } from '@carbon/react'
 import { Information } from '@carbon/react/icons'
 
 import { useCriteriasContext } from '@providers/CriteriaProvider'
-import { CriteriaBenchmark, EvaluationType } from '@types'
-import { splitDotsAndCapitalizeFirstWord, toTitleCase } from '@utils'
+import { GroupByValueResult } from '@types'
+import { capitalizeFirstWord, splitDotsAndCapitalizeFirstWord, toTitleCase } from '@utils'
 
 import classes from './CriteriaBenchmarkCard.module.scss'
-import { CriteriaDetailsModal } from './CriteriaDetailsModal'
 import { useURLInfoContext } from './Providers/URLInfoProvider'
 
 interface Props {
-  criteriaBenchmark: CriteriaBenchmark
+  groupByField: string
+  groupByValue: string
+  groupByValueResult: GroupByValueResult
   className?: string
   style?: CSSProperties
-  showCorrelationColumns: boolean
 }
 
 const beatutifyName: { [key: string]: string } = {
@@ -27,25 +27,24 @@ const beatutifyName: { [key: string]: string } = {
   f1_macro: 'F1 macro',
 }
 
-export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumns, className, style }: Props) => {
+export const GroupByValueResultCard = ({ groupByField, groupByValue, groupByValueResult, className, style }: Props) => {
   const { benchmark } = useURLInfoContext()
   const { getCriteria } = useCriteriasContext()
   const [criteriaDetailsModal, setCriteriaDetailsModal] = useState(false)
   // const [showAllVersions, setShowAllVersions] = useState(true)
-  const criteria = useMemo(
-    () => getCriteria(criteriaBenchmark.catalogCriteriaName, benchmark?.type as EvaluationType),
-    [benchmark?.type, criteriaBenchmark.catalogCriteriaName, getCriteria],
-  )
+  // const criteria = useMemo(
+  //   () => getCriteria(criteriaBenchmark.catalogCriteriaName, benchmark?.type as EvaluationType),
+  //   [benchmark?.type, criteriaBenchmark.catalogCriteriaName, getCriteria],
+  // )
 
-  const benchmarkMetrics = useMemo(() => {
-    return Object.keys(criteriaBenchmark.evaluatorBenchmarks[0].results).filter(
-      (metric) => showCorrelationColumns || !metric.startsWith('corr'),
-    )
-  }, [criteriaBenchmark.evaluatorBenchmarks, showCorrelationColumns])
+  const metrics = useMemo(
+    () => Object.keys(Object.values(groupByValueResult.judgeResults)[0].results),
+    [groupByValueResult],
+  )
 
   const benchmarkMetricsHeaders = useMemo(
     () =>
-      benchmarkMetrics.map((metric, i) =>
+      metrics.map((metric, i) =>
         metric === 'pearson' ? (
           <div key={i} className={classes.headerWithTooltip}>
             {beatutifyName[metric]}
@@ -64,7 +63,7 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
           beatutifyName[metric] || splitDotsAndCapitalizeFirstWord(metric)
         ),
       ),
-    [benchmarkMetrics],
+    [metrics],
   )
 
   const metricToPercentageString = (metricValue: number) => Math.round(metricValue * 1000) / 10 + '%'
@@ -81,30 +80,12 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
     return result !== null ? Math.round(result * 100) / 100 : '-'
   }
 
-  // removes old benchmarks, i.e. evaluator benchmarks of old llm-as-a-judge version
-  const newestEvaluators = useMemo(
+  const judgeResults = useMemo(
     () =>
-      // criteriaBenchmark.evaluatorBenchmarks.filter((e) => {
-      //   const repeatedEvaluators = criteriaBenchmark.evaluatorBenchmarks.filter(
-      //     (ev) => ev.evaluator_id === e.evaluator_id,
-      //   )
-
-      //   repeatedEvaluators.sort((a, b) => {
-      //     return new Version(b.laaj_version) > new Version(a.laaj_version) ? 1 : -1
-      //   })
-
-      //   return e.laaj_version === repeatedEvaluators[0].laaj_version
-      // }),
-      criteriaBenchmark.evaluatorBenchmarks,
-    [criteriaBenchmark.evaluatorBenchmarks],
-  )
-
-  const displayedEvaluators = useMemo(
-    () =>
-      criteriaBenchmark.evaluatorBenchmarks.sort((a, b) =>
+      Object.values(groupByValueResult.judgeResults).sort((a, b) =>
         a.model.localeCompare(b.model) !== 0 ? a.model.localeCompare(b.model) : a.judge.localeCompare(b.judge),
       ),
-    [criteriaBenchmark.evaluatorBenchmarks],
+    [groupByValueResult.judgeResults],
   )
 
   return (
@@ -113,19 +94,19 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
         <Tile className={cx(className, classes.root)} style={style}>
           <div className={classes.criteriaHeader}>
             <div className={classes.criteriaInfo}>
-              <h5>{`Criteria: ${splitDotsAndCapitalizeFirstWord(criteriaBenchmark.name)}`}</h5>
-              {criteria !== null && (
+              <h5>{`${capitalizeFirstWord(groupByField)}: ${splitDotsAndCapitalizeFirstWord(groupByValue)}`}</h5>
+              {/* {criteria !== null && (
                 <Link
                   onClick={() => setCriteriaDetailsModal(true)}
                   style={{ textDecoration: 'none', cursor: 'pointer' }}
                 >
                   {'(View details)'}
                 </Link>
-              )}
+              )} */}
             </div>
             <p
               style={{ paddingTop: '0.5rem', fontStyle: 'italic', color: 'gray' }}
-            >{`Number of instances: ${criteriaBenchmark.datasetLen}`}</p>
+            >{`Number of instances: ${groupByValueResult.datasetLen}`}</p>
           </div>
 
           <div className={cx(classes.table)}>
@@ -139,23 +120,22 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
                 </TableRow>
               </TableHead>
               <TableBody>
-                {displayedEvaluators.map((evaluatorBenchmark, i) => (
+                {judgeResults.map((judgeResult, i) => (
                   <TableRow key={i}>
-                    {/* <TableCell>{`${evaluatorBenchmark.evaluator_id} (v${evaluatorBenchmark.laaj_version})`}</TableCell> */}
-                    <TableCell>{toTitleCase(`${evaluatorBenchmark.model} (${evaluatorBenchmark.judge})`)}</TableCell>
-                    {benchmarkMetrics.map((metric) => (
+                    <TableCell>{toTitleCase(`${judgeResult.model} (${judgeResult.judge})`)}</TableCell>
+                    {metrics.map((metric) => (
                       <TableCell
                         key={metric}
                         className={cx({
                           [classes.highlightedCellText]:
-                            evaluatorBenchmark.results[metric] ===
+                            judgeResult.results[metric] ===
                             getBetterResult(
-                              newestEvaluators.map((e) => e.results[metric]),
+                              judgeResults.map((e) => e.results[metric]),
                               metric,
                             ),
                         })}
                       >
-                        {parseResult(metric, evaluatorBenchmark.results[metric])}
+                        {parseResult(metric, judgeResult.results[metric])}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -164,14 +144,14 @@ export const CriteriaBenchmarkCard = ({ criteriaBenchmark, showCorrelationColumn
             </Table>
           </div>
         </Tile>
-        {criteria !== null && (
+        {/* {criteria !== null && (
           <CriteriaDetailsModal
             criteria={criteria}
             open={criteriaDetailsModal}
             setOpen={setCriteriaDetailsModal}
             type={benchmark?.type}
           />
-        )}
+        )} */}
       </>
     )
   )

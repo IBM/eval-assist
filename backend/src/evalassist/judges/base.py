@@ -217,7 +217,7 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
                 ],
             )
 
-            results_len: int = int(len(results) / 2)
+            results_len: int = len(instances)
             results = [
                 DirectInstanceResult(
                     criteria=results[i].criteria,
@@ -227,11 +227,10 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
                     metadata=results[i].metadata,
                     positional_bias=DirectPositionalBias(
                         detected=results[i].option != results[i + results_len].option,
-                        option=results[i + results_len].option,
-                        explanation=results[i + results_len].explanation,
+                        result=results[results_len + i],
                     ),
                 )
-                for i in range(cast(int, results_len))
+                for i in range(results_len)
             ]
         else:
             results = self._run(instances=instances, criteria=criteria)

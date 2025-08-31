@@ -31,6 +31,8 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
     setSelectedInstance(null)
   }
 
+  console.log(selectedInstance)
+
   const positionalBiasDetected = useMemo(() => {
     if (selectedInstance === null || selectedInstance.result === null) return null
     return returnByPipelineType(
@@ -181,7 +183,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                 <p>
                                   <strong>{`${capitalizeFirstWord(k)}:`}</strong>
                                 </p>
-                                <p style={{ whiteSpace: 'pre-line' }}>{capitalizeFirstWord(v)}</p>
+                                <p style={{ whiteSpace: 'pre-line' }}>{capitalizeFirstWord(v.toString())}</p>
                               </React.Fragment>
                             ))}
                           </>

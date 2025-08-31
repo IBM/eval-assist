@@ -6,7 +6,7 @@ from langchain.output_parsers import OutputFixingParser, ResponseSchema
 from langchain.prompts import PromptTemplate
 
 from .base import DirectJudge, UnitxtInferenceLangchainRunnable
-from .types import Criteria, DirectInstance, DirectInstanceResult, DirectPositionalBias
+from .types import Criteria, DirectInstance, DirectInstanceResult
 
 
 class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
@@ -490,9 +490,6 @@ class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable)
                 criteria=criterion,
                 option=selected_option,
                 explanation=explanation,
-                positional_bias=DirectPositionalBias(
-                    detected=False,
-                ),
                 metadata={"Number of stages": str(stages_count)},
             )
             for selected_option, explanation, stages_count, criterion in zip(

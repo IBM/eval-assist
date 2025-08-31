@@ -38,11 +38,10 @@ class DummyPairwiseJudge(PairwiseJudge):
     def get_name(self) -> str:
         return "dummy"
 
-    def _evaluate(
+    def _run(
         self,
         instances: Sequence[PairwiseInstance],
         criteria: Sequence[Criteria],
-        check_positional_bias: bool,
     ) -> Sequence[PairwiseInstanceResult]:
         results: list[PairwiseInstanceResult] = []
         systems_per_instance = len(instances[0].responses)
