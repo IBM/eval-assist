@@ -2,12 +2,12 @@ import cx from 'classnames'
 import Papa from 'papaparse'
 import { generateId, readCsvFile, returnByPipelineType } from 'src/utils'
 
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useMemo, useState } from 'react'
 
 import { FileUploader, Layer, Modal } from '@carbon/react'
 
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
-import { Instance } from '@types'
+import { EvaluationType, Instance, PairwiseInstance } from '@types'
 
 import classes from './ImportTestDataModal.module.scss'
 
@@ -45,6 +45,19 @@ export const UploadTestDataModal = ({ open, setOpen }: Props) => {
     setOpen(false)
   }
 
+  const requiredResponseFields = useMemo(
+    () =>
+      returnByPipelineType(
+        currentTestCase.type,
+        () => [currentTestCase.criteria.predictionField],
+        () =>
+          new Array((currentTestCase.instances[0] as PairwiseInstance).responses.length)
+            .fill(null)
+            .map((_, i) => `${currentTestCase.criteria.predictionField} ${i + 1}`),
+      ),
+    [currentTestCase.criteria.predictionField, currentTestCase.instances, currentTestCase.type],
+  )
+
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
@@ -75,23 +88,31 @@ export const UploadTestDataModal = ({ open, setOpen }: Props) => {
       }
     }
     // check that csv contains the prediction field
-    if (!csvColumnNames.includes(currentTestCase.criteria.predictionField)) {
-      failed = true
-      missingFields.push(currentTestCase.criteria.predictionField)
+    for (const requiredResponseField of requiredResponseFields) {
+      if (!csvColumnNames.includes(requiredResponseField)) {
+        failed = true
+        missingFields.push(requiredResponseField)
+      }
     }
 
     if (failed) {
       setWrongFormatMessage(
-        `The uploaded file has a wrong format. The following fields are missing: ${missingFields.join(', ')}.`,
+        `The uploaded file has a wrong format. The following columns are missing: ${missingFields
+          .map((s) => `'${s}'`)
+          .join(', ')}.`,
       )
       setHasWrongFormat(true)
       return
     }
+    setHasWrongFormat(false)
 
     const instances: Instance[] = []
     // refactor this check, if done from the first row it is not required for all rows
     for (const unparsedInstance of instancesAsDict) {
       // check if it has all the required keys
+      const instanceResponses = requiredResponseFields.map(
+        (requiredResponseField) => unparsedInstance[requiredResponseField],
+      )
       let instance: Instance = {
         id: generateId(),
         contextVariables: currentTestCase.criteria.contextFields.map((contextField) => ({
@@ -100,13 +121,37 @@ export const UploadTestDataModal = ({ open, setOpen }: Props) => {
         })),
         expectedResult: unparsedInstance['expected_result'] || '',
         result: null,
-        [returnByPipelineType(currentTestCase.type, 'response', 'responses')]:
-          unparsedInstance[currentTestCase.criteria.predictionField]!,
+        [returnByPipelineType(currentTestCase.type, 'response', 'responses')]: returnByPipelineType(
+          currentTestCase.type,
+          instanceResponses[0],
+          instanceResponses,
+        ),
       }
       instances.push(instance)
     }
     setToUploadTestData(instances)
   }
+
+  // const indicationsList = useMemo(() => {
+  //   const indications = []
+  //   indications.push('The uploaded file must be a csv.')
+  //   if (currentTestCase.type === EvaluationType.DIRECT) {
+  //     indications.push(`Include a column response field names ${currentTestCase.criteria.predictionField}`)
+  //   } else {
+  //     indications.push(`Include a column for each response field: ${requiredResponseFields.join(', ')}.`)
+  //   }
+  //   if (currentTestCase.criteria.contextFields.length) {
+  //     indications.push(
+  //       `Include a column for each context variable: ${currentTestCase.criteria.contextFields.join(', ')}`,
+  //     )
+  //   }
+  //   return indications
+  // }, [
+  //   currentTestCase.criteria.contextFields,
+  //   currentTestCase.criteria.predictionField,
+  //   currentTestCase.type,
+  //   requiredResponseFields,
+  // ])
 
   return (
     <Modal
@@ -128,7 +173,12 @@ export const UploadTestDataModal = ({ open, setOpen }: Props) => {
             buttonLabel="Select file"
             filenameStatus="edit"
             iconDescription="Delete file"
-            labelDescription={'Select a csv file'}
+            labelDescription={`Select a csv file with the following columns: ${[
+              ...requiredResponseFields,
+              ...currentTestCase.criteria.contextFields,
+            ]
+              .map((s) => `'${s}'`)
+              .join(', ')}.`}
             labelTitle="Import test data from file"
             name=""
             onChange={onChange}

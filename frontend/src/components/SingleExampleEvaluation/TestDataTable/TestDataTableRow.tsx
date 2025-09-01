@@ -34,7 +34,7 @@ interface Props {
   }
   instance: Instance
   setInstance: (instance: Instance) => void
-  readOnly: boolean
+  removeEnabled: boolean
   removeInstance: () => void
   type: EvaluationType
   addInstance: (instance: Instance) => void
@@ -49,7 +49,7 @@ export const TestDataTableRow = ({
   isInstanceEvaluationRunning,
   criteria,
   gridClasses,
-  readOnly,
+  removeEnabled,
   instance,
   setInstance,
   addInstance,
@@ -175,7 +175,7 @@ export const TestDataTableRow = ({
           runEvaluation([instance.id])
         }}
         onFixInstance={instance.result?.feedback ? () => fixInstance(instance.id) : null}
-        removeEnabled={!readOnly}
+        removeEnabled={removeEnabled}
       >
         {({ setActive, setInactive }) => (
           <div

@@ -349,7 +349,7 @@ export const TestDataTable = ({ style, className }: Props) => {
               gridClasses={gridClasses}
               instance={instance}
               setInstance={(instance) => setInstance(instance, i)}
-              readOnly={false}
+              removeEnabled={currentTestCase.type !== EvaluationType.PAIRWISE || instances.length > 1}
               removeInstance={() => removeInstance(i)}
               type={currentTestCase.type}
               addInstance={addInstance}
