@@ -380,7 +380,7 @@ https://ibm.github.io/eval-assist/ -->
                       <pre>
 <code>python3 -m venv venv
 source venv/bin/activate
-pip install evalassist
+pip install 'evalassist[webapp]'
 eval-assist serve</code></pre>
                     </li>
                     <li>
@@ -388,7 +388,7 @@ eval-assist serve</code></pre>
                       <pre>
 <code>python3 -m venv venv
 venv\Scripts\activate.bat
-pip install evalassist
+pip install 'evalassist[webapp]'
 eval-assist serve</code></pre>
                     </li>
                   </ul>
@@ -398,7 +398,7 @@ eval-assist serve</code></pre>
                 <div class="content">
                   <p class="is-size-5 has-text-weight-light"></p>
                   <pre>
-<code>uvx --python 3.11 --from evalassist eval-assist serve</code>
+<code>uvx --python 3.11 --from 'evalassist[webapp]' eval-assist serve</code>
 </pre>
                 </div>
               </li>
@@ -408,7 +408,7 @@ eval-assist serve</code></pre>
                   <pre>
 <code>conda create -n evalassist python=3.11
 conda activate evalassist
-pip install evalassist
+pip install 'evalassist[webapp]'
 eval-assist serve</code></pre>
                 </div>
               </li>
@@ -460,9 +460,14 @@ eval-assist serve</code></pre>
               >
             </li>
             <li>
-              <strong>EvalAssist: A Human-Centered Tool for LLM-as-a-Judge</strong>
-              <br/>
-              <em>HEAL @ CHI 2025 Human-centered Evaluation and Auditing of Language Models </em>
+              <strong
+                >EvalAssist: A Human-Centered Tool for LLM-as-a-Judge</strong
+              >
+              <br />
+              <em
+                >HEAL @ CHI 2025 Human-centered Evaluation and Auditing of
+                Language Models
+              </em>
               <a
                 href="https://heal-workshop.github.io/chi2025_papers/11_EvalAssist_A_Human_Centered.pdf"
                 target="_blank"
