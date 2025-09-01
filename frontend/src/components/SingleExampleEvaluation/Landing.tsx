@@ -108,7 +108,7 @@ export const Landing = ({}: Props) => {
         />
         <Card
           title={PAIRWISE_NAME}
-          description={'Compare to choose the which response is better'}
+          description={'Compare to choose which response is better'}
           imageSrc="pairwise_helper"
           onClick={createEmptyPairwiseTestCase}
           actionButton={
