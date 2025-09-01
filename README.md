@@ -30,7 +30,7 @@ with their criteria, they can auto-generate a Notebook with Unitxt code to run b
 data sets based on their criteria definition. EvalAssist also includes a catalog of example test cases,
 exhibiting the use of LLM-as-a-judge across a variety of scenarios. Users can save their own test cases.
 
-## How to Install
+## How to install and run EvalAssist
 
 EvalAssist can be installed using various package managers. Before proceeding, ensure you're using **Python >= 3.10, <3.14** to avoid compatibility issues. Make sure to set `DATA_DIR` to avoid data loss (e.g. `export DATA_DIR="~/.eval_assist"`).
 
@@ -63,6 +63,39 @@ In all cases, after running the command, you can access the EvalAssist server at
 EvalAssist can be configured through environment variables and command parameters. Take a look at the [configuration documentation](SYSTEM_CONFIGURATION.md).
 
 _Check out the tutorials to see how to [run evaluations](https://github.com/IBM/eval-assist/wiki#mini-tutorial-running-an-evaluation) and [generate synthetic data](https://github.com/IBM/eval-assist/wiki#mini-tutorial-generating-test-data)._
+
+## Use Evalassist backend standalone
+
+You can run LLM as a Judge evaluations using Python only. For example:
+
+```python
+from evalassist.judges import SimpleDirectJudge
+from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
+from unitxt.inference import CrossProviderInferenceEngine
+
+judge = SimpleDirectJudge(
+    inference_engine=CrossProviderInferenceEngine(
+        model="llama-3-3-70b-instruct",
+        provider="watsonx",
+        **DEFAULT_JUDGE_INFERENCE_PARAMS,
+    ),
+)
+
+results = judge(
+    instances=[
+        "Use the API client to fetch data from the server and the cache to store frequently accessed results for faster performance."
+    ],
+    criteria="Is the text self-explanatory and self-contained?",  # Create yes/no direct assessment criteria",
+)
+```
+
+EvalAssist implements a [Judge API](https://github.com/IBM/eval-assist/blob/1aae10e030cd3e78b0b6049bf90e8cc31a418931/backend/src/evalassist/judges/base.py#L59) for easily defining and trying different LLM judges. Currently, the following judges are available:
+
+- **SimpleDirectJudge**: a judge that uses structured output parsing to make evaluations. It has support for providing feedback in addition to the explanation and the selected option.
+- **UnitxtDirectJudge** and **UnitxtPairwiseJudge**: wrappers for Unitxt judges.
+- **MPrometheusDirectJudge** and **MPrometheusPairwiseJudge**: wrapper for the [M-Prometheus judges](https://github.com/prometheus-eval/prometheus-eval).
+- **DummyDirectJudge** and **DummyPairwiseJudge**: use as a guide to implement new judges.
+- **ThesisAntithesisDirectJudge**: a direct judge for complex scenarios where many options are available and it is important that the judge deeply analyses the nuances between them.
 
 ## Contributing
 
