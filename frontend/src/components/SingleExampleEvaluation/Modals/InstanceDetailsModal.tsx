@@ -31,8 +31,6 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
     setSelectedInstance(null)
   }
 
-  console.log(selectedInstance)
-
   const positionalBiasDetected = useMemo(() => {
     if (selectedInstance === null || selectedInstance.result === null) return null
     return returnByPipelineType(

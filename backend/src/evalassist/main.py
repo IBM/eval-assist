@@ -555,15 +555,30 @@ def download_test_case(params: DownloadTestCaseBody, background_tasks: Backgroun
 
 @router.post("/download-test-data/")
 def download_test_data(params: DownloadTestDataBody, background_tasks: BackgroundTasks):
-    # in the csv I want the instances:
+    prediction_rows = []
+    if isinstance(params.instances[0], PairwiseInstance):
+        prediction_rows = [
+            {
+                f"{params.prediction_field} {i + 1}": response
+                for i, response in enumerate(cast(PairwiseInstance, instance).responses)
+            }
+            for instance in params.instances
+        ]
+    else:
+        prediction_rows = [
+            {params.prediction_field: cast(DirectInstance, instance).response}
+            for instance in params.instances
+        ]
+
     instances = params.instances
     rows = [
         {
-            **(i.context if i.context is not None else {}),
-            params.prediction_field: i.get_prediction(),
-            "expected_result": i.expected_result,
+            **(instance.context if instance.context is not None else {}),
+            # params.prediction_field: instance.get_prediction(),
+            "expected_result": instance.expected_result,
+            **prediction_fields,
         }
-        for i in instances
+        for instance, prediction_fields in zip(instances, prediction_rows)
     ]
 
     df = pd.DataFrame(rows)
