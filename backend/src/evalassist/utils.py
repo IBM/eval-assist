@@ -6,7 +6,6 @@ import os
 import re
 import time
 import traceback
-from collections.abc import Sequence
 from enum import Enum
 from typing import Any, cast
 
@@ -553,7 +552,7 @@ def get_system_version():
 
 def unitxt_dataset_to_evalassist_instances(
     dataset: IterableDataset,
-    criteria: Sequence[Criteria],
+    criteria: list[Criteria],
 ) -> list[DirectInstance]:
     if any(
         criterion.prediction_field is None or criterion.context_fields is None

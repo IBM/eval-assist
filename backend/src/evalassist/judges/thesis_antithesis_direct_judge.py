@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from textwrap import dedent
 from typing import Any, cast
 
@@ -15,8 +14,8 @@ class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable)
 
     def _run(
         self,
-        instances: Sequence[DirectInstance],
-        criteria: Sequence[Criteria],
+        instances: list[DirectInstance],
+        criteria: list[Criteria],
     ) -> list[DirectInstanceResult]:
         # # make it easier for models to create json object
         # for option in cast(CriteriaWithOptions, self.criteria).options:
