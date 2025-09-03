@@ -1,5 +1,3 @@
-from collections.abc import Sequence
-
 from .base import DirectJudge, PairwiseJudge
 from .types import (
     Criteria,
@@ -18,9 +16,9 @@ class DummyDirectJudge(DirectJudge):
 
     def _run(
         self,
-        instances: Sequence[DirectInstance],
-        criteria: Sequence[Criteria],
-    ) -> Sequence[DirectInstanceResult]:
+        instances: list[DirectInstance],
+        criteria: list[Criteria],
+    ) -> list[DirectInstanceResult]:
         return [
             DirectInstanceResult(
                 criteria=criteria[0],
@@ -40,9 +38,9 @@ class DummyPairwiseJudge(PairwiseJudge):
 
     def _run(
         self,
-        instances: Sequence[PairwiseInstance],
-        criteria: Sequence[Criteria],
-    ) -> Sequence[PairwiseInstanceResult]:
+        instances: list[PairwiseInstance],
+        criteria: list[Criteria],
+    ) -> list[PairwiseInstanceResult]:
         results: list[PairwiseInstanceResult] = []
         systems_per_instance = len(instances[0].responses)
         comparisons_per_instance = systems_per_instance - 1

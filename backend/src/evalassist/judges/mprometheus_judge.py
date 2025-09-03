@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from typing import Literal
 
 from .base import DirectJudge, PairwiseJudge
@@ -23,14 +22,14 @@ class MPrometheusDirectJudge(DirectJudge):
     def get_name(self) -> str:
         return "prometheus"
 
-    def _validate_criteria(self, criteria: Sequence[Criteria]):
+    def _validate_criteria(self, criteria: list[Criteria]):
         for criterion in criteria:
             if len(criterion.options) != 5:
                 raise ValueError(
                     "Criteria must be of Likert type (5 options in crescending order) because that is the only rubric supported by Prometheus models in direct assessment evaluations."
                 )
 
-    def _validate_instances(self, instances: Sequence[DirectInstance]):
+    def _validate_instances(self, instances: list[DirectInstance]):
         for instance in instances:
             if instance.context is not None and "instruction" not in instance.context:
                 raise ValueError(
@@ -39,9 +38,9 @@ class MPrometheusDirectJudge(DirectJudge):
 
     def _run(
         self,
-        instances: Sequence[DirectInstance],
-        criteria: Sequence[Criteria],
-    ) -> Sequence[DirectInstanceResult]:
+        instances: list[DirectInstance],
+        criteria: list[Criteria],
+    ) -> list[DirectInstanceResult]:
         from prometheus_eval import PrometheusEval
         from prometheus_eval.prompts import (
             ABSOLUTE_PROMPT_WO_REF,
@@ -105,7 +104,7 @@ class MPrometheusPairwiseJudge(PairwiseJudge):
     def get_name(self) -> str:
         return "prometheus"
 
-    def _validate_instances(self, instances: Sequence[PairwiseInstance]):
+    def _validate_instances(self, instances: list[PairwiseInstance]):
         for instance in instances:
             if instance.context is not None and "instruction" not in instance.context:
                 raise ValueError(
@@ -118,9 +117,9 @@ class MPrometheusPairwiseJudge(PairwiseJudge):
 
     def _run(
         self,
-        instances: Sequence[PairwiseInstance],
-        criteria: Sequence[Criteria],
-    ) -> Sequence[PairwiseInstanceResult]:
+        instances: list[PairwiseInstance],
+        criteria: list[Criteria],
+    ) -> list[PairwiseInstanceResult]:
         from prometheus_eval import PrometheusEval
         from prometheus_eval.prompts import RELATIVE_PROMPT_WO_REF
         from prometheus_eval.vllm import VLLM

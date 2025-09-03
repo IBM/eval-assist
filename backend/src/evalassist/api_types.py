@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from enum import Enum
 
 from fastapi import HTTPException
@@ -126,7 +125,7 @@ class EvaluationRequest(BaseModel):
     llm_provider_credentials: dict[str, str | None]
     evaluator_name: str
     type: EvaluatorTypeEnum
-    instances: Sequence[DirectInstanceDTO] | Sequence[PairwiseInstanceDTO]
+    instances: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
     criteria: CriteriaDTO | CriteriaWithOptionsDTO
 
 

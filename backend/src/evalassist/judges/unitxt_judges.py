@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
 from typing import Any, Generic, List, cast
 
 from unitxt.api import evaluate, load_dataset
@@ -57,8 +56,8 @@ class UnitxtJudge(
         return "unitxt"
 
     def _run(
-        self, instances: Sequence[InstanceTypeVar], criteria: Sequence[Criteria]
-    ) -> Sequence[ReturnVarType]:
+        self, instances: list[InstanceTypeVar], criteria: list[Criteria]
+    ) -> list[ReturnVarType]:
         # unitxt has a fixed task input fields, so we will add all of them in case different criterias have different prediction and/or context fields
         all_context_fields: set[str] = set(
             [
@@ -272,7 +271,7 @@ class GraniteGuardianJudge(
         ]
 
     def parse_results(
-        self, dataset, criteria: Sequence[Criteria]
+        self, dataset, criteria: list[Criteria]
     ) -> list[DirectInstanceResult]:
         results = []
         for instance, criterion in zip(dataset, criteria):
@@ -313,9 +312,9 @@ class GraniteGuardianJudge(
 
     def get_unitxt_dataset(
         self,
-        instances: Sequence[DirectInstance],
+        instances: list[DirectInstance],
         predictions: list[str],
-        criteria: Sequence[Criteria],
+        criteria: list[Criteria],
     ) -> list[dict[str, str]]:
         contexts = [
             instance.context if instance.context is not None else {}
@@ -340,9 +339,9 @@ class GraniteGuardianJudge(
 
     def _run(
         self,
-        instances: Sequence[DirectInstance],
-        criteria: Sequence[Criteria],
-    ) -> Sequence[DirectInstanceResult]:
+        instances: list[DirectInstance],
+        criteria: list[Criteria],
+    ) -> list[DirectInstanceResult]:
         risk_names = [self.get_risk_name(criterion.name) for criterion in criteria]
         predictions = self.get_predictions(instances)
         dataset = self.get_unitxt_dataset(

@@ -2,7 +2,6 @@ import logging
 import os
 import traceback
 import uuid
-from collections.abc import Sequence
 from typing import cast
 
 import nbformat as nbf
@@ -320,7 +319,7 @@ async def evaluate(
                     generate_feedback=True,
                 )
             per_instance_result = evaluator.evaluate(
-                instances=cast(Sequence[DirectInstance], req.instances),
+                instances=cast(list[DirectInstance], req.instances),
                 criteria=criteria,
                 check_positional_bias=True,
             )
@@ -334,7 +333,7 @@ async def evaluate(
             evaluator = UnitxtPairwiseJudge(inference_engine=inference_engine)
 
             per_instance_result = evaluator.evaluate(
-                instances=cast(Sequence[PairwiseInstance], req.instances),
+                instances=cast(list[PairwiseInstance], req.instances),
                 criteria=criteria,
                 check_positional_bias=True,
             )

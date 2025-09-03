@@ -29,7 +29,7 @@
 #         )
 #     ]
 
-#     results: Sequence[DirectInstanceResult] = judge.evaluate(instances=instances, criteria=criteria)
+#     results: list[DirectInstanceResult] = judge.evaluate(instances=instances, criteria=criteria)
 
 #     print(results)
 #     assert results[0].option == "Excellent"

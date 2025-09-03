@@ -1,6 +1,5 @@
 import logging
 import random
-from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
 from textwrap import dedent
 from typing import Any, cast
@@ -74,7 +73,7 @@ class SimpleDirectJudge(
         self,
         context_sections: list[str],
         predictions: list[str],
-        criteria: Sequence[Criteria],
+        criteria: list[Criteria],
     ) -> list[tuple[str, str]]:
         unique_criteria_instance: list[tuple[Criteria, tuple[str, str]]] = list(
             {
@@ -204,8 +203,8 @@ class SimpleDirectJudge(
 
     def _run(
         self,
-        instances: Sequence[DirectInstance],
-        criteria: Sequence[Criteria],
+        instances: list[DirectInstance],
+        criteria: list[Criteria],
     ) -> list[DirectInstanceResult]:
         output_parsers: list[OutputFixingParser] = []
         format_instructions_list = []

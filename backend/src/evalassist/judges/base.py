@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from collections import Counter
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, TypeVar, cast
 
@@ -93,28 +92,30 @@ class Judge(
 
     def evaluate(
         self,
-        instances: Sequence[InstanceTypeVar] | Sequence[str],
-        criteria: Criteria | Sequence[Criteria] | str,
+        instances: list[InstanceTypeVar] | list[str],
+        criteria: Criteria | list[Criteria] | str,
         check_positional_bias: bool = False,
-    ) -> Sequence[ReturnVarType]:
+    ) -> list[ReturnVarType]:
         """Run the judge on a batch of instances and return the results."""
-        if (
-            isinstance(criteria, Sequence)
-            and not isinstance(criteria, str)
-            and len(criteria) != len(instances)
-        ):
-            raise ValueError(
-                f"The provided criteria list must be equal in length with the instances. {len(criteria)} != {len(instances)}"
-            )
-        parsed_criteria: Sequence[Criteria] | Sequence[str]
-        if isinstance(criteria, str):
-            parsed_criteria = [criteria] * len(instances)
-        elif isinstance(criteria, Sequence):
-            parsed_criteria = criteria
-        else:
-            parsed_criteria = [criteria] * len(instances)
 
-        parsed_criteria = self._get_parsed_criteria(parsed_criteria)
+        if isinstance(criteria, list):
+            if len(criteria) != len(instances):
+                raise ValueError(
+                    f"The provided criteria list must be equal in length with the instances. {len(criteria)} != {len(instances)}"
+                )
+            if len(criteria) == 0:
+                raise ValueError("Criteria list is empty")
+
+        elif not isinstance(criteria, str) and not isinstance(criteria, Criteria):
+            raise ValueError(
+                f"criteria parameter must be of type Criteria or str, you provided a {type(criteria)}"
+            )
+
+        parsed_criteria = self._get_parsed_criteria(
+            cast(list[Criteria] | list[str], [criteria] * len(instances))
+            if isinstance(criteria, str) or isinstance(criteria, Criteria)
+            else criteria
+        )
         parsed_instances = self._get_instances_from_str(instances)
 
         if self.use_self_consistency:
@@ -125,7 +126,7 @@ class Judge(
                 criterion for criterion in parsed_criteria for _ in range(3)
             ]
 
-        results: Sequence[ReturnVarType] = self._evaluate(
+        results: list[ReturnVarType] = self._evaluate(
             instances=parsed_instances,
             criteria=parsed_criteria,
             check_positional_bias=check_positional_bias,
@@ -135,10 +136,10 @@ class Judge(
 
     def __call__(
         self,
-        instances: Sequence[InstanceTypeVar] | Sequence[str],
-        criteria: Criteria | Sequence[Criteria] | str,
+        instances: list[InstanceTypeVar] | list[str],
+        criteria: Criteria | list[Criteria] | str,
         check_positional_bias: bool = False,
-    ) -> Sequence[ReturnVarType]:
+    ) -> list[ReturnVarType]:
         return self.evaluate(
             instances=instances,
             criteria=criteria,
@@ -148,30 +149,30 @@ class Judge(
     @abstractmethod
     def _evaluate(
         self,
-        instances: Sequence[InstanceTypeVar],
-        criteria: Sequence[Criteria],
+        instances: list[InstanceTypeVar],
+        criteria: list[Criteria],
         check_positional_bias: bool,
-    ) -> Sequence[ReturnVarType]: ...
+    ) -> list[ReturnVarType]: ...
 
     @abstractmethod
     def _run(
         self,
-        instances: Sequence[InstanceTypeVar],
-        criteria: Sequence[Criteria],
-    ) -> Sequence[ReturnVarType]: ...
+        instances: list[InstanceTypeVar],
+        criteria: list[Criteria],
+    ) -> list[ReturnVarType]: ...
 
     @abstractmethod
     def _get_instances_from_str(
-        self, instances: Sequence[InstanceTypeVar] | Sequence[str] | Sequence[list[str]]
-    ) -> Sequence[InstanceTypeVar]: ...
+        self, instances: list[InstanceTypeVar] | list[str] | list[list[str]]
+    ) -> list[InstanceTypeVar]: ...
 
     @abstractmethod
     def _get_parsed_criteria(
-        self, criteria: Sequence[Criteria] | Sequence[str]
-    ) -> Sequence[Criteria]: ...
+        self, criteria: list[Criteria] | list[str]
+    ) -> list[Criteria]: ...
 
     @abstractmethod
-    def get_predictions(self, instances: Sequence[InstanceTypeVar]) -> Any:
+    def get_predictions(self, instances: list[InstanceTypeVar]) -> Any:
         """Return the raw predictions (e.g., LLM responses) for the given instances."""
         ...
 
@@ -195,12 +196,12 @@ class Judge(
 class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
     def _evaluate(
         self,
-        instances: Sequence[DirectInstance],
-        criteria: Sequence[Criteria],
+        instances: list[DirectInstance],
+        criteria: list[Criteria],
         check_positional_bias: bool = False,
-    ) -> Sequence[DirectInstanceResult]:
+    ) -> list[DirectInstanceResult]:
         if check_positional_bias:
-            results: Sequence[DirectInstanceResult] = self._run(
+            results: list[DirectInstanceResult] = self._run(
                 instances=[*instances, *instances],
                 criteria=[
                     *criteria,
@@ -266,14 +267,12 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
         return results
 
     def _get_instances_from_str(
-        self, instances: Sequence[DirectInstance] | Sequence[str] | Sequence[list[str]]
-    ) -> Sequence[DirectInstance]:
-        parsed_instances: Sequence[DirectInstance]
-        if isinstance(instances, Sequence) and all(
-            isinstance(x, str) for x in instances
-        ):
+        self, instances: list[DirectInstance] | list[str] | list[list[str]]
+    ) -> list[DirectInstance]:
+        parsed_instances: list[DirectInstance]
+        if isinstance(instances, list) and all(isinstance(x, str) for x in instances):
             parsed_instances = cast(
-                Sequence[DirectInstance],
+                list[DirectInstance],
                 [
                     DirectInstance(
                         context={},
@@ -281,17 +280,17 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
                         metadata=None,
                         response=i,
                     )
-                    for i in cast(Sequence[str], instances)
+                    for i in cast(list[str], instances)
                 ],
             )
         else:
-            parsed_instances = cast(Sequence[DirectInstance], instances)
+            parsed_instances = cast(list[DirectInstance], instances)
         return parsed_instances
 
     def _get_parsed_criteria(
-        self, criteria: Sequence[Criteria] | Sequence[str]
-    ) -> Sequence[Criteria]:
-        if isinstance(criteria, Sequence) and all(isinstance(x, str) for x in criteria):
+        self, criteria: list[Criteria] | list[str]
+    ) -> list[Criteria]:
+        if isinstance(criteria, list) and all(isinstance(x, str) for x in criteria):
             return [
                 Criteria(
                     name="",
@@ -302,7 +301,7 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
                     ],
                     prediction_field="response",
                 )
-                for description in cast(Sequence[str], criteria)
+                for description in cast(list[str], criteria)
             ]
         else:
             return [
@@ -312,17 +311,17 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
                     options=criterion.options,
                     prediction_field=criterion.prediction_field,
                 )
-                for criterion in cast(Sequence[Criteria], criteria)
+                for criterion in cast(list[Criteria], criteria)
             ]
 
     @abstractmethod
     def _run(
         self,
-        instances: Sequence[DirectInstance],
-        criteria: Sequence[Criteria],
-    ) -> Sequence[DirectInstanceResult]: ...
+        instances: list[DirectInstance],
+        criteria: list[Criteria],
+    ) -> list[DirectInstanceResult]: ...
 
-    def get_predictions(self, instances: Sequence[DirectInstance]) -> list[str]:
+    def get_predictions(self, instances: list[DirectInstance]) -> list[str]:
         return [i.response for i in instances]
 
     def get_descriptor(self) -> JudgeDescriptor:
@@ -348,12 +347,12 @@ class PairwiseJudge(Judge[PairwiseInstance, PairwiseInstanceResult], ABC):
 
     def _evaluate(
         self,
-        instances: Sequence[PairwiseInstance],
-        criteria: Sequence[Criteria],
+        instances: list[PairwiseInstance],
+        criteria: list[Criteria],
         check_positional_bias: bool,
-    ) -> Sequence[PairwiseInstanceResult]:
+    ) -> list[PairwiseInstanceResult]:
         if check_positional_bias:
-            results: Sequence[PairwiseInstanceResult] = self._run(
+            results: list[PairwiseInstanceResult] = self._run(
                 instances=[
                     *instances,
                     *[
@@ -397,11 +396,11 @@ class PairwiseJudge(Judge[PairwiseInstance, PairwiseInstanceResult], ABC):
     @abstractmethod
     def _run(
         self,
-        instances: Sequence[PairwiseInstance],
-        criteria: Sequence[Criteria],
-    ) -> Sequence[PairwiseInstanceResult]: ...
+        instances: list[PairwiseInstance],
+        criteria: list[Criteria],
+    ) -> list[PairwiseInstanceResult]: ...
 
-    def get_predictions(self, instances: Sequence[PairwiseInstance]) -> list[list[str]]:
+    def get_predictions(self, instances: list[PairwiseInstance]) -> list[list[str]]:
         return [i.responses for i in instances]
 
     def get_descriptor(self) -> JudgeDescriptor:
@@ -411,14 +410,12 @@ class PairwiseJudge(Judge[PairwiseInstance, PairwiseInstanceResult], ABC):
 
     def _get_instances_from_str(
         self,
-        instances: Sequence[PairwiseInstance] | Sequence[str] | Sequence[list[str]],
-    ) -> Sequence[PairwiseInstance]:
-        parsed_instances: Sequence[PairwiseInstance]
-        if isinstance(instances, Sequence) and all(
-            isinstance(x, str) for x in instances
-        ):
+        instances: list[PairwiseInstance] | list[str] | list[list[str]],
+    ) -> list[PairwiseInstance]:
+        parsed_instances: list[PairwiseInstance]
+        if isinstance(instances, list) and all(isinstance(x, str) for x in instances):
             parsed_instances = cast(
-                Sequence[PairwiseInstance],
+                list[PairwiseInstance],
                 [
                     PairwiseInstance(
                         context={},
@@ -426,26 +423,26 @@ class PairwiseJudge(Judge[PairwiseInstance, PairwiseInstanceResult], ABC):
                         metadata=None,
                         responses=i,
                     )
-                    for i in cast(Sequence[list[str]], instances)
+                    for i in cast(list[list[str]], instances)
                 ],
             )
         else:
-            parsed_instances = cast(Sequence[PairwiseInstance], instances)
+            parsed_instances = cast(list[PairwiseInstance], instances)
         return parsed_instances
 
     def _get_parsed_criteria(
-        self, criteria: Sequence[Criteria] | Sequence[str]
-    ) -> Sequence[Criteria]:
-        if isinstance(criteria, Sequence) and all(isinstance(x, str) for x in criteria):
+        self, criteria: list[Criteria] | list[str]
+    ) -> list[Criteria]:
+        if isinstance(criteria, list) and all(isinstance(x, str) for x in criteria):
             return [
                 Criteria(
                     name="",
                     description=description,
                 )
-                for description in cast(Sequence[str], criteria)
+                for description in cast(list[str], criteria)
             ]
         else:
-            return cast(Sequence[Criteria], criteria)
+            return cast(list[Criteria], criteria)
 
 
 # ----------------------------------------------------------------------

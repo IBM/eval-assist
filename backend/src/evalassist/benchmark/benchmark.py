@@ -1,7 +1,6 @@
 import json
 import logging
 import traceback
-from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
 from typing import cast
 
@@ -124,7 +123,7 @@ def parse_and_store_results(
     card: str,
     dataset: IterableDataset,
     instances: list[DirectInstance],
-    results: Sequence[DirectInstanceResult],
+    results: list[DirectInstanceResult],
     judge: DirectJudge,
 ):
     criteria_names = [result.criteria.name for result in results]
@@ -321,7 +320,7 @@ def run_single_model_card(
             dataset, criteria
         )
 
-        results: Sequence[DirectInstanceResult] = judge(
+        results: list[DirectInstanceResult] = judge(
             parsed_dataset, criteria, check_positional_bias=True
         )
 
