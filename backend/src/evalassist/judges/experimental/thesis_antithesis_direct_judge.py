@@ -4,8 +4,8 @@ from typing import Any, cast
 from langchain.output_parsers import OutputFixingParser, ResponseSchema
 from langchain.prompts import PromptTemplate
 
-from .base import DirectJudge, UnitxtInferenceLangchainRunnable
-from .types import Criteria, DirectInstance, DirectInstanceResult
+from ..base import DirectJudge, UnitxtInferenceLangchainRunnable
+from ..types import Criteria, DirectInstance, DirectInstanceResult
 
 
 class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):

@@ -1,12 +1,11 @@
 import logging
-from collections.abc import Sequence
 from typing import cast
 
 from evalassist.judges import CriteriaOption
 
-from .base import DirectJudge
-from .simple_direct_judge import SimpleDirectJudge
-from .types import Criteria, DirectInstance, DirectInstanceResult
+from ..base import DirectJudge
+from ..simple_direct_judge import SimpleDirectJudge
+from ..types import Criteria, DirectInstance, DirectInstanceResult
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +16,9 @@ class CriticizedDirectJudge(DirectJudge):
 
     def _run(
         self,
-        instances: Sequence[DirectInstance],
-        criteria: Sequence[Criteria],
-    ) -> Sequence[DirectInstanceResult]:
+        instances: list[DirectInstance],
+        criteria: list[Criteria],
+    ) -> list[DirectInstanceResult]:
         simple_judge = SimpleDirectJudge(self.inference_engine)
         logger.info(f"Running evaluation on {len(instances)} instances...")
         results = simple_judge(instances, criteria)
