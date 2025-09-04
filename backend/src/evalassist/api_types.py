@@ -247,7 +247,6 @@ class FixInstanceRequest(BaseModel):
     evaluator_name: str
     type: EvaluatorTypeEnum
     instance: DirectInstanceDTO
-    criteria: CriteriaWithOptionsDTO
     result: DirectInstanceResult
 
 

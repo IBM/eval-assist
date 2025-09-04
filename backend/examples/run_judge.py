@@ -15,7 +15,7 @@ results = judge(
     instances=[
         "Use the API client to fetch data from the server and the cache to store frequently accessed results for faster performance."
     ],
-    criteria="Is the text self-explanatory and self-contained?",  # Create yes/no direct assessment criteria",
+    criteria="Is the text self-explanatory and self-contained?",  # Creates yes/no direct assessment criteria,
 )
 
 # providing criteria="Is the response self-explanatory?" is equal to the following criteria defintion
