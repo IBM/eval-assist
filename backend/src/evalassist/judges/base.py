@@ -21,6 +21,8 @@ from .types import (
     DirectInstanceResult,
     DirectPositionalBias,
     Instance,
+    MultiCriteria,
+    MultiCriteriaDirectInstanceResult,
     PairwiseInstance,
     PairwiseInstanceResult,
 )
@@ -97,7 +99,6 @@ class Judge(
         check_positional_bias: bool = False,
     ) -> list[ReturnVarType]:
         """Run the judge on a batch of instances and return the results."""
-
         if isinstance(criteria, list):
             if len(criteria) != len(instances):
                 raise ValueError(
@@ -266,6 +267,57 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
 
         return results
 
+    def evaluate_multi_criteria(
+        self,
+        instances: list[DirectInstance] | list[str],
+        multi_criteria: MultiCriteria | list[str] | list[Criteria],
+    ) -> list[MultiCriteriaDirectInstanceResult]:
+        if isinstance(multi_criteria, list):
+            criteria = self._get_parsed_criteria(multi_criteria)
+            parsed_multi_criteria = MultiCriteria.from_criteria(criteria)
+        else:
+            parsed_multi_criteria = multi_criteria
+
+        weighted_criteria = parsed_multi_criteria.items
+        criteria_count = len(weighted_criteria)
+        replicated_instances, replicated_criteria = zip(
+            *[
+                [instance, weighted_criterion.criterion]
+                for instance in instances
+                for weighted_criterion in weighted_criteria
+            ]
+        )
+        replicated_instances = list(replicated_instances)
+        replicated_criteria = list(replicated_criteria)
+
+        results = self.evaluate(replicated_instances, replicated_criteria)  # type: ignore
+
+        if any(r.score is None for r in results):
+            raise ValueError(
+                "One or more result didn't report a numeric score. Weighted criteria need a score to be calculated. Provide a score in all criteria options."
+            )
+
+        final_results: list[MultiCriteriaDirectInstanceResult] = []
+        for i in range(0, len(replicated_instances), len(weighted_criteria)):
+            per_criteria_results = results[i : i + criteria_count]
+            result = MultiCriteriaDirectInstanceResult(
+                multi_criteria=parsed_multi_criteria,
+                per_criterion_results=per_criteria_results,
+                per_criterion_score={
+                    item.criterion.name: item.get_score_from_result(per_criteria_result)
+                    for item, per_criteria_result in zip(
+                        parsed_multi_criteria.items, per_criteria_results
+                    )
+                },
+                aggregated_score=parsed_multi_criteria.get_aggregated_score(
+                    results={
+                        result.criteria.name: result for result in per_criteria_results
+                    }
+                ),
+            )
+            final_results.append(result)
+        return final_results
+
     def _get_instances_from_str(
         self, instances: list[DirectInstance] | list[str] | list[list[str]]
     ) -> list[DirectInstance]:
@@ -310,6 +362,7 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
                     description=criterion.description,
                     options=criterion.options,
                     prediction_field=criterion.prediction_field,
+                    context_fields=criterion.context_fields,
                 )
                 for criterion in cast(list[Criteria], criteria)
             ]
