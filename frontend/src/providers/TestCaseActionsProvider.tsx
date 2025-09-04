@@ -441,8 +441,8 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         evaluator_name: evaluatorName,
         type: type,
         instance: parsedToFixInstance,
-        criteria: parsedCriteria,
         result: {
+          criteria: parsedCriteria,
           option: result.option,
           score: null,
           explanation: result.explanation,
