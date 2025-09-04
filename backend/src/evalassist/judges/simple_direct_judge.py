@@ -4,25 +4,20 @@ from concurrent.futures import ThreadPoolExecutor
 from textwrap import dedent
 from typing import Any, cast
 
+from evalassist.judges.utils import get_context_dict
 from langchain.output_parsers import OutputFixingParser
 from langchain.prompts import PromptTemplate
 from langchain_core.exceptions import OutputParserException
 from pydantic import BaseModel, Field, field_validator
 from unitxt.inference import InferenceEngine
 
-from .base import (
-    DirectJudge,
-    UnitxtInferenceEngineMixin,
-    UnitxtInferenceLangchainRunnable,
-)
+from .base import DirectJudge, UnitxtInferenceLangchainRunnable
 from .types import Criteria, DirectInstance, DirectInstanceResult
 
 logger = logging.getLogger(__name__)
 
 
-class SimpleDirectJudge(
-    DirectJudge, UnitxtInferenceLangchainRunnable, UnitxtInferenceEngineMixin
-):
+class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
     generate_synthetic_persona: bool
     generate_feedback: bool
     judge_description_prompt: str | None
@@ -274,8 +269,8 @@ class SimpleDirectJudge(
 
         predictions: list[str] = [i.response for i in instances]
         context_variables_list: list[dict[str, str]] = [
-            instance.context if instance.context is not None else {}
-            for instance in instances
+            get_context_dict(instance, criterion)
+            for instance, criterion in zip(instances, criteria)
         ]
         str_context_variables_list: list[str | None] = [
             "\n\n".join(f"- {k}: {v}" for k, v in c.items()) if len(c) else None
