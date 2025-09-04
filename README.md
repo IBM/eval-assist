@@ -95,7 +95,8 @@ EvalAssist implements a [Judge API](https://github.com/IBM/eval-assist/blob/1aae
 - **UnitxtDirectJudge** and **UnitxtPairwiseJudge**: wrappers for Unitxt judges.
 - **MPrometheusDirectJudge** and **MPrometheusPairwiseJudge**: wrapper for the [M-Prometheus judges](https://github.com/prometheus-eval/prometheus-eval).
 - **DummyDirectJudge** and **DummyPairwiseJudge**: use as a guide to implement new judges.
-- **ThesisAntithesisDirectJudge**: a direct judge for complex scenarios where many options are available and it is important that the judge deeply analyses the nuances between them.
+
+Look at [the benchmarks results](https://evalassist-evalassist.hf.space/benchmarks/) to find out how the judges perform on different datasets created to benchmark LLM as a Judge evaluators.
 
 ## Contributing
 
