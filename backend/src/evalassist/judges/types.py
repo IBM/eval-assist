@@ -185,7 +185,7 @@ class MultiCriteria(BaseModel):
                 raise ValueError(f"Missing result for criterion {item.criterion.name}")
 
             score = item.get_score_from_result(result)
-            if item.required and score < 1.0:
+            if item.required and score < cast(float, item.weight):
                 return 0.0
             total += score
         return total
