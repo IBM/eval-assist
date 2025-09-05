@@ -321,6 +321,13 @@ class MultiCriteria(BaseModel):
                     )
         return self
 
+    @model_validator(mode="after")
+    def check_unique_criteria_names(self) -> Self:
+        criteria_names = [item.criterion.name for item in self.items]
+        if len(criteria_names) != len(set(criteria_names)):
+            raise ValueError("All criteria names must be unique")
+        return self
+
 
 class MultiCriteriaDirectInstanceResult(BaseModel):
     multi_criteria: MultiCriteria = Field(
