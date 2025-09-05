@@ -96,7 +96,7 @@ When configuring `MultiCriteria`, you have several options to adjust how the agg
 * `score_threshold`: If specified, the score for the criterion will be 1.0 if the result score is above this threshold, and 0.0 otherwise.
 * `required`: If set to `True`, the aggregated score will be 0.0 if the score for this criterion does not match the maximum possible value (i.e., its weight).
 
-By default, the scores for each criterion are normalized between 0 and 1 based on the minimum and maximum scores of the criterion's options.
+By default, the scores for each criterion are normalized between 0 and 1 based on the minimum and maximum scores of the criterion's options. To disable this, pass `normalize_scores=False` to the MultiCriteria object.
 
 ### Example Usage
 
