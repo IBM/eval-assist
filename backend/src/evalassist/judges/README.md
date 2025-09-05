@@ -8,7 +8,7 @@ The judges module is a component of the EvalAssist project, designed to evaluate
 
 ### Types
 
-The module defines several key types in [`types.py`](backend/src/evalassist/judges/types.py):
+The module defines several key types in [`types.py`](./types.py):
 
 * `Instance`: Abstract base class for evaluation instances.
 * `DirectInstance` and `PairwiseInstance`: Concrete subclasses for direct and pairwise evaluations.
