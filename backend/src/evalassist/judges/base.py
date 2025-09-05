@@ -278,13 +278,13 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
         else:
             parsed_multi_criteria = multi_criteria
 
-        weighted_criteria = parsed_multi_criteria.items
-        criteria_count = len(weighted_criteria)
+        multi_criteria_items = parsed_multi_criteria.items
+        criteria_count = len(multi_criteria_items)
         replicated_instances, replicated_criteria = zip(
             *[
                 [instance, weighted_criterion.criterion]
                 for instance in instances
-                for weighted_criterion in weighted_criteria
+                for weighted_criterion in multi_criteria_items
             ]
         )
         replicated_instances = list(replicated_instances)
@@ -298,7 +298,7 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
             )
 
         final_results: list[MultiCriteriaDirectInstanceResult] = []
-        for i in range(0, len(replicated_instances), len(weighted_criteria)):
+        for i in range(0, len(replicated_instances), criteria_count):
             per_criteria_results = results[i : i + criteria_count]
             result = MultiCriteriaDirectInstanceResult(
                 multi_criteria=parsed_multi_criteria,
