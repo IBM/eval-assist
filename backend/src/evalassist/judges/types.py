@@ -1,8 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Self, cast
+from typing import Any, cast
 
 from pydantic import BaseModel, Field, RootModel, field_validator, model_validator
+from typing_extensions import Self
 from unitxt.llm_as_judge import Criteria as UnitxtCriteria
 from unitxt.llm_as_judge import CriteriaOption as UnitxtCriteriaOption
 from unitxt.llm_as_judge import CriteriaWithOptions as UnitxtCriteriaWithOptions
