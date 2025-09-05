@@ -441,6 +441,35 @@ class TestMultiCriteria(unittest.TestCase):
 
         self.assertEqual(aggregated_score, 0.0)
 
+    def test_duplicate_criteria_names(self):
+        # Create multiple criteria with duplicate names
+        criterion1 = Criteria(
+            name="criterion1",
+            description="Criterion 1",
+            options=[
+                CriteriaOption(name="Good", description="", score=1.0),
+                CriteriaOption(name="Bad", description="", score=0.0),
+            ],
+        )
+
+        criterion2 = Criteria(
+            name="criterion1",  # Duplicate name
+            description="Criterion 2",
+            options=[
+                CriteriaOption(name="Good", description="", score=1.0),
+                CriteriaOption(name="Bad", description="", score=0.0),
+            ],
+        )
+
+        # Create a MultiCriteria with duplicate criteria names
+        with self.assertRaises(ValidationError):
+            MultiCriteria(
+                items=[
+                    MultiCriteriaItem(criterion=criterion1, weight=0.5),
+                    MultiCriteriaItem(criterion=criterion2, weight=0.5),
+                ]
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
