@@ -1,4 +1,49 @@
+from pydantic import BaseModel, create_model, field_validator
+
 from .types import Criteria, Instance
+
+
+def generate_dynamic_model(
+    model_name: str, option_names: list[str], include_feedback: bool
+):
+    # Field definitions
+    field_defs = {
+        "assessment": (str, ...),
+        "selected_option": (str, ...),
+    }
+
+    # Validator function to enforce valid options
+    def validate_selected_option(cls, value: str) -> str:
+        if value not in option_names:
+            raise ValueError(f"value must be one of {option_names}")
+        return value
+
+    # Wrap with field_validator decorator
+    validators = {
+        "validate_selected_option": field_validator("selected_option", mode="after")(
+            validate_selected_option
+        )
+    }
+
+    # Create base dynamic model
+    dynamic_model = create_model(
+        model_name,
+        __config__=None,
+        __doc__=None,
+        __base__=BaseModel,
+        __module__=__name__,
+        __validators__=validators,
+        __cls_kwargs__=None,
+        **field_defs,
+    )
+
+    # Optionally extend with a feedback field
+    if include_feedback:
+        dynamic_model = create_model(
+            f"{model_name}WithFeedback", __base__=dynamic_model, feedback=(str, "")
+        )
+
+    return dynamic_model
 
 
 def get_context_dict(instance: Instance, criteria: Criteria) -> dict[str, str]:
