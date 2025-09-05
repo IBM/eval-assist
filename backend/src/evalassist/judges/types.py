@@ -12,23 +12,36 @@ logger = logging.getLogger(__name__)
 
 
 class Instance(BaseModel, ABC):
-    context: dict[str, str] = Field(default_factory=dict)
-    expected_result: str | None = None
-    metadata: dict[str, Any] | None = None
+    context: dict[str, str] = Field(
+        default_factory=dict,
+        description="Additional context information for the instance, stored as key-value pairs.",
+    )
+    expected_result: str | None = Field(
+        default=None,
+        description="The expected result or ground truth for the instance, if available.",
+    )
+    metadata: dict[str, Any] | None = Field(
+        default=None,
+        description="Additional metadata about the instance, stored as key-value pairs.",
+    )
 
     @abstractmethod
     def get_prediction(self) -> Any: ...  # noqa: E704
 
 
 class DirectInstance(Instance):
-    response: str
+    response: str = Field(
+        description="The response or prediction generated for the instance."
+    )
 
     def get_prediction(self):
         return self.response
 
 
 class PairwiseInstance(Instance):
-    responses: list[str]
+    responses: list[str] = Field(
+        description="A list of responses or predictions to be compared in a pairwise evaluation."
+    )
 
     def get_prediction(self):
         return self.responses
@@ -50,17 +63,33 @@ class PairwiseInstanceResult(RootModel):
 
 
 class CriteriaOption(BaseModel):
-    name: str
-    description: str
-    score: float | None = None
+    name: str = Field(description="The name or label of the criteria option.")
+    description: str = Field(
+        description="A detailed description of the criteria option.", default=""
+    )
+    score: float | None = Field(
+        default=None,
+        description="The score associated with this criteria option, if applicable.",
+    )
 
 
 class Criteria(BaseModel):
-    name: str
-    description: str
-    prediction_field: str | None = None
-    context_fields: list[str] | None = None
-    options: list[CriteriaOption] = Field(default_factory=list)
+    name: str = Field(description="The name or identifier of the criteria.")
+    description: str = Field(
+        description="A detailed description of the criteria and its purpose."
+    )
+    prediction_field: str | None = Field(
+        default=None,
+        description="The field in the instance that contains the prediction to be evaluated against this criteria.",
+    )
+    context_fields: list[str] | None = Field(
+        default=None,
+        description="A list of fields in the instance's context that are relevant to this criteria.",
+    )
+    options: list[CriteriaOption] = Field(
+        default_factory=list,
+        description="A list of possible options or outcomes for this criteria, along with their descriptions and scores.",
+    )
 
     def get_score_from_option(self, option_name: str):
         try:
@@ -133,12 +162,39 @@ class DirectInstanceResult(BaseModel):
 
 
 class MultiCriteriaItem(BaseModel):
-    criterion: Criteria
-    weight: float | None = Field(default=None, ge=0.0, le=1.0)
-    target_option: str | None = None
-    score_threshold: float | None = None
-    normalize_scores: bool = True
-    required: bool = False
+    criterion: Criteria = Field(
+        description="The criteria being evaluated in this multi-criteria item."
+    )
+    weight: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="The weight assigned to this criteria in the overall evaluation. If None, the weight is determined by the MultiCriteria configuration.",
+    )
+    target_option: str | None = Field(
+        default=None,
+        description="The target option for this criteria. If specified, the score is 1.0 if the result matches this option, and 0.0 otherwise.",
+    )
+    score_threshold: float | None = Field(
+        default=None,
+        description="The score threshold for this criteria. If specified, the score is 1.0 if the result score is above this threshold, and 0.0 otherwise.",
+    )
+    normalize_scores: bool = Field(
+        default=True,
+        description="Whether to normalize the scores for this criteria. Normalization scales scores to a range between 0 and 1.",
+    )
+    required: bool = Field(
+        default=False,
+        description="Whether this criteria is required. If True and the score is not the optimal (or more than the score_threshold if provided, or the selected option equal to the target_option if provided), the overall aggregated score will be 0.0.",
+    )
+
+    def normalized(self, unnormalized_score: float | None) -> float | None:
+        scores: list[float | None] = [option.score for option in self.criterion.options]
+        if any(score is None for score in scores):
+            return None
+        min_score = min(scores)  # type: ignore
+        max_score = max(scores)  # type: ignore
+        return (unnormalized_score - min_score) / (max_score - min_score)
 
     def get_score_from_result(self, result: DirectInstanceResult) -> float:
         score: float = cast(float, result.score)
@@ -148,7 +204,18 @@ class MultiCriteriaItem(BaseModel):
             score = 1.0 if score > self.score_threshold else 0.0
 
         if self.weight is not None:
+            if self.normalize_scores:
+                if result.score == 10.0:
+                    ...
+                normalized_score = self.normalized(score)
+                if normalized_score is None:
+                    raise ValueError(
+                        "normalize_score is True and either the result score or the criteria option is None"
+                    )
+                return self.weight * normalized_score
+
             return self.weight * score
+
         return score
 
     @model_validator(mode="after")
@@ -163,11 +230,7 @@ class MultiCriteriaItem(BaseModel):
     def normalize_scores_if_needed(self) -> Self:
         scores: list[float | None] = [option.score for option in self.criterion.options]
         if self.normalize_scores and all(score is not None for score in scores):
-            min_score = min(scores)  # type: ignore
-            max_score = max(scores)  # type: ignore
-            normalized_scores = [
-                (score - min_score) / (max_score - min_score) for score in scores
-            ]
+            normalized_scores = [self.normalized(score) for score in scores]
             for option, normalized_score in zip(
                 self.criterion.options, normalized_scores
             ):
@@ -176,7 +239,9 @@ class MultiCriteriaItem(BaseModel):
 
 
 class MultiCriteria(BaseModel):
-    items: list[MultiCriteriaItem]
+    items: list[MultiCriteriaItem] = Field(
+        description="A list of MultiCriteriaItem objects representing the multiple criteria to be evaluated."
+    )
 
     def get_aggregated_score(self, results: dict[str, DirectInstanceResult]) -> float:
         total = 0.0
@@ -258,7 +323,15 @@ class MultiCriteria(BaseModel):
 
 
 class MultiCriteriaDirectInstanceResult(BaseModel):
-    multi_criteria: MultiCriteria
-    per_criterion_results: list[DirectInstanceResult]
-    per_criterion_score: dict[str, float]
-    aggregated_score: float
+    multi_criteria: MultiCriteria = Field(
+        description="The MultiCriteria configuration used for this evaluation."
+    )
+    per_criterion_results: list[DirectInstanceResult] = Field(
+        description="A list of DirectInstanceResult objects, one for each criterion in the multi-criteria evaluation."
+    )
+    per_criterion_score: dict[str, float] = Field(
+        description="A dictionary mapping criterion names to their respective scores."
+    )
+    aggregated_score: float = Field(
+        description="The overall aggregated score for the instance across all criteria."
+    )
