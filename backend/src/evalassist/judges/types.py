@@ -1,4 +1,5 @@
 import logging
+import math
 from abc import ABC, abstractmethod
 from typing import Any, cast
 
@@ -179,10 +180,6 @@ class MultiCriteriaItem(BaseModel):
         default=None,
         description="The score threshold for this criteria. If specified, the score is 1.0 if the result score is above this threshold, and 0.0 otherwise.",
     )
-    normalize_scores: bool = Field(
-        default=True,
-        description="Whether to normalize the scores for this criteria. Normalization scales scores to a range between 0 and 1.",
-    )
     required: bool = Field(
         default=False,
         description="Whether this criteria is required. If True and the score is not the optimal (or more than the score_threshold if provided, or the selected option equal to the target_option if provided), the overall aggregated score will be 0.0.",
@@ -204,19 +201,9 @@ class MultiCriteriaItem(BaseModel):
             score = 1.0 if score > self.score_threshold else 0.0
 
         if self.weight is not None:
-            if self.normalize_scores:
-                if result.score == 10.0:
-                    ...
-                normalized_score = self.normalized(score)
-                if normalized_score is None:
-                    raise ValueError(
-                        "normalize_score is True and either the result score or the criteria option is None"
-                    )
-                return self.weight * normalized_score
-
             return self.weight * score
-
-        return score
+        else:
+            raise ValueError(f"{self.criterion.name}'s weight is None, it shouldn't!")
 
     @model_validator(mode="after")
     def validate_strategy(self) -> Self:
@@ -226,21 +213,14 @@ class MultiCriteriaItem(BaseModel):
             )
         return self
 
-    @model_validator(mode="after")
-    def normalize_scores_if_needed(self) -> Self:
-        scores: list[float | None] = [option.score for option in self.criterion.options]
-        if self.normalize_scores and all(score is not None for score in scores):
-            normalized_scores = [self.normalized(score) for score in scores]
-            for option, normalized_score in zip(
-                self.criterion.options, normalized_scores
-            ):
-                option.score = normalized_score
-        return self
-
 
 class MultiCriteria(BaseModel):
     items: list[MultiCriteriaItem] = Field(
         description="A list of MultiCriteriaItem objects representing the multiple criteria to be evaluated."
+    )
+    normalize_scores: bool = Field(
+        default=True,
+        description="Whether to normalize the scores for the criteria items. Normalization scales scores to a range between 0.0 and 1.0",
     )
 
     def get_aggregated_score(self, results: dict[str, DirectInstanceResult]) -> float:
@@ -250,11 +230,11 @@ class MultiCriteria(BaseModel):
             if result is None:
                 raise ValueError(f"Missing result for criterion {item.criterion.name}")
 
-            score = item.get_score_from_result(result)
+            score: float = item.get_score_from_result(result)
             if item.required and score < cast(float, item.weight):
                 return 0.0
             total += score
-        return total
+        return round(total, 9)
 
     @classmethod
     def from_criteria(cls, criteria: list[Criteria]) -> "MultiCriteria":
@@ -263,14 +243,6 @@ class MultiCriteria(BaseModel):
         equal_weight = 1.0 / len(criteria)
         items = [MultiCriteriaItem(criterion=c, weight=equal_weight) for c in criteria]
         return cls(items=items)
-
-    @model_validator(mode="after")
-    def check_weights(self) -> Self:
-        if all(item.weight is not None for item in self.items):
-            total_weight = sum(cast(float, item.weight) for item in self.items)
-            if total_weight != 1.0:
-                raise ValueError("Total weight must sum to 1.0")
-        return self
 
     @field_validator("items")
     @classmethod
@@ -301,24 +273,52 @@ class MultiCriteria(BaseModel):
                     w.weight = equal_weight
         return value
 
-    @field_validator("items")
-    @classmethod
-    def validate_score(cls, items: list[MultiCriteriaItem]) -> list[MultiCriteriaItem]:
-        missing_scores = []
-        for item in items:
+    @model_validator(mode="after")
+    def check_weights(self) -> Self:
+        if all(item.weight is not None for item in self.items):
+            total_weight = sum(cast(float, item.weight) for item in self.items)
+            if not math.isclose(total_weight, 1.0, rel_tol=1e-9, abs_tol=1e-9):
+                raise ValueError(
+                    f"Total weight must sum to 1.0. Weights are: {', '.join(str(item.weight) for item in self.items)} which adds up to {total_weight}"
+                )
+        return self
+
+    @model_validator(mode="after")
+    def validate_score(self: Self) -> Self:
+        invalid_items = []
+        for item in self.items:
             if any(option.score is None for option in item.criterion.options):
-                missing_scores.append(item.criterion.name)
-        if len(missing_scores) > 0:
+                if item.target_option is None:
+                    invalid_items.append(item.criterion.name)
+
+        if len(invalid_items) > 0:
             raise ValueError(
-                f"The following criteria are missing option scores: {', '.join(missing_scores)}"
+                f"The following criteria are missing option scores: {', '.join(invalid_items)}. If you don't provide all option scores, target_option should be set."
             )
-        return items
+
+        return self
 
     @model_validator(mode="after")
     def set_criteria_name_if_needed(self) -> Self:
         for i, item in enumerate(self.items):
             if item.criterion.name == "":
                 item.criterion.name = f"criteria_{i + 1}"
+        return self
+
+    @model_validator(mode="after")
+    def normalize_scores_if_needed(self) -> Self:
+        if self.normalize_scores:
+            for item in self.items:
+                scores: list[float | None] = [
+                    option.score for option in item.criterion.options
+                ]
+                if all(score is not None for score in scores):
+                    for option in item.criterion.options:
+                        option.score = item.normalized(option.score)
+                else:
+                    logger.warning(
+                        f"{item.criterion.name} option scores can't be normalized because one or more option scores are None"
+                    )
         return self
 
 
