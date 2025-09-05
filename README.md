@@ -89,14 +89,7 @@ results = judge(
 )
 ```
 
-EvalAssist implements a [Judge API](https://github.com/IBM/eval-assist/blob/1aae10e030cd3e78b0b6049bf90e8cc31a418931/backend/src/evalassist/judges/base.py#L59) for easily defining and trying different LLM judges. Currently, the following judges are available:
-
-- **SimpleDirectJudge**: a judge that uses structured output parsing to make evaluations. It has support for providing feedback in addition to the explanation and the selected option.
-- **UnitxtDirectJudge** and **UnitxtPairwiseJudge**: wrappers for Unitxt judges.
-- **MPrometheusDirectJudge** and **MPrometheusPairwiseJudge**: wrapper for the [M-Prometheus judges](https://github.com/prometheus-eval/prometheus-eval).
-- **DummyDirectJudge** and **DummyPairwiseJudge**: use as a guide to implement new judges.
-
-Look at [the benchmarks results](https://evalassist-evalassist.hf.space/benchmarks/) to find out how the judges perform on different datasets created to benchmark LLM as a Judge evaluators.
+Look at the documentation [of the judges sub-package](/backend/src/evalassist/judges/README.md).
 
 ## Contributing
 

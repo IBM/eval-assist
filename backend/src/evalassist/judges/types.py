@@ -47,21 +47,6 @@ class PairwiseInstance(Instance):
         return self.responses
 
 
-class SingleSystemPairwiseResult(BaseModel):
-    contest_results: list[bool]
-    compared_to: list[int]
-    explanations: list[str]
-    positional_bias: list[bool] | None = None
-    certainty: list[float] | None = None
-    winrate: float
-    ranking: int
-    selections: list[str]
-
-
-class PairwiseInstanceResult(RootModel):
-    root: dict[str, SingleSystemPairwiseResult]
-
-
 class CriteriaOption(BaseModel):
     name: str = Field(description="The name or label of the criteria option.")
     description: str = Field(
@@ -144,6 +129,21 @@ class Criteria(BaseModel):
                 for option in unitxt_criteria.options
             ]
         return res
+
+
+class SingleSystemPairwiseResult(BaseModel):
+    contest_results: list[bool]
+    compared_to: list[int]
+    explanations: list[str]
+    positional_bias: list[bool] | None = None
+    certainty: list[float] | None = None
+    winrate: float
+    ranking: int
+    selections: list[str]
+
+
+class PairwiseInstanceResult(RootModel):
+    root: dict[str, SingleSystemPairwiseResult]
 
 
 class DirectPositionalBias(BaseModel):
