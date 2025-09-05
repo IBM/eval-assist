@@ -215,6 +215,132 @@ class TestMultiCriteria(unittest.TestCase):
         with self.assertRaises(ValueError):
             multi_criteria.get_aggregated_score(results={criterion1.name: result1})
 
+    def test_strategy_mix(self):
+        criterion_a = Criteria(
+            name="test_criterion_a",
+            description="Test criterion",
+            options=[
+                CriteriaOption(name="Good", description="", score=1.0),
+                CriteriaOption(name="Bad", description="", score=0.0),
+            ],
+        )
+
+        criterion_b = Criteria(
+            name="test_criterion_b",
+            description="Test criterion",
+            options=[
+                CriteriaOption(name="Correct", description="", score=5.0),
+                CriteriaOption(name="Incorrect", description="", score=0.0),
+            ],
+        )
+
+        criterion_c = Criteria(
+            name="test_criterion_c",
+            description="Test criterion",
+            options=[
+                CriteriaOption(name="Yes", description=""),
+                CriteriaOption(name="No", description=""),
+            ],
+        )
+
+        result_a = DirectInstanceResult(
+            criteria=criterion_a,
+            option="Good",
+            score=1.0,
+            explanation="",
+            feedback=None,
+        )
+
+        # Create a DirectInstanceResult
+        result_b = DirectInstanceResult(
+            criteria=criterion_b,
+            option="Correct",
+            score=1.0,
+            explanation="",
+            feedback=None,
+        )
+
+        result_c = DirectInstanceResult(
+            criteria=criterion_c,
+            option="Yes",
+            score=None,
+            explanation="",
+            feedback=None,
+        )
+
+        item_a = MultiCriteriaItem(criterion=criterion_a, weight=0.6)
+        item_b = MultiCriteriaItem(criterion=criterion_b, weight=0.2)
+        item_c = MultiCriteriaItem(
+            criterion=criterion_c, weight=0.2, target_option="Yes"
+        )
+
+        multi_criteria = MultiCriteria(
+            items=[
+                item_a,
+                item_b,
+                item_c,
+            ],
+            normalize_scores=True,
+        )
+
+        aggregated_score = multi_criteria.get_aggregated_score(
+            results={
+                criterion_a.name: result_a,
+                criterion_b.name: result_b,
+                criterion_c.name: result_c,
+            }
+        )
+        self.assertEqual(aggregated_score, 1.0)
+
+        criterion_d = Criteria(
+            name="test_criterion_d",
+            description="Test criterion",
+            options=[
+                CriteriaOption(name="Yes", description=""),
+                CriteriaOption(name="No", description=""),
+            ],
+        )
+
+        result_d = DirectInstanceResult(
+            criteria=criterion_d,
+            option="Yes",
+            score=None,
+            explanation="",
+            feedback=None,
+        )
+
+        item_a.weight = 0.4
+        item_d = MultiCriteriaItem(
+            criterion=criterion_d, weight=0.2, required=True, target_option="No"
+        )
+
+        multi_criteria = MultiCriteria(
+            items=[
+                item_a,
+                item_b,
+                item_c,
+                item_d,
+            ],
+            normalize_scores=False,
+        )
+
+        aggregated_score = multi_criteria.get_aggregated_score(
+            results={
+                criterion_a.name: result_a,
+                criterion_b.name: result_b,
+                criterion_c.name: result_c,
+                criterion_d.name: result_d,
+            }
+        )
+
+        self.assertEqual(aggregated_score, 0.0)
+
+        self.assertEqual(item_a.get_score_from_result(result=result_a), 0.4)
+        result_b.score = 5.0
+        self.assertEqual(item_b.get_score_from_result(result=result_b), 0.2 * 5.0)
+        self.assertEqual(item_c.get_score_from_result(result=result_c), 0.2)
+        self.assertEqual(item_d.get_score_from_result(result=result_d), 0.0)
+
     def test_target_option(self):
         # Create a criterion
         criterion = Criteria(
