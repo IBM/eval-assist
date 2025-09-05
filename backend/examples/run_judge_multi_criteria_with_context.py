@@ -19,7 +19,7 @@ judge = SimpleDirectJudge(
 )
 
 criteria_a = Criteria(
-    name="self-explanatory",
+    name="Self-explanatory",
     description="Is the text self-explanatory and self-contained?",
     options=[
         CriteriaOption(name="Yes", description="", score=1.0),
@@ -31,7 +31,7 @@ criteria_a = Criteria(
 
 criteria_b = Criteria(
     name="Consistent",
-    description="Is the text consistent?",
+    description="Does the text maintain internal consistency?",
     options=[
         CriteriaOption(name="Yes", description="", score=1.0),
         CriteriaOption(name="No", description="", score=0.0),
@@ -40,23 +40,66 @@ criteria_b = Criteria(
     context_fields=["summary"],
 )
 
+criteria_c = Criteria(
+    name="Technical Accuracy",
+    description="Is the response technically accurate based on the reference?",
+    options=[
+        CriteriaOption(name="Correct", description="", score=1.0),
+        CriteriaOption(name="Incorrect", description="", score=0.0),
+    ],
+    prediction_field="response",
+    context_fields=["reference_text"],
+)
+
+
+# 🔹 Multi-criteria configuration
 multi_criteria = MultiCriteria(
     items=[
+        # Weighted criterion: contributes 50% of final score
         MultiCriteriaItem(
             criterion=criteria_a,
+            weight=0.5,
         ),
+        # Weighted criterion: contributes 30% of final score
         MultiCriteriaItem(
             criterion=criteria_b,
+            weight=0.3,
+        ),
+        # Required criterion: if failed, final score is 0.0 regardless of others
+        MultiCriteriaItem(
+            criterion=criteria_c,
+            weight=0.2,
+            required=True,
         ),
     ]
 )
 
+
 instances = [
+    # Failing case: self-explanatory + consistent, but technically wrong
     DirectInstance(
-        context={"reference_text": "reference text", "summary": "summary"},
-        response="Use the API client to fetch data from the server and the cache to store frequently accessed results for faster performance.",
+        context={
+            "reference_text": "Use the API client to fetch data, and cache results for efficiency.",
+            "summary": "API client usage and caching",
+        },
+        response=(
+            "You should always query the database directly. "
+            "Caching is optional and the API client is unnecessary."
+        ),
+    ),
+    # Passing case: clear, consistent, and technically correct
+    DirectInstance(
+        context={
+            "reference_text": "Use the API client to fetch data, and cache results for efficiency.",
+            "summary": "API client usage and caching",
+        },
+        response=(
+            "Use the API client to retrieve data. "
+            "For frequently accessed results, store them in a cache to improve performance."
+        ),
     ),
 ]
+
 
 results: list[MultiCriteriaDirectInstanceResult] = judge.evaluate_multi_criteria(
     instances=instances,
@@ -64,11 +107,8 @@ results: list[MultiCriteriaDirectInstanceResult] = judge.evaluate_multi_criteria
 )
 
 
-print(results[0].model_dump_json(exclude={"per_criterion_results"}, indent=4))
-
-# print("### Aggregated score")
-# print(f"{results[0].aggregated_score}")
-
-# print("### Per criteria score")
-# for criterion_result in results[0].per_criterion_results:
-#     print(f"{criterion_result.criteria.name}: {criterion_result.score}")
+for idx, res in enumerate(results, start=1):
+    print(f"\n=== Instance {idx} ===")
+    print(f"Aggregated score: {res.aggregated_score:.2f}")
+    for c in res.per_criterion_results:
+        print(f" - {c.criteria.name}: {c.option} → score={c.score}")

@@ -61,10 +61,12 @@ print(
         exclude={"multi_criteria", "per_criterion_results"}, indent=4
     )
 )
-
-print("### Aggregated score")
-print(f"{results[0].aggregated_score}")
-
-print("### Per criteria score")
-for criterion_result in results[0].per_criterion_results:
-    print(f"{criterion_result.criteria.name}: {criterion_result.score}")
+"""
+{
+    "per_criterion_score": {
+        "criteria_1": 0.5,
+        "criteria_2": 0.5
+    },
+    "aggregated_score": 1.0
+}
+"""
