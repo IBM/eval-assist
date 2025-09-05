@@ -4,11 +4,11 @@ from concurrent.futures import ThreadPoolExecutor
 from textwrap import dedent
 from typing import Any, cast
 
-from evalassist.judges.utils import get_context_dict
+from evalassist.judges.utils import generate_dynamic_model, get_context_dict
 from langchain.output_parsers import OutputFixingParser
 from langchain.prompts import PromptTemplate
 from langchain_core.exceptions import OutputParserException
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from unitxt.inference import InferenceEngine
 
 from .base import DirectJudge, UnitxtInferenceLangchainRunnable
@@ -208,37 +208,15 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         feedback_step_sections = []
         prediction_fields = []
         for criterion in criteria:
-            criterion_names = [o.name for o in criterion.options]
-
-            class DynamicOutputJudgeModel(BaseModel):
-                assessment: str = Field(..., description="Step by step assessment")
-                selected_option: str = Field(
-                    ...,
-                    description=f"The chosen option. Any of {', '.join([o.name for o in criterion.options])}",
-                )
-
-                @field_validator("selected_option")
-                def validate_value(cls, v):
-                    if v not in criterion_names:
-                        raise ValueError(f"value must be one of {criterion_names}")
-                    return v
-
-            class DynamicOutputJudgeModelWithFeedback(DynamicOutputJudgeModel):
-                feedback: str = Field(
-                    default="",
-                    description=f"Actionable suggestions that would help improve the evaluated {criterion.prediction_field if criterion.prediction_field is not None else 'response'} based on the assessment",
-                )
-
-            output_model_klass = (
-                DynamicOutputJudgeModelWithFeedback
-                if self.generate_feedback
-                else DynamicOutputJudgeModel
+            klass = generate_dynamic_model(
+                model_name=f"{criterion.name}_model",
+                option_names=[o.name for o in criterion.options],
+                include_feedback=self.generate_feedback,
             )
+            classes.append(klass)
 
-            classes.append(output_model_klass)
-
-            output_parser: OutputFixingParser[DynamicOutputJudgeModel] = (
-                self.get_pydantic_output_fixing_parser(output_model_klass)
+            output_parser: OutputFixingParser = self.get_pydantic_output_fixing_parser(
+                klass
             )
             output_parsers.append(output_parser)
 
@@ -416,6 +394,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
                 option=selected_option,
                 explanation=explanation,
                 feedback=feedback,
+                # score=next(iter(option.name for option in criterion.options if option.name == selected_option)).score,
                 positional_bias=None,
                 metadata={
                     **parsing_metadata,
