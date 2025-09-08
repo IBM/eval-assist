@@ -56,11 +56,12 @@ results: list[MultiCriteriaDirectInstanceResult] = judge.evaluate_multi_criteria
 #     ]
 # )
 
-print(
-    results[0].model_dump_json(
-        exclude={"multi_criteria", "per_criterion_results"}, indent=4
+print(f"Aggregated score: {results[0].aggregated_score:.2f}")
+for item_result in results[0].item_results:
+    print(
+        f"{item_result.criteria_name} -> {item_result.score} (weighted: {item_result.weighted_score})"
     )
-)
+
 """
 {
     "per_criterion_score": {
