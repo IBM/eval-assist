@@ -11,7 +11,7 @@ from langchain_core.exceptions import OutputParserException
 from pydantic import BaseModel, Field
 from unitxt.inference import InferenceEngine
 
-from .base import DirectJudge, UnitxtInferenceLangchainRunnable
+from .base import DirectJudge, JudgeDescriptor, UnitxtInferenceLangchainRunnable
 from .types import Criteria, DirectInstance, DirectInstanceResult
 
 logger = logging.getLogger(__name__)
@@ -63,6 +63,11 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
 
     def get_name(self) -> str:
         return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}{'_with_self_consistency' if self.use_self_consistency else ''}"
+
+    def get_descriptor(self) -> JudgeDescriptor:
+        judge_descriptor = JudgeDescriptor(self.get_name(), "direct", "")
+        judge_descriptor.inference_engine_id = self.get_inference_engine_id()
+        return judge_descriptor
 
     def generate_personas(
         self,

@@ -63,10 +63,15 @@ from .const import (
 )
 from .database import engine  # Assumes you have engine/session setup
 from .extended_unitxt import EXTENDED_EVALUATORS_METADATA
-from .judges import Criteria, SimpleDirectJudge
-from .judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
-from .judges.types import DirectInstance, PairwiseInstance
-from .judges.unitxt_judges import GraniteGuardianJudge, UnitxtPairwiseJudge
+from .judges import (
+    DEFAULT_JUDGE_INFERENCE_PARAMS,
+    Criteria,
+    DirectInstance,
+    GraniteGuardianJudge,
+    PairwiseInstance,
+    SimpleDirectJudge,
+    UnitxtPairwiseJudge,
+)
 from .model import AppUser, StoredTestCase
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
 

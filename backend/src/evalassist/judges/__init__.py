@@ -17,7 +17,7 @@ from .types import (
     PairwiseInstanceResult,
     SingleSystemPairwiseResult,
 )
-from .unitxt_judges import UnitxtDirectJudge, UnitxtPairwiseJudge
+from .unitxt_judges import GraniteGuardianJudge, UnitxtDirectJudge, UnitxtPairwiseJudge
 
 __all__: list[str] = [
     "Judge",
@@ -44,4 +44,5 @@ __all__: list[str] = [
     "MultiCriteria",
     "MultiCriteriaItem",
     "MultiCriteriaDirectInstanceResult",
+    "GraniteGuardianJudge",
 ]
