@@ -1,7 +1,7 @@
 import logging
 import math
 from abc import ABC, abstractmethod
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, Field, RootModel, field_validator, model_validator
 from typing_extensions import Self
@@ -162,6 +162,19 @@ class DirectInstanceResult(BaseModel):
     positional_bias: DirectPositionalBias | None = None
 
 
+MultiCriteriaStrategy = Literal["target_option", "score_threshold", "none"]
+
+
+class MultiCriteriaItemResult(BaseModel):
+    criteria_name: str
+    weight: float
+    score: float | None
+    weighted_score: float | None
+    option: str
+    strategy: MultiCriteriaStrategy
+    required: bool
+
+
 class MultiCriteriaItem(BaseModel):
     criterion: Criteria = Field(
         description="The criteria being evaluated in this multi-criteria item."
@@ -193,17 +206,45 @@ class MultiCriteriaItem(BaseModel):
         max_score = max(scores)  # type: ignore
         return (unnormalized_score - min_score) / (max_score - min_score)
 
-    def get_score_from_result(self, result: DirectInstanceResult) -> float:
-        score: float = cast(float, result.score)
+    def get_strategy(self) -> MultiCriteriaStrategy:
+        if self.target_option is not None:
+            return "target_option"
+        if self.score_threshold is not None:
+            return "score_threshold"
+        return "none"
+
+    def get_score(self, result: DirectInstanceResult) -> float | None:
+        score = result.score
+        if score is None and self.target_option is None:
+            return None
+
         if self.target_option is not None:
             score = 1.0 if result.option == self.target_option else 0.0
+
         elif self.score_threshold is not None:
+            if score is None:
+                raise ValueError(
+                    "Result doesn't have a score, probably becuase option score wansn't set and score_threshold was set."
+                )
             score = 1.0 if score > self.score_threshold else 0.0
 
-        if self.weight is not None:
-            return self.weight * score
-        else:
+        if self.weight is None:
             raise ValueError(f"{self.criterion.name}'s weight is None, it shouldn't!")
+
+        return score
+
+    def get_result(self, result: DirectInstanceResult) -> MultiCriteriaItemResult:
+        weight = cast(float, self.weight)
+        score: float | None = self.get_score(result)
+        return MultiCriteriaItemResult(
+            criteria_name=self.criterion.name,
+            weight=weight,
+            score=score,
+            weighted_score=score * weight if score is not None else None,
+            option=result.option,
+            strategy=self.get_strategy(),
+            required=self.required,
+        )
 
     @model_validator(mode="after")
     def validate_strategy(self) -> Self:
@@ -223,17 +264,27 @@ class MultiCriteria(BaseModel):
         description="Whether to normalize the scores for the criteria items. Normalization scales scores to a range between 0.0 and 1.0",
     )
 
-    def get_aggregated_score(self, results: dict[str, DirectInstanceResult]) -> float:
+    def get_aggregated_score(
+        self, item_results: list[MultiCriteriaItemResult]
+    ) -> float | None:
+        item_results_criteria_names = [
+            item_result.criteria_name for item_result in item_results
+        ]
+        if len(self.items) != len(item_results) or any(
+            item.criterion.name not in item_results_criteria_names
+            for item in self.items
+        ):
+            raise ValueError("Some criteria results are missing.")
         total = 0.0
         for item in self.items:
-            result = results.get(item.criterion.name)
-            if result is None:
-                raise ValueError(f"Missing result for criterion {item.criterion.name}")
-
-            score: float = item.get_score_from_result(result)
-            if item.required and score < cast(float, item.weight):
+            item_result = next(
+                iter(x for x in item_results if x.criteria_name == item.criterion.name)
+            )
+            if item_result.weighted_score is None:
+                return None
+            if item.required and item_result.weighted_score < item_result.weight:
                 return 0.0
-            total += score
+            total += item_result.weighted_score
         return round(total, 9)
 
     @classmethod
@@ -333,12 +384,12 @@ class MultiCriteriaDirectInstanceResult(BaseModel):
     multi_criteria: MultiCriteria = Field(
         description="The MultiCriteria configuration used for this evaluation."
     )
-    per_criterion_results: list[DirectInstanceResult] = Field(
+    criteria_results: list[DirectInstanceResult] = Field(
         description="A list of DirectInstanceResult objects, one for each criterion in the multi-criteria evaluation."
     )
-    per_criterion_score: dict[str, float] = Field(
-        description="A dictionary mapping criterion names to their respective scores."
+    item_results: list[MultiCriteriaItemResult] = Field(
+        description="A dictionary mapping criterion names to their respective weight/score tuples."
     )
-    aggregated_score: float = Field(
+    aggregated_score: float | None = Field(
         description="The overall aggregated score for the instance across all criteria."
     )

@@ -44,8 +44,8 @@ criteria_c = Criteria(
     name="Technical Accuracy",
     description="Is the response technically accurate based on the reference?",
     options=[
-        CriteriaOption(name="Correct", description="", score=1.0),
-        CriteriaOption(name="Incorrect", description="", score=0.0),
+        CriteriaOption(name="Correct", description=""),
+        CriteriaOption(name="Incorrect", description=""),
     ],
     prediction_field="response",
     context_fields=["reference_text"],
@@ -70,6 +70,7 @@ multi_criteria = MultiCriteria(
             criterion=criteria_c,
             weight=0.2,
             required=True,
+            target_option="Correct",
         ),
     ]
 )
@@ -83,8 +84,7 @@ instances = [
             "summary": "API client usage and caching",
         },
         response=(
-            "You should always query the database directly. "
-            "Caching is optional and the API client is unnecessary."
+            "You should always query the database directly. Caching is optional."
         ),
     ),
     # Passing case: clear, consistent, and technically correct
@@ -110,5 +110,7 @@ results: list[MultiCriteriaDirectInstanceResult] = judge.evaluate_multi_criteria
 for idx, res in enumerate(results, start=1):
     print(f"\n=== Instance {idx} ===")
     print(f"Aggregated score: {res.aggregated_score:.2f}")
-    for c in res.per_criterion_results:
-        print(f" - {c.criteria.name}: {c.option} → score={c.score}")
+    for item_result in res.item_results:
+        print(
+            f"{item_result.criteria_name} -> {item_result.score} (weighted: {item_result.weighted_score})"
+        )

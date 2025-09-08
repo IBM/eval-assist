@@ -31,14 +31,14 @@ class TestMultiCriteria(unittest.TestCase):
             feedback=None,
         )
 
+        multi_criteria_item = MultiCriteriaItem(criterion=criterion, weight=1.0)
+
         # Create a MultiCriteria with weighted criterion
-        multi_criteria = MultiCriteria(
-            items=[MultiCriteriaItem(criterion=criterion, weight=1.0)]
-        )
+        multi_criteria = MultiCriteria(items=[multi_criteria_item])
 
         # Calculate aggregated score
         aggregated_score = multi_criteria.get_aggregated_score(
-            results={criterion.name: result}
+            [multi_criteria_item.get_result(result)]
         )
 
         self.assertEqual(aggregated_score, 1.0)
@@ -80,17 +80,21 @@ class TestMultiCriteria(unittest.TestCase):
             feedback=None,
         )
 
+        # Create MultiCriteriaItems
+        item1 = MultiCriteriaItem(criterion=criterion1, weight=0.6)
+        item2 = MultiCriteriaItem(criterion=criterion2, weight=0.4)
+
         # Create a MultiCriteria with weighted criteria
         multi_criteria = MultiCriteria(
             items=[
-                MultiCriteriaItem(criterion=criterion1, weight=0.6),
-                MultiCriteriaItem(criterion=criterion2, weight=0.4),
+                item1,
+                item2,
             ]
         )
 
         # Calculate aggregated score
         aggregated_score = multi_criteria.get_aggregated_score(
-            results={criterion1.name: result1, criterion2.name: result2}
+            [item1.get_result(result1), item2.get_result(result2)]
         )
 
         self.assertEqual(aggregated_score, 0.6)
@@ -116,13 +120,14 @@ class TestMultiCriteria(unittest.TestCase):
         )
 
         # Create a MultiCriteria with a required criterion
-        multi_criteria = MultiCriteria(
-            items=[MultiCriteriaItem(criterion=criterion, weight=1.0, required=True)]
+        multi_criteria_item = MultiCriteriaItem(
+            criterion=criterion, weight=1.0, required=True
         )
+        multi_criteria = MultiCriteria(items=[multi_criteria_item])
 
         # Calculate aggregated score
         aggregated_score = multi_criteria.get_aggregated_score(
-            results={criterion.name: result}
+            [multi_criteria_item.get_result(result)]
         )
 
         self.assertEqual(aggregated_score, 0.0)
@@ -148,13 +153,12 @@ class TestMultiCriteria(unittest.TestCase):
         )
 
         # Create a MultiCriteria
-        multi_criteria = MultiCriteria(
-            items=[MultiCriteriaItem(criterion=criterion, weight=1.0)]
-        )
+        multi_criteria_item = MultiCriteriaItem(criterion=criterion, weight=1.0)
+        multi_criteria = MultiCriteria(items=[multi_criteria_item])
 
         # Calculate aggregated score
         aggregated_score = multi_criteria.get_aggregated_score(
-            results={criterion.name: result}
+            [multi_criteria_item.get_result(result)]
         )
 
         self.assertEqual(aggregated_score, 1.0)
@@ -203,17 +207,21 @@ class TestMultiCriteria(unittest.TestCase):
             feedback=None,
         )
 
+        # Create MultiCriteriaItems
+        item1 = MultiCriteriaItem(criterion=criterion1, weight=0.6)
+        item2 = MultiCriteriaItem(criterion=criterion2, weight=0.4, required=True)
+
         # Create a MultiCriteria
         multi_criteria = MultiCriteria(
             items=[
-                MultiCriteriaItem(criterion=criterion1, weight=0.6),
-                MultiCriteriaItem(criterion=criterion2, weight=0.4),
+                item1,
+                item2,
             ]
         )
 
         # Calculate aggregated score with missing result for criterion2
         with self.assertRaises(ValueError):
-            multi_criteria.get_aggregated_score(results={criterion1.name: result1})
+            multi_criteria.get_aggregated_score([item1.get_result(result1)])
 
     def test_strategy_mix(self):
         criterion_a = Criteria(
@@ -284,11 +292,11 @@ class TestMultiCriteria(unittest.TestCase):
         )
 
         aggregated_score = multi_criteria.get_aggregated_score(
-            results={
-                criterion_a.name: result_a,
-                criterion_b.name: result_b,
-                criterion_c.name: result_c,
-            }
+            [
+                item_a.get_result(result_a),
+                item_b.get_result(result_b),
+                item_c.get_result(result_c),
+            ]
         )
         self.assertEqual(aggregated_score, 1.0)
 
@@ -325,21 +333,21 @@ class TestMultiCriteria(unittest.TestCase):
         )
 
         aggregated_score = multi_criteria.get_aggregated_score(
-            results={
-                criterion_a.name: result_a,
-                criterion_b.name: result_b,
-                criterion_c.name: result_c,
-                criterion_d.name: result_d,
-            }
+            [
+                item_a.get_result(result_a),
+                item_b.get_result(result_b),
+                item_c.get_result(result_c),
+                item_d.get_result(result_d),
+            ]
         )
 
         self.assertEqual(aggregated_score, 0.0)
 
-        self.assertEqual(item_a.get_score_from_result(result=result_a), 0.4)
+        self.assertEqual(item_a.get_score(result=result_a), 1.0)
         result_b.score = 5.0
-        self.assertEqual(item_b.get_score_from_result(result=result_b), 0.2 * 5.0)
-        self.assertEqual(item_c.get_score_from_result(result=result_c), 0.2)
-        self.assertEqual(item_d.get_score_from_result(result=result_d), 0.0)
+        self.assertEqual(item_b.get_score(result=result_b), 5.0)
+        self.assertEqual(item_c.get_score(result=result_c), 1.0)
+        self.assertEqual(item_d.get_score(result=result_d), 0.0)
 
     def test_target_option(self):
         # Create a criterion
@@ -367,10 +375,11 @@ class TestMultiCriteria(unittest.TestCase):
                 MultiCriteriaItem(criterion=criterion, weight=1.0, target_option="Good")
             ]
         )
+        multi_criteria_item = multi_criteria.items[0]
 
         # Calculate aggregated score
         aggregated_score = multi_criteria.get_aggregated_score(
-            results={criterion.name: result}
+            [multi_criteria_item.get_result(result)]
         )
 
         self.assertEqual(aggregated_score, 1.0)
@@ -386,7 +395,7 @@ class TestMultiCriteria(unittest.TestCase):
 
         # Calculate aggregated score
         aggregated_score = multi_criteria.get_aggregated_score(
-            results={criterion.name: result}
+            [multi_criteria_item.get_result(result)]
         )
 
         self.assertEqual(aggregated_score, 0.0)
@@ -417,10 +426,11 @@ class TestMultiCriteria(unittest.TestCase):
                 MultiCriteriaItem(criterion=criterion, weight=1.0, score_threshold=0.5)
             ]
         )
+        multi_criteria_item = multi_criteria.items[0]
 
         # Calculate aggregated score
         aggregated_score = multi_criteria.get_aggregated_score(
-            results={criterion.name: result}
+            [multi_criteria_item.get_result(result)]
         )
 
         self.assertEqual(aggregated_score, 1.0)
@@ -436,7 +446,7 @@ class TestMultiCriteria(unittest.TestCase):
 
         # Calculate aggregated score
         aggregated_score = multi_criteria.get_aggregated_score(
-            results={criterion.name: result}
+            [multi_criteria_item.get_result(result)]
         )
 
         self.assertEqual(aggregated_score, 0.0)

@@ -23,6 +23,7 @@ from .types import (
     Instance,
     MultiCriteria,
     MultiCriteriaDirectInstanceResult,
+    MultiCriteriaItemResult,
     PairwiseInstance,
     PairwiseInstanceResult,
 )
@@ -292,27 +293,21 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
 
         results = self.evaluate(replicated_instances, replicated_criteria)  # type: ignore
 
-        if any(r.score is None for r in results):
-            raise ValueError(
-                "One or more result didn't report a numeric score. Weighted criteria need a score to be calculated. Provide a score in all criteria options."
-            )
-
         final_results: list[MultiCriteriaDirectInstanceResult] = []
         for i in range(0, len(replicated_instances), criteria_count):
-            per_criteria_results = results[i : i + criteria_count]
+            criteria_results = results[i : i + criteria_count]
+            item_results: list[MultiCriteriaItemResult] = [
+                item.get_result(per_criteria_result)
+                for item, per_criteria_result in zip(
+                    parsed_multi_criteria.items, criteria_results
+                )
+            ]
             result = MultiCriteriaDirectInstanceResult(
                 multi_criteria=parsed_multi_criteria,
-                per_criterion_results=per_criteria_results,
-                per_criterion_score={
-                    item.criterion.name: item.get_score_from_result(per_criteria_result)
-                    for item, per_criteria_result in zip(
-                        parsed_multi_criteria.items, per_criteria_results
-                    )
-                },
+                criteria_results=criteria_results,
+                item_results=item_results,
                 aggregated_score=parsed_multi_criteria.get_aggregated_score(
-                    results={
-                        result.criteria.name: result for result in per_criteria_results
-                    }
+                    item_results=item_results
                 ),
             )
             final_results.append(result)
