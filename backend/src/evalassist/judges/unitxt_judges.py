@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Generic, List, cast
 
+from evalassist.judges.simple_direct_judge import JudgeDescriptor
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
 from unitxt.blocks import Task, TaskCard
@@ -50,7 +51,12 @@ class UnitxtJudge(
     def get_evaluator_klass(self) -> type: ...
 
     @abstractmethod
-    def parse_results(self, dataset) -> List[ReturnVarType]: ...
+    def parse_results(self, dataset) -> list[ReturnVarType]: ...
+
+    def get_descriptor(self) -> JudgeDescriptor:
+        judge_descriptor = JudgeDescriptor(self.get_name(), "direct", "")
+        judge_descriptor.inference_engine_id = self.get_inference_engine_id()
+        return judge_descriptor
 
     def get_name(self) -> str:
         return "unitxt"
@@ -212,9 +218,7 @@ class UnitxtPairwiseJudge(
         return results
 
 
-class GraniteGuardianJudge(
-    DirectJudge,
-):
+class GraniteGuardianJudge(DirectJudge, UnitxtInferenceEngineMixin):
     def get_name(self) -> str:
         return "Granite Guardian"
 
@@ -224,6 +228,11 @@ class GraniteGuardianJudge(
         "context_field": "context",
         "tools_field": "tools",
     }
+
+    def get_descriptor(self) -> JudgeDescriptor:
+        judge_descriptor = JudgeDescriptor(self.get_name(), "direct", "")
+        judge_descriptor.inference_engine_id = self.get_inference_engine_id()
+        return judge_descriptor
 
     def get_harms_and_risks_result_description(
         self, evaluated_component, criteria_name

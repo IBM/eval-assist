@@ -57,11 +57,14 @@ class UnitxtInferenceEngineMixin:
         super().__init__(*args, **kwargs)
         self.inference_engine = inference_engine
 
+    def get_inference_engine_id(self) -> str:
+        """Return the identifier of the underlying inference engine."""
+        return "_".join(self.inference_engine.get_engine_id().split("_")[:-1])
+
 
 class Judge(
     ABC,
     Generic[InstanceTypeVar, ReturnVarType],
-    UnitxtInferenceEngineMixin,
 ):
     """
     Abstract base class for all judges.
@@ -80,10 +83,6 @@ class Judge(
     ):
         super().__init__(*args, **kwargs)
         self.use_self_consistency = use_self_consistency
-
-    def get_inference_engine_id(self) -> str:
-        """Return the identifier of the underlying inference engine."""
-        return "_".join(self.inference_engine.get_engine_id().split("_")[:-1])
 
     def get_ai_message_from_prompt(
         self, prompt: str, role: Literal["system", "user", "assistant"] = "user"
@@ -373,9 +372,7 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
         return [i.response for i in instances]
 
     def get_descriptor(self) -> JudgeDescriptor:
-        return JudgeDescriptor(
-            self.get_name(), "direct", self.get_inference_engine_id()
-        )
+        return JudgeDescriptor(self.get_name(), "direct", "")
 
 
 class PairwiseJudge(Judge[PairwiseInstance, PairwiseInstanceResult], ABC):
@@ -452,9 +449,7 @@ class PairwiseJudge(Judge[PairwiseInstance, PairwiseInstanceResult], ABC):
         return [i.responses for i in instances]
 
     def get_descriptor(self) -> JudgeDescriptor:
-        return JudgeDescriptor(
-            self.get_name(), "pairwise", self.get_inference_engine_id()
-        )
+        return JudgeDescriptor(self.get_name(), "pairwise", "")
 
     def _get_instances_from_str(
         self,

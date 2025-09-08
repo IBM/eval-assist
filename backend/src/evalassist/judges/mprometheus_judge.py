@@ -11,16 +11,22 @@ from .types import (
 )
 
 
-class MPrometheusDirectJudge(DirectJudge):
+class MPrometheusJudge:
     m_prometheus_model_name: str
 
-    def __init__(self, m_prometheus_b_params: Literal[3, 7, 14]):
+    def __init__(self, m_prometheus_b_params: Literal[3, 7, 14], **kwargs):
+        super().__init__(**kwargs)
         self.m_prometheus_model_name = (
             f"Unbabel/M-Prometheus-{str(m_prometheus_b_params)}B"
         )
 
+
+class MPrometheusDirectJudge(MPrometheusJudge, DirectJudge):
     def get_name(self) -> str:
         return "prometheus"
+
+    def get_inference_engine_id(self) -> str:
+        return "mprometheus"
 
     def _validate_criteria(self, criteria: list[Criteria]):
         for criterion in criteria:
@@ -93,14 +99,7 @@ class MPrometheusDirectJudge(DirectJudge):
         ]
 
 
-class MPrometheusPairwiseJudge(PairwiseJudge):
-    m_prometheus_model_name: str
-
-    def __init__(self, m_prometheus_b_params: Literal[3, 7, 14]):
-        self.m_prometheus_model_name = (
-            f"Unbabel/M-Prometheus-{str(m_prometheus_b_params)}B"
-        )
-
+class MPrometheusPairwiseJudge(MPrometheusJudge, PairwiseJudge):
     def get_name(self) -> str:
         return "prometheus"
 
