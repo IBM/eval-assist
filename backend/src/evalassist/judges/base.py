@@ -12,7 +12,7 @@ from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompt_values import StringPromptValue
 from langchain_core.runnables import RunnableLambda
 from pydantic import BaseModel
-from unitxt.inference import CrossProviderInferenceEngine, InferenceEngine
+from unitxt.inference import InferenceEngine
 
 from .types import (
     Criteria,
@@ -507,7 +507,7 @@ class UnitxtInferenceLangchainRunnable(UnitxtInferenceEngineMixin):
             # Call the custom model here and return the raw text
             response: str = cast(
                 str,
-                cast(CrossProviderInferenceEngine, self.inference_engine).infer(
+                self.inference_engine.infer(
                     dataset=[
                         {
                             "source": text.text,

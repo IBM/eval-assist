@@ -1,4 +1,4 @@
-from pydantic import BaseModel, create_model, field_validator
+from pydantic import BaseModel, ConfigDict, create_model, field_validator
 
 from .types import Criteria, Instance
 
@@ -28,7 +28,7 @@ def generate_dynamic_model(
     # Create base dynamic model
     dynamic_model = create_model(
         model_name,
-        __config__=None,
+        __config__=ConfigDict(extra="forbid"),
         __doc__=None,
         __base__=BaseModel,
         __module__=__name__,
