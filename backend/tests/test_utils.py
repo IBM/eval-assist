@@ -81,6 +81,11 @@ def test_clean_object():
 
 
 def test_get_inference_engine():
+    from unitxt.settings_utils import get_settings
+
+    # Set the flag before any unitxt behavior is invoked
+    get_settings().skip_artifacts_prepare_and_verify = True
+
     # Test with different providers
     credentials = {
         "api_key": "test_key",  # pragma: allowlist secret
@@ -115,6 +120,7 @@ def test_get_inference_engine():
     #     ),
     #     HFAutoModelInferenceEngine,
     # )
+    get_settings().skip_artifacts_prepare_and_verify = False
 
 
 def test_get_default_torch_device():
