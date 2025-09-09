@@ -41,7 +41,7 @@ classifiers = [
     "Framework :: Jupyter",
 ]
 
-dependencies = ["pydantic", "langchain", "unitxt>=1.26.6"]
+dependencies = ["pydantic", "langchain>=0.3.8", "unitxt>=1.26.6"]
 
 [tool.poetry]
 packages = [{ include = "evalassist", from = "src" }]
