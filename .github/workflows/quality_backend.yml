@@ -43,6 +43,7 @@ jobs:
         env:
           WATSONX_API_KEY: ${{ secrets.WATSONX_API_KEY }}
           WATSONX_PROJECT_ID: ${{ secrets.WATSONX_PROJECT_ID }}
+          WATSONX_URL: https://us-south.ml.cloud.ibm.com
         working-directory: backend
         run: |
           poetry run pytest --cov=evalassist -q
