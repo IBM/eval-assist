@@ -181,7 +181,22 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                 <p>
                                   <strong>{`${capitalizeFirstWord(k)}:`}</strong>
                                 </p>
-                                <p style={{ whiteSpace: 'pre-line' }}>{capitalizeFirstWord(v.toString())}</p>
+                                {typeof v === 'object' && !Array.isArray(v) && v !== null ? (
+                                  <div className={cx(classes.gridTemplate)}>
+                                    {Object.entries(v).map(([metadataValueKey, metadataValue], i) => (
+                                      <React.Fragment key={i}>
+                                        <p>
+                                          <strong>{`${capitalizeFirstWord(metadataValueKey)}:`}</strong>
+                                        </p>
+                                        <p style={{ whiteSpace: 'pre-line' }}>
+                                          {capitalizeFirstWord(metadataValue as string)}
+                                        </p>
+                                      </React.Fragment>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p style={{ whiteSpace: 'pre-line' }}>{capitalizeFirstWord(v.toString())}</p>
+                                )}
                               </React.Fragment>
                             ))}
                           </>
