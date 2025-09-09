@@ -247,7 +247,7 @@ description = "Read/rewrite/write Python ASTs"
 optional = true
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "astor-0.8.1-py2.py3-none-any.whl", hash = "sha256:070a54e890cefb5b3739d19f30f5a5ec840ffc9c50ffa7d23cc9fc1a38ebbfc5"},
     {file = "astor-0.8.1.tar.gz", hash = "sha256:6a6effda93f4e1ce9f618779b2dd1d9d84f1e32812c23a29b3fff6fd7f63fa5e"},
@@ -344,7 +344,7 @@ description = "Python bindings for the Rust blake3 crate"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "blake3-1.0.5-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:1ba833ff7dee08bbf56b1e9d0479fda74f867b90fbe12c85078f8fbf2b505d6f"},
     {file = "blake3-1.0.5-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:606676dbb974b66afea2240741dfd4afafd8ed6697454eff0e1e0c4dc130e5b0"},
@@ -502,7 +502,7 @@ description = "Extensible memoizing collections and decorators"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"dev\" or python_version == \"3.10\" and (extra == \"dev\" or extra == \"prometheus\")"
+markers = "(extra == \"dev\" or extra == \"prometheus\") and (python_full_version < \"3.12.4\" or extra == \"dev\")"
 files = [
     {file = "cachetools-6.1.0-py3-none-any.whl", hash = "sha256:1c7bb3cf9193deaf3508b7c5f2a79986c13ea38965c5adcff1f84519cf39163e"},
     {file = "cachetools-6.1.0.tar.gz", hash = "sha256:b4c4f404392848db3ce7aac34950d17be4d864da4b8b66911008e430bc544587"},
@@ -515,7 +515,7 @@ description = "CBOR (de)serializer with extensive tag support"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "cbor2-5.7.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:305edac16524df843d53ba086bc194c0975388e755ed177eb84e0324e3d705ec"},
     {file = "cbor2-5.7.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:e00d7250e528a9a1bfd3b294799bdae96c158f72d95be58a3fbf97dab2467bbe"},
@@ -588,7 +588,7 @@ description = "Foreign Function Interface for Python calling C code."
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "platform_python_implementation == \"PyPy\" or implementation_name == \"pypy\" and extra == \"webapp\" or python_version == \"3.10\" and extra == \"prometheus\" or python_version == \"3.10\" and implementation_name == \"pypy\" and (extra == \"webapp\" or extra == \"prometheus\")"
+markers = "((extra == \"webapp\" or extra == \"prometheus\") and implementation_name == \"pypy\" or platform_python_implementation == \"PyPy\" or extra == \"prometheus\") and python_full_version < \"3.12.4\" or (extra == \"webapp\" and implementation_name == \"pypy\" or platform_python_implementation == \"PyPy\") and python_full_version >= \"3.12.4\""
 files = [
     {file = "cffi-1.17.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:df8b1c11f177bc2313ec4b2d46baec87a5f3e71fc8b45dab2ee7cae86d9aba14"},
     {file = "cffi-1.17.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:8f2cdc858323644ab277e9bb925ad72ae0e67f69e804f4898c070998d50b1a67"},
@@ -813,7 +813,7 @@ description = "Pickler class to extend the standard pickle.Pickler functionality
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "cloudpickle-3.1.1-py3-none-any.whl", hash = "sha256:c8c5a44295039331ee9dad40ba100a9c7297b6f988e50e87ccdf3765a668350e"},
     {file = "cloudpickle-3.1.1.tar.gz", hash = "sha256:b216fa8ae4019d5482a8ac3c95d8f6346115d8835911fd4aefd1a445e4242c64"},
@@ -826,7 +826,7 @@ description = "Cross-platform colored terminal text."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 groups = ["main"]
-markers = "platform_system == \"Windows\" or extra == \"dev\" or (extra == \"dev\" or extra == \"prometheus\") and sys_platform == \"win32\" and python_version == \"3.10\""
+markers = "platform_system == \"Windows\" or extra == \"dev\" or (extra == \"dev\" or extra == \"prometheus\") and sys_platform == \"win32\" and python_full_version < \"3.12.4\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -839,7 +839,7 @@ description = "Library for utilization of compressed safetensors of neural netwo
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "compressed_tensors-0.10.2-py3-none-any.whl", hash = "sha256:e1b4d9bc2006e3fd3a938e59085f318fdb280c5af64688a4792bf1bc263e579d"},
     {file = "compressed_tensors-0.10.2.tar.gz", hash = "sha256:6de13ac535d7ffdd8890fad3d229444c33076170acaa8fab6bab8ecfa96c1d8f"},
@@ -966,7 +966,7 @@ description = "CuPy: NumPy & SciPy for GPU"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"prometheus\" and sys_platform != \"darwin\" and python_version == \"3.10\""
+markers = "extra == \"prometheus\" and sys_platform != \"darwin\" and python_full_version < \"3.12.4\""
 files = [
     {file = "cupy_cuda12x-13.6.0-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:9e37f60f27ff9625dfdccc4688a09852707ec613e32ea9404f425dd22a386d14"},
     {file = "cupy_cuda12x-13.6.0-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:e78409ea72f5ac7d6b6f3d33d99426a94005254fa57e10617f430f9fd7c3a0a1"},
@@ -1056,7 +1056,7 @@ description = "Decompile python functions, from bytecode to source code!"
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "depyf-0.19.0-py3-none-any.whl", hash = "sha256:040b35fc0997d49df024b7d094f2a7836f91e9ed02f49982dd37e70aa3285ad5"},
     {file = "depyf-0.19.0.tar.gz", hash = "sha256:afed0916b32d141cc90fa6220df01885eda442ca43b297d5050eeb90b4a5cb44"},
@@ -1130,7 +1130,7 @@ description = "DNS toolkit"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "dnspython-2.7.0-py3-none-any.whl", hash = "sha256:b4c34b7d10b51bcc3a5071e7b8dee77939f1e878477eeecc965e9835f63c6c86"},
     {file = "dnspython-2.7.0.tar.gz", hash = "sha256:ce9c432eda0dc91cf618a5cedf1a4e142651196bbcd2c80e89ed5a907e5cfaf1"},
@@ -1152,7 +1152,7 @@ description = "A new flavour of deep learning operations"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "einops-0.8.1-py3-none-any.whl", hash = "sha256:919387eb55330f5757c6bea9165c5ff5cfe63a642682ea788a6d472576d81737"},
     {file = "einops-0.8.1.tar.gz", hash = "sha256:de5d960a7a761225532e0f1959e5315ebeafc0cd43394732f103ca44b9837e84"},
@@ -1165,7 +1165,7 @@ description = "A robust email address syntax and deliverability validation libra
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "email_validator-2.2.0-py3-none-any.whl", hash = "sha256:561977c2d73ce3611850a06fa56b414621e0c8faa9d66f2611407d87465da631"},
     {file = "email_validator-2.2.0.tar.gz", hash = "sha256:cb690f344c617a714f22e66ae771445a1ceb46821152df8e165c5f9a364582b7"},
@@ -1265,7 +1265,7 @@ description = "Run and manage FastAPI apps from the command line with FastAPI CL
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "fastapi_cli-0.0.8-py3-none-any.whl", hash = "sha256:0ea95d882c85b9219a75a65ab27e8da17dac02873e456850fa0a726e96e985eb"},
     {file = "fastapi_cli-0.0.8.tar.gz", hash = "sha256:2360f2989b1ab4a3d7fc8b3a0b20e8288680d8af2e31de7c38309934d7f8a0ee"},
@@ -1288,7 +1288,7 @@ description = "Deploy and manage FastAPI Cloud apps from the command line 🚀"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "fastapi_cloud_cli-0.1.5-py3-none-any.whl", hash = "sha256:d80525fb9c0e8af122370891f9fa83cf5d496e4ad47a8dd26c0496a6c85a012a"},
     {file = "fastapi_cloud_cli-0.1.5.tar.gz", hash = "sha256:341ee585eb731a6d3c3656cb91ad38e5f39809bf1a16d41de1333e38635a7937"},
@@ -1342,7 +1342,7 @@ description = "Fast, re-entrant optimistic lock implemented in Cython"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "extra == \"prometheus\" and sys_platform != \"darwin\" and python_version == \"3.10\""
+markers = "extra == \"prometheus\" and sys_platform != \"darwin\" and python_full_version < \"3.12.4\""
 files = [
     {file = "fastrlock-0.8.3-cp27-cp27m-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:bbbe31cb60ec32672969651bf68333680dacaebe1a1ec7952b8f5e6e23a70aa5"},
     {file = "fastrlock-0.8.3-cp27-cp27m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:45055702fe9bff719cdc62caa849aa7dbe9e3968306025f639ec62ef03c65e88"},
@@ -1600,7 +1600,7 @@ description = "An open platform for training, serving, and evaluating large lang
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "python_full_version >= \"3.12.4\" and extra == \"prometheus\""
 files = [
     {file = "fschat-0.2.36-py3-none-any.whl", hash = "sha256:a66ecf1e90f6db1d015096f6aa8a305d20d0a13e067951285aecdb56a33e9cb1"},
     {file = "fschat-0.2.36.tar.gz", hash = "sha256:ac724458bb105cb5b3b9ec852150345dfa7f61fd7c275d6635d66fa1ed904d90"},
@@ -1678,7 +1678,7 @@ description = "Read and write ML models in GGUF for GGML"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "gguf-0.17.1-py3-none-any.whl", hash = "sha256:7bc5aa7eeb1931f7d39b48fdc5b38fda6b294b9dca75cf607ac69557840a3943"},
     {file = "gguf-0.17.1.tar.gz", hash = "sha256:36ad71aad900a3e75fc94ebe96ea6029f03a4e44be7627ef7ad3d03e8c7bcb53"},
@@ -1813,10 +1813,10 @@ files = [
 name = "hf-xet"
 version = "1.1.5"
 description = "Fast transfer of large files with the Hugging Face Hub."
-optional = false
+optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and (platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\")"
+markers = "extra == \"prometheus\" and (platform_machine == \"x86_64\" or platform_machine == \"amd64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\") and python_full_version < \"3.12.4\""
 files = [
     {file = "hf_xet-1.1.5-cp37-abi3-macosx_10_12_x86_64.whl", hash = "sha256:f52c2fa3635b8c37c7764d8796dfa72706cc4eded19d638331161e82b0792e23"},
     {file = "hf_xet-1.1.5-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:9fa6e3ee5d61912c4a113e0708eaaef987047616465ac7aa30f7121a48fc1af8"},
@@ -1860,7 +1860,7 @@ description = "A collection of framework independent HTTP protocol utils."
 optional = true
 python-versions = ">=3.8.0"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "httptools-0.6.4-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:3c73ce323711a6ffb0d247dcd5a550b8babf0f757e86a52558fe5b86d6fefcc0"},
     {file = "httptools-0.6.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:345c288418f0944a6fe67be8e6afa9262b18c7626c3ef3c28adc5eabc06a68da"},
@@ -2132,7 +2132,7 @@ description = "a regex intersection checker"
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "interegular-0.3.3-py37-none-any.whl", hash = "sha256:b0c07007d48c89d6d19f7204972d369b2a77222722e126b6aa63aa721dc3b19c"},
     {file = "interegular-0.3.3.tar.gz", hash = "sha256:d9b697b21b34884711399ba0f0376914b81899ce670032486d0d048344a76600"},
@@ -2145,7 +2145,7 @@ description = "A very fast and expressive template engine."
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "extra == \"webapp\" or extra == \"prometheus\" or extra == \"local-inference\""
+markers = "extra == \"prometheus\" or extra == \"webapp\" or extra == \"local-inference\""
 files = [
     {file = "jinja2-3.1.6-py3-none-any.whl", hash = "sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67"},
     {file = "jinja2-3.1.6.tar.gz", hash = "sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d"},
@@ -2510,7 +2510,7 @@ description = "a modern parsing library"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "lark-1.2.2-py3-none-any.whl", hash = "sha256:c2276486b02f0f1b90be155f2c8ba4a8e194d42775786db622faccd652d8e80c"},
     {file = "lark-1.2.2.tar.gz", hash = "sha256:ca807d0162cd16cef15a8feecb862d7319e7a09bdb13aef927968e45040fed80"},
@@ -2529,7 +2529,7 @@ description = "Pure Python library for LaTeX to MathML conversion"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version >= \"3.12.4\""
 files = [
     {file = "latex2mathml-3.78.0-py3-none-any.whl", hash = "sha256:1aeca3dc027b3006ad7b301b7f4a15ffbb4c1451e3dc8c3389e97b37b497e1d6"},
     {file = "latex2mathml-3.78.0.tar.gz", hash = "sha256:712193aa4c6ade1a8e0145dac7bc1f9aafbd54f93046a2356a7e1c05fa0f8b31"},
@@ -2574,7 +2574,7 @@ description = "Bindings for the Low-level Guidance (llguidance) Rust library for
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"prometheus\" and (platform_machine == \"x86_64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\") and python_version == \"3.10\""
+markers = "extra == \"prometheus\" and (platform_machine == \"x86_64\" or platform_machine == \"arm64\" or platform_machine == \"aarch64\") and python_full_version < \"3.12.4\""
 files = [
     {file = "llguidance-0.7.30-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:c80af02c118d2b0526bcecaab389af2ed094537a069b0fc724cd2a2f2ba3990f"},
     {file = "llguidance-0.7.30-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:00a256d532911d2cf5ba4ef63e182944e767dd2402f38d63002016bc37755958"},
@@ -2593,7 +2593,7 @@ description = "lightweight wrapper around basic LLVM functionality"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "extra == \"prometheus\" and python_version == \"3.10\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "llvmlite-0.44.0-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:9fbadbfba8422123bab5535b293da1cf72f9f478a65645ecd73e781f962ca614"},
     {file = "llvmlite-0.44.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:cccf8eb28f24840f2689fb1a45f9c0f7e582dd24e088dcf96e424834af11f791"},
@@ -2625,7 +2625,7 @@ description = "Enforce the output format (JSON Schema, Regex etc) of a language 
 optional = true
 python-versions = "<4.0,>=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "lm_format_enforcer-0.10.12-py3-none-any.whl", hash = "sha256:267c2b421c77f7cd51ac2e0e3af8db278a373704d834b49ff55f18a2c05e9800"},
     {file = "lm_format_enforcer-0.10.12.tar.gz", hash = "sha256:130bd7ce8a6b224f25b6314ba9ae78ee4b48594db1767c74391c9182e2902a6c"},
@@ -2707,7 +2707,7 @@ description = "A fast and complete Python implementation of Markdown"
 optional = true
 python-versions = "<4,>=3.9"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "python_full_version >= \"3.12.4\" and extra == \"prometheus\""
 files = [
     {file = "markdown2-2.5.4-py3-none-any.whl", hash = "sha256:3c4b2934e677be7fec0e6f2de4410e116681f4ad50ec8e5ba7557be506d3f439"},
     {file = "markdown2-2.5.4.tar.gz", hash = "sha256:a09873f0b3c23dbfae589b0080587df52ad75bb09a5fa6559147554736676889"},
@@ -2731,7 +2731,7 @@ description = "Safely add untrusted strings to HTML/XML markup."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"webapp\" or extra == \"prometheus\" or extra == \"local-inference\""
+markers = "extra == \"prometheus\" or extra == \"webapp\" or extra == \"local-inference\""
 files = [
     {file = "MarkupSafe-3.0.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:7e94c425039cde14257288fd61dcfb01963e658efbc0ff54f5306b06054700f8"},
     {file = "MarkupSafe-3.0.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9e2d922824181480953426608b81967de705c3cef4d1af983af849d7bd619158"},
@@ -2829,7 +2829,7 @@ description = "Mistral-common is a library of common utilities for Mistral AI."
 optional = true
 python-versions = "<3.14,>=3.9.0"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "mistral_common-1.8.4-py3-none-any.whl", hash = "sha256:bfaf2550046cebe8289946adc267ba807ac266e5325647af4c4f67292124bc2f"},
     {file = "mistral_common-1.8.4.tar.gz", hash = "sha256:e611c16ef59c2b60ffdecef4d5e9158e1bf838fad6bad34aa050123601af703a"},
@@ -2881,7 +2881,7 @@ description = "A framework for machine learning on Apple silicon."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"prometheus\" and platform_machine == \"arm64\" and platform_system == \"Darwin\" and python_version == \"3.10\""
+markers = "extra == \"prometheus\" and platform_machine == \"arm64\" and platform_system == \"Darwin\" and python_full_version < \"3.12.4\""
 files = [
     {file = "mlx-0.28.0-cp310-cp310-macosx_13_0_arm64.whl", hash = "sha256:5167b4c8d4aae9361afb5d770c75b653d66aa0ebbb8b0099ddd6da5d55d8e6b6"},
     {file = "mlx-0.28.0-cp310-cp310-macosx_14_0_arm64.whl", hash = "sha256:168e945bd0e6de19fd0d73ecd0123ba99108342347be2c5aacd387cf1c889310"},
@@ -2920,7 +2920,7 @@ description = "LLMs with MLX and the Hugging Face Hub"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"prometheus\" and platform_machine == \"arm64\" and platform_system == \"Darwin\" and python_version == \"3.10\""
+markers = "extra == \"prometheus\" and platform_machine == \"arm64\" and platform_system == \"Darwin\" and python_full_version < \"3.12.4\""
 files = [
     {file = "mlx_lm-0.26.3-py3-none-any.whl", hash = "sha256:c6a9e44bd707822bc165ce638723ab11252e8334b7b3bf79c7d399c8c3d6d48e"},
     {file = "mlx_lm-0.26.3.tar.gz", hash = "sha256:06cd74ee3eea920335c528e68feb854eede45fe4e5f149b464ac100c1dbeaded"},
@@ -2946,7 +2946,7 @@ description = "A framework for machine learning on Apple silicon."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"prometheus\" and platform_machine == \"arm64\" and platform_system == \"Darwin\" and python_version == \"3.10\""
+markers = "extra == \"prometheus\" and platform_machine == \"arm64\" and platform_system == \"Darwin\" and python_full_version < \"3.12.4\""
 files = [
     {file = "mlx_metal-0.28.0-py3-none-macosx_13_0_arm64.whl", hash = "sha256:ce08d40f1fad4f0b3bc87bfff5d603c7fe7dd141c082ba9ce9328b41e8f8d46b"},
     {file = "mlx_metal-0.28.0-py3-none-macosx_14_0_arm64.whl", hash = "sha256:424142ab843e2ac0b14edb58cf88d96723823c565291f46ddeeaa072abcc991e"},
@@ -2960,7 +2960,7 @@ description = "Python library for arbitrary-precision floating-point arithmetic"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "extra == \"local-inference\" or extra == \"prometheus\""
+markers = "extra == \"prometheus\" or extra == \"local-inference\""
 files = [
     {file = "mpmath-1.3.0-py3-none-any.whl", hash = "sha256:a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c"},
     {file = "mpmath-1.3.0.tar.gz", hash = "sha256:7a28eb2a9774d00c7bc92411c19a89209d5da7c4c9a9e227be8330a23a25b91f"},
@@ -3049,7 +3049,7 @@ description = "A fast serialization and validation library, with builtin support
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "msgspec-0.19.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d8dd848ee7ca7c8153462557655570156c2be94e79acec3561cf379581343259"},
     {file = "msgspec-0.19.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:0553bbc77662e5708fe66aa75e7bd3e4b0f209709c48b299afd791d711a93c36"},
@@ -3370,7 +3370,7 @@ description = "Python package for creating and manipulating graphs and networks"
 optional = true
 python-versions = ">=3.11"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "python_version >= \"3.11\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "networkx-3.5-py3-none-any.whl", hash = "sha256:0030d386a9a06dee3565298b4a734b68589749a544acbb6c412dc9e2489ec6ec"},
     {file = "networkx-3.5.tar.gz", hash = "sha256:d4c6f9cf81f52d69230866796b82afbccdec3db7ae4fbd1b65ea750feed50037"},
@@ -3392,7 +3392,7 @@ description = "Python binding to Ammonia HTML sanitizer Rust crate"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "python_full_version >= \"3.12.4\" and extra == \"prometheus\""
 files = [
     {file = "nh3-0.3.0-cp313-cp313t-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:a537ece1bf513e5a88d8cff8a872e12fe8d0f42ef71dd15a5e7520fecd191bbb"},
     {file = "nh3-0.3.0-cp313-cp313t-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7c915060a2c8131bef6a29f78debc29ba40859b6dbe2362ef9e5fd44f11487c2"},
@@ -3472,7 +3472,7 @@ description = "compiling Python code using LLVM"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "extra == \"prometheus\" and python_version == \"3.10\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "numba-0.61.2-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:cf9f9fc00d6eca0c23fc840817ce9f439b9f03c8f03d6246c0e7f0cb15b7162a"},
     {file = "numba-0.61.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:ea0247617edcb5dd61f6106a56255baab031acc4257bddaeddb3a1003b4ca3fd"},
@@ -3508,7 +3508,7 @@ description = "Fundamental package for array computing in Python"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "python_version == \"3.10\""
+markers = "python_full_version < \"3.12.4\""
 files = [
     {file = "numpy-2.2.6-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:b412caa66f72040e6d268491a59f2c43bf03eb6c96dd8f0307829feb7fa2b6fb"},
     {file = "numpy-2.2.6-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:8e41fd67c52b86603a91c1a505ebaef50b3314de0213461c7a6e99c9a3beff90"},
@@ -3574,7 +3574,7 @@ description = "Fundamental package for array computing in Python"
 optional = false
 python-versions = ">=3.11"
 groups = ["main"]
-markers = "python_version >= \"3.11\""
+markers = "python_full_version >= \"3.12.4\""
 files = [
     {file = "numpy-2.3.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:6ea9e48336a402551f52cd8f593343699003d2353daa4b72ce8d34f66b722070"},
     {file = "numpy-2.3.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:5ccb7336eaf0e77c1635b232c141846493a588ec9ea777a7c24d7166bb8533ae"},
@@ -3636,7 +3636,7 @@ description = "CUBLAS native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_cublas_cu12-12.6.4.1-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:08ed2686e9875d01b58e3cb379c6896df8e76c75e0d4a7f7dace3d7b6d9ef8eb"},
     {file = "nvidia_cublas_cu12-12.6.4.1-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:235f728d6e2a409eddf1df58d5b0921cf80cfa9e72b9f2775ccb7b4a87984668"},
@@ -3650,7 +3650,7 @@ description = "CUDA profiling tools runtime libs."
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_cuda_cupti_cu12-12.6.80-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:166ee35a3ff1587f2490364f90eeeb8da06cd867bd5b701bf7f9a02b78bc63fc"},
     {file = "nvidia_cuda_cupti_cu12-12.6.80-py3-none-manylinux2014_aarch64.whl", hash = "sha256:358b4a1d35370353d52e12f0a7d1769fc01ff74a191689d3870b2123156184c4"},
@@ -3666,7 +3666,7 @@ description = "NVRTC native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_cuda_nvrtc_cu12-12.6.77-py3-none-manylinux2014_aarch64.whl", hash = "sha256:5847f1d6e5b757f1d2b3991a01082a44aad6f10ab3c5c0213fa3e25bddc25a13"},
     {file = "nvidia_cuda_nvrtc_cu12-12.6.77-py3-none-manylinux2014_x86_64.whl", hash = "sha256:35b0cc6ee3a9636d5409133e79273ce1f3fd087abb0532d2d2e8fff1fe9efc53"},
@@ -3680,7 +3680,7 @@ description = "CUDA Runtime native Libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_cuda_runtime_cu12-12.6.77-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:6116fad3e049e04791c0256a9778c16237837c08b27ed8c8401e2e45de8d60cd"},
     {file = "nvidia_cuda_runtime_cu12-12.6.77-py3-none-manylinux2014_aarch64.whl", hash = "sha256:d461264ecb429c84c8879a7153499ddc7b19b5f8d84c204307491989a365588e"},
@@ -3696,7 +3696,7 @@ description = "cuDNN runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_cudnn_cu12-9.5.1.17-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:9fd4584468533c61873e5fda8ca41bac3a38bcb2d12350830c69b0a96a7e4def"},
     {file = "nvidia_cudnn_cu12-9.5.1.17-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:30ac3869f6db17d170e0e556dd6cc5eee02647abc31ca856634d5a40f82c15b2"},
@@ -3713,7 +3713,7 @@ description = "CUFFT native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_cufft_cu12-11.3.0.4-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:d16079550df460376455cba121db6564089176d9bac9e4f360493ca4741b22a6"},
     {file = "nvidia_cufft_cu12-11.3.0.4-py3-none-manylinux2014_aarch64.whl", hash = "sha256:8510990de9f96c803a051822618d42bf6cb8f069ff3f48d93a8486efdacb48fb"},
@@ -3732,7 +3732,7 @@ description = "cuFile GPUDirect libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_cufile_cu12-1.11.1.6-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:cc23469d1c7e52ce6c1d55253273d32c565dd22068647f3aa59b3c6b005bf159"},
     {file = "nvidia_cufile_cu12-1.11.1.6-py3-none-manylinux_2_27_aarch64.whl", hash = "sha256:8f57a0051dcf2543f6dc2b98a98cb2719c37d3cee1baba8965d57f3bbc90d4db"},
@@ -3745,7 +3745,7 @@ description = "CURAND native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_curand_cu12-10.3.7.77-py3-none-manylinux2014_aarch64.whl", hash = "sha256:6e82df077060ea28e37f48a3ec442a8f47690c7499bff392a5938614b56c98d8"},
     {file = "nvidia_curand_cu12-10.3.7.77-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:a42cd1344297f70b9e39a1e4f467a4e1c10f1da54ff7a85c12197f6c652c8bdf"},
@@ -3761,7 +3761,7 @@ description = "CUDA solver native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_cusolver_cu12-11.7.1.2-py3-none-manylinux2014_aarch64.whl", hash = "sha256:0ce237ef60acde1efc457335a2ddadfd7610b892d94efee7b776c64bb1cac9e0"},
     {file = "nvidia_cusolver_cu12-11.7.1.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:e9e49843a7707e42022babb9bcfa33c29857a93b88020c4e4434656a655b698c"},
@@ -3782,7 +3782,7 @@ description = "CUSPARSE native runtime libraries"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_cusparse_cu12-12.5.4.2-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:d25b62fb18751758fe3c93a4a08eff08effedfe4edf1c6bb5afd0890fe88f887"},
     {file = "nvidia_cusparse_cu12-12.5.4.2-py3-none-manylinux2014_aarch64.whl", hash = "sha256:7aa32fa5470cf754f72d1116c7cbc300b4e638d3ae5304cfa4a638a5b87161b1"},
@@ -3801,7 +3801,7 @@ description = "NVIDIA cuSPARSELt"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_cusparselt_cu12-0.6.3-py3-none-manylinux2014_aarch64.whl", hash = "sha256:8371549623ba601a06322af2133c4a44350575f5a3108fb75f3ef20b822ad5f1"},
     {file = "nvidia_cusparselt_cu12-0.6.3-py3-none-manylinux2014_x86_64.whl", hash = "sha256:e5c8a26c36445dd2e6812f1177978a24e2d37cacce7e090f297a688d1ec44f46"},
@@ -3815,7 +3815,7 @@ description = "NVIDIA Collective Communication Library (NCCL) Runtime"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_nccl_cu12-2.26.2-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:5c196e95e832ad30fbbb50381eb3cbd1fadd5675e587a548563993609af19522"},
     {file = "nvidia_nccl_cu12-2.26.2-py3-none-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:694cf3879a206553cc9d7dbda76b13efaf610fdb70a50cba303de1b0d1530ac6"},
@@ -3828,7 +3828,7 @@ description = "Nvidia JIT LTO Library"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_nvjitlink_cu12-12.6.85-py3-none-manylinux2010_x86_64.manylinux_2_12_x86_64.whl", hash = "sha256:eedc36df9e88b682efe4309aa16b5b4e78c2407eac59e8c10a6a47535164369a"},
     {file = "nvidia_nvjitlink_cu12-12.6.85-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:cf4eaa7d4b6b543ffd69d6abfb11efdeb2db48270d94dfd3a452c24150829e41"},
@@ -3842,7 +3842,7 @@ description = "NVIDIA Tools Extension"
 optional = true
 python-versions = ">=3"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "nvidia_nvtx_cu12-12.6.77-py3-none-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:f44f8d86bb7d5629988d61c8d3ae61dddb2015dee142740536bc7481b022fe4b"},
     {file = "nvidia_nvtx_cu12-12.6.77-py3-none-manylinux2014_aarch64.whl", hash = "sha256:adcaabb9d436c9761fca2b13959a2d237c5f9fd406c8e4b723c695409ff88059"},
@@ -3904,7 +3904,7 @@ description = "Wrapper package for OpenCV python bindings."
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "opencv-python-headless-4.12.0.88.tar.gz", hash = "sha256:cfdc017ddf2e59b6c2f53bc12d74b6b0be7ded4ec59083ea70763921af2b6c09"},
     {file = "opencv_python_headless-4.12.0.88-cp37-abi3-macosx_13_0_arm64.whl", hash = "sha256:1e58d664809b3350c1123484dd441e1667cd7bed3086db1b9ea1b6f6cb20b50e"},
@@ -4008,7 +4008,7 @@ description = "Structured Text Generation in Rust"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "outlines_core-0.2.10-cp310-cp310-macosx_14_0_arm64.whl", hash = "sha256:b984c932bdf2843e3d5a8e57e09830d52c4237ac394f39542c4e543378b94ffb"},
     {file = "outlines_core-0.2.10-cp310-cp310-macosx_14_0_x86_64.whl", hash = "sha256:65b2dba48d0f98b0145eb50494985f026e3c10df3fde94ced40e9c2aa6ea32ca"},
@@ -4175,7 +4175,7 @@ description = "Parse partial JSON generated by LLM"
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "partial_json_parser-0.2.1.1.post6-py3-none-any.whl", hash = "sha256:abc332f09b13ef5233384dbfe7128a0e9ea3fa4b8f8be9b37ac1b433c810e99e"},
     {file = "partial_json_parser-0.2.1.1.post6.tar.gz", hash = "sha256:43896b68929678224cbbe4884a6a5fe9251ded4b30b8b7d7eb569e5feea93afc"},
@@ -4207,7 +4207,7 @@ description = "Python Imaging Library (Fork)"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "pillow-11.3.0-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:1b9c17fd4ace828b3003dfd1e30bff24863e0eb59b535e8f80194d9cc7ecf860"},
     {file = "pillow-11.3.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:65dc69160114cdd0ca0f35cb434633c75e8e7fad4cf855177a05bf38678f73ad"},
@@ -4388,7 +4388,7 @@ description = "Python client for the Prometheus monitoring system."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "prometheus_client-0.22.1-py3-none-any.whl", hash = "sha256:cca895342e308174341b2cbf99a56bef291fbc0ef7b9e5412a0f26d653ba7094"},
     {file = "prometheus_client-0.22.1.tar.gz", hash = "sha256:190f1331e783cf21eb60bca559354e0a4d4378facecf78f5428c39b675d20d28"},
@@ -4422,7 +4422,7 @@ description = "Instrument your FastAPI app with Prometheus metrics"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "prometheus_fastapi_instrumentator-7.1.0-py3-none-any.whl", hash = "sha256:978130f3c0bb7b8ebcc90d35516a6fe13e02d2eb358c8f83887cdef7020c31e9"},
     {file = "prometheus_fastapi_instrumentator-7.1.0.tar.gz", hash = "sha256:be7cd61eeea4e5912aeccb4261c6631b3f227d8924542d79eaf5af3f439cbe5e"},
@@ -4439,7 +4439,7 @@ description = "Library for building powerful interactive command lines in Python
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "python_full_version >= \"3.12.4\" and extra == \"prometheus\""
 files = [
     {file = "prompt_toolkit-3.0.51-py3-none-any.whl", hash = "sha256:52742911fde84e2d423e2f9a4cf1de7d7ac4e51958f648d9540e0fb8db077b07"},
     {file = "prompt_toolkit-3.0.51.tar.gz", hash = "sha256:931a162e3b27fc90c86f1b48bb1fb2c528c2761475e57c9c06de13311c7b54ed"},
@@ -4687,7 +4687,7 @@ description = "Get CPU info with pure Python"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "py-cpuinfo-9.0.0.tar.gz", hash = "sha256:3cdbbf3fac90dc6f118bfd64384f309edeadd902d7c8fb17f02ffa1fc3f49690"},
     {file = "py_cpuinfo-9.0.0-py3-none-any.whl", hash = "sha256:859625bc251f64e21f077d099d4162689c762b5d6a4c3c97553d56241c9674d5"},
@@ -4768,7 +4768,7 @@ description = "Fast Base64 encoding/decoding"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "pybase64-1.4.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:82b4593b480773b17698fef33c68bae0e1c474ba07663fad74249370c46b46c9"},
     {file = "pybase64-1.4.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:a126f29d29cb4a498db179135dbf955442a0de5b00f374523f5dcceb9074ff58"},
@@ -5000,7 +5000,7 @@ description = "ISO country, subdivision, language, currency and script definitio
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "pycountry-24.6.1-py3-none-any.whl", hash = "sha256:f1a4fb391cd7214f8eefd39556d740adcc233c778a27f8942c8dca351d6ce06f"},
     {file = "pycountry-24.6.1.tar.gz", hash = "sha256:b61b3faccea67f87d10c1f2b0fc0be714409e8fcdcc1315613174f6466c10221"},
@@ -5013,7 +5013,7 @@ description = "C parser in Python"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "platform_python_implementation == \"PyPy\" or implementation_name == \"pypy\" and extra == \"webapp\" or python_version == \"3.10\" and extra == \"prometheus\" or python_version == \"3.10\" and implementation_name == \"pypy\" and (extra == \"webapp\" or extra == \"prometheus\")"
+markers = "((extra == \"webapp\" or extra == \"prometheus\") and implementation_name == \"pypy\" or platform_python_implementation == \"PyPy\" or extra == \"prometheus\") and python_full_version < \"3.12.4\" or (extra == \"webapp\" and implementation_name == \"pypy\" or platform_python_implementation == \"PyPy\") and python_full_version >= \"3.12.4\""
 files = [
     {file = "pycparser-2.22-py3-none-any.whl", hash = "sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"},
     {file = "pycparser-2.22.tar.gz", hash = "sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6"},
@@ -5161,7 +5161,7 @@ description = "Extra Pydantic types."
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "pydantic_extra_types-2.10.5-py3-none-any.whl", hash = "sha256:b60c4e23d573a69a4f1a16dd92888ecc0ef34fb0e655b4f305530377fa70e7a8"},
     {file = "pydantic_extra_types-2.10.5.tar.gz", hash = "sha256:1dcfa2c0cf741a422f088e0dbb4690e7bfadaaf050da3d6f80d6c3cf58a2bad8"},
@@ -5314,7 +5314,7 @@ description = "JSON Log Formatter for the Python Logging Package"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "python_json_logger-3.3.0-py3-none-any.whl", hash = "sha256:dd980fae8cffb24c13caf6e158d3d61c0d6d22342f932cb6e9deedab3d35eec7"},
     {file = "python_json_logger-3.3.0.tar.gz", hash = "sha256:12b7e74b17775e7d565129296105bbe3910842d9d0eb083fc83a6a617aa8df84"},
@@ -5330,7 +5330,7 @@ description = "A streaming multipart parser for Python"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "python_multipart-0.0.20-py3-none-any.whl", hash = "sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104"},
     {file = "python_multipart-0.0.20.tar.gz", hash = "sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13"},
@@ -5445,7 +5445,7 @@ description = "Python bindings for 0MQ"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "extra == \"webapp\" or python_version == \"3.10\" and (extra == \"webapp\" or extra == \"prometheus\")"
+markers = "(extra == \"webapp\" or extra == \"prometheus\") and (python_full_version < \"3.12.4\" or extra == \"webapp\")"
 files = [
     {file = "pyzmq-27.0.0-cp310-cp310-macosx_10_15_universal2.whl", hash = "sha256:b973ee650e8f442ce482c1d99ca7ab537c69098d53a3d046676a484fd710c87a"},
     {file = "pyzmq-27.0.0-cp310-cp310-manylinux2014_i686.manylinux_2_17_i686.whl", hash = "sha256:661942bc7cd0223d569d808f2e5696d9cc120acc73bf3e88a1f1be7ab648a7e4"},
@@ -5783,7 +5783,7 @@ description = "Rich toolkit for building command-line applications"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "rich_toolkit-0.15.0-py3-none-any.whl", hash = "sha256:ddb91008283d4a7989fd8ff0324a48773a7a2276229c6a3070755645538ef1bb"},
     {file = "rich_toolkit-0.15.0.tar.gz", hash = "sha256:3f5730e9f2d36d0bfe01cf723948b7ecf4cc355d2b71e2c00e094f7963128c09"},
@@ -5801,7 +5801,7 @@ description = "Python Bindings for the ignore crate"
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "rignore-0.6.4-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:c201375cfe76e56e61fcdfe50d0882aafb49544b424bfc828e0508dc9fbc431b"},
     {file = "rignore-0.6.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:4962d537e377394292c4828e1e9c620618dd8daa49ba746abe533733a89f8644"},
@@ -6373,7 +6373,7 @@ description = "Python client for Sentry (https://sentry.io)"
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "sentry_sdk-2.35.0-py2.py3-none-any.whl", hash = "sha256:6e0c29b9a5d34de8575ffb04d289a987ff3053cf2c98ede445bea995e3830263"},
     {file = "sentry_sdk-2.35.0.tar.gz", hash = "sha256:5ea58d352779ce45d17bc2fa71ec7185205295b83a9dbb5707273deb64720092"},
@@ -6426,12 +6426,34 @@ unleash = ["UnleashClient (>=6.0.1)"]
 
 [[package]]
 name = "setuptools"
+version = "79.0.1"
+description = "Easily download, build, install, upgrade, and uninstall Python packages"
+optional = true
+python-versions = ">=3.9"
+groups = ["main"]
+markers = "python_version >= \"3.12\" and (extra == \"prometheus\" or extra == \"local-inference\" or extra == \"dev\" or extra == \"webapp\") and python_full_version < \"3.12.4\""
+files = [
+    {file = "setuptools-79.0.1-py3-none-any.whl", hash = "sha256:e147c0549f27767ba362f9da434eab9c5dc0045d5304feb602a0af001089fc51"},
+    {file = "setuptools-79.0.1.tar.gz", hash = "sha256:128ce7b8f33c3079fd1b067ecbb4051a66e8526e7b65f6cec075dfc650ddfa88"},
+]
+
+[package.extras]
+check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\"", "ruff (>=0.8.0) ; sys_platform != \"cygwin\""]
+core = ["importlib_metadata (>=6) ; python_version < \"3.10\"", "jaraco.functools (>=4)", "jaraco.text (>=3.7)", "more_itertools", "more_itertools (>=8.8)", "packaging (>=24.2)", "platformdirs (>=4.2.2)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "wheel (>=0.43.0)"]
+cover = ["pytest-cov"]
+doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "pyproject-hooks (!=1.1)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier", "towncrier (<24.7)"]
+enabler = ["pytest-enabler (>=2.2)"]
+test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21) ; python_version >= \"3.9\" and sys_platform != \"cygwin\"", "jaraco.envs (>=2.2)", "jaraco.path (>=3.7.2)", "jaraco.test (>=5.5)", "packaging (>=24.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.*)", "pytest-home (>=0.5)", "pytest-perf ; sys_platform != \"cygwin\"", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel (>=0.44.0)"]
+type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.develop (>=7.21) ; sys_platform != \"cygwin\"", "mypy (==1.14.*)", "pytest-mypy"]
+
+[[package]]
+name = "setuptools"
 version = "80.9.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version < \"3.12\" and platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"prometheus\" or extra == \"local-inference\" or extra == \"dev\" or extra == \"webapp\") or extra == \"dev\" or extra == \"webapp\" or platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"local-inference\" or extra == \"prometheus\" or extra == \"dev\" or extra == \"webapp\") or python_version >= \"3.12\" and (extra == \"local-inference\" or extra == \"prometheus\" or extra == \"dev\" or extra == \"webapp\")"
+markers = "python_version < \"3.12\" and (platform_system == \"Linux\" and platform_machine == \"x86_64\" and (extra == \"prometheus\" or extra == \"local-inference\") or extra == \"dev\" or extra == \"webapp\") or python_full_version >= \"3.12.4\" and (extra == \"local-inference\" or extra == \"prometheus\" or extra == \"dev\" or extra == \"webapp\")"
 files = [
     {file = "setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922"},
     {file = "setuptools-80.9.0.tar.gz", hash = "sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c"},
@@ -6453,7 +6475,7 @@ description = "Tool to Detect Surrounding Shell"
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"},
     {file = "shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de"},
@@ -6466,7 +6488,7 @@ description = "A generator library for concise, unambiguous and URL-safe UUIDs."
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "python_full_version >= \"3.12.4\" and extra == \"prometheus\""
 files = [
     {file = "shortuuid-1.0.13-py3-none-any.whl", hash = "sha256:a482a497300b49b4953e15108a7913244e1bb0d41f9d332f5e9925dba33a3c5a"},
     {file = "shortuuid-1.0.13.tar.gz", hash = "sha256:3bb9cf07f606260584b1df46399c0b87dd84773e7b25912b7e391e30797c5e72"},
@@ -6516,7 +6538,7 @@ description = "An audio library based on libsndfile, CFFI and NumPy"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "soundfile-0.13.1-py2.py3-none-any.whl", hash = "sha256:a23c717560da2cf4c7b5ae1142514e0fd82d6bbd9dfc93a50423447142f2c445"},
     {file = "soundfile-0.13.1-py2.py3-none-macosx_10_9_x86_64.whl", hash = "sha256:82dc664d19831933fe59adad199bf3945ad06d84bc111a5b4c0d3089a5b9ec33"},
@@ -6552,7 +6574,7 @@ description = "High quality, one-dimensional sample-rate conversion library"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "soxr-0.5.0.post1-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:7406d782d85f8cf64e66b65e6b7721973de8a1dc50b9e88bc2288c343a987484"},
     {file = "soxr-0.5.0.post1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:fa0a382fb8d8e2afed2c1642723b2d2d1b9a6728ff89f77f3524034c8885b8c9"},
@@ -6739,7 +6761,7 @@ description = "A Python library to create SVG drawings."
 optional = true
 python-versions = ">=3.6"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "python_full_version >= \"3.12.4\" and extra == \"prometheus\""
 files = [
     {file = "svgwrite-1.4.3-py3-none-any.whl", hash = "sha256:bb6b2b5450f1edbfa597d924f9ac2dd099e625562e492021d7dd614f65f8a22d"},
     {file = "svgwrite-1.4.3.zip", hash = "sha256:a8fbdfd4443302a6619a7f76bc937fc683daf2628d9b737c891ec08b8ce524c3"},
@@ -6752,7 +6774,7 @@ description = "Computer algebra system (CAS) in Python"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "extra == \"local-inference\" or extra == \"prometheus\""
+markers = "extra == \"prometheus\" or extra == \"local-inference\""
 files = [
     {file = "sympy-1.14.0-py3-none-any.whl", hash = "sha256:e091cc3e99d2141a0ba2847328f5479b05d94a6635cb96148ccb3f34671bd8f5"},
     {file = "sympy-1.14.0.tar.gz", hash = "sha256:d3d3fe8df1e5a0b42f0e7bdf50541697dbe7d23746e894990c030e2b05e72517"},
@@ -6962,7 +6984,7 @@ description = "Tensors and Dynamic neural networks in Python with strong GPU acc
 optional = true
 python-versions = ">=3.9.0"
 groups = ["main"]
-markers = "extra == \"local-inference\" or extra == \"prometheus\""
+markers = "extra == \"prometheus\" or extra == \"local-inference\""
 files = [
     {file = "torch-2.7.1-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:a103b5d782af5bd119b81dbcc7ffc6fa09904c423ff8db397a1e6ea8fd71508f"},
     {file = "torch-2.7.1-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:fe955951bdf32d182ee8ead6c3186ad54781492bf03d547d31771a01b3d6fb7d"},
@@ -7025,7 +7047,7 @@ description = "An audio package for PyTorch"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "torchaudio-2.7.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:4739af57d0eb94347d1c6a1b5668be78a7383afe826dde18a04883b9f9f263b1"},
     {file = "torchaudio-2.7.1-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:c089dbfc14c5f47091b7bf3f6bf2bbac93b86619299d04d9c102f4ad53758990"},
@@ -7063,7 +7085,7 @@ description = "image and video datasets and models for torch deep learning"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "torchvision-0.22.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:3b47d8369ee568c067795c0da0b4078f39a9dfea6f3bc1f3ac87530dfda1dd56"},
     {file = "torchvision-0.22.1-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:990de4d657a41ed71680cd8be2e98ebcab55371f30993dc9bd2e676441f7180e"},
@@ -7198,7 +7220,7 @@ description = "State-of-the-art Machine Learning for JAX, PyTorch and TensorFlow
 optional = true
 python-versions = ">=3.9.0"
 groups = ["main"]
-markers = "extra == \"local-inference\" or extra == \"prometheus\""
+markers = "extra == \"prometheus\" or extra == \"local-inference\""
 files = [
     {file = "transformers-4.53.2-py3-none-any.whl", hash = "sha256:db8f4819bb34f000029c73c3c557e7d06fc1b8e612ec142eecdae3947a9c78bf"},
     {file = "transformers-4.53.2.tar.gz", hash = "sha256:6c3ed95edfb1cba71c4245758f1b4878c93bf8cde77d076307dacb2cbbd72be2"},
@@ -7272,7 +7294,7 @@ description = "A language and compiler for custom Deep Learning operations"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"local-inference\" or extra == \"prometheus\")"
+markers = "platform_machine == \"x86_64\" and platform_system == \"Linux\" and (extra == \"prometheus\" or extra == \"local-inference\")"
 files = [
     {file = "triton-3.3.1-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b74db445b1c562844d3cfad6e9679c72e93fdfb1a90a24052b03bb5c49d1242e"},
     {file = "triton-3.3.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b31e3aa26f8cb3cc5bf4e187bf737cbacf17311e1112b781d4a059353dfd731b"},
@@ -7297,7 +7319,7 @@ description = "Typer, build great CLIs. Easy to code. Based on Python type hints
 optional = true
 python-versions = ">=3.7"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "typer-0.16.1-py3-none-any.whl", hash = "sha256:90ee01cb02d9b8395ae21ee3368421faf21fa138cb2a541ed369c08cec5237c9"},
     {file = "typer-0.16.1.tar.gz", hash = "sha256:d358c65a464a7a90f338e3bb7ff0c74ac081449e53884b12ba658cbd72990614"},
@@ -7435,7 +7457,7 @@ description = "Fast implementation of asyncio event loop on top of libuv"
 optional = true
 python-versions = ">=3.8.0"
 groups = ["main"]
-markers = "sys_platform != \"win32\" and sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\" and extra == \"prometheus\" and python_version == \"3.10\""
+markers = "sys_platform != \"win32\" and sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\" and extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "uvloop-0.21.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:ec7e6b09a6fdded42403182ab6b832b71f4edaf7f37a9a0e371a01db5f0cb45f"},
     {file = "uvloop-0.21.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:196274f2adb9689a289ad7d65700d37df0c0930fd8e4e743fa4834e850d7719d"},
@@ -7510,7 +7532,7 @@ description = "A high-throughput and memory-efficient inference and serving engi
 optional = true
 python-versions = ">=3.8"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "python_full_version >= \"3.12.4\" and extra == \"prometheus\""
 files = [
     {file = "vllm-0.1.2.tar.gz", hash = "sha256:6fff59a918ec822c3d7a9060c3af5604a1bbf26ec4db15656678768019aefad7"},
 ]
@@ -7536,7 +7558,7 @@ description = "A high-throughput and memory-efficient inference and serving engi
 optional = true
 python-versions = "<3.13,>=3.9"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "vllm-0.10.0-cp38-abi3-manylinux1_x86_64.whl", hash = "sha256:8ca37559d82b43b5e8c8248d2e4a1ecb51d6d4e5d517491d656df6491ed93dab"},
     {file = "vllm-0.10.0.tar.gz", hash = "sha256:a44e9013db26082a82c3931ed8772ac884d6d60566d36ecdb0e8dc01c65b241a"},
@@ -7584,6 +7606,8 @@ regex = "*"
 requests = ">=2.26.0"
 scipy = "*"
 sentencepiece = "*"
+setuptools = {version = ">=77.0.3,<80", markers = "python_version > \"3.11\""}
+six = {version = ">=1.16.0", markers = "python_version > \"3.11\""}
 tiktoken = ">=0.6.0"
 tokenizers = ">=0.21.1"
 torch = "2.7.1"
@@ -7610,7 +7634,7 @@ description = "Simple, modern and high performance file watching and code reload
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "watchfiles-1.1.0-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:27f30e14aa1c1e91cb653f03a63445739919aef84c8d2517997a83155e7a2fcc"},
     {file = "watchfiles-1.1.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:3366f56c272232860ab45c77c3ca7b74ee819c8e1f6f35a7125556b198bbc6df"},
@@ -7730,7 +7754,7 @@ description = "WaveDrom compatible python command line"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "python_full_version >= \"3.12.4\" and extra == \"prometheus\""
 files = [
     {file = "wavedrom-2.0.3.post3.tar.gz", hash = "sha256:327b4d5dca593c81257c202fea516f7a908747fb11527c359f034f5b7af7f47b"},
 ]
@@ -7750,7 +7774,7 @@ description = "Measures the displayed width of unicode strings in a terminal"
 optional = true
 python-versions = "*"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "python_full_version >= \"3.12.4\" and extra == \"prometheus\""
 files = [
     {file = "wcwidth-0.2.13-py2.py3-none-any.whl", hash = "sha256:3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859"},
     {file = "wcwidth-0.2.13.tar.gz", hash = "sha256:72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5"},
@@ -7776,7 +7800,7 @@ description = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version == \"3.10\" and extra == \"prometheus\""
+markers = "extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "websockets-15.0.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d63efaa0cd96cf0c5fe4d581521d9fa87744540d4bc999ae6e08595a1014b45b"},
     {file = "websockets-15.0.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:ac60e3b188ec7574cb761b08d50fcedf9d77f1530352db4eef1707fe9dee7205"},
@@ -7856,7 +7880,7 @@ description = "XFormers: A collection of composable Transformer building blocks.
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and extra == \"prometheus\" and python_version == \"3.10\""
+markers = "platform_system == \"Linux\" and platform_machine == \"x86_64\" and extra == \"prometheus\" and python_full_version < \"3.12.4\""
 files = [
     {file = "xformers-0.0.31-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:50aedaea82a38d7d28631f77617d1ed1f6f37c60bdc4bf167a69cbc0e39cee76"},
     {file = "xformers-0.0.31-cp39-abi3-win_amd64.whl", hash = "sha256:23331bdb9831ba0df96f55258537ca0df7ad888efc75cea97a0de79b5e2291c4"},
@@ -7874,7 +7898,7 @@ description = "XFormers: A collection of composable Transformer building blocks.
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version >= \"3.11\" and extra == \"prometheus\""
+markers = "python_full_version >= \"3.12.4\" and extra == \"prometheus\""
 files = [
     {file = "xformers-0.0.31.post1-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:81ecbcaf6253f61378189bd1cc3a1e2ff994d3ecb391fe098ef88834c6ff6358"},
     {file = "xformers-0.0.31.post1-cp39-abi3-win_amd64.whl", hash = "sha256:294c30125442f5a84964e5b87b3cd5e83b87053896a13bbfee17c0043ee66e62"},
@@ -7892,7 +7916,7 @@ description = "Efficient, Flexible and Portable Structured Generation"
 optional = true
 python-versions = "<4,>=3.8"
 groups = ["main"]
-markers = "extra == \"prometheus\" and (platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"arm64\") and python_version == \"3.10\""
+markers = "extra == \"prometheus\" and (platform_machine == \"x86_64\" or platform_machine == \"aarch64\" or platform_machine == \"arm64\") and python_full_version < \"3.12.4\""
 files = [
     {file = "xgrammar-0.1.21-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:77af5e5487992489131047e38e7136733a24f9c1aa73ef80665a85effd835f77"},
     {file = "xgrammar-0.1.21-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:ae38de964a1d56437bc84c0aedf1b0a5a48ff2e805a0ec454b0caaa25b3c7f84"},
@@ -8328,4 +8352,4 @@ webapp = ["alembic", "boto3", "click", "diskcache", "fastapi", "ibm_watsonx_ai",
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "e3a558aedaac37ff39c3f894ea4a2b0521108c2d23a54409ad1a2de0c13692f8"
+content-hash = "4691af96372a0bdbae611431b0ded5d750d069bbec030a6ba631b68d84d71146"
