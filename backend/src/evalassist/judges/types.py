@@ -158,7 +158,7 @@ class DirectInstanceResult(BaseModel):
     score: float | None = None
     explanation: str
     feedback: str | None = None
-    metadata: dict[str, Any] | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
     positional_bias: DirectPositionalBias | None = None
 
 
