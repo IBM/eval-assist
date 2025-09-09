@@ -40,7 +40,10 @@ def generate_dynamic_model(
     # Optionally extend with a feedback field
     if include_feedback:
         dynamic_model = create_model(
-            f"{model_name}WithFeedback", __base__=dynamic_model, feedback=(str, "")
+            f"{model_name}WithFeedback",
+            __base__=dynamic_model,
+            feedback=(str, ""),
+            __config__=None,
         )
 
     return dynamic_model
