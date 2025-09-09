@@ -14,7 +14,8 @@ The module defines several key types in [`types.py`](./types.py):
 * `DirectInstance` and `PairwiseInstance`: Concrete subclasses for direct and pairwise evaluations.
 * `Criteria` and `CriteriaOption`: Classes representing evaluation criteria and their options.
 * `DirectInstanceResult` and `PairwiseInstanceResult`: Classes for storing evaluation results.
-* `MultiCriteria` and `MultiCriteriaItem`: Classes for defining and evaluating multiple criteria simultaneously.
+* `MultiCriteria` and `MultiCriteriaItem`: Classes for defining and evaluating multiple criteria simultaneously on direct assessment evaluation.
+* `MultiCriteriaItemResult`: Class for storing results of multi-criteria item direct evaluation.
 * `MultiCriteriaDirectInstanceResult`: Class for storing results of multi-criteria direct evaluations.
 
 ### Base Classes
@@ -160,7 +161,11 @@ print(results[0].per_criterion_score)
 
 EvalAssist implements a [Judge API](./base.py) for easily defining and trying different LLM judges. Currently, the following judges are available:
 
-* **SimpleDirectJudge**: a judge that uses structured output parsing to make evaluations. It has support for providing feedback in addition to the explanation and the selected option.
+* **SimpleDirectJudge**: a judge that uses structured output parsing to make evaluations. It accepts the following parameters:
+
+* `generate_feedback`: generate feedback as actionable suggestions if the evaluation result is not optimal. Can be used to automatically fix the evaluated text.
+* `judge_description_prompt`: a judge description to be used in the prompt. Defaults to "You are an evaluator. You are an expert on evaluating text based on a rubric."
+* `generate_synthetic_persona`: generate a synthetic persona based on the criteria to be used as the judge description.
 
 * **UnitxtDirectJudge** and **UnitxtPairwiseJudge**: wrappers for Unitxt judges.
 
