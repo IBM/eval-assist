@@ -27,7 +27,7 @@ if __name__ == "__main__":
         #     SimpleDirectJudge,
         #     {
         #         "generate_synthetic_persona": True,
-        #         "use_self_consistency": True,
+        #         "self_consistency": True,
         #     },
         #     {
         #         'temperature': 0.3,
@@ -37,7 +37,7 @@ if __name__ == "__main__":
         #     SimpleDirectJudge,
         #     {
         #         "generate_synthetic_persona": False,
-        #         "use_self_consistency": True,
+        #         "self_consistency": True,
         #     },
         #     {
         #         'temperature': 0.3,
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         #     SimpleDirectJudge,
         #     {
         #         "generate_synthetic_persona": True,
-        #         "use_self_consistency": False,
+        #         "self_consistency": False,
         #     },
         #     {
         #         'temperature': 0.0,
@@ -57,7 +57,7 @@ if __name__ == "__main__":
             SimpleDirectJudge,
             {
                 "generate_synthetic_persona": False,
-                "use_self_consistency": False,
+                "self_consistency": False,
             },
             {
                 "temperature": 0.0,

@@ -73,16 +73,24 @@ class Judge(
     ``Criteria`` and returns a result specific to the concrete implementation.
     """
 
-    use_self_consistency: bool
+    self_consistency: int = False
 
     def __init__(
         self,
-        use_self_consistency: bool = False,
+        self_consistency: bool | int = False,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        self.use_self_consistency = use_self_consistency
+        if self_consistency < 0:
+            raise ValueError(
+                "self_consistency must have a boolean value or be an int greater than 0."
+            )
+        self.self_consistency = (
+            self_consistency
+            if isinstance(self_consistency, int)
+            else (3 if self_consistency is True else 0)
+        )
 
     def get_ai_message_from_prompt(
         self, prompt: str, role: Literal["system", "user", "assistant"] = "user"
@@ -119,12 +127,16 @@ class Judge(
         )
         parsed_instances = self._get_instances_from_str(instances)
 
-        if self.use_self_consistency:
+        if self.self_consistency > 0:
             parsed_instances = [
-                instance for instance in parsed_instances for _ in range(3)
+                instance
+                for instance in parsed_instances
+                for _ in range(self.self_consistency)
             ]
             parsed_criteria = [
-                criterion for criterion in parsed_criteria for _ in range(3)
+                criterion
+                for criterion in parsed_criteria
+                for _ in range(self.self_consistency)
             ]
 
         results: list[ReturnVarType] = self._evaluate(
@@ -248,20 +260,33 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
                     pass
             r.score = score
 
-        if self.use_self_consistency:
-            # apply majority voting for each of the three evaluation
+        if self.self_consistency > 0:
+            # apply majority voting for each of the self consistency evaluations
             parsed_results = []
-            for i in range(0, len(results), 3):
-                selected_options = [results[i].option for j in range(i, i + 3)]
+            for i in range(0, len(results), self.self_consistency):
+                selected_options = [
+                    results[i].option for j in range(i, i + self.self_consistency)
+                ]
                 most_common_option = Counter(selected_options).most_common(1)[0][0]
                 index_of_most_common = selected_options.index(most_common_option)
                 to_update_result_index = i + index_of_most_common
-                results[to_update_result_index].option = most_common_option
-                results[to_update_result_index].score = (
-                    sum(cast(float, r.score) for r in results[i : i + 3]) / 3
-                    if all(r.score is not None for r in results[i : i + 3])
-                    else None
-                )  # type: ignore
+                to_update_result = results[to_update_result_index]
+                to_update_result.option = most_common_option
+                if all(
+                    r.score is not None for r in results[i : i + self.self_consistency]
+                ):
+                    # set the mean of the scores as the score
+                    to_update_result.score = (
+                        sum(
+                            cast(float, r.score)
+                            for r in results[i : i + self.self_consistency]
+                        )
+                        / self.self_consistency
+                    )
+
+                to_update_result.metadata["self_consistency"] = {
+                    "selected_options": selected_options,
+                }
                 parsed_results.append(results[to_update_result_index])
             return parsed_results
 
@@ -385,7 +410,7 @@ class PairwiseJudge(Judge[PairwiseInstance, PairwiseInstanceResult], ABC):
             *args,
             **kwargs,
         )
-        if self.use_self_consistency:
+        if self.self_consistency:
             raise ValueError(
                 "Self consistency is not supported on pairwise comparison judges yet.s"
             )

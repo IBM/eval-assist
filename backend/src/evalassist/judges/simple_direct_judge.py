@@ -28,15 +28,29 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         generate_synthetic_persona: bool = False,
         judge_description_prompt: str | None = None,
         generate_feedback: bool = False,
-        use_self_consistency: bool = False,
+        self_consistency: bool = False,
     ):
         super().__init__(
-            inference_engine=inference_engine, use_self_consistency=use_self_consistency
+            inference_engine=inference_engine, self_consistency=self_consistency
         )
         if generate_synthetic_persona and judge_description_prompt:
             raise ValueError(
                 "Either provide set generate_synthetic_persona to False or don't provide a judge_description_prompt."
             )
+
+        if self.self_consistency:
+            temp = getattr(self.inference_engine, "temperature", None)
+            if temp is not None:
+                try:
+                    if float(temp) == 0.0:
+                        logger.warning(
+                            "Self-consistency may not bring any benefit when temperature is 0."
+                        )
+                except (TypeError, ValueError):
+                    logger.debug(
+                        "Could not interpret temperature value for self-consistency check."
+                    )
+
         self.generate_synthetic_persona = generate_synthetic_persona
         self.judge_description_prompt = judge_description_prompt
         self.generate_feedback = generate_feedback
@@ -62,7 +76,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         return parsed_response, metadata
 
     def get_name(self) -> str:
-        return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}{'_with_self_consistency' if self.use_self_consistency else ''}"
+        return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}{'_with_self_consistency' if self.self_consistency else ''}"
 
     def get_descriptor(self) -> JudgeDescriptor:
         judge_descriptor = JudgeDescriptor(self.get_name(), "direct", "")
