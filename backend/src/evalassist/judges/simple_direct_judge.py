@@ -28,7 +28,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         generate_synthetic_persona: bool = False,
         judge_description_prompt: str | None = None,
         generate_feedback: bool = False,
-        self_consistency: bool = False,
+        self_consistency: bool | int = False,
     ):
         super().__init__(
             inference_engine=inference_engine, self_consistency=self_consistency
