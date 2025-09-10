@@ -67,9 +67,9 @@ from .judges import (
     DEFAULT_JUDGE_INFERENCE_PARAMS,
     Criteria,
     DirectInstance,
+    DirectJudge,
     GraniteGuardianJudge,
     PairwiseInstance,
-    SimpleDirectJudge,
     UnitxtPairwiseJudge,
 )
 from .model import AppUser, StoredTestCase
@@ -319,7 +319,7 @@ async def evaluate(
             if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
                 evaluator = GraniteGuardianJudge(inference_engine=inference_engine)
             else:
-                evaluator = SimpleDirectJudge(
+                evaluator = DirectJudge(
                     inference_engine=inference_engine,
                     generate_feedback=True,
                 )
