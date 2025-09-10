@@ -4,11 +4,11 @@ from typing import Any, cast
 from langchain.output_parsers import OutputFixingParser, ResponseSchema
 from langchain.prompts import PromptTemplate
 
-from ..base import DirectJudge, UnitxtInferenceLangchainRunnable
+from ..base import BaseDirectJudge, UnitxtInferenceLangchainRunnable
 from ..types import Criteria, DirectInstance, DirectInstanceResult
 
 
-class ThesisAntithesisDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
+class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
     def get_name(self) -> str:
         return "thesis_untithesis"
 

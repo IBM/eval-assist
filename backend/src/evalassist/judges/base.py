@@ -62,7 +62,7 @@ class UnitxtInferenceEngineMixin:
         return "_".join(self.inference_engine.get_engine_id().split("_")[:-1])
 
 
-class Judge(
+class BaseJudge(
     ABC,
     Generic[InstanceTypeVar, ReturnVarType],
 ):
@@ -89,6 +89,7 @@ class Judge(
         self.self_consistency = (
             self_consistency
             if isinstance(self_consistency, int)
+            and not isinstance(self_consistency, bool)
             else (3 if self_consistency is True else 0)
         )
 
@@ -206,7 +207,7 @@ class Judge(
 # ----------------------------------------------------------------------
 # Concrete abstract subclasses for the two main evaluation modes
 # ----------------------------------------------------------------------
-class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
+class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
     def _evaluate(
         self,
         instances: list[DirectInstance],
@@ -235,6 +236,7 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
             results = [
                 DirectInstanceResult(
                     criteria=results[i].criteria,
+                    instance=instances[i],
                     option=results[i].option,
                     explanation=results[i].explanation,
                     feedback=results[i].feedback,
@@ -265,7 +267,7 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
             parsed_results = []
             for i in range(0, len(results), self.self_consistency):
                 selected_options = [
-                    results[i].option for j in range(i, i + self.self_consistency)
+                    results[j].option for j in range(i, i + self.self_consistency)
                 ]
                 most_common_option = Counter(selected_options).most_common(1)[0][0]
                 index_of_most_common = selected_options.index(most_common_option)
@@ -400,7 +402,7 @@ class DirectJudge(Judge[DirectInstance, DirectInstanceResult], ABC):
         return JudgeDescriptor(self.get_name(), "direct", "")
 
 
-class PairwiseJudge(Judge[PairwiseInstance, PairwiseInstanceResult], ABC):
+class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC):
     def __init__(
         self,
         *args,

@@ -1,8 +1,13 @@
-from .base import DirectJudge, Judge, PairwiseJudge, UnitxtInferenceLangchainRunnable
+from .base import (
+    BaseDirectJudge,
+    BaseJudge,
+    BasePairwiseJudge,
+    UnitxtInferenceLangchainRunnable,
+)
 from .const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from .dummy_judge import DummyDirectJudge, DummyPairwiseJudge
 from .mprometheus_judge import MPrometheusDirectJudge, MPrometheusPairwiseJudge
-from .simple_direct_judge import SimpleDirectJudge
+from .simple_direct_judge import DirectJudge
 from .types import (
     Criteria,
     CriteriaOption,
@@ -20,14 +25,14 @@ from .types import (
 from .unitxt_judges import GraniteGuardianJudge, UnitxtDirectJudge, UnitxtPairwiseJudge
 
 __all__: list[str] = [
-    "Judge",
+    "BaseJudge",
     "DummyDirectJudge",
     "DummyPairwiseJudge",
-    "SimpleDirectJudge",
+    "DirectJudge",
     "UnitxtDirectJudge",
     "UnitxtPairwiseJudge",
-    "DirectJudge",
-    "PairwiseJudge",
+    "BaseDirectJudge",
+    "BasePairwiseJudge",
     "Instance",
     "DirectInstance",
     "PairwiseInstance",

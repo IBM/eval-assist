@@ -1,4 +1,4 @@
-from evalassist.judges import DirectInstance, SimpleDirectJudge
+from evalassist.judges import DirectInstance, DirectJudge
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from evalassist.judges.types import (
     Criteria,
@@ -9,7 +9,7 @@ from evalassist.judges.types import (
 )
 from unitxt.inference import CrossProviderInferenceEngine
 
-judge = SimpleDirectJudge(
+judge = DirectJudge(
     inference_engine=CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",
         provider="watsonx",

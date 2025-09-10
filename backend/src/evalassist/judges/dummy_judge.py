@@ -1,4 +1,4 @@
-from .base import DirectJudge, PairwiseJudge
+from .base import BaseDirectJudge, BasePairwiseJudge
 from .types import (
     Criteria,
     DirectInstance,
@@ -10,7 +10,7 @@ from .types import (
 )
 
 
-class DummyDirectJudge(DirectJudge):
+class DummyDirectJudge(BaseDirectJudge):
     def get_name(self) -> str:
         return "dummy"
 
@@ -21,6 +21,7 @@ class DummyDirectJudge(DirectJudge):
     ) -> list[DirectInstanceResult]:
         return [
             DirectInstanceResult(
+                instance=instances[0],
                 criteria=criteria[0],
                 option=criteria[0].options[0].name,
                 explanation="explanation",
@@ -32,7 +33,7 @@ class DummyDirectJudge(DirectJudge):
         ]
 
 
-class DummyPairwiseJudge(PairwiseJudge):
+class DummyPairwiseJudge(BasePairwiseJudge):
     def get_name(self) -> str:
         return "dummy"
 

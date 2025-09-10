@@ -18,10 +18,10 @@ from unitxt.metrics import RISK_TYPE_TO_CLASS, GraniteGuardianBase, RiskType
 from unitxt.templates import NullTemplate
 
 from .base import (
-    DirectJudge,
+    BaseDirectJudge,
+    BaseJudge,
+    BasePairwiseJudge,
     InstanceTypeVar,
-    Judge,
-    PairwiseJudge,
     ReturnVarType,
     UnitxtInferenceEngineMixin,
 )
@@ -36,7 +36,7 @@ from .types import (
 
 
 class UnitxtJudge(
-    Judge[InstanceTypeVar, ReturnVarType],
+    BaseJudge[InstanceTypeVar, ReturnVarType],
     ABC,
     Generic[InstanceTypeVar, ReturnVarType],
     UnitxtInferenceEngineMixin,
@@ -150,7 +150,7 @@ class UnitxtJudge(
 
 class UnitxtDirectJudge(
     UnitxtJudge[DirectInstance, DirectInstanceResult],
-    DirectJudge,
+    BaseDirectJudge,
 ):
     def get_preprocess_steps(self):
         return [LoadCriteriaWithOptions(field="judgement", to_field="criteria")]
@@ -169,6 +169,7 @@ class UnitxtDirectJudge(
 
             results.append(
                 DirectInstanceResult(
+                    instance=instance,
                     criteria=Criteria.from_unitxt_criteria(
                         cast(
                             UnitxtCriteriaWithOptions,
@@ -185,7 +186,7 @@ class UnitxtDirectJudge(
 
 class UnitxtPairwiseJudge(
     UnitxtJudge[PairwiseInstance, PairwiseInstanceResult],
-    PairwiseJudge,
+    BasePairwiseJudge,
 ):
     def get_preprocess_steps(self):
         return [LoadCriteria(field="judgement", to_field="criteria")]
@@ -218,7 +219,7 @@ class UnitxtPairwiseJudge(
         return results
 
 
-class GraniteGuardianJudge(DirectJudge, UnitxtInferenceEngineMixin):
+class GraniteGuardianJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
     def get_name(self) -> str:
         return "Granite Guardian"
 
@@ -280,18 +281,21 @@ class GraniteGuardianJudge(DirectJudge, UnitxtInferenceEngineMixin):
         ]
 
     def parse_results(
-        self, dataset, criteria: list[Criteria]
+        self,
+        dataset,
+        criteria: list[Criteria],
+        instances: list[DirectInstance],
     ) -> list[DirectInstanceResult]:
         results = []
-        for instance, criterion in zip(dataset, criteria):
-            risk_name: str = instance["score"]["instance"]["score_name"]
-            instance_score = instance["score"]["instance"]
+        for row, criterion, instance in zip(dataset, criteria, instances):
+            risk_name: str = row["score"]["instance"]["score_name"]
+            instance_score = row["score"]["instance"]
             explanation = self.get_harms_and_risks_result_description(
                 cast(str, criterion.prediction_field).replace("_", " "),
                 risk_name.lower().replace(" ", "_"),
             )
 
-            instance_score = instance["score"]["instance"]
+            instance_score = row["score"]["instance"]
             selected_option = instance_score[f"{risk_name}_label"]
 
             if selected_option is None:
@@ -299,6 +303,7 @@ class GraniteGuardianJudge(DirectJudge, UnitxtInferenceEngineMixin):
 
             results.append(
                 DirectInstanceResult(
+                    instance=instance,
                     criteria=criterion,
                     option=instance_score[f"{risk_name}_label"],
                     explanation=explanation,
@@ -388,7 +393,7 @@ class GraniteGuardianJudge(DirectJudge, UnitxtInferenceEngineMixin):
         evaluated_dataset: EvaluationResults = evaluate(predictions=None, data=dataset)
 
         per_instance_result: list[DirectInstanceResult] = self.parse_results(
-            dataset=evaluated_dataset, criteria=criteria
+            dataset=evaluated_dataset, criteria=criteria, instances=instances
         )
         return per_instance_result
 

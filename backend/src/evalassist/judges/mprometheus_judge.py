@@ -1,6 +1,6 @@
 from typing import Literal
 
-from .base import DirectJudge, PairwiseJudge
+from .base import BaseDirectJudge, BasePairwiseJudge
 from .types import (
     Criteria,
     DirectInstance,
@@ -21,7 +21,7 @@ class MPrometheusJudge:
         )
 
 
-class MPrometheusDirectJudge(MPrometheusJudge, DirectJudge):
+class MPrometheusDirectJudge(MPrometheusJudge, BaseDirectJudge):
     def get_name(self) -> str:
         return "prometheus"
 
@@ -90,16 +90,19 @@ class MPrometheusDirectJudge(MPrometheusJudge, DirectJudge):
 
         return [
             DirectInstanceResult(
+                instance=instance,
                 criteria=criterion,
                 option=criterion.options[score - 1].name,
                 score=score,
                 explanation=feedback,
             )
-            for feedback, score, criterion in zip(feedbacks, scores, criteria)
+            for feedback, score, criterion, instance in zip(
+                feedbacks, scores, criteria, instances
+            )
         ]
 
 
-class MPrometheusPairwiseJudge(MPrometheusJudge, PairwiseJudge):
+class MPrometheusPairwiseJudge(MPrometheusJudge, BasePairwiseJudge):
     def get_name(self) -> str:
         return "prometheus"
 
