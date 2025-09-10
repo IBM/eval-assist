@@ -2,11 +2,14 @@ import pytest
 from evalassist.judges.types import (
     Criteria,
     CriteriaOption,
+    DirectInstance,
     DirectInstanceResult,
     MultiCriteria,
     MultiCriteriaItem,
 )
 from pydantic import ValidationError
+
+dummy_direct_instance = DirectInstance(response="")
 
 
 def test_single_criteria_weighted():
@@ -25,6 +28,7 @@ def test_single_criteria_weighted():
         score=1.0,
         explanation="",
         feedback=None,
+        instance=dummy_direct_instance,
     )
 
     multi_criteria_item = MultiCriteriaItem(criterion=criterion, weight=1.0)
@@ -57,10 +61,20 @@ def test_multiple_criteria_weighted():
     )
 
     result1 = DirectInstanceResult(
-        criteria=criterion1, option="Good", score=1.0, explanation="", feedback=None
+        criteria=criterion1,
+        option="Good",
+        score=1.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
     result2 = DirectInstanceResult(
-        criteria=criterion2, option="Bad", score=0.0, explanation="", feedback=None
+        criteria=criterion2,
+        option="Bad",
+        score=0.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
 
     item1 = MultiCriteriaItem(criterion=criterion1, weight=0.6)
@@ -86,7 +100,12 @@ def test_required_criteria():
     )
 
     result = DirectInstanceResult(
-        criteria=criterion, option="Bad", score=0.0, explanation="", feedback=None
+        criteria=criterion,
+        option="Bad",
+        score=0.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
     multi_criteria_item = MultiCriteriaItem(
         criterion=criterion, weight=1.0, required=True
@@ -110,7 +129,12 @@ def test_normalized_scores():
     )
 
     result = DirectInstanceResult(
-        criteria=criterion, option="Good", score=1.0, explanation="", feedback=None
+        criteria=criterion,
+        option="Good",
+        score=1.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
 
     multi_criteria_item = MultiCriteriaItem(criterion=criterion, weight=1.0)
@@ -156,7 +180,12 @@ def test_missing_result():
     )
 
     result1 = DirectInstanceResult(
-        criteria=criterion1, option="Good", score=1.0, explanation="", feedback=None
+        criteria=criterion1,
+        option="Good",
+        score=1.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
 
     item1 = MultiCriteriaItem(criterion=criterion1, weight=0.6)
@@ -195,13 +224,28 @@ def test_strategy_mix():
     )
 
     result_a = DirectInstanceResult(
-        criteria=criterion_a, option="Good", score=1.0, explanation="", feedback=None
+        criteria=criterion_a,
+        option="Good",
+        score=1.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
     result_b = DirectInstanceResult(
-        criteria=criterion_b, option="Correct", score=1.0, explanation="", feedback=None
+        criteria=criterion_b,
+        option="Correct",
+        score=1.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
     result_c = DirectInstanceResult(
-        criteria=criterion_c, option="Yes", score=None, explanation="", feedback=None
+        criteria=criterion_c,
+        option="Yes",
+        score=None,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
 
     item_a = MultiCriteriaItem(criterion=criterion_a, weight=0.6)
@@ -231,7 +275,12 @@ def test_strategy_mix():
     )
 
     result_d = DirectInstanceResult(
-        criteria=criterion_d, option="Yes", score=None, explanation="", feedback=None
+        criteria=criterion_d,
+        option="Yes",
+        score=None,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
 
     item_a.weight = 0.4
@@ -271,7 +320,12 @@ def test_target_option():
     )
 
     result = DirectInstanceResult(
-        criteria=criterion, option="Good", score=1.0, explanation="", feedback=None
+        criteria=criterion,
+        option="Good",
+        score=1.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
 
     multi_criteria = MultiCriteria(
@@ -285,7 +339,12 @@ def test_target_option():
     assert aggregated_score == 1.0
 
     result = DirectInstanceResult(
-        criteria=criterion, option="Bad", score=0.0, explanation="", feedback=None
+        criteria=criterion,
+        option="Bad",
+        score=0.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
 
     aggregated_score = multi_criteria.get_aggregated_score(
@@ -305,7 +364,12 @@ def test_score_threshold():
     )
 
     result = DirectInstanceResult(
-        criteria=criterion, option="Good", score=1.0, explanation="", feedback=None
+        criteria=criterion,
+        option="Good",
+        score=1.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
 
     multi_criteria = MultiCriteria(
@@ -319,7 +383,12 @@ def test_score_threshold():
     assert aggregated_score == 1.0
 
     result = DirectInstanceResult(
-        criteria=criterion, option="Bad", score=0.0, explanation="", feedback=None
+        criteria=criterion,
+        option="Bad",
+        score=0.0,
+        explanation="",
+        feedback=None,
+        instance=dummy_direct_instance,
     )
     aggregated_score = multi_criteria.get_aggregated_score(
         [multi_criteria_item.get_result(result)]
