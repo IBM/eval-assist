@@ -51,7 +51,9 @@ class UnitxtJudge(
     def get_evaluator_klass(self) -> type: ...
 
     @abstractmethod
-    def parse_results(self, dataset) -> list[ReturnVarType]: ...
+    def parse_results(
+        self, dataset, instances: list[InstanceTypeVar]
+    ) -> list[ReturnVarType]: ...
 
     def get_descriptor(self) -> JudgeDescriptor:
         judge_descriptor = JudgeDescriptor(self.get_name(), "direct", "")
@@ -142,7 +144,8 @@ class UnitxtJudge(
         dataset = load_dataset(card=card, split="test")
         evaluated_dataset: EvaluationResults = evaluate(data=dataset)
         per_instance_results: list[ReturnVarType] = self.parse_results(
-            evaluated_dataset
+            evaluated_dataset,
+            instances,
         )
 
         return per_instance_results
@@ -161,11 +164,11 @@ class UnitxtDirectJudge(
     def get_evaluator_klass(self):
         return LLMJudgeDirect
 
-    def parse_results(self, dataset) -> list[DirectInstanceResult]:
+    def parse_results(self, dataset, instances) -> list[DirectInstanceResult]:
         results = []
         prefix = dataset[0]["score"]["instance"]["score_name"]
-        for instance in dataset:
-            instance_score = instance["score"]["instance"]
+        for row, instance in zip(dataset, instances):
+            row_score = row["score"]["instance"]
 
             results.append(
                 DirectInstanceResult(
@@ -173,11 +176,11 @@ class UnitxtDirectJudge(
                     criteria=Criteria.from_unitxt_criteria(
                         cast(
                             UnitxtCriteriaWithOptions,
-                            fetch_artifact(instance_score[f"{prefix}_criteria"])[0],
+                            fetch_artifact(row_score[f"{prefix}_criteria"])[0],
                         )
                     ),
-                    option=instance_score[f"{prefix}_selected_option"],
-                    explanation=instance_score[f"{prefix}_assessment"],
+                    option=row_score[f"{prefix}_selected_option"],
+                    explanation=row_score[f"{prefix}_assessment"],
                     positional_bias=None,
                 )
             )
@@ -197,16 +200,16 @@ class UnitxtPairwiseJudge(
     def get_evaluator_klass(self):
         return LLMJudgePairwise
 
-    def parse_results(self, dataset):
+    def parse_results(self, dataset, instances: list[PairwiseInstance]):
         results: list[PairwiseInstanceResult] = []
-        for instance in dataset:
-            score = instance["score"]["instance"]
+        for row, instance in zip(dataset, instances):
+            score = row["score"]["instance"]
 
-            parsed_score: dict[str, SingleSystemPairwiseResult] = {}
+            row_score: dict[str, SingleSystemPairwiseResult] = {}
             for key in score.keys():
                 outer_key = key.split("_")[0]
                 if outer_key not in ["score", "criteria"]:
-                    parsed_score[outer_key] = SingleSystemPairwiseResult(
+                    row_score[outer_key] = SingleSystemPairwiseResult(
                         contest_results=score[f"{outer_key}_contest_results"],
                         compared_to=score[f"{outer_key}_compared_to"],
                         explanations=score[f"{outer_key}_assessments"],
@@ -215,7 +218,7 @@ class UnitxtPairwiseJudge(
                         ranking=score[f"{outer_key}_ranking"],
                         selections=score[f"{outer_key}_selections"],
                     )
-            results.append(PairwiseInstanceResult(parsed_score))
+            results.append(PairwiseInstanceResult(row_score))
         return results
 
 
