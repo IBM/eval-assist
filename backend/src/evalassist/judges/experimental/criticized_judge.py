@@ -3,14 +3,14 @@ from typing import cast
 
 from evalassist.judges import CriteriaOption
 
-from ..base import DirectJudge
-from ..simple_direct_judge import SimpleDirectJudge
+from ..base import BaseDirectJudge
+from ..simple_direct_judge import DirectJudge
 from ..types import Criteria, DirectInstance, DirectInstanceResult
 
 logger = logging.getLogger(__name__)
 
 
-class CriticizedDirectJudge(DirectJudge):
+class CriticizedDirectJudge(BaseDirectJudge):
     def get_name(self) -> str:
         return "criticized"
 
@@ -19,7 +19,7 @@ class CriticizedDirectJudge(DirectJudge):
         instances: list[DirectInstance],
         criteria: list[Criteria],
     ) -> list[DirectInstanceResult]:
-        simple_judge = SimpleDirectJudge(self.inference_engine)
+        simple_judge = DirectJudge(self.inference_engine)
         logger.info(f"Running evaluation on {len(instances)} instances...")
         results = simple_judge(instances, criteria)
         criticize_criterion = Criteria(
@@ -55,7 +55,7 @@ class CriticizedDirectJudge(DirectJudge):
             ],
         )
 
-        criticize_judge = SimpleDirectJudge(
+        criticize_judge = DirectJudge(
             self.inference_engine,
             generate_feedback=True,
         )

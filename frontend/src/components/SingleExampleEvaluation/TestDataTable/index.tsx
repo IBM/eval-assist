@@ -76,7 +76,7 @@ export const TestDataTable = ({ style, className }: Props) => {
     if (!resultsAvailable) return
     return currentTestCase.type === EvaluationType.DIRECT
       ? (instances as DirectInstance[])?.every(
-          (instance) => (instance.result as DirectInstanceResult)?.positionalBias.detected == false,
+          (instance) => (instance.result as DirectInstanceResult)?.positionalBias?.detected == false,
         )
       : (instances as PairwiseInstance[])?.every(
           (instance) =>

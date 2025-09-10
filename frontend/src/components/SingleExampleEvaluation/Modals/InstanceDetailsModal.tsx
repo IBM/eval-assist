@@ -6,7 +6,7 @@ import React from 'react'
 import Markdown, { Components } from 'react-markdown'
 
 import { Accordion, AccordionItem, Layer, ListItem, Modal, Tooltip, UnorderedList } from '@carbon/react'
-import { ArrowRight, Warning } from '@carbon/react/icons'
+import { ArrowRight, List, Warning } from '@carbon/react/icons'
 
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 
@@ -35,7 +35,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
     if (selectedInstance === null || selectedInstance.result === null) return null
     return returnByPipelineType(
       currentTestCase.type,
-      () => (selectedInstance.result as DirectInstanceResult).positionalBias.detected,
+      () => (selectedInstance.result as DirectInstanceResult).positionalBias?.detected,
       () =>
         Object.values(selectedInstance.result as PairwiseInstanceResult).some((instance) =>
           instance.positionalBias.some((pb) => pb),
@@ -56,7 +56,6 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
       return setOpenedPerReponseResults([])
     setOpenedPerReponseResults(Object.keys(selectedInstance.result as PairwiseInstanceResult).map((_) => false))
   }, [currentTestCase.type, selectedInstance])
-
   return (
     selectedInstance !== null && (
       <Modal open={open} onRequestClose={onClose} passiveModal size="lg" modalHeading={`Instance details`}>
@@ -157,19 +156,19 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                         >
                           {positionalBiasDetected ? 'Detected' : 'Not detected'}
                         </p>
-                        {(selectedInstance.result as DirectInstanceResult).positionalBias.detected && (
+                        {(selectedInstance.result as DirectInstanceResult).positionalBias?.detected && (
                           <>
                             <p>
                               <strong>{'Positional bias result:'}</strong>
                             </p>
-                            <p>{(selectedInstance.result as DirectInstanceResult).positionalBias.option}</p>
+                            <p>{(selectedInstance.result as DirectInstanceResult).positionalBias?.option}</p>
 
                             <p>
                               <strong>{'Positional bias explanation:'}</strong>
                             </p>
                             <div>
                               <Markdown components={markdownHeadingConf}>
-                                {(selectedInstance.result as DirectInstanceResult).positionalBias.explanation}
+                                {(selectedInstance.result as DirectInstanceResult).positionalBias?.explanation}
                               </Markdown>
                             </div>
                           </>
@@ -183,14 +182,22 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                 </p>
                                 {typeof v === 'object' && !Array.isArray(v) && v !== null ? (
                                   <div className={cx(classes.gridTemplate)}>
-                                    {Object.entries(v).map(([metadataValueKey, metadataValue], i) => (
+                                    {Object.entries(v).map(([metadataKey, metadataValue], i) => (
                                       <React.Fragment key={i}>
                                         <p>
-                                          <strong>{`${capitalizeFirstWord(metadataValueKey)}:`}</strong>
+                                          <strong>{`${capitalizeFirstWord(metadataKey)}:`}</strong>
                                         </p>
-                                        <p style={{ whiteSpace: 'pre-line' }}>
-                                          {capitalizeFirstWord(metadataValue as string)}
-                                        </p>
+                                        {Array.isArray(v) ? (
+                                          <List>
+                                            {(metadataValue as Array<string>).map((i, j) => (
+                                              <ListItem key={j}>{i}</ListItem>
+                                            ))}
+                                          </List>
+                                        ) : (
+                                          <p style={{ whiteSpace: 'pre-line' }}>
+                                            {(metadataValue as string).toString()}
+                                          </p>
+                                        )}
                                       </React.Fragment>
                                     ))}
                                   </div>

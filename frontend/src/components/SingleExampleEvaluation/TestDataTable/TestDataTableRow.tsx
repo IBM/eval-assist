@@ -118,7 +118,7 @@ export const TestDataTableRow = ({
     if (instance.result === null) return false
     return returnByPipelineType(
       type,
-      () => (instance.result as DirectInstanceResult).positionalBias.detected,
+      () => (instance.result as DirectInstanceResult).positionalBias?.detected || false,
       () =>
         Object.values(instance.result as PairwiseInstanceResult).some((instance) =>
           instance.positionalBias.some((pb) => pb),

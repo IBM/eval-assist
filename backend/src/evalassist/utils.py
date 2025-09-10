@@ -115,7 +115,6 @@ def get_cross_inference_engine_params(
     provider_specific_args = {}
     inference_engine_params = {
         "max_tokens": 1024,
-        "seed": 42,
         "credentials": credentials.copy(),
         "provider": provider,
     }

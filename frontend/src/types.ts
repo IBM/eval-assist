@@ -4,7 +4,7 @@ export interface DirectInstanceResultV0 {
   option: string
   positionalBiasOption: string
   certainty: FetchedDirectInstanceResultV0['certainty']
-  positionalBias: {
+  positionalBias?: {
     detected: boolean
     option: string
     explanation: string

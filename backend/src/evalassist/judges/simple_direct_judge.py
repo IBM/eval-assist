@@ -11,13 +11,13 @@ from langchain_core.exceptions import OutputParserException
 from pydantic import BaseModel, Field
 from unitxt.inference import InferenceEngine
 
-from .base import DirectJudge, JudgeDescriptor, UnitxtInferenceLangchainRunnable
+from .base import BaseDirectJudge, JudgeDescriptor, UnitxtInferenceLangchainRunnable
 from .types import Criteria, DirectInstance, DirectInstanceResult
 
 logger = logging.getLogger(__name__)
 
 
-class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
+class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
     generate_synthetic_persona: bool
     generate_feedback: bool
     judge_description_prompt: str | None
@@ -76,7 +76,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         return parsed_response, metadata
 
     def get_name(self) -> str:
-        return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}{'_with_self_consistency' if self.self_consistency else ''}"
+        return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}{f'_with_self_consistency_{self.self_consistency}_attempts' if self.self_consistency else ''}"
 
     def get_descriptor(self) -> JudgeDescriptor:
         judge_descriptor = JudgeDescriptor(self.get_name(), "direct", "")
@@ -409,6 +409,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
         ]
         return [
             DirectInstanceResult(
+                instance=instance,
                 criteria=criterion,
                 option=selected_option,
                 explanation=explanation,
@@ -421,7 +422,7 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
                     "unparsed_response": unparsed_response,
                 },
             )
-            for selected_option, explanation, feedback, prompt, unparsed_response, criterion, parsing_metadata in zip(
+            for selected_option, explanation, feedback, prompt, unparsed_response, criterion, parsing_metadata, instance in zip(
                 selected_options,
                 explanations,
                 feedbacks,
@@ -429,5 +430,6 @@ class SimpleDirectJudge(DirectJudge, UnitxtInferenceLangchainRunnable):
                 unparsed_responses,
                 criteria,
                 parsing_metadatas,
+                instances,
             )
         ]
