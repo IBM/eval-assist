@@ -49,18 +49,18 @@ Evaluation results content vary between direct, pairwise and multiple criteria e
 
 ## Single criteria evaluation
 
-The `backend/examples/run_judge.py` file demonstrates how to use the `SimpleDirectJudge` class. The `evaluate` method of judges is flexible and can be called with simplified parameters. For instance, the `instances` parameter can be a list of strings or `DirectInstance` objects, and the `criteria` parameter can be a string (which will be translated into account as a yes/no criteria) or a `Criteria` object.
+The `backend/examples/run_judge.py` file demonstrates how to use the `DirectJudge` class. The `evaluate` method of judges is flexible and can be called with simplified parameters. For instance, the `instances` parameter can be a list of strings or `DirectInstance` objects, and the `criteria` parameter can be a string (which will be translated into account as a yes/no criteria) or a `Criteria` object.
 
 ### Example Usage
 
-The `backend/examples/run_judge.py` file demonstrates how to use the `SimpleDirectJudge` class:
+The `backend/examples/run_judge.py` file demonstrates how to use the `DirectJudge` class:
 
 ```python
-from evalassist.judges import SimpleDirectJudge
+from evalassist.judges import DirectJudge
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from unitxt.inference import CrossProviderInferenceEngine
 
-judge = SimpleDirectJudge(
+judge = DirectJudge(
     inference_engine=CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",
         provider="watsonx",
@@ -104,7 +104,7 @@ By default, the scores for each criterion are normalized between 0 and 1 based o
 Here's an example of how to use multi-criteria evaluation:
 
 ```python
-from evalassist.judges import SimpleDirectJudge, MultiCriteria, MultiCriteriaItem
+from evalassist.judges import DirectJudge, MultiCriteria, MultiCriteriaItem
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from unitxt.inference import CrossProviderInferenceEngine
 
@@ -135,7 +135,7 @@ multi_criteria = MultiCriteria(
     ]
 )
 
-judge = SimpleDirectJudge(
+judge = DirectJudge(
     inference_engine=CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",
         provider="watsonx",
@@ -161,7 +161,7 @@ print(results[0].per_criterion_score)
 
 EvalAssist implements a [Judge API](./base.py) for easily defining and trying different LLM judges. Currently, the following judges are available:
 
-* **SimpleDirectJudge**: a judge that uses structured output parsing to make evaluations. It accepts the following parameters:
+* **DirectJudge**: main judge implementation. A judge that uses structured output parsing to make evaluations. It accepts the following parameters:
 
 * `generate_feedback`: generate feedback as actionable suggestions if the evaluation result is not optimal. Can be used to automatically fix the evaluated text.
 * `judge_description_prompt`: a judge description to be used in the prompt. Defaults to "You are an evaluator. You are an expert on evaluating text based on a rubric."

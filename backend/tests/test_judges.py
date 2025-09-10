@@ -4,7 +4,7 @@ from evalassist.judges import (
     Criteria,
     DirectInstance,
     DirectInstanceResult,
-    SimpleDirectJudge,
+    DirectJudge,
     UnitxtDirectJudge,
 )
 from unitxt.artifact import fetch_artifact
@@ -17,7 +17,7 @@ def test_simple_judge():
         model="llama-3-3-70b-instruct",
         provider="watsonx",
     )
-    judge = SimpleDirectJudge(inference_engine=inference_engine, generate_feedback=True)
+    judge = DirectJudge(inference_engine=inference_engine, generate_feedback=True)
     criteria = [
         Criteria.from_unitxt_criteria(
             cast(

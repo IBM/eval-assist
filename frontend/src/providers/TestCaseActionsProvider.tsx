@@ -447,11 +447,13 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
           score: null,
           explanation: result.explanation,
           feedback: result.feedback,
-          positional_bias: {
-            detected: result.positionalBias.detected,
-            option: result.positionalBias.option,
-            explanation: result.positionalBias.explanation,
-          },
+          positional_bias: result.positionalBias
+            ? {
+                detected: result.positionalBias.detected,
+                option: result.positionalBias.option,
+                explanation: result.positionalBias.explanation,
+              }
+            : null,
           metadata: result.metadata,
         },
       }
