@@ -8,6 +8,10 @@ on:
 
 jobs:
   quality:
+    env:
+      WATSONX_API_KEY: ${{ secrets.WATSONX_API_KEY }}
+      WATSONX_PROJECT_ID: ${{ secrets.WATSONX_PROJECT_ID }}
+      WATSONX_URL: "https://us-south.ml.cloud.ibm.com"
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -40,10 +44,6 @@ jobs:
           curl -f http://127.0.0.1:8000/api/health || (echo "App did not start correctly" && exit 1)
 
       - name: Run pytest with coverage
-        env:
-          WATSONX_API_KEY: ${{ secrets.WATSONX_API_KEY }}
-          WATSONX_PROJECT_ID: ${{ secrets.WATSONX_PROJECT_ID }}
-          WATSONX_URL: "https://us-south.ml.cloud.ibm.com"
         working-directory: backend
         run: |
           poetry run pytest --cov=evalassist -q
