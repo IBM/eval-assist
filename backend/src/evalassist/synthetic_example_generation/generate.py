@@ -163,7 +163,7 @@ class DirectActionGenerator:
                     - A text containing that selection, with the selection marked using <regenerate> tags
                     - Your task is to substitute the selected text with a counterfactual example to diversify perspective, demographic, or approach. It should fit seamlessly into the original text. The regenerated selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
                     - Examples: “toddler” changed to “adult”, “terrorist” changed to “diplomat”, “men” changed to “women”, “easy” changed to “difficult”, “great” changed to “poor”
-      
+
                     Selection:
                     {selection}
 
@@ -227,7 +227,7 @@ class DirectActionGenerator:
                     ✅ The {action_past} selection must not disrupt the sentence structure or introduce grammatical errors (e.g., missing prepositions or incorrect tense).
                     🚫 Do not introduce any new information that is not present in the original text.
 
-                    - if the selection is equal to the whole text, your task is {action_infinitive} the whole text.
+                    - If the selection is equal to the whole text, your task is {action_infinitive} the whole text.
                     - Examples: “toddler” changed to “kid”, “terrorist” changed to “extremist”, “men” changed to “human”, “easy” changed to “simple”, “great” changed to “excellent”
 
                     Selection:
@@ -337,7 +337,7 @@ class Generator:
                     Important:
                     {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
                     - Make sure your answer clearly demonstrates the described characteristics
-                    - Do not mention the criteria in your answer - simply generate an answer to the question that embodies the characteristics
+                    - Do not mention the criteria in your answer - Simply generate an answer to the question that embodies the characteristics
                     """),
             )
 
