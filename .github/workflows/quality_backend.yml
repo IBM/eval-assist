@@ -48,6 +48,14 @@ jobs:
         run: |
           poetry run pytest --cov=evalassist -q
 
+      - name: Run run_judge Python files
+        working-directory: backend
+        run: |
+          for file in examples/run_judge*.py; do
+            echo "Running $file"
+            poetry run python "$file"
+          done
+
       - name: Send failure message
         if: failure() # This step will only run if a previous step failed
         run: echo "The quality & security verification failed. This is likely due to not using pre-commit hooks please run 'pre-commit install' before any commit."
