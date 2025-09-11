@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import random
 from concurrent.futures import ThreadPoolExecutor
@@ -56,6 +57,11 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
         self.generate_feedback = generate_feedback
 
     def parse_response(self, unparsed_response, output_parser, klass, criterion):
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
         metadata = {}
         try:
             parsed_response = output_parser.parse(completion=unparsed_response)
