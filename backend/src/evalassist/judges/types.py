@@ -5,6 +5,7 @@ from typing import Any, Literal, cast
 
 from pydantic import BaseModel, Field, RootModel, field_validator, model_validator
 from typing_extensions import Self
+from unitxt.artifact import UnitxtArtifactNotFoundError, fetch_artifact
 from unitxt.llm_as_judge import Criteria as UnitxtCriteria
 from unitxt.llm_as_judge import CriteriaOption as UnitxtCriteriaOption
 from unitxt.llm_as_judge import CriteriaWithOptions as UnitxtCriteriaWithOptions
@@ -110,7 +111,17 @@ class Criteria(BaseModel):
             )
 
     @staticmethod
-    def from_unitxt_criteria(unitxt_criteria: UnitxtCriteria):
+    def from_unitxt_criteria(unitxt_criteria: UnitxtCriteria | str) -> "Criteria":
+        if isinstance(unitxt_criteria, str):
+            try:
+                unitxt_criteria = cast(
+                    UnitxtCriteriaWithOptions,
+                    fetch_artifact(unitxt_criteria)[0],
+                )
+                if not isinstance(unitxt_criteria, UnitxtCriteriaWithOptions):
+                    raise ValueError("The fetched artifact is not a criteria.")
+            except UnitxtArtifactNotFoundError:
+                raise ValueError("Error loading unitxt criteria artifact from catalog.")
         res = Criteria(
             name=unitxt_criteria.name,
             description=unitxt_criteria.description,
