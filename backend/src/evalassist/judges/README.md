@@ -167,6 +167,8 @@ EvalAssist implements a [Judge API](./base.py) for easily defining and trying di
 * `judge_description_prompt`: a judge description to be used in the prompt. Defaults to "You are an evaluator. You are an expert on evaluating text based on a rubric."
 * `generate_synthetic_persona`: generate a synthetic persona based on the criteria to be used as the judge description.
 
+This judge uses langchain to parse the structured output. Underlying LLM is asked to generate a json schema derived from a Pydantic model. An output fixing parser is used if the model is unable to generate the correct response format or the content is invalid -e.g. the selected option doesn't exist- by prompting the LLM with the error. It will try as much as three times to generate the correct format. If all generations failed a random option is chosen.
+
 * **UnitxtDirectJudge** and **UnitxtPairwiseJudge**: wrappers for Unitxt judges.
 
 * **MPrometheusDirectJudge** and **MPrometheusPairwiseJudge**: wrapper for the [M-Prometheus judges](https://github.com/prometheus-eval/prometheus-eval).
