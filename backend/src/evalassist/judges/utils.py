@@ -55,13 +55,15 @@ def get_context_dict(instance: Instance, criteria: Criteria) -> dict[str, str]:
     The criteria context_fields takes precedense. This is useful for multi criteria evaluations
     where different criteria require different context.
     """
-    if (
-        criteria.context_fields is not None
-        and instance.context is not None
-        and all(field in instance.context for field in criteria.context_fields)
-    ):
-        return {
-            context_field: instance.context[context_field]
-            for context_field in criteria.context_fields
-        }
-    return instance.context if instance.context is not None else {}
+    if criteria.context_fields is not None:
+        # criteria implicitly expects no context
+        if len(criteria.context_fields) == 0:
+            return {}
+        # criteria expects some context, get it from instance.context if available
+        if all(field in instance.context for field in criteria.context_fields):
+            return {
+                context_field: instance.context[context_field]
+                for context_field in criteria.context_fields
+            }
+    # criteria does not specify whether it expects context or not, return the instance context
+    return instance.context
