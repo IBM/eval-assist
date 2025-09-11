@@ -12,7 +12,7 @@ from unitxt.inference import CrossProviderInferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions
 
 
-def test_simple_judge():
+def test_main_judge():
     inference_engine = CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",
         provider="watsonx",
@@ -27,18 +27,8 @@ def test_simple_judge():
                 ],
             )
         ),
-        Criteria.from_unitxt_criteria(
-            cast(
-                CriteriaWithOptions,
-                fetch_artifact("metrics.llm_as_judge.direct.criteria.coherence")[0],
-            )
-        ),
-        Criteria.from_unitxt_criteria(
-            cast(
-                CriteriaWithOptions,
-                fetch_artifact("metrics.llm_as_judge.direct.criteria.coherence")[0],
-            )
-        ),
+        Criteria.from_unitxt_criteria("metrics.llm_as_judge.direct.criteria.coherence"),
+        Criteria.from_unitxt_criteria("metrics.llm_as_judge.direct.criteria.coherence"),
     ]
     instances = [
         DirectInstance(
