@@ -14,6 +14,11 @@ judge = DirectJudge(
         model="llama-3-3-70b-instruct",
         provider="watsonx",
         **DEFAULT_JUDGE_INFERENCE_PARAMS,
+        provider_specific_args={
+            "watsonx": {
+                "max_requests_per_second": 8,
+            }
+        },
     ),
     generate_feedback=True,
 )
