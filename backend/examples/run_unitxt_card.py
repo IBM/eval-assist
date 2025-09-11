@@ -44,6 +44,11 @@ judge = DirectJudge(
         model="llama-3-3-70b-instruct",
         provider="watsonx",
         use_cache=False,
+        provider_specific_args={
+            "watsonx": {
+                "max_requests_per_second": 8,
+            }
+        },
     ),
 )
 results = judge(instances, eval_assist_criteria)
