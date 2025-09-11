@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import random
-from concurrent.futures import ThreadPoolExecutor
 from textwrap import dedent
 from typing import Any, cast
 
@@ -16,6 +15,19 @@ from .base import BaseDirectJudge, JudgeDescriptor, UnitxtInferenceLangchainRunn
 from .types import Criteria, DirectInstance, DirectInstanceResult
 
 logger = logging.getLogger(__name__)
+
+
+class SafeEventLoopPolicy(asyncio.DefaultEventLoopPolicy):
+    def get_event_loop(self):
+        try:
+            return super().get_event_loop()
+        except RuntimeError:
+            loop = self.new_event_loop()
+            self.set_event_loop(loop)
+            return loop
+
+
+asyncio.set_event_loop_policy(SafeEventLoopPolicy())
 
 
 class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
@@ -56,30 +68,63 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
         self.judge_description_prompt = judge_description_prompt
         self.generate_feedback = generate_feedback
 
-    def parse_response(self, unparsed_response, output_parser, klass, criterion):
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+    async def parse_response_async(
+        self,
+        unparsed_response: str,
+        output_parser: OutputFixingParser,
+        klass: type[BaseModel],
+        criterion,
+    ) -> tuple[Any, dict[str, Any]]:
         metadata = {}
         try:
-            parsed_response = output_parser.parse(completion=unparsed_response)
+            # Always use the async parse when in async context
+            parsed_response = await output_parser.aparse(completion=unparsed_response)
             metadata["failed_generation"] = False
+
         except OutputParserException as e:
-            logger.debug(
-                f"Selected random option for model {self.inference_engine.get_engine_id()} because it was unable to generate a chosen option"
-            )
+            # fallback behavior if parsing fails
             parsed_response = klass(
-                selected_option=random.choice(
-                    [o.name for o in criterion.options]  # nosec
-                ),
+                selected_option=random.choice([o.name for o in criterion.options]),  # nosec
                 assessment="",
             )
             metadata["failed_generation"] = True
             metadata["failed_generation_original_output"] = unparsed_response
             metadata["failed_generation_final_output"] = e.llm_output
+
         return parsed_response, metadata
+
+    async def parse_all_responses_async(
+        self,
+        unparsed_responses: list[str],
+        output_parsers: list[OutputFixingParser],
+        classes: list[type[BaseModel]],
+        criteria: list[Any],
+    ) -> tuple[list[Any], list[dict[str, Any]]]:
+        tasks = []
+        for unparsed_response, output_parser, klass, criterion in zip(
+            unparsed_responses, output_parsers, classes, criteria
+        ):
+            tasks.append(
+                self.parse_response_async(
+                    unparsed_response, output_parser, klass, criterion
+                )
+            )
+        results = await asyncio.gather(*tasks)
+        parsed_responses, metadatas = zip(*results)
+        return list(parsed_responses), list(metadatas)
+
+    def parse_all_responses(
+        self,
+        unparsed_responses,
+        output_parsers,
+        classes,
+        criteria,
+    ):
+        return asyncio.run(
+            self.parse_all_responses_async(
+                unparsed_responses, output_parsers, classes, criteria
+            )
+        )
 
     def get_name(self) -> str:
         return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}{f'_with_self_consistency_{self.self_consistency}_attempts' if self.self_consistency else ''}"
@@ -386,27 +431,12 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
         )
         parsed_responses: list[Any] = []
 
-        futures = []
-        with ThreadPoolExecutor(max_workers=10) as executor:
-            for unparsed_response, output_parser, klass, criterion in zip(
-                unparsed_responses, output_parsers, classes, criteria
-            ):
-                futures.append(
-                    executor.submit(
-                        self.parse_response,
-                        unparsed_response,
-                        output_parser,
-                        klass,
-                        criterion,
-                    )
-                )
-
-        parsed_responses = []
-        parsing_metadatas = []
-        for future in futures:
-            parsed_response, metadata = future.result()
-            parsed_responses.append(parsed_response)
-            parsing_metadatas.append(metadata)
+        parsed_responses, parsing_metadatas = self.parse_all_responses(
+            unparsed_responses=unparsed_responses,
+            output_parsers=output_parsers,
+            classes=classes,
+            criteria=criteria,
+        )
 
         explanations: list[str] = [r.assessment for r in parsed_responses]
         selected_options: list[str] = [r.selected_option for r in parsed_responses]
@@ -439,3 +469,223 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                 instances,
             )
         ]
+
+    # def evaluate_with_custom_prompt(
+    #         self,
+    #         instances: list[DirectInstance],
+    #         judge_prompt: str,
+    #         options: list[str] | tuple[float | int, float | int],
+    #     ) -> list[DirectInstanceResult]:
+    #         output_parsers: list[OutputFixingParser] = []
+    #         format_instructions_list = []
+    #         criteria_options_list = []
+    #         classes = []
+    #         feedback_step_sections = []
+    #         prediction_fields = []
+    #         for criterion in criteria:
+    #             klass = generate_dynamic_model(
+    #                 model_name=f"{criterion.name}_model",
+    #                 option_names=[o.name for o in criterion.options],
+    #                 include_feedback=self.generate_feedback,
+    #             )
+    #             classes.append(klass)
+
+    #             output_parser: OutputFixingParser = self.get_pydantic_output_fixing_parser(
+    #                 klass
+    #             )
+    #             output_parsers.append(output_parser)
+
+    #             format_instructions: str = output_parser.get_format_instructions()
+    #             format_instructions_list.append(format_instructions)
+
+    #             criteria_options: str = "\n".join(
+    #                 [
+    #                     f"- {option.name}{f': {option.description}' if option.description else ''}"
+    #                     for option in criterion.options
+    #                 ]
+    #             )
+    #             criteria_options_list.append(criteria_options)
+
+    #             prediction_field = (
+    #                 criterion.prediction_field
+    #                 if criterion.prediction_field is not None
+    #                 else "response"
+    #             )
+    #             prediction_fields.append(prediction_field)
+
+    #             feedback_step_section = (
+    #                 f'5. At the end, provide "feedback" consisting of actionable suggestions that would help improve the evaluated {prediction_field}. Unlike the assessment, which explains the reasoning behind the judgment, the feedback should focus on guiding refinement. For example, in creative writing, it could suggest improving clarity, coherence, or narrative flow. In analytical tasks, it could recommend strengthening evidence, refining arguments, or correcting inaccuracies. Keep feedback concise and specific enough to support iterative improvement. If you consider that the {prediction_field} is optimal, leave the "feedback" field empty ("")'
+    #                 if self.generate_feedback
+    #                 else ""
+    #             )
+    #             feedback_step_sections.append(feedback_step_section)
+
+    #         predictions: list[str] = [i.response for i in instances]
+    #         context_variables_list: list[dict[str, str]] = [
+    #             get_context_dict(instance, criterion)
+    #             for instance, criterion in zip(instances, criteria)
+    #         ]
+    #         str_context_variables_list: list[str | None] = [
+    #             "\n\n".join(f"- {k}: {v}" for k, v in c.items()) if len(c) else None
+    #             for c in context_variables_list
+    #         ]
+
+    #         context_sections: list[str] = [
+    #             ("\n\n### Context\n\n" + c + "\n") if c is not None else ""
+    #             for c in str_context_variables_list
+    #         ]
+    #         if self.judge_description_prompt:
+    #             judge_description_sections = [self.judge_description_prompt] * len(criteria)
+    #         else:
+    #             if self.generate_synthetic_persona:
+    #                 personas = self.generate_personas(
+    #                     context_sections=context_sections,
+    #                     predictions=predictions,
+    #                     criteria=criteria,
+    #                 )
+    #             else:
+    #                 persona_name, persona_description = (
+    #                     "an evaluator",
+    #                     "an expert on evaluating text based on a rubric.",
+    #                 )
+    #                 personas = [(persona_name, persona_description)] * len(criteria)
+    #             judge_description_sections = [
+    #                 f"You are a {persona_name}. You are {persona_description}"
+    #                 for persona_name, persona_description in personas
+    #             ]
+
+    #         prompt_template = PromptTemplate(
+    #             input_variables=[
+    #                 "text_to_evaluate",
+    #                 "context_section",
+    #                 "criteria_name_section",
+    #                 "criteria_description",
+    #                 "criteria_options",
+    #                 "format_instructions",
+    #                 "prediction_field",
+    #                 "feedback_step_section",
+    #                 "judge_description_section",
+    #             ],
+    #             template=dedent(
+    #                 text="""\
+    #                 {judge_description_section}
+
+    #                 You will be given:
+    #                 - **Criterion** (name, description, options)
+    #                 - **Optional context**
+    #                 - **The {prediction_field}** to evaluate
+
+    #                 ### Important steps:
+
+    #                 1. Think step-by‑step through your reasoning about which option best fits.
+    #                 2. Write your full chain‑of‑thought *only* inside the `assessment` JSON field.
+    #                 3. The chain-of-thought should use markdown code for easier reading and parsing.
+    #                 4. Set `"selected_option"` to one of the provided options based on the assessment.
+    #                 {feedback_step_section}
+
+    #                 ### Criteria:{criteria_name_section}
+    #                 Description: {criteria_description}
+    #                 Options:
+    #                 {criteria_options}{context_section}
+
+    #                 ### The {prediction_field} to evaluate
+
+    #                 {text_to_evaluate}
+
+    #                 ### Output format
+
+    #                 {format_instructions}
+    #             """,
+    #             ),
+    #         )
+
+    #         prompts: list[str] = [
+    #             prompt_template.format(
+    #                 text_to_evaluate=prediction,
+    #                 context_section=context_section,
+    #                 criteria_name_section=f"\n\nCriteria name: {criterion.name}"
+    #                 if criterion.name
+    #                 else "\n",
+    #                 criteria_description=criterion.description,
+    #                 criteria_options=criterion_options,
+    #                 format_instructions=format_instructions,
+    #                 prediction_field=prediction_field,
+    #                 feedback_step_section=feedback_step_section,
+    #                 judge_description_section=judge_description_section,
+    #             )
+    #             for prediction, context_section, criterion, criterion_options, format_instructions, prediction_field, feedback_step_section, judge_description_section in zip(
+    #                 predictions,
+    #                 context_sections,
+    #                 criteria,
+    #                 criteria_options_list,
+    #                 format_instructions_list,
+    #                 prediction_fields,
+    #                 feedback_step_sections,
+    #                 judge_description_sections,
+    #             )
+    #         ]
+
+    #         unparsed_responses: list[str] = cast(
+    #             list[str],
+    #             self.inference_engine.infer(
+    #                 dataset=[
+    #                     {"source": prompt, "data_classification_policy": ["public"]}
+    #                     for prompt in prompts
+    #                 ]
+    #             ),
+    #         )
+    #         parsed_responses: list[Any] = []
+
+    #         futures = []
+    #         with ThreadPoolExecutor(max_workers=10) as executor:
+    #             for unparsed_response, output_parser, klass, criterion in zip(
+    #                 unparsed_responses, output_parsers, classes, criteria
+    #             ):
+    #                 futures.append(
+    #                     executor.submit(
+    #                         self.parse_response,
+    #                         unparsed_response,
+    #                         output_parser,
+    #                         klass,
+    #                         criterion,
+    #                     )
+    #                 )
+
+    #         parsed_responses = []
+    #         parsing_metadatas = []
+    #         for future in futures:
+    #             parsed_response, metadata = future.result()
+    #             parsed_responses.append(parsed_response)
+    #             parsing_metadatas.append(metadata)
+
+    #         explanations: list[str] = [r.assessment for r in parsed_responses]
+    #         selected_options: list[str] = [r.selected_option for r in parsed_responses]
+    #         feedbacks: list[str | None] = [
+    #             None if not self.generate_feedback else r.feedback for r in parsed_responses
+    #         ]
+    #         return [
+    #             DirectInstanceResult(
+    #                 instance=instance,
+    #                 criteria=criterion,
+    #                 option=selected_option,
+    #                 explanation=explanation,
+    #                 feedback=feedback,
+    #                 # score=next(iter(option.name for option in criterion.options if option.name == selected_option)).score,
+    #                 positional_bias=None,
+    #                 metadata={
+    #                     **parsing_metadata,
+    #                     "prompt": prompt,
+    #                     "unparsed_response": unparsed_response,
+    #                 },
+    #             )
+    #             for selected_option, explanation, feedback, prompt, unparsed_response, criterion, parsing_metadata, instance in zip(
+    #                 selected_options,
+    #                 explanations,
+    #                 feedbacks,
+    #                 prompts,
+    #                 unparsed_responses,
+    #                 criteria,
+    #                 parsing_metadatas,
+    #                 instances,
+    #             )
+    #         ]
