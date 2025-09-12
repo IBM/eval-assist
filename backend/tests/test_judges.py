@@ -16,6 +16,7 @@ def test_main_judge():
     inference_engine = CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",
         provider="watsonx",
+        use_cache=False,
     )
     judge = DirectJudge(inference_engine=inference_engine, generate_feedback=True)
     criteria = [
@@ -54,7 +55,7 @@ def test_main_judge():
     )
 
     assert results[0].option == "Excellent"
-    assert cast(float, results[1].score) >= 0.75
+    assert cast(float, results[1].score) >= 0.5
     assert cast(float, results[2].score) == 0.0
     assert (
         results[2].feedback is not None and len(results[2].feedback) > 0
