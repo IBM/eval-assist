@@ -2,15 +2,16 @@ import logging
 from typing import cast
 
 from evalassist.judges import CriteriaOption
+from evalassist.judges.unitxt_judges import UnitxtInferenceEngineMixin
 
 from ..base import BaseDirectJudge
-from ..simple_direct_judge import DirectJudge
+from ..direct_judge import DirectJudge
 from ..types import Criteria, DirectInstance, DirectInstanceResult
 
 logger = logging.getLogger(__name__)
 
 
-class CriticizedDirectJudge(BaseDirectJudge):
+class CriticizedDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
     def get_name(self) -> str:
         return "criticized"
 
