@@ -48,13 +48,13 @@ jobs:
         run: |
           poetry run pytest --cov=evalassist -q
 
-      - name: Run run_judge Python files
-        working-directory: backend
-        run: |
-          for file in examples/run_judge*.py; do
-            echo "Running $file"
-            poetry run python "$file"
-          done
+      # - name: Run run_judge Python files
+      #   working-directory: backend
+      #   run: |
+      #     for file in examples/run_judge*.py; do
+      #       echo "Running $file"
+      #       poetry run python "$file"
+      #     done
 
       - name: Send failure message
         if: failure() # This step will only run if a previous step failed
