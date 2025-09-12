@@ -164,8 +164,8 @@ class DirectPositionalBias(BaseModel):
 
 
 class DirectInstanceResult(BaseModel):
-    criteria: Criteria
-    instance: DirectInstance
+    criteria: Criteria | None = None
+    instance: DirectInstance | None = None
     option: str
     score: float | None = None
     explanation: str

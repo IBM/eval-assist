@@ -251,9 +251,13 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
         else:
             results = self._run(instances=instances, criteria=criteria)
 
-        # add numeric scores if possible
+        # add numeric scores from criteria if possible
         for r in results:
-            score: float | None = r.criteria.get_score_from_option(r.option)
+            score: float | None = (
+                r.criteria.get_score_from_option(r.option)
+                if r.criteria is not None
+                else None
+            )
             if score is None:
                 try:
                     # try to use the option name as the numeric score

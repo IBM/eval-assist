@@ -1,32 +1,27 @@
+from collections.abc import Callable
+from typing import Any
+
 from pydantic import BaseModel, ConfigDict, create_model, field_validator
 
 from .types import Criteria, Instance
 
 
-def generate_dynamic_model(
-    model_name: str, option_names: list[str], include_feedback: bool
-):
-    # Field definitions
-    field_defs = {
-        "assessment": (str, ...),
-        "selected_option": (str, ...),
-    }
-
-    # Validator function to enforce valid options
-    def validate_selected_option(cls, value: str) -> str:
-        if value not in option_names:
-            raise ValueError(f"value must be one of {option_names}")
-        return value
-
-    # Wrap with field_validator decorator
-    validators = {
-        "validate_selected_option": field_validator("selected_option", mode="after")(
-            validate_selected_option
+def generate_dynamic_pydantic_model(
+    model_name: str,
+    field_definitions: list[tuple[str, type, Any, list[Callable[..., Any]]]],
+) -> type[BaseModel]:
+    validators: dict[str, Callable[..., Any]] = {
+        validator.__name__: field_validator(field_definition[0], mode="after")(
+            validator
         )
+        for field_definition in field_definitions
+        for validator in field_definition[3]
     }
-
-    # Create base dynamic model
-    dynamic_model = create_model(
+    field_defs: dict[str, tuple[type, Any]] = {
+        field_definition[0]: (field_definition[1], field_definition[2])
+        for field_definition in field_definitions
+    }
+    return create_model(
         model_name,
         __config__=ConfigDict(extra="forbid"),
         __doc__=None,
@@ -36,17 +31,6 @@ def generate_dynamic_model(
         __cls_kwargs__=None,
         **field_defs,
     )
-
-    # Optionally extend with a feedback field
-    if include_feedback:
-        dynamic_model = create_model(
-            f"{model_name}WithFeedback",
-            __base__=dynamic_model,
-            feedback=(str, ""),
-            __config__=None,
-        )
-
-    return dynamic_model
 
 
 def get_context_dict(instance: Instance, criteria: Criteria) -> dict[str, str]:
@@ -67,3 +51,14 @@ def get_context_dict(instance: Instance, criteria: Criteria) -> dict[str, str]:
             }
     # criteria does not specify whether it expects context or not, return the instance context
     return instance.context
+
+
+def is_float(element: Any) -> bool:
+    # If you expect None to be passed:
+    if element is None:
+        return False
+    try:
+        float(element)
+        return True
+    except ValueError:
+        return False
