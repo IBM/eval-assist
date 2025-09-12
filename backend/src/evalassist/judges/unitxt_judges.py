@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Generic, List, cast
 
-from evalassist.judges.simple_direct_judge import JudgeDescriptor
+from evalassist.judges.direct_judge import JudgeDescriptor
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
 from unitxt.blocks import Task, TaskCard
