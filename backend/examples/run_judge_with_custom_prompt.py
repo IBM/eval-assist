@@ -29,7 +29,11 @@ Answer: The theory of relativity was developed by Albert Einstein in the early 2
 
 results = judge.evaluate_with_custom_prompt(
     judge_prompts=[judge_prompt],
-    valid_outputs=(1, 5),
+    valid_outputs=(1, 5),  # or [1, 2, 3, 4, 5]
 )
 
-print(results)
+print("### Selected option / Score")
+print(f"{results[0].option} / {results[0].score}")
+
+print("\n### Explanation")
+print(results[0].explanation)
