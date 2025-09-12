@@ -11,7 +11,7 @@ from unitxt.artifact import fetch_artifact
 from unitxt.llm_as_judge import CriteriaWithOptions
 
 from ..const import EVAL_ASSIST_DIR
-from ..judges import DirectJudge
+from ..judges import BaseDirectJudge
 from ..judges.types import DirectInstance, DirectInstanceResult
 from ..utils import convert_nan_to_none, unitxt_dataset_to_evalassist_instances
 from .utils import (
@@ -21,7 +21,6 @@ from .utils import (
     get_benchmark_results_as_df,
     get_judge_from_config,
     get_judgebench_cards,
-    is_result_available,
     save_evaluation_backup_to_sqlite,
     save_results_to_sqlite,
 )
@@ -124,9 +123,15 @@ def parse_and_store_results(
     dataset: IterableDataset,
     instances: list[DirectInstance],
     results: list[DirectInstanceResult],
-    judge: DirectJudge,
+    judge: BaseDirectJudge,
 ):
-    criteria_names = [result.criteria.name for result in results]
+    criteria_names = []
+    for result in results:
+        if result.criteria is not None and result.criteria.name is None:
+            raise ValueError(
+                "Criteria doesn't have a name. When benchmarking, it is required."
+            )
+        criteria_names.append(cast(str, cast(Criteria, result.criteria).name))
 
     if any(result.score is None for result in results):
         raise ValueError("Score is None!")
@@ -175,7 +180,7 @@ def parse_and_store_results(
         "benchmark_name": benchmark_name,
         "dataset_name": dataset_name,
         "judge": judge.get_name(),
-        "model": judge.get_inference_engine_id(),
+        "model": judge.get_descriptor().inference_engine_id,
         "results": json.dumps(convert_nan_to_none(parsed_results)),
         "dataset_len": str(evaluation_results.global_scores["num_of_instances"]),
         "group_by_field": None,
@@ -184,7 +189,7 @@ def parse_and_store_results(
 
     benchmark_results: list = []
     benchmark_results.append(benchmark_result)
-
+    judge_descriptor = judge.get_descriptor()
     for (
         group_by_field,
         group_by_field_scores,
@@ -204,8 +209,8 @@ def parse_and_store_results(
                 "card": card,  # if there are several criteria, we have to add the overall result
                 "benchmark_name": benchmark_name,
                 "dataset_name": dataset_name,
-                "judge": judge.get_name(),
-                "model": judge.get_inference_engine_id(),
+                "judge": judge_descriptor.name,
+                "model": judge_descriptor.inference_engine_id,
                 "results": json.dumps(convert_nan_to_none(parsed_results)),
                 "dataset_len": str(group_by_value_scores["num_of_instances"]),
                 "group_by_field": group_by_field_corrected,
@@ -224,8 +229,8 @@ def parse_and_store_results(
     result_backup: list[dict] = [
         {
             "card": card,
-            "judge": judge.get_descriptor().name,
-            "model": judge.get_inference_engine_id(),
+            "judge": judge_descriptor.name,
+            "model": judge_descriptor.inference_engine_id,
             "sample_index": i,
             "instance": instance.model_dump_json(indent=4),
             "result": result.model_dump_json(indent=4),
@@ -256,7 +261,7 @@ def parse_and_store_results(
 
 def run_single_model_card(
     card: str,
-    judge: DirectJudge,
+    judge: BaseDirectJudge,
     instances_per_dataset: int | None = None,
 ):
     """
@@ -321,7 +326,7 @@ def run_single_model_card(
         )
 
         results: list[DirectInstanceResult] = judge(
-            parsed_dataset, criteria, check_positional_bias=True
+            parsed_dataset, criteria, check_positional_bias=False
         )
 
         parse_and_store_results(
@@ -338,7 +343,7 @@ def run_single_model_card(
 
 
 def run_benchmarks(
-    judge_configs: list[tuple[type[DirectJudge], dict, dict, str]],
+    judge_configs: list[tuple[type[BaseDirectJudge], dict, dict, str]],
     max_workers: int,
     instances_per_dataset: int | None,
     dataset_keyword_filters: list[str] | None = None,
@@ -375,11 +380,12 @@ def run_benchmarks(
                 judge = get_judge_from_config(judge_config)
 
                 # Skip if the benchmark has already been run
-                if not is_result_available(
-                    judge.get_name(),
-                    judge.get_inference_engine_id(),
-                    card,
-                ):
+                # if not is_result_available(
+                #     judge.get_name(),
+                #     judge.get_descriptor().inference_engine_id,
+                #     card,
+                # ):
+                if True:
                     # Submit the task to the executor
                     futures.append(
                         executor.submit(

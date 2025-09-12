@@ -19,7 +19,7 @@ dataset = load_dataset(
         postprocessors=["processors.cast_to_float_return_0_5_if_failed"],
     ),
     format="formats.empty",
-    loader_limit=40,
+    loader_limit=100,
     split="test",
 )
 

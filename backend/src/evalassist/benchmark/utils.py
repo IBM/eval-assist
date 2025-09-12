@@ -8,7 +8,7 @@ from unitxt.inference import CrossProviderInferenceEngine
 from unitxt.settings_utils import get_constants
 
 from ..const import EVAL_ASSIST_DIR
-from ..judges import DirectJudge
+from ..judges import BaseDirectJudge
 
 
 def folder_exists_in_github_repo(owner, repo, folder_path, branch="main"):
@@ -114,9 +114,9 @@ def get_judgebench_cards():
 
 
 def get_judge_from_config(
-    kwargs: tuple[type[DirectJudge], dict, dict, str],
+    kwargs: tuple[type[BaseDirectJudge], dict, dict, str],
     inference_engines={},
-) -> DirectJudge:
+) -> BaseDirectJudge:
     judge_klass, judge_kwargs, inference_engine_kwargs, model = kwargs
     temperature = (
         inference_engine_kwargs["temperature"]
@@ -127,14 +127,16 @@ def get_judge_from_config(
     if key in inference_engines:
         inference_engine = inference_engines[key]
     else:
-        inference_engine = CrossProviderInferenceEngine(
-            model=model,
-            provider="rits",
-            temperature=temperature,
-            max_tokens=2048,
-            cache_batch_size=50,
-            data_classification_policy=["public"],
-        )
+        params = {
+            "model": model,
+            "provider": "rits",
+            "temperature": temperature,
+            "max_tokens": 2048,
+            "cache_batch_size": 50,
+            "data_classification_policy": ["public"],
+        }
+        params.update(inference_engine_kwargs)
+        inference_engine = CrossProviderInferenceEngine(**params)
         inference_engines[key] = inference_engine
 
     return judge_klass(
