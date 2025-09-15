@@ -44,17 +44,19 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
     def __init__(
         self,
         inference_engine: InferenceEngine,
-        max_retries: int,
         generate_synthetic_persona: bool = False,
         judge_description_prompt: str | None = None,
         generate_feedback: bool = False,
         self_consistency: bool | int = False,
         on_generation_failure: Literal["raise", "random"] = "random",
+        *args,
+        **kwargs,
     ):
         super().__init__(
             inference_engine=inference_engine,
             self_consistency=self_consistency,
-            max_retries=max_retries,
+            *args,
+            **kwargs,
         )
 
         if on_generation_failure not in ["raise", "random"]:
