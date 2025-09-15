@@ -523,6 +523,17 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
 # Helper mix‑in for judges that use LangChain runnables
 # ----------------------------------------------------------------------
 class UnitxtInferenceLangchainRunnable(UnitxtInferenceEngineMixin):
+    max_retries: int
+
+    def __init__(
+        self,
+        max_retries: int = 3,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.max_retries = max_retries
+
     def _get_runnable_lambda(self) -> RunnableLambda[StringPromptValue, str]:
         """
         Create a LangChain ``RunnableLambda`` that forwards the prompt to the
@@ -570,7 +581,7 @@ class UnitxtInferenceLangchainRunnable(UnitxtInferenceEngineMixin):
         return OutputFixingParser.from_llm(
             llm=self._get_runnable_lambda(),
             parser=PydanticOutputParser(pydantic_object=pydantic_object),
-            max_retries=3,
+            max_retries=self.max_retries,
         )
 
     def get_structured_output_fixing_parser(
@@ -592,5 +603,5 @@ class UnitxtInferenceLangchainRunnable(UnitxtInferenceEngineMixin):
         return OutputFixingParser.from_llm(
             llm=self._get_runnable_lambda(),
             parser=StructuredOutputParser.from_response_schemas(response_schemas),
-            max_retries=3,
+            max_retries=self.max_retries,
         )
