@@ -34,6 +34,12 @@ results = judge.evaluate_with_custom_prompt(
 
 print("### Selected option / Score")
 print(f"{results[0].option} / {results[0].score}")
+"""
+5 / 5.0
+"""
 
 print("\n### Explanation")
 print(results[0].explanation)
+"""
+The answer states that the theory of relativity was developed by Albert Einstein in the early 20th century, which is directly supported by the context. The context explicitly mentions that Albert Einstein, a German-born physicist, developed the theory of relativity in the early 20th century. Therefore, all parts of the answer are directly supported by the context.
+"""
