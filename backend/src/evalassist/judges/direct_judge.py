@@ -350,6 +350,32 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
             )
         return model
 
+    def get_in_context_example_as_str(self, criterion: Criteria):
+        if not criterion.examples:
+            return ""
+
+        title = "\n\n## Examples\n\nTake into account the following examples with ground truth when performing the evaluation.\n\n"
+        examples_str = []
+        for i, example in enumerate(criterion.examples):
+            context: dict[str, str] = get_context_dict(example.instance, criterion)
+            context_str: str = (
+                "\n\n".join(f"- {k}: {v}" for k, v in context.items())
+                if len(context)
+                else ""
+            )
+            context_section_str: str = (
+                ("\n#### Context\n\n" + context_str) if context_str else ""
+            )
+
+            prediction_section = f"#### The {criterion.prediction_field if criterion.prediction_field else 'text'} to evaluate\n{cast(DirectInstance, example.instance).response}"
+
+            ground_truth_section = f"#### Ground truth: {example.ground_truth}"
+
+            example_str = f"### Example {i + 1}:\n{context_section_str}\n\n{prediction_section}\n\n{ground_truth_section}\n"
+            examples_str.append(example_str)
+        res = title + "\n\n".join(examples_str) + "\n[End of examples]"
+        return res
+
     def _run(
         self,
         instances: list[DirectInstance],
@@ -410,7 +436,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
         ]
 
         context_sections: list[str] = [
-            ("\n\n### Context\n\n" + c + "\n") if c is not None else ""
+            ("\n\n## Context\n\n" + c + "\n") if c is not None else ""
             for c in str_context_variables_list
         ]
         if self.judge_description_prompt:
@@ -437,6 +463,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
             input_variables=[
                 "text_to_evaluate",
                 "context_section",
+                "examples_section",
                 "criteria_name_section",
                 "criteria_description",
                 "criteria_options",
@@ -454,7 +481,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                 - **Optional context**
                 - **The {prediction_field}** to evaluate
 
-                ### Important steps:
+                ## Important steps:
 
                 1. Think step-by‑step through your reasoning about which option best fits.
                 2. Write your full chain‑of‑thought *only* inside the `assessment` JSON field.
@@ -462,16 +489,16 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                 4. Set `"selected_option"` to one of the provided options based on the assessment.
                 {feedback_step_section}
 
-                ### Criteria:{criteria_name_section}
+                ## Criteria:{criteria_name_section}
                 Description: {criteria_description}
                 Options:
-                {criteria_options}{context_section}
+                {criteria_options}{examples_section}{context_section}
 
-                ### The {prediction_field} to evaluate
+                ## The {prediction_field} to evaluate
 
                 {text_to_evaluate}
 
-                ### Output format
+                ## Output format
 
                 {format_instructions}
                 Output must be valid JSON only — no extra text.
@@ -483,6 +510,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
             prompt_template.format(
                 text_to_evaluate=prediction,
                 context_section=context_section,
+                examples_section=self.get_in_context_example_as_str(criterion),
                 criteria_name_section=f"\n\nCriteria name: {criterion.name}"
                 if criterion.name
                 else "\n",

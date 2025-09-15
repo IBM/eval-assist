@@ -60,6 +60,11 @@ class CriteriaOption(BaseModel):
     )
 
 
+class InstanceWithGroundTruth(BaseModel):
+    instance: Instance
+    ground_truth: str
+
+
 class Criteria(BaseModel):
     name: str = Field(description="The name or identifier of the criteria.")
     description: str = Field(
@@ -76,6 +81,11 @@ class Criteria(BaseModel):
     options: list[CriteriaOption] = Field(
         default_factory=list,
         description="A list of possible options or outcomes for this criteria, along with their descriptions and scores.",
+    )
+
+    examples: list[InstanceWithGroundTruth] = Field(
+        default_factory=list,
+        description="Instance examples to be used to be used both as criteria documentation and in-context examples.",
     )
 
     def get_score_from_option(self, option_name: str):
@@ -141,6 +151,18 @@ class Criteria(BaseModel):
                 for option in unitxt_criteria.options
             ]
         return res
+
+    @model_validator(mode="after")
+    def validate_example_options(self) -> Self:
+        criteria_option_names = [option.name for option in self.options]
+        if any(
+            example.ground_truth not in criteria_option_names
+            for example in self.examples
+        ):
+            raise ValueError(
+                "Example ground truth is invalid because it is not equal to any of the criteria options."
+            )
+        return self
 
 
 class SingleSystemPairwiseResult(BaseModel):
