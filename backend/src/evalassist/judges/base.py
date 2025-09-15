@@ -225,6 +225,7 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
                             description=criterion.description,
                             prediction_field=criterion.prediction_field,
                             context_fields=criterion.context_fields,
+                            examples=criterion.examples,
                             options=list(reversed(criterion.options)),
                         )
                         for criterion in criteria
@@ -388,6 +389,7 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
                     options=criterion.options,
                     prediction_field=criterion.prediction_field,
                     context_fields=criterion.context_fields,
+                    examples=criterion.examples,
                 )
                 for criterion in cast(list[Criteria], criteria)
             ]
