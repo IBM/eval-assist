@@ -3,7 +3,7 @@ import logging
 import random
 from collections.abc import Callable
 from textwrap import dedent
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 from evalassist.judges.utils import (
     generate_dynamic_pydantic_model,
@@ -39,18 +39,30 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
     generate_synthetic_persona: bool
     generate_feedback: bool
     judge_description_prompt: str | None
+    on_generation_failure: Literal["raise", "random"]
 
     def __init__(
         self,
         inference_engine: InferenceEngine,
+        max_retries: int,
         generate_synthetic_persona: bool = False,
         judge_description_prompt: str | None = None,
         generate_feedback: bool = False,
         self_consistency: bool | int = False,
+        on_generation_failure: Literal["raise", "random"] = "random",
     ):
         super().__init__(
-            inference_engine=inference_engine, self_consistency=self_consistency
+            inference_engine=inference_engine,
+            self_consistency=self_consistency,
+            max_retries=max_retries,
         )
+
+        if on_generation_failure not in ["raise", "random"]:
+            raise ValueError(
+                "on_generation_failure must be either 'raise' or 'random'. Received {on_generation_failure} instead."
+            )
+        self.on_generation_failure = on_generation_failure
+
         if generate_synthetic_persona and judge_description_prompt:
             raise ValueError(
                 "Either provide set generate_synthetic_persona to False or don't provide a judge_description_prompt."
@@ -78,29 +90,35 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
         unparsed_response: str,
         output_parser: OutputFixingParser,
         klass: type[BaseModel],
-        on_failure_default: str | int | list[str] | list[int],
+        on_failure_default: str | int | list[str | int],
     ) -> tuple[Any, dict[str, Any]]:
         metadata = {}
         try:
             # Always use the async parse when in async context
             parsed_response = await output_parser.aparse(completion=unparsed_response)
-            metadata["failed_generation"] = False
+            metadata["generation_failed"] = False
 
         except OutputParserException as e:
             # fallback behavior if parsing fails
-            if isinstance(on_failure_default, (str, int)):
-                parsed_response = klass(
-                    selected_option=on_failure_default,
-                    assessment="",
+            if self.on_generation_failure == "raise":
+                raise ValueError(
+                    f"The judge was unable to generate a valid evaluation result. The model {self.inference_engine.get_engine_id()}'s output's validation failed with the following error:\n{e.llm_output}"
                 )
             else:
+                if on_failure_default is None:
+                    selected_option = ""
+                elif isinstance(on_failure_default, (str, int)):
+                    selected_option = on_failure_default
+                else:
+                    selected_option = random.choice(on_failure_default)  # nosec
+
                 parsed_response = klass(
-                    selected_option=random.choice(on_failure_default),  # nosec
+                    selected_option=selected_option,
                     assessment="",
                 )
-            metadata["failed_generation"] = True
-            metadata["failed_generation_original_output"] = unparsed_response
-            metadata["failed_generation_final_output"] = e.llm_output
+                metadata["failed_generation"] = True
+                metadata["failed_generation_original_output"] = unparsed_response
+                metadata["failed_generation_final_output"] = e.llm_output
 
         return parsed_response, metadata
 
@@ -109,28 +127,18 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
         unparsed_responses: list[str],
         output_parsers: list[OutputFixingParser],
         classes: list[type[BaseModel]],
-        on_failure_default: str | int | list[str] | list[int] | list[list[str]],
+        on_failure_default: list[str | int | list[str | int]],
     ) -> tuple[list[Any], list[dict[str, Any]]]:
         tasks = []
-        for i, (unparsed_response, output_parser, klass) in enumerate(
-            zip(unparsed_responses, output_parsers, classes)
+        for unparsed_response, output_parser, klass, on_failure_default_item in zip(
+            unparsed_responses, output_parsers, classes, on_failure_default
         ):
             tasks.append(
                 self.parse_response_async(
                     unparsed_response=unparsed_response,
                     output_parser=output_parser,
                     klass=klass,
-                    on_failure_default=cast(
-                        str | list[str],
-                        on_failure_default
-                        if not (
-                            isinstance(on_failure_default, list)
-                            and all(
-                                isinstance(item, list) for item in on_failure_default
-                            )
-                        )
-                        else on_failure_default[i],
-                    ),
+                    on_failure_default=on_failure_default_item,
                 )
             )
         results = await asyncio.gather(*tasks)
@@ -142,7 +150,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
         unparsed_responses: list[str],
         output_parsers: list[OutputFixingParser],
         classes: list[type[BaseModel]],
-        on_failure_default: str | int | list[str] | list[int] | list[list[str]],
+        on_failure_default: list[str | int | list[str | int]],
     ):
         return asyncio.run(
             self.parse_all_responses_async(
@@ -464,6 +472,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                 ### Output format
 
                 {format_instructions}
+                Output must be valid JSON only — no extra text.
             """,
             ),
         )
@@ -672,13 +681,25 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
 
         on_failure_default_options = []
         if valid_outputs is not None:
-            on_failure_default_options = valid_outputs[0]
+            if isinstance(valid_outputs, list):
+                on_failure_default_options = valid_outputs
+            else:
+                on_failure_default_options = list(
+                    range(valid_outputs[0], valid_outputs[1] + 1, 1)
+                )
+
+        else:
+            on_failure_default_options = [""]
+
+        on_failure_default_options = on_failure_default_options * len(judge_prompts)
 
         parsed_responses, parsing_metadatas = self.parse_all_responses(
             unparsed_responses=unparsed_responses,
             output_parsers=[output_parser] * len(unparsed_responses),
             classes=[dynamic_model] * len(unparsed_responses),
-            on_failure_default=on_failure_default_options,
+            on_failure_default=cast(
+                list[str | int | list[str | int]], on_failure_default_options
+            ),
         )
 
         explanations: list[str] = [r.assessment for r in parsed_responses]
