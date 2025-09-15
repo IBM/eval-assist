@@ -116,9 +116,9 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                     selected_option=selected_option,
                     assessment="",
                 )
-                metadata["failed_generation"] = True
-                metadata["failed_generation_original_output"] = unparsed_response
-                metadata["failed_generation_final_output"] = e.llm_output
+                metadata["generation_failed"] = True
+                metadata["generation_failed_original_output"] = unparsed_response
+                metadata["generation_failed_final_output"] = e.llm_output
 
         return parsed_response, metadata
 
