@@ -613,6 +613,18 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                         [validate_selected_score],
                     )
                 )
+        else:
+            field_defs.append(
+                (
+                    "selected_score",
+                    int,
+                    Field(
+                        ...,
+                        description="The chosen option.",
+                    ),
+                    [],
+                )
+            )
 
         dynamic_model = generate_dynamic_pydantic_model(
             "structured_output_model", field_defs
