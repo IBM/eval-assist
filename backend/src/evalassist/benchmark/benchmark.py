@@ -6,6 +6,7 @@ from typing import cast
 
 from datasets import IterableDataset
 from evalassist.judges import Criteria
+from evalassist.judges.types import InstanceWithGroundTruth
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
 from unitxt.llm_as_judge import CriteriaWithOptions
@@ -124,6 +125,7 @@ def parse_and_store_results(
     instances: list[DirectInstance],
     results: list[DirectInstanceResult],
     judge: BaseDirectJudge,
+    add_in_context_examples: bool,
 ):
     criteria_names = []
     for result in results:
@@ -154,7 +156,7 @@ def parse_and_store_results(
     metric_names = [m.split(".")[1] for m in evaluation_results[0]["metrics"]]
 
     # Parse the evaluation results into a dictionary
-    parsed_results = {
+    parsed_metric_results = {
         metric_name: float(
             evaluation_results.global_scores[metric_map.get(metric_name, metric_name)]
         )
@@ -162,7 +164,7 @@ def parse_and_store_results(
     }
 
     # Store the positional bias rate in the parsed results
-    parsed_results["positional_bias_rate"] = positional_bias_rate
+    parsed_metric_results["positional_bias_rate"] = positional_bias_rate
 
     benchmark_name = card.split(".")[1]
     dataset_name = ".".join(
@@ -175,13 +177,16 @@ def parse_and_store_results(
         if benchmark_name.startswith("judge_bench")
         else criteria_names[0]
     )
-    benchmark_result = {
+    judge_descriptor = judge.get_descriptor()
+    benchmark_result: dict[str, str | None] = {
         "card": card,  # if there are several criteria, we have to add the overall result
         "benchmark_name": benchmark_name,
         "dataset_name": dataset_name,
-        "judge": judge.get_name(),
+        "judge": f"{judge_descriptor.name}" + "_with_examples"
+        if add_in_context_examples
+        else "",
         "model": judge.get_descriptor().inference_engine_id,
-        "results": json.dumps(convert_nan_to_none(parsed_results)),
+        "results": json.dumps(convert_nan_to_none(parsed_metric_results)),
         "dataset_len": str(evaluation_results.global_scores["num_of_instances"]),
         "group_by_field": None,
         "group_by_value": None,
@@ -189,29 +194,28 @@ def parse_and_store_results(
 
     benchmark_results: list = []
     benchmark_results.append(benchmark_result)
-    judge_descriptor = judge.get_descriptor()
     for (
         group_by_field,
         group_by_field_scores,
     ) in evaluation_results.groups_scores.items():
         for group_by_value, group_by_value_scores in group_by_field_scores.items():
-            parsed_results = {
+            parsed_metric_results: dict[str, float | None] = {
                 metric_name: float(
                     group_by_value_scores[metric_map.get(metric_name, metric_name)]
                 )
                 for metric_name in metric_names
             }
-            parsed_results["positional_bias_rate"] = None
+            parsed_metric_results["positional_bias_rate"] = None
             group_by_field_corrected = (
                 group_by_field if group_by_field != "criteria/name" else "criteria"
             )
-            benchmark_result: dict[str, str] = {
+            per_criteria_benchmark_result: dict[str, str | None] = {
                 "card": card,  # if there are several criteria, we have to add the overall result
                 "benchmark_name": benchmark_name,
                 "dataset_name": dataset_name,
-                "judge": judge_descriptor.name,
+                "judge": f"{judge_descriptor.name}_with_examples",
                 "model": judge_descriptor.inference_engine_id,
-                "results": json.dumps(convert_nan_to_none(parsed_results)),
+                "results": json.dumps(convert_nan_to_none(parsed_metric_results)),
                 "dataset_len": str(group_by_value_scores["num_of_instances"]),
                 "group_by_field": group_by_field_corrected,
                 "group_by_value": group_by_value,
@@ -220,16 +224,16 @@ def parse_and_store_results(
                 group_by_field_corrected == "criteria"
                 and benchmark_name == " biggen_bench"
             ):
-                benchmark_result["group_by_value"] = benchmark_result[
-                    "group_by_value"
-                ].split("-")[0]  # we leave the task and discard the capability
-            benchmark_results.append(benchmark_result)
+                per_criteria_benchmark_result["group_by_value"] = cast(
+                    str, per_criteria_benchmark_result["group_by_value"]
+                ).split("-")[0]  # we leave the task and discard the capability
+            benchmark_results.append(per_criteria_benchmark_result)
 
     ground_truth = [float(d["target"]) for d in dataset]
     result_backup: list[dict] = [
         {
             "card": card,
-            "judge": judge_descriptor.name,
+            "judge": f"{judge_descriptor.name}_with_examples",
             "model": judge_descriptor.inference_engine_id,
             "sample_index": i,
             "instance": instance.model_dump_json(indent=4),
@@ -256,12 +260,44 @@ def parse_and_store_results(
 
     save_evaluation_backup_to_sqlite(result_backup)
     save_results_to_sqlite(benchmark_results)
-    # return benchmark_results
+
+
+def add_examples(
+    instances: list[DirectInstance], criteria: list[Criteria], ground_truth: list[float]
+):
+    d = {}
+    for instance, criterion, label in zip(instances, criteria, ground_truth):
+        if criterion.name not in d:
+            d[criterion.name] = {
+                "criteria": criterion,
+                "instances": [],
+                "ground_truth": [],
+            }
+        if label not in d[criterion.name]["ground_truth"]:
+            d[criterion.name]["instances"].append(instance)
+            d[criterion.name]["ground_truth"].append(label)
+    for k, v in d.items():
+        v["examples"] = [
+            InstanceWithGroundTruth(
+                instance=instance,
+                ground_truth=next(
+                    iter(
+                        option.name
+                        for option in v["criteria"].options
+                        if option.score == ground_truth
+                    )
+                ),
+            )
+            for instance, ground_truth in zip(v["instances"], v["ground_truth"])
+        ]
+    for criterion in criteria:
+        criterion.examples = d[criterion.name]["examples"]
 
 
 def run_single_model_card(
     card: str,
     judge: BaseDirectJudge,
+    add_in_context_examples: bool,
     instances_per_dataset: int | None = None,
 ):
     """
@@ -284,11 +320,10 @@ def run_single_model_card(
     )
 
     try:
+        group_by_fields = ["criteria/name"]
+        if "biggen" in card:
+            group_by_fields = group_by_fields + ["language", "capability"]
         try:
-            group_by_fields = ["criteria/name"]
-            if "biggen" in card:
-                group_by_fields = group_by_fields + ["language", "capability"]
-
             dataset: IterableDataset = cast(
                 IterableDataset,
                 load_dataset(
@@ -325,6 +360,10 @@ def run_single_model_card(
             dataset, criteria
         )
 
+        ground_truth = [float(d["target"]) for d in dataset]
+
+        add_examples(parsed_dataset, criteria, ground_truth)
+
         results: list[DirectInstanceResult] = judge(
             parsed_dataset, criteria, check_positional_bias=False
         )
@@ -335,6 +374,7 @@ def run_single_model_card(
             instances=parsed_dataset,
             results=results,
             judge=judge,
+            add_in_context_examples=add_in_context_examples,
         )
         print("Finished running card:", card, "with judge:", judge.get_descriptor())
     except Exception:
@@ -346,6 +386,7 @@ def run_benchmarks(
     judge_configs: list[tuple[type[BaseDirectJudge], dict, dict, str]],
     max_workers: int,
     instances_per_dataset: int | None,
+    add_in_context_examples: bool = False,
     dataset_keyword_filters: list[str] | None = None,
     dataset_keyword_selectors: list[str] | None = None,
 ):
@@ -392,6 +433,7 @@ def run_benchmarks(
                             run_single_model_card,
                             card,
                             judge,
+                            add_in_context_examples,
                             instances_per_dataset,
                         )
                     )
