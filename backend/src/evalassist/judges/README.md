@@ -25,9 +25,9 @@ The `base.py` file contains abstract base classes for judges:
 * `Judge`: The main abstract base class for all judges.
 * `DirectJudge` and `PairwiseJudge`: Abstract subclasses for direct and pairwise evaluation judges.
 
-## Creating a Judge
+## Contributing a judge implementation
 
-To create a custom judge, you can subclass `DirectJudge` or `PairwiseJudge` and implement the required abstract methods.
+To create a custom judge, you can subclass `DirectJudge` or `PairwiseJudge` and implement the `_run()` methods. This method is in charge of evaluating a list of instances on a list a criteria. The parent methods `evaluate()` and `_evaluate()` take care of adjusting the criteria and replicating the instances as needed based on the `check_positional_bias` and `self_consistency` values.
 
 ## Evaluation Process
 
@@ -49,7 +49,7 @@ Evaluation results content vary between direct, pairwise and multiple criteria e
 
 ## Single criteria evaluation
 
-The `backend/examples/run_judge.py` file demonstrates how to use the `DirectJudge` class. The `evaluate` method of judges is flexible and can be called with simplified parameters. For instance, the `instances` parameter can be a list of strings or `DirectInstance` objects, and the `criteria` parameter can be a string (which will be translated into account as a yes/no criteria) or a `Criteria` object.
+The `evaluate` method of judges is flexible and can be called with simplified parameters. For instance, the `instances` parameter can be a list of strings or `DirectInstance` objects, and the `criteria` parameter can be a string (which will be translated into account as a yes/no criteria) or a `Criteria` object.
 
 ### Example Usage
 
@@ -163,9 +163,9 @@ EvalAssist implements a [Judge API](./base.py) for easily defining and trying di
 
 * **DirectJudge**: main judge implementation. A judge that uses structured output parsing to make evaluations. It accepts the following parameters:
 
-* `generate_feedback`: generate feedback as actionable suggestions if the evaluation result is not optimal. Can be used to automatically fix the evaluated text.
-* `judge_description_prompt`: a judge description to be used in the prompt. Defaults to "You are an evaluator. You are an expert on evaluating text based on a rubric."
-* `generate_synthetic_persona`: generate a synthetic persona based on the criteria to be used as the judge description.
+  * `generate_feedback`: generate feedback as actionable suggestions if the evaluation result is not optimal. Can be used to automatically fix the evaluated text.
+  * `judge_description_prompt`: a judge description to be used in the prompt. Defaults to "You are an evaluator. You are an expert on evaluating text based on a rubric."
+  * `generate_synthetic_persona`: generate a synthetic persona based on the criteria to be used as the judge description.
 
 This judge uses langchain to parse the structured output. Underlying LLM is asked to generate a json schema derived from a Pydantic model. An output fixing parser is used if the model is unable to generate the correct response format or the content is invalid -e.g. the selected option doesn't exist- by prompting the LLM with the error. It will try as much as three times to generate the correct format. If all generations failed a random option is chosen.
 
@@ -174,5 +174,11 @@ This judge uses langchain to parse the structured output. Underlying LLM is aske
 * **MPrometheusDirectJudge** and **MPrometheusPairwiseJudge**: wrapper for the [M-Prometheus judges](https://github.com/prometheus-eval/prometheus-eval).
 
 * **DummyDirectJudge** and **DummyPairwiseJudge**: use as a guide to implement new judges.
+
+### Judge configuration
+
+In addition to the aforementioned judge descriptions, all judges can receive a `check_positional_bias` and a `self_consistency` field in its constructors.
+
+### Benchmarks
 
 Look at [the benchmarks results](https://evalassist-evalassist.hf.space/benchmarks/) to find out how the judges perform on different datasets created to benchmark LLM as a Judge evaluators.
