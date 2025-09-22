@@ -107,6 +107,9 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                     f"The judge was unable to generate a valid evaluation result. The model {self.inference_engine.get_engine_id()}'s output's validation failed with the following error:\n{e.llm_output}"
                 )
             else:
+                logger.debug(
+                    f"The judge was unable to generate a valid evaluation result. The model {self.inference_engine.get_engine_id()}'s output's validation failed with the following error:\n{e.llm_output}"
+                )
                 if on_failure_default is None:
                     selected_option = ""
                 elif isinstance(on_failure_default, (str, int)):
