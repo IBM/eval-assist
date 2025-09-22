@@ -74,10 +74,12 @@ class BaseJudge(
     """
 
     self_consistency: int = False
+    check_positional_bias: bool = False
 
     def __init__(
         self,
         self_consistency: bool | int = False,
+        check_positional_bias: bool = False,
         *args,
         **kwargs,
     ):
@@ -93,6 +95,8 @@ class BaseJudge(
             else (3 if self_consistency is True else 0)
         )
 
+        self.check_positional_bias = check_positional_bias
+
     def get_ai_message_from_prompt(
         self, prompt: str, role: Literal["system", "user", "assistant"] = "user"
     ) -> dict[str, str]:
@@ -105,7 +109,6 @@ class BaseJudge(
         self,
         instances: list[InstanceTypeVar] | list[str],
         criteria: Criteria | list[Criteria] | str,
-        check_positional_bias: bool = False,
     ) -> list[ReturnVarType]:
         """Run the judge on a batch of instances and return the results."""
         if isinstance(criteria, list):
@@ -143,7 +146,6 @@ class BaseJudge(
         results: list[ReturnVarType] = self._evaluate(
             instances=parsed_instances,
             criteria=parsed_criteria,
-            check_positional_bias=check_positional_bias,
         )
 
         return results
@@ -152,12 +154,10 @@ class BaseJudge(
         self,
         instances: list[InstanceTypeVar] | list[str],
         criteria: Criteria | list[Criteria] | str,
-        check_positional_bias: bool = False,
     ) -> list[ReturnVarType]:
         return self.evaluate(
             instances=instances,
             criteria=criteria,
-            check_positional_bias=check_positional_bias,
         )
 
     @abstractmethod
@@ -165,7 +165,6 @@ class BaseJudge(
         self,
         instances: list[InstanceTypeVar],
         criteria: list[Criteria],
-        check_positional_bias: bool,
     ) -> list[ReturnVarType]: ...
 
     @abstractmethod
@@ -212,9 +211,8 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
         self,
         instances: list[DirectInstance],
         criteria: list[Criteria],
-        check_positional_bias: bool = False,
     ) -> list[DirectInstanceResult]:
-        if check_positional_bias:
+        if self.check_positional_bias:
             results: list[DirectInstanceResult] = self._run(
                 instances=[*instances, *instances],
                 criteria=[
@@ -427,9 +425,8 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
         self,
         instances: list[PairwiseInstance],
         criteria: list[Criteria],
-        check_positional_bias: bool,
     ) -> list[PairwiseInstanceResult]:
-        if check_positional_bias:
+        if self.check_positional_bias:
             results: list[PairwiseInstanceResult] = self._run(
                 instances=[
                     *instances,
