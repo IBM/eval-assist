@@ -366,7 +366,8 @@ def run_single_model_card(
         add_examples(parsed_dataset, criteria, ground_truth)
 
         results: list[DirectInstanceResult] = judge(
-            parsed_dataset, criteria, check_positional_bias=False
+            parsed_dataset,
+            criteria,
         )
 
         parse_and_store_results(

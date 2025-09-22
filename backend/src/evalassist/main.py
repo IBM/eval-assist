@@ -322,11 +322,11 @@ async def evaluate(
                 evaluator = DirectJudge(
                     inference_engine=inference_engine,
                     generate_feedback=True,
+                    check_positional_bias=True,
                 )
             per_instance_result = evaluator.evaluate(
                 instances=cast(list[DirectInstance], req.instances),
                 criteria=criteria,
-                check_positional_bias=True,
             )
         else:
             criteria = Criteria(
@@ -340,7 +340,6 @@ async def evaluate(
             per_instance_result = evaluator.evaluate(
                 instances=cast(list[PairwiseInstance], req.instances),
                 criteria=criteria,
-                check_positional_bias=True,
             )
 
         # Add the id to each instance result
