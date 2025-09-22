@@ -420,7 +420,7 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
         )
         if self.self_consistency:
             raise ValueError(
-                "Self consistency is not supported on pairwise comparison judges yet.s"
+                "Self consistency is not supported on pairwise comparison judges yet."
             )
 
     def _evaluate(
