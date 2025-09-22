@@ -22,6 +22,7 @@ from .utils import (
     get_benchmark_results_as_df,
     get_judge_from_config,
     get_judgebench_cards,
+    is_result_available,
     save_evaluation_backup_to_sqlite,
     save_results_to_sqlite,
 )
@@ -421,12 +422,12 @@ def run_benchmarks(
                 judge = get_judge_from_config(judge_config)
 
                 # Skip if the benchmark has already been run
-                # if not is_result_available(
-                #     judge.get_name(),
-                #     judge.get_descriptor().inference_engine_id,
-                #     card,
-                # ):
-                if True:
+                if not is_result_available(
+                    judge.get_name(),
+                    judge.get_descriptor().inference_engine_id,
+                    card,
+                ):
+                    # if True:
                     # Submit the task to the executor
                     futures.append(
                         executor.submit(
