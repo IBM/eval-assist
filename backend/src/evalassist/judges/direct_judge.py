@@ -157,11 +157,15 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
         classes: list[type[BaseModel]],
         on_failure_default: list[str | int | list[str | int]],
     ):
-        return asyncio.run(
-            self.parse_all_responses_async(
-                unparsed_responses, output_parsers, classes, on_failure_default
-            )
+        loop = asyncio.get_event_loop()
+        task = self.parse_all_responses_async(
+            unparsed_responses=unparsed_responses,
+            output_parsers=output_parsers,
+            classes=classes,
+            on_failure_default=on_failure_default,
         )
+        responses = loop.run_until_complete(task)
+        return responses
 
     def get_name(self) -> str:
         return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}{f'_with_self_consistency_{self.self_consistency}_attempts' if self.self_consistency else ''}"
