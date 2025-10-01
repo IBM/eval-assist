@@ -10,19 +10,21 @@ from .const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from .direct_judge import DirectJudge
 from .dummy_judge import DummyDirectJudge, DummyPairwiseJudge
 from .mprometheus_judge import MPrometheusDirectJudge, MPrometheusPairwiseJudge
+from .pairwise_judge import PairwiseJudge
 from .types import (
     Criteria,
     CriteriaOption,
     DirectInstance,
     DirectInstanceResult,
-    DirectPositionalBias,
+    DirectPositionalBiasResult,
     Instance,
     MultiCriteria,
     MultiCriteriaDirectInstanceResult,
     MultiCriteriaItem,
     PairwiseInstance,
     PairwiseInstanceResult,
-    SingleSystemPairwiseResult,
+    PairwisePositionalBiasResult,
+    SingleSystemPairwiseInstanceResult,
 )
 from .unitxt_judges import GraniteGuardianJudge, UnitxtDirectJudge, UnitxtPairwiseJudge
 
@@ -44,6 +46,7 @@ __all__: list[str] = [
     "DummyDirectJudge",
     "DummyPairwiseJudge",
     "DirectJudge",
+    "PairwiseJudge",
     "UnitxtDirectJudge",
     "UnitxtPairwiseJudge",
     "BaseDirectJudge",
@@ -51,9 +54,10 @@ __all__: list[str] = [
     "Instance",
     "DirectInstance",
     "PairwiseInstance",
-    "SingleSystemPairwiseResult",
+    "SingleSystemPairwiseInstanceResult",
     "PairwiseInstanceResult",
-    "DirectPositionalBias",
+    "DirectPositionalBiasResult",
+    "PairwisePositionalBiasResult",
     "DirectInstanceResult",
     "DEFAULT_JUDGE_INFERENCE_PARAMS",
     "Criteria",

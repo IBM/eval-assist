@@ -1,9 +1,9 @@
 import logging
 import math
 from abc import ABC, abstractmethod
-from typing import Any, Literal, cast
+from typing import Any, Generic, Literal, TypeVar, cast
 
-from pydantic import BaseModel, Field, RootModel, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing_extensions import Self
 from unitxt.artifact import UnitxtArtifactNotFoundError, fetch_artifact
 from unitxt.llm_as_judge import Criteria as UnitxtCriteria
@@ -18,7 +18,7 @@ class Instance(BaseModel, ABC):
         default_factory=dict,
         description="Additional context information for the instance, stored as key-value pairs.",
     )
-    expected_result: str | None = Field(
+    expected_result: str | int | None = Field(
         default=None,
         description="The expected result or ground truth for the instance, if available.",
     )
@@ -88,7 +88,7 @@ class Criteria(BaseModel):
         description="Instance examples to be used to be used both as criteria documentation and in-context examples.",
     )
 
-    def get_score_from_option(self, option_name: str):
+    def get_score_from_option(self, option_name: str | int):
         try:
             return next(iter(o for o in self.options if o.name == option_name)).score
         except StopIteration:
@@ -165,36 +165,53 @@ class Criteria(BaseModel):
         return self
 
 
-class SingleSystemPairwiseResult(BaseModel):
-    contest_results: list[bool]
+class SingleSystemPairwiseInstanceResult(BaseModel):
+    contest_results: list[bool | str]
     compared_to: list[int]
     explanations: list[str]
     positional_bias: list[bool] | None = None
-    certainty: list[float] | None = None
     winrate: float
     ranking: int
-    selections: list[str]
+    selections: list[int]
 
 
-class PairwiseInstanceResult(RootModel):
-    root: dict[str, SingleSystemPairwiseResult]
+InstanceT = TypeVar("InstanceT", bound="Instance")
+ResultT = TypeVar("ResultT", bound="InstanceResult")
+PositionalBiasResultT = TypeVar("PositionalBiasResultT", bound="PositionalBiasResult")
 
 
-class DirectPositionalBias(BaseModel):
-    detected: bool
-    result: "DirectInstanceResult | None" = None
-
-
-class DirectInstanceResult(BaseModel):
+class InstanceResult(BaseModel, Generic[InstanceT, PositionalBiasResultT]):
     criteria: Criteria | None = None
-    instance: DirectInstance | None = None
-    option: str
-    score: float | None = None
-    explanation: str
-    feedback: str | None = None
+    instance: InstanceT | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
-    positional_bias: DirectPositionalBias | None = None
+    selected_option: str | int
+    explanation: str = ""
+    positional_bias: PositionalBiasResultT | None = None
 
+
+class PositionalBiasResult(BaseModel, Generic[ResultT]):
+    detected: bool
+    result: "ResultT | None" = None
+
+
+DirectPositionalBiasResult = PositionalBiasResult["DirectInstanceResult"]
+PairwisePositionalBiasResult = PositionalBiasResult["PairwiseInstanceResult"]
+
+
+class PairwiseInstanceResult(
+    InstanceResult[PairwiseInstance, PositionalBiasResult["PairwiseInstanceResult"]]
+):
+    per_system_results: list[SingleSystemPairwiseInstanceResult] | None = None
+
+
+class DirectInstanceResult(
+    InstanceResult[DirectInstance, PositionalBiasResult["DirectInstanceResult"]]
+):
+    score: float | None = None
+    feedback: str | None = None
+
+
+# Multi criteria types
 
 MultiCriteriaStrategy = Literal["target_option", "score_threshold", "none"]
 
@@ -204,7 +221,7 @@ class MultiCriteriaItemResult(BaseModel):
     weight: float
     score: float | None
     weighted_score: float | None
-    option: str
+    option: str | int
     strategy: MultiCriteriaStrategy
     required: bool
 
@@ -253,7 +270,7 @@ class MultiCriteriaItem(BaseModel):
             return None
 
         if self.target_option is not None:
-            score = 1.0 if result.option == self.target_option else 0.0
+            score = 1.0 if result.selected_option == self.target_option else 0.0
 
         elif self.score_threshold is not None:
             if score is None:
@@ -275,7 +292,7 @@ class MultiCriteriaItem(BaseModel):
             weight=weight,
             score=score,
             weighted_score=score * weight if score is not None else None,
-            option=result.option,
+            option=result.selected_option,
             strategy=self.get_strategy(),
             required=self.required,
         )

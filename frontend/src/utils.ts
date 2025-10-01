@@ -7,10 +7,16 @@ import {
   CriteriaOption,
   CriteriaWithOptions,
   DirectInstance,
+  DirectInstanceResult,
   EvaluationType,
+  FetchedDirectInstanceResult,
+  FetchedDirectInstanceResultWithId,
+  FetchedPairwiseInstanceResult,
+  FetchedPairwiseInstanceResultWithId,
   Instance,
   PairwiseInstance,
   PairwiseInstanceResult,
+  PerResponsePairwiseResult,
   TestCase,
 } from '@types'
 
@@ -315,6 +321,67 @@ export const parseInstanceForBackend = (instance: Instance, type: EvaluationType
     id: instance.id,
     expected_result: instance.expectedResult,
     is_synthetic: instance.metadata?.synthetic_generation ? true : false,
+  }
+}
+
+export const parseInstanceResultFromBackend = (
+  fetchedInstanceResult: FetchedDirectInstanceResult | FetchedPairwiseInstanceResult,
+  type: EvaluationType,
+): DirectInstanceResult | PairwiseInstanceResult => {
+  if (type === EvaluationType.DIRECT) {
+    const directFetchedInstanceResult = fetchedInstanceResult as FetchedDirectInstanceResult
+    const instanceResult: DirectInstanceResult = {
+      selectedOption: directFetchedInstanceResult.selected_option,
+      positionalBiasOption: directFetchedInstanceResult.positional_bias_option,
+      explanation: directFetchedInstanceResult.explanation,
+      feedback: directFetchedInstanceResult.feedback,
+      score: directFetchedInstanceResult.score,
+      positionalBias: directFetchedInstanceResult.positional_bias
+        ? {
+            detected: directFetchedInstanceResult.positional_bias.detected,
+            result: parseInstanceResultFromBackend(
+              directFetchedInstanceResult.positional_bias.result,
+              type,
+            ) as DirectInstanceResult,
+          }
+        : null,
+      metadata: directFetchedInstanceResult.metadata,
+    }
+    return instanceResult
+  } else {
+    const pairwiseFetchedInstanceResult = fetchedInstanceResult as FetchedPairwiseInstanceResult
+    let per_system_results: PerResponsePairwiseResult[] | null = null
+    if (pairwiseFetchedInstanceResult.per_system_results) {
+      per_system_results = []
+      pairwiseFetchedInstanceResult.per_system_results.forEach((fetchedPerResponseResult) => {
+        per_system_results!.push({
+          contestResults: fetchedPerResponseResult.contest_results,
+          comparedTo: fetchedPerResponseResult.compared_to,
+          explanations: fetchedPerResponseResult.explanations,
+          positionalBias:
+            fetchedPerResponseResult.positional_bias ||
+            new Array(fetchedPerResponseResult.contest_results.length).fill(false),
+          winrate: fetchedPerResponseResult.winrate,
+          ranking: fetchedPerResponseResult.ranking,
+        })
+      })
+    }
+    let instanceResult: PairwiseInstanceResult = {
+      perSystemResults: per_system_results,
+      selectedOption: pairwiseFetchedInstanceResult.selected_option,
+      explanation: pairwiseFetchedInstanceResult.explanation,
+      metadata: pairwiseFetchedInstanceResult.metadata,
+      positionalBias: pairwiseFetchedInstanceResult.positional_bias
+        ? {
+            detected: pairwiseFetchedInstanceResult.positional_bias.detected,
+            result: parseInstanceResultFromBackend(
+              pairwiseFetchedInstanceResult.positional_bias.result,
+              type,
+            ) as PairwiseInstanceResult,
+          }
+        : null,
+    }
+    return instanceResult
   }
 }
 

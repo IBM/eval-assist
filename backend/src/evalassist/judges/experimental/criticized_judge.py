@@ -69,7 +69,7 @@ class CriticizedDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                         "judge_prompt": result.metadata["prompt"],  # type: ignore
                         "explanation": result.explanation,
                     },
-                    response=result.option,
+                    response=result.selected_option,
                 )
                 for result in results
             ],
@@ -100,7 +100,7 @@ class CriticizedDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                                     if instances[to_revisit_result_index].context
                                     else {}
                                 ),
-                                "Feedback from previous evaluation": f"The previous time you evaluated this instance, your evaluation was categorized as '{criticized_results[to_revisit_result_index].option}'. In order to improve it, take the following feedback into account: {cast(str, criticized_results[to_revisit_result_index].feedback)}"
+                                "Feedback from previous evaluation": f"The previous time you evaluated this instance, your evaluation was categorized as '{criticized_results[to_revisit_result_index].selected_option}'. In order to improve it, take the following feedback into account: {cast(str, criticized_results[to_revisit_result_index].feedback)}"
                                 if criticized_results[to_revisit_result_index].feedback
                                 != ""
                                 else "Nothing to improve",

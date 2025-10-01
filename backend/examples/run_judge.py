@@ -31,7 +31,7 @@ results = judge(
 
 
 print("### Selected option / Score")
-print(f"{results[0].option} / {results[0].score}")
+print(f"{results[0].selected_option} / {results[0].score}")
 """
 No / 0.0
 """

@@ -7,7 +7,7 @@ from .types import (
     DirectInstanceResult,
     PairwiseInstance,
     PairwiseInstanceResult,
-    SingleSystemPairwiseResult,
+    SingleSystemPairwiseInstanceResult,
 )
 
 
@@ -92,7 +92,7 @@ class MPrometheusDirectJudge(MPrometheusJudge, BaseDirectJudge):
             DirectInstanceResult(
                 instance=instance,
                 criteria=criterion,
-                option=criterion.options[score - 1].name,
+                selected_option=criterion.options[score - 1].name,
                 score=score,
                 explanation=feedback,
             )
@@ -157,8 +157,8 @@ class MPrometheusPairwiseJudge(MPrometheusJudge, BasePairwiseJudge):
         for i, (instance, feedback, score) in enumerate(
             zip(instances, feedbacks, scores)
         ):
-            instance_result: dict[str, SingleSystemPairwiseResult] = {}
-            instance_result["system_1"] = SingleSystemPairwiseResult(
+            instance_result: dict[str, SingleSystemPairwiseInstanceResult] = {}
+            instance_result["system_1"] = SingleSystemPairwiseInstanceResult(
                 contest_results=[score == "A"],
                 compared_to=[1],
                 explanations=[feedback],
@@ -168,7 +168,7 @@ class MPrometheusPairwiseJudge(MPrometheusJudge, BasePairwiseJudge):
                 selections=["1" if score == "A" else "2"],
             )
 
-            instance_result["system_2"] = SingleSystemPairwiseResult(
+            instance_result["system_2"] = SingleSystemPairwiseInstanceResult(
                 contest_results=[score == "B"],
                 compared_to=[0],
                 explanations=[feedback],

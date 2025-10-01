@@ -70,7 +70,7 @@ from .judges import (
     DirectJudge,
     GraniteGuardianJudge,
     PairwiseInstance,
-    UnitxtPairwiseJudge,
+    PairwiseJudge,
 )
 from .model import AppUser, StoredTestCase
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
@@ -335,7 +335,10 @@ async def evaluate(
                 prediction_field=req.criteria.prediction_field,
                 context_fields=req.criteria.context_fields,
             )
-            evaluator = UnitxtPairwiseJudge(inference_engine=inference_engine)
+            evaluator = PairwiseJudge(
+                inference_engine=inference_engine,
+                check_positional_bias=True,
+            )
 
             per_instance_result = evaluator.evaluate(
                 instances=cast(list[PairwiseInstance], req.instances),
@@ -716,7 +719,7 @@ Fix the following text based on the feedback
 ### Feedback
 {req.result.feedback}
 
-Only respond with the fixed text, not titles.
+Only respond with the fixed text, not titles. Keep the text length if possible.
 
 Fixed text:
 

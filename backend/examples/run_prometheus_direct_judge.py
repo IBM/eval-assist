@@ -51,7 +51,7 @@ if __name__ == "__main__":
     )
 
     print("### Selected option / Score")
-    print(f"{results[0].option} / {results[0].score}")
+    print(f"{results[0].selected_option} / {results[0].score}")
 
     print("\n### Explanation")
     print(results[0].explanation)

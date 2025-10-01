@@ -19,13 +19,14 @@ from .types import (
     CriteriaOption,
     DirectInstance,
     DirectInstanceResult,
-    DirectPositionalBias,
+    DirectPositionalBiasResult,
     Instance,
     MultiCriteria,
     MultiCriteriaDirectInstanceResult,
     MultiCriteriaItemResult,
     PairwiseInstance,
     PairwiseInstanceResult,
+    PairwisePositionalBiasResult,
 )
 
 # ----------------------------------------------------------------------
@@ -236,12 +237,13 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
                 DirectInstanceResult(
                     criteria=results[i].criteria,
                     instance=instances[i],
-                    option=results[i].option,
+                    selected_option=results[i].selected_option,
                     explanation=results[i].explanation,
                     feedback=results[i].feedback,
                     metadata=results[i].metadata,
-                    positional_bias=DirectPositionalBias(
-                        detected=results[i].option != results[i + results_len].option,
+                    positional_bias=DirectPositionalBiasResult(
+                        detected=results[i].selected_option
+                        != results[i + results_len].selected_option,
                         result=results[results_len + i],
                     ),
                 )
@@ -253,14 +255,14 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
         # add numeric scores from criteria if possible
         for r in results:
             score: float | None = (
-                r.criteria.get_score_from_option(r.option)
+                r.criteria.get_score_from_option(r.selected_option)
                 if r.criteria is not None
                 else None
             )
             if score is None:
                 try:
                     # try to use the option name as the numeric score
-                    score = float(r.option)
+                    score = float(r.selected_option)
                 except (ValueError, TypeError):
                     pass
             r.score = score
@@ -270,13 +272,14 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
             parsed_results = []
             for i in range(0, len(results), self.self_consistency):
                 selected_options = [
-                    results[j].option for j in range(i, i + self.self_consistency)
+                    results[j].selected_option
+                    for j in range(i, i + self.self_consistency)
                 ]
                 most_common_option = Counter(selected_options).most_common(1)[0][0]
                 index_of_most_common = selected_options.index(most_common_option)
                 to_update_result_index = i + index_of_most_common
                 to_update_result = results[to_update_result_index]
-                to_update_result.option = most_common_option
+                to_update_result.selected_option = most_common_option
                 if all(
                     r.score is not None for r in results[i : i + self.self_consistency]
                 ):
@@ -448,21 +451,46 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
 
             results_len: int = int(len(results) / 2)
 
-            for instance_result, positional_bias_instance_result in zip(
-                results[:results_len], results[results_len:]
+            for instance_result, positional_bias_instance_result, instance in zip(
+                results[:results_len], results[results_len:], instances
             ):
-                responses_count = len(instance_result.root)
-                for i, response_result in enumerate(instance_result.root.values()):
-                    positional_bias_result_response = list(
-                        positional_bias_instance_result.root.values()
-                    )[responses_count - i - 1]
-                    response_result.positional_bias = [
-                        a != b
-                        for a, b in zip(
-                            response_result.contest_results,
-                            reversed(positional_bias_result_response.contest_results),
+                if (
+                    instance_result.per_system_results is not None
+                    and positional_bias_instance_result.per_system_results is not None
+                ):
+                    responses_count = len(instance_result.per_system_results)
+                    for i, response_result in enumerate(
+                        instance_result.per_system_results
+                    ):
+                        positional_bias_result_response = list(
+                            positional_bias_instance_result.per_system_results
+                        )[responses_count - i - 1]
+                        response_result.positional_bias = [
+                            a != b
+                            for a, b in zip(
+                                response_result.contest_results,
+                                reversed(
+                                    positional_bias_result_response.contest_results
+                                ),
+                            )
+                        ]
+
+                instance_result.positional_bias = PairwisePositionalBiasResult(
+                    detected=(
+                        instance_result.selected_option == "tie"
+                        and positional_bias_instance_result.selected_option != "tie"
+                    )
+                    or (
+                        positional_bias_instance_result.selected_option != "tie"
+                        and instance_result.selected_option
+                        != (
+                            len(instance.responses)
+                            - cast(int, positional_bias_instance_result.selected_option)
+                            - 1
                         )
-                    ]
+                    ),
+                    result=positional_bias_instance_result,
+                )
 
             return results
         else:

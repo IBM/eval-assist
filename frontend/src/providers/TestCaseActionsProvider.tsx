@@ -16,9 +16,17 @@ import {
   Instance,
   PairwiseInstance,
   PairwiseInstanceResult,
+  PerResponsePairwiseResult,
+  PerResponsePairwiseResultV0,
   TestCase,
 } from '@types'
-import { parseCriteriaForBackend, parseInstanceForBackend, returnByPipelineType, toSnakeCase } from '@utils'
+import {
+  parseCriteriaForBackend,
+  parseInstanceForBackend,
+  parseInstanceResultFromBackend,
+  returnByPipelineType,
+  toSnakeCase,
+} from '@utils'
 
 import { useAppSidebarContext } from './AppSidebarProvider'
 import { useCriteriasContext } from './CriteriaProvider'
@@ -241,40 +249,14 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
           timeout: 5000,
         })
         let updatedInstances: Instance[] = currentTestCase.instances.map((instance) => ({ ...instance }))
-        if (currentTestCase.type === EvaluationType.DIRECT) {
-          ;(responseBody.results as FetchedDirectResults).forEach(
-            (fetchedInstanceResult: FetchedDirectInstanceResultWithId, i) => {
-              const instanceResult: DirectInstanceResult = {
-                option: fetchedInstanceResult.result.option,
-                positionalBiasOption: fetchedInstanceResult.result.positional_bias_option,
-                explanation: fetchedInstanceResult.result.explanation,
-                feedback: fetchedInstanceResult.result.feedback,
-                score: fetchedInstanceResult.result.score,
-                positionalBias: fetchedInstanceResult.result.positional_bias,
-                certainty: fetchedInstanceResult.result.certainty,
-                metadata: fetchedInstanceResult.result.metadata,
-              }
-              updatedInstances.find((instance) => instance.id === fetchedInstanceResult.id)!.result = instanceResult
-            },
-          )
-        } else {
-          ;(responseBody.results as FetchedPairwiseResults).forEach((fetchedInstanceResult, i) => {
-            let instanceResult: PairwiseInstanceResult = {}
-            Object.entries(fetchedInstanceResult.result).forEach(([result_idx, fetchedPerResponseResult]) => {
-              instanceResult[result_idx] = {
-                contestResults: fetchedPerResponseResult.contest_results,
-                comparedTo: fetchedPerResponseResult.compared_to,
-                explanations: fetchedPerResponseResult.explanations,
-                positionalBias:
-                  fetchedPerResponseResult.positional_bias ||
-                  new Array(fetchedPerResponseResult.contest_results.length).fill(false),
-                winrate: fetchedPerResponseResult.winrate,
-                ranking: fetchedPerResponseResult.ranking,
-              }
-            })
-            updatedInstances.find((instance) => instance.id === fetchedInstanceResult.id)!.result = instanceResult
-          })
-        }
+
+        ;(responseBody.results as FetchedDirectResults | FetchedPairwiseResults).forEach(
+          (fetchedInstanceResultWithId) => {
+            updatedInstances.find((instance) => instance.id === fetchedInstanceResultWithId.id)!.result =
+              parseInstanceResultFromBackend(fetchedInstanceResultWithId.result, currentTestCase.type)
+          },
+        )
+
         setCurrentTestCase((prev) => {
           // used to filter the instances to update if one or more instances were deleted while the evaluation was running
           const currentInstanceIds = prev.instances.map((i) => i.id)
@@ -443,15 +425,15 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         instance: parsedToFixInstance,
         result: {
           criteria: parsedCriteria,
-          option: result.option,
+          selected_option: result.selectedOption,
           score: null,
           explanation: result.explanation,
           feedback: result.feedback,
           positional_bias: result.positionalBias
             ? {
                 detected: result.positionalBias.detected,
-                option: result.positionalBias.option,
-                explanation: result.positionalBias.explanation,
+                option: result.positionalBias.result.selectedOption,
+                explanation: result.positionalBias.result.explanation,
               }
             : null,
           metadata: result.metadata,
@@ -479,7 +461,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         }
       })
     },
-    [currentTestCase, getProviderCredentialsWithDefaults, post, setCurrentTestCase],
+    [addToast, currentTestCase, getProviderCredentialsWithDefaults, post, removeToast, setCurrentTestCase],
   )
 
   return (

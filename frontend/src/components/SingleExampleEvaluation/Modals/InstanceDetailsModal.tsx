@@ -33,15 +33,8 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
 
   const positionalBiasDetected = useMemo(() => {
     if (selectedInstance === null || selectedInstance.result === null) return null
-    return returnByPipelineType(
-      currentTestCase.type,
-      () => (selectedInstance.result as DirectInstanceResult).positionalBias?.detected,
-      () =>
-        Object.values(selectedInstance.result as PairwiseInstanceResult).some((instance) =>
-          instance.positionalBias.some((pb) => pb),
-        ),
-    )
-  }, [currentTestCase.type, selectedInstance])
+    return selectedInstance.result.positionalBias ? selectedInstance.result.positionalBias.detected : false
+  }, [selectedInstance])
 
   const [openedPerReponseResults, setOpenedPerReponseResults] = useState<boolean[]>([])
 
@@ -117,7 +110,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                         <p>
                           <strong>{'Result: '}</strong>
                         </p>
-                        <p>{(selectedInstance.result as DirectInstanceResult).option}</p>
+                        <p>{(selectedInstance.result as DirectInstanceResult).selectedOption}</p>
 
                         <p>
                           <strong>Explanation:</strong>
@@ -161,14 +154,16 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                             <p>
                               <strong>{'Positional bias result:'}</strong>
                             </p>
-                            <p>{(selectedInstance.result as DirectInstanceResult).positionalBias?.option}</p>
+                            <p>
+                              {(selectedInstance.result as DirectInstanceResult).positionalBias?.result.selectedOption}
+                            </p>
 
                             <p>
                               <strong>{'Positional bias explanation:'}</strong>
                             </p>
                             <div>
                               <Markdown components={markdownHeadingConf}>
-                                {(selectedInstance.result as DirectInstanceResult).positionalBias?.explanation}
+                                {(selectedInstance.result as DirectInstanceResult).positionalBias?.result.explanation}
                               </Markdown>
                             </div>
                           </>
@@ -218,121 +213,206 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                             <p key={'expected-result-title'}>
                               <strong>{'Expected winner: '}</strong>
                             </p>
-                            <p key={'expected-result-value'}>{`${toTitleCase(
-                              currentTestCase.criteria.predictionField,
-                            )} ${selectedInstance.expectedResult}`}</p>
+                            <p key={'expected-result-value'}>
+                              {selectedInstance.expectedResult === 'tie'
+                                ? 'Tie'
+                                : `${toTitleCase(currentTestCase.criteria.predictionField)} ${
+                                    Number(selectedInstance.expectedResult) + 1
+                                  }`}
+                            </p>
                           </Fragment>
                         )}
-
-                        <p key={'instance-ranking-title'}>
-                          <strong>{'Instance ranking: '}</strong>
-                        </p>
-                        <div
-                          style={{
-                            display: 'grid',
-                            gridTemplateColumns: '2fr 1fr 10fr',
-                            justifyItems: 'center',
-                            alignItems: 'center',
-                          }}
-                          key={'ranking'}
-                        >
-                          {Object.keys(selectedInstance.result as PairwiseInstanceResult)
-                            .sort(
-                              (key1, key2) =>
-                                (selectedInstance.result as PairwiseInstanceResult)[key1].ranking -
-                                (selectedInstance.result as PairwiseInstanceResult)[key2].ranking,
-                            )
-                            .map((key, i) => (
-                              <Fragment key={`results-${i}`}>
-                                <p style={{ justifySelf: 'start' }}>{`- ${
-                                  (selectedInstance.result as PairwiseInstanceResult)[key].ranking
-                                }${getOrdinalSuffix(
-                                  (selectedInstance.result as PairwiseInstanceResult)[key].ranking,
-                                )} place`}</p>
-                                <ArrowRight style={{ justifySelf: 'start' }} size={16} />
-                                <p style={{ justifySelf: 'start' }}>
-                                  {` ${toTitleCase(
-                                    currentTestCase.criteria.predictionField,
-                                  )} ${key} (Winrate: ${toPercentage(
-                                    (selectedInstance.result as PairwiseInstanceResult)[key].winrate,
-                                  )})`}
-                                </p>
-                              </Fragment>
-                            ))}
-                        </div>
-                        <p>
-                          <strong>{'Positional bias:'}</strong>
-                        </p>
-                        <p
-                          className={cx({
-                            [classes.errorText]: positionalBiasDetected,
-                          })}
-                        >
-                          {positionalBiasDetected ? 'Detected' : 'Not detected'}
-                        </p>
-                        <p key={'instance-per-response-title'}>
-                          <strong>{`Per ${currentTestCase.criteria.predictionField.toLocaleLowerCase()} results: `}</strong>
-                        </p>
-                        <Accordion className={classes.accordionFullWidth}>
-                          {Object.entries(selectedInstance.result as PairwiseInstanceResult).map(
-                            ([key, responseResults], j) => (
-                              <AccordionItem
-                                title={`${toTitleCase(currentTestCase.criteria.predictionField)} ${key}`}
-                                key={j}
-                                open={openedPerReponseResults[j]}
-                                onClick={() => {
-                                  setOpenedPerReponseResults([
-                                    ...openedPerReponseResults.slice(0, j).map(() => false),
-                                    !!!openedPerReponseResults[j],
-                                    ...openedPerReponseResults.slice(j + 1).map(() => false),
-                                  ])
-                                }}
-                              >
-                                <div className={cx(classes.gridTemplate)}>
-                                  <p>
-                                    <strong>{'Ranking: '}</strong>
-                                  </p>
-                                  <p>{`${responseResults.ranking}${getOrdinalSuffix(responseResults.ranking)}`}</p>
-                                  <p>
-                                    <strong>{'Winrate: '}</strong>
-                                  </p>
-                                  <p>{toPercentage(responseResults.winrate)}</p>
-                                  <p>
-                                    <strong>{'Contest results: '}</strong>
-                                  </p>
-                                  <UnorderedList>
-                                    {Object.values(responseResults.explanations).map((explanation, i) => (
-                                      <ListItem key={i}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                          <div>
-                                            <p key={i} className={classes.explanation}>
-                                              <strong>{`${
-                                                responseResults.contestResults[i] ? 'Won' : 'Lost'
-                                              } against ${toTitleCase(currentTestCase.criteria.predictionField)} ${
-                                                responseResults.comparedTo[i]
-                                              }: `}</strong>
-                                            </p>
-                                            <div>
-                                              <Markdown components={markdownHeadingConf}>{explanation}</Markdown>
-                                            </div>
-                                            <br />
-                                          </div>
-                                          {responseResults.positionalBias[i] && (
-                                            <Tooltip label={'Positional bias detected'}>
-                                              <div className={classes.errorText}>
-                                                <Warning />
+                        {(selectedInstance.result as PairwiseInstanceResult).perSystemResults !== null ? (
+                          <>
+                            <p key={'instance-ranking-title'}>
+                              <strong>{'Instance ranking: '}</strong>
+                            </p>
+                            <div
+                              style={{
+                                display: 'grid',
+                                gridTemplateColumns: '2fr 1fr 10fr',
+                                justifyItems: 'center',
+                                alignItems: 'center',
+                              }}
+                              key={'ranking'}
+                            >
+                              {(selectedInstance.result as PairwiseInstanceResult)
+                                .perSystemResults!.sort((result1, result2) => result1.ranking - result2.ranking)
+                                .map((result, i) => (
+                                  <Fragment key={`results-${i}`}>
+                                    <p style={{ justifySelf: 'start' }}>{`- ${result.ranking + 1}${getOrdinalSuffix(
+                                      result.ranking,
+                                    )} place`}</p>
+                                    <ArrowRight style={{ justifySelf: 'start' }} size={16} />
+                                    <p style={{ justifySelf: 'start' }}>
+                                      {` ${toTitleCase(currentTestCase.criteria.predictionField)} ${
+                                        i + 1
+                                      } (Winrate: ${toPercentage(result.winrate)})`}
+                                    </p>
+                                  </Fragment>
+                                ))}
+                            </div>
+                            <p>
+                              <strong>{'Positional bias:'}</strong>
+                            </p>
+                            <p
+                              className={cx({
+                                [classes.errorText]: positionalBiasDetected,
+                              })}
+                            >
+                              {positionalBiasDetected ? 'Detected' : 'Not detected'}
+                            </p>
+                            <p key={'instance-per-response-title'}>
+                              <strong>{`Per ${currentTestCase.criteria.predictionField.toLocaleLowerCase()} results: `}</strong>
+                            </p>
+                            <Accordion className={classes.accordionFullWidth}>
+                              {(selectedInstance.result as PairwiseInstanceResult).perSystemResults!.map(
+                                (responseResults, j) => (
+                                  <AccordionItem
+                                    title={`${toTitleCase(currentTestCase.criteria.predictionField)} ${j + 1}`}
+                                    key={j}
+                                    open={openedPerReponseResults[j]}
+                                    onClick={() => {
+                                      setOpenedPerReponseResults([
+                                        ...openedPerReponseResults.slice(0, j).map(() => false),
+                                        !!!openedPerReponseResults[j],
+                                        ...openedPerReponseResults.slice(j + 1).map(() => false),
+                                      ])
+                                    }}
+                                  >
+                                    <div className={cx(classes.gridTemplate)}>
+                                      <p>
+                                        <strong>{'Ranking: '}</strong>
+                                      </p>
+                                      <p>{`${responseResults.ranking + 1}${getOrdinalSuffix(
+                                        responseResults.ranking + 1,
+                                      )}`}</p>
+                                      <p>
+                                        <strong>{'Winrate: '}</strong>
+                                      </p>
+                                      <p>{toPercentage(responseResults.winrate)}</p>
+                                      <p>
+                                        <strong>{'Contest results: '}</strong>
+                                      </p>
+                                      <UnorderedList>
+                                        {Object.values(responseResults.explanations).map((explanation, i) => (
+                                          <ListItem key={i}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                              <div>
+                                                <p key={i} className={classes.explanation}>
+                                                  <strong>{`${
+                                                    responseResults.contestResults[i] ? 'Won' : 'Lost'
+                                                  } against ${toTitleCase(currentTestCase.criteria.predictionField)} ${
+                                                    responseResults.comparedTo[i] + 1
+                                                  }: `}</strong>
+                                                </p>
+                                                <div>
+                                                  <Markdown components={markdownHeadingConf}>{explanation}</Markdown>
+                                                </div>
+                                                <br />
                                               </div>
-                                            </Tooltip>
-                                          )}
-                                        </div>
-                                      </ListItem>
+                                              {responseResults.positionalBias[i] && (
+                                                <Tooltip label={'Positional bias detected'}>
+                                                  <div className={classes.errorText}>
+                                                    <Warning />
+                                                  </div>
+                                                </Tooltip>
+                                              )}
+                                            </div>
+                                          </ListItem>
+                                        ))}
+                                      </UnorderedList>
+                                    </div>
+                                  </AccordionItem>
+                                ),
+                              )}
+                            </Accordion>
+                          </>
+                        ) : (
+                          <>
+                            <p>
+                              <strong>Selected option:</strong>
+                            </p>
+                            <div>
+                              <p key={'expected-result-value'}>
+                                {selectedInstance.result.selectedOption === 'tie'
+                                  ? 'Tie'
+                                  : `${toTitleCase(currentTestCase.criteria.predictionField)} ${
+                                      Number(selectedInstance.result.selectedOption) + 1
+                                    }`}
+                              </p>
+                            </div>
+                            <p>
+                              <strong>Explanation:</strong>
+                            </p>
+                            <div className="markdown">
+                              <Markdown components={markdownHeadingConf}>
+                                {(selectedInstance.result as PairwiseInstanceResult).explanation}
+                              </Markdown>
+                            </div>
+                          </>
+                        )}
+                        {(selectedInstance.result as PairwiseInstanceResult).positionalBias?.detected && (
+                          <>
+                            <p>
+                              <strong>{'Positional bias result:'}</strong>
+                            </p>
+                            <p key={'expected-result-value'}>
+                              {selectedInstance.result.selectedOption === 'tie'
+                                ? 'Tie'
+                                : `${toTitleCase(currentTestCase.criteria.predictionField)} ${
+                                    Number(
+                                      (selectedInstance.result as PairwiseInstanceResult).positionalBias?.result
+                                        .selectedOption,
+                                    ) + 1
+                                  }`}
+                            </p>
+
+                            <p>
+                              <strong>{'Positional bias explanation:'}</strong>
+                            </p>
+                            <div>
+                              <Markdown components={markdownHeadingConf}>
+                                {(selectedInstance.result as PairwiseInstanceResult).positionalBias?.result.explanation}
+                              </Markdown>
+                            </div>
+                          </>
+                        )}
+                        {selectedInstance.result.metadata && (
+                          <>
+                            {Object.entries(selectedInstance.result.metadata).map(([k, v], i) => (
+                              <React.Fragment key={i}>
+                                <p>
+                                  <strong>{`${capitalizeFirstWord(k)}:`}</strong>
+                                </p>
+                                {typeof v === 'object' && !Array.isArray(v) && v !== null ? (
+                                  <div className={cx(classes.gridTemplate)}>
+                                    {Object.entries(v).map(([metadataKey, metadataValue], i) => (
+                                      <React.Fragment key={i}>
+                                        <p>
+                                          <strong>{`${capitalizeFirstWord(metadataKey)}:`}</strong>
+                                        </p>
+                                        {Array.isArray(v) ? (
+                                          <List>
+                                            {(metadataValue as Array<string>).map((i, j) => (
+                                              <ListItem key={j}>{i}</ListItem>
+                                            ))}
+                                          </List>
+                                        ) : (
+                                          <p style={{ whiteSpace: 'pre-line' }}>
+                                            {(metadataValue as string).toString()}
+                                          </p>
+                                        )}
+                                      </React.Fragment>
                                     ))}
-                                  </UnorderedList>
-                                </div>
-                              </AccordionItem>
-                            ),
-                          )}
-                        </Accordion>
+                                  </div>
+                                ) : (
+                                  <p style={{ whiteSpace: 'pre-line' }}>{capitalizeFirstWord(v.toString())}</p>
+                                )}
+                              </React.Fragment>
+                            ))}
+                          </>
+                        )}
                       </>
                     )}
                   </>
