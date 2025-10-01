@@ -24,7 +24,7 @@ def test_single_criteria_weighted():
 
     result = DirectInstanceResult(
         criteria=criterion,
-        option="Good",
+        selected_option="Good",
         score=1.0,
         explanation="",
         feedback=None,
@@ -62,7 +62,7 @@ def test_multiple_criteria_weighted():
 
     result1 = DirectInstanceResult(
         criteria=criterion1,
-        option="Good",
+        selected_option="Good",
         score=1.0,
         explanation="",
         feedback=None,
@@ -70,7 +70,7 @@ def test_multiple_criteria_weighted():
     )
     result2 = DirectInstanceResult(
         criteria=criterion2,
-        option="Bad",
+        selected_option="Bad",
         score=0.0,
         explanation="",
         feedback=None,
@@ -101,7 +101,7 @@ def test_required_criteria():
 
     result = DirectInstanceResult(
         criteria=criterion,
-        option="Bad",
+        selected_option="Bad",
         score=0.0,
         explanation="",
         feedback=None,
@@ -130,7 +130,7 @@ def test_normalized_scores():
 
     result = DirectInstanceResult(
         criteria=criterion,
-        option="Good",
+        selected_option="Good",
         score=1.0,
         explanation="",
         feedback=None,
@@ -181,7 +181,7 @@ def test_missing_result():
 
     result1 = DirectInstanceResult(
         criteria=criterion1,
-        option="Good",
+        selected_option="Good",
         score=1.0,
         explanation="",
         feedback=None,
@@ -225,7 +225,7 @@ def test_strategy_mix():
 
     result_a = DirectInstanceResult(
         criteria=criterion_a,
-        option="Good",
+        selected_option="Good",
         score=1.0,
         explanation="",
         feedback=None,
@@ -233,7 +233,7 @@ def test_strategy_mix():
     )
     result_b = DirectInstanceResult(
         criteria=criterion_b,
-        option="Correct",
+        selected_option="Correct",
         score=1.0,
         explanation="",
         feedback=None,
@@ -241,7 +241,7 @@ def test_strategy_mix():
     )
     result_c = DirectInstanceResult(
         criteria=criterion_c,
-        option="Yes",
+        selected_option="Yes",
         score=None,
         explanation="",
         feedback=None,
@@ -276,7 +276,7 @@ def test_strategy_mix():
 
     result_d = DirectInstanceResult(
         criteria=criterion_d,
-        option="Yes",
+        selected_option="Yes",
         score=None,
         explanation="",
         feedback=None,
@@ -321,7 +321,7 @@ def test_target_option():
 
     result = DirectInstanceResult(
         criteria=criterion,
-        option="Good",
+        selected_option="Good",
         score=1.0,
         explanation="",
         feedback=None,
@@ -340,7 +340,7 @@ def test_target_option():
 
     result = DirectInstanceResult(
         criteria=criterion,
-        option="Bad",
+        selected_option="Bad",
         score=0.0,
         explanation="",
         feedback=None,
@@ -365,7 +365,7 @@ def test_score_threshold():
 
     result = DirectInstanceResult(
         criteria=criterion,
-        option="Good",
+        selected_option="Good",
         score=1.0,
         explanation="",
         feedback=None,
@@ -384,7 +384,7 @@ def test_score_threshold():
 
     result = DirectInstanceResult(
         criteria=criterion,
-        option="Bad",
+        selected_option="Bad",
         score=0.0,
         explanation="",
         feedback=None,

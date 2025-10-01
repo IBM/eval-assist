@@ -4,11 +4,6 @@ export interface DirectInstanceResultV0 {
   option: string
   positionalBiasOption: string
   certainty: FetchedDirectInstanceResultV0['certainty']
-  positionalBias?: {
-    detected: boolean
-    option: string
-    explanation: string
-  }
   explanation: string
   metadata?: FetchedDirectInstanceResultV0['metadata']
 }
@@ -18,10 +13,18 @@ export interface DirectInstanceResultV1 extends DirectInstanceResultV0 {
   score?: number
 }
 
-export type DirectInstanceResult = DirectInstanceResultV1
+export interface DirectInstanceResultV2 extends Omit<DirectInstanceResultV1, 'option' | 'certainty'> {
+  selectedOption: string
+  positionalBias: {
+    detected: boolean
+    result: DirectInstanceResultV2
+  } | null
+}
+
+export type DirectInstanceResult = DirectInstanceResultV2
 
 export interface PerResponsePairwiseResultV0 {
-  contestResults: boolean[]
+  contestResults: (boolean | string)[]
   positionalBias: boolean[]
   winrate: number
   ranking: number
@@ -33,7 +36,18 @@ export type PerResponsePairwiseResult = PerResponsePairwiseResultV0
 
 export type PairwiseInstanceResultV0 = { [key: string]: PerResponsePairwiseResultV0 }
 
-export type PairwiseInstanceResult = PairwiseInstanceResultV0
+export interface PairwiseInstanceResultV1 {
+  perSystemResults: PerResponsePairwiseResultV0[] | null
+  selectedOption: number | string
+  explanation: string
+  metadata?: { [key: string]: string }
+  positionalBias: {
+    detected: boolean
+    result: PairwiseInstanceResultV1
+  } | null
+}
+
+export type PairwiseInstanceResult = PairwiseInstanceResultV1
 
 export interface FetchedDirectInstanceResultV0 {
   option: string
@@ -53,18 +67,38 @@ export interface FetchedDirectInstanceResultV1 extends FetchedDirectInstanceResu
   score?: number
 }
 
-export type FetchedDirectInstanceResultWithId = {
+export interface FetchedDirectInstanceResultV2
+  extends Omit<FetchedDirectInstanceResultV1, 'option' | 'positional_bias'> {
+  selected_option: string
+  explanation: string
+  positional_bias?: {
+    detected: boolean
+    result: FetchedDirectInstanceResultV2
+  }
+}
+
+export type FetchedDirectInstanceResultWithIdV0 = {
   id: string
   result: FetchedDirectInstanceResultV1
 }
 
-export type FetchedDirectInstanceResult = FetchedDirectInstanceResultV1
+export type FetchedDirectInstanceResultWithIdV1 = {
+  id: string
+  result: FetchedDirectInstanceResultV2
+}
 
-export type FetchedDirectResultsV0 = FetchedDirectInstanceResultWithId[]
-export type FetchedDirectResults = FetchedDirectResultsV0
+export type FetchedDirectInstanceResultWithId = FetchedDirectInstanceResultWithIdV1
+
+export type FetchedDirectInstanceResult = FetchedDirectInstanceResultV2
+
+export type FetchedDirectResultsV0 = FetchedDirectInstanceResultWithIdV0[]
+export type FetchedDirectResultsV1 = FetchedDirectInstanceResultWithIdV1[]
+export type FetchedDirectResults = FetchedDirectResultsV1
 
 export type DirectResultsV0 = DirectInstanceResultV0[]
-export type DirectResults = DirectResultsV0
+export type DirectResultsV1 = DirectInstanceResultV1[]
+export type DirectResultsV2 = DirectInstanceResultV2[]
+export type DirectResults = DirectResultsV2
 
 interface FetchedPerResponsePairwiseResultV0 {
   contest_results: boolean[]
@@ -76,27 +110,55 @@ interface FetchedPerResponsePairwiseResultV0 {
   positional_bias: boolean[]
 }
 
+interface FetchedPerResponsePairwiseResultV1 extends Omit<FetchedPerResponsePairwiseResultV0, 'certainties'> {
+  metadata?: FetchedDirectInstanceResultV0['metadata']
+}
+
 export type FetchedPairwiseInstanceResultV0 = {
   [key: string]: FetchedPerResponsePairwiseResultV0
 }
+
+export interface FetchedPairwiseInstanceResultV1 {
+  per_system_results?: FetchedPerResponsePairwiseResultV1[]
+  selected_option: number | string
+  explanation: string
+  positional_bias?: {
+    detected: boolean
+    result: FetchedPairwiseInstanceResultV1
+  }
+  metadata?: { [key: string]: string }
+}
+
+export type FetchedPairwiseInstanceResult = FetchedPairwiseInstanceResultV1
 
 export type FetchedPairwiseInstanceResultWithIdV0 = {
   id: string
   result: FetchedPairwiseInstanceResultV0
 }
 
-export type FetchedPairwiseResultsV0 = FetchedPairwiseInstanceResultWithIdV0[]
+export type FetchedPairwiseInstanceResultWithIdV1 = {
+  id: string
+  result: FetchedPairwiseInstanceResultV1
+}
 
-export type FetchedPairwiseResults = FetchedPairwiseResultsV0
+export type FetchedPairwiseInstanceResultWithId = FetchedPairwiseInstanceResultWithIdV1
+
+export type FetchedPairwiseResultsV0 = FetchedPairwiseInstanceResultWithIdV0[]
+export type FetchedPairwiseResultsV1 = FetchedPairwiseInstanceResultWithIdV1[]
+
+export type FetchedPairwiseResults = FetchedPairwiseResultsV1
 
 export type PairwiseResultsV0 = PairwiseInstanceResultV0[]
-export type PairwiseResults = PairwiseResultsV0
+export type PairwiseResultsV1 = PairwiseInstanceResultV1[]
+export type PairwiseResults = PairwiseResultsV1
 
-export type FetchedResultsV0 = FetchedDirectResultsV0 | FetchedPairwiseResultsV0 | null
+export type FetchedResultsV0 = FetchedDirectResultsV1 | FetchedPairwiseResultsV1 | null
 
 export type ResultsV0 = DirectResultsV0 | PairwiseResultsV0 | null
+export type ResultsV1 = DirectResultsV1 | PairwiseResultsV1 | null
+export type ResultsV2 = DirectResultsV2 | PairwiseResultsV1 | null
 
-export type Results = ResultsV0
+export type Results = ResultsV2
 
 export interface CriteriaOptionV0 {
   name: string
@@ -108,7 +170,7 @@ export type CriteriaOption = CriteriaOptionV0
 export type InstanceV0 = {
   id: string
   contextVariables: ContextVariableV0[]
-  expectedResult: string
+  expectedResult: string | number
   result: DirectInstanceResult | PairwiseInstanceResult | null
   metadata?: Record<string, any>
 }

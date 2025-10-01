@@ -56,7 +56,7 @@ def test_main_judge():
         instances=instances, criteria=criteria
     )
 
-    assert results[0].option == "Excellent"
+    assert results[0].selected_option == "Excellent"
     assert cast(float, results[1].score) >= 0.5
     assert cast(float, results[2].score) == 0.0
     assert (
@@ -74,13 +74,13 @@ def test_judges_str_params():
         instances=["Refer to the DTO or visit the BO please"],
         criteria="Is the text self explainable?",
     )
-    assert results[0].option == "No"
+    assert results[0].selected_option == "No"
 
 
 @patch(
     "unitxt.inference.CrossProviderInferenceEngine.infer",
     return_value=[
-        '``\n{\n  "assessment": "assessment",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```',
+        '``\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```',
     ],
 )
 def test_direct_judge_mocked_inference_success(mock_infer):
@@ -105,7 +105,7 @@ def test_direct_judge_mocked_inference_success(mock_infer):
 @patch(
     "unitxt.inference.CrossProviderInferenceEngine.infer",
     return_value=[
-        '``\n{\n  "assessment": "assessment",\n  "selected_option": "Excellent",\n  "feedback": "feedback"\n}\n```',
+        '``\n{\n  "explanation": "explanation",\n  "selected_option": "Excellent",\n  "feedback": "feedback"\n}\n```',
     ],
 )
 def test_direct_judge_mocked_inference_failure(mock_infer):
@@ -137,12 +137,12 @@ def test_direct_judge_mocked_inference_failure(mock_infer):
 @patch(
     "unitxt.inference.CrossProviderInferenceEngine.infer",
     side_effect=[
-        ['``\n{\n  "assessment": "assessment",\n  "feedback": "feedback"\n}\n```'],
+        ['``\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```'],
         [
-            '``\n{\n  "assessment": "assessment",\n  "selected_option": "Excellent",\n  "feedback": "feedback"\n}\n```'
+            '``\n{\n  "explanation": "explanation",\n  "selected_option": "Excellent",\n  "feedback": "feedback"\n}\n```'
         ],
         [
-            '``\n{\n  "assessment": "assessment",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
+            '``\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
         ],
     ],
 )

@@ -22,19 +22,6 @@ from .types import Criteria, DirectInstance, DirectInstanceResult
 logger = logging.getLogger(__name__)
 
 
-class SafeEventLoopPolicy(asyncio.DefaultEventLoopPolicy):
-    def get_event_loop(self):
-        try:
-            return super().get_event_loop()
-        except RuntimeError:
-            loop = self.new_event_loop()
-            self.set_event_loop(loop)
-            return loop
-
-
-asyncio.set_event_loop_policy(SafeEventLoopPolicy())
-
-
 class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
     generate_synthetic_persona: bool
     generate_feedback: bool
@@ -119,7 +106,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
 
                 parsed_response = klass(
                     selected_option=selected_option,
-                    assessment="",
+                    explanation="",
                 )
                 metadata["generation_failed"] = True
                 metadata["generation_failed_original_output"] = unparsed_response
@@ -206,7 +193,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                 )
                 persona_description: str = Field(
                     ...,
-                    description="The description of why the <persona_name> is ideal to perform the evaluation. Don't include the the initial 'you'. For example: 'an expert on evaluating text based on a rubric' or 'a customer support specialist experienced in clarity and tone assessment'.",
+                    description="The description of why the <persona_name> is ideal to perform the evaluation. Don't include the the initial 'you'. For example: 'an expert on evaluating text based on a rubric' or 'a customer support specialist experienced in clarity and tone explanation'.",
                 )
 
             synthetic_persona_klasses.append(SyntheticPersona)
@@ -318,7 +305,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
 
         field_defs = [
             (
-                "assessment",
+                "explanation",
                 str,
                 Field(..., description="Step by step explanation of the evaluation"),
                 [],
@@ -343,7 +330,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                     str,
                     Field(
                         default="",
-                        description=f"Actionable suggestions that would help improve the evaluated {criterion.prediction_field if criterion.prediction_field is not None else 'response'} based on the assessment",
+                        description=f"Actionable suggestions that would help improve the evaluated {criterion.prediction_field if criterion.prediction_field is not None else 'response'} based on the explanation",
                     ),
                     [],
                 )
@@ -422,7 +409,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
             prediction_fields.append(prediction_field)
 
             feedback_step_section = (
-                f'5. At the end, provide "feedback" consisting of actionable suggestions that would help improve the evaluated {prediction_field}. Unlike the assessment, which explains the reasoning behind the judgment, the feedback should focus on guiding refinement. For example, in creative writing, it could suggest improving clarity, coherence, or narrative flow. In analytical tasks, it could recommend strengthening evidence, refining arguments, or correcting inaccuracies. Keep feedback concise and specific enough to support iterative improvement. If you consider that the {prediction_field} is optimal, leave the "feedback" field empty ("")'
+                f'5. At the end, provide "feedback" consisting of actionable suggestions that would help improve the evaluated {prediction_field}. Unlike the explanation, which explains the reasoning behind the judgment, the feedback should focus on guiding refinement. For example, in creative writing, it could suggest improving clarity, coherence, or narrative flow. In analytical tasks, it could recommend strengthening evidence, refining arguments, or correcting inaccuracies. Keep feedback concise and specific enough to support iterative improvement. If you consider that the {prediction_field} is optimal, leave the "feedback" field empty ("")'
                 if self.generate_feedback
                 else ""
             )
@@ -487,9 +474,9 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                 ## Important steps:
 
                 1. Think step-by‑step through your reasoning about which option best fits.
-                2. Write your full chain‑of‑thought *only* inside the `assessment` JSON field.
+                2. Write your full chain‑of‑thought *only* inside the `explanation` JSON field.
                 3. The chain-of-thought should use markdown code for easier reading and parsing.
-                4. Set `"selected_option"` to one of the provided options based on the assessment.
+                4. Set `"selected_option"` to one of the provided options based on the explanation.
                 {feedback_step_section}
 
                 ## Criteria:{criteria_name_section}
@@ -556,7 +543,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
             ],
         )
 
-        explanations: list[str] = [r.assessment for r in parsed_responses]
+        explanations: list[str] = [r.explanation for r in parsed_responses]
         selected_options: list[str] = [r.selected_option for r in parsed_responses]
         feedbacks: list[str | None] = [
             None if not self.generate_feedback else r.feedback for r in parsed_responses
@@ -565,7 +552,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
             DirectInstanceResult(
                 instance=instance,
                 criteria=criterion,
-                option=selected_option,
+                selected_option=selected_option,
                 explanation=explanation,
                 feedback=feedback,
                 # score=next(iter(option.name for option in criterion.options if option.name == selected_option)).score,
@@ -595,7 +582,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
     ) -> list[DirectInstanceResult]:
         field_defs: list[tuple[str, type, Any, list[Callable[..., Any]]]] = [
             (
-                "assessment",
+                "explanation",
                 str,
                 Field(..., description="Step by step explanation of the evaluation"),
                 [],
@@ -735,7 +722,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
             ),
         )
 
-        explanations: list[str] = [r.assessment for r in parsed_responses]
+        explanations: list[str] = [r.explanation for r in parsed_responses]
         selected_options: list[str] = [
             getattr(r, "selected_option", str(getattr(r, "selected_score", None)))
             for r in parsed_responses
@@ -743,7 +730,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
 
         return [
             DirectInstanceResult(
-                option=selected_option,
+                selected_option=selected_option,
                 score=float(selected_option) if is_float(selected_option) else None,
                 explanation=explanation,
                 metadata={

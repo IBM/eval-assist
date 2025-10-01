@@ -15,6 +15,7 @@ import {
   CriteriaWithOptions,
   DirectInstance,
   DirectInstanceResult,
+  DirectResults,
   EvaluationType,
   Instance,
   PairwiseInstance,
@@ -109,22 +110,23 @@ export const TestDataTableRow = ({
         type,
         () => (criteria as CriteriaWithOptions).options.map((option) => ({ value: option.name, text: option.name })),
 
-        () => responses.map((_, i) => ({ text: `${toTitleCase(criteria.predictionField)} ${i + 1}`, value: i + 1 })),
+        () => [
+          ...responses.map((_, i) => ({ text: `${toTitleCase(criteria.predictionField)} ${i + 1}`, value: i })),
+          { text: 'Tie', value: 'tie' },
+        ],
       ).filter((option) => option.text !== ''),
     [type, criteria, responses],
   )
 
   const positionalBiasDetected = useMemo(() => {
     if (instance.result === null) return false
-    return returnByPipelineType(
-      type,
-      () => (instance.result as DirectInstanceResult).positionalBias?.detected || false,
-      () =>
-        Object.values(instance.result as PairwiseInstanceResult).some((instance) =>
-          instance.positionalBias.some((pb) => pb),
-        ),
-    )
-  }, [instance, type])
+    return instance.result.positionalBias ? instance.result.positionalBias.detected : false
+  }, [instance])
+
+  const pairwiseWinnerIndexOrTie = useMemo(() => {
+    if (instance.result === null || type !== EvaluationType.PAIRWISE) return null
+    return (instance.result as PairwiseInstanceResult).selectedOption
+  }, [instance.result, type])
 
   const result = useMemo<{ result: string; positionalBias: boolean; agreement: boolean } | null>(() => {
     if (type == EvaluationType.DIRECT) {
@@ -132,22 +134,21 @@ export const TestDataTableRow = ({
       const result = directInstance.result as DirectInstanceResult
       if (!result) return null
       return {
-        result: (result as DirectInstanceResult).option,
+        result: (result as DirectInstanceResult).selectedOption,
         positionalBias: positionalBiasDetected,
-        agreement: result.option === directInstance.expectedResult,
+        agreement: result.selectedOption === directInstance.expectedResult,
       }
     } else {
       const pairwiseInstance = instance as PairwiseInstance
-      if (pairwiseInstance.result === null) return null
-      const winnerIndex = Object.values(pairwiseInstance.result).findIndex((r) => r.ranking === 1)
-      const winner = `Response ${winnerIndex + 1}`
+      if (pairwiseInstance.result === null || pairwiseWinnerIndexOrTie === null) return null
+      const winner = pairwiseWinnerIndexOrTie === 'tie' ? 'Tie' : `Response ${Number(pairwiseWinnerIndexOrTie) + 1}`
       return {
         result: winner,
         positionalBias: positionalBiasDetected,
-        agreement: `${winnerIndex + 1}` === instance.expectedResult,
+        agreement: pairwiseWinnerIndexOrTie == instance.expectedResult,
       }
     }
-  }, [instance, positionalBiasDetected, type])
+  }, [instance, pairwiseWinnerIndexOrTie, positionalBiasDetected, type])
 
   const onExpandInstance = () => {
     setSelectedInstance(instance)
@@ -158,13 +159,6 @@ export const TestDataTableRow = ({
     addInstance({ ...instance, id: generateId() })
   }
 
-  const pairwiseWinnerIndex = useMemo(() => {
-    if (instance.result === null || type !== EvaluationType.PAIRWISE) return null
-    return Object.values(instance.result as PairwiseInstanceResult)
-      .map((r) => r.ranking)
-      .indexOf(1)
-  }, [instance.result, type])
-
   return (
     <>
       <RemovableSection
@@ -174,7 +168,11 @@ export const TestDataTableRow = ({
         onEvaluateInstance={() => {
           runEvaluation([instance.id])
         }}
-        onFixInstance={instance.result?.feedback ? () => fixInstance(instance.id) : null}
+        onFixInstance={
+          type == EvaluationType.DIRECT && (instance.result as DirectInstanceResult)?.feedback
+            ? () => fixInstance(instance.id)
+            : null
+        }
         removeEnabled={removeEnabled}
       >
         {({ setActive, setInactive }) => (
@@ -187,7 +185,7 @@ export const TestDataTableRow = ({
             <div className={cx(classes.tableRowSection)}>
               {responses.map((response, i) => (
                 <div key={i} style={{ position: 'relative', height: '100%' }}>
-                  {!evaluationRunning && i === pairwiseWinnerIndex && (
+                  {!evaluationRunning && i === pairwiseWinnerIndexOrTie && (
                     <Tooltip
                       label={'Winner'}
                       style={{
@@ -273,18 +271,12 @@ export const TestDataTableRow = ({
                         onFocus={setActive}
                         onBlur={setInactive}
                       >
-                        <strong>
-                          {returnByPipelineType(
-                            type,
-                            result.result,
-                            `${toTitleCase(criteria.predictionField)} ${pairwiseWinnerIndex! + 1}`,
-                          )}
-                        </strong>
+                        <strong>{result.result}</strong>
                       </div>
                       {result.positionalBias && (
                         <div className={cx(classes.positionalBias)}>{'Positional bias detected'}</div>
                       )}
-                      {instance.expectedResult && (
+                      {instance.expectedResult !== '' && (
                         <div
                           className={cx(classes.resultBlockTypography, {
                             [classes.untrastedResultTypography]: !result.agreement,

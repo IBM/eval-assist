@@ -487,7 +487,7 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
         return [
             DirectInstanceResult(
                 criteria=criterion,
-                option=selected_option,
+                selected_option=selected_option,
                 explanation=explanation,
                 metadata={"Number of stages": str(stages_count)},
             )

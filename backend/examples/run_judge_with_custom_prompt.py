@@ -33,7 +33,7 @@ results = judge.evaluate_with_custom_prompt(
 )
 
 print("### Selected option / Score")
-print(f"{results[0].option} / {results[0].score}")
+print(f"{results[0].selected_option} / {results[0].score}")
 """
 5 / 5.0
 """

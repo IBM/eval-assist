@@ -7,13 +7,13 @@ if __name__ == "__main__":
     MAX_WORKERS = 1
     BATCH_SIZE = 25
     RITS_API_KEYS = None
-    INSTANCES_PER_DATASET = None
+    INSTANCES_PER_DATASET = 300
     # List of models to benchmark
     MODELS = [
-        # "gpt-oss-120b",
+        "gpt-oss-120b",
         # "llama-3-3-70b-instruct",
         # "llama-4-scout",
-        "llama-4-maverick",
+        # "llama-4-maverick",
         # "granite-3-3-8b-instruct",
         # "deepseek-v3",
         # "phi-4",
@@ -37,7 +37,7 @@ if __name__ == "__main__":
             DirectJudge,
             {
                 "generate_synthetic_persona": False,
-                "self_consistency": True,
+                "self_consistency": False,
             },
             {
                 "temperature": 1.0,

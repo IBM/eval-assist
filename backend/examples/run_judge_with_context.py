@@ -99,7 +99,7 @@ results = judge(instances, criteria_list)
 for i, r in enumerate(results):
     print(f"## Result {i + 1}")
     print("### Selected option / Score")
-    print(f"{results[i].option} / {results[i].score}")
+    print(f"{results[i].selected_option} / {results[i].score}")
     # print("\n### Explanation")
     # print(results[i].explanation)
 """

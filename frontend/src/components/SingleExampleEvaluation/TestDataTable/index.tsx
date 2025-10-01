@@ -74,18 +74,10 @@ export const TestDataTable = ({ style, className }: Props) => {
 
   const noPositionalBias = useMemo(() => {
     if (!resultsAvailable) return
-    return currentTestCase.type === EvaluationType.DIRECT
-      ? (instances as DirectInstance[])?.every(
-          (instance) => (instance.result as DirectInstanceResult)?.positionalBias?.detected == false,
-        )
-      : (instances as PairwiseInstance[])?.every(
-          (instance) =>
-            instance.result === null ||
-            Object.values(instance.result as PairwiseInstanceResult).every((perResponseResults) =>
-              perResponseResults.positionalBias.every((pBias) => pBias === false),
-            ),
-        )
-  }, [currentTestCase.type, instances, resultsAvailable])
+    return instances.some((instance) =>
+      instance.result?.positionalBias ? instance.result.positionalBias.detected : false,
+    )
+  }, [instances, resultsAvailable])
 
   const addEmptyRow = () => {
     let newEmptyInstance: Instance = {
