@@ -374,6 +374,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
         output_parsers: list[OutputFixingParser] = []
         format_instructions_list = []
         criteria_options_list = []
+        criteria_option_names_list = []
         classes = []
         feedback_step_sections = []
         prediction_fields = []
@@ -399,6 +400,10 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                     for option in criterion.options
                 ]
             )
+            criteria_option_names_list.append(
+                ", ".join([f'"{option.name}"' for option in criterion.options])
+            )
+
             criteria_options_list.append(criteria_options)
 
             prediction_field = (
@@ -409,7 +414,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
             prediction_fields.append(prediction_field)
 
             feedback_step_section = (
-                f'5. At the end, provide "feedback" consisting of actionable suggestions that would help improve the evaluated {prediction_field}. Unlike the explanation, which explains the reasoning behind the judgment, the feedback should focus on guiding refinement. For example, in creative writing, it could suggest improving clarity, coherence, or narrative flow. In analytical tasks, it could recommend strengthening evidence, refining arguments, or correcting inaccuracies. Keep feedback concise and specific enough to support iterative improvement. If you consider that the {prediction_field} is optimal, leave the "feedback" field empty ("")'
+                f'6. At the end, provide "feedback" consisting of actionable suggestions that would help improve the evaluated {prediction_field}. Unlike the explanation, which explains the reasoning behind the judgment, the feedback should focus on guiding refinement. For example, in creative writing, it could suggest improving clarity, coherence, or narrative flow. In analytical tasks, it could recommend strengthening evidence, refining arguments, or correcting inaccuracies. Keep feedback concise and specific enough to support iterative improvement. If you consider that the {prediction_field} is optimal, leave the "feedback" field empty ("")'
                 if self.generate_feedback
                 else ""
             )
@@ -440,12 +445,12 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                 )
             else:
                 persona_name, persona_description = (
-                    "an evaluator",
-                    "an expert on evaluating text based on a rubric.",
+                    "an expert evaluator",
+                    "a judge whose job is to evaluate a text against a criterion and optional context. You objective and concise.",
                 )
                 personas = [(persona_name, persona_description)] * len(criteria)
             judge_description_sections = [
-                f"You are a {persona_name}. You are {persona_description}"
+                f"You are {persona_name}. You are {persona_description}"
                 for persona_name, persona_description in personas
             ]
 
@@ -471,12 +476,13 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                 - **Optional context**
                 - **The {prediction_field}** to evaluate
 
-                ## Important steps:
+                ## Required evaluation behavior (follow these precisely):
 
-                1. Think step-by‑step through your reasoning about which option best fits.
-                2. Write your full chain‑of‑thought *only* inside the `explanation` JSON field.
-                3. The chain-of-thought should use markdown code for easier reading and parsing.
-                4. Set `"selected_option"` to one of the provided options based on the explanation.
+                1. Read the *criterion* and the *context* carefully.
+                2. Compare the {prediction_field} to the criterion and the context.
+                3. Decide which criterion option best fits the {prediction_field}.
+                4. Write your reasoning in the `"explanation"`, using clear markdown bullet points that describe why one response is better. Keep it concise and factual.
+                5. Set `"selected_option"` to exactly one of the following values: {criteria_option_names}.
                 {feedback_step_section}
 
                 ## Criteria:{criteria_name_section}
@@ -510,8 +516,9 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                 prediction_field=prediction_field,
                 feedback_step_section=feedback_step_section,
                 judge_description_section=judge_description_section,
+                criteria_option_names=criteria_option_names,
             )
-            for prediction, context_section, criterion, criterion_options, format_instructions, prediction_field, feedback_step_section, judge_description_section in zip(
+            for prediction, context_section, criterion, criterion_options, format_instructions, prediction_field, feedback_step_section, judge_description_section, criteria_option_names in zip(
                 predictions,
                 context_sections,
                 criteria,
@@ -520,6 +527,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
                 prediction_fields,
                 feedback_step_sections,
                 judge_description_sections,
+                criteria_option_names_list,
             )
         ]
 
