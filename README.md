@@ -89,6 +89,8 @@ results = judge(
 )
 ```
 
+If using the backend standalone, there is no need to install the `webapp` extras.
+
 Look at the documentation [of the judges sub-package](/backend/src/evalassist/judges/README.md).
 
 ## Contributing

@@ -1,8 +1,10 @@
-# EvalAssist Judges Module
+# EvalAssist Judges package
 
 ## Overview
 
-The judges module is a component of the EvalAssist project, designed to evaluate instances against a set of criteria. It provides a flexible framework for different types of evaluations, including direct and pairwise assessments.
+The judges module is the core component of the EvalAssist project, designed to evaluate instances against a set of criteria. It provides a flexible framework for different types of evaluations, including direct and pairwise assessments.
+
+To use this package, you will have to install evalassist first (e.g. `pip install evalassist` or your installation method of preference). Then, you can import any judge from `evalassist.judges`. For example: `from evalassist.judges import BaseDirectJudge`.
 
 ## Key Components
 
@@ -13,6 +15,7 @@ The module defines several key types in [`types.py`](./types.py):
 * `Instance`: Abstract base class for evaluation instances.
 * `DirectInstance` and `PairwiseInstance`: Concrete subclasses for direct and pairwise evaluations.
 * `Criteria` and `CriteriaOption`: Classes representing evaluation criteria and their options.
+* `InstanceWithGroundTruth`: Class representing an instance with its ground truth.
 * `DirectInstanceResult` and `PairwiseInstanceResult`: Classes for storing evaluation results.
 * `MultiCriteria` and `MultiCriteriaItem`: Classes for defining and evaluating multiple criteria simultaneously on direct assessment evaluation.
 * `MultiCriteriaItemResult`: Class for storing results of multi-criteria item direct evaluation.
@@ -23,11 +26,11 @@ The module defines several key types in [`types.py`](./types.py):
 The `base.py` file contains abstract base classes for judges:
 
 * `Judge`: The main abstract base class for all judges.
-* `DirectJudge` and `PairwiseJudge`: Abstract subclasses for direct and pairwise evaluation judges.
+* `BaseDirectJudge` and `BasePairwiseJudge`: Abstract subclasses for direct and pairwise evaluation judges.
 
 ## Contributing a judge implementation
 
-To create a custom judge, you can subclass `DirectJudge` or `PairwiseJudge` and implement the `_run()` methods. This method is in charge of evaluating a list of instances on a list a criteria. The parent methods `evaluate()` and `_evaluate()` take care of adjusting the criteria and replicating the instances as needed based on the `check_positional_bias` and `self_consistency` values.
+To create a custom judge, you can subclass `BaseDirectJudge` or `BasePairwiseJudge` and implement the `_run()` methods. This method is in charge of evaluating a list of instances on a list a criteria. The parent methods `evaluate()` and `_evaluate()` take care of adjusting the criteria and replicating the instances as needed based on the `check_positional_bias` and `self_consistency` values.
 
 ## Evaluation Process
 
@@ -43,7 +46,7 @@ The evaluation process involves:
 Evaluation results content vary between direct, pairwise and multiple criteria evaluations.
 
 * **Direct single criteria result** (DirectInstanceResult): contains information such as the selected option, score, explanation, feedback, positional bias and metadata (depends on the Judge, e.g. the prompt used).
-* **Pairwise single criteria result** (PairwiseInstanceResult): Contains detailed information of the contests of the different compared responses: contest results, compared to, explanations, positional bias, certainty, winrate, ranking, selections
+* **Pairwise single criteria result** (PairwiseInstanceResult): Contains both gloabal and detailed information of the contests of the different compared responses: contest results, compared to, explanations, positional bias, certainty, winrate, ranking, selections
 * **Direct multiple criteria result** (MultiCriteriaDirectInstanceResult): contains the aggregated score (between 0.0 and 1.0) even if the single criteria doesn't have a numeric score, per criterion score (the numeric score per criterion once weight was applied) and the single criteria results for each instance.
 * **Pairwise multiple criteria result**: not implemented yet.
 
@@ -53,10 +56,10 @@ The `evaluate` method of judges is flexible and can be called with simplified pa
 
 ### Example Usage
 
-The `backend/examples/run_judge.py` file demonstrates how to use the `DirectJudge` class:
+The `backend/examples/run_judge.py` file demonstrates how to use the `BaseDirectJudge` class:
 
 ```python
-from evalassist.judges import DirectJudge
+from evalassist.judges import BaseDirectJudge
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from unitxt.inference import CrossProviderInferenceEngine
 
@@ -104,7 +107,7 @@ By default, the scores for each criterion are normalized between 0 and 1 based o
 Here's an example of how to use multi-criteria evaluation:
 
 ```python
-from evalassist.judges import DirectJudge, MultiCriteria, MultiCriteriaItem
+from evalassist.judges import BaseDirectJudge, MultiCriteria, MultiCriteriaItem
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from unitxt.inference import CrossProviderInferenceEngine
 
@@ -161,6 +164,7 @@ print(results[0].per_criterion_score)
 
 EvalAssist implements a [Judge API](./base.py) for easily defining and trying different LLM judges. Currently, the following judges are available:
 
+* **PairwiseJudge**: A judge that compares two or more responses to determine which is better based on the given criteria. It is particularly useful for evaluating the quality of responses in a pairwise manner. Each comparison requires one model call as all responses are compared at once.
 * **DirectJudge**: main judge implementation. A judge that uses structured output parsing to make evaluations. It accepts the following parameters:
 
   * `generate_feedback`: generate feedback as actionable suggestions if the evaluation result is not optimal. Can be used to automatically fix the evaluated text.
