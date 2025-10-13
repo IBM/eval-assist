@@ -112,7 +112,7 @@ class BaseJudge(
 
     def evaluate(
         self,
-        instances: list[InstanceTypeVar] | list[str],
+        instances: list[InstanceTypeVar] | list[str] | list[list[str]],
         criteria: Criteria | list[Criteria] | str,
     ) -> list[ReturnVarType]:
         """Run the judge on a batch of instances and return the results."""
@@ -518,7 +518,11 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
         instances: list[PairwiseInstance] | list[str] | list[list[str]],
     ) -> list[PairwiseInstance]:
         parsed_instances: list[PairwiseInstance]
-        if isinstance(instances, list) and all(isinstance(x, str) for x in instances):
+        if (
+            isinstance(instances, list)
+            and all(isinstance(x, list) for x in instances)
+            and all(isinstance(y, str) for x in instances for y in x)
+        ):
             parsed_instances = cast(
                 list[PairwiseInstance],
                 [
@@ -531,8 +535,12 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
                     for i in cast(list[list[str]], instances)
                 ],
             )
-        else:
+        elif all(isinstance(x, PairwiseInstance) for x in instances):
             parsed_instances = cast(list[PairwiseInstance], instances)
+        else:
+            raise ValueError(
+                f"Invalid instance type. Type must be list[list[str]] or list[PairwiseInstance]. Receive {type(instances[0])}"
+            )
         return parsed_instances
 
     def _get_parsed_criteria(
