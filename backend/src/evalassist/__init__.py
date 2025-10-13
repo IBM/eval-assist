@@ -3,6 +3,7 @@ import logging
 import litellm
 
 litellm.drop_params = True
+litellm.disable_aiohttp_transport = True
 
 # print(
 #     r"""
