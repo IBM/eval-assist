@@ -65,6 +65,10 @@ class UnitxtJudge(
         self, instances: list[InstanceTypeVar], criteria: list[Criteria]
     ) -> list[ReturnVarType]:
         # unitxt has a fixed task input fields, so we will add all of them in case different criterias have different prediction and/or context fields
+        for criterion in criteria:
+            if criterion.prediction_field is None:
+                criterion.prediction_field = "response"
+
         all_context_fields: set[str] = set(
             [
                 list_item
@@ -101,7 +105,6 @@ class UnitxtJudge(
         input_fields.update(
             {field: self.get_prediction_type() for field in all_prediction_fields}
         )
-
         # add the context fields
         task_data: list[dict[str, str | list[str]]] = [
             {
@@ -110,9 +113,7 @@ class UnitxtJudge(
             }
             for instance, prediction, criterion in zip(instances, predictions, criteria)
         ]
-
         # add the context fields as empty strings in case different criteria provide diffent context names or prediction_field names
-
         task_data = [
             {
                 k: (td[k] if k in td else "")
@@ -126,7 +127,6 @@ class UnitxtJudge(
                 for td, c in zip(task_data, criteria)
             ]
         }
-
         card = TaskCard(
             loader=LoadFromDictionary(data=data, data_classification_policy=["public"]),
             preprocess_steps=self.get_preprocess_steps(),
