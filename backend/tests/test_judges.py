@@ -4,11 +4,13 @@ from unittest.mock import patch
 import pytest
 from evalassist.judges import (
     Criteria,
+    CriteriaOption,
     DirectInstance,
     DirectInstanceResult,
     DirectJudge,
     UnitxtDirectJudge,
 )
+from evalassist.judges.types import InstanceWithGroundTruth
 from unitxt.artifact import fetch_artifact
 from unitxt.inference import CrossProviderInferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions
@@ -121,7 +123,7 @@ def test_direct_judge_mocked_inference_failure(mock_infer):
         on_generation_failure="raise",
     )
 
-    instances = [
+    instances: list[DirectInstance] = [
         DirectInstance(
             context={"question": "What is the capital of Argentina?"},
             response="Buenos Aires",
@@ -168,3 +170,142 @@ def test_direct_judge_mocked_inference_almost_failure(mock_infer):
     judge.evaluate(instances=instances, criteria="Is the response faithful?")
 
     assert mock_infer.call_count == 3
+
+
+def test_direct_judge_mocked_inference_almost_failure_2():
+    """In this test, the first call to inference engine is mocked and set to an invalid output generator, so the parser fails first time.
+
+    The second time the inference engine is called is when the output fixing parser invokes it to fix the invalid judge generation.
+
+    We add this test to make sure there are no thread/async related issues.
+    """
+    # ✅ Store the real method before patching
+    real_infer = CrossProviderInferenceEngine.infer
+
+    with patch.object(CrossProviderInferenceEngine, "infer") as mock_infer:
+
+        def side_effect(*args, **kwargs):
+            if mock_infer.call_count == 1:
+                return [
+                    '``\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```',
+                    '``\n{\n  "explanation": "explanation",\n  "feedback": "feedback", "selected_option": "No"\n}\n```',
+                ]
+            return real_infer(inference_engine, *args, **kwargs)
+
+        mock_infer.side_effect = side_effect
+
+        inference_engine = CrossProviderInferenceEngine(
+            model="llama-3-3-70b-instruct",
+            provider="watsonx",
+            use_cache=False,
+        )
+        judge = DirectJudge(
+            inference_engine=inference_engine,
+            generate_feedback=True,
+            on_generation_failure="raise",
+        )
+
+        instances = [
+            DirectInstance(
+                context={"question": "What is the capital of Argentina?"},
+                response="Buenos Aires",
+            ),
+            DirectInstance(
+                context={"question": "Who was the president of France in 2008?"},
+                response="Pitagoras",
+            ),
+        ]
+
+        result = judge.evaluate(
+            instances=instances, criteria="Is the response faithful?"
+        )
+
+        print(result[0].model_dump_json(indent=4))
+
+
+@patch(
+    "unitxt.inference.CrossProviderInferenceEngine.infer",
+    side_effect=[
+        [
+            '``\n{\n  "persona_name": "persona_name",\n  "persona_description": "persona_description"\n}\n```'
+        ],
+        [
+            '``\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
+        ],
+    ],
+)
+def test_direct_judge_with_synthetic_persona_mocked_inference_success(mock_infer):
+    inference_engine = CrossProviderInferenceEngine(
+        model="llama-3-3-70b-instruct",
+        provider="watsonx",
+        use_cache=False,
+    )
+    judge = DirectJudge(
+        inference_engine=inference_engine,
+        generate_feedback=True,
+        generate_synthetic_persona=True,
+    )
+
+    instances = [
+        DirectInstance(
+            context={"question": "What is the capital of Argentina?"},
+            response="Buenos Aires",
+        )
+    ]
+
+    response = judge.evaluate(instances=instances, criteria="Is the response faithful?")
+    assert mock_infer.call_count == 2
+    assert "persona_name" in response[0].metadata["prompt"]
+
+
+@patch(
+    "unitxt.inference.CrossProviderInferenceEngine.infer",
+    side_effect=[
+        [
+            '``\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
+        ],
+    ],
+)
+def test_direct_judge_with_ice_mocked_inference_success(mock_infer):
+    inference_engine = CrossProviderInferenceEngine(
+        model="llama-3-3-70b-instruct",
+        provider="watsonx",
+        use_cache=False,
+    )
+    judge = DirectJudge(inference_engine=inference_engine, generate_feedback=True)
+
+    instances = [
+        DirectInstance(
+            context={"question": "What is the capital of Argentina?"},
+            response="Buenos Aires",
+        )
+    ]
+
+    criteria: Criteria = Criteria(
+        name="faithfulness",
+        description="Is the response faithful?",
+        options=[
+            CriteriaOption(
+                name="Yes",
+            ),
+            CriteriaOption(
+                name="No",
+            ),
+        ],
+        examples=[
+            InstanceWithGroundTruth(
+                instance=DirectInstance(
+                    context={"question": "What is the capital of France?"},
+                    response="Paris",
+                ),
+                ground_truth="Yes",
+            )
+        ],
+    )
+
+    response = judge.evaluate(instances=instances, criteria=criteria)
+    assert mock_infer.call_count == 1
+    assert (
+        "## Examples" in response[0].metadata["prompt"]
+        and "Paris" in response[0].metadata["prompt"]
+    )
