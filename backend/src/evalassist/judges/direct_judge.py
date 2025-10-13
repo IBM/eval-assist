@@ -189,21 +189,33 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
         output_parsers = []
         format_instructions = []
         for criterion in unique_criteria:
-
-            class SyntheticPersona(BaseModel):
-                persona_name: str = Field(
-                    default=...,
-                    description=f"The name of the persona responsible for evaluating the {criterion.prediction_field} according to the criterion {criterion.name}.",
-                )
-                persona_description: str = Field(
-                    ...,
-                    description="The description of why the <persona_name> is ideal to perform the evaluation. Don't include the the initial 'you'. For example: 'an expert on evaluating text based on a rubric' or 'a customer support specialist experienced in clarity and tone explanation'.",
-                )
-
-            synthetic_persona_klasses.append(SyntheticPersona)
+            dynamic_model = generate_dynamic_pydantic_model(
+                model_name="structured_output_model",
+                field_definitions=[
+                    (
+                        "persona_name",
+                        str,
+                        Field(
+                            ...,
+                            description=f"The name of the persona responsible for evaluating the {criterion.prediction_field} according to the criterion {criterion.name}.",
+                        ),
+                        [],
+                    ),
+                    (
+                        "persona_description",
+                        str,
+                        Field(
+                            ...,
+                            description="The description of why the <persona_name> is ideal to perform the evaluation. Don't include the the initial 'you'. For example: 'an expert on evaluating text based on a rubric' or 'a customer support specialist experienced in clarity and tone explanation'.",
+                        ),
+                        [],
+                    ),
+                ],
+            )
+            synthetic_persona_klasses.append(dynamic_model)
 
             output_parser: OutputFixingParser = self.get_pydantic_output_fixing_parser(
-                SyntheticPersona
+                dynamic_model
             )
             output_parsers.append(output_parser)
             format_instructions.append(output_parser.get_format_instructions())
