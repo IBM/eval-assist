@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 from collections import Counter
 from dataclasses import dataclass
@@ -28,6 +29,9 @@ from .types import (
     PairwiseInstanceResult,
     PairwisePositionalBiasResult,
 )
+
+logger = logging.getLogger(__name__)
+
 
 # ----------------------------------------------------------------------
 # Core abstract judge definition
