@@ -216,11 +216,7 @@ def test_direct_judge_mocked_inference_almost_failure_2():
             ),
         ]
 
-        result = judge.evaluate(
-            instances=instances, criteria="Is the response faithful?"
-        )
-
-        print(result[0].model_dump_json(indent=4))
+        judge.evaluate(instances=instances, criteria="Is the response faithful?")
 
 
 @patch(
@@ -309,3 +305,70 @@ def test_direct_judge_with_ice_mocked_inference_success(mock_infer):
         "## Examples" in response[0].metadata["prompt"]
         and "Paris" in response[0].metadata["prompt"]
     )
+
+
+@patch(
+    "unitxt.inference.CrossProviderInferenceEngine.infer",
+    side_effect=[
+        [
+            '{"explanation": "The answer directly states that Albert Einstein developed the theory of relativity in the early 20th century, which is fully supported by the context provided. The context explicitly mentions that Albert Einstein, a German-born physicist, developed the theory of relativity in the early 20th century, making the answer fully grounded in the given information.", "selected_score": 5}'
+        ],
+        [
+            '{"explanation": "explanation", "selected_option": "Yes"}',
+        ],
+    ],
+)
+def test_direct_judge_custom_prompt_mocked_inference_success(mock_infer):
+    inference_engine = CrossProviderInferenceEngine(
+        model="llama-3-3-70b-instruct",
+        provider="watsonx",
+        use_cache=False,
+    )
+    judge = DirectJudge(inference_engine=inference_engine)
+
+    judge_prompt = """You are an expert grader. Your job is to evaluate how factually grounded an AI-generated answer is, based on a given context. From provider combination of Question, Context and Answer, you must judge whether the answer contains any hallucinations — i.e., information not found or contradicted by the context.
+
+## Grading Scale:
+Rate the answer from 1 to 5 using this rubric:
+
+- 5: Fully grounded — All parts of the answer are directly supported by the context.
+- 4: Mostly grounded — Minor details may be unverifiable, but the answer is mostly faithful.
+- 3: Partially grounded — Some parts are correct, some are not verifiable or possibly incorrect.
+- 2: Minimally grounded — Most of the content is unsupported or speculative.
+- 1: Not grounded — The answer contradicts or fabricates facts entirely.
+
+Question: Who developed the theory of relativity?
+Context:
+Albert Einstein, a German-born physicist, developed the theory of relativity in the early 20th century. It revolutionized theoretical physics and introduced concepts such as time dilation and the equivalence of mass and energy.",
+Answer: The theory of relativity was developed by Albert Einstein in the early 20th century."""
+
+    results = judge.evaluate_with_custom_prompt(
+        judge_prompts=[judge_prompt],
+        valid_outputs=(1, 5),  # or [1, 2, 3, 4, 5]
+    )
+
+    mock_infer.assert_called_once()
+
+    assert results[0].score == 5
+
+    judge_prompt = """You are an expert judge. Your job is to evaluate how factually grounded an AI-generated answer is, based on a given context. From provider combination of Question, Context and Answer, you must judge whether the answer contains any hallucinations — i.e., information not found or contradicted by the context.
+
+## Criteria:
+Evaluate the answer using the following rubric:
+
+- Yes: Fully grounded — All parts of the answer are directly supported by the context.
+- No: Mostly grounded — Minor details may be unverifiable, but the answer is mostly faithful.
+
+Question: Who developed the theory of relativity?
+Context:
+Albert Einstein, a German-born physicist, developed the theory of relativity in the early 20th century. It revolutionized theoretical physics and introduced concepts such as time dilation and the equivalence of mass and energy.",
+Answer: The theory of relativity was developed by Albert Einstein in the early 20th century."""
+
+    results = judge.evaluate_with_custom_prompt(
+        judge_prompts=[judge_prompt],
+        valid_outputs=["Yes", "No"],
+    )
+
+    # mock_infer.assert_called_once()
+
+    assert results[0].selected_option == "Yes"
