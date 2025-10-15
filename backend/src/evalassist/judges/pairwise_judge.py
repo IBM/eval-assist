@@ -1,23 +1,21 @@
-import asyncio
 import logging
-import random
 from textwrap import dedent
-from typing import Any, Literal, cast
+from typing import Literal, cast
 
+from evalassist.judges.batch_parser import BatchRepairParser
 from evalassist.judges.utils import generate_dynamic_pydantic_model, get_context_dict
-from langchain.output_parsers import OutputFixingParser
-from langchain.prompts import PromptTemplate
-from langchain_core.exceptions import OutputParserException
+from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.prompts.prompt import PromptTemplate
 from pydantic import BaseModel, Field
 from unitxt.inference import InferenceEngine
 
-from .base import BasePairwiseJudge, JudgeDescriptor, UnitxtInferenceLangchainRunnable
+from .base import BasePairwiseJudge, JudgeDescriptor, UnitxtInferenceEngineMixin
 from .types import Criteria, PairwiseInstance, PairwiseInstanceResult
 
 logger = logging.getLogger(__name__)
 
 
-class PairwiseJudge(BasePairwiseJudge, UnitxtInferenceLangchainRunnable):
+class PairwiseJudge(BasePairwiseJudge, UnitxtInferenceEngineMixin):
     on_generation_failure: Literal["raise", "random"]
     tie_enabled: bool
 
@@ -56,86 +54,6 @@ class PairwiseJudge(BasePairwiseJudge, UnitxtInferenceLangchainRunnable):
                     logger.debug(
                         "Could not interpret temperature value for self-consistency check."
                     )
-
-    async def parse_response_async(
-        self,
-        unparsed_response: str,
-        output_parser: OutputFixingParser,
-        klass: type[BaseModel],
-        on_failure_default: str | int | list[str | int],
-    ) -> tuple[Any, dict[str, Any]]:
-        metadata = {}
-        try:
-            # Always use the async parse when in async context
-            parsed_response = await output_parser.aparse(completion=unparsed_response)
-            metadata["generation_failed"] = False
-
-        except OutputParserException as e:
-            # fallback behavior if parsing fails
-            if self.on_generation_failure == "raise":
-                raise ValueError(
-                    f"The judge was unable to generate a valid evaluation result. The model {self.inference_engine.get_engine_id()}'s output's validation failed with the following error:\n{e.llm_output}"
-                )
-            else:
-                logger.debug(
-                    f"The judge was unable to generate a valid evaluation result. The model {self.inference_engine.get_engine_id()}'s output's validation failed with the following error:\n{e.llm_output}"
-                )
-                if on_failure_default is None:
-                    selected_option = ""
-                elif isinstance(on_failure_default, (str, int)):
-                    selected_option = on_failure_default
-                else:
-                    selected_option = random.choice(on_failure_default)  # nosec
-
-                parsed_response = klass(
-                    selected_option=selected_option,
-                    explanation="",
-                )
-                metadata["generation_failed"] = True
-                metadata["generation_failed_original_output"] = unparsed_response
-                metadata["generation_failed_final_output"] = e.llm_output
-
-        return parsed_response, metadata
-
-    async def parse_all_responses_async(
-        self,
-        unparsed_responses: list[str],
-        output_parsers: list[OutputFixingParser],
-        classes: list[type[BaseModel]],
-        on_failure_default: list[str | int | list[str | int]],
-    ) -> tuple[list[Any], list[dict[str, Any]]]:
-        tasks = []
-        for unparsed_response, output_parser, klass, on_failure_default_item in zip(
-            unparsed_responses, output_parsers, classes, on_failure_default
-        ):
-            tasks.append(
-                self.parse_response_async(
-                    unparsed_response=unparsed_response,
-                    output_parser=output_parser,
-                    klass=klass,
-                    on_failure_default=on_failure_default_item,
-                )
-            )
-        results = await asyncio.gather(*tasks)
-        parsed_responses, metadatas = zip(*results)
-        return list(parsed_responses), list(metadatas)
-
-    def parse_all_responses(
-        self,
-        unparsed_responses: list[str],
-        output_parsers: list[OutputFixingParser],
-        classes: list[type[BaseModel]],
-        on_failure_default: list[str | int | list[str | int]],
-    ):
-        loop = asyncio.get_event_loop()
-        task = self.parse_all_responses_async(
-            unparsed_responses=unparsed_responses,
-            output_parsers=output_parsers,
-            classes=classes,
-            on_failure_default=on_failure_default,
-        )
-        responses = loop.run_until_complete(task)
-        return responses
 
     def get_name(self) -> str:
         return f"simple{f'_with_self_consistency_{self.self_consistency}_attempts' if self.self_consistency else ''}"
@@ -186,7 +104,7 @@ class PairwiseJudge(BasePairwiseJudge, UnitxtInferenceLangchainRunnable):
         #             f"The number of texts to compare must be equal to 2 for all the instances. Received {len(instance.responses)} texts."
         #         )
 
-        output_parsers: list[OutputFixingParser] = []
+        output_parsers: list[PydanticOutputParser] = []
         format_instructions_list = []
         classes = []
         prediction_fields = []
@@ -212,9 +130,7 @@ class PairwiseJudge(BasePairwiseJudge, UnitxtInferenceLangchainRunnable):
             )
             classes.append(klass)
 
-            output_parser: OutputFixingParser = self.get_pydantic_output_fixing_parser(
-                klass
-            )
+            output_parser = PydanticOutputParser(pydantic_object=klass)
             output_parsers.append(output_parser)
 
             format_instructions: str = output_parser.get_format_instructions()
@@ -335,13 +251,17 @@ class PairwiseJudge(BasePairwiseJudge, UnitxtInferenceLangchainRunnable):
                 ]
             ),
         )
-        parsed_responses: list[Any] = []
 
-        parsed_responses, parsing_metadatas = self.parse_all_responses(
+        parser = BatchRepairParser(
+            inference_engine=self.inference_engine,
+            max_retries=3,
+            on_generation_failure=self.on_generation_failure,
+        )
+
+        parsed_responses, parsing_metadatas = parser.parse_all_responses(
             unparsed_responses=unparsed_responses,
-            output_parsers=output_parsers,
-            classes=classes,
             on_failure_default=valid_options_list,
+            output_parsers=output_parsers,
         )
 
         explanations: list[str] = [r.explanation for r in parsed_responses]

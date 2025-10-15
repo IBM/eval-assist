@@ -1,11 +1,4 @@
-import asyncio
-
-from .base import (
-    BaseDirectJudge,
-    BaseJudge,
-    BasePairwiseJudge,
-    UnitxtInferenceLangchainRunnable,
-)
+from .base import BaseDirectJudge, BaseJudge, BasePairwiseJudge
 from .const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from .direct_judge import DirectJudge
 from .dummy_judge import DummyDirectJudge, DummyPairwiseJudge
@@ -28,19 +21,6 @@ from .types import (
 )
 from .unitxt_judges import GraniteGuardianJudge, UnitxtDirectJudge, UnitxtPairwiseJudge
 
-
-class SafeEventLoopPolicy(asyncio.DefaultEventLoopPolicy):
-    def get_event_loop(self):
-        try:
-            return super().get_event_loop()
-        except RuntimeError:
-            loop = self.new_event_loop()
-            self.set_event_loop(loop)
-            return loop
-
-
-asyncio.set_event_loop_policy(SafeEventLoopPolicy())
-
 __all__: list[str] = [
     "BaseJudge",
     "DummyDirectJudge",
@@ -62,7 +42,6 @@ __all__: list[str] = [
     "DEFAULT_JUDGE_INFERENCE_PARAMS",
     "Criteria",
     "CriteriaOption",
-    "UnitxtInferenceLangchainRunnable",
     "MPrometheusDirectJudge",
     "MPrometheusPairwiseJudge",
     "MultiCriteria",

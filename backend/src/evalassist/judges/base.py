@@ -4,15 +4,6 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, TypeVar, cast
 
-from langchain.output_parsers import (
-    OutputFixingParser,
-    ResponseSchema,
-    StructuredOutputParser,
-)
-from langchain_core.output_parsers import PydanticOutputParser
-from langchain_core.prompt_values import StringPromptValue
-from langchain_core.runnables import RunnableLambda
-from pydantic import BaseModel
 from unitxt.inference import InferenceEngine
 
 from .types import (
@@ -152,12 +143,15 @@ class BaseJudge(
             instances=parsed_instances,
             criteria=parsed_criteria,
         )
-
+        # import json
+        # result_str = json.dumps([result.model_dump() for result in results])
+        # with open("output2.json", "w") as file:
+        #     file.write(result_str)
         return results
 
     def __call__(
         self,
-        instances: list[InstanceTypeVar] | list[str],
+        instances: list[InstanceTypeVar] | list[str] | list[list[str]],
         criteria: Criteria | list[Criteria] | str,
     ) -> list[ReturnVarType]:
         return self.evaluate(
@@ -556,91 +550,3 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
             ]
         else:
             return cast(list[Criteria], criteria)
-
-
-# ----------------------------------------------------------------------
-# Helper mix‑in for judges that use LangChain runnables
-# ----------------------------------------------------------------------
-class UnitxtInferenceLangchainRunnable(UnitxtInferenceEngineMixin):
-    max_retries: int
-
-    def __init__(
-        self,
-        max_retries: int = 3,
-        *args,
-        **kwargs,
-    ):
-        super().__init__(*args, **kwargs)
-        self.max_retries = max_retries
-
-    def _get_runnable_lambda(self) -> RunnableLambda[StringPromptValue, str]:
-        """
-        Create a LangChain ``RunnableLambda`` that forwards the prompt to the
-        underlying ``InferenceEngine`` and returns the raw LLM response.
-
-        Returns
-        -------
-        RunnableLambda[StringPromptValue, str]
-            A callable runnable that can be used in LangChain pipelines.
-        """
-
-        def llm_invoke(text: StringPromptValue) -> str:
-            # Call the custom model here and return the raw text
-            response: str = cast(
-                str,
-                self.inference_engine.infer(
-                    dataset=[
-                        {
-                            "source": text.text,
-                            "data_classification_policy": ["public"],
-                        }
-                    ]
-                )[0],
-            )
-            return response
-
-        return RunnableLambda(func=llm_invoke)
-
-    def get_pydantic_output_fixing_parser(
-        self, pydantic_object: type[BaseModel]
-    ) -> OutputFixingParser[Any]:
-        """
-        Create an ``OutputFixingParser`` for a given Pydantic model.
-
-        Parameters
-        ----------
-        pydantic_object : Type[BaseModel]
-            The Pydantic model class used to parse the LLM output.
-
-        Returns
-        -------
-        OutputFixingParser[Any]
-            Configured parser with retry logic.
-        """
-        return OutputFixingParser.from_llm(
-            llm=self._get_runnable_lambda(),
-            parser=PydanticOutputParser(pydantic_object=pydantic_object),
-            max_retries=self.max_retries,
-        )
-
-    def get_structured_output_fixing_parser(
-        self, response_schemas: list[ResponseSchema]
-    ) -> OutputFixingParser[Any]:
-        """
-        Create an ``OutputFixingParser`` for a given Pydantic model.
-
-        Parameters
-        ----------
-        pydantic_object : Type[BaseModel]
-            The Pydantic model class used to parse the LLM output.
-
-        Returns
-        -------
-        OutputFixingParser[Any]
-            Configured parser with retry logic.
-        """
-        return OutputFixingParser.from_llm(
-            llm=self._get_runnable_lambda(),
-            parser=StructuredOutputParser.from_response_schemas(response_schemas),
-            max_retries=self.max_retries,
-        )

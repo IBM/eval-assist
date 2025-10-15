@@ -185,12 +185,18 @@ def test_direct_judge_mocked_inference_almost_failure_2():
     with patch.object(CrossProviderInferenceEngine, "infer") as mock_infer:
 
         def side_effect(*args, **kwargs):
-            if mock_infer.call_count == 1:
-                return [
-                    '``\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```',
-                    '``\n{\n  "explanation": "explanation",\n  "feedback": "feedback", "selected_option": "No"\n}\n```',
-                ]
-            return real_infer(inference_engine, *args, **kwargs)
+            if mock_infer.call_count < 3:
+                r = [
+                    [
+                        '``\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```'
+                    ],
+                    [
+                        '``\n{\n  "explanation": "explanation",\n "selected_option": "N"\n}\n```'
+                    ],
+                ][mock_infer.call_count - 1]
+            else:
+                r = real_infer(inference_engine, *args, **kwargs)
+            return r
 
         mock_infer.side_effect = side_effect
 

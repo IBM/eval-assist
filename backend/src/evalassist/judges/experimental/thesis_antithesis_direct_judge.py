@@ -1,14 +1,17 @@
 from textwrap import dedent
-from typing import Any, cast
+from typing import cast
 
-from langchain.output_parsers import OutputFixingParser, ResponseSchema
-from langchain.prompts import PromptTemplate
+from evalassist.judges.batch_parser import BatchRepairParser
+from evalassist.judges.utils import generate_dynamic_pydantic_model
+from langchain_core.output_parsers import PydanticOutputParser
+from langchain_core.prompts.prompt import PromptTemplate
+from pydantic import Field
 
-from ..base import BaseDirectJudge, UnitxtInferenceLangchainRunnable
+from ..base import BaseDirectJudge, UnitxtInferenceEngineMixin
 from ..types import Criteria, DirectInstance, DirectInstanceResult
 
 
-class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunnable):
+class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
     def get_name(self) -> str:
         return "thesis_untithesis"
 
@@ -17,38 +20,38 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
         instances: list[DirectInstance],
         criteria: list[Criteria],
     ) -> list[DirectInstanceResult]:
-        # # make it easier for models to create json object
-        # for option in cast(CriteriaWithOptions, self.criteria).options:
-        #     if len(option.name) == 1:
-        #         adapted_option_name = f"option_{option.name}"
-        #         if cast(CriteriaWithOptions, self.criteria).option_map is not None:
-        #             cast(CriteriaWithOptions, self.criteria).option_map[adapted_option_name] = (
-        #                 cast(CriteriaWithOptions, self.criteria).option_map[option.name]
-        #             )
-        #             del cast(CriteriaWithOptions, self.criteria).option_map[option.name]
-        #         option.name = adapted_option_name
+        parser = BatchRepairParser(
+            inference_engine=self.inference_engine,
+            max_retries=3,
+            on_generation_failure="raise",
+        )
 
         # First stage
 
-        first_stage_response_schemas_list: list[list[ResponseSchema]] = [
-            [
-                ResponseSchema(
-                    name=f"Arguments for {option.name}",
-                    description=f"The argument for evaluating the text as {option.name}",
+        first_stage_output_parsers: list[PydanticOutputParser] = [
+            PydanticOutputParser(
+                pydantic_object=generate_dynamic_pydantic_model(
+                    model_name="first_stage_model",
+                    field_definitions=[
+                        (
+                            f"Arguments for {option.name}",
+                            str,
+                            Field(
+                                ...,
+                                description=f"The argument for evaluating the text as {option.name}",
+                            ),
+                            [],
+                        )
+                        for option in criterion.options
+                    ],
                 )
-                for option in criterion.options
-            ]
+            )
             for criterion in criteria
-        ]
-
-        first_stage_output_parser_list = [
-            self.get_structured_output_fixing_parser(first_stage_response_schemas)
-            for first_stage_response_schemas in first_stage_response_schemas_list
         ]
 
         first_stage_format_instructions_list = [
             first_stage_output_parser.get_format_instructions()
-            for first_stage_output_parser in first_stage_output_parser_list
+            for first_stage_output_parser in first_stage_output_parsers
         ]
 
         criteria_options_list = [
@@ -118,7 +121,7 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
             [self.get_ai_message_from_prompt(p)] for p in first_stage_prompts
         ]
 
-        first_stage_responses = cast(
+        first_stage_unparsed_responses = cast(
             list[str],
             self.inference_engine.infer(
                 [
@@ -128,28 +131,39 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
             ),
         )
 
-        first_stage_parsed_responses = [
-            first_stage_output_parser.parse(response)
-            for response, first_stage_output_parser in zip(
-                first_stage_responses, first_stage_output_parser_list
-            )
-        ]
+        first_stage_parsed_responses, _ = parser.parse_all_responses(
+            unparsed_responses=first_stage_unparsed_responses,
+            on_failure_default=[
+                [option.name for option in criterion.options] for criterion in criteria
+            ],
+            output_parsers=first_stage_output_parsers,
+        )
 
         # Second stage
-
-        second_stage_response_schemas = [
-            ResponseSchema(
-                name="selected_option",
-                description="Main selected criterion option",
-            ),
-            ResponseSchema(
-                name="alternative_selected_option",
-                description="Optinal alternative selected criterion option",
-            ),
-        ]
-
-        second_stage_output_parser = self.get_structured_output_fixing_parser(
-            second_stage_response_schemas
+        second_stage_output_parser = PydanticOutputParser(
+            pydantic_object=generate_dynamic_pydantic_model(
+                model_name="second_stage_model",
+                field_definitions=[
+                    (
+                        "selected_option",
+                        str,
+                        Field(
+                            ...,
+                            description="Main selected criterion option",
+                        ),
+                        [],
+                    ),
+                    (
+                        "alternative_selected_option",
+                        str,
+                        Field(
+                            ...,
+                            description="Optinal alternative selected criterion option",
+                        ),
+                        [],
+                    ),
+                ],
+            )
         )
 
         second_stage_format_instructions = (
@@ -198,12 +212,12 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
             ]
             for first_stage_message, first_stage_parsed_response, second_stage_prompt in zip(
                 first_stage_messages,
-                first_stage_responses,
+                first_stage_unparsed_responses,
                 second_stage_prompts,
             )
         ]
 
-        second_stage_output_responses = cast(
+        second_stage_unparsed_responses = cast(
             list[str],
             self.inference_engine.infer(
                 [
@@ -217,14 +231,20 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
         )
         second_stage_output_parsed_responses = [
             second_stage_output_parser.parse(response)
-            for response in second_stage_output_responses
+            for response in second_stage_unparsed_responses
         ]
+
+        second_stage_output_parsed_responses, _ = parser.parse_all_responses(
+            unparsed_responses=second_stage_unparsed_responses,
+            output_parsers=[second_stage_output_parser]
+            * len(second_stage_unparsed_responses),
+        )
+
+        # Third stage (if required)
         second_stage_selected_option_list = [
             second_stage_output_parsed_response["selected_option"]
             for second_stage_output_parsed_response in second_stage_output_parsed_responses
         ]
-
-        # Third stage (if required)
 
         is_unsure_list = [
             second_stage_output_parsed_response["alternative_selected_option"] != ""
@@ -251,19 +271,30 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
             ]
             option_two_list.append(option_two)
 
-            third_stage_response_schemas = [
-                ResponseSchema(
-                    name=option_one,
-                    description=f"The argument for not evaluating the text as {option_one}",
-                ),
-                ResponseSchema(
-                    name=option_two,
-                    description=f"The argument for not evaluating the text as {option_two}",
-                ),
-            ]
-
-            third_stage_output_parser = self.get_structured_output_fixing_parser(
-                third_stage_response_schemas
+            third_stage_output_parser = PydanticOutputParser(
+                pydantic_object=generate_dynamic_pydantic_model(
+                    model_name="third_stage_model",
+                    field_definitions=[
+                        (
+                            option_one,
+                            str,
+                            Field(
+                                ...,
+                                description=f"The argument for not evaluating the text as {option_one}",
+                            ),
+                            [],
+                        ),
+                        (
+                            "option_two",
+                            str,
+                            Field(
+                                ...,
+                                description=f"The argument for not evaluating the text as {option_two}",
+                            ),
+                            [],
+                        ),
+                    ],
+                )
             )
 
             third_stage_output_parsers.append(third_stage_output_parser)
@@ -301,13 +332,13 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
             third_stage_messages = [
                 *second_stage_messages_list[unsure_index],
                 self.get_ai_message_from_prompt(
-                    second_stage_output_responses[unsure_index], "assistant"
+                    second_stage_unparsed_responses[unsure_index], "assistant"
                 ),
                 self.get_ai_message_from_prompt(third_stage_prompt),
             ]
             third_stage_messages_list.append(third_stage_messages)
 
-        third_stage_output_responses = cast(
+        third_stage_unparsed_responses = cast(
             list[str],
             self.inference_engine.infer(
                 [
@@ -327,29 +358,41 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
             option_one,
             option_two,
             third_stage_messages,
-            third_stage_output_response,
+            third_stage_unparsed_response,
             unsure_index,
         ) in zip(
             option_one_list,
             option_two_list,
             third_stage_messages_list,
-            third_stage_output_responses,
+            third_stage_unparsed_responses,
             unsure_indexes,
         ):
-            fourth_stage_response_schemas = [
-                ResponseSchema(
-                    name="explanation",
-                    description="An explanation that clearly states why you selected that option",
-                ),
-                ResponseSchema(
-                    name="selected_option",
-                    description=f"the selected option (either '{option_one}' or '{option_two}')",
-                ),
-            ]
-
-            fourth_stage_output_parser: OutputFixingParser[Any] = (
-                self.get_structured_output_fixing_parser(fourth_stage_response_schemas)
+            fourth_stage_output_parser = PydanticOutputParser(
+                pydantic_object=generate_dynamic_pydantic_model(
+                    model_name="fourth_stage_model",
+                    field_definitions=[
+                        (
+                            "explanation",
+                            str,
+                            Field(
+                                ...,
+                                description="An explanation that clearly states why you selected that option",
+                            ),
+                            [],
+                        ),
+                        (
+                            "selected_option",
+                            str,
+                            Field(
+                                ...,
+                                description=f"the selected option (either '{option_one}' or '{option_two}')",
+                            ),
+                            [],
+                        ),
+                    ],
+                )
             )
+
             fourth_stage_output_parsers.append(fourth_stage_output_parser)
 
             fourth_stage_format_instructions = (
@@ -415,13 +458,13 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
             fourth_stage_messages: list[dict[str, str]] = [
                 *third_stage_messages,
                 self.get_ai_message_from_prompt(
-                    third_stage_output_response, "assistant"
+                    third_stage_unparsed_response, "assistant"
                 ),
                 self.get_ai_message_from_prompt(fourth_stage_prompt),
             ]
             fourth_stage_messages_list.append(fourth_stage_messages)
 
-        fourth_stage_output_responses = cast(
+        fourth_stage_unparsed_responses = cast(
             list[str],
             self.inference_engine.infer(
                 [
@@ -433,12 +476,11 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
                 ]
             ),
         )
-        fourth_stage_output_parsed_responses = [
-            fourth_stage_output_parser.parse(response)
-            for fourth_stage_output_parser, response in zip(
-                fourth_stage_output_parsers, fourth_stage_output_responses
-            )
-        ]
+        fourth_stage_output_parsed_responses, _ = parser.parse_all_responses(
+            unparsed_responses=fourth_stage_unparsed_responses,
+            output_parsers=fourth_stage_output_parsers,
+        )
+
         fourth_stage_selected_option_list = [
             fourth_stage_output_parsed_response["selected_option"]
             for fourth_stage_output_parsed_response in fourth_stage_output_parsed_responses
@@ -461,7 +503,7 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
                     fourth_stage_messages_list[i]
                     + [
                         self.get_ai_message_from_prompt(
-                            fourth_stage_output_responses[i], "assistant"
+                            fourth_stage_unparsed_responses[i], "assistant"
                         )
                     ]
                 )
@@ -478,7 +520,7 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceLangchainRunna
                     second_stage_messages_list[j]
                     + [
                         self.get_ai_message_from_prompt(
-                            second_stage_output_responses[j], "assistant"
+                            second_stage_unparsed_responses[j], "assistant"
                         )
                     ]
                 )
