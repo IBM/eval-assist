@@ -101,4 +101,4 @@ Look at the [Local Development Guide](https://github.com/IBM/eval-assist/blob/ma
 
 ## Documentation
 
-You can find extesive documentation of the system in the [Documentation page](https://github.com/IBM/eval-assist/wiki).
+You can find extensive documentation of the system in the [Documentation page](https://github.com/IBM/eval-assist/wiki).
