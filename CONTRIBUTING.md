@@ -16,7 +16,7 @@ A good way to familiarize yourself with the codebase and contribution process is
 to look for and tackle low-hanging fruits in the [issue tracker](https://github.com/ibm/eval-assist/issues).
 
 
-Look at the [Local Development Guide](https://github.com/IBM/eval-assist/blob/main/LOCAL_DEV_GUIDE.md) for instructions on setting up a local development environment.
+Look at the [Local Development Guide](https://github.com/IBM/eval-assist/blob/main/LOCAL_DEV_GUIDE.MD) for instructions on setting up a local development environment.
 
 **Note: We appreciate your effort, and want to avoid a situation where a contribution
 requires extensive rework (by you or by us), sits in backlog for a long time, or
