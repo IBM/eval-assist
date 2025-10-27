@@ -39,7 +39,7 @@ from .extended_unitxt import (
     ExtendedEvaluatorNameEnum,
     ExtendedModelProviderEnum,
 )
-from .judges.types import DirectInstance
+from .judges import Instance
 
 logger = logging.getLogger(__name__)
 
@@ -552,19 +552,21 @@ def get_system_version():
 def unitxt_dataset_to_evalassist_instances(
     dataset: IterableDataset,
     criteria: list[Criteria],
-) -> list[DirectInstance]:
+) -> list[Instance]:
     if any(
-        criterion.prediction_field is None or criterion.context_fields is None
+        criterion.to_evaluate_field is None or criterion.context_fields is None
         for criterion in criteria
     ):
         raise ValueError(
-            "The criteria.prediction_field is None. It must be set to retrieve the response to evaluate from the task_data"
+            "The criteria.to_evaluate_field is None. It must be set to retrieve the response to evaluate from the task_data"
         )
     task_data_list = [json.loads(d["task_data"]) for d in dataset]
     return [
-        DirectInstance(
-            context={k: task_data[k] for k in cast(list, criterion.context_fields)},
-            response=task_data[criterion.prediction_field],
+        Instance(
+            fields={
+                **{k: task_data[k] for k in cast(list, criterion.context_fields)},
+                criterion.to_evaluate_field: task_data[criterion.to_evaluate_field],
+            },
         )
         for task_data, criterion in zip(task_data_list, criteria)
     ]
@@ -606,7 +608,7 @@ def criteria_with_options_DTO_to_BO_mapper(
             CriteriaOption(name=o.name, description=o.description)
             for o in criteria.options
         ],
-        prediction_field=criteria.prediction_field,
+        to_evaluate_field=criteria.to_evaluate_field,
         context_fields=criteria.context_fields,
     )
 

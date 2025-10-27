@@ -2,21 +2,21 @@ import logging
 from abc import ABC, abstractmethod
 from collections import Counter
 from dataclasses import dataclass
-from typing import Any, Generic, Literal, TypeVar, cast
+from typing import Generic, Literal, TypeVar, cast
 
+from evalassist.judges.utils import get_to_evaluate_text
 from unitxt.inference import InferenceEngine
 
 from .types import (
+    TO_EVALUATE_FIELD_DEFAULT,
     Criteria,
     CriteriaOption,
-    DirectInstance,
     DirectInstanceResult,
     DirectPositionalBiasResult,
     Instance,
     MultiCriteria,
     MultiCriteriaDirectInstanceResult,
     MultiCriteriaItemResult,
-    PairwiseInstance,
     PairwiseInstanceResult,
     PairwisePositionalBiasResult,
 )
@@ -101,6 +101,20 @@ class BaseJudge(
             "content": prompt,
         }
 
+    def _verify_fields(self, instances: list[Instance], criteria: list[Criteria]):
+        for instance, criterion in zip(instances, criteria):
+            if criterion.to_evaluate_field not in instance.fields:
+                raise ValueError(
+                    f"'{criterion.name}' criteria's to_evaluate_field '{criterion.to_evaluate_field}' is required in instance.field but was not found. Instance's fields are {list(instance.fields.keys())}"
+                )
+            if criterion.context_fields is not None:
+                if not all(
+                    field in instance.fields for field in criterion.context_fields
+                ):
+                    raise ValueError(
+                        f"Instance doesn't have the fields that the criteria's context_fields expects. Criteria's context fields are: {list(criterion.context_fields)} while instance fields are has {list(instance.fields.keys())}"
+                    )
+
     def evaluate(
         self,
         instances: list[InstanceTypeVar] | list[str] | list[list[str]],
@@ -125,7 +139,9 @@ class BaseJudge(
             if isinstance(criteria, str) or isinstance(criteria, Criteria)
             else criteria
         )
-        parsed_instances = self._get_instances_from_str(instances)
+        parsed_instances: list[Instance] = self._get_instances_from_str(instances)
+
+        self._verify_fields(parsed_instances, parsed_criteria)
 
         if self.self_consistency > 0:
             parsed_instances = [
@@ -162,7 +178,7 @@ class BaseJudge(
     @abstractmethod
     def _evaluate(
         self,
-        instances: list[InstanceTypeVar],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[ReturnVarType]: ...
 
@@ -176,17 +192,17 @@ class BaseJudge(
     @abstractmethod
     def _get_instances_from_str(
         self, instances: list[InstanceTypeVar] | list[str] | list[list[str]]
-    ) -> list[InstanceTypeVar]: ...
+    ) -> list[Instance]: ...
 
     @abstractmethod
     def _get_parsed_criteria(
         self, criteria: list[Criteria] | list[str]
     ) -> list[Criteria]: ...
 
-    @abstractmethod
-    def get_predictions(self, instances: list[InstanceTypeVar]) -> Any:
-        """Return the raw predictions (e.g., LLM responses) for the given instances."""
-        ...
+    # @abstractmethod
+    # def get_predictions(self, instances: list[InstanceTypeVar]) -> Any:
+    #     """Return the raw predictions (e.g., LLM responses) for the given instances."""
+    #     ...
 
     @abstractmethod
     def get_descriptor(self) -> JudgeDescriptor:
@@ -205,10 +221,10 @@ class BaseJudge(
 # ----------------------------------------------------------------------
 # Concrete abstract subclasses for the two main evaluation modes
 # ----------------------------------------------------------------------
-class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
+class BaseDirectJudge(BaseJudge[Instance, DirectInstanceResult], ABC):
     def _evaluate(
         self,
-        instances: list[DirectInstance],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[DirectInstanceResult]:
         if self.check_positional_bias:
@@ -220,7 +236,7 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
                         Criteria(
                             name=criterion.name,
                             description=criterion.description,
-                            prediction_field=criterion.prediction_field,
+                            to_evaluate_field=criterion.to_evaluate_field,
                             context_fields=criterion.context_fields,
                             examples=criterion.examples,
                             options=list(reversed(criterion.options)),
@@ -300,7 +316,7 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
 
     def evaluate_multi_criteria(
         self,
-        instances: list[DirectInstance] | list[str],
+        instances: list[Instance] | list[str],
         multi_criteria: MultiCriteria | list[str] | list[Criteria],
     ) -> list[MultiCriteriaDirectInstanceResult]:
         if isinstance(multi_criteria, list):
@@ -334,7 +350,6 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
             ]
             result = MultiCriteriaDirectInstanceResult(
                 multi_criteria=parsed_multi_criteria,
-                criteria_results=criteria_results,
                 item_results=item_results,
                 aggregated_score=parsed_multi_criteria.get_aggregated_score(
                     item_results=item_results
@@ -344,24 +359,23 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
         return final_results
 
     def _get_instances_from_str(
-        self, instances: list[DirectInstance] | list[str] | list[list[str]]
-    ) -> list[DirectInstance]:
-        parsed_instances: list[DirectInstance]
-        if isinstance(instances, list) and all(isinstance(x, str) for x in instances):
+        self, instances: list[Instance] | list[str] | list[list[str]]
+    ) -> list[Instance]:
+        parsed_instances: list[Instance]
+        if isinstance(instances, list) and all(
+            isinstance(instance, str) for instance in instances
+        ):
             parsed_instances = cast(
-                list[DirectInstance],
+                list[Instance],
                 [
-                    DirectInstance(
-                        context={},
-                        expected_result=None,
-                        metadata=None,
-                        response=i,
+                    Instance(
+                        fields={TO_EVALUATE_FIELD_DEFAULT: instance},
                     )
-                    for i in cast(list[str], instances)
+                    for instance in cast(list[str], instances)
                 ],
             )
         else:
-            parsed_instances = cast(list[DirectInstance], instances)
+            parsed_instances = cast(list[Instance], instances)
         return parsed_instances
 
     def _get_parsed_criteria(
@@ -376,7 +390,7 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
                         CriteriaOption(name="Yes", description="", score=1.0),
                         CriteriaOption(name="No", description="", score=0.0),
                     ],
-                    prediction_field="response",
+                    to_evaluate_field="response",
                 )
                 for description in cast(list[str], criteria)
             ]
@@ -386,7 +400,7 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
                     name=criterion.name,
                     description=criterion.description,
                     options=criterion.options,
-                    prediction_field=criterion.prediction_field,
+                    to_evaluate_field=criterion.to_evaluate_field,
                     context_fields=criterion.context_fields,
                     examples=criterion.examples,
                 )
@@ -396,18 +410,18 @@ class BaseDirectJudge(BaseJudge[DirectInstance, DirectInstanceResult], ABC):
     @abstractmethod
     def _run(
         self,
-        instances: list[DirectInstance],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[DirectInstanceResult]: ...
 
-    def get_predictions(self, instances: list[DirectInstance]) -> list[str]:
-        return [i.response for i in instances]
+    # def get_predictions(self, instances: list[Instance]) -> list[str]:
+    #     return [i.response for i in instances]
 
     def get_descriptor(self) -> JudgeDescriptor:
         return JudgeDescriptor(self.get_name(), "direct", "")
 
 
-class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC):
+class BasePairwiseJudge(BaseJudge[Instance, PairwiseInstanceResult], ABC):
     def __init__(
         self,
         *args,
@@ -424,7 +438,7 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
 
     def _evaluate(
         self,
-        instances: list[PairwiseInstance],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[PairwiseInstanceResult]:
         if self.check_positional_bias:
@@ -432,13 +446,21 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
                 instances=[
                     *instances,
                     *[
-                        PairwiseInstance(
-                            context=i.context,
-                            expected_result=i.expected_result,
-                            metadata=i.metadata,
-                            responses=list(reversed(i.responses)),
+                        Instance(
+                            fields={
+                                **{
+                                    k: v
+                                    for k, v in instance.fields.items()
+                                    if k != criterion.to_evaluate_field
+                                },
+                                **{
+                                    k: list(reversed(cast(list[str], v)))
+                                    for k, v in instance.fields.items()
+                                    if k == criterion.to_evaluate_field
+                                },
+                            }
                         )
-                        for i in instances
+                        for instance, criterion in zip(instances, criteria)
                     ],
                 ],
                 criteria=[
@@ -447,11 +469,16 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
                 ],
             )
 
-            results_len: int = int(len(results) / 2)
+            results_len: int = int(
+                len(results) / 2
+            )  # half of positional bias result count, e.g. original number of instances to evaluate
 
-            for instance_result, positional_bias_instance_result, instance in zip(
-                results[:results_len], results[results_len:], instances
-            ):
+            for (
+                instance_result,
+                positional_bias_instance_result,
+                instance,
+                criterion,
+            ) in zip(results[:results_len], results[results_len:], instances, criteria):
                 if (
                     instance_result.per_system_results is not None
                     and positional_bias_instance_result.per_system_results is not None
@@ -482,7 +509,11 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
                         positional_bias_instance_result.selected_option != "tie"
                         and instance_result.selected_option
                         != (
-                            len(instance.responses)
+                            len(
+                                cast(
+                                    list[str], get_to_evaluate_text(instance, criterion)
+                                )
+                            )
                             - cast(int, positional_bias_instance_result.selected_option)
                             - 1
                         )
@@ -497,40 +528,37 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
     @abstractmethod
     def _run(
         self,
-        instances: list[PairwiseInstance],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[PairwiseInstanceResult]: ...
 
-    def get_predictions(self, instances: list[PairwiseInstance]) -> list[list[str]]:
-        return [i.responses for i in instances]
+    # def get_predictions(self, instances: list[Instance]) -> list[list[str]]:
+    #     return [i.responses for i in instances]
 
     def get_descriptor(self) -> JudgeDescriptor:
         return JudgeDescriptor(self.get_name(), "pairwise", "")
 
     def _get_instances_from_str(
         self,
-        instances: list[PairwiseInstance] | list[str] | list[list[str]],
-    ) -> list[PairwiseInstance]:
-        parsed_instances: list[PairwiseInstance]
+        instances: list[Instance] | list[str] | list[list[str]],
+    ) -> list[Instance]:
+        parsed_instances: list[Instance]
         if (
             isinstance(instances, list)
             and all(isinstance(x, list) for x in instances)
             and all(isinstance(y, str) for x in instances for y in x)
         ):
             parsed_instances = cast(
-                list[PairwiseInstance],
+                list[Instance],
                 [
-                    PairwiseInstance(
-                        context={},
-                        expected_result=None,
-                        metadata=None,
-                        responses=i,
+                    Instance(
+                        fields={TO_EVALUATE_FIELD_DEFAULT: instance},
                     )
-                    for i in cast(list[list[str]], instances)
+                    for instance in cast(list[list[str]], instances)
                 ],
             )
-        elif all(isinstance(x, PairwiseInstance) for x in instances):
-            parsed_instances = cast(list[PairwiseInstance], instances)
+        elif all(isinstance(x, Instance) for x in instances):
+            parsed_instances = cast(list[Instance], instances)
         else:
             raise ValueError(
                 f"Invalid instance type. Type must be list[list[str]] or list[PairwiseInstance]. Receive {type(instances[0])}"
@@ -545,6 +573,7 @@ class BasePairwiseJudge(BaseJudge[PairwiseInstance, PairwiseInstanceResult], ABC
                 Criteria(
                     name="",
                     description=description,
+                    to_evaluate_field=TO_EVALUATE_FIELD_DEFAULT,
                 )
                 for description in cast(list[str], criteria)
             ]

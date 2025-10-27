@@ -1,4 +1,6 @@
-from evalassist.judges import DirectJudge
+from typing import cast
+
+from evalassist.judges import DirectInstanceResult, DirectJudge
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from evalassist.judges.types import MultiCriteriaDirectInstanceResult
 from unitxt.inference import CrossProviderInferenceEngine
@@ -30,7 +32,7 @@ results: list[MultiCriteriaDirectInstanceResult] = judge.evaluate_multi_criteria
 #         CriteriaOption(name="Yes", description="", score=1.0),
 #         CriteriaOption(name="No", description="", score=0.0),
 #     ],
-#     prediction_field="response",
+#     to_evaluate_field="response",
 # )
 
 # criteria_b = Criteria(
@@ -40,7 +42,7 @@ results: list[MultiCriteriaDirectInstanceResult] = judge.evaluate_multi_criteria
 #         CriteriaOption(name="Yes", description="", score=1.0),
 #         CriteriaOption(name="No", description="", score=0.0),
 #     ],
-#     prediction_field="response",
+#     to_evaluate_field="response",
 # )
 
 # multi_criteria  = MultiCriteria(
@@ -57,9 +59,11 @@ results: list[MultiCriteriaDirectInstanceResult] = judge.evaluate_multi_criteria
 # )
 
 print(f"Aggregated score: {results[0].aggregated_score:.2f}")
-for item_result in results[0].item_results:
+for item_result, multi_criteria_item in zip(
+    results[0].item_results, results[0].multi_criteria.items
+):
     print(
-        f"{item_result.criteria_name} -> {item_result.score} (weighted: {item_result.weighted_score})"
+        f"{multi_criteria_item.criterion.name} -> {cast(DirectInstanceResult, item_result.result).score} (weighted: {item_result.weighted_score})"
     )
 
 """

@@ -46,6 +46,7 @@ from .api_types import (
     FixInstanceResponse,
     InstanceResultDTO,
     NotebookParams,
+    PairwiseInstanceDTO,
     PersonaEnum,
     PutTestCaseBody,
     SyntheticExampleGenerationRequest,
@@ -66,10 +67,8 @@ from .extended_unitxt import EXTENDED_EVALUATORS_METADATA
 from .judges import (
     DEFAULT_JUDGE_INFERENCE_PARAMS,
     Criteria,
-    DirectInstance,
     DirectJudge,
     GraniteGuardianJudge,
-    PairwiseInstance,
     PairwiseJudge,
 )
 from .model import AppUser, StoredTestCase
@@ -235,7 +234,7 @@ def get_criterias() -> dict[str, list[CriteriaWithOptionsDTO] | list[CriteriaDTO
                     CriteriaOptionDTO(name=o.name, description=o.description)
                     for o in c.options
                 ],
-                prediction_field=cast(str, c.prediction_field),
+                to_evaluate_field=cast(str, c.prediction_field),
                 context_fields=cast(list[str], c.context_fields),
             )
             for c in DIRECT_CRITERIA
@@ -244,7 +243,7 @@ def get_criterias() -> dict[str, list[CriteriaWithOptionsDTO] | list[CriteriaDTO
             CriteriaDTO(
                 name=c.name,
                 description=c.description,
-                prediction_field=cast(str, c.prediction_field),
+                to_evaluate_field=cast(str, c.prediction_field),
                 context_fields=cast(list[str], c.context_fields),
             )
             for c in PAIRWISE_CRITERIA
@@ -308,10 +307,19 @@ async def evaluate(
                 **DEFAULT_JUDGE_INFERENCE_PARAMS,
             },
         )
-        if req.criteria.prediction_field is None or req.criteria.context_fields is None:
+        if (
+            req.criteria.to_evaluate_field is None
+            or req.criteria.context_fields is None
+        ):
             raise ValueError(
                 "EvalAssist uses the new LLM Judge API, where the predictions and context fields are provided in the criteria definition. Make sure to adhere to it."
             )
+
+        instances = [
+            dto_instance.to_instance(req.criteria.to_evaluate_field)
+            for dto_instance in req.instances
+        ]
+
         if req.type == EvaluatorTypeEnum.DIRECT:
             criteria = criteria_with_options_DTO_to_BO_mapper(
                 cast(CriteriaWithOptionsDTO, req.criteria)
@@ -325,14 +333,14 @@ async def evaluate(
                     check_positional_bias=True,
                 )
             per_instance_result = evaluator.evaluate(
-                instances=cast(list[DirectInstance], req.instances),
+                instances=instances,
                 criteria=criteria,
             )
         else:
             criteria = Criteria(
                 name=req.criteria.name,
                 description=req.criteria.description,
-                prediction_field=req.criteria.prediction_field,
+                to_evaluate_field=req.criteria.to_evaluate_field,
                 context_fields=req.criteria.context_fields,
             )
             evaluator = PairwiseJudge(
@@ -341,7 +349,7 @@ async def evaluate(
             )
 
             per_instance_result = evaluator.evaluate(
-                instances=cast(list[PairwiseInstance], req.instances),
+                instances=instances,
                 criteria=criteria,
             )
 
@@ -562,29 +570,29 @@ def download_test_case(params: DownloadTestCaseBody, background_tasks: Backgroun
 @router.post("/download-test-data/")
 def download_test_data(params: DownloadTestDataBody, background_tasks: BackgroundTasks):
     prediction_rows = []
-    if isinstance(params.instances[0], PairwiseInstance):
+    if isinstance(params.instances[0], PairwiseInstanceDTO):
         prediction_rows = [
             {
-                f"{params.prediction_field} {i + 1}": response
-                for i, response in enumerate(cast(PairwiseInstance, instance).responses)
+                f"{params.to_evaluate_field} {i + 1}": response
+                for i, response in enumerate(
+                    cast(PairwiseInstanceDTO, instance).responses
+                )
             }
             for instance in params.instances
         ]
     else:
         prediction_rows = [
-            {params.prediction_field: cast(DirectInstance, instance).response}
+            {params.to_evaluate_field: cast(DirectInstanceDTO, instance).response}
             for instance in params.instances
         ]
 
     instances = params.instances
     rows = [
         {
-            **(instance.context if instance.context is not None else {}),
-            # params.prediction_field: instance.get_prediction(),
-            "expected_result": instance.expected_result,
-            **prediction_fields,
+            **to_evaluate_fields,
+            **instance.context,
         }
-        for instance, prediction_fields in zip(instances, prediction_rows)
+        for instance, to_evaluate_fields in zip(instances, prediction_rows)
     ]
 
     df = pd.DataFrame(rows)
@@ -658,7 +666,8 @@ def get_synthetic_examples(params: SyntheticExampleGenerationRequest):
             per_criteria_option_count=params.per_criteria_option_count,
             borderline_count=params.borderline_count,
         )
-        return generator.generate()
+        result = generator.generate()
+        return result
 
     return run()
 

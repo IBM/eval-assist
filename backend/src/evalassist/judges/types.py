@@ -1,6 +1,5 @@
 import logging
 import math
-from abc import ABC, abstractmethod
 from typing import Any, Generic, Literal, TypeVar, cast
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -12,41 +11,35 @@ from unitxt.llm_as_judge import CriteriaWithOptions as UnitxtCriteriaWithOptions
 
 logger = logging.getLogger(__name__)
 
+TO_EVALUATE_FIELD_DEFAULT = "response"
 
-class Instance(BaseModel, ABC):
-    context: dict[str, str] = Field(
+
+class Instance(BaseModel):
+    fields: dict[str, str | list[str]] = Field(
         default_factory=dict,
-        description="Additional context information for the instance, stored as key-value pairs.",
-    )
-    expected_result: str | int | None = Field(
-        default=None,
-        description="The expected result or ground truth for the instance, if available.",
-    )
-    metadata: dict[str, Any] | None = Field(
-        default=None,
-        description="Additional metadata about the instance, stored as key-value pairs.",
+        description="Fields that will be used in the evaluation of the instance, stored as key-value pairs. The fields represent both the text to evaluate and the context. The Criteria object decides the role of each field in the evaluation. If there is only one field, it is interpreted as the text to evaluate.",
     )
 
-    @abstractmethod
-    def get_prediction(self) -> Any: ...  # noqa: E704
+    # @abstractmethod
+    # def get_prediction(self) -> Any: ...  # noqa: E704
 
 
-class DirectInstance(Instance):
-    response: str = Field(
-        description="The response or prediction generated for the instance."
-    )
+# class DirectInstance(Instance):
+#     response: str = Field(
+#         description="The response or prediction generated for the instance."
+#     )
 
-    def get_prediction(self):
-        return self.response
+#     def get_prediction(self):
+#         return self.response
 
 
-class PairwiseInstance(Instance):
-    responses: list[str] = Field(
-        description="A list of responses or predictions to be compared in a pairwise evaluation."
-    )
+# class PairwiseInstance(Instance):
+#     responses: list[str] = Field(
+#         description="A list of responses or predictions to be compared in a pairwise evaluation."
+#     )
 
-    def get_prediction(self):
-        return self.responses
+#     def get_prediction(self):
+#         return self.responses
 
 
 class CriteriaOption(BaseModel):
@@ -60,19 +53,14 @@ class CriteriaOption(BaseModel):
     )
 
 
-class InstanceWithGroundTruth(BaseModel):
-    instance: Instance
-    ground_truth: str
-
-
 class Criteria(BaseModel):
     name: str = Field(description="The name or identifier of the criteria.")
     description: str = Field(
         description="A detailed description of the criteria and its purpose."
     )
-    prediction_field: str | None = Field(
-        default=None,
-        description="The field in the instance that contains the prediction to be evaluated against this criteria.",
+    to_evaluate_field: str = Field(
+        # default=TO_EVALUATE_FIELD_DEFAULT,
+        description="The field in the instance that contains the text to be evaluated against this criteria.",
     )
     context_fields: list[str] | None = Field(
         default=None,
@@ -83,9 +71,9 @@ class Criteria(BaseModel):
         description="A list of possible options or outcomes for this criteria, along with their descriptions and scores.",
     )
 
-    examples: list[InstanceWithGroundTruth] = Field(
+    examples: list["InstanceResult"] = Field(
         default_factory=list,
-        description="Instance examples to be used to be used both as criteria documentation and in-context examples.",
+        description="Instance result examples to be used both as criteria documentation and in-context examples.",
     )
 
     def get_score_from_option(self, option_name: str | int):
@@ -99,7 +87,7 @@ class Criteria(BaseModel):
             return UnitxtCriteriaWithOptions(
                 name=self.name,
                 description=self.description,
-                prediction_field=self.prediction_field,
+                prediction_field=self.to_evaluate_field,
                 context_fields=self.context_fields,
                 options=[
                     UnitxtCriteriaOption(
@@ -114,7 +102,7 @@ class Criteria(BaseModel):
             )
         else:
             return UnitxtCriteria(
-                prediction_field=self.prediction_field,
+                prediction_field=self.to_evaluate_field,
                 context_fields=self.context_fields,
                 name=self.name,
                 description=self.description,
@@ -135,7 +123,9 @@ class Criteria(BaseModel):
         res = Criteria(
             name=unitxt_criteria.name,
             description=unitxt_criteria.description,
-            prediction_field=unitxt_criteria.prediction_field,
+            to_evaluate_field=unitxt_criteria.prediction_field
+            if unitxt_criteria.prediction_field is not None
+            else TO_EVALUATE_FIELD_DEFAULT,
             context_fields=cast(list[str], unitxt_criteria.context_fields),
         )
         if isinstance(unitxt_criteria, UnitxtCriteriaWithOptions):
@@ -153,15 +143,18 @@ class Criteria(BaseModel):
         return res
 
     @model_validator(mode="after")
-    def validate_example_options(self) -> Self:
+    def validate_examples(self) -> Self:
         criteria_option_names = [option.name for option in self.options]
         if any(
-            example.ground_truth not in criteria_option_names
+            example.selected_option not in criteria_option_names
             for example in self.examples
         ):
             raise ValueError(
                 "Example ground truth is invalid because it is not equal to any of the criteria options."
             )
+
+        if any(example.instance is None for example in self.examples):
+            raise ValueError("In context example must have an instance.")
         return self
 
 
@@ -199,13 +192,13 @@ PairwisePositionalBiasResult = PositionalBiasResult["PairwiseInstanceResult"]
 
 
 class PairwiseInstanceResult(
-    InstanceResult[PairwiseInstance, PositionalBiasResult["PairwiseInstanceResult"]]
+    InstanceResult[Instance, PositionalBiasResult["PairwiseInstanceResult"]]
 ):
     per_system_results: list[SingleSystemPairwiseInstanceResult] | None = None
 
 
 class DirectInstanceResult(
-    InstanceResult[DirectInstance, PositionalBiasResult["DirectInstanceResult"]]
+    InstanceResult[Instance, PositionalBiasResult["DirectInstanceResult"]]
 ):
     score: float | None = None
     feedback: str | None = None
@@ -217,11 +210,9 @@ MultiCriteriaStrategy = Literal["target_option", "score_threshold", "none"]
 
 
 class MultiCriteriaItemResult(BaseModel):
-    criteria_name: str
+    result: InstanceResult
     weight: float
-    score: float | None
     weighted_score: float | None
-    option: str | int
     strategy: MultiCriteriaStrategy
     required: bool
 
@@ -288,11 +279,9 @@ class MultiCriteriaItem(BaseModel):
         weight = cast(float, self.weight)
         score: float | None = self.get_score(result)
         return MultiCriteriaItemResult(
-            criteria_name=self.criterion.name,
+            result=result,
             weight=weight,
-            score=score,
             weighted_score=score * weight if score is not None else None,
-            option=result.selected_option,
             strategy=self.get_strategy(),
             required=self.required,
         )
@@ -319,7 +308,8 @@ class MultiCriteria(BaseModel):
         self, item_results: list[MultiCriteriaItemResult]
     ) -> float | None:
         item_results_criteria_names = [
-            item_result.criteria_name for item_result in item_results
+            cast(Criteria, item_result.result.criteria).name
+            for item_result in item_results
         ]
         if len(self.items) != len(item_results) or any(
             item.criterion.name not in item_results_criteria_names
@@ -329,7 +319,11 @@ class MultiCriteria(BaseModel):
         total = 0.0
         for item in self.items:
             item_result = next(
-                iter(x for x in item_results if x.criteria_name == item.criterion.name)
+                iter(
+                    x
+                    for x in item_results
+                    if cast(Criteria, x.result.criteria).name == item.criterion.name
+                )
             )
             if item_result.weighted_score is None:
                 return None
@@ -434,9 +428,6 @@ class MultiCriteria(BaseModel):
 class MultiCriteriaDirectInstanceResult(BaseModel):
     multi_criteria: MultiCriteria = Field(
         description="The MultiCriteria configuration used for this evaluation."
-    )
-    criteria_results: list[DirectInstanceResult] = Field(
-        description="A list of DirectInstanceResult objects, one for each criterion in the multi-criteria evaluation."
     )
     item_results: list[MultiCriteriaItemResult] = Field(
         description="A dictionary mapping criterion names to their respective weight/score tuples."

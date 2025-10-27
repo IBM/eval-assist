@@ -1,8 +1,12 @@
-from evalassist.judges import DirectInstance, DirectJudge
+from typing import cast
+
+from evalassist.judges import DirectJudge
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from evalassist.judges.types import (
     Criteria,
     CriteriaOption,
+    DirectInstanceResult,
+    Instance,
     MultiCriteria,
     MultiCriteriaDirectInstanceResult,
     MultiCriteriaItem,
@@ -22,10 +26,10 @@ criteria_a = Criteria(
     name="Self-explanatory",
     description="Is the text self-explanatory and self-contained?",
     options=[
-        CriteriaOption(name="Yes", description="", score=1.0),
-        CriteriaOption(name="No", description="", score=0.0),
+        CriteriaOption(name="Yes", score=1.0),
+        CriteriaOption(name="No", score=0.0),
     ],
-    prediction_field="response",
+    to_evaluate_field="response",
     context_fields=["reference_text"],
 )
 
@@ -33,10 +37,10 @@ criteria_b = Criteria(
     name="Consistent",
     description="Does the text maintain internal consistency?",
     options=[
-        CriteriaOption(name="Yes", description="", score=1.0),
-        CriteriaOption(name="No", description="", score=0.0),
+        CriteriaOption(name="Yes", score=1.0),
+        CriteriaOption(name="No", score=0.0),
     ],
-    prediction_field="response",
+    to_evaluate_field="response",
     context_fields=["summary"],
 )
 
@@ -44,10 +48,10 @@ criteria_c = Criteria(
     name="Technical Accuracy",
     description="Is the response technically accurate based on the reference?",
     options=[
-        CriteriaOption(name="Correct", description=""),
-        CriteriaOption(name="Incorrect", description=""),
+        CriteriaOption(name="Correct"),
+        CriteriaOption(name="Incorrect"),
     ],
-    prediction_field="response",
+    to_evaluate_field="response",
     context_fields=["reference_text"],
 )
 
@@ -78,25 +82,25 @@ multi_criteria = MultiCriteria(
 
 instances = [
     # Failing case: self-explanatory + consistent, but technically wrong
-    DirectInstance(
-        context={
+    Instance(
+        fields={
             "reference_text": "Use the API client to fetch data, and cache results for efficiency.",
             "summary": "API client usage and caching",
+            "response": (
+                "You should always query the database directly. Caching is optional."
+            ),
         },
-        response=(
-            "You should always query the database directly. Caching is optional."
-        ),
     ),
     # Passing case: clear, consistent, and technically correct
-    DirectInstance(
-        context={
+    Instance(
+        fields={
             "reference_text": "Use the API client to fetch data, and cache results for efficiency.",
             "summary": "API client usage and caching",
+            "response": (
+                "Use the API client to retrieve data. "
+                "For frequently accessed results, store them in a cache to improve performance."
+            ),
         },
-        response=(
-            "Use the API client to retrieve data. "
-            "For frequently accessed results, store them in a cache to improve performance."
-        ),
     ),
 ]
 
@@ -110,7 +114,9 @@ results: list[MultiCriteriaDirectInstanceResult] = judge.evaluate_multi_criteria
 for idx, res in enumerate(results, start=1):
     print(f"\n=== Instance {idx} ===")
     print(f"Aggregated score: {res.aggregated_score:.2f}")
-    for item_result in res.item_results:
+    for item_result, multi_criteria_item in zip(
+        res.item_results, res.multi_criteria.items
+    ):
         print(
-            f"{item_result.criteria_name} -> {item_result.score} (weighted: {item_result.weighted_score})"
+            f"{multi_criteria_item.criterion.name} -> {cast(DirectInstanceResult, item_result.result).score} (weighted: {item_result.weighted_score})"
         )

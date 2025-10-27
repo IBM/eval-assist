@@ -2,14 +2,14 @@ import pytest
 from evalassist.judges.types import (
     Criteria,
     CriteriaOption,
-    DirectInstance,
     DirectInstanceResult,
+    Instance,
     MultiCriteria,
     MultiCriteriaItem,
 )
 from pydantic import ValidationError
 
-dummy_direct_instance = DirectInstance(response="")
+dummy_direct_instance = Instance(fields={"response": "response"})
 
 
 def test_single_criteria_weighted():
@@ -20,6 +20,7 @@ def test_single_criteria_weighted():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
 
     result = DirectInstanceResult(
@@ -49,6 +50,7 @@ def test_multiple_criteria_weighted():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
 
     criterion2 = Criteria(
@@ -58,6 +60,7 @@ def test_multiple_criteria_weighted():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
 
     result1 = DirectInstanceResult(
@@ -97,6 +100,7 @@ def test_required_criteria():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
 
     result = DirectInstanceResult(
@@ -126,6 +130,7 @@ def test_normalized_scores():
             CriteriaOption(name="Good", description="", score=10.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
 
     result = DirectInstanceResult(
@@ -155,6 +160,7 @@ def test_zero_weight():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
 
     with pytest.raises(ValidationError):
@@ -169,6 +175,7 @@ def test_missing_result():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
     criterion2 = Criteria(
         name="criterion2",
@@ -177,6 +184,7 @@ def test_missing_result():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
 
     result1 = DirectInstanceResult(
@@ -205,6 +213,7 @@ def test_strategy_mix():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
     criterion_b = Criteria(
         name="test_criterion_b",
@@ -213,6 +222,7 @@ def test_strategy_mix():
             CriteriaOption(name="Correct", description="", score=5.0),
             CriteriaOption(name="Incorrect", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
     criterion_c = Criteria(
         name="test_criterion_c",
@@ -221,6 +231,7 @@ def test_strategy_mix():
             CriteriaOption(name="Yes", description=""),
             CriteriaOption(name="No", description=""),
         ],
+        to_evaluate_field="response",
     )
 
     result_a = DirectInstanceResult(
@@ -272,6 +283,7 @@ def test_strategy_mix():
             CriteriaOption(name="Yes", description=""),
             CriteriaOption(name="No", description=""),
         ],
+        to_evaluate_field="response",
     )
 
     result_d = DirectInstanceResult(
@@ -317,6 +329,7 @@ def test_target_option():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
 
     result = DirectInstanceResult(
@@ -361,6 +374,7 @@ def test_score_threshold():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
 
     result = DirectInstanceResult(
@@ -404,6 +418,7 @@ def test_duplicate_criteria_names():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
     criterion2 = Criteria(
         name="criterion1",  # duplicate name
@@ -412,6 +427,7 @@ def test_duplicate_criteria_names():
             CriteriaOption(name="Good", description="", score=1.0),
             CriteriaOption(name="Bad", description="", score=0.0),
         ],
+        to_evaluate_field="response",
     )
 
     with pytest.raises(ValidationError):

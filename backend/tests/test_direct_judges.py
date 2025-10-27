@@ -5,14 +5,14 @@ import pytest
 from evalassist.judges import (
     Criteria,
     CriteriaOption,
-    DirectInstance,
     DirectInstanceResult,
     DirectJudge,
+    Instance,
     UnitxtDirectJudge,
 )
-from evalassist.judges.types import InstanceWithGroundTruth
+from evalassist.judges.types import InstanceResult
 from unitxt.artifact import fetch_artifact
-from unitxt.inference import CrossProviderInferenceEngine
+from unitxt.inference import CrossProviderInferenceEngine, MockInferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions
 
 
@@ -36,28 +36,29 @@ def test_main_judge():
         Criteria.from_unitxt_criteria("metrics.llm_as_judge.direct.criteria.coherence"),
     ]
     instances = [
-        DirectInstance(
-            context={"question": "What is the capital of Argentina?"},
-            response="Buenos Aires is the capital and largest city of Argentina, located on the western shore of the Río de la Plata.",
-        ),
-        DirectInstance(
-            context={
-                "original text": "Machine learning is a subset of artificial intelligence that involves the use of algorithms and statistical models to enable computers to perform tasks without explicit instructions."
+        Instance(
+            fields={
+                "question": "What is the capital of Argentina?",
+                "response": "Buenos Aires is the capital and largest city of Argentina, located on the western shore of the Río de la Plata.",
             },
-            response="Machine learning uses algorithms to let computers learn tasks without explicit programming.",
         ),
-        DirectInstance(
-            context={
-                "original text": "Machine learning is a subset of artificial intelligence that involves the use of algorithms and statistical models to enable computers to perform tasks without explicit instructions."
+        Instance(
+            fields={
+                "original text": "Machine learning is a subset of artificial intelligence that involves the use of algorithms and statistical models to enable computers to perform tasks without explicit instructions.",
+                "response": "Machine learning uses algorithms to let computers learn tasks without explicit programming.",
             },
-            response="Machine learning uses algorithms to mimic wild animals",
+        ),
+        Instance(
+            fields={
+                "original text": "Machine learning is a subset of artificial intelligence that involves the use of algorithms and statistical models to enable computers to perform tasks without explicit instructions.",
+                "response": "Machine learning uses algorithms to mimic wild animals",
+            },
         ),
     ]
 
     results: list[DirectInstanceResult] = judge.evaluate(
         instances=instances, criteria=criteria
     )
-
     assert results[0].selected_option == "Excellent"
     assert cast(float, results[1].score) >= 0.5
     assert cast(float, results[2].score) == 0.0
@@ -80,23 +81,21 @@ def test_judges_str_params():
 
 
 @patch(
-    "unitxt.inference.CrossProviderInferenceEngine.infer",
+    "unitxt.inference.MockInferenceEngine.infer",
     return_value=[
-        '``\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```',
+        '```\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```',
     ],
 )
 def test_direct_judge_mocked_inference_success(mock_infer):
-    inference_engine = CrossProviderInferenceEngine(
-        model="llama-3-3-70b-instruct",
-        provider="watsonx",
-        use_cache=False,
-    )
+    inference_engine = MockInferenceEngine(model_name="mock")
     judge = DirectJudge(inference_engine=inference_engine, generate_feedback=True)
 
     instances = [
-        DirectInstance(
-            context={"question": "What is the capital of Argentina?"},
-            response="Buenos Aires",
+        Instance(
+            fields={
+                "question": "What is the capital of Argentina?",
+                "response": "Buenos Aires",
+            },
         )
     ]
 
@@ -105,28 +104,26 @@ def test_direct_judge_mocked_inference_success(mock_infer):
 
 
 @patch(
-    "unitxt.inference.CrossProviderInferenceEngine.infer",
+    "unitxt.inference.MockInferenceEngine.infer",
     return_value=[
-        '``\n{\n  "explanation": "explanation",\n  "selected_option": "Excellent",\n  "feedback": "feedback"\n}\n```',
+        '```\n{\n  "explanation": "explanation",\n  "selected_option": "Excellent",\n  "feedback": "feedback"\n}\n```',
     ],
 )
 def test_direct_judge_mocked_inference_failure(mock_infer):
     # selected_option is invalid
-    inference_engine = CrossProviderInferenceEngine(
-        model="llama-3-3-70b-instruct",
-        provider="watsonx",
-        use_cache=False,
-    )
+    inference_engine = MockInferenceEngine(model_name="mock")
     judge = DirectJudge(
         inference_engine=inference_engine,
         generate_feedback=True,
         on_generation_failure="raise",
     )
 
-    instances: list[DirectInstance] = [
-        DirectInstance(
-            context={"question": "What is the capital of Argentina?"},
-            response="Buenos Aires",
+    instances: list[Instance] = [
+        Instance(
+            fields={
+                "question": "What is the capital of Argentina?",
+                "response": "Buenos Aires",
+            },
         )
     ]
 
@@ -137,23 +134,21 @@ def test_direct_judge_mocked_inference_failure(mock_infer):
 
 
 @patch(
-    "unitxt.inference.CrossProviderInferenceEngine.infer",
+    "unitxt.inference.MockInferenceEngine.infer",
     side_effect=[
-        ['``\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```'],
         [
-            '``\n{\n  "explanation": "explanation",\n  "selected_option": "Excellent",\n  "feedback": "feedback"\n}\n```'
+            'json```\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```'
         ],
         [
-            '``\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
+            'json```\n{\n  "explanation": "explanation",\n  "selected_option": "Excellent",\n  "feedback": "feedback"\n}\n```'
+        ],
+        [
+            'json```\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
         ],
     ],
 )
 def test_direct_judge_mocked_inference_almost_failure(mock_infer):
-    inference_engine = CrossProviderInferenceEngine(
-        model="llama-3-3-70b-instruct",
-        provider="watsonx",
-        use_cache=False,
-    )
+    inference_engine = MockInferenceEngine(model_name="mock")
     judge = DirectJudge(
         inference_engine=inference_engine,
         generate_feedback=True,
@@ -161,9 +156,11 @@ def test_direct_judge_mocked_inference_almost_failure(mock_infer):
     )
 
     instances = [
-        DirectInstance(
-            context={"question": "What is the capital of Argentina?"},
-            response="Buenos Aires",
+        Instance(
+            fields={
+                "question": "What is the capital of Argentina?",
+                "response": "Buenos Aires",
+            },
         )
     ]
 
@@ -188,10 +185,10 @@ def test_direct_judge_mocked_inference_almost_failure_2():
             if mock_infer.call_count < 3:
                 r = [
                     [
-                        '``\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```'
+                        '```\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```'
                     ],
                     [
-                        '``\n{\n  "explanation": "explanation",\n "selected_option": "N"\n}\n```'
+                        '```\n{\n  "explanation": "explanation",\n "selected_option": "N"\n}\n```'
                     ],
                 ][mock_infer.call_count - 1]
             else:
@@ -212,13 +209,17 @@ def test_direct_judge_mocked_inference_almost_failure_2():
         )
 
         instances = [
-            DirectInstance(
-                context={"question": "What is the capital of Argentina?"},
-                response="Buenos Aires",
+            Instance(
+                fields={
+                    "question": "What is the capital of Argentina?",
+                    "response": "Buenos Aires",
+                },
             ),
-            DirectInstance(
-                context={"question": "Who was the president of France in 2008?"},
-                response="Pitagoras",
+            Instance(
+                fields={
+                    "question": "Who was the president of France in 2008?",
+                    "response": "Pitagoras",
+                },
             ),
         ]
 
@@ -226,22 +227,18 @@ def test_direct_judge_mocked_inference_almost_failure_2():
 
 
 @patch(
-    "unitxt.inference.CrossProviderInferenceEngine.infer",
+    "unitxt.inference.MockInferenceEngine.infer",
     side_effect=[
         [
-            '``\n{\n  "persona_name": "persona_name",\n  "persona_description": "persona_description"\n}\n```'
+            '```\n{\n  "persona_name": "persona_name",\n  "persona_description": "persona_description"\n}\n```'
         ],
         [
-            '``\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
+            '```\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
         ],
     ],
 )
 def test_direct_judge_with_synthetic_persona_mocked_inference_success(mock_infer):
-    inference_engine = CrossProviderInferenceEngine(
-        model="llama-3-3-70b-instruct",
-        provider="watsonx",
-        use_cache=False,
-    )
+    inference_engine = MockInferenceEngine(model_name="mock")
     judge = DirectJudge(
         inference_engine=inference_engine,
         generate_feedback=True,
@@ -249,37 +246,37 @@ def test_direct_judge_with_synthetic_persona_mocked_inference_success(mock_infer
     )
 
     instances = [
-        DirectInstance(
-            context={"question": "What is the capital of Argentina?"},
-            response="Buenos Aires",
+        Instance(
+            fields={
+                "question": "What is the capital of Argentina?",
+                "response": "Buenos Aires",
+            },
         )
     ]
 
     response = judge.evaluate(instances=instances, criteria="Is the response faithful?")
     assert mock_infer.call_count == 2
-    assert "persona_name" in response[0].metadata["prompt"]
+    assert "persona_name" in response[0].metadata["prompt"][0]["content"]
 
 
 @patch(
-    "unitxt.inference.CrossProviderInferenceEngine.infer",
+    "unitxt.inference.MockInferenceEngine.infer",
     side_effect=[
         [
-            '``\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
+            '```\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
         ],
     ],
 )
 def test_direct_judge_with_ice_mocked_inference_success(mock_infer):
-    inference_engine = CrossProviderInferenceEngine(
-        model="llama-3-3-70b-instruct",
-        provider="watsonx",
-        use_cache=False,
-    )
+    inference_engine = MockInferenceEngine(model_name="mock")
     judge = DirectJudge(inference_engine=inference_engine, generate_feedback=True)
 
     instances = [
-        DirectInstance(
-            context={"question": "What is the capital of Argentina?"},
-            response="Buenos Aires",
+        Instance(
+            fields={
+                "question": "What is the capital of Argentina?",
+                "response": "Buenos Aires",
+            },
         )
     ]
 
@@ -294,13 +291,16 @@ def test_direct_judge_with_ice_mocked_inference_success(mock_infer):
                 name="No",
             ),
         ],
+        to_evaluate_field="response",
         examples=[
-            InstanceWithGroundTruth(
-                instance=DirectInstance(
-                    context={"question": "What is the capital of France?"},
-                    response="Paris",
+            InstanceResult(
+                instance=Instance(
+                    fields={
+                        "question": "What is the capital of France?",
+                        "response": "Paris",
+                    },
                 ),
-                ground_truth="Yes",
+                selected_option="Yes",
             )
         ],
     )
@@ -308,13 +308,13 @@ def test_direct_judge_with_ice_mocked_inference_success(mock_infer):
     response = judge.evaluate(instances=instances, criteria=criteria)
     assert mock_infer.call_count == 1
     assert (
-        "## Examples" in response[0].metadata["prompt"]
-        and "Paris" in response[0].metadata["prompt"]
+        "## Examples" in response[0].metadata["prompt"][1]["content"]
+        and "Paris" in response[0].metadata["prompt"][1]["content"]
     )
 
 
 @patch(
-    "unitxt.inference.CrossProviderInferenceEngine.infer",
+    "unitxt.inference.MockInferenceEngine.infer",
     side_effect=[
         [
             '{"explanation": "The answer directly states that Albert Einstein developed the theory of relativity in the early 20th century, which is fully supported by the context provided. The context explicitly mentions that Albert Einstein, a German-born physicist, developed the theory of relativity in the early 20th century, making the answer fully grounded in the given information.", "selected_score": 5}'
@@ -325,11 +325,7 @@ def test_direct_judge_with_ice_mocked_inference_success(mock_infer):
     ],
 )
 def test_direct_judge_custom_prompt_mocked_inference_success(mock_infer):
-    inference_engine = CrossProviderInferenceEngine(
-        model="llama-3-3-70b-instruct",
-        provider="watsonx",
-        use_cache=False,
-    )
+    inference_engine = MockInferenceEngine(model_name="mock")
     judge = DirectJudge(inference_engine=inference_engine)
 
     judge_prompt = """You are an expert grader. Your job is to evaluate how factually grounded an AI-generated answer is, based on a given context. From provider combination of Question, Context and Answer, you must judge whether the answer contains any hallucinations — i.e., information not found or contradicted by the context.

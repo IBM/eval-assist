@@ -1,24 +1,27 @@
 from itertools import cycle
 
+import nest_asyncio
 from evalassist.benchmark import run_benchmarks
 from evalassist.judges import BaseDirectJudge, DirectJudge
 
+nest_asyncio.apply()
+
 if __name__ == "__main__":
-    MAX_WORKERS = 1
-    BATCH_SIZE = 25
+    BATCH_SIZE = 200
     RITS_API_KEYS = None
-    INSTANCES_PER_DATASET = 300
+    INSTANCES_PER_DATASET = 200
     # List of models to benchmark
     MODELS = [
-        "gpt-oss-120b",
-        # "llama-3-3-70b-instruct",
+        # "gpt-oss-120b",
+        "llama-3-3-70b-instruct",
         # "llama-4-scout",
-        # "llama-4-maverick",
+        "llama-4-maverick",
         # "granite-3-3-8b-instruct",
         # "deepseek-v3",
         # "phi-4",
         # "mistral-small-instruct",
     ]
+    MAX_WORKERS = len(MODELS)
     api_key_cycle = cycle(RITS_API_KEYS if RITS_API_KEYS is not None else [None])
 
     inference_engines = {}
@@ -30,7 +33,7 @@ if __name__ == "__main__":
         #         "self_consistency": True,
         #     },
         #     {
-        #         'temperature': 0.3,
+        #         'temperature': 1.0,
         #     },
         # ),
         (
@@ -39,10 +42,7 @@ if __name__ == "__main__":
                 "generate_synthetic_persona": False,
                 "self_consistency": False,
             },
-            {
-                "temperature": 1.0,
-                "use_cache": False,
-            },
+            {},
         ),
         # (
         #     DirectJudge,
@@ -58,10 +58,10 @@ if __name__ == "__main__":
         #     DirectJudge,
         #     {
         #         "generate_synthetic_persona": False,
-        #         "self_consistency": False,
+        #         "self_consistency": True,
         #     },
         #     {
-        #         "temperature": 0.0,
+        #         "temperature": 1.0,
         #     },
         # ),
         # (UnitxtDirectJudge, {}, {}),
@@ -77,8 +77,8 @@ if __name__ == "__main__":
         judge_configs=JUDGE_CONFIGS_WITH_MODEL,
         max_workers=MAX_WORKERS,
         instances_per_dataset=INSTANCES_PER_DATASET,
-        dataset_keyword_filters=["drop", "esnli"],
-        dataset_keyword_selectors=["biggen"],
+        dataset_keyword_filters=["drop", "esnli", "biggen"],
+        # dataset_keyword_selectors=["biggen"],
     )
     # model = "granite-3-3-8b-instruct"
     # inference_engine = CrossProviderInferenceEngine(

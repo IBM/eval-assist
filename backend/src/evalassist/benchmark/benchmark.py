@@ -6,14 +6,14 @@ from typing import cast
 
 from datasets import IterableDataset
 from evalassist.judges import Criteria
-from evalassist.judges.types import InstanceWithGroundTruth
+from evalassist.judges.types import InstanceResult
 from unitxt.api import evaluate, load_dataset
 from unitxt.artifact import fetch_artifact
 from unitxt.llm_as_judge import CriteriaWithOptions
 
 from ..const import EVAL_ASSIST_DIR
 from ..judges import BaseDirectJudge
-from ..judges.types import DirectInstance, DirectInstanceResult
+from ..judges.types import DirectInstanceResult, Instance
 from ..utils import convert_nan_to_none, unitxt_dataset_to_evalassist_instances
 from .utils import (
     add_judgebench_readme_urls,
@@ -22,7 +22,6 @@ from .utils import (
     get_benchmark_results_as_df,
     get_judge_from_config,
     get_judgebench_cards,
-    is_result_available,
     save_evaluation_backup_to_sqlite,
     save_results_to_sqlite,
 )
@@ -123,11 +122,15 @@ metric_map = {
 def parse_and_store_results(
     card: str,
     dataset: IterableDataset,
-    instances: list[DirectInstance],
+    instances: list[Instance],
     results: list[DirectInstanceResult],
     judge: BaseDirectJudge,
     add_in_context_examples: bool,
 ):
+    judge_descriptor = judge.get_descriptor()
+    judge_name = judge_descriptor.name + (
+        "_with_examples" if add_in_context_examples else ""
+    )
     criteria_names = []
     for result in results:
         if result.criteria is not None and result.criteria.name is None:
@@ -178,15 +181,12 @@ def parse_and_store_results(
         if benchmark_name.startswith("judge_bench")
         else criteria_names[0]
     )
-    judge_descriptor = judge.get_descriptor()
     benchmark_result: dict[str, str | None] = {
         "card": card,  # if there are several criteria, we have to add the overall result
         "benchmark_name": benchmark_name,
         "dataset_name": dataset_name,
-        "judge": f"{judge_descriptor.name}" + "_with_examples"
-        if add_in_context_examples
-        else "",
-        "model": judge.get_descriptor().inference_engine_id,
+        "judge": judge_name,
+        "model": judge_descriptor.inference_engine_id,
         "results": json.dumps(convert_nan_to_none(parsed_metric_results)),
         "dataset_len": str(evaluation_results.global_scores["num_of_instances"]),
         "group_by_field": None,
@@ -214,7 +214,7 @@ def parse_and_store_results(
                 "card": card,  # if there are several criteria, we have to add the overall result
                 "benchmark_name": benchmark_name,
                 "dataset_name": dataset_name,
-                "judge": f"{judge_descriptor.name}_with_examples",
+                "judge": judge_name,
                 "model": judge_descriptor.inference_engine_id,
                 "results": json.dumps(convert_nan_to_none(parsed_metric_results)),
                 "dataset_len": str(group_by_value_scores["num_of_instances"]),
@@ -234,7 +234,7 @@ def parse_and_store_results(
     result_backup: list[dict] = [
         {
             "card": card,
-            "judge": f"{judge_descriptor.name}_with_examples",
+            "judge": judge_name,
             "model": judge_descriptor.inference_engine_id,
             "sample_index": i,
             "instance": instance.model_dump_json(indent=4),
@@ -264,7 +264,7 @@ def parse_and_store_results(
 
 
 def add_examples(
-    instances: list[DirectInstance], criteria: list[Criteria], ground_truth: list[float]
+    instances: list[Instance], criteria: list[Criteria], ground_truth: list[float]
 ):
     d = {}
     for instance, criterion, label in zip(instances, criteria, ground_truth):
@@ -279,9 +279,9 @@ def add_examples(
             d[criterion.name]["ground_truth"].append(label)
     for k, v in d.items():
         v["examples"] = [
-            InstanceWithGroundTruth(
+            InstanceResult(
                 instance=instance,
-                ground_truth=next(
+                selected_option=next(
                     iter(
                         option.name
                         for option in v["criteria"].options
@@ -357,13 +357,14 @@ def run_single_model_card(
             for d in dataset
         ]
 
-        parsed_dataset: list[DirectInstance] = unitxt_dataset_to_evalassist_instances(
+        parsed_dataset: list[Instance] = unitxt_dataset_to_evalassist_instances(
             dataset, criteria
         )
 
         ground_truth = [float(d["target"]) for d in dataset]
 
-        add_examples(parsed_dataset, criteria, ground_truth)
+        if add_in_context_examples:
+            add_examples(parsed_dataset, criteria, ground_truth)
 
         results: list[DirectInstanceResult] = judge(
             parsed_dataset,
@@ -423,11 +424,12 @@ def run_benchmarks(
                 judge = get_judge_from_config(judge_config)
 
                 # Skip if the benchmark has already been run
-                if not is_result_available(
-                    judge.get_name(),
-                    judge.get_descriptor().inference_engine_id,
-                    card,
-                ):
+                # if not is_result_available(
+                #     judge.get_name(),
+                #     judge.get_descriptor().inference_engine_id,
+                #     card,
+                # ):
+                if True:
                     # if True:
                     # Submit the task to the executor
                     futures.append(

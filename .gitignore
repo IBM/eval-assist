@@ -53,3 +53,5 @@ inference_engine_cache
 !benchmark_results.db
 
 backend/src/evalassist/benchmark/to_inspect.csv
+
+app.log

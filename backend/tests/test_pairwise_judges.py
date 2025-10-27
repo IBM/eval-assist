@@ -2,7 +2,7 @@ from typing import cast
 
 from evalassist.judges import (
     Criteria,
-    PairwiseInstance,
+    Instance,
     PairwiseInstanceResult,
     PairwiseJudge,
     UnitxtPairwiseJudge,
@@ -27,19 +27,23 @@ def test_main_judge():
     )
 
     instances = [
-        PairwiseInstance(
-            context={"question": "when is christmas"},
-            responses=[
-                "Christmas is on December 25th",
-                "For those who celebrate it, Christmas falls on December 25th.",
-            ],
+        Instance(
+            fields={
+                "question": "when is christmas",
+                "response": [
+                    "Christmas is on December 25th",
+                    "For those who celebrate it, Christmas falls on December 25th.",
+                ],
+            },
         ),
-        PairwiseInstance(
-            context={"question": "when is christmas"},
-            responses=[
-                "Christmas is celebrated on December 25th by those who observe it.",
-                "For those who celebrate it, Christmas falls on December 25th.",
-            ],
+        Instance(
+            fields={
+                "question": "when is christmas",
+                "response": [
+                    "Christmas is celebrated on December 25th by those who observe it.",
+                    "For those who celebrate it, Christmas falls on December 25th.",
+                ],
+            },
         ),
     ]
 

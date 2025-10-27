@@ -132,8 +132,10 @@ def get_judge_from_config(
             "provider": "rits",
             "temperature": temperature,
             "max_tokens": 2048,
-            "cache_batch_size": 50,
+            "cache_batch_size": 25,
             "data_classification_policy": ["public"],
+            "seed": 42,
+            "use_cache": True,
         }
         params.update(inference_engine_kwargs)
         inference_engine = CrossProviderInferenceEngine(**params)
@@ -141,6 +143,7 @@ def get_judge_from_config(
 
     return judge_klass(
         inference_engine=inference_engine,
+        check_positional_bias=True,
         **judge_kwargs,
     )
 

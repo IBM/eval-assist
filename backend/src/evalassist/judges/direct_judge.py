@@ -3,19 +3,20 @@ from collections.abc import Callable
 from textwrap import dedent
 from typing import Any, Literal, cast
 
-from evalassist.judges.batch_parser import BatchRepairParser
+from evalassist.judges.batch_repair_parser import BatchRepairParser
 from evalassist.judges.utils import (
+    build_format_instructions,
     generate_dynamic_pydantic_model,
     get_context_dict,
+    get_to_evaluate_text,
     is_float,
 )
-from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts.prompt import PromptTemplate
 from pydantic import BaseModel, Field
 from unitxt.inference import InferenceEngine
 
 from .base import BaseDirectJudge, JudgeDescriptor, UnitxtInferenceEngineMixin
-from .types import Criteria, DirectInstance, DirectInstanceResult
+from .types import Criteria, DirectInstanceResult, Instance
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +74,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
         self.generate_feedback = generate_feedback
 
     def get_name(self) -> str:
-        return f"simple{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}{f'_with_self_consistency_{self.self_consistency}_attempts' if self.self_consistency else ''}"
+        return f"in_house{'_with_synthetic_persona' if self.generate_synthetic_persona else ''}{'_with_feedback' if self.generate_feedback else ''}{f'_with_self_consistency_{self.self_consistency}_attempts' if self.self_consistency else ''}"
 
     def get_descriptor(self) -> JudgeDescriptor:
         judge_descriptor = JudgeDescriptor(self.get_name(), "direct", "")
@@ -104,8 +105,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
         ]
 
         synthetic_persona_klasses = []
-        output_parsers = []
-        format_instructions = []
+        format_instructions_list = []
         for criterion in unique_criteria:
             dynamic_model = generate_dynamic_pydantic_model(
                 model_name="structured_output_model",
@@ -115,7 +115,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                         str,
                         Field(
                             ...,
-                            description=f"The name of the persona responsible for evaluating the {criterion.prediction_field} according to the criterion {criterion.name}.",
+                            description=f"The name of the persona responsible for evaluating the {criterion.to_evaluate_field} according to the criterion {criterion.name}.",
                         ),
                         [],
                     ),
@@ -131,48 +131,33 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 ],
             )
             synthetic_persona_klasses.append(dynamic_model)
+            format_instructions_list.append(build_format_instructions(dynamic_model))
 
-            output_parser: PydanticOutputParser = PydanticOutputParser(
-                pydantic_object=dynamic_model
-            )
-            output_parsers.append(output_parser)
-            format_instructions.append(output_parser.get_format_instructions())
+        template = dedent(
+            text="""\
+                Your task is to generate a persona that is the most appropriate to evaluate a text based on the following criteria.
+                You will be provided with the criteria name, description and options and an example instance.
 
-        template = PromptTemplate(
-            input_variables=[
-                "criteria_name_section"
-                "criteria_description"
-                "criteria_options"
-                "prediction_field"
-                "instance_example"
-                "format_instruction"
-            ],
-            template=dedent(
-                text="""\
-                    Your task is to generate a persona that is the most appropriate to evaluate a text based on the following criteria.
-                    You will be provided with the criteria name, description and options and an example instance.
+                ### Criterion:
 
-                    ### Criterion:
+                {criteria_name_section}
+                Description: {criteria_description}
+                Options:
+                {criteria_options}
 
-                    {criteria_name_section}
-                    Description: {criteria_description}
-                    Options:
-                    {criteria_options}
+                ### Example instance
 
-                    ### Example instance
+                {instance_example}
 
-                    {instance_example}
+                For the persona, you will generate the name or role (e.g. a doctor, a philosopher, a lawyer) and a brief description that makes emphasis on what makes the persona the ideal for performing the evaluation (e.g. have a lot of experience reading and writing email summaries).
 
-                    For the persona, you will generate the name or role (e.g. a doctor, a philosopher, a lawyer) and a brief description that makes emphasis on what makes the persona the ideal for performing the evaluation (e.g. have a lot of experience reading and writing email summaries).
+                ### Output format
 
-                    ### Output format
+                The persona info will be used as this:
+                "You are <persona_name>. Your task is to evaluate a {to_evaluate_field}. You <persona_description>".
 
-                    The persona info will be used as this:
-                    "You are <persona_name>. Your task is to evaluate a {prediction_field}. You <persona_description>".
-
-                    {format_instruction}
-                """
-            ),
+                {format_instruction}
+            """
         )
 
         prompts = [
@@ -187,14 +172,14 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                         for o in criterion.options
                     ]
                 ),
-                prediction_field=criterion.prediction_field
-                if criterion.prediction_field
+                to_evaluate_field=criterion.to_evaluate_field
+                if criterion.to_evaluate_field
                 else "text",
                 instance_example=instance_example_str,
                 format_instruction=format_instruction,
             )
             for criterion, instance_example_str, format_instruction in zip(
-                criteria, instance_examples_str, format_instructions
+                criteria, instance_examples_str, format_instructions_list
             )
         ]
 
@@ -214,16 +199,14 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             on_generation_failure=self.on_generation_failure,
         )
 
-        parsed_responses, _ = parser.parse_all_responses(
+        parsed_responses, _ = parser.parse_and_repair(
             unparsed_responses=unparsed_responses,
-            on_failure_default=[
-                [option.name for option in criterion.options] for criterion in criteria
-            ],
-            output_parsers=output_parsers,
+            on_failure_default={"persona_name": "", "persona_description": ""},
+            model_classes=synthetic_persona_klasses,
         )
 
         personas = [
-            (persona.persona_name, persona.persona_description)
+            (persona.persona_name, persona.persona_description)  # type: ignore
             for persona in parsed_responses
         ]  # type: ignore
         criteria_name_to_persona = {
@@ -274,8 +257,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                     "feedback",
                     str,
                     Field(
-                        default="",
-                        description=f"Actionable suggestions that would help improve the evaluated {criterion.prediction_field if criterion.prediction_field is not None else 'response'} based on the explanation",
+                        description=f"Actionable suggestions that would help improve the evaluated {criterion.to_evaluate_field if criterion.to_evaluate_field is not None else 'response'} based on the explanation",
                     ),
                     [],
                 )
@@ -289,10 +271,12 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
         if not criterion.examples:
             return ""
 
-        title = "\n\n## Examples\n\nTake into account the following examples with ground truth when performing the evaluation.\n\n"
+        title = "\n\n## Examples\n\nTake into account the following examples when performing the evaluation.\n\n"
         examples_str = []
         for i, example in enumerate(criterion.examples):
-            context: dict[str, str] = get_context_dict(example.instance, criterion)
+            context: dict[str, str] = get_context_dict(
+                cast(Instance, example.instance), criterion
+            )
             context_str: str = (
                 "\n\n".join(f"- {k}: {v}" for k, v in context.items())
                 if len(context)
@@ -302,40 +286,39 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 ("\n#### Context\n\n" + context_str) if context_str else ""
             )
 
-            prediction_section = f"#### The {criterion.prediction_field if criterion.prediction_field else 'text'} to evaluate\n{cast(DirectInstance, example.instance).response}"
+            prediction_section = f"#### The {criterion.to_evaluate_field if criterion.to_evaluate_field else 'text'} to evaluate\n{get_to_evaluate_text(cast(Instance, example.instance), criterion)}"
 
-            ground_truth_section = f"#### Ground truth: {example.ground_truth}"
+            explanation_section = (
+                f"#### Explanation: {example.explanation}\n\n"
+                if example.explanation
+                else ""
+            )
 
-            example_str = f"### Example {i + 1}:\n{context_section_str}\n\n{prediction_section}\n\n{ground_truth_section}\n"
+            ground_truth_section = f"#### Selected option: {example.selected_option}"
+
+            example_str = f"### Example {i + 1}:\n{context_section_str}\n\n{prediction_section}\n\n{explanation_section}{ground_truth_section}\n"
             examples_str.append(example_str)
         res = title + "\n\n".join(examples_str) + "\n[End of examples]"
         return res
 
     def _run(
         self,
-        instances: list[DirectInstance],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[DirectInstanceResult]:
-        output_parsers: list[PydanticOutputParser] = []
         format_instructions_list = []
         criteria_options_list = []
         criteria_option_names_list = []
-        classes = []
+        model_classes = []
         feedback_step_sections = []
-        prediction_fields = []
+        to_evaluate_fields = []
         for criterion in criteria:
             klass = self.generate_pydantic_model(
                 model_name=f"{criterion.name}_model",
                 criterion=criterion,
                 include_feedback=self.generate_feedback,
             )
-            classes.append(klass)
-
-            output_parser = PydanticOutputParser(pydantic_object=klass)
-            output_parsers.append(output_parser)
-
-            format_instructions: str = output_parser.get_format_instructions()
-            format_instructions_list.append(format_instructions)
+            model_classes.append(klass)
 
             criteria_options: str = "\n".join(
                 [
@@ -349,21 +332,25 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
 
             criteria_options_list.append(criteria_options)
 
-            prediction_field = (
-                criterion.prediction_field
-                if criterion.prediction_field is not None
+            to_evaluate_field = (
+                criterion.to_evaluate_field
+                if criterion.to_evaluate_field is not None
                 else "response"
             )
-            prediction_fields.append(prediction_field)
+            to_evaluate_fields.append(to_evaluate_field)
 
             feedback_step_section = (
-                f'6. At the end, provide "feedback" consisting of actionable suggestions that would help improve the evaluated {prediction_field}. Unlike the explanation, which explains the reasoning behind the judgment, the feedback should focus on guiding refinement. For example, in creative writing, it could suggest improving clarity, coherence, or narrative flow. In analytical tasks, it could recommend strengthening evidence, refining arguments, or correcting inaccuracies. Keep feedback concise and specific enough to support iterative improvement. If you consider that the {prediction_field} is optimal, leave the "feedback" field empty ("")'
+                f'7. At the end, provide "feedback" consisting of actionable suggestions that would help improve the evaluated {to_evaluate_field}. Unlike the explanation, which explains the reasoning behind the judgment, the feedback should focus on guiding refinement. For example, in creative writing, it could suggest improving clarity, coherence, or narrative flow. In analytical tasks, it could recommend strengthening evidence, refining arguments, or correcting inaccuracies. Keep feedback concise and specific enough to support iterative improvement. If you consider that the {to_evaluate_field} is optimal, leave the "feedback" field empty ("")'
                 if self.generate_feedback
                 else ""
             )
             feedback_step_sections.append(feedback_step_section)
+            format_instructions_list.append(build_format_instructions(klass))
 
-        predictions: list[str] = [i.response for i in instances]
+        predictions: list[str] = [
+            cast(str, get_to_evaluate_text(instance, criterion))
+            for instance, criterion in zip(instances, criteria)
+        ]
         context_variables_list: list[dict[str, str]] = [
             get_context_dict(instance, criterion)
             for instance, criterion in zip(instances, criteria)
@@ -379,53 +366,59 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
         ]
         if self.judge_description_prompt:
             judge_description_sections = [self.judge_description_prompt] * len(criteria)
-        else:
-            if self.generate_synthetic_persona:
-                personas = self.generate_personas(
-                    context_sections=context_sections,
-                    predictions=predictions,
-                    criteria=criteria,
-                )
-            else:
-                persona_name, persona_description = (
-                    "an expert evaluator",
-                    "a judge whose job is to evaluate a text against a criterion and optional context. You objective and concise.",
-                )
-                personas = [(persona_name, persona_description)] * len(criteria)
+        elif self.generate_synthetic_persona:
+            personas = self.generate_personas(
+                context_sections=context_sections,
+                predictions=predictions,
+                criteria=criteria,
+            )
             judge_description_sections = [
                 f"You are {persona_name}. You are {persona_description}"
                 for persona_name, persona_description in personas
             ]
+        else:
+            judge_description_sections = [
+                "You are an expert evaluator. Your task is to objectively and concisely assess a text against a given criterion and optional context. Focus on the substance of the text, follow the instructions carefully, and produce output strictly in the required JSON format. Do not include any explanations, commentary, or text outside the JSON object."
+            ] * len(criteria)
 
-        prompt_template = PromptTemplate(
-            input_variables=[
-                "text_to_evaluate",
-                "context_section",
-                "examples_section",
-                "criteria_name_section",
-                "criteria_description",
-                "criteria_options",
-                "format_instructions",
-                "prediction_field",
-                "feedback_step_section",
-                "judge_description_section",
-            ],
-            template=dedent(
-                text="""\
-                {judge_description_section}
+        system_template = dedent(
+            """\
+            {judge_description_section}
 
+            You must output only valid JSON with no extra text.
+            Use the following schema and formatting rules:
+            {format_instructions}
+            """
+        )
+
+        user_template = dedent(
+            """\
                 You will be given:
                 - **Criterion** (name, description, options)
                 - **Optional context**
-                - **The {prediction_field}** to evaluate
+                - **The {to_evaluate_field}** to evaluate
 
                 ## Required evaluation behavior (follow these precisely):
 
                 1. Read the *criterion* and the *context* carefully.
-                2. Compare the {prediction_field} to the criterion and the context.
-                3. Decide which criterion option best fits the {prediction_field}.
-                4. Write your reasoning in the `"explanation"`, using clear markdown bullet points that describe why one response is better. Keep it concise and factual.
+
+                2. Compare the {to_evaluate_field} to the criterion and the context.
+
+                3. Decide which criterion option best fits the {to_evaluate_field}.
+
+                • If more than one option seems plausible:
+                    - Choose the one that best satisfies the criterion based on the strongest evidence, not speculation.
+                    - If still unclear, select the option that is closest but explain the ambiguity in "explanation".
+
+                4. Write your reasoning in the "explanation", using clear markdown bullet points that describe why one option fits best. When possible, cite specific excerpts or features from the {to_evaluate_field} that support your choice.
+
                 5. Set `"selected_option"` to exactly one of the following values: {criteria_option_names}.
+
+                6. Before submitting your final answer, verify that:
+                - The output is valid JSON
+                - All keys are quoted
+                - There are no trailing commas
+                - `"selected_option"` matches exactly one allowed value
                 {feedback_step_section}
 
                 ## Criteria:{criteria_name_section}
@@ -433,55 +426,64 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 Options:
                 {criteria_options}{examples_section}{context_section}
 
-                ## The {prediction_field} to evaluate
+                ## The {to_evaluate_field} to evaluate
 
                 {text_to_evaluate}
-
-                ## Output format
-
-                {format_instructions}
-                Output must be valid JSON only — no extra text.
-            """,
-            ),
+                """
         )
 
-        prompts: list[str] = [
-            prompt_template.format(
-                text_to_evaluate=prediction,
-                context_section=context_section,
-                examples_section=self.get_in_context_example_as_str(criterion),
-                criteria_name_section=f"\n\nCriteria name: {criterion.name}"
-                if criterion.name
-                else "\n",
-                criteria_description=criterion.description,
-                criteria_options=criterion_options,
-                format_instructions=format_instructions,
-                prediction_field=prediction_field,
-                feedback_step_section=feedback_step_section,
-                judge_description_section=judge_description_section,
-                criteria_option_names=criteria_option_names,
-            )
-            for prediction, context_section, criterion, criterion_options, format_instructions, prediction_field, feedback_step_section, judge_description_section, criteria_option_names in zip(
+        prompts: list[list[dict]] = [
+            [
+                {
+                    "role": "system",
+                    "content": system_template.format(
+                        judge_description_section=judge_description_section,
+                        format_instructions=format_instructions,
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": user_template.format(
+                        text_to_evaluate=prediction,
+                        context_section=context_section,
+                        examples_section=self.get_in_context_example_as_str(criterion),
+                        criteria_name_section=(
+                            f"\n\nCriteria name: {criterion.name}"
+                            if criterion.name
+                            else "\n"
+                        ),
+                        criteria_description=criterion.description,
+                        criteria_options=criterion_options,
+                        to_evaluate_field=to_evaluate_field,
+                        feedback_step_section=feedback_step_section,
+                        criteria_option_names=criteria_option_names,
+                    ),
+                },
+            ]
+            for prediction, context_section, criterion, criterion_options, format_instructions, to_evaluate_field, feedback_step_section, judge_description_section, criteria_option_names in zip(
                 predictions,
                 context_sections,
                 criteria,
                 criteria_options_list,
                 format_instructions_list,
-                prediction_fields,
+                to_evaluate_fields,
                 feedback_step_sections,
                 judge_description_sections,
                 criteria_option_names_list,
             )
         ]
 
+        dataset = [
+            {
+                "source": messages,
+                "data_classification_policy": ["public"],
+            }
+            for messages in prompts
+        ]
+
         unparsed_responses: list[str] = cast(
             list[str],
-            self.inference_engine(
-                dataset=[
-                    {"source": prompt, "data_classification_policy": ["public"]}
-                    for prompt in prompts
-                ]
-            ),
+            self.inference_engine(dataset=dataset),
         )
 
         parser = BatchRepairParser(
@@ -490,17 +492,19 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             on_generation_failure=self.on_generation_failure,
         )
 
-        parsed_responses, parsing_metadatas = parser.parse_all_responses(
+        parsed_responses, parsing_metadatas = parser.parse_and_repair(
             unparsed_responses=unparsed_responses,
             on_failure_default=[
-                [option.name for option in criterion.options] for criterion in criteria
+                {"selected_option": [option.name for option in criterion.options]}
+                for criterion in criteria
             ],
-            output_parsers=output_parsers,
+            model_classes=model_classes,
         )
-        explanations: list[str] = [r.explanation for r in parsed_responses]
-        selected_options: list[str] = [r.selected_option for r in parsed_responses]
+        explanations: list[str] = [r.explanation for r in parsed_responses]  # type: ignore
+        selected_options: list[str] = [r.selected_option for r in parsed_responses]  # type: ignore
         feedbacks: list[str | None] = [
-            None if not self.generate_feedback else r.feedback for r in parsed_responses
+            None if not self.generate_feedback else r.feedback  # type: ignore
+            for r in parsed_responses  # type: ignore
         ]
         return [
             DirectInstanceResult(
@@ -542,6 +546,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 [],
             ),
         ]
+        selected_field: Literal["selected_option", "selected_score"]
 
         if valid_outputs is not None:
             if isinstance(valid_outputs, list):
@@ -551,9 +556,10 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                         raise ValueError(f"value must be one of {valid_outputs}")
                     return value
 
+                selected_field = "selected_option"
                 field_defs.append(
                     (
-                        "selected_option",
+                        selected_field,
                         str,
                         Field(
                             ...,
@@ -585,9 +591,10 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                         )  # type: ignore
                     return value
 
+                selected_field = "selected_score"
                 field_defs.append(
                     (
-                        "selected_score",
+                        selected_field,
                         int,
                         Field(
                             ...,
@@ -597,9 +604,10 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                     )
                 )
         else:
+            selected_field = "selected_score"
             field_defs.append(
                 (
-                    "selected_score",
+                    selected_field,
                     int,
                     Field(
                         ...,
@@ -613,14 +621,10 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             "structured_output_model", field_defs
         )
 
-        output_parser = PydanticOutputParser(pydantic_object=dynamic_model)
-
-        format_instructions: str = output_parser.get_format_instructions()
-
         prompt_template = PromptTemplate(
             input_variables=["judge_prompt"],
             partial_variables={
-                "format_instructions": format_instructions,
+                "format_instructions": build_format_instructions(dynamic_model),
             },
             template=dedent(
                 text="""\
@@ -670,15 +674,13 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             on_generation_failure=self.on_generation_failure,
         )
 
-        parsed_responses, parsing_metadatas = parser.parse_all_responses(
+        parsed_responses, parsing_metadatas = parser.parse_and_repair(
             unparsed_responses=unparsed_responses,
-            output_parsers=[output_parser] * len(unparsed_responses),
-            on_failure_default=cast(
-                list[str | int | list[str | int]], on_failure_default_options
-            ),
+            on_failure_default={selected_field: on_failure_default_options},
+            model_classes=[dynamic_model] * len(unparsed_responses),
         )
 
-        explanations: list[str] = [r.explanation for r in parsed_responses]
+        explanations: list[str] = [r.explanation for r in parsed_responses]  # type: ignore
         selected_options: list[str] = [
             getattr(r, "selected_option", str(getattr(r, "selected_score", None)))
             for r in parsed_responses

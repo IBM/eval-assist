@@ -1,6 +1,5 @@
-from evalassist.judges import Instance
+from evalassist.judges import Criteria, Instance, PairwiseJudge
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
-from evalassist.judges.pairwise_judge import PairwiseJudge
 from unitxt.inference import CrossProviderInferenceEngine
 
 judge = PairwiseJudge(
@@ -11,19 +10,29 @@ judge = PairwiseJudge(
     ),
 )
 
+weird_string = "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+
+instances = [
+    Instance(
+        fields={
+            weird_string: [
+                f"{i}_respo1Use the API client to fetch data from the server and the cache to store frequently accessed results for faster performance.",
+                f"{i}_respon2Do it.",
+            ]
+        },
+    )
+    for i in range(50)
+]
+
 results = judge(
-    instances=[
-        Instance(
-            fields={
-                "response": [
-                    "Reminder: Your dentist appointment is scheduled for Tuesday at 3 PM.",
-                    "Don't forget! You have a dentist appointment at 3 PM on Tuesday.",
-                ]
-            }
-        ),
-    ],
-    criteria="Clarity and effectiveness in delivering a reminder message.",
+    instances=instances,
+    criteria=Criteria(
+        name="criteria",
+        description="Is the text self-explanatory and self-contained?",
+        to_evaluate_field=weird_string,
+    ),
 )
+
 
 print("### Selected option")
 print(f"{results[0].selected_option}")

@@ -294,7 +294,7 @@ for i, result in enumerate(results):
     instance_scores = result['score']['instance']
     summary = {
         f'system_{i}': {"winrate": instance_scores[f'{i}_winrate'], "ranking": instance_scores[f'{i}_ranking']}
-     for i in range(
+    for i in range(
         1,
         len(predictions[0]) + 1
     )}

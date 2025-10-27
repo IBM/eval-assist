@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, Generic, List, cast
 
-from evalassist.judges.direct_judge import JudgeDescriptor
+from evalassist.judges.direct_judge import JudgeDescriptor, get_context_dict
+from evalassist.judges.utils import get_to_evaluate_text
 from unitxt.api import evaluate, load_dataset
 from unitxt.blocks import Task, TaskCard
 from unitxt.llm_as_judge import (
@@ -25,9 +26,8 @@ from .base import (
 )
 from .types import (
     Criteria,
-    DirectInstance,
     DirectInstanceResult,
-    PairwiseInstance,
+    Instance,
     PairwiseInstanceResult,
     SingleSystemPairwiseInstanceResult,
 )
@@ -65,30 +65,38 @@ class UnitxtJudge(
         self, instances: list[InstanceTypeVar], criteria: list[Criteria]
     ) -> list[ReturnVarType]:
         # unitxt has a fixed task input fields, so we will add all of them in case different criterias have different prediction and/or context fields
-        for criterion in criteria:
-            if criterion.prediction_field is None:
-                criterion.prediction_field = "response"
+        # for criterion in criteria:
+        #     if criterion.to_evaluate_field is None:
+        #         criterion.to_evaluate_field = "response"
 
         all_context_fields: set[str] = set(
             [
                 list_item
                 for listt in [
                     (
-                        c.context_fields
-                        if c.context_fields is not None
-                        else (list(i.context.keys()) if i.context is not None else {})
+                        criterion.context_fields
+                        if criterion.context_fields is not None
+                        else (
+                            [
+                                x
+                                for x in list(instance.fields.keys())
+                                if x != criterion.to_evaluate_field
+                            ]
+                        )
                     )
-                    for i, c in zip(instances, criteria)
+                    for instance, criterion in zip(instances, criteria)
                 ]
                 for list_item in listt
             ]
         )
 
-        all_prediction_fields: set[str] = set(
-            [cast(str, c.prediction_field) for c in criteria]
-        )
+        all_prediction_fields: set[str] = set([c.to_evaluate_field for c in criteria])
 
-        predictions = self.get_predictions(instances)
+        # to_evaluate_texts = self.get_predictions(instances)
+        to_evaluate_texts = [
+            get_to_evaluate_text(instance, criterion)
+            for instance, criterion in zip(instances, criteria)
+        ]
 
         evaluator_params = {
             "inference_engine": self.inference_engine,
@@ -105,13 +113,21 @@ class UnitxtJudge(
         input_fields.update(
             {field: self.get_prediction_type() for field in all_prediction_fields}
         )
+
+        contexts = [
+            get_context_dict(instance, criterion)
+            for instance, criterion in zip(instances, criteria)
+        ]
+
         # add the context fields
         task_data: list[dict[str, str | list[str]]] = [
             {
-                **(instance.context if instance.context is not None else {}),
-                cast(str, criterion.prediction_field): prediction,
+                **context,
+                criterion.to_evaluate_field: prediction,
             }
-            for instance, prediction, criterion in zip(instances, predictions, criteria)
+            for context, prediction, criterion in zip(
+                contexts, to_evaluate_texts, criteria
+            )
         ]
         # add the context fields as empty strings in case different criteria provide diffent context names or prediction_field names
         task_data = [
@@ -151,7 +167,7 @@ class UnitxtJudge(
 
 
 class UnitxtDirectJudge(
-    UnitxtJudge[DirectInstance, DirectInstanceResult],
+    UnitxtJudge[Instance, DirectInstanceResult],
     BaseDirectJudge,
 ):
     def get_preprocess_steps(self):
@@ -186,7 +202,7 @@ def to_zero_index_list(int_list: list):
 
 
 class UnitxtPairwiseJudge(
-    UnitxtJudge[PairwiseInstance, PairwiseInstanceResult],
+    UnitxtJudge[Instance, PairwiseInstanceResult],
     BasePairwiseJudge,
 ):
     def get_preprocess_steps(self):
@@ -199,7 +215,7 @@ class UnitxtPairwiseJudge(
         return LLMJudgePairwise
 
     def parse_results(
-        self, dataset, instances: list[PairwiseInstance], criteria: list[Criteria]
+        self, dataset, instances: list[Instance], criteria: list[Criteria]
     ):
         results: list[PairwiseInstanceResult] = []
         for row, instance, criterion in zip(dataset, instances, criteria):
@@ -276,11 +292,16 @@ class GraniteGuardianJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
 
     def get_prompt(self, risk_name, instances, criterion: Criteria) -> list[str]:
         risk_name = self.get_risk_name(risk_name)
-        predictions = self.get_predictions(instances)
+
+        # to_evaluate_texts = self.get_predictions(instances)
+        to_evaluate_texts = [
+            cast(str, get_to_evaluate_text(instance, criterion))
+            for instance in instances
+        ]
 
         context_variables_list = self.get_unitxt_dataset(
             instances=instances,
-            predictions=predictions,
+            predictions=to_evaluate_texts,
             criteria=[criterion] * len(instances),
         )
         input_fields = self.get_input_fields(context_variables_list)
@@ -304,14 +325,14 @@ class GraniteGuardianJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
         self,
         dataset,
         criteria: list[Criteria],
-        instances: list[DirectInstance],
+        instances: list[Instance],
     ) -> list[DirectInstanceResult]:
         results = []
         for row, criterion, instance in zip(dataset, criteria, instances):
             risk_name: str = row["score"]["instance"]["score_name"]
             instance_score = row["score"]["instance"]
             explanation = self.get_harms_and_risks_result_description(
-                cast(str, criterion.prediction_field).replace("_", " "),
+                cast(str, criterion.to_evaluate_field).replace("_", " "),
                 risk_name.lower().replace(" ", "_"),
             )
 
@@ -346,18 +367,23 @@ class GraniteGuardianJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
 
     def get_unitxt_dataset(
         self,
-        instances: list[DirectInstance],
+        instances: list[Instance],
         predictions: list[str],
         criteria: list[Criteria],
     ) -> list[dict[str, str]]:
+        # contexts = [
+        #     instance.context if instance.context is not None else {}
+        #     for instance in instances
+        # ]
         contexts = [
-            instance.context if instance.context is not None else {}
-            for instance in instances
+            get_context_dict(instance, criterion)
+            for instance, criterion in zip(instances, criteria)
         ]
+
         for context, prediction, criterion in zip(contexts, predictions, criteria):
             # use prediction as one more context variable
-            if criterion.prediction_field is not None:
-                context[cast(str, criterion.prediction_field)] = prediction
+            if criterion.to_evaluate_field is not None:
+                context[cast(str, criterion.to_evaluate_field)] = prediction
             else:
                 context["response"] = prediction
 
@@ -373,13 +399,18 @@ class GraniteGuardianJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
 
     def _run(
         self,
-        instances: list[DirectInstance],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[DirectInstanceResult]:
         risk_names = [self.get_risk_name(criterion.name) for criterion in criteria]
-        predictions = self.get_predictions(instances)
+        # to_evaluate_texts = self.get_predictions(instances)
+        to_evaluate_texts = [
+            cast(str, get_to_evaluate_text(instance, criterion))
+            for instance, criterion in zip(instances, criteria)
+        ]
+
         dataset = self.get_unitxt_dataset(
-            instances=instances, predictions=predictions, criteria=criteria
+            instances=instances, predictions=to_evaluate_texts, criteria=criteria
         )
         input_fields = self.get_input_fields(dataset)
 

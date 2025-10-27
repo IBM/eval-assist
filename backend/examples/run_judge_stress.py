@@ -1,34 +1,37 @@
-from evalassist.judges import DirectJudge
+from evalassist.judges import Criteria, CriteriaOption, DirectJudge
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from unitxt.inference import CrossProviderInferenceEngine
 
 judge = DirectJudge(
     inference_engine=CrossProviderInferenceEngine(
-        model="llama-3-3-70b-instruct",
-        provider="watsonx",
+        model="llama-4-maverick",
+        provider="rits",
         **DEFAULT_JUDGE_INFERENCE_PARAMS,
     ),
     generate_feedback=True,
 )
 
+instances = [
+    f"{i}_Use the API client to fetch data from the server and the cache to store frequently accessed results for faster performance."
+    for i in range(50)
+]
+
 results = judge(
-    instances=[
-        "Use the API client to fetch data from the server and the cache to store frequently accessed results for faster performance."
-    ],
-    criteria="Is the text self-explanatory and self-contained?",  # Creates yes/no direct assessment criteria,
+    instances=instances,
+    criteria=Criteria(
+        name="criteria",
+        description="Is the text self-explanatory and self-contained?",
+        options=[
+            CriteriaOption(
+                name="|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+            ),
+            CriteriaOption(
+                name="||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+            ),
+        ],
+        to_evaluate_field="response",
+    ),
 )
-
-# providing criteria="Is the response self-explanatory?" is equal to the following criteria defintion
-# criteria = Criteria(
-#     name="self-explanatory",
-#     description="Is the text self-explanatory and self-contained?",
-#     options=[
-#         CriteriaOption(name="Yes", description="", score=1.0),
-#         CriteriaOption(name="No", description="", score=0.0),
-#     ],
-#     to_evaluate_field="response",
-# )
-
 
 print("### Selected option / Score")
 print(f"{results[0].selected_option} / {results[0].score}")

@@ -2,15 +2,18 @@ import logging
 from textwrap import dedent
 from typing import Literal, cast
 
-from evalassist.judges.batch_parser import BatchRepairParser
-from evalassist.judges.utils import generate_dynamic_pydantic_model, get_context_dict
-from langchain_core.output_parsers import PydanticOutputParser
-from langchain_core.prompts.prompt import PromptTemplate
+from evalassist.judges.batch_repair_parser import BatchRepairParser
+from evalassist.judges.utils import (
+    build_format_instructions,
+    generate_dynamic_pydantic_model,
+    get_context_dict,
+    get_to_evaluate_text,
+)
 from pydantic import BaseModel, Field
 from unitxt.inference import InferenceEngine
 
 from .base import BasePairwiseJudge, JudgeDescriptor, UnitxtInferenceEngineMixin
-from .types import Criteria, PairwiseInstance, PairwiseInstanceResult
+from .types import Criteria, Instance, PairwiseInstanceResult
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +59,7 @@ class PairwiseJudge(BasePairwiseJudge, UnitxtInferenceEngineMixin):
                     )
 
     def get_name(self) -> str:
-        return f"simple{f'_with_self_consistency_{self.self_consistency}_attempts' if self.self_consistency else ''}"
+        return f"in_house{f'_with_self_consistency_{self.self_consistency}_attempts' if self.self_consistency else ''}"
 
     def get_descriptor(self) -> JudgeDescriptor:
         judge_descriptor = JudgeDescriptor(self.get_name(), "pairwise", "")
@@ -95,196 +98,235 @@ class PairwiseJudge(BasePairwiseJudge, UnitxtInferenceEngineMixin):
 
     def _run(
         self,
-        instances: list[PairwiseInstance],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[PairwiseInstanceResult]:
-        # for instance in instances:
-        #     if len(instance.responses) != 2:
-        #         raise ValueError(
-        #             f"The number of texts to compare must be equal to 2 for all the instances. Received {len(instance.responses)} texts."
-        #         )
-
-        output_parsers: list[PydanticOutputParser] = []
+        model_classes = []
         format_instructions_list = []
-        classes = []
-        prediction_fields = []
-        valid_options_list = []
+        to_evaluate_fields = []
+        valid_options_list: list = []
         for instance, criterion in zip(instances, criteria):
-            prediction_field = (
-                criterion.prediction_field
-                if criterion.prediction_field is not None
-                else "response"
-            ).lower()
-            prediction_fields.append(prediction_field)
+            to_evaluate_field = criterion.to_evaluate_field
+            to_evaluate_fields.append(to_evaluate_field)
+
             valid_options = [
                 *[
-                    f"{prediction_field}_{i + 1}"
-                    for i in range(len(instance.responses))
+                    f"{to_evaluate_field}_{i + 1}"
+                    for i in range(
+                        len(cast(list[str], get_to_evaluate_text(instance, criterion)))
+                    )
                 ],
                 "tie",
             ]
             valid_options_list.append(valid_options)
+
             klass = self.generate_pydantic_model(
                 model_name=f"{criterion.name}_model",
                 valid_options=valid_options,
             )
-            classes.append(klass)
+            model_classes.append(klass)
+            format_instructions_list.append(build_format_instructions(klass))
 
-            output_parser = PydanticOutputParser(pydantic_object=klass)
-            output_parsers.append(output_parser)
-
-            format_instructions: str = output_parser.get_format_instructions()
-            format_instructions_list.append(format_instructions)
-
-        context_variables_list: list[dict[str, str]] = [
+        # Build context sections
+        context_variables_list = [
             get_context_dict(instance, criterion)
             for instance, criterion in zip(instances, criteria)
         ]
-        str_context_variables_list: list[str | None] = [
-            "\n\n".join(f"- {k}: {v}" for k, v in c.items()) if len(c) else None
+        context_sections = [
+            (
+                "\n\n## Context\n\n"
+                + "\n".join(f"- {k}: {v}" for k, v in c.items())
+                + "\n"
+            )
+            if c
+            else ""
             for c in context_variables_list
         ]
 
-        context_sections: list[str] = [
-            ("\n\n## Context\n\n" + c + "\n") if c is not None else ""
-            for c in str_context_variables_list
-        ]
+        # Build example sections
+        def get_example_str(criterion: Criteria) -> str:
+            if not criterion.examples:
+                return ""
+            examples_str = []
+            for i, example in enumerate(criterion.examples):
+                context = get_context_dict(cast(Instance, example.instance), criterion)
+                context_str = "\n".join(f"- {k}: {v}" for k, v in context.items())
+                context_section = (
+                    f"\n#### Context\n{context_str}" if context_str else ""
+                )
+                prediction_section = "#### Responses\n" + "\n".join(
+                    f"{criterion.to_evaluate_field if criterion.to_evaluate_field else 'text'}_{idx + 1}: {resp}"
+                    for idx, resp in enumerate(
+                        cast(
+                            list[str],
+                            get_to_evaluate_text(
+                                cast(Instance, example.instance), criterion
+                            ),
+                        )
+                    )
+                )
+                explanation_section = (
+                    f"#### Explanation\n{example.explanation}"
+                    if example.explanation
+                    else ""
+                )
+                selected_section = f"#### Selected option\n{example.selected_option}"
+                examples_str.append(
+                    f"### Example {i + 1}:\n{context_section}\n{prediction_section}\n{explanation_section}\n{selected_section}"
+                )
+            return "\n\n".join(examples_str)
+
+        examples_sections = [get_example_str(c) for c in criteria]
+
+        # Judge description (static)
         judge_description_sections = [
-            f"You are a an evaluator. You are an expert on comparing {prediction_field} texts based on a criterion."
-            for prediction_field in prediction_fields
+            f"You are an evaluator. You are an expert on comparing {pf} texts based on a criterion."
+            for pf in to_evaluate_fields
         ]
 
+        # Tie instructions
         tie_sections = [
-            f'\n\n## Tie option\n\nIf two or more of the {prediction_field} texts are equally good based on the criteria, set the `"selected_option"` field as `"tie"`.\n\n'
+            f'\n\n## Tie option\nIf two or more of the {pf} texts are equally good based on the criterion, set the "selected_option" field as "tie".\n'
             if self.tie_enabled
             else ""
-            for prediction_field in prediction_fields
+            for pf in to_evaluate_fields
         ]
 
         responses_sections = [
             "\n".join(
                 [
-                    f"{prediction_field}_{i + 1}: {response}"
-                    for i, response in enumerate(instance.responses)
+                    f"{to_evaluate_field}_{i + 1}: {response}"
+                    for i, response in enumerate(
+                        cast(list[str], instance.fields[to_evaluate_field])
+                    )
                 ]
             )
-            for instance, prediction_field in zip(instances, prediction_fields)
+            for instance, to_evaluate_field in zip(instances, to_evaluate_fields)
         ]
 
-        prompt_template = PromptTemplate(
-            input_variables=[
-                "context_section",
-                # "examples_section",
-                "criteria_name_section",
-                "criteria_description",
-                "format_instructions",
-                "prediction_field",
-                "judge_description_section",
-                "tie_section",
-                "responses_section",
-            ],
-            template=dedent(
-                text="""\
-                {judge_description_section}
+        # Build system and user prompts
+        system_template = dedent(
+            """\
+            {judge_description_section}
 
-                You will be given:
-                - **Criterion** (name and description)
-                - **Optional context**
-                - The **{prediction_field}** texts to evaluate
-
-
-                ## Required evaluation behavior (follow these precisely):
-
-                1. Read the *criterion* and the *context* carefully.
-                2. Compare each candidate {prediction_field} against the criterion and the reference context.
-                3. Decide which candidate best satisfies the criterion (or decide tie if two or more candidates are equally good).
-                4. Write your reasoning in the `"explanation"`, using clear markdown bullet points that describe why one response is better. Keep it concise and factual.
-                5. Set `"selected_option"` to exactly one of the following values: {valid_options}.
-
-
-                ## Criteria: {criteria_name_section}
-
-                {criteria_description}
-                {context_section}
-                ## The {prediction_field} texts to evaluate
-                {responses_section}
-                {tie_section}
-                ## Output format
-
-                {format_instructions}
-                Output must be valid JSON only — no extra text.
-            """,
-            ),
+            You must output only valid JSON with no extra text.
+            Use the following schema and formatting rules:
+            {format_instructions}
+            """
         )
 
-        prompts: list[str] = [
-            prompt_template.format(
-                context_section=context_section,
-                # examples_section=self.get_in_context_example_as_str(criterion),
-                criteria_name_section=criterion.name if criterion.name else "\n",
-                criteria_description=criterion.description,
-                format_instructions=format_instructions,
-                prediction_field=prediction_field,
-                judge_description_section=judge_description_section,
-                tie_section=tie_section,
-                responses_section=responses_section,
-                valid_options=", ".join([f'"{v}"' for v in valid_options]),
-            )
-            for context_section, criterion, format_instructions, prediction_field, judge_description_section, tie_section, responses_section, valid_options in zip(
+        user_template = dedent(
+            """\
+            You will be given:
+            - **Criterion** (name and description)
+            - **Optional context**
+            - The **{to_evaluate_field}** texts to evaluate
+
+            ## Required evaluation behavior (follow these precisely):
+            1. Read the *criterion* and the *context* carefully.
+            2. Compare each candidate {to_evaluate_field} against the criterion and the reference context.
+            3. Decide which candidate best satisfies the criterion (or decide tie if two or more candidates are equally good).
+            4. Write your reasoning in the "explanation", using clear markdown bullet points that describe why one response is better. Keep it concise and factual.
+            5. Set "selected_option" to exactly one of the following values: {valid_options}.
+            6. Before submitting your final answer, verify that:
+            - The output is valid JSON
+            - All keys are quoted
+            - There are no trailing commas
+            - `"selected_option"` matches exactly one allowed value
+
+            ## Criteria: {criteria_name_section}
+            {criteria_description}
+            {context_section}
+            {examples_section}
+
+            ## The {to_evaluate_field} texts to evaluate
+            {responses_section}
+            {tie_section}
+            """
+        )
+
+        # Compose final prompts as system + user messages
+        prompts = [
+            [
+                {
+                    "role": "system",
+                    "content": system_template.format(
+                        judge_description_section=jd,
+                        format_instructions=fi,
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": user_template.format(
+                        context_section=ctx,
+                        examples_section=ex,
+                        criteria_name_section=crit.name if crit.name else "\n",
+                        criteria_description=crit.description,
+                        to_evaluate_field=pf,
+                        tie_section=tie,
+                        responses_section=resp,
+                        valid_options=", ".join([f'"{v}"' for v in valid_opts]),
+                    ),
+                },
+            ]
+            for ctx, ex, crit, pf, tie, resp, jd, fi, valid_opts in zip(
                 context_sections,
+                examples_sections,
                 criteria,
-                format_instructions_list,
-                prediction_fields,
-                judge_description_sections,
+                to_evaluate_fields,
                 tie_sections,
                 responses_sections,
+                judge_description_sections,
+                format_instructions_list,
                 valid_options_list,
             )
         ]
 
-        unparsed_responses: list[str] = cast(
-            list[str],
-            self.inference_engine.infer(
-                dataset=[
-                    {"source": prompt, "data_classification_policy": ["public"]}
-                    for prompt in prompts
-                ]
-            ),
-        )
+        dataset = [
+            {"source": msgs, "data_classification_policy": ["public"]}
+            for msgs in prompts
+        ]
 
+        # Call inference engine
+        unparsed_responses = cast(list[str], self.inference_engine(dataset=dataset))
+
+        # Parse responses
         parser = BatchRepairParser(
             inference_engine=self.inference_engine,
             max_retries=3,
             on_generation_failure=self.on_generation_failure,
         )
 
-        parsed_responses, parsing_metadatas = parser.parse_all_responses(
+        parsed_responses, parsing_metadatas = parser.parse_and_repair(
             unparsed_responses=unparsed_responses,
-            on_failure_default=valid_options_list,
-            output_parsers=output_parsers,
+            on_failure_default=[
+                {"selected_option": valid_options}
+                for valid_options in valid_options_list
+            ],
+            model_classes=model_classes,
         )
 
-        explanations: list[str] = [r.explanation for r in parsed_responses]
-        selected_options: list[str] = [r.selected_option for r in parsed_responses]
-        parsed_selected_options = []
-        for selected_option in selected_options:
-            if selected_option == "tie":
-                parsed_selected_options.append("tie")
-            else:
-                parsed_selected_options.append(int(selected_option.split("_")[1]) - 1)
+        # Map outputs to internal format
+        explanations = [r.explanation for r in parsed_responses]  # type: ignore
+        selected_options = [r.selected_option for r in parsed_responses]  # type: ignore
+        parsed_selected_options = [
+            "tie" if so == "tie" else int(so.split("_")[1]) - 1
+            for so in selected_options
+        ]
+
         return [
             PairwiseInstanceResult(
                 instance=instance,
-                criteria=criterion,
-                selected_option=selected_option,
-                explanation=explanation,
+                criteria=crit,
+                selected_option=sel,
+                explanation=exp,
                 metadata={
-                    **parsing_metadata,
+                    **meta,
                     "prompt": prompt,
-                    "unparsed_response": unparsed_response,
+                    "unparsed_response": unparsed,
                 },
             )
-            for selected_option, explanation, prompt, unparsed_response, criterion, parsing_metadata, instance in zip(
+            for sel, exp, prompt, unparsed, crit, meta, instance in zip(
                 parsed_selected_options,
                 explanations,
                 prompts,

@@ -297,7 +297,7 @@ export const parseCriteriaForBackend = (criteria: Criteria) => {
   const res = {
     name: criteria.name,
     description: criteria.description,
-    prediction_field: criteria.predictionField,
+    to_evaluate_field: criteria.predictionField,
     context_fields: criteria.contextFields,
   }
   if (isInstanceOfCriteriaWithOptions(criteria)) {
