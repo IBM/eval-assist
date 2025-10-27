@@ -499,7 +499,6 @@ class Generator:
             self.per_criteria_option_count[criteria_borderline["name"]] = (
                 self.borderline_count
             )
-
         if self.domain is not None:
             domain_section = f"- The generated {self.criteria.to_evaluate_field.lower()} is going to be evaluated on the {self.domain.value} domain\n"
         else:
@@ -768,7 +767,7 @@ class Generator:
                 ),
             ],
         )
-        criteria_format_instructions = build_format_instructions(self.dynamic_model)
+        criteria_format_instructions = build_format_instructions(dynamic_model)
 
         criteria_options_list = [
             f"{option.name}: {option.description}" for option in criteria_options
