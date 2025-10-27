@@ -63,7 +63,7 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
               name: capitalizeFirstWord(fetchedCriterion.name),
               description: fetchedCriterion.description,
               options: fetchedCriterion.options,
-              predictionField: capitalizeFirstWord(fetchedCriterion.prediction_field),
+              predictionField: capitalizeFirstWord(fetchedCriterion.to_evaluate_field),
               contextFields: fetchedCriterion.context_fields.map((c) => capitalizeFirstWord(c)),
             } as CriteriaWithOptions),
         ),
@@ -72,7 +72,7 @@ export const CriteriasProvider = ({ children }: { children: ReactNode }) => {
             ({
               name: capitalizeFirstWord(fetchedCriterion.name),
               description: fetchedCriterion.description,
-              predictionField: capitalizeFirstWord(fetchedCriterion.prediction_field),
+              predictionField: capitalizeFirstWord(fetchedCriterion.to_evaluate_field),
               contextFields: fetchedCriterion.context_fields.map((c) => capitalizeFirstWord(c)),
             } as Criteria),
         ),

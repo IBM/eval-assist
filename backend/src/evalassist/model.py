@@ -5,7 +5,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class AppUser(SQLModel, table=True):
-    __tablename__ = "app_user"
+    __tablename__ = "app_user"  # type: ignore
     id: int | None = Field(default=None, primary_key=True)
     email: str = Field(index=True, unique=True)
     name: str
@@ -18,7 +18,7 @@ class AppUser(SQLModel, table=True):
 
 
 class StoredTestCase(SQLModel, table=True):
-    __tablename__ = "stored_test_case"
+    __tablename__ = "stored_test_case"  # type: ignore
     id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="app_user.id")
     content: str
@@ -28,7 +28,7 @@ class StoredTestCase(SQLModel, table=True):
 
 
 class LogRecord(SQLModel, table=True):
-    __tablename__ = "log_record"
+    __tablename__ = "log_record"  # type: ignore
     id: int | None = Field(default=None, primary_key=True)
     data: str
     user_id: int = Field(foreign_key="app_user.id")

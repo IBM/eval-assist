@@ -116,3 +116,5 @@ custom_models.json
 evalassist/static
 
 src/evalassist/benchmark/benchmark_results_cache.csv
+
+.coverage

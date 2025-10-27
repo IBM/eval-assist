@@ -1,17 +1,13 @@
+from abc import ABC, abstractmethod
 from enum import Enum
+from typing import Any
 
 from fastapi import HTTPException
-from pydantic import BaseModel, RootModel, field_validator
+from pydantic import BaseModel, Field, RootModel, field_validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
 
 from .extended_unitxt import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
-from .judges.types import (
-    DirectInstance,
-    DirectInstanceResult,
-    Instance,
-    PairwiseInstance,
-    PairwiseInstanceResult,
-)
+from .judges.types import DirectInstanceResult, Instance, PairwiseInstanceResult
 from .model import StoredTestCase
 
 
@@ -85,7 +81,7 @@ class DirectActionTypeEnum(str, Enum):
 class CriteriaDTO(BaseModel):
     name: str
     description: str
-    prediction_field: str
+    to_evaluate_field: str
     context_fields: list[str]
 
     @field_validator("description")
@@ -108,16 +104,46 @@ class CriteriaWithOptionsDTO(CriteriaDTO):
     options: list[CriteriaOptionDTO]
 
 
-class InstanceDTO(Instance):
+class InstanceDTO(BaseModel, ABC):
     id: str
+    metadata: dict[str, Any] | None = Field(
+        default=None,
+        description="Additional metadata about the instance, stored as key-value pairs.",
+    )
+    context: dict
+    expected_result: str | int | None = Field(
+        default=None,
+        description="The expected result or ground truth for the instance, if available.",
+    )
+
+    def to_instance(self, to_evaluate_field: str) -> Instance:
+        return Instance(
+            fields={
+                **(self.context if self.context is not None else {}),
+                to_evaluate_field: self.get_prediction(),
+            }
+        )
+
+    @abstractmethod
+    def get_prediction(self) -> Any: ...  # noqa: E704
 
 
-class DirectInstanceDTO(DirectInstance, InstanceDTO):
-    pass
+class DirectInstanceDTO(InstanceDTO):
+    response: str = Field(
+        description="The response or prediction generated for the instance."
+    )
+
+    def get_prediction(self):
+        return self.response
 
 
-class PairwiseInstanceDTO(PairwiseInstance, InstanceDTO):
-    pass
+class PairwiseInstanceDTO(InstanceDTO):
+    responses: list[str] = Field(
+        description="A list of responses or predictions to be compared in a pairwise evaluation."
+    )
+
+    def get_prediction(self):
+        return self.responses
 
 
 class EvaluationRequest(BaseModel):
@@ -228,7 +254,7 @@ class DownloadTestCaseBody(BaseModel):
 
 class DownloadTestDataBody(BaseModel):
     instances: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
-    prediction_field: str
+    to_evaluate_field: str
 
 
 class EvaluatorMetadataAPI(BaseModel):

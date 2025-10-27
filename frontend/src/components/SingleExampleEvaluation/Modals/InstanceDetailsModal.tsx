@@ -49,6 +49,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
       return setOpenedPerReponseResults([])
     setOpenedPerReponseResults(Object.keys(selectedInstance.result as PairwiseInstanceResult).map((_) => false))
   }, [currentTestCase.type, selectedInstance])
+
   return (
     selectedInstance !== null && (
       <Modal open={open} onRequestClose={onClose} passiveModal size="lg" modalHeading={`Instance details`}>
@@ -115,7 +116,7 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                         <p>
                           <strong>Explanation:</strong>
                         </p>
-                        <div className="markdown">
+                        <div>
                           <Markdown components={markdownHeadingConf}>
                             {(selectedInstance.result as DirectInstanceResult).explanation}
                           </Markdown>
@@ -180,12 +181,12 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                     {Object.entries(v).map(([metadataKey, metadataValue], i) => (
                                       <React.Fragment key={i}>
                                         <p>
-                                          <strong>{`${capitalizeFirstWord(metadataKey)}:`}</strong>
+                                          <strong>{`${capitalizeFirstWord(metadataKey)}`}</strong>
                                         </p>
                                         {Array.isArray(v) ? (
                                           <List>
                                             {(metadataValue as Array<string>).map((i, j) => (
-                                              <ListItem key={j}>{i}</ListItem>
+                                              <ListItem key={j}>{`${i}`}</ListItem>
                                             ))}
                                           </List>
                                         ) : (
@@ -196,6 +197,14 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                       </React.Fragment>
                                     ))}
                                   </div>
+                                ) : Array.isArray(v) ? (
+                                  <UnorderedList>
+                                    {v.map((message, ii) => (
+                                      <ListItem key={ii}>
+                                        {`${capitalizeFirstWord(message['role'])}: ${message['content']}`}
+                                      </ListItem>
+                                    ))}
+                                  </UnorderedList>
                                 ) : (
                                   <p style={{ whiteSpace: 'pre-line' }}>{capitalizeFirstWord(v.toString())}</p>
                                 )}
@@ -406,6 +415,14 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                                       </React.Fragment>
                                     ))}
                                   </div>
+                                ) : Array.isArray(v) ? (
+                                  <UnorderedList>
+                                    {v.map((message, ii) => (
+                                      <ListItem key={ii}>
+                                        {`${capitalizeFirstWord(message['role'])}: ${message['content']}`}
+                                      </ListItem>
+                                    ))}
+                                  </UnorderedList>
                                 ) : (
                                   <p style={{ whiteSpace: 'pre-line' }}>{capitalizeFirstWord(v.toString())}</p>
                                 )}

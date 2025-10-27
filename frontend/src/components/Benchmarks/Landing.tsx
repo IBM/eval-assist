@@ -14,7 +14,7 @@ import classes from './index.module.scss'
 
 export const Landing = () => {
   const { benchmarks } = useBenchmarksContext()
-  console.log(benchmarks)
+
   const [selectedTagItems, setSelectedTagItems] = useState<string[]>([])
   const [selectedBenchmarkItems, setSelectedBenchmarkItems] = useState<string[]>([])
   const [selectedCriteriaItems, setSelectedCriteriaItems] = useState<string[]>([])

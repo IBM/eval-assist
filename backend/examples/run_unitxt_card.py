@@ -2,7 +2,7 @@ import json
 from typing import cast
 
 import unitxt
-from evalassist.judges import Criteria, DirectInstance, DirectJudge
+from evalassist.judges import Criteria, DirectJudge, Instance
 from unitxt.api import evaluate, load_dataset
 from unitxt.inference import CrossProviderInferenceEngine
 from unitxt.templates import InputOutputTemplate
@@ -19,23 +19,23 @@ dataset = load_dataset(
         postprocessors=["processors.cast_to_float_return_0_5_if_failed"],
     ),
     format="formats.empty",
-    loader_limit=100,
+    loader_limit=20,
     split="test",
 )
 
 criterion = "metrics.llm_as_judge.direct.criteria.reference_document_faithfulness"
 
 eval_assist_criteria: Criteria = Criteria.from_unitxt_criteria(criterion)
-instances: list[DirectInstance] = []
+instances: list[Instance] = []
 for row in dataset:
     task_data = json.loads(row["task_data"])  # type: ignore
     instances.append(
-        DirectInstance(
-            context={
-                "contexts": str(task_data["contexts"]),
+        Instance(
+            fields={
+                "reference_document": str(task_data["contexts"]),
                 "question": task_data["question"],
+                "response": task_data["answer"],
             },
-            response=task_data["answer"],
         )
     )
 

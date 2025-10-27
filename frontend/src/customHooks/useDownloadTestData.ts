@@ -17,7 +17,7 @@ export const useDownloadTestData = () => {
     try {
       const response = await post('download-test-data/', {
         instances,
-        prediction_field: criteria.prediction_field,
+        to_evaluate_field: criteria.to_evaluate_field,
       })
 
       if (!response.ok) {

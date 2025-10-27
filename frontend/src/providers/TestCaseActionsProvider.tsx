@@ -410,7 +410,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       if (!toFixInstance) return
       const type = currentTestCase.type
       const parsedToFixInstance = parseInstanceForBackend(toFixInstance, type)
-      const result = toFixInstance?.result as DirectInstanceResult
+      const result = toFixInstance?.result as DirectInstanceResult // result is not null because the fix button wouldnt be visible if it were null
       const parsedCriteria = parseCriteriaForBackend(currentTestCase.criteria)
       const provider = currentTestCase.evaluator!.provider
       const llmProviderCredentials = getProviderCredentialsWithDefaults(provider)
@@ -443,6 +443,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         kind: 'info',
         title: 'Fixing instance...',
       })
+      console.log(body)
       const fixedText = ((await (await post('fix-instance/', body)).json()) as { fixed_response: string })[
         'fixed_response'
       ]

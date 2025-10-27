@@ -1,10 +1,13 @@
+from typing import cast
+
+from evalassist.judges.utils import get_to_evaluate_text
+
 from .base import BaseDirectJudge, BasePairwiseJudge
 from .types import (
     Criteria,
-    DirectInstance,
     DirectInstanceResult,
     DirectPositionalBiasResult,
-    PairwiseInstance,
+    Instance,
     PairwiseInstanceResult,
     SingleSystemPairwiseInstanceResult,
 )
@@ -16,7 +19,7 @@ class DummyDirectJudge(BaseDirectJudge):
 
     def _run(
         self,
-        instances: list[DirectInstance],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[DirectInstanceResult]:
         return [
@@ -39,11 +42,13 @@ class DummyPairwiseJudge(BasePairwiseJudge):
 
     def _run(
         self,
-        instances: list[PairwiseInstance],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[PairwiseInstanceResult]:
         results: list[PairwiseInstanceResult] = []
-        systems_per_instance = len(instances[0].responses)
+        systems_per_instance = len(
+            cast(list[str], get_to_evaluate_text(instances[0], criteria[0]))
+        )
         comparisons_per_instance = systems_per_instance - 1
         for i, instance in enumerate(instances):
             instance_result: list[SingleSystemPairwiseInstanceResult] = []
@@ -57,7 +62,7 @@ class DummyPairwiseJudge(BasePairwiseJudge):
                     positional_bias=[False for _ in range(comparisons_per_instance)],
                     winrate=1.0,
                     ranking=1,
-                    selections=["1" for _ in range(comparisons_per_instance)],
+                    selections=[1 for _ in range(comparisons_per_instance)],
                 )
             )
             results.append(

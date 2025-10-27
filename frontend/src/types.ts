@@ -320,7 +320,7 @@ export interface FetchedCriteriaWithOptionsV0 extends FetchedCriteriaV0 {
 }
 
 export interface FetchedCriteriaWithOptionsV1 extends FetchedCriteriaWithOptionsV0 {
-  prediction_field: string
+  to_evaluate_field: string
   context_fields: string[]
 }
 
@@ -343,7 +343,7 @@ export type CriteriaWithOptions = CriteriaWithOptionsV1
 export interface FetchedCriteriaV0 {
   name: string
   description: string
-  prediction_field: string
+  to_evaluate_field: string
   context_fields: string[]
 }
 

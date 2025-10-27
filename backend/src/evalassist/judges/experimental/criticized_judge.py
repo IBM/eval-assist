@@ -6,7 +6,7 @@ from evalassist.judges.unitxt_judges import UnitxtInferenceEngineMixin
 
 from ..base import BaseDirectJudge
 from ..direct_judge import DirectJudge
-from ..types import Criteria, DirectInstance, DirectInstanceResult
+from ..types import Criteria, DirectInstanceResult, Instance
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class CriticizedDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
 
     def _run(
         self,
-        instances: list[DirectInstance],
+        instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[DirectInstanceResult]:
         simple_judge = DirectJudge(self.inference_engine)
@@ -31,7 +31,7 @@ class CriticizedDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 "in the provided judge prompt, and whether the selected option is justified. "
             ),
             context_fields=["judge_prompt", "explanation"],
-            prediction_field="selected_option",
+            to_evaluate_field="selected_option",
             options=[
                 CriteriaOption(
                     name="Excellent",
@@ -64,12 +64,12 @@ class CriticizedDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
         logger.info("Criticizing the results...")
         criticized_results = criticize_judge(
             instances=[
-                DirectInstance(
-                    context={
+                Instance(
+                    fields={
                         "judge_prompt": result.metadata["prompt"],  # type: ignore
                         "explanation": result.explanation,
+                        "response": result.selected_option,  # type: ignore
                     },
-                    response=result.selected_option,
                 )
                 for result in results
             ],
@@ -91,21 +91,14 @@ class CriticizedDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 to_revisit_results_index,
                 simple_judge(
                     instances=[
-                        DirectInstance(
-                            context={
-                                **(
-                                    cast(
-                                        dict, instances[to_revisit_result_index].context
-                                    )
-                                    if instances[to_revisit_result_index].context
-                                    else {}
-                                ),
+                        Instance(
+                            fields={
+                                **instances[to_revisit_result_index].fields,
                                 "Feedback from previous evaluation": f"The previous time you evaluated this instance, your evaluation was categorized as '{criticized_results[to_revisit_result_index].selected_option}'. In order to improve it, take the following feedback into account: {cast(str, criticized_results[to_revisit_result_index].feedback)}"
                                 if criticized_results[to_revisit_result_index].feedback
                                 != ""
                                 else "Nothing to improve",
                             },
-                            response=instances[to_revisit_result_index].response,
                         )
                         for to_revisit_result_index in to_revisit_results_index
                     ],
@@ -128,9 +121,9 @@ class CriticizedDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                                 ),
                                 "judge_feedback",
                             ],
-                            prediction_field=criteria[
+                            to_evaluate_field=criteria[
                                 to_revisit_result_index
-                            ].prediction_field,
+                            ].to_evaluate_field,
                         )
                         for to_revisit_result_index in to_revisit_results_index
                     ],

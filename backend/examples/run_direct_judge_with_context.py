@@ -1,4 +1,4 @@
-from evalassist.judges import DirectInstance, DirectJudge
+from evalassist.judges import DirectJudge, Instance
 from evalassist.judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from evalassist.judges.types import Criteria, CriteriaOption
 from unitxt.inference import CrossProviderInferenceEngine
@@ -19,7 +19,8 @@ criteria_a = Criteria(
         CriteriaOption(name="Yes", description="", score=1.0),
         CriteriaOption(name="No", description="", score=0.0),
     ],
-    # context_fields=[],
+    # context_fields=[]
+    to_evaluate_field="answer",
 )
 
 criteria_b = Criteria(
@@ -29,7 +30,7 @@ criteria_b = Criteria(
         CriteriaOption(name="Yes", description="", score=1.0),
         CriteriaOption(name="No", description="", score=0.0),
     ],
-    prediction_field="answer",
+    to_evaluate_field="answer",
     context_fields=["reference_doc"],  # judge should check against knowledge base
 )
 
@@ -40,52 +41,52 @@ criteria_c = Criteria(
         CriteriaOption(name="Yes", description="", score=1.0),
         CriteriaOption(name="No", description="", score=0.0),
     ],
-    prediction_field="answer",
+    to_evaluate_field="answer",
     context_fields=["customer_question"],
 )
 
 # --- Example instances ---
 instances = [
     # Failing case: polite but inaccurate
-    DirectInstance(
-        context={
+    Instance(
+        fields={
             "customer_question": "Can I reset my password without access to my email?",
             "reference_doc": (
                 "Users can reset their password using the registered phone number "
                 "or by contacting support if they don’t have email access."
             ),
+            "answer": (
+                "Unfortunately, you cannot reset your password without email access. "
+                "You’ll need to create a new account."
+            ),
         },
-        response=(
-            "Unfortunately, you cannot reset your password without email access. "
-            "You’ll need to create a new account."
-        ),
     ),
     # Passing case: clear, accurate, relevant
-    DirectInstance(
-        context={
+    Instance(
+        fields={
             "customer_question": "Can I reset my password without access to my email?",
             "reference_doc": (
                 "Users can reset their password using the registered phone number "
                 "or by contacting support if they don’t have email access."
             ),
+            "answer": (
+                "Yes, you can reset your password without your email. "
+                "Use your registered phone number or contact support for assistance."
+            ),
         },
-        response=(
-            "Yes, you can reset your password without your email. "
-            "Use your registered phone number or contact support for assistance."
-        ),
     ),
     # Mixed case: clear but not fully accurate (ignores phone option)
-    DirectInstance(
-        context={
+    Instance(
+        fields={
             "customer_question": "Can I reset my password without access to my email?",
             "reference_doc": (
                 "Users can reset their password using the registered phone number "
                 "or by contacting support if they don’t have email access."
             ),
+            "answer": (
+                "Yes, just contact our support team and they will help you reset your password."
+            ),
         },
-        response=(
-            "Yes, just contact our support team and they will help you reset your password."
-        ),
     ),
 ]
 

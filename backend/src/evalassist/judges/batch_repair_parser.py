@@ -1,11 +1,11 @@
 import json
 import logging
 import random
-from typing import Literal
+from typing import Literal, cast
 
-from langchain_core.exceptions import OutputParserException
-from langchain_core.output_parsers import PydanticOutputParser
-from pydantic import BaseModel
+from evalassist.judges.utils import create_default_instance, sanitize_and_parse_json
+from pydantic import BaseModel, ValidationError
+from unitxt.inference import InferenceEngine
 
 logger = logging.getLogger(__name__)
 
@@ -13,40 +13,46 @@ logger = logging.getLogger(__name__)
 class BatchRepairParser:
     def __init__(
         self,
-        inference_engine,
+        inference_engine: InferenceEngine,
         max_retries: int = 3,
         on_generation_failure: Literal["raise", "random"] = "random",
     ):
         """
         inference_engine: object with `infer(dataset: list[dict]) -> list[str]`
         max_retries: number of repair rounds
-        on_generation_failure: "raise" or "fallback"
+        on_generation_failure: "raise" or "random"
         """
-        self.inference_engine = inference_engine
+        self.inference_engine: InferenceEngine = inference_engine
         self.max_retries = max_retries
         self.on_generation_failure = on_generation_failure
 
-    def parse_all_responses(
+    def parse_and_repair(
         self,
         unparsed_responses: list[str],
-        output_parsers: list[PydanticOutputParser],
-        on_failure_default: list[str | int | list[str | int]] | None = None,
-    ) -> tuple[list, list[dict]]:
+        model_classes: list[type[BaseModel]],
+        on_failure_default: list[dict] | dict | None = None,
+    ) -> tuple[list[BaseModel], list[dict]]:
         """
-        Parse all responses using PydanticOutputParser, repairing failed responses in batches.
+        Parse all responses into Pydantic models, repairing failed responses in batches.
         """
+        if isinstance(on_failure_default, dict):
+            on_failure_default = [on_failure_default] * len(unparsed_responses)
         n = len(unparsed_responses)
-
+        sanitized_unparsed_responses = [
+            sanitize_and_parse_json(x) for x in unparsed_responses
+        ]
         parsed: list[BaseModel | None] = [None] * n
-        metadata = [{}] * n
+        metadata: list[dict] = [{} for _ in range(n)]
 
         # Initial parse attempt
         failures = []
-        for i, (text, parser) in enumerate(zip(unparsed_responses, output_parsers)):
+        for i, (text, model_class) in enumerate(
+            zip(sanitized_unparsed_responses, model_classes)
+        ):
             try:
-                parsed[i] = parser.parse(text)
+                parsed[i] = model_class.model_validate_json(text, strict=False)
                 metadata[i] = {"generation_failed": False}
-            except OutputParserException as e:
+            except ValidationError as e:
                 failures.append(i)
                 metadata[i] = {
                     "generation_failed": True,
@@ -58,18 +64,22 @@ class BatchRepairParser:
         while failures and attempt < self.max_retries:
             attempt += 1
             logger.debug(
-                f"BatchRepairParser: repair attempt {attempt}/{self.max_retries} for {len(failures)} items"
+                f"BatchRepairParser: repair attempt {attempt}/{self.max_retries} for {len(failures)} items (out of {len(sanitized_unparsed_responses)} items) using inference engine {self.inference_engine.get_engine_id()}"
+            )
+            logger.debug(
+                f"First incorrect unparsed response is:\n{sanitized_unparsed_responses[failures[0]]}"
+            )
+            logger.debug(
+                f"First parsing issue was:\n{metadata[failures[0]].get('parsing_error', '')}"
             )
 
             dataset = []
             idx_map = []
 
             for idx in failures:
-                raw_text = unparsed_responses[idx]
-                parser = output_parsers[idx]
-                model_class = parser.pydantic_object
-
-                prompt_text: str = self._format_repair_prompt(
+                raw_text = sanitized_unparsed_responses[idx]
+                model_class = model_classes[idx]
+                prompt_text = self._format_repair_prompt(
                     invalid_output=raw_text,
                     parsing_error=metadata[idx].get("parsing_error", ""),
                     model_class=model_class,
@@ -83,40 +93,44 @@ class BatchRepairParser:
                 )
                 idx_map.append(idx)
 
-            # Send batch to Unitxt
+            # Send batch to inference engine
             try:
                 repaired_texts = [
-                    str(r) for r in self.inference_engine.infer(dataset=dataset)
+                    sanitize_and_parse_json(str(r))
+                    for r in self.inference_engine.infer(dataset=dataset)
                 ]
             except Exception as e:
                 logger.exception(
                     "BatchRepairParser: inference_engine.infer failed on retry %s", e
                 )
-                break  # fallback
+                break
 
             # Attempt parsing repaired responses
             new_failures = []
             for pos_in_batch, repaired_text in enumerate(repaired_texts):
                 original_index = idx_map[pos_in_batch]
-                parser = output_parsers[original_index]
+                model_class = model_classes[original_index]
 
-                unparsed_responses[original_index] = repaired_text
-
+                sanitized_unparsed_responses[original_index] = repaired_text
                 metadata[original_index]["generation_failed_last_attempt_output"] = (
                     repaired_text
                 )
                 metadata[original_index]["repair_attempts"] = attempt
 
                 try:
-                    parsed_obj = parser.parse(repaired_text)
+                    parsed_obj = model_class.model_validate_json(repaired_text)
                     parsed[original_index] = parsed_obj
                     metadata[original_index]["generation_failed"] = False
-                except OutputParserException as e:
-                    metadata[original_index]["parsing_error_after_repair"] = str(e)
+                except ValidationError as e:
                     metadata[original_index]["parsing_error"] = str(e)
                     new_failures.append(original_index)
 
             failures = new_failures
+
+        if failures:
+            logger.debug(
+                f"BatchRepairParser: repairing failed for {len(failures)} items. Applying on_generation_failure='{self.on_generation_failure}'."
+            )
 
         # Fallback for remaining failures
         for i in failures:
@@ -125,34 +139,22 @@ class BatchRepairParser:
                     f"Failed to parse response after {attempt} attempts.\n"
                     f"Original output:\n{metadata[i].get('generation_failed_original_output')}\n"
                     f"Last attempt:\n{metadata[i].get('generation_failed_final_output')}\n"
-                    f"Error:\n{metadata[i].get('parsing_error_after_repair') or metadata[i].get('parsing_error')}"
+                    f"Error:\n{metadata[i].get('parsing_error')}"
                 )
 
             if on_failure_default is not None:
-                default = on_failure_default[i]
-                # TODO: adjust to be applicable to any model
-                if default is None:
-                    selected_option = ""
-                elif isinstance(default, (str, int)):
-                    selected_option = default
-                else:
-                    selected_option = random.choice(default)  # nosec
+                defaults: dict = on_failure_default[i]
+                for k, v in defaults.items():
+                    if isinstance(v, list):
+                        defaults[k] = random.choice(v)  # nosec
 
-                parser = output_parsers[i]
-                parsed[i] = parser.pydantic_object(
-                    selected_option=selected_option,
-                    explanation="",
-                )
+                model_class = model_classes[i]
+                parsed[i] = create_default_instance(model_class, defaults)
 
                 metadata[i]["generation_failed"] = True
-                metadata[i]["final_fallback_chosen"] = selected_option
+                metadata[i]["final_fallback_chosen"] = defaults
 
-        # Ensure all metadata entries exist
-        for i in range(n):
-            if metadata[i] is None:
-                metadata[i] = {"generation_failed": False}
-
-        return parsed, metadata
+        return cast(list[BaseModel], parsed), metadata
 
     def _format_repair_prompt(
         self,
@@ -171,7 +173,8 @@ class BatchRepairParser:
             schema_json = "<unable to generate model schema>"
 
         prompt = (
-            f"You are given an invalid model output that must be corrected to match the expected JSON schema.\n\n"
+            "You are given an invalid model output that must be corrected "
+            "to match the expected JSON schema.\n\n"
             f"INVALID OUTPUT:\n```\n{invalid_output}\n```\n\n"
             f"PARSING ERROR:\n```\n{parsing_error}\n```\n\n"
             f"EXPECTED JSON SCHEMA:\n{schema_json}\n\n"
@@ -179,6 +182,7 @@ class BatchRepairParser:
             "1) Produce a single JSON object strictly conforming to the schema above.\n"
             "2) Do NOT include explanations or extra text.\n"
             "3) If a field's value is unknown, use empty string, null, or logical empty value.\n"
+            "4) If the INVALID OUTPUT is a model refusing to generate the requested content. Output a valid JSON with empty fields."
             "Return only the corrected JSON object."
         )
         return prompt
