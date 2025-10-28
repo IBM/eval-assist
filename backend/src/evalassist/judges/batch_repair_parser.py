@@ -67,10 +67,10 @@ class BatchRepairParser:
                 f"BatchRepairParser: repair attempt {attempt}/{self.max_retries} for {len(failures)} items (out of {len(sanitized_unparsed_responses)} items) using inference engine {self.inference_engine.get_engine_id()}"
             )
             logger.debug(
-                f"First incorrect unparsed response is:\n{sanitized_unparsed_responses[failures[0]]}"
+                f"First incorrect unparsed response (id {failures[0]}) is:\n{sanitized_unparsed_responses[failures[0]]}"
             )
             logger.debug(
-                f"First parsing issue was:\n{metadata[failures[0]].get('parsing_error', '')}"
+                f"First parsing issue (id {failures[0]}) was:\n{metadata[failures[0]].get('parsing_error', '')}"
             )
 
             dataset = []
