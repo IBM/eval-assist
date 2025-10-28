@@ -69,7 +69,7 @@ class BaseJudge(
     ``Criteria`` and returns a result specific to the concrete implementation.
     """
 
-    self_consistency: int = False
+    self_consistency: bool | int = False
     check_positional_bias: bool = False
 
     def __init__(
