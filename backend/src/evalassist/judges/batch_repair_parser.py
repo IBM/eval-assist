@@ -95,10 +95,8 @@ class BatchRepairParser:
 
             # Send batch to inference engine
             try:
-                repaired_texts = [
-                    sanitize_and_parse_json(str(r))
-                    for r in self.inference_engine.infer(dataset=dataset)
-                ]
+                x = self.inference_engine.infer(dataset=dataset)
+                repaired_texts = [sanitize_and_parse_json(str(r)) for r in x]
             except Exception as e:
                 logger.exception(
                     "BatchRepairParser: inference_engine.infer failed on retry %s", e

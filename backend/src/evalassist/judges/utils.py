@@ -107,6 +107,7 @@ def build_format_instructions(model: type[BaseModel]) -> str:
         'The object {"properties": {"foo": ["bar", "baz"]}} is not well-formatted.\n\n'
         "Here is the output schema:\n```json\n"
         f"{model.model_json_schema()}\n```\n"
+        "You must output a single-line JSON object (not pretty-printed, no newlines or indentation). Do not add spaces or formatting for readability. All control characters inside strings must be escaped."
     )
 
 
