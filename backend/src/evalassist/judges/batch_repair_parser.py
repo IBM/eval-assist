@@ -31,6 +31,7 @@ class BatchRepairParser:
         unparsed_responses: list[str],
         model_classes: list[type[BaseModel]],
         on_failure_default: list[dict] | dict | None = None,
+        previous_messages_list: list[list[dict[str, str]]] | None = None,
     ) -> tuple[list[BaseModel], list[dict]]:
         """
         Parse all responses into Pydantic models, repairing failed responses in batches.
@@ -38,25 +39,20 @@ class BatchRepairParser:
         if isinstance(on_failure_default, dict):
             on_failure_default = [on_failure_default] * len(unparsed_responses)
         n = len(unparsed_responses)
-        sanitized_unparsed_responses = [
-            sanitize_and_parse_json(x) for x in unparsed_responses
-        ]
         parsed: list[BaseModel | None] = [None] * n
         metadata: list[dict] = [{} for _ in range(n)]
 
         # Initial parse attempt
         failures = []
-        for i, (text, model_class) in enumerate(
-            zip(sanitized_unparsed_responses, model_classes)
-        ):
+        for i, (text, model_class) in enumerate(zip(unparsed_responses, model_classes)):
             try:
-                parsed[i] = model_class.model_validate_json(text, strict=False)
+                parsed[i] = self.try_parse(model_class, text)
                 metadata[i] = {"generation_failed": False}
-            except ValidationError as e:
+            except Exception as e:
                 failures.append(i)
                 metadata[i] = {
                     "generation_failed": True,
-                    "generation_failed_original_output": text,
+                    "generation_failed_original_output": sanitize_and_parse_json(text),
                     "parsing_error": str(e),
                 }
 
@@ -64,10 +60,10 @@ class BatchRepairParser:
         while failures and attempt < self.max_retries:
             attempt += 1
             logger.debug(
-                f"BatchRepairParser: repair attempt {attempt}/{self.max_retries} for {len(failures)} items (out of {len(sanitized_unparsed_responses)} items) using inference engine {self.inference_engine.get_engine_id()}"
+                f"BatchRepairParser: repair attempt {attempt}/{self.max_retries} for {len(failures)} items (out of {len(unparsed_responses)} items) using inference engine {self.inference_engine.get_engine_id()}"
             )
             logger.debug(
-                f"First incorrect unparsed response (id {failures[0]}) is:\n{sanitized_unparsed_responses[failures[0]]}"
+                f"First incorrect unparsed response (id {failures[0]}) is:\n{unparsed_responses[failures[0]]}"
             )
             logger.debug(
                 f"First parsing issue (id {failures[0]}) was:\n{metadata[failures[0]].get('parsing_error', '')}"
@@ -77,12 +73,15 @@ class BatchRepairParser:
             idx_map = []
 
             for idx in failures:
-                raw_text = sanitized_unparsed_responses[idx]
+                raw_text = unparsed_responses[idx]
                 model_class = model_classes[idx]
                 prompt_text = self._format_repair_prompt(
                     invalid_output=raw_text,
                     parsing_error=metadata[idx].get("parsing_error", ""),
                     model_class=model_class,
+                    previous_messages=previous_messages_list[idx]
+                    if previous_messages_list
+                    else None,
                 )
 
                 dataset.append(
@@ -95,8 +94,9 @@ class BatchRepairParser:
 
             # Send batch to inference engine
             try:
-                x = self.inference_engine.infer(dataset=dataset)
-                repaired_texts = [sanitize_and_parse_json(str(r)) for r in x]
+                repaired_texts = cast(
+                    list[str], self.inference_engine.infer(dataset=dataset)
+                )
             except Exception as e:
                 logger.exception(
                     "BatchRepairParser: inference_engine.infer failed on retry %s", e
@@ -109,17 +109,16 @@ class BatchRepairParser:
                 original_index = idx_map[pos_in_batch]
                 model_class = model_classes[original_index]
 
-                sanitized_unparsed_responses[original_index] = repaired_text
+                unparsed_responses[original_index] = repaired_text
                 metadata[original_index]["generation_failed_last_attempt_output"] = (
                     repaired_text
                 )
                 metadata[original_index]["repair_attempts"] = attempt
 
                 try:
-                    parsed_obj = model_class.model_validate_json(repaired_text)
-                    parsed[original_index] = parsed_obj
+                    parsed[original_index] = self.try_parse(model_class, repaired_text)
                     metadata[original_index]["generation_failed"] = False
-                except ValidationError as e:
+                except Exception as e:
                     metadata[original_index]["parsing_error"] = str(e)
                     new_failures.append(original_index)
 
@@ -159,7 +158,8 @@ class BatchRepairParser:
         invalid_output: str,
         parsing_error: str,
         model_class: type[BaseModel],
-    ) -> str:
+        previous_messages: list[dict[str, str]] | None,
+    ) -> list[dict[str, str]]:
         """
         Build a repair prompt using the Pydantic model's JSON schema.
         """
@@ -169,18 +169,50 @@ class BatchRepairParser:
             )
         except Exception:
             schema_json = "<unable to generate model schema>"
+        messages = []
+        if previous_messages is not None:
+            messages = [
+                *previous_messages,
+                {
+                    "role": "assistant",
+                    "content": invalid_output,
+                },
+                {
+                    "role": "user",
+                    "content": "The json string output you generated is invalid and must be fixed to match the expected JSON schema.\n\n"
+                    f"INVALID OUTPUT:\n```\n{invalid_output}\n```\n\n"
+                    f"PARSING ERROR:\n```\n{parsing_error}\n```\n\n"
+                    f"EXPECTED JSON SCHEMA:\n{schema_json}\n\n"
+                    "INSTRUCTIONS:\n"
+                    "1) Produce a single JSON string strictly conforming to the schema above. Pay special attention to correcly escaping control characters or quotation strings inside json values.\n"
+                    "2) Do NOT include explanations or extra text.\n"
+                    "3) If the INVALID OUTPUT is a model refusing to generate the requested content. Output a valid JSON with empty fields."
+                    "Return only the corrected JSON string.",
+                },
+            ]
+        else:
+            messages.append(
+                {
+                    "role": "user",
+                    "content": "You are given an invalid model output that must be corrected "
+                    "to match the expected JSON schema.\n\n"
+                    f"INVALID OUTPUT:\n```\n{invalid_output}\n```\n\n"
+                    f"PARSING ERROR:\n```\n{parsing_error}\n```\n\n"
+                    f"EXPECTED JSON SCHEMA:\n{schema_json}\n\n"
+                    "INSTRUCTIONS:\n"
+                    "1) Produce a single JSON string object strictly conforming to the schema above.\n"
+                    "2) Do NOT include explanations or extra text.\n"
+                    "3) If a field's value is unknown, use empty string, null, or logical empty value.\n"
+                    "4) If the INVALID OUTPUT is a model refusing to generate the requested content. Output a valid JSON with empty fields."
+                    "Return only the corrected JSON string.",
+                }
+            )
+        return messages
 
-        prompt = (
-            "You are given an invalid model output that must be corrected "
-            "to match the expected JSON schema.\n\n"
-            f"INVALID OUTPUT:\n```\n{invalid_output}\n```\n\n"
-            f"PARSING ERROR:\n```\n{parsing_error}\n```\n\n"
-            f"EXPECTED JSON SCHEMA:\n{schema_json}\n\n"
-            "INSTRUCTIONS:\n"
-            "1) Produce a single JSON object strictly conforming to the schema above.\n"
-            "2) Do NOT include explanations or extra text.\n"
-            "3) If a field's value is unknown, use empty string, null, or logical empty value.\n"
-            "4) If the INVALID OUTPUT is a model refusing to generate the requested content. Output a valid JSON with empty fields."
-            "Return only the corrected JSON object."
-        )
-        return prompt
+    def try_parse(self, model_class: type[BaseModel], text: str) -> BaseModel:
+        try:
+            return model_class.model_validate_json(json_data=text, strict=False)
+        except ValidationError:
+            return model_class.model_validate_json(
+                json_data=sanitize_and_parse_json(text), strict=False
+            )
