@@ -145,10 +145,6 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 Options:
                 {criteria_options}
 
-                ### Example instance
-
-                {instance_example}
-
                 For the persona, you will generate the name or role (e.g. a doctor, a philosopher, a lawyer) and a brief description that makes emphasis on what makes the persona the ideal for performing the evaluation (e.g. have a lot of experience reading and writing email summaries).
 
                 ### Output format
@@ -160,24 +156,29 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             """
         )
 
-        prompts = [
-            template.format(
-                criteria_name_section=f"Criteria name: {criterion.name}"
-                if criterion.name
-                else "",
-                criteria_description=criterion.description,
-                criteria_options="\n".join(
-                    [
-                        f"- {o.name}{f': {o.description}' if o.description else ''}"
-                        for o in criterion.options
-                    ]
-                ),
-                to_evaluate_field=criterion.to_evaluate_field
-                if criterion.to_evaluate_field
-                else "text",
-                instance_example=instance_example_str,
-                format_instruction=format_instruction,
-            )
+        messages_list: list[list[dict[str, str]]] = [
+            [
+                {
+                    "role": "user",
+                    "content": template.format(
+                        criteria_name_section=f"Criteria name: {criterion.name}"
+                        if criterion.name
+                        else "",
+                        criteria_description=criterion.description,
+                        criteria_options="\n".join(
+                            [
+                                f"- {o.name}{f': {o.description}' if o.description else ''}"
+                                for o in criterion.options
+                            ]
+                        ),
+                        to_evaluate_field=criterion.to_evaluate_field
+                        if criterion.to_evaluate_field
+                        else "text",
+                        instance_example=instance_example_str,
+                        format_instruction=format_instruction,
+                    ),
+                }
+            ]
             for criterion, instance_example_str, format_instruction in zip(
                 criteria, instance_examples_str, format_instructions_list
             )
@@ -187,8 +188,8 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             list[str],
             self.inference_engine.infer(
                 dataset=[
-                    {"source": prompt, "data_classification_policy": ["public"]}
-                    for prompt in prompts
+                    {"source": messages, "data_classification_policy": ["public"]}
+                    for messages in messages_list
                 ]
             ),
         )
@@ -203,6 +204,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             unparsed_responses=unparsed_responses,
             on_failure_default={"persona_name": "", "persona_description": ""},
             model_classes=synthetic_persona_klasses,
+            previous_messages_list=messages_list,
         )
 
         personas = [
@@ -364,6 +366,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             ("\n\n## Context\n\n" + c + "\n") if c is not None else ""
             for c in str_context_variables_list
         ]
+        judge_description_sections = []
         if self.judge_description_prompt:
             judge_description_sections = [self.judge_description_prompt] * len(criteria)
         elif self.generate_synthetic_persona:
@@ -432,7 +435,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 """
         )
 
-        prompts: list[list[dict]] = [
+        messages_list: list[list[dict[str, str]]] = [
             [
                 {
                     "role": "system",
@@ -478,7 +481,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 "source": messages,
                 "data_classification_policy": ["public"],
             }
-            for messages in prompts
+            for messages in messages_list
         ]
 
         unparsed_responses: list[str] = cast(
@@ -499,6 +502,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 for criterion in criteria
             ],
             model_classes=model_classes,
+            previous_messages_list=messages_list,
         )
         explanations: list[str] = [r.explanation for r in parsed_responses]  # type: ignore
         selected_options: list[str] = [r.selected_option for r in parsed_responses]  # type: ignore
@@ -506,7 +510,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             None if not self.generate_feedback else r.feedback  # type: ignore
             for r in parsed_responses  # type: ignore
         ]
-        return [
+        results: list[DirectInstanceResult] = [
             DirectInstanceResult(
                 instance=instance,
                 criteria=criterion,
@@ -525,13 +529,19 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 selected_options,
                 explanations,
                 feedbacks,
-                prompts,
+                messages_list,
                 unparsed_responses,
                 criteria,
                 parsing_metadatas,
                 instances,
             )
         ]
+        if self.generate_synthetic_persona:
+            for result, judge_description_section in zip(
+                results, judge_description_sections
+            ):
+                result.metadata["persona"] = judge_description_section
+        return results
 
     def evaluate_with_custom_prompt(
         self,
