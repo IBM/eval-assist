@@ -107,51 +107,49 @@ def build_format_instructions(model: type[BaseModel]) -> str:
         'The object {"properties": {"foo": ["bar", "baz"]}} is not well-formatted.\n\n'
         "Here is the output schema:\n```json\n"
         f"{model.model_json_schema()}\n```\n"
+        "You must output a single-line JSON object (not pretty-printed, no newlines or indentation). Do not add spaces or formatting for readability. All control characters inside strings must be escaped."
     )
 
 
 def sanitize_and_parse_json(raw_json: str) -> str:
     """
-    Sanitize a JSON string.
+    Sanitize a JSON string to make it parseable.
 
-    This function:
-    - Removes Markdown fences (```json, json```, etc.)
-    - Fixes invalid escape sequences (e.g., \', stray backslashes)
-    - Escapes unescaped newlines (\n), carriage returns (\r), and tabs (\t)
-    - Converts smart quotes to plain quotes
-    - Fixes partial or malformed JSON (e.g., missing closing braces)
-    - Returns a JSON string that can be safely parsed
+    This function performs multiple steps to sanitize the input JSON string:
+    1. Removes Markdown fences (```json, json```, etc.)
+    2. Fixes invalid escape sequences (e.g., \', stray backslashes)
+    3. Escapes unescaped newlines (\n), carriage returns (\r), and tabs (\t)
+    4. Converts smart quotes to plain quotes
+    5. Attempts to fix partial or malformed JSON (e.g., missing closing braces)
 
     Args:
-        raw_json: The raw JSON string (possibly with unescaped characters).
+        raw_json: The raw JSON string (possibly with unescaped characters or formatting issues).
 
     Returns:
         A sanitized JSON string that can be parsed with json.loads().
 
     Raises:
-        json.JSONDecodeError if the string cannot be fixed.
-        TypeError if raw_json is not a string.
+        json.JSONDecodeError: If the string cannot be fixed.
+        TypeError: If raw_json is not a string.
     """
     if not isinstance(raw_json, str):
         raise TypeError("raw_json must be a string")
 
-    # -------------------------------
-    # 1. Normalize and strip Markdown fences
-    # -------------------------------
+    # Step 1: Normalize and strip Markdown fences
     raw_json = raw_json.strip()
-    markdown_match = re.search(r"```(?:json)?(.*?)```", raw_json, re.DOTALL)
+    markdown_match: re.Match[str] | None = re.search(
+        r"```(?:json)?(.*?)```", raw_json, re.DOTALL
+    )
     json_str = markdown_match.group(1).strip() if markdown_match else raw_json
 
-    # -------------------------------
-    # 2. Normalize invalid characters and escapes
-    # -------------------------------
-    # Replace smart quotes and backticks
+    # Step 2: Normalize invalid characters and escapes
+    # Replace smart quotes, backticks, and other special characters with their plain equivalents
     json_str = (
-        json_str.replace("“", '"')
-        .replace("”", '"')
+        json_str.replace("“", "'")
+        .replace("”", "'")
         .replace("‘", "'")
         .replace("’", "'")
-        .replace("`", '"')
+        .replace("`", "'")
     )
 
     # Replace Python-style escaped single quotes with plain quotes
@@ -160,14 +158,34 @@ def sanitize_and_parse_json(raw_json: str) -> str:
     # Remove invalid backslash escapes (anything not valid JSON escape)
     json_str = re.sub(r'\\(?!["\\/bfnrtu])', r"\\\\", json_str)
 
-    # -------------------------------
-    # 3. Escape problematic characters inside string values
-    # -------------------------------
+    # Step 3: Escape problematic characters inside string values
     def _replace_chars(match: re.Match[str]) -> str:
+        # Replace newlines, carriage returns, and tabs with their escaped versions
         value = match.group(2)
+
+        # # Escape control characters (ASCII < 32) to JSON-safe sequences
+        # def escape_char(c: str) -> str:
+        #     code = ord(c)
+        #     if code == 8:
+        #         return r'\b'
+        #     elif code == 9:
+        #         return r'\t'
+        #     elif code == 10:
+        #         return r'\n'
+        #     elif code == 12:
+        #         return r'\f'
+        #     elif code == 13:
+        #         return r'\r'
+        #     elif code < 32:
+        #         return '\\u%04x' % code
+        #     return c
+
+        # value = ''.join(escape_char(c) for c in value)
+
         value = re.sub(r"\n", r"\\n", value)
         value = re.sub(r"\r", r"\\r", value)
         value = re.sub(r"\t", r"\\t", value)
+        # Ensure double quotes are properly escaped
         value = re.sub(r'(?<!\\)"', r"\"", value)
         return match.group(1) + value + match.group(3)
 
@@ -175,23 +193,27 @@ def sanitize_and_parse_json(raw_json: str) -> str:
         r'(".*?"\s*:\s*")(.*?)(")', _replace_chars, json_str, flags=re.DOTALL
     )
 
-    # -------------------------------
-    # 4. Try parsing and, if needed, repair partial JSON
-    # -------------------------------
+    # Step 4: Try parsing and, if needed, repair partial JSON
     try:
+        # Attempt to parse the sanitized JSON string
         json.loads(json_str)
         return json_str
     except json.JSONDecodeError:
+        # Handle empty string
         if not json_str:
             raise json.JSONDecodeError("Empty string is not valid JSON", json_str, 0)
+
+        # Initialize variables for repairing partial JSON
         new_chars = []
         stack = []
         is_inside_string = False
         escaped = False
 
+        # Iterate through characters to repair JSON
         for char in json_str:
             new_char = char
             if is_inside_string:
+                # Handle characters inside a string
                 if char == '"' and not escaped:
                     is_inside_string = False
                 elif char == "\n" and not escaped:
@@ -201,26 +223,34 @@ def sanitize_and_parse_json(raw_json: str) -> str:
                 else:
                     escaped = False
             elif char == '"':
+                # Enter a string
                 is_inside_string = True
                 escaped = False
             elif char == "{":
+                # Push opening brace onto stack
                 stack.append("}")
             elif char == "[":
+                # Push opening bracket onto stack
                 stack.append("]")
             elif char in {"}", "]"}:
+                # Pop corresponding closing bracket/brace from stack if it matches
                 if stack and stack[-1] == char:
                     stack.pop()
                 else:
+                    # If no match, consider it an error (return empty string)
                     return ""
             new_chars.append(new_char)
 
+        # Handle remaining state after iterating through all characters
         if is_inside_string:
             if escaped:
                 new_chars.pop()
             new_chars.append('"')
 
+        # Reverse the stack to get closing brackets/braces in correct order
         stack.reverse()
 
+        # Attempt to repair JSON by adding missing closing brackets/braces
         while new_chars:
             candidate = "".join(new_chars + stack)
             try:
@@ -229,6 +259,7 @@ def sanitize_and_parse_json(raw_json: str) -> str:
             except json.JSONDecodeError:
                 new_chars.pop()
 
+        # If all else fails, return the original sanitized JSON string
         return json_str
 
 

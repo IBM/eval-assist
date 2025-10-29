@@ -11,6 +11,7 @@ import { useBeforeOnload } from '@customHooks/useBeforeOnload'
 import { useShortcuts } from '@customHooks/useShortcuts'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
+import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
@@ -27,12 +28,10 @@ import { Modals } from './Modals'
 import classes from './SingleExampleEvaluation.module.scss'
 import { TestCaseOptions } from './TestCaseOptions'
 import { TestDataTable } from './TestDataTable'
-import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 
 export const SingleExampleEvaluation = () => {
   const { currentTestCase, setCurrentTestCase, changesDetected, isTestCaseSaved, showingTestCase } =
     useCurrentTestCase()
-
   const {
     setNewTestCaseModalOpen,
     setImportTestCaseModalOpen: setUploadTestCaseModalOpen,
@@ -103,15 +102,17 @@ export const SingleExampleEvaluation = () => {
                 >
                   {'New Test Case'}
                 </Button>
-                {storageEnabled && <Button
-                  kind="tertiary"
-                  onClick={() => {
-                    setUploadTestCaseModalOpen(true)
-                  }}
-                  renderIcon={Upload}
-                >
-                  {'Import Test Case'}
-                </Button>}
+                {storageEnabled && (
+                  <Button
+                    kind="tertiary"
+                    onClick={() => {
+                      setUploadTestCaseModalOpen(true)
+                    }}
+                    renderIcon={Upload}
+                  >
+                    {'Import Test Case'}
+                  </Button>
+                )}
               </div>
             </div>
             <TestCaseOptions style={{ marginBottom: '1rem' }} className={classes['left-padding']} />
