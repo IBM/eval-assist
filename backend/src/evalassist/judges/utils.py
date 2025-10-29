@@ -137,17 +137,19 @@ def sanitize_and_parse_json(raw_json: str) -> str:
 
     # Step 1: Normalize and strip Markdown fences
     raw_json = raw_json.strip()
-    markdown_match = re.search(r"```(?:json)?(.*?)```", raw_json, re.DOTALL)
+    markdown_match: re.Match[str] | None = re.search(
+        r"```(?:json)?(.*?)```", raw_json, re.DOTALL
+    )
     json_str = markdown_match.group(1).strip() if markdown_match else raw_json
 
     # Step 2: Normalize invalid characters and escapes
     # Replace smart quotes, backticks, and other special characters with their plain equivalents
     json_str = (
-        json_str.replace("“", '"')
-        .replace("”", '"')
+        json_str.replace("“", "'")
+        .replace("”", "'")
         .replace("‘", "'")
         .replace("’", "'")
-        .replace("`", '"')
+        .replace("`", "'")
     )
 
     # Replace Python-style escaped single quotes with plain quotes
@@ -160,6 +162,26 @@ def sanitize_and_parse_json(raw_json: str) -> str:
     def _replace_chars(match: re.Match[str]) -> str:
         # Replace newlines, carriage returns, and tabs with their escaped versions
         value = match.group(2)
+
+        # # Escape control characters (ASCII < 32) to JSON-safe sequences
+        # def escape_char(c: str) -> str:
+        #     code = ord(c)
+        #     if code == 8:
+        #         return r'\b'
+        #     elif code == 9:
+        #         return r'\t'
+        #     elif code == 10:
+        #         return r'\n'
+        #     elif code == 12:
+        #         return r'\f'
+        #     elif code == 13:
+        #         return r'\r'
+        #     elif code < 32:
+        #         return '\\u%04x' % code
+        #     return c
+
+        # value = ''.join(escape_char(c) for c in value)
+
         value = re.sub(r"\n", r"\\n", value)
         value = re.sub(r"\r", r"\\r", value)
         value = re.sub(r"\t", r"\\t", value)

@@ -63,7 +63,7 @@ class BatchRepairParser:
                 f"BatchRepairParser: repair attempt {attempt}/{self.max_retries} for {len(failures)} items (out of {len(unparsed_responses)} items) using inference engine {self.inference_engine.get_engine_id()}"
             )
             logger.debug(
-                f"First incorrect unparsed response (id {failures[0]}) is:\n{unparsed_responses[failures[0]]}"
+                f"First incorrect unparsed response (id {failures[0]}) is:\n{repr(unparsed_responses[failures[0]])}"
             )
             logger.debug(
                 f"First parsing issue (id {failures[0]}) was:\n{metadata[failures[0]].get('parsing_error', '')}"
@@ -130,7 +130,7 @@ class BatchRepairParser:
             )
         elif attempt > 0:
             logger.debug(
-                f"BatchRepairParser: all failed generations where succesfully repaired after {attempt} attempts."
+                f"BatchRepairParser: all failed generations were succesfully repaired after {attempt} attempts."
             )
         # Fallback for remaining failures
         for i in failures:
