@@ -99,7 +99,7 @@ def test_sanitize_and_parse_json():
     assert sanitize_and_parse_json('{"key": "value"') == '{"key": "value"}'
 
     # Test JSON with smart quotes (should be converted to regular quotes)
-    assert sanitize_and_parse_json('{"key": "“value”"}') == '{"key": ""value""}'
+    assert sanitize_and_parse_json('{"key": "“value”"}') == '{"key": "\'value\'"}'
 
     # Test JSON with invalid characters (carriage return)
     assert sanitize_and_parse_json('{"key": "value\r"}') == '{"key": "value\\r"}'
