@@ -128,7 +128,10 @@ class BatchRepairParser:
             logger.debug(
                 f"BatchRepairParser: repairing failed for {len(failures)} items. Applying on_generation_failure='{self.on_generation_failure}'."
             )
-
+        elif attempt > 0:
+            logger.debug(
+                f"BatchRepairParser: all failed generations where succesfully repaired after {attempt} attempts."
+            )
         # Fallback for remaining failures
         for i in failures:
             if self.on_generation_failure == "raise":
