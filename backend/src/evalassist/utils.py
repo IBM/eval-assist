@@ -64,11 +64,9 @@ def get_custom_models():
         with open(CUSTOM_MODELS_PATH, "r", encoding="utf-8") as file:
             try:
                 custom_models = json.load(file)
-                from . import root_pkg_logger
 
-                root_pkg_logger.debug(
-                    "Loaded the following custom models",
-                    json.dumps(custom_models, indent=2),
+                logger.debug(
+                    f"Loaded the following custom models:\n{json.dumps(custom_models, indent=2)}"
                 )
                 return custom_models
             except Exception:
