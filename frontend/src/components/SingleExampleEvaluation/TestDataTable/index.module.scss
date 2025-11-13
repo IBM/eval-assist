@@ -179,6 +179,11 @@ $columns-3: 5fr 1fr 1fr 0;
   gap: 0.5rem;
 }
 
+.resultBlockInner :global .cds--form-item {
+  flex: 0 0 auto;
+  margin-bottom: 7px;
+}
+
 .resultBlockOuter {
   display: flex;
   flex-direction: column;

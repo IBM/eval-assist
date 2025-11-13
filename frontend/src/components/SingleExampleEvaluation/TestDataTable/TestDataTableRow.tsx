@@ -295,6 +295,7 @@ export const TestDataTableRow = ({
                         expectedResult: e.target.value,
                       })
                     }
+                    style={{ flex: '0 0 auto !important', height: '40px !important', lineHeight: '40px !important' }}
                   >
                     <SelectItem value={''} text={''} />
                     {expectedResultsOptions.map((option, i) => (
