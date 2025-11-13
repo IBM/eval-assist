@@ -130,7 +130,7 @@ class EvaluationNotebookGenerator(ABC):
 
     def get_load_criteria_code(self):
         return f"""
-criteria: Criteria = Criteria.model_validate({self.criteria.model_dump_json(indent=4, exclude={"examples": {"criteria": True, "positional_bias": True}})})
+criteria: Criteria = Criteria.model_validate({self.criteria.model_dump_json(indent=4, exclude={"examples": {"__all__": {"criteria": True, "positional_bias": True, "metadata": True, "explanation": True}}, "options": {"__all__": {"score": True}}})})
 """
 
     @abstractmethod
