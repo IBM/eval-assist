@@ -102,21 +102,18 @@ class EvaluationNotebookGenerator(ABC):
     def get_load_dataset_code(self) -> str:
         return (
             "instances: list[Instance] = [\n"
-            + "".join(
-                [
-                    f"\tInstance(\n\t\tfields={{\n{
-                        ',\n'.join(
-                            [
-                                f"\t\t\t'{k}': {self.get_field_value(k, v)}"
-                                for k, v in instance.fields.items()
-                            ]
-                        )
-                    }\n\t\t}},\n\t),\n"
-                    for instance in self.instances
-                ]
-            )
+            + "".join([self._format_instance(instance) for instance in self.instances])
             + "]"
         )
+
+    def _format_instance(self, instance) -> str:
+        field_lines = ",\n".join(
+            [
+                f"\t\t\t'{k}': {self.get_field_value(k, v)}"
+                for k, v in instance.fields.items()
+            ]
+        )
+        return f"\tInstance(\n\t\tfields={{\n{field_lines}\n\t\t}},\n\t),\n"
 
     def get_eval_md(self) -> str:
         return "### Setup the judge and run the evaluation"
