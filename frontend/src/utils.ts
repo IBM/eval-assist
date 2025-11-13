@@ -10,9 +10,7 @@ import {
   DirectInstanceResult,
   EvaluationType,
   FetchedDirectInstanceResult,
-  FetchedDirectInstanceResultWithId,
   FetchedPairwiseInstanceResult,
-  FetchedPairwiseInstanceResultWithId,
   Instance,
   PairwiseInstance,
   PairwiseInstanceResult,
@@ -111,6 +109,7 @@ export const getEmptyTestCase = (type: EvaluationType, criteria?: Criteria): Tes
       perCriteriaOptionCount: null,
       borderlineCount: null,
     },
+    examples: [],
   }
 }
 

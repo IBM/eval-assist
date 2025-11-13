@@ -9,15 +9,11 @@ import {
   DirectInstance,
   DirectInstanceResult,
   EvaluationType,
-  FetchedDirectInstanceResultWithId,
   FetchedDirectResults,
   FetchedPairwiseResults,
   FetchedTestCase,
   Instance,
   PairwiseInstance,
-  PairwiseInstanceResult,
-  PerResponsePairwiseResult,
-  PerResponsePairwiseResultV0,
   TestCase,
 } from '@types'
 import {
@@ -100,7 +96,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   const [inProgressEvalToastId, setInProgressEvalToastId] = useState<string | null>(null)
 
   const getTestCaseAsJson = useCallback(
-    (testCase: TestCase): FetchedTestCase => {
+    (testCase: TestCase, keepId: boolean = true): FetchedTestCase => {
       return {
         name: testCase.name,
         content: JSON.stringify({
@@ -111,9 +107,10 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
           pipeline: testCase.evaluator,
           syntheticGenerationConfig: testCase.syntheticGenerationConfig,
           contentFormatVersion: CURRENT_FORMAT_VERSION,
+          examples: testCase.examples,
         }),
         user_id: -1, // set at the fetchUtils hook
-        id: testCase.id || -1,
+        id: keepId ? testCase.id || -1 : -1,
       }
     },
     [CURRENT_FORMAT_VERSION],
@@ -181,6 +178,8 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
 
       const toEvaluateInstancesParsed = toEvaluateInstances.map((i) => parseInstanceForBackend(i, currentTestCase.type))
 
+      const examplesParsed = currentTestCase.examples.map((e) => parseInstanceForBackend(e, currentTestCase.type))
+
       if (toEvaluateInstancesParsed.length === 0) {
         removeToast(inProgressEvalToastId)
         addToast({
@@ -198,6 +197,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
 
       let body: any = {
         instances: toEvaluateInstancesParsed,
+        examples: examplesParsed,
         evaluator_name: currentTestCase.evaluator?.name,
         provider: currentTestCase.evaluator?.provider,
         criteria: parsedCriteria,
@@ -334,7 +334,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
     async (name: string, fromTestCase?: TestCase) => {
       if (currentTestCase === null) return false
       const toSaveTestCase = fromTestCase ?? currentTestCase
-      const parsedToSaveTestCase = getTestCaseAsJson(toSaveTestCase)
+      const parsedToSaveTestCase = getTestCaseAsJson(toSaveTestCase, false)
       parsedToSaveTestCase.name = name
       const res = await put('test_case/', {
         test_case: parsedToSaveTestCase,

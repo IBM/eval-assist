@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
-import { FetchedTestCase, TestCase, TestCaseV0, TestCaseV1 } from '@types'
+import { FetchedTestCase, TestCase, TestCaseV0, TestCaseV1, TestCaseV2 } from '@types'
 
 // EXAMPLES
 // fetched test case is v0 and current is v1
@@ -127,6 +127,14 @@ export const useParseFetchedTestCase = () => {
     [],
   )
 
+  const parseFetchedTestCaseV1ToV2 = useCallback(
+    (fetchedTestCase: TestCaseV1): TestCaseV2 => ({
+      ...fetchedTestCase,
+      examples: [],
+    }),
+    [],
+  )
+
   const parseFetchedTestCaseV1 = useCallback(
     (fetchedTestCase: Record<string, any>): TestCaseV1 =>
       ({
@@ -135,17 +143,25 @@ export const useParseFetchedTestCase = () => {
     [],
   )
 
+    const parseFetchedTestCaseV2 = useCallback(
+    (fetchedTestCase: Record<string, any>): TestCaseV2 =>
+      ({
+        ...fetchedTestCase,
+      } as TestCaseV2),
+    [],
+  )
+
   const testCaseParsingVersionToVersionFunctions: any[] = useMemo(
-    () => [parseFetchedTestCaseV0ToV1],
-    [parseFetchedTestCaseV0ToV1],
+    () => [parseFetchedTestCaseV0ToV1, parseFetchedTestCaseV1ToV2],
+    [parseFetchedTestCaseV0ToV1, parseFetchedTestCaseV1ToV2],
   )
 
   const testCaseParsingVersionFunctions = useMemo(
-    () => [parseFetchedTestCaseV0, parseFetchedTestCaseV1],
-    [parseFetchedTestCaseV0, parseFetchedTestCaseV1],
+    () => [parseFetchedTestCaseV0, parseFetchedTestCaseV1, parseFetchedTestCaseV2],
+    [parseFetchedTestCaseV0, parseFetchedTestCaseV1, parseFetchedTestCaseV2],
   )
 
-  const CURRENT_FORMAT_VERSION = useMemo(() => 1, [])
+  const CURRENT_FORMAT_VERSION = useMemo(() => 2, [])
 
   const parseFetchedTestCase = useCallback(
     (fetchedTestCase: FetchedTestCase): TestCase => {

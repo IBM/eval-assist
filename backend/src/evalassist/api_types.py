@@ -1,13 +1,19 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any
+from typing import Any, cast
 
+from evalassist.judges import Criteria, CriteriaOption
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, RootModel, field_validator
 from unitxt.llm_as_judge import EvaluatorNameEnum, EvaluatorTypeEnum, ModelProviderEnum
 
 from .extended_unitxt import ExtendedEvaluatorNameEnum, ExtendedModelProviderEnum
-from .judges.types import DirectInstanceResult, Instance, PairwiseInstanceResult
+from .judges.types import (
+    DirectInstanceResult,
+    Instance,
+    InstanceResult,
+    PairwiseInstanceResult,
+)
 from .model import StoredTestCase
 
 
@@ -88,9 +94,18 @@ class CriteriaDTO(BaseModel):
     def validate_criteria(cls, description):
         if len(description.strip()) == 0:
             raise HTTPException(
-                status_code=400, detail="Evaluation criteria is required."
+                status_code=400, detail="Evaluation criteria description is required."
             )
         return description
+
+    def to_criteria(self, examples: list[InstanceResult]) -> Criteria:
+        return Criteria(
+            name=self.name,
+            description=self.description,
+            to_evaluate_field=self.to_evaluate_field,
+            context_fields=self.context_fields,
+            examples=examples,
+        )
 
 
 class CriteriaOptionDTO(BaseModel):
@@ -102,6 +117,19 @@ class CriteriaWithOptionsDTO(CriteriaDTO):
     name: str
     description: str
     options: list[CriteriaOptionDTO]
+
+    def to_criteria(self, examples: list[InstanceResult]) -> Criteria:
+        return Criteria(
+            name=self.name,
+            description=self.description,
+            options=[
+                CriteriaOption(name=o.name, description=o.description)
+                for o in self.options
+            ],
+            to_evaluate_field=self.to_evaluate_field,
+            context_fields=self.context_fields,
+            examples=examples,
+        )
 
 
 class InstanceDTO(BaseModel, ABC):
@@ -122,6 +150,12 @@ class InstanceDTO(BaseModel, ABC):
                 **(self.context if self.context is not None else {}),
                 to_evaluate_field: self.get_prediction(),
             }
+        )
+
+    def to_instance_result(self, to_evaluate_field: str) -> InstanceResult:
+        return InstanceResult(
+            instance=self.to_instance(to_evaluate_field),
+            selected_option=cast(str, self.expected_result),
         )
 
     @abstractmethod
@@ -153,6 +187,7 @@ class EvaluationRequest(BaseModel):
     type: EvaluatorTypeEnum
     instances: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
     criteria: CriteriaDTO | CriteriaWithOptionsDTO
+    examples: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
 
 
 class PairwiseInstanceResultDTO(BaseModel):
@@ -166,15 +201,14 @@ class PairwiseResultDTO(BaseModel):
 
 class NotebookParams(BaseModel):
     test_case_name: str
-    criteria: dict
     evaluator_name: EvaluatorNameEnum | ExtendedEvaluatorNameEnum
     provider: ModelProviderEnum
-    predictions: list[str | list[str]]
-    context_variables: list[dict[str, str]]
     credentials: dict[str, str]
     evaluator_type: EvaluatorTypeEnum
-    model_name: str | None = None
     plain_python_script: bool
+    instances: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
+    examples: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
+    criteria: CriteriaDTO | CriteriaWithOptionsDTO
 
 
 # class DownloadTestCaseParams(BaseModel):
@@ -200,7 +234,7 @@ class DirectInstanceResultDTO(BaseModel):
     result: DirectInstanceResult
 
 
-class InstanceResultDTO(BaseModel):
+class InstanceResultWithId(BaseModel):
     id: str
     result: DirectInstanceResult | PairwiseInstanceResult
 
@@ -209,12 +243,12 @@ class DirectResultDTO(BaseModel):
     results: list[DirectInstanceResultDTO]
 
 
-class InstanceResult(RootModel):
+class InstanceResultDTO(RootModel):
     root: DirectInstanceResultDTO | PairwiseInstanceResultDTO
 
 
 class EvaluationResultDTO(BaseModel):
-    results: list[InstanceResultDTO]
+    results: list[InstanceResultWithId]
 
 
 class TestModelRequestModel(BaseModel):

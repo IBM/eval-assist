@@ -1,4 +1,4 @@
-import { getEmptyTestCase, getJSONStringWithSortedKeys, returnByPipelineType, toSnakeCase } from 'src/utils'
+import { getEmptyTestCase, getJSONStringWithSortedKeys, returnByPipelineType } from 'src/utils'
 
 import {
   Dispatch,
@@ -294,20 +294,31 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
 
   const [selectedInstance, setSelectedInstance] = useState<Instance | null>(null)
 
-  const getStringifiedInstanceContent = useCallback(
-    (instance: Instance) => {
-      return getJSONStringWithSortedKeys({
-        evaluator: currentTestCase.evaluator,
-        criteria: currentTestCase.criteria,
-        ...instance.contextVariables,
-        response: returnByPipelineType(
-          currentTestCase.type,
-          () => (instance as DirectInstance).response,
-          (instance as PairwiseInstance).responses,
-        ),
-      })
-    },
+  const getInstanceMainContent = useCallback(
+    (instance: Instance): Record<string, any> => ({
+      evaluator: currentTestCase.evaluator,
+      criteria: currentTestCase.criteria,
+      ...instance.contextVariables,
+      response: returnByPipelineType(
+        currentTestCase.type,
+        () => (instance as DirectInstance).response,
+        (instance as PairwiseInstance).responses,
+      ),
+    }),
     [currentTestCase],
+  )
+
+  const getStringifiedInstanceContent = useCallback(
+    (instance: Instance, includeExamples: boolean = true): string => {
+      const dict = getInstanceMainContent(instance)
+      if (includeExamples) {
+        dict['examples'] = currentTestCase.examples.length
+          ? currentTestCase.examples.map((inContextExample) => getInstanceMainContent(inContextExample)).join(',')
+          : ''
+      }
+      return getJSONStringWithSortedKeys(dict)
+    },
+    [currentTestCase.examples, getInstanceMainContent],
   )
 
   // Used to compute if an instance result is outdated

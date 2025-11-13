@@ -44,7 +44,7 @@ from .api_types import (
     FeatureFlagsModel,
     FixInstanceRequest,
     FixInstanceResponse,
-    InstanceResultDTO,
+    InstanceResultWithId,
     NotebookParams,
     PairwiseInstanceDTO,
     PersonaEnum,
@@ -78,7 +78,6 @@ from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNot
 from .synthetic_example_generation.generate import DirectActionGenerator, Generator
 from .utils import (
     clean_object,
-    criteria_with_options_DTO_to_BO_mapper,
     get_custom_models,
     get_evaluator_metadata_wrapper,
     get_inference_engine_from_judge_metadata,
@@ -261,9 +260,7 @@ def get_prompt(req: EvaluationRequest):
     res = evaluator.get_prompt(
         instances=req.instances,
         risk_name=req.criteria.name,
-        criterion=criteria_with_options_DTO_to_BO_mapper(
-            cast(CriteriaWithOptionsDTO, req.criteria)
-        ),
+        criterion=req.criteria.to_criteria(examples=[]),
     )
     return res
 
@@ -319,11 +316,12 @@ async def evaluate(
             dto_instance.to_instance(req.criteria.to_evaluate_field)
             for dto_instance in req.instances
         ]
-
+        examples = [
+            example.to_instance_result(req.criteria.to_evaluate_field)
+            for example in req.examples
+        ]
         if req.type == EvaluatorTypeEnum.DIRECT:
-            criteria = criteria_with_options_DTO_to_BO_mapper(
-                cast(CriteriaWithOptionsDTO, req.criteria)
-            )
+            criteria = req.criteria.to_criteria(examples=examples)
             if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
                 evaluator = GraniteGuardianJudge(inference_engine=inference_engine)
             else:
@@ -342,6 +340,7 @@ async def evaluate(
                 description=req.criteria.description,
                 to_evaluate_field=req.criteria.to_evaluate_field,
                 context_fields=req.criteria.context_fields,
+                examples=examples,
             )
             evaluator = PairwiseJudge(
                 inference_engine=inference_engine,
@@ -356,7 +355,7 @@ async def evaluate(
         # Add the id to each instance result
         res = []
         for instance_result, instance in zip(per_instance_result, req.instances):
-            res.append(InstanceResultDTO(id=instance.id, result=instance_result))
+            res.append(InstanceResultWithId(id=instance.id, result=instance_result))
 
         return EvaluationResultDTO(results=res)
 
@@ -500,24 +499,36 @@ def cleanup_file(filepath: str):
 
 @router.post("/download-notebook/")
 def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks):
-    # Validate inputs
-    if (
-        not hasattr(params, "criteria")
-        or not hasattr(params, "evaluator_name")
-        or not hasattr(params, "predictions")
-        or not hasattr(params, "context_variables")
-    ):
-        raise HTTPException(status_code=400, detail="Missing required fields")
+    instances = [
+        dto_instance.to_instance(params.criteria.to_evaluate_field)
+        for dto_instance in params.instances
+    ]
+    examples = [
+        example.to_instance_result(params.criteria.to_evaluate_field)
+        for example in params.examples
+    ]
+    criteria = params.criteria.to_criteria(examples=examples)
+
     evaluator_name, custom_model_name = init_evaluator_name(params.evaluator_name)
     evaluator_metadata = get_evaluator_metadata_wrapper(
         evaluator_name, custom_model_name
     )
     model_name = get_model_name_from_evaluator(evaluator_metadata, params.provider)
-    params.model_name = model_name
+    p = {
+        "instances": instances,
+        "criteria": criteria,
+        "test_case_name": params.test_case_name,
+        "evaluator_name": evaluator_name,
+        "provider": params.provider,
+        "credentials": params.credentials,
+        "evaluator_type": params.evaluator_type,
+        "model_name": model_name,
+        "plain_python_script": params.plain_python_script,
+    }
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
-        nb = DirectEvaluationNotebook(params).generate_notebook()
+        nb = DirectEvaluationNotebook(**p).generate_notebook()
     else:
-        nb = PairwiseEvaluationNotebook(params).generate_notebook()
+        nb = PairwiseEvaluationNotebook(**p).generate_notebook()
     from nbconvert import PythonExporter
 
     result_content_file = nb

@@ -465,6 +465,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
         {
           name: 'Conciseness',
@@ -509,6 +510,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
         {
           name: 'Harmfulness',
@@ -549,6 +551,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
         {
           name: 'Insensitivity',
@@ -592,6 +595,7 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           criteria: getCriteria('insensitivity', EvaluationType.DIRECT) as CriteriaWithOptions,
+          examples: [],
         },
         {
           id: null,
@@ -662,6 +666,7 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           criteria: getCriteria('coherence', EvaluationType.DIRECT) as CriteriaWithOptions,
+          examples: [],
         },
         {
           name: 'Summarization Preference',
@@ -719,6 +724,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
         {
           name: 'Reference Document Faithfulness',
@@ -808,6 +814,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
         {
           name: 'Fairness',
@@ -866,6 +873,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
       ].map((testCase) => prettifyTestCaseFields(testCase)),
     [getCriteria],
@@ -906,6 +914,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
         {
           name: 'Consistency',
@@ -939,6 +948,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
         {
           name: 'Inclusivity',
@@ -972,6 +982,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
         {
           name: 'Reference Document Faithfulness',
@@ -1012,6 +1023,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
         {
           name: 'Summarization Preference',
@@ -1048,6 +1060,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
         {
           name: 'Email Inclusivity',
@@ -1084,6 +1097,7 @@ export const useTestCaseLibrary = () => {
             perCriteriaOptionCount: null,
             borderlineCount: null,
           },
+          examples: [],
         },
       ].map((testCase) => prettifyTestCaseFields(testCase)),
     [getCriteria],

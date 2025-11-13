@@ -1,4 +1,4 @@
-import { ChangeEvent, ComponentProps, memo, useCallback, useEffect, useLayoutEffect, useRef } from 'react'
+import { ChangeEvent, ComponentProps, memo, useLayoutEffect, useRef } from 'react'
 
 import { TextArea } from '@carbon/react'
 
