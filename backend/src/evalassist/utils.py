@@ -11,7 +11,7 @@ from typing import Any, cast
 
 from botocore.exceptions import NoCredentialsError
 from datasets import IterableDataset
-from evalassist.judges import Criteria, CriteriaOption
+from evalassist.judges import Criteria
 from fastapi import HTTPException
 from ibm_watsonx_ai.wml_client_error import (
     ApiRequestFailure,
@@ -30,7 +30,6 @@ from unitxt.inference import (
 )
 from unitxt.llm_as_judge import EvaluatorNameEnum, ModelProviderEnum
 
-from .api_types import CriteriaWithOptionsDTO
 from .const import CUSTOM_MODELS_PATH, EVAL_ASSIST_DIR
 from .extended_unitxt import (
     EXTENDED_EVALUATOR_TO_MODEL_ID,
@@ -595,21 +594,6 @@ def get_inference_engine_from_judge_metadata(
         provider=provider,
         model_name=model_name,
         custom_params=custom_params,
-    )
-
-
-def criteria_with_options_DTO_to_BO_mapper(
-    criteria: CriteriaWithOptionsDTO,
-) -> Criteria:
-    return Criteria(
-        name=criteria.name,
-        description=criteria.description,
-        options=[
-            CriteriaOption(name=o.name, description=o.description)
-            for o in criteria.options
-        ],
-        to_evaluate_field=criteria.to_evaluate_field,
-        context_fields=criteria.context_fields,
     )
 
 

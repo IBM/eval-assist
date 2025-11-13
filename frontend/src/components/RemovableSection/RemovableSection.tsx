@@ -3,31 +3,27 @@ import cx from 'classnames'
 import { useState } from 'react'
 
 import { Tooltip } from '@carbon/react'
-import { Maximize, Play, Replicate, Tools, TrashCan } from '@carbon/react/icons'
+import { CarbonIconType } from '@carbon/react/icons'
+
+import { useAppSidebarContext } from '@providers/AppSidebarProvider'
 
 import classes from './RemovableSection.module.scss'
 
+interface Action {
+  label: string
+  fn: () => void
+  enabled: boolean
+  icon: CarbonIconType
+}
+
 interface Props {
-  onRemove: () => void
-  onExpand: () => void
-  onDuplicate: () => void
-  onEvaluateInstance: () => void
-  onFixInstance: (() => void) | null
-  removeEnabled?: boolean
+  actions: Action[]
   children: (arg: { setActive: () => void; setInactive: () => void }) => JSX.Element
 }
 
-export default function RemovableSection({
-  onRemove,
-  onExpand,
-  onDuplicate,
-  onEvaluateInstance,
-  onFixInstance,
-  removeEnabled,
-  children,
-}: Props) {
+export default function RemovableSection({ actions, children }: Props) {
   const [active, setActive] = useState(false)
-  const optionButtonsCount = onFixInstance ? 5 : 4
+  const { sidebarTabSelected } = useAppSidebarContext()
   return (
     <div className={cx(classes.container)}>
       <div className={classes.outline} />
@@ -38,72 +34,26 @@ export default function RemovableSection({
 
       <div
         className={cx(classes.actionButtonsContainer)}
-        style={{ gap: optionButtonsCount === 4 ? '0.7rem' : '0.3rem' }}
+        style={{ gap: actions.length > 2 ? `${125 / actions.length - 20}px` : '10px' }}
       >
-        <Tooltip label="Duplicate" align="top">
-          <button
-            aria-label="Duplicate"
-            className={cx(classes.actionButton, {
-              [classes.active]: active,
-            })}
-            onClick={onDuplicate}
-            tabIndex={-1}
+        {actions.map((action, i) => (
+          <Tooltip
+            label={action.label}
+            align={i == 0 ? 'top' : i == actions.length - 1 ? 'bottom' : sidebarTabSelected ? 'left' : 'right'}
+            key={i}
           >
-            <Replicate />
-          </button>
-        </Tooltip>
-        {onFixInstance && (
-          <Tooltip label="Fix" align="left">
             <button
-              aria-label="Fix instance"
+              aria-label={action.label}
               className={cx(classes.actionButton, {
                 [classes.active]: active,
               })}
-              onClick={onFixInstance}
+              onClick={action.fn}
               tabIndex={-1}
             >
-              <Tools />
+              {<action.icon />}
             </button>
           </Tooltip>
-        )}
-        <Tooltip label="Evaluate" align="left">
-          <button
-            aria-label="Evaluate"
-            className={cx(classes.actionButton, {
-              [classes.active]: active,
-            })}
-            onClick={onEvaluateInstance}
-            tabIndex={-1}
-          >
-            <Play />
-          </button>
-        </Tooltip>
-        <Tooltip label="See details" align="left">
-          <button
-            aria-label="See details"
-            className={cx(classes.actionButton, {
-              [classes.active]: active,
-            })}
-            onClick={onExpand}
-            tabIndex={-1}
-          >
-            <Maximize />
-          </button>
-        </Tooltip>
-        {removeEnabled && (
-          <Tooltip label="Remove" align="bottom">
-            <button
-              aria-label="Remove"
-              className={cx(classes.actionButton, {
-                [classes.active]: active,
-              })}
-              onClick={onRemove}
-              tabIndex={-1}
-            >
-              <TrashCan />
-            </button>
-          </Tooltip>
-        )}
+        ))}
       </div>
     </div>
   )

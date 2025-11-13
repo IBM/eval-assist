@@ -4,7 +4,7 @@ import { generateId, returnByPipelineType, toTitleCase } from 'src/utils'
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react'
 
 import { InlineLoading, Link, Select, SelectItem, Tooltip } from '@carbon/react'
-import { ArrowRight, Trophy } from '@carbon/react/icons'
+import { ArrowRight, Maximize, Play, Replicate, Tools, TrashCan, Trophy } from '@carbon/react/icons'
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
@@ -15,7 +15,6 @@ import {
   CriteriaWithOptions,
   DirectInstance,
   DirectInstanceResult,
-  DirectResults,
   EvaluationType,
   Instance,
   PairwiseInstance,
@@ -35,12 +34,13 @@ interface Props {
   }
   instance: Instance
   setInstance: (instance: Instance) => void
-  removeEnabled: boolean
   removeInstance: () => void
   type: EvaluationType
-  addInstance: (instance: Instance) => void
+  addInstance: (instance: Instance, index?: number) => void
   resultsAvailable: boolean
   runEvaluation: (evaluationIds: string[]) => Promise<void>
+  convertInstanceToExample: () => void
+  index: number
 }
 
 export const TestDataTableRow = ({
@@ -50,7 +50,6 @@ export const TestDataTableRow = ({
   isInstanceEvaluationRunning,
   criteria,
   gridClasses,
-  removeEnabled,
   instance,
   setInstance,
   addInstance,
@@ -58,8 +57,11 @@ export const TestDataTableRow = ({
   type,
   resultsAvailable,
   runEvaluation,
+  convertInstanceToExample,
+  index,
 }: Props) => {
-  const { outdatedResultInstanceIds } = useCurrentTestCase()
+  const { outdatedResultInstanceIds, setInstancesLastEvaluatedContent, getStringifiedInstanceContent } =
+    useCurrentTestCase()
   const { fixInstance } = useTestCaseActionsContext()
   const isResultOutdated = useMemo(
     () => outdatedResultInstanceIds.includes(instance.id),
@@ -150,31 +152,72 @@ export const TestDataTableRow = ({
     }
   }, [instance, pairwiseWinnerIndexOrTie, positionalBiasDetected, type])
 
-  const onExpandInstance = () => {
+  const onExpandInstance = useCallback(() => {
     setSelectedInstance(instance)
     setResultDetailsModalOpen(true)
-  }
+  }, [instance, setResultDetailsModalOpen, setSelectedInstance])
 
-  const onDuplicateInstance = () => {
-    addInstance({ ...instance, id: generateId() })
-  }
+  const onDuplicateInstance = useCallback(() => {
+    const id = generateId()
+    const duplicatedInstance = { ...instance, id }
+    addInstance(duplicatedInstance, index + 1)
+    setInstancesLastEvaluatedContent((prev) =>
+      Object.fromEntries([...Object.entries(prev), [id, getStringifiedInstanceContent(duplicatedInstance)]]),
+    )
+  }, [addInstance, getStringifiedInstanceContent, index, instance, setInstancesLastEvaluatedContent])
+
+  const rowActions = useMemo(() => {
+    const actions = [
+      {
+        label: 'Evaluate',
+        fn: () => {
+          runEvaluation([instance.id])
+        },
+        icon: Play,
+        enabled: true,
+      },
+      {
+        label: 'See details',
+        fn: onExpandInstance,
+        icon: Maximize,
+        enabled: true,
+      },
+      {
+        label: 'Duplicate',
+        fn: onDuplicateInstance,
+        icon: Replicate,
+        enabled: true,
+      },
+      {
+        label: 'Remove',
+        fn: removeInstance,
+        icon: TrashCan,
+        enabled: true,
+      },
+    ]
+    if (type == EvaluationType.DIRECT && (instance.result as DirectInstanceResult)?.feedback) {
+      actions.push({
+        label: 'Fix instance',
+        fn: () => fixInstance(instance.id),
+        icon: Tools,
+        enabled: true,
+      })
+    }
+    return actions
+  }, [
+    fixInstance,
+    instance.id,
+    instance.result,
+    onDuplicateInstance,
+    onExpandInstance,
+    removeInstance,
+    runEvaluation,
+    type,
+  ])
 
   return (
     <>
-      <RemovableSection
-        onRemove={() => removeInstance()}
-        onExpand={() => onExpandInstance()}
-        onDuplicate={() => onDuplicateInstance()}
-        onEvaluateInstance={() => {
-          runEvaluation([instance.id])
-        }}
-        onFixInstance={
-          type == EvaluationType.DIRECT && (instance.result as DirectInstanceResult)?.feedback
-            ? () => fixInstance(instance.id)
-            : null
-        }
-        removeEnabled={removeEnabled}
-      >
+      <RemovableSection actions={rowActions}>
         {({ setActive, setInactive }) => (
           <div
             className={cx(classes.tableRow, classes.responsesRow, {
@@ -238,24 +281,37 @@ export const TestDataTableRow = ({
             </div>
             {/* Expected result */}
             <div className={cx(classes.blockElement, classes.resultBlock)}>
-              <Select
-                id={`select-expected-results`}
-                noLabel
-                value={
-                  instance.expectedResult !== null && instance.expectedResult !== '' ? instance.expectedResult : ''
-                }
-                onChange={(e) =>
-                  setInstance({
-                    ...instance,
-                    expectedResult: e.target.value,
-                  })
-                }
-              >
-                <SelectItem value={''} text={''} />
-                {expectedResultsOptions.map((option, i) => (
-                  <SelectItem key={i} text={option.text} value={option.value} />
-                ))}
-              </Select>
+              <div className={classes.resultBlockOuter}>
+                <div className={classes.resultBlockInner}>
+                  <Select
+                    id={`select-expected-results`}
+                    noLabel
+                    value={
+                      instance.expectedResult !== null && instance.expectedResult !== '' ? instance.expectedResult : ''
+                    }
+                    onChange={(e) =>
+                      setInstance({
+                        ...instance,
+                        expectedResult: e.target.value,
+                      })
+                    }
+                  >
+                    <SelectItem value={''} text={''} />
+                    {expectedResultsOptions.map((option, i) => (
+                      <SelectItem key={i} text={option.text} value={option.value} />
+                    ))}
+                  </Select>
+                  {instance.expectedResult != '' && (
+                    <Link
+                      onClick={() => convertInstanceToExample()}
+                      renderIcon={() => <ArrowRight />}
+                      className={classes.viewExplanation}
+                    >
+                      {'Convert to example'}
+                    </Link>
+                  )}
+                </div>
+              </div>
             </div>
 
             {result !== null && !isInstanceEvaluationRunning ? (
@@ -295,7 +351,7 @@ export const TestDataTableRow = ({
                         className={classes.viewExplanation}
                       >
                         {'View explanation'}
-                      </Link>{' '}
+                      </Link>
                     </div>
                   </div>
                 </div>

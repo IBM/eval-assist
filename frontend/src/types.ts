@@ -211,13 +211,17 @@ export interface TestCaseV0 {
   contextVariableNames: string[]
   evaluator: Evaluator | null
   criteria: CriteriaV1 | CriteriaWithOptionsV1
-  instances: InstanceV0[]
+  instances: Instance[]
   syntheticGenerationConfig: SyntheticGenerationConfig
 }
 
 export interface TestCaseV1 extends Omit<TestCaseV0, 'responseVariableName' | 'contextVariableNames'> {}
 
-export type TestCase = TestCaseV1
+export interface TestCaseV2 extends TestCaseV1 {
+  examples: Instance[]
+}
+
+export type TestCase = TestCaseV2
 
 export enum EvaluationType {
   DIRECT = 'direct',

@@ -1,7 +1,7 @@
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useModelProviderCredentials } from '@providers/ModelProviderCredentialsProvider'
 import { useToastContext } from '@providers/ToastProvider'
-import { parseCriteriaForBackend, returnByPipelineType } from '@utils'
+import { parseCriteriaForBackend, parseInstanceForBackend, returnByPipelineType } from '@utils'
 
 import { DirectInstance, PairwiseInstance } from '../types'
 import { useFetchUtils } from './useFetchUtils'
@@ -25,21 +25,15 @@ export const useUnitxtCodeGeneration = () => {
       timeout: 5000,
     })
     try {
+      const instances = currentTestCase.instances.map((i) => parseInstanceForBackend(i, currentTestCase.type))
+      const examples = currentTestCase.examples.map((e) => parseInstanceForBackend(e, currentTestCase.type))
+      const criteria = parseCriteriaForBackend(currentTestCase.criteria)
+
       const response = await post('download-notebook/', {
-        criteria: parseCriteriaForBackend(currentTestCase.criteria),
+        criteria,
         evaluator_name: currentTestCase.evaluator.name,
-        predictions:
-          currentTestCase.instances.map((instance) =>
-            returnByPipelineType(
-              currentTestCase.type,
-              () => (instance as DirectInstance).response,
-              () => (instance as PairwiseInstance).responses,
-            ),
-          ) || [],
-        context_variables:
-          currentTestCase.instances.map((instance) =>
-            instance.contextVariables.reduce((acc, item, index) => ({ ...acc, [item.name]: item.value }), {}),
-          ) || {},
+        instances,
+        examples,
         provider: currentTestCase.evaluator.provider,
         credentials: getCredentialKeysFromProvider(currentTestCase.evaluator.provider).reduce(
           (acc, item, index) => ({ ...acc, [item]: '' }),

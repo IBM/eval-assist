@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 
 import { ComposedModal, ModalBody, ModalFooter, ModalHeader, RadioButton, RadioButtonGroup } from '@carbon/react'
 
-import { useUnitxtCodeGeneration } from '@customHooks/useUnitxtNotebookGeneration'
+import { useUnitxtCodeGeneration } from '@customHooks/useNotebookGeneration'
 
 import classes from './ChooseCodeGenerationType copy.module.scss'
 

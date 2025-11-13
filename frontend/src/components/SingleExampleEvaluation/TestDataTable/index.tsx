@@ -1,10 +1,10 @@
 import cx from 'classnames'
 import { generateId, returnByPipelineType, toTitleCase } from 'src/utils'
 
-import { CSSProperties, ChangeEvent, Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
+import { CSSProperties, ChangeEvent, useCallback, useEffect, useMemo } from 'react'
 
 import { Button, IconButton, InlineLoading, PaginationNav, Toggle } from '@carbon/react'
-import { Add, AiGenerate, Download, Save, SettingsAdjust, TrashCan } from '@carbon/react/icons'
+import { Add, AiGenerate, Download, SettingsAdjust, TrashCan } from '@carbon/react/icons'
 
 import { EditableTag } from '@components/EditableTag'
 import { INSTANCES_PER_PAGE } from '@constants'
@@ -15,14 +15,7 @@ import { useSyntheticGeneration } from '@providers/SyntheticGenerationProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 import { useURLParamsContext } from '@providers/URLParamsProvider'
 
-import {
-  DirectInstance,
-  DirectInstanceResult,
-  EvaluationType,
-  Instance,
-  PairwiseInstance,
-  PairwiseInstanceResult,
-} from '../../../types'
+import { DirectInstance, EvaluationType, Instance, PairwiseInstance } from '../../../types'
 import { TestDataTableRow } from './TestDataTableRow'
 import classes from './index.module.scss'
 
@@ -101,8 +94,9 @@ export const TestDataTable = ({ style, className }: Props) => {
     setInstances([...instances, newEmptyInstance])
   }
 
-  const addInstance = (instance: Instance) => {
-    setInstances([...instances, instance])
+  const addInstance = (instance: Instance, index?: number) => {
+    const idx = index !== undefined ? index : instances.length
+    setInstances([...instances.slice(0, idx), instance, ...instances.slice(idx)])
   }
 
   const addContextVariable = () => {
@@ -195,6 +189,18 @@ export const TestDataTable = ({ style, className }: Props) => {
       setInstances(instances.filter((_, i) => getActualInstanceIndex(indexToRemove) !== i))
     },
     [getActualInstanceIndex, instances, setInstances],
+  )
+
+  const convertInstanceToExample = useCallback(
+    (indexToConvert: number) => {
+      const actualIndexToConvert = getActualInstanceIndex(indexToConvert)
+      setCurrentTestCase({
+        ...currentTestCase,
+        instances: instances.filter((_, i) => actualIndexToConvert !== i),
+        examples: [...currentTestCase.examples, instances[actualIndexToConvert]],
+      })
+    },
+    [currentTestCase, getActualInstanceIndex, instances, setCurrentTestCase],
   )
 
   const onPageChange = useCallback(
@@ -341,12 +347,13 @@ export const TestDataTable = ({ style, className }: Props) => {
               gridClasses={gridClasses}
               instance={instance}
               setInstance={(instance) => setInstance(instance, i)}
-              removeEnabled={currentTestCase.type !== EvaluationType.PAIRWISE || instances.length > 1}
               removeInstance={() => removeInstance(i)}
+              convertInstanceToExample={() => convertInstanceToExample(i)}
               type={currentTestCase.type}
               addInstance={addInstance}
               resultsAvailable={resultsAvailable}
               runEvaluation={runEvaluation}
+              index={i}
             />
           ))}
           {totalPages > 1 && (
