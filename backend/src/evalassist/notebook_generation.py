@@ -161,7 +161,7 @@ judge = DirectJudge(
 results: list[DirectInstanceResult] = judge(instances, criteria)
 
 for i, result in enumerate(results):
-    print(f'instance {{i}}: selected option {{result.selected_option}}')\
+    print(f'instance {{i + 1}}: selected option {{result.selected_option}}')\
 """
 
     def get_field_value(self, key: str, value: str | list[str]) -> str:
@@ -194,7 +194,7 @@ judge = PairwiseJudge(
 results: list[PairwiseInstanceResult] = judge(instances, criteria)
 
 for i, result in enumerate(results):
-    print(f'instance {{i}}: selected option {{result.selected_option}}')\
+    print(f'instance {{i + 1}}: selected option {{result.selected_option}}')\
 """
 
     def get_field_value(self, key: str, value: str | list[str]) -> str:
