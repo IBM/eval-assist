@@ -1,3 +1,4 @@
+import { diffWords } from 'diff'
 import Papa from 'papaparse'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -419,4 +420,62 @@ export const readCsvFile = <T = any>(file: Blob): Promise<T[]> => {
     reader.onerror = () => reject(reader.error)
     reader.readAsText(file)
   })
+}
+
+export const getPromptDiff = (fromPrompt: string, toPrompt: string) => {
+  const diffs = diffWords(fromPrompt, toPrompt, { ignoreWhitespace: true })
+  const aux = diffs.filter((d) => d.value !== '\n')
+
+  // merge consecutive removed spans
+  let i = 0
+  while (i < aux.length - 1) {
+    if (aux[i].removed && aux[i + 1].removed) {
+      aux[i].value = `${aux[i].value} ${aux[i + 1].value}`
+      aux.splice(i + 1, 1)
+    } else {
+      i = i + 1
+    }
+  }
+
+  // organize deleted/added spans
+  i = 0
+  let added: string[] = []
+  let removed: string[] = []
+  while (i <= aux.length) {
+    if (i < aux.length && aux[i].added) {
+      added.push(aux[i].value)
+      i += 1
+    } else if (i < aux.length && aux[i].removed) {
+      removed.push(aux[i].value)
+      i += 1
+    } else if (i < aux.length && aux[i].value === ' ') {
+      aux.splice(i, 1)
+    } else {
+      if (added.length && removed.length) {
+        const removedMerged = {
+          removed: true,
+          added: undefined,
+          value: removed.join(' '),
+        }
+
+        const addedMerged = {
+          removed: undefined,
+          added: true,
+          value: added.join(' '),
+        }
+
+        const start = i - removed.length - added.length
+        aux[start] = removedMerged
+        aux[start + 1] = addedMerged
+        aux.splice(start + 2, removed.length + added.length - 2)
+        i = start + 2
+      } else {
+        i += 1
+      }
+      added = []
+      removed = []
+    }
+  }
+
+  return aux
 }

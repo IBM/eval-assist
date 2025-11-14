@@ -112,7 +112,7 @@ def get_cross_inference_engine_params(
     provider_specific_params: dict | None = None,
 ):
     provider_specific_args = {}
-    inference_engine_params = {
+    inference_engine_params: dict[str, Any] = {
         "max_tokens": 1024,
         "credentials": credentials.copy(),
         "provider": provider,
