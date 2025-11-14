@@ -16,7 +16,6 @@ from .types import (
     Instance,
     MultiCriteria,
     MultiCriteriaDirectInstanceResult,
-    MultiCriteriaItemResult,
     PairwiseInstanceResult,
     PairwisePositionalBiasResult,
 )
@@ -341,21 +340,10 @@ class BaseDirectJudge(BaseJudge[Instance, DirectInstanceResult], ABC):
 
         final_results: list[MultiCriteriaDirectInstanceResult] = []
         for i in range(0, len(replicated_instances), criteria_count):
-            criteria_results = results[i : i + criteria_count]
-            item_results: list[MultiCriteriaItemResult] = [
-                item.get_result(per_criteria_result)
-                for item, per_criteria_result in zip(
-                    parsed_multi_criteria.items, criteria_results
-                )
+            criteria_results: list[DirectInstanceResult] = results[
+                i : i + criteria_count
             ]
-            result = MultiCriteriaDirectInstanceResult(
-                multi_criteria=parsed_multi_criteria,
-                item_results=item_results,
-                aggregated_score=parsed_multi_criteria.get_aggregated_score(
-                    item_results=item_results
-                ),
-            )
-            final_results.append(result)
+            final_results.append(parsed_multi_criteria.get_result(criteria_results))
         return final_results
 
     def _get_instances_from_str(
@@ -479,6 +467,17 @@ class BasePairwiseJudge(BaseJudge[Instance, PairwiseInstanceResult], ABC):
                 instance,
                 criterion,
             ) in zip(results[:results_len], results[results_len:], instances, criteria):
+                # update winner index if there is not a tie
+                positional_bias_instance_result.selected_option = (
+                    (
+                        len(cast(list[str], get_to_evaluate_text(instance, criterion)))
+                        - cast(int, positional_bias_instance_result.selected_option)
+                        - 1
+                    )
+                    if positional_bias_instance_result.selected_option != "tie"
+                    else "tie"
+                )
+
                 if (
                     instance_result.per_system_results is not None
                     and positional_bias_instance_result.per_system_results is not None
@@ -501,23 +500,8 @@ class BasePairwiseJudge(BaseJudge[Instance, PairwiseInstanceResult], ABC):
                         ]
 
                 instance_result.positional_bias = PairwisePositionalBiasResult(
-                    detected=(
-                        instance_result.selected_option == "tie"
-                        and positional_bias_instance_result.selected_option != "tie"
-                    )
-                    or (
-                        positional_bias_instance_result.selected_option != "tie"
-                        and instance_result.selected_option
-                        != (
-                            len(
-                                cast(
-                                    list[str], get_to_evaluate_text(instance, criterion)
-                                )
-                            )
-                            - cast(int, positional_bias_instance_result.selected_option)
-                            - 1
-                        )
-                    ),
+                    detected=instance_result.selected_option
+                    != positional_bias_instance_result.selected_option,
                     result=positional_bias_instance_result,
                 )
 
