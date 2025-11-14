@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid'
 
-import { ReactNode, createContext, useCallback, useContext, useRef, useState } from 'react'
+import { Dispatch, ReactNode, SetStateAction, createContext, useCallback, useContext, useRef, useState } from 'react'
 
 import { useAuthentication } from '@customHooks/useAuthentication'
 import { useFetchUtils } from '@customHooks/useFetchUtils'
@@ -42,7 +42,9 @@ interface TestCaseActionsContextValue {
   evaluatingInstanceIds: string[]
   cancelEvaluation: () => void
   getTestCaseAsJson: (testCase: TestCase) => FetchedTestCase
-  fixInstance: (instanceId: string) => Promise<void>
+  fixInstance: (instanceId: string) => Promise<string | null>
+  fixingInstanceId: string | null
+  setFixingInstanceId: Dispatch<SetStateAction<string | null>>
 }
 
 const TestCaseActionsContext = createContext<TestCaseActionsContextValue>({
@@ -60,7 +62,9 @@ const TestCaseActionsContext = createContext<TestCaseActionsContextValue>({
     content: '',
     name: '',
   }),
-  fixInstance: (instanceId: string) => Promise.resolve(),
+  fixInstance: (instanceId: string) => Promise.resolve(null),
+  fixingInstanceId: null,
+  setFixingInstanceId: () => {},
 })
 
 export const useTestCaseActionsContext = () => {
@@ -94,7 +98,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   const { userTestCases: userTestCases, setUserTestCases: setUserTestCases } = useUserTestCasesContext()
   const { setSidebarTabSelected } = useAppSidebarContext()
   const [inProgressEvalToastId, setInProgressEvalToastId] = useState<string | null>(null)
-
+  const [fixingInstanceId, setFixingInstanceId] = useState<string | null>(null)
   const getTestCaseAsJson = useCallback(
     (testCase: TestCase, keepId: boolean = true): FetchedTestCase => {
       return {
@@ -407,7 +411,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   const fixInstance = useCallback(
     async (instanceId: string) => {
       const toFixInstance = currentTestCase.instances.find((instance) => instanceId === instance.id)
-      if (!toFixInstance) return
+      if (!toFixInstance) return null
       const type = currentTestCase.type
       const parsedToFixInstance = parseInstanceForBackend(toFixInstance, type)
       const result = toFixInstance?.result as DirectInstanceResult // result is not null because the fix button wouldnt be visible if it were null
@@ -415,12 +419,12 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       const provider = currentTestCase.evaluator!.provider
       const llmProviderCredentials = getProviderCredentialsWithDefaults(provider)
       const evaluatorName = currentTestCase.evaluator?.name
-      if (!result) return
+      if (!result) return null
 
       const body = {
-        provider: provider,
         llm_provider_credentials: llmProviderCredentials,
-        evaluator_name: evaluatorName,
+        provider: currentTestCase.syntheticGenerationConfig.evaluator?.provider,
+        evaluator_name: currentTestCase.syntheticGenerationConfig.evaluator?.name,
         type: type,
         instance: parsedToFixInstance,
         result: {
@@ -439,30 +443,19 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
           metadata: result.metadata,
         },
       }
-      const fixingInProgressToastId = addToast({
-        kind: 'info',
-        title: 'Fixing instance...',
-      })
-      console.log(body)
       const fixedText = ((await (await post('fix-instance/', body)).json()) as { fixed_response: string })[
         'fixed_response'
       ]
-      removeToast(fixingInProgressToastId)
-      setCurrentTestCase(() => {
-        // used to filter the instances to update if one or more instances were deleted while the evaluation was running
-        const instances: DirectInstance[] = (currentTestCase.instances as DirectInstance[]).map(
-          (instance: DirectInstance) => ({
-            ...instance,
-            response: instance.id === instanceId ? fixedText : instance.response,
-          }),
-        )
-        return {
-          ...currentTestCase,
-          instances: instances,
-        }
-      })
+      return fixedText
     },
-    [addToast, currentTestCase, getProviderCredentialsWithDefaults, post, removeToast, setCurrentTestCase],
+    [
+      currentTestCase.criteria,
+      currentTestCase.evaluator,
+      currentTestCase.instances,
+      currentTestCase.type,
+      getProviderCredentialsWithDefaults,
+      post,
+    ],
   )
 
   return (
@@ -475,9 +468,11 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         cancelEvaluation,
         getTestCaseAsJson,
         fixInstance,
+        setFixingInstanceId,
         evaluationRunning,
         evaluationFailed,
         evaluatingInstanceIds,
+        fixingInstanceId,
       }}
     >
       {children}

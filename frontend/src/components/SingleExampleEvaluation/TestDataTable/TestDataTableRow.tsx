@@ -8,6 +8,7 @@ import { ArrowRight, Maximize, Play, Replicate, Tools, TrashCan, Trophy } from '
 
 import { FlexTextArea } from '@components/FlexTextArea/FlexTextArea'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
+import { useModalsContext } from '@providers/ModalsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
 
 import {
@@ -62,7 +63,9 @@ export const TestDataTableRow = ({
 }: Props) => {
   const { outdatedResultInstanceIds, setInstancesLastEvaluatedContent, getStringifiedInstanceContent } =
     useCurrentTestCase()
-  const { fixInstance } = useTestCaseActionsContext()
+  const { setFixingInstanceId } = useTestCaseActionsContext()
+  const { setIsFixInstanceModalOpen } = useModalsContext()
+
   const isResultOutdated = useMemo(
     () => outdatedResultInstanceIds.includes(instance.id),
     [instance.id, outdatedResultInstanceIds],
@@ -198,20 +201,24 @@ export const TestDataTableRow = ({
     if (type == EvaluationType.DIRECT && (instance.result as DirectInstanceResult)?.feedback) {
       actions.push({
         label: 'Fix instance',
-        fn: () => fixInstance(instance.id),
+        fn: () => {
+          setIsFixInstanceModalOpen(true)
+          setFixingInstanceId(instance.id)
+        },
         icon: Tools,
         enabled: true,
       })
     }
     return actions
   }, [
-    fixInstance,
     instance.id,
     instance.result,
     onDuplicateInstance,
     onExpandInstance,
     removeInstance,
     runEvaluation,
+    setFixingInstanceId,
+    setIsFixInstanceModalOpen,
     type,
   ])
 

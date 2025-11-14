@@ -6,6 +6,7 @@ import { DeleteTestCaseModal } from './Modals/DeleteTestCaseModal'
 import { EditPairwiseResponseName } from './Modals/EditPairwiseResponseName'
 import { EditTestCaseNameModal } from './Modals/EditTestCaseNameModal'
 import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
+import { FixInstanceModal } from './Modals/FixInstanceModal'
 import { UploadTestCaseModal } from './Modals/ImportTestCaseModal'
 import { UploadTestDataModal } from './Modals/ImportTestDataModal'
 import { InstanceDetailsModal } from './Modals/InstanceDetailsModal'
@@ -46,6 +47,8 @@ export const Modals = () => {
     setmodelProviderCrendentialsModalOpen,
     editPairwiseResponseNameModalOpen,
     setEditPairwiseResponseNameModalOpen,
+    isFixInstanceModalOpen,
+    setIsFixInstanceModalOpen,
   } = useModalsContext()
 
   const { showingTestCase } = useCurrentTestCase()
@@ -82,6 +85,9 @@ export const Modals = () => {
             setOpen={setEditPairwiseResponseNameModalOpen}
           />
           <UploadTestDataModal open={importTestDataModalOpen} setOpen={setImportTestDataModalOpen} />
+          {isFixInstanceModalOpen && (
+            <FixInstanceModal open={isFixInstanceModalOpen} setOpen={setIsFixInstanceModalOpen} />
+          )}
         </>
       )}
     </>
