@@ -49,8 +49,6 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
     setOpenedPerReponseResults(Object.keys(selectedInstance.result as PairwiseInstanceResult).map((_) => false))
   }, [currentTestCase.type, selectedInstance])
 
-  console.log(selectedInstance)
-
   return (
     selectedInstance !== null && (
       <Modal open={open} onRequestClose={onClose} passiveModal size="lg" modalHeading={`Instance details`}>

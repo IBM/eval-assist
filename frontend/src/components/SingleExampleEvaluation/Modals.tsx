@@ -1,9 +1,9 @@
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 
-import { ChooseCodeGenerationType } from './Modals/ChooseCodeGenerationType'
 import { ConfigurationModal } from './Modals/ConfigurationModal'
 import { DeleteTestCaseModal } from './Modals/DeleteTestCaseModal'
+import { DownloadModal } from './Modals/DownloadModal'
 import { EditPairwiseResponseName } from './Modals/EditPairwiseResponseName'
 import { EditTestCaseNameModal } from './Modals/EditTestCaseNameModal'
 import { EvaluationRunningModal } from './Modals/EvaluationRunningModal'
@@ -78,7 +78,7 @@ export const Modals = () => {
           {syntheticGenerationModalOpen && (
             <SyntheticGenerationModal open={syntheticGenerationModalOpen} setOpen={setSyntheticGenerationModalOpen} />
           )}
-          <ChooseCodeGenerationType open={sampleCodeTypeModalOpen} setOpen={setSampleCodeTypeModalOpen} />
+          <DownloadModal open={sampleCodeTypeModalOpen} setOpen={setSampleCodeTypeModalOpen} />
           <ModelProviderCredentialsModal
             open={modelProviderCrendentialsModalOpen}
             setOpen={setmodelProviderCrendentialsModalOpen}
