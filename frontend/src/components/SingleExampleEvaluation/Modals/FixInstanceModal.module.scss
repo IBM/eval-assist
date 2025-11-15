@@ -37,10 +37,10 @@
 }
 
 .added {
-  background-color: #b5efdb;
+  background-color: $support-success;
 }
 
 .removed {
-  text-decoration: line-through red;
-  background-color: #ee9690;
+  text-decoration: line-through $text-error;
+  background-color: $text-error;
 }
