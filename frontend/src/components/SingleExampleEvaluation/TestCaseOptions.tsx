@@ -99,7 +99,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
         <TestCaseTypeBadge type={currentTestCase.type} style={{ paddingInline: '0.5rem' }} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-        <IconButton kind="ghost" onClick={onConfigurationClick} label={'Config'}>
+        <IconButton kind="tertiary" onClick={onConfigurationClick} label={'Configuration'}>
           <Settings />
         </IconButton>
 
@@ -132,7 +132,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
           <IconButton
             disabled={isRisksAndHarms}
             kind="ghost"
-            label={'Sample code'}
+            label={'Download'}
             onClick={() => setSampleCodeTypeModalOpen(true)}
           >
             <Download />
@@ -144,20 +144,9 @@ export const TestCaseOptions = ({ style, className }: Props) => {
             renderIcon={Download}
             onClick={() => setSampleCodeTypeModalOpen(true)}
           >
-            {'Donwload as code'}
+            {'Donwload'}
           </Button>
         )}
-        <IconButton
-          // disabled={isRisksAndHarms}
-          kind="ghost"
-          label={'Download Test Case'}
-          onClick={onDownloadTestCaseClick}
-        >
-          <Json />
-        </IconButton>
-        <IconButton kind="ghost" label={'Download Test Data'} onClick={onDownloadTestDataClick}>
-          <Csv />
-        </IconButton>
         {storageEnabled && (
           <>
             <div style={{ height: '2rem' }} className={classes['vertical-divider']}></div>

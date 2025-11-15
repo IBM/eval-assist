@@ -102,7 +102,6 @@ export const ConfigurationModal = ({ open, setOpen }: Props) => {
       secondaryButtonText="Cancel"
       onRequestSubmit={() => setOpen(false)}
       shouldSubmitOnEnter
-      className={cx(classes['bottom-padding'], classes.root)}
     >
       <Layer type={'outline'}>
         <div className={classes.container}>
