@@ -188,6 +188,8 @@ class EvaluationRequest(BaseModel):
     instances: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
     criteria: CriteriaDTO | CriteriaWithOptionsDTO
     examples: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
+    judge: str
+    judge_params: dict
 
 
 class PairwiseInstanceResultDTO(BaseModel):
@@ -299,6 +301,10 @@ class EvaluatorMetadataAPI(BaseModel):
 class EvaluatorsResponseModel(BaseModel):
     # model_config = ConfigDict(arbitrary_types_allowed=True)
     evaluators: list[EvaluatorMetadataAPI]
+
+
+class JudgesResponseModel(BaseModel):
+    judges: dict[str, list]
 
 
 class FixInstanceRequest(BaseModel):

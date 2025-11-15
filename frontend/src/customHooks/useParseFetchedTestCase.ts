@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react'
 
+import { BASE_JUDGE_PARAMS_MAP, DEFAULT_JUDGE, JUDGE_DEFAULT_PARAMS_MAP } from '@constants'
 import { useEvaluatorOptionsContext } from '@providers/EvaluatorOptionsProvider'
 import { FetchedTestCase, TestCase, TestCaseV0, TestCaseV1, TestCaseV2 } from '@types'
 
@@ -131,6 +132,13 @@ export const useParseFetchedTestCase = () => {
     (fetchedTestCase: TestCaseV1): TestCaseV2 => ({
       ...fetchedTestCase,
       examples: [],
+      judge: {
+        name: DEFAULT_JUDGE,
+        params: {
+          ...BASE_JUDGE_PARAMS_MAP,
+          ...JUDGE_DEFAULT_PARAMS_MAP[fetchedTestCase.type][DEFAULT_JUDGE],
+        },
+      },
     }),
     [],
   )
@@ -143,7 +151,7 @@ export const useParseFetchedTestCase = () => {
     [],
   )
 
-    const parseFetchedTestCaseV2 = useCallback(
+  const parseFetchedTestCaseV2 = useCallback(
     (fetchedTestCase: Record<string, any>): TestCaseV2 =>
       ({
         ...fetchedTestCase,

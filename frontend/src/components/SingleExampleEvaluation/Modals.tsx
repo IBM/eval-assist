@@ -2,6 +2,7 @@ import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 
 import { ChooseCodeGenerationType } from './Modals/ChooseCodeGenerationType'
+import { ConfigurationModal } from './Modals/ConfigurationModal'
 import { DeleteTestCaseModal } from './Modals/DeleteTestCaseModal'
 import { EditPairwiseResponseName } from './Modals/EditPairwiseResponseName'
 import { EditTestCaseNameModal } from './Modals/EditTestCaseNameModal'
@@ -49,6 +50,8 @@ export const Modals = () => {
     setEditPairwiseResponseNameModalOpen,
     isFixInstanceModalOpen,
     setIsFixInstanceModalOpen,
+    isConfigurationModalOpen,
+    setIsConfigurationModalOpen,
   } = useModalsContext()
 
   const { showingTestCase } = useCurrentTestCase()
@@ -88,6 +91,7 @@ export const Modals = () => {
           {isFixInstanceModalOpen && (
             <FixInstanceModal open={isFixInstanceModalOpen} setOpen={setIsFixInstanceModalOpen} />
           )}
+          <ConfigurationModal open={isConfigurationModalOpen} setOpen={setIsConfigurationModalOpen} />
         </>
       )}
     </>

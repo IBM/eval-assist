@@ -53,7 +53,6 @@ include = [
 ]
 version = "0.0.0"
 
-
 [project.optional-dependencies]
 dev = [
     "pre_commit",

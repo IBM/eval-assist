@@ -157,6 +157,42 @@ class Criteria(BaseModel):
             raise ValueError("In context example must have an instance.")
         return self
 
+    def normalize_scores(self):
+        if not len(self.options) or any(
+            option.score is None for option in self.options
+        ):
+            # criteria is pairwise (no options) or score is not defined for all options
+            logger.warning(
+                f"{self.name} option scores can't be normalized because one or more option scores are None"
+            )
+            return
+        scores = [option.score for option in self.options]
+        min_score = min(scores)  # type: ignore / scores is not None
+        max_score = max(scores)  # type: ignore / scores is not None
+        for option, score in zip(self.options, scores):
+            option.score = (score - min_score) / (max_score - min_score)
+
+    # def normalize_score(self,):
+    #     if not len(self.options) or any(option.score is None for option in self.options):
+    #         # criteria is pairwise (no options) or score is not defined for all options
+    #         logger.warning(
+    #             f"{self.name} option scores can't be normalized because one or more option scores are None"
+    #         )
+    #         return
+    #     scores = [option.score for option in self.options]
+    #     min_score = min(scores)  # type: ignore / scores is not None
+    #     max_score = max(scores)  # type: ignore / scores is not None
+    #     for option, score in zip(self.options, scores):
+    #         option.score = (score - min_score) / (max_score - min_score)
+
+    def get_normalized_score(self, unnormalized_score: float | None) -> float | None:
+        scores: list[float | None] = [option.score for option in self.options]
+        if any(score is None for score in scores):
+            return None
+        min_score = min(scores)  # type: ignore
+        max_score = max(scores)  # type: ignore
+        return (unnormalized_score - min_score) / (max_score - min_score)
+
 
 class SingleSystemPairwiseInstanceResult(BaseModel):
     contest_results: list[bool | str]
@@ -240,14 +276,6 @@ class MultiCriteriaItem(BaseModel):
         description="Whether this criteria is required. If True and the score is not the optimal (or more than the score_threshold if provided, or the selected option equal to the target_option if provided), the overall aggregated score will be 0.0.",
     )
 
-    def normalized(self, unnormalized_score: float | None) -> float | None:
-        scores: list[float | None] = [option.score for option in self.criterion.options]
-        if any(score is None for score in scores):
-            return None
-        min_score = min(scores)  # type: ignore
-        max_score = max(scores)  # type: ignore
-        return (unnormalized_score - min_score) / (max_score - min_score)
-
     def get_strategy(self) -> MultiCriteriaStrategy:
         if self.target_option is not None:
             return "target_option"
@@ -255,8 +283,12 @@ class MultiCriteriaItem(BaseModel):
             return "score_threshold"
         return "none"
 
-    def get_score(self, result: DirectInstanceResult) -> float | None:
+    def get_score(
+        self, result: DirectInstanceResult, normalize_score: bool
+    ) -> float | None:
         score = result.score
+        if normalize_score:
+            score = cast(Criteria, result.criteria).get_normalized_score(score)
         if score is None and self.target_option is None:
             return None
 
@@ -275,9 +307,11 @@ class MultiCriteriaItem(BaseModel):
 
         return score
 
-    def get_result(self, result: DirectInstanceResult) -> MultiCriteriaItemResult:
+    def get_result(
+        self, result: DirectInstanceResult, normalize_score: bool
+    ) -> MultiCriteriaItemResult:
         weight = cast(float, self.weight)
-        score: float | None = self.get_score(result)
+        score: float | None = self.get_score(result, normalize_score)
         return MultiCriteriaItemResult(
             result=result,
             weight=weight,
@@ -402,19 +436,10 @@ class MultiCriteria(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def normalize_scores_if_needed(self) -> Self:
+    def normalize_scores_if_needed(self: "MultiCriteria") -> "MultiCriteria":
         if self.normalize_scores:
             for item in self.items:
-                scores: list[float | None] = [
-                    option.score for option in item.criterion.options
-                ]
-                if all(score is not None for score in scores):
-                    for option in item.criterion.options:
-                        option.score = item.normalized(option.score)
-                else:
-                    logger.warning(
-                        f"{item.criterion.name} option scores can't be normalized because one or more option scores are None"
-                    )
+                item.criterion.normalize_scores()
         return self
 
     @model_validator(mode="after")
@@ -423,6 +448,19 @@ class MultiCriteria(BaseModel):
         if len(criteria_names) != len(set(criteria_names)):
             raise ValueError("All criteria names must be unique")
         return self
+
+    def get_result(
+        self, criteria_results: list[DirectInstanceResult]
+    ) -> "MultiCriteriaDirectInstanceResult":
+        item_results: list[MultiCriteriaItemResult] = [
+            item.get_result(per_criteria_result, self.normalize_scores)
+            for item, per_criteria_result in zip(self.items, criteria_results)
+        ]
+        return MultiCriteriaDirectInstanceResult(
+            multi_criteria=self,
+            item_results=item_results,
+            aggregated_score=self.get_aggregated_score(item_results=item_results),
+        )
 
 
 class MultiCriteriaDirectInstanceResult(BaseModel):

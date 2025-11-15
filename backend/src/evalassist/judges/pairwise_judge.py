@@ -45,19 +45,6 @@ class PairwiseJudge(BasePairwiseJudge, UnitxtInferenceEngineMixin):
         self.on_generation_failure = on_generation_failure
         self.tie_enabled = tie_enabled
 
-        if self.self_consistency:
-            temp = getattr(self.inference_engine, "temperature", None)
-            if temp is not None:
-                try:
-                    if float(temp) == 0.0:
-                        logger.warning(
-                            "Self-consistency may not bring any benefit when temperature is 0."
-                        )
-                except (TypeError, ValueError):
-                    logger.debug(
-                        "Could not interpret temperature value for self-consistency check."
-                    )
-
     def get_name(self) -> str:
         return f"in_house{f'_with_self_consistency_{self.self_consistency}_attempts' if self.self_consistency else ''}"
 

@@ -112,6 +112,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
           syntheticGenerationConfig: testCase.syntheticGenerationConfig,
           contentFormatVersion: CURRENT_FORMAT_VERSION,
           examples: testCase.examples,
+          judge: testCase.judge,
         }),
         user_id: -1, // set at the fetchUtils hook
         id: keepId ? testCase.id || -1 : -1,
@@ -206,8 +207,10 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
         provider: currentTestCase.evaluator?.provider,
         criteria: parsedCriteria,
         type: currentTestCase.type,
+        judge: currentTestCase.judge.name,
+        judge_params: currentTestCase.judge.params,
+        llm_provider_credentials: getProviderCredentialsWithDefaults(currentTestCase.evaluator!.provider),
       }
-      body['llm_provider_credentials'] = getProviderCredentialsWithDefaults(currentTestCase.evaluator!.provider)
 
       const startEvaluationTime = new Date().getTime() / 1000
       response = await post('evaluate/', body)
@@ -418,7 +421,6 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       const parsedCriteria = parseCriteriaForBackend(currentTestCase.criteria)
       const provider = currentTestCase.evaluator!.provider
       const llmProviderCredentials = getProviderCredentialsWithDefaults(provider)
-      const evaluatorName = currentTestCase.evaluator?.name
       if (!result) return null
 
       const body = {
@@ -452,6 +454,8 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
       currentTestCase.criteria,
       currentTestCase.evaluator,
       currentTestCase.instances,
+      currentTestCase.syntheticGenerationConfig.evaluator?.name,
+      currentTestCase.syntheticGenerationConfig.evaluator?.provider,
       currentTestCase.type,
       getProviderCredentialsWithDefaults,
       post,
