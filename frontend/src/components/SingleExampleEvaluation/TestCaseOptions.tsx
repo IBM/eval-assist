@@ -3,7 +3,17 @@ import { toTitleCase } from 'src/utils'
 import { CSSProperties, useState } from 'react'
 
 import { Button, IconButton } from '@carbon/react'
-import { Csv, Download, Edit, Json, Save, Settings, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
+import {
+  Csv,
+  Download,
+  Edit,
+  Json,
+  Password,
+  Save,
+  Settings,
+  TrashCan,
+  WatsonHealthSaveImage,
+} from '@carbon/react/icons'
 
 import { TestCaseTypeBadge } from '@components/TestCaseTypeBadge/TestCaseTypeBadge'
 import { useDownloadTestCase } from '@customHooks/useDownloadTestCase'
@@ -32,6 +42,7 @@ export const TestCaseOptions = ({ style, className }: Props) => {
     setEditNameModalOpen,
     setSampleCodeTypeModalOpen,
     setIsConfigurationModalOpen,
+    setmodelProviderCrendentialsModalOpen,
   } = useModalsContext()
   const { onSave } = useTestCaseActionsContext()
 
@@ -46,6 +57,10 @@ export const TestCaseOptions = ({ style, className }: Props) => {
 
   const onConfigurationClick = async () => {
     setIsConfigurationModalOpen(true)
+  }
+
+  const onCredentialsClick = async () => {
+    setmodelProviderCrendentialsModalOpen(true)
   }
 
   const onDownloadTestCaseClick = () => {
@@ -86,6 +101,10 @@ export const TestCaseOptions = ({ style, className }: Props) => {
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
         <IconButton kind="ghost" onClick={onConfigurationClick} label={'Config'}>
           <Settings />
+        </IconButton>
+
+        <IconButton kind="ghost" onClick={onCredentialsClick} label={'API credentials'}>
+          <Password />
         </IconButton>
         {storageEnabled && isTestCaseSaved && (
           <IconButton

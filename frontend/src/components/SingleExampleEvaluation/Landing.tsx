@@ -2,10 +2,8 @@ import cx from 'classnames'
 import { DIRECT_NAME, PAIRWISE_NAME } from 'src/constants'
 import { getEmptyTestCase } from 'src/utils'
 
-import { Dispatch, SetStateAction } from 'react'
-
 import { Button } from '@carbon/react'
-import { Add, ArrowRight, Launch, Upload, View } from '@carbon/react/icons'
+import { Add, ArrowRight, Upload, View } from '@carbon/react/icons'
 
 import { useThemeContext } from '@components/ThemeProvider/ThemeProvider'
 import { useAuthentication } from '@customHooks/useAuthentication'
@@ -13,7 +11,7 @@ import { useAppSidebarContext } from '@providers/AppSidebarProvider'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 
-import { EvaluationType, TestCase } from '../../types'
+import { EvaluationType } from '../../types'
 import { Card } from './Card/Card'
 import classes from './Landing.module.scss'
 
