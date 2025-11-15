@@ -239,9 +239,8 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
     getDefaultEvaluator,
   ])
 
-  const showingTestCase = useMemo<boolean>(() => preloadedTestCase !== null, [preloadedTestCase])
-
   const [currentTestCase, setCurrentTestCase] = useState(preloadedTestCase || getEmptyTestCase(EvaluationType.DIRECT))
+  const showingTestCase = useMemo<boolean>(() => preloadedTestCase !== null, [preloadedTestCase])
 
   const currentTestCaseString = useMemo<string>(
     () => (currentTestCase !== null && showingTestCase ? getJSONStringWithSortedKeys(currentTestCase) : ''),
@@ -304,6 +303,7 @@ export const CurrentTestCaseProvider = ({ children }: { children: ReactNode }) =
         () => (instance as DirectInstance).response,
         (instance as PairwiseInstance).responses,
       ),
+      judge: currentTestCase.judge,
     }),
     [currentTestCase],
   )

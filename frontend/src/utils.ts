@@ -2,6 +2,7 @@ import { diffWords } from 'diff'
 import Papa from 'papaparse'
 import { v4 as uuidv4 } from 'uuid'
 
+import { BASE_JUDGE_DEFAULT_PARAMS_MAP, DEFAULT_JUDGE, JUDGE_DEFAULT_PARAMS_MAP } from '@constants'
 import {
   CaretCoordinates,
   Criteria,
@@ -111,6 +112,13 @@ export const getEmptyTestCase = (type: EvaluationType, criteria?: Criteria): Tes
       borderlineCount: null,
     },
     examples: [],
+    judge: {
+      name: DEFAULT_JUDGE,
+      params: {
+        ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+        ...JUDGE_DEFAULT_PARAMS_MAP[type][DEFAULT_JUDGE],
+      },
+    },
   }
 }
 

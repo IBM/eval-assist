@@ -3,7 +3,7 @@ import { toTitleCase } from 'src/utils'
 import { CSSProperties, useState } from 'react'
 
 import { Button, IconButton } from '@carbon/react'
-import { Csv, Download, Edit, Json, Save, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
+import { Csv, Download, Edit, Json, Save, Settings, TrashCan, WatsonHealthSaveImage } from '@carbon/react/icons'
 
 import { TestCaseTypeBadge } from '@components/TestCaseTypeBadge/TestCaseTypeBadge'
 import { useDownloadTestCase } from '@customHooks/useDownloadTestCase'
@@ -26,8 +26,13 @@ export const TestCaseOptions = ({ style, className }: Props) => {
   const { storageEnabled } = useFeatureFlags()
   const { currentTestCase, isTestCaseSaved, changesDetected } = useCurrentTestCase()
   const { isRisksAndHarms } = useURLParamsContext()
-  const { setDeleteTestCaseModalOpen, setSaveTestCaseModalOpen, setEditNameModalOpen, setSampleCodeTypeModalOpen } =
-    useModalsContext()
+  const {
+    setDeleteTestCaseModalOpen,
+    setSaveTestCaseModalOpen,
+    setEditNameModalOpen,
+    setSampleCodeTypeModalOpen,
+    setIsConfigurationModalOpen,
+  } = useModalsContext()
   const { onSave } = useTestCaseActionsContext()
 
   const { downloadTestCase } = useDownloadTestCase()
@@ -37,6 +42,10 @@ export const TestCaseOptions = ({ style, className }: Props) => {
     setSavingTestCase(true)
     await onSave()
     setSavingTestCase(false)
+  }
+
+  const onConfigurationClick = async () => {
+    setIsConfigurationModalOpen(true)
   }
 
   const onDownloadTestCaseClick = () => {
@@ -75,6 +84,9 @@ export const TestCaseOptions = ({ style, className }: Props) => {
         <TestCaseTypeBadge type={currentTestCase.type} style={{ paddingInline: '0.5rem' }} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <IconButton kind="ghost" onClick={onConfigurationClick} label={'Config'}>
+          <Settings />
+        </IconButton>
         {storageEnabled && isTestCaseSaved && (
           <IconButton
             disabled={savingTestCase || !changesDetected || isRisksAndHarms}

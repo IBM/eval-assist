@@ -87,7 +87,8 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             {text_to_evaluate}
 
             ### First Evaluation Stage:
-            For each option of the criterion, provide a CoT step-by-step reasoning explaining why the text *would* fit that option. If there is no supporting evidence, respond with "No arguments.". If in doubt, provide the arguments anyway.
+            For each option of the criterion, provide a detailed argument explaining why the text *would* fit that option. If there is no supporting evidence, respond with "No arguments.". If in doubt, provide the arguments anyway. You must output only valid JSON with no extra text.
+            Use the following schema and formatting rules:
 
             ### Output format
             {format_instructions}
@@ -468,7 +469,7 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                         )
                     ]
                 )
-                amount_of_stages.append(2)
+                amount_of_stages.append(4)
                 i += 1
             else:
                 selected_options.append(second_stage_selected_option_list[j])
@@ -485,7 +486,7 @@ class ThesisAntithesisDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                         )
                     ]
                 )
-                amount_of_stages.append(4)
+                amount_of_stages.append(2)
             j += 1
         return [
             DirectInstanceResult(

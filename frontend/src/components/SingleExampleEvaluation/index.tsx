@@ -4,6 +4,7 @@ import { BackendUserProvider } from '@providers/BackendUserProvider'
 import { CriteriasProvider } from '@providers/CriteriaProvider'
 import { CurrentTestCaseProvider } from '@providers/CurrentTestCaseProvider'
 import { EvaluatorOptionsProvider } from '@providers/EvaluatorOptionsProvider'
+import { JudgeOptionsProvider } from '@providers/JudgeOptionsProvider'
 import { ModalsProvider } from '@providers/ModalsProvider'
 import { ModelProviderCredentialsProvider } from '@providers/ModelProviderCredentialsProvider'
 import { SelectedTextProvider } from '@providers/SelectedTextProvider'
@@ -18,27 +19,29 @@ const Landing = () => (
   <BackendUserProvider>
     <CriteriasProvider>
       <EvaluatorOptionsProvider>
-        <ModelProviderCredentialsProvider>
-          <UserTestCasesProvider>
-            <URLParamsProvider>
-              <CurrentTestCaseProvider>
-                <TestCaseActionsProvider>
-                  <ModalsProvider>
-                    <SelectedTextProvider>
-                      <SyntheticGenerationProvider>
-                        <AppSidebarProvider>
-                          <EditorProvider>
-                            <SingleExampleEvaluation />
-                          </EditorProvider>
-                        </AppSidebarProvider>
-                      </SyntheticGenerationProvider>
-                    </SelectedTextProvider>
-                  </ModalsProvider>
-                </TestCaseActionsProvider>
-              </CurrentTestCaseProvider>
-            </URLParamsProvider>
-          </UserTestCasesProvider>
-        </ModelProviderCredentialsProvider>
+        <JudgeOptionsProvider>
+          <ModelProviderCredentialsProvider>
+            <UserTestCasesProvider>
+              <URLParamsProvider>
+                <CurrentTestCaseProvider>
+                  <TestCaseActionsProvider>
+                    <ModalsProvider>
+                      <SelectedTextProvider>
+                        <SyntheticGenerationProvider>
+                          <AppSidebarProvider>
+                            <EditorProvider>
+                              <SingleExampleEvaluation />
+                            </EditorProvider>
+                          </AppSidebarProvider>
+                        </SyntheticGenerationProvider>
+                      </SelectedTextProvider>
+                    </ModalsProvider>
+                  </TestCaseActionsProvider>
+                </CurrentTestCaseProvider>
+              </URLParamsProvider>
+            </UserTestCasesProvider>
+          </ModelProviderCredentialsProvider>
+        </JudgeOptionsProvider>
       </EvaluatorOptionsProvider>
     </CriteriasProvider>
   </BackendUserProvider>

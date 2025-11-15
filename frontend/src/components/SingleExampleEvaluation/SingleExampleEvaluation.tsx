@@ -31,17 +31,20 @@ import { TestCaseOptions } from './TestCaseOptions'
 import { TestDataTable } from './TestDataTable'
 
 export const SingleExampleEvaluation = () => {
-  const { currentTestCase, setCurrentTestCase, changesDetected, isTestCaseSaved, showingTestCase } =
-    useCurrentTestCase()
+  const {
+    currentTestCase,
+    setCurrentTestCase,
+    changesDetected,
+    isTestCaseSaved,
+    showingTestCase,
+    areRelevantCredentialsProvided,
+  } = useCurrentTestCase()
 
   const {
     setNewTestCaseModalOpen,
     setImportTestCaseModalOpen: setUploadTestCaseModalOpen,
     setmodelProviderCrendentialsModalOpen,
   } = useModalsContext()
-
-  // we are ignoring client side rendering to be able to use useSessionStorage
-  const { areRelevantCredentialsProvided } = useCurrentTestCase()
 
   const { isRisksAndHarms } = useURLParamsContext()
 

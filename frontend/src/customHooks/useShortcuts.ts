@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from 'react'
 
+import { useAppSidebarContext } from '@providers/AppSidebarProvider'
 import { useCurrentTestCase } from '@providers/CurrentTestCaseProvider'
 import { useFeatureFlags } from '@providers/FeatureFlagsProvider'
 import { useModalsContext } from '@providers/ModalsProvider'
 import { useTestCaseActionsContext } from '@providers/TestCaseActionsProvider'
-import { useAppSidebarContext } from '@providers/AppSidebarProvider'
 
 interface Props {}
 
@@ -25,7 +25,7 @@ export const useShortcuts = ({}: Props) => {
         }
       } else if (e.key === 'b' && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
         e.preventDefault()
-        setSidebarTabSelected(sidebarTabSelected === null ? "library_test_cases" : null)
+        setSidebarTabSelected(sidebarTabSelected === null ? 'library_test_cases' : null)
       }
     },
     [changesDetected, isTestCaseSaved, onSave, setSaveTestCaseModalOpen, sidebarTabSelected, setSidebarTabSelected],
@@ -36,6 +36,5 @@ export const useShortcuts = ({}: Props) => {
       document.addEventListener('keydown', onShortcut)
       return () => document.removeEventListener('keydown', onShortcut)
     }
-    
   }, [isTestCaseSaved, onSave, onShortcut, setSaveTestCaseModalOpen, storageEnabled])
 }

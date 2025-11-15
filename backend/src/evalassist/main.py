@@ -45,6 +45,7 @@ from .api_types import (
     FixInstanceRequest,
     FixInstanceResponse,
     InstanceResultWithId,
+    JudgesResponseModel,
     NotebookParams,
     PairwiseInstanceDTO,
     PersonaEnum,
@@ -66,10 +67,9 @@ from .database import engine  # Assumes you have engine/session setup
 from .extended_unitxt import EXTENDED_EVALUATORS_METADATA
 from .judges import (
     DEFAULT_JUDGE_INFERENCE_PARAMS,
+    JUDGE_CLASS_MAP,
     Criteria,
-    DirectJudge,
     GraniteGuardianJudge,
-    PairwiseJudge,
 )
 from .model import AppUser, StoredTestCase
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
@@ -160,7 +160,7 @@ def get_feature_flags() -> dict[str, bool]:
 
 @router.get("/evaluators/", response_model=EvaluatorsResponseModel)
 def get_evaluators():
-    """Get the list of available pipelines, as supported by llm-as-a-judge library"""
+    """Get the list of available models"""
     evaluators = [
         EvaluatorMetadataAPI(**e.__dict__) for e in EXTENDED_EVALUATORS_METADATA
     ]
@@ -172,6 +172,14 @@ def get_evaluators():
             )
         )
     return EvaluatorsResponseModel(evaluators=evaluators)
+
+
+@router.get("/judges/", response_model=JudgesResponseModel)
+def get_judges():
+    """Get the list of available judges"""
+    return JudgesResponseModel(
+        judges={k: list(v.keys()) for k, v in JUDGE_CLASS_MAP.items()}
+    )
 
 
 @router.get("/default-credentials/", response_model=dict[str, dict[str, str]])
@@ -216,7 +224,7 @@ def get_default_credentials():
 
 
 @router.get("/criteria/")
-def get_criterias() -> dict[str, list[CriteriaWithOptionsDTO] | list[CriteriaDTO]]:
+def get_criteria() -> dict[str, list[CriteriaWithOptionsDTO] | list[CriteriaDTO]]:
     """Get the list of available criterias"""
     for c in [*DIRECT_CRITERIA, *PAIRWISE_CRITERIA]:
         if c.context_fields is None or c.prediction_field is None:
@@ -295,6 +303,14 @@ async def evaluate(
 
     @handle_llm_generation_exceptions
     def run():
+        if (
+            req.judge_params["self_consistency"] is True
+            or req.judge_params["self_consistency"] > 1
+        ):
+            temperature = 1.0
+        else:
+            temperature = 0.0
+
         inference_engine: InferenceEngine = get_inference_engine_from_judge_metadata(
             evaluator_name=evaluator_name,
             custom_model_name=custom_model_name,
@@ -302,6 +318,7 @@ async def evaluate(
             llm_provider_credentials=req.llm_provider_credentials,
             custom_params={
                 **DEFAULT_JUDGE_INFERENCE_PARAMS,
+                "temperature": temperature,
             },
         )
         if (
@@ -320,17 +337,15 @@ async def evaluate(
             example.to_instance_result(req.criteria.to_evaluate_field)
             for example in req.examples
         ]
+        judge = JUDGE_CLASS_MAP[req.type][req.judge](
+            **{"inference_engine": inference_engine, **req.judge_params}
+        )  # type: ignore
+
         if req.type == EvaluatorTypeEnum.DIRECT:
             criteria = req.criteria.to_criteria(examples=examples)
             if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
-                evaluator = GraniteGuardianJudge(inference_engine=inference_engine)
-            else:
-                evaluator = DirectJudge(
-                    inference_engine=inference_engine,
-                    generate_feedback=True,
-                    check_positional_bias=True,
-                )
-            per_instance_result = evaluator.evaluate(
+                judge = GraniteGuardianJudge(inference_engine=inference_engine)
+            per_instance_result = judge.evaluate(
                 instances=instances,
                 criteria=criteria,
             )
@@ -342,12 +357,7 @@ async def evaluate(
                 context_fields=req.criteria.context_fields,
                 examples=examples,
             )
-            evaluator = PairwiseJudge(
-                inference_engine=inference_engine,
-                check_positional_bias=True,
-            )
-
-            per_instance_result = evaluator.evaluate(
+            per_instance_result = judge.evaluate(
                 instances=instances,
                 criteria=criteria,
             )
@@ -526,9 +536,9 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
         "plain_python_script": params.plain_python_script,
     }
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
-        nb = DirectEvaluationNotebook(**p).generate_notebook()
+        nb = DirectEvaluationNotebook(**p).generate_notebook()  # type: ignore
     else:
-        nb = PairwiseEvaluationNotebook(**p).generate_notebook()
+        nb = PairwiseEvaluationNotebook(**p).generate_notebook()  # type: ignore
     from nbconvert import PythonExporter
 
     result_content_file = nb

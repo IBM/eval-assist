@@ -30,7 +30,6 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
     setOpen(false)
     setSelectedInstance(null)
   }
-
   const positionalBiasDetected = useMemo(() => {
     if (selectedInstance === null || selectedInstance.result === null) return null
     return selectedInstance.result.positionalBias ? selectedInstance.result.positionalBias.detected : false
@@ -49,6 +48,8 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
       return setOpenedPerReponseResults([])
     setOpenedPerReponseResults(Object.keys(selectedInstance.result as PairwiseInstanceResult).map((_) => false))
   }, [currentTestCase.type, selectedInstance])
+
+  console.log(selectedInstance)
 
   return (
     selectedInstance !== null && (
@@ -171,42 +172,48 @@ export const InstanceDetailsModal = ({ open, setOpen }: Props) => {
                         )}
                         {selectedInstance.result.metadata && (
                           <>
-                            {Object.entries(selectedInstance.result.metadata).map(([k, v], i) => (
+                            {Object.entries(selectedInstance.result.metadata).map(([metadataKey, metadataValue], i) => (
                               <React.Fragment key={i}>
                                 <p>
-                                  <strong>{`${capitalizeFirstWord(k)}:`}</strong>
+                                  <strong>{`${capitalizeFirstWord(metadataKey)}:`}</strong>
                                 </p>
-                                {typeof v === 'object' && !Array.isArray(v) && v !== null ? (
+                                {typeof metadataValue === 'object' &&
+                                !Array.isArray(metadataValue) &&
+                                metadataValue !== null ? (
                                   <div className={cx(classes.gridTemplate)}>
-                                    {Object.entries(v).map(([metadataKey, metadataValue], i) => (
+                                    {Object.entries(metadataValue).map(([innerMetadataKey, innerMetadataValue], i) => (
                                       <React.Fragment key={i}>
                                         <p>
-                                          <strong>{`${capitalizeFirstWord(metadataKey)}`}</strong>
+                                          <strong>{`${capitalizeFirstWord(innerMetadataKey)}`}</strong>
                                         </p>
-                                        {Array.isArray(v) ? (
+                                        {Array.isArray(metadataValue) ? (
                                           <List>
-                                            {(metadataValue as Array<string>).map((i, j) => (
+                                            {(innerMetadataValue as Array<string>).map((i, j) => (
                                               <ListItem key={j}>{`${i}`}</ListItem>
                                             ))}
                                           </List>
-                                        ) : (
+                                        ) : innerMetadataValue !== null ? (
                                           <p style={{ whiteSpace: 'pre-line' }}>
-                                            {(metadataValue as string).toString()}
+                                            {(innerMetadataValue as string).toString()}
                                           </p>
+                                        ) : (
+                                          '-'
                                         )}
                                       </React.Fragment>
                                     ))}
                                   </div>
-                                ) : Array.isArray(v) ? (
+                                ) : Array.isArray(metadataValue) ? (
                                   <UnorderedList>
-                                    {v.map((message, ii) => (
+                                    {metadataValue.map((message, ii) => (
                                       <ListItem key={ii}>
                                         {`${capitalizeFirstWord(message['role'])}: ${message['content']}`}
                                       </ListItem>
                                     ))}
                                   </UnorderedList>
                                 ) : (
-                                  <p style={{ whiteSpace: 'pre-line' }}>{capitalizeFirstWord(v.toString())}</p>
+                                  <p style={{ whiteSpace: 'pre-line' }}>
+                                    {capitalizeFirstWord(metadataValue.toString())}
+                                  </p>
                                 )}
                               </React.Fragment>
                             ))}

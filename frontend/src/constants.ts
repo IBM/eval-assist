@@ -132,3 +132,55 @@ export const notInUnitxtCriteria: { direct: CriteriaWithOptions[]; pairwise: Cri
   ],
   pairwise: [],
 }
+
+export const DEFAULT_JUDGE = 'eval_assist'
+
+export const BASE_JUDGE_PARAMS_MAP: Record<string, any> = {
+  check_positional_bias: 'boolean',
+  self_consistency: 'number',
+}
+
+export const BASE_JUDGE_DEFAULT_PARAMS_MAP: Record<string, any> = {
+  check_positional_bias: true,
+  self_consistency: 1,
+}
+
+export const JUDGE_PARAMS_MAP: Record<string, Record<string, any>> = {
+  direct: {
+    eval_assist: {
+      generate_synthetic_persona: 'boolean',
+      generate_feedback: 'boolean',
+      on_generation_failure: ['raise', 'random'],
+    },
+    m_prometheus: {},
+    criticized: {},
+    thesis_antithesis: {},
+    unitxt: {},
+    granite_guardian: {},
+  },
+  pairwise: {
+    eval_assist: {},
+    m_prometheus: {},
+    unitxt: {},
+  },
+}
+
+export const JUDGE_DEFAULT_PARAMS_MAP: Record<string, Record<string, any>> = {
+  direct: {
+    eval_assist: {
+      generate_synthetic_persona: false,
+      generate_feedback: true,
+      on_generation_failure: 'random',
+    },
+    m_prometheus: {},
+    criticized: {},
+    thesis_antithesis: {},
+    unitxt: {},
+    granite_guardian: {},
+  },
+  pairwise: {
+    eval_assist: {},
+    m_prometheus: {},
+    unitxt: {},
+  },
+}

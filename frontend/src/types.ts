@@ -217,8 +217,14 @@ export interface TestCaseV0 {
 
 export interface TestCaseV1 extends Omit<TestCaseV0, 'responseVariableName' | 'contextVariableNames'> {}
 
+export interface Judge {
+  name: string
+  params: Record<string, any>
+}
+
 export interface TestCaseV2 extends TestCaseV1 {
   examples: Instance[]
+  judge: Judge
 }
 
 export type TestCase = TestCaseV2

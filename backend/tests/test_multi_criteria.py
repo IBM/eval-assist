@@ -5,6 +5,7 @@ from evalassist.judges.types import (
     DirectInstanceResult,
     Instance,
     MultiCriteria,
+    MultiCriteriaDirectInstanceResult,
     MultiCriteriaItem,
 )
 from pydantic import ValidationError
@@ -23,7 +24,7 @@ def test_single_criteria_weighted():
         to_evaluate_field="response",
     )
 
-    result = DirectInstanceResult(
+    instance_result = DirectInstanceResult(
         criteria=criterion,
         selected_option="Good",
         score=1.0,
@@ -35,11 +36,7 @@ def test_single_criteria_weighted():
     multi_criteria_item = MultiCriteriaItem(criterion=criterion, weight=1.0)
     multi_criteria = MultiCriteria(items=[multi_criteria_item])
 
-    aggregated_score = multi_criteria.get_aggregated_score(
-        [multi_criteria_item.get_result(result)]
-    )
-
-    assert aggregated_score == 1.0
+    assert multi_criteria.get_result([instance_result]).aggregated_score == 1.0
 
 
 def test_multiple_criteria_weighted():
@@ -85,11 +82,7 @@ def test_multiple_criteria_weighted():
 
     multi_criteria = MultiCriteria(items=[item1, item2])
 
-    aggregated_score = multi_criteria.get_aggregated_score(
-        [item1.get_result(result1), item2.get_result(result2)]
-    )
-
-    assert aggregated_score == 0.6
+    assert multi_criteria.get_result([result1, result2]).aggregated_score == 0.6
 
 
 def test_required_criteria():
@@ -103,7 +96,7 @@ def test_required_criteria():
         to_evaluate_field="response",
     )
 
-    result = DirectInstanceResult(
+    instance_result = DirectInstanceResult(
         criteria=criterion,
         selected_option="Bad",
         score=0.0,
@@ -116,10 +109,7 @@ def test_required_criteria():
     )
     multi_criteria = MultiCriteria(items=[multi_criteria_item])
 
-    aggregated_score = multi_criteria.get_aggregated_score(
-        [multi_criteria_item.get_result(result)]
-    )
-    assert aggregated_score == 0.0
+    assert multi_criteria.get_result([instance_result]).aggregated_score == 0.0
 
 
 def test_normalized_scores():
@@ -145,11 +135,7 @@ def test_normalized_scores():
     multi_criteria_item = MultiCriteriaItem(criterion=criterion, weight=1.0)
     multi_criteria = MultiCriteria(items=[multi_criteria_item])
 
-    aggregated_score = multi_criteria.get_aggregated_score(
-        [multi_criteria_item.get_result(result)]
-    )
-
-    assert aggregated_score == 1.0
+    assert multi_criteria.get_result([result]).aggregated_score == 1.0
 
 
 def test_zero_weight():
@@ -187,7 +173,7 @@ def test_missing_result():
         to_evaluate_field="response",
     )
 
-    result1 = DirectInstanceResult(
+    instance_result = DirectInstanceResult(
         criteria=criterion1,
         selected_option="Good",
         score=1.0,
@@ -202,7 +188,7 @@ def test_missing_result():
     multi_criteria = MultiCriteria(items=[item1, item2])
 
     with pytest.raises(ValueError):
-        multi_criteria.get_aggregated_score([item1.get_result(result1)])
+        multi_criteria.get_result([instance_result])
 
 
 def test_strategy_mix():
@@ -234,7 +220,7 @@ def test_strategy_mix():
         to_evaluate_field="response",
     )
 
-    result_a = DirectInstanceResult(
+    instance_result_a = DirectInstanceResult(
         criteria=criterion_a,
         selected_option="Good",
         score=1.0,
@@ -242,7 +228,7 @@ def test_strategy_mix():
         feedback=None,
         instance=dummy_direct_instance,
     )
-    result_b = DirectInstanceResult(
+    instance_result_b = DirectInstanceResult(
         criteria=criterion_b,
         selected_option="Correct",
         score=1.0,
@@ -250,7 +236,7 @@ def test_strategy_mix():
         feedback=None,
         instance=dummy_direct_instance,
     )
-    result_c = DirectInstanceResult(
+    instance_result_c = DirectInstanceResult(
         criteria=criterion_c,
         selected_option="Yes",
         score=None,
@@ -267,14 +253,16 @@ def test_strategy_mix():
         items=[item_a, item_b, item_c], normalize_scores=True
     )
 
-    aggregated_score = multi_criteria.get_aggregated_score(
-        [
-            item_a.get_result(result_a),
-            item_b.get_result(result_b),
-            item_c.get_result(result_c),
-        ]
+    instance_results: list[DirectInstanceResult] = [
+        instance_result_a,
+        instance_result_b,
+        instance_result_c,
+    ]
+    result: MultiCriteriaDirectInstanceResult = multi_criteria.get_result(
+        instance_results
     )
-    assert aggregated_score == 1.0
+
+    assert result.aggregated_score == 1.0
 
     criterion_d = Criteria(
         name="test_criterion_d",
@@ -286,7 +274,7 @@ def test_strategy_mix():
         to_evaluate_field="response",
     )
 
-    result_d = DirectInstanceResult(
+    instance_result_d = DirectInstanceResult(
         criteria=criterion_d,
         selected_option="Yes",
         score=None,
@@ -304,21 +292,18 @@ def test_strategy_mix():
         items=[item_a, item_b, item_c, item_d], normalize_scores=False
     )
 
-    aggregated_score = multi_criteria.get_aggregated_score(
-        [
-            item_a.get_result(result_a),
-            item_b.get_result(result_b),
-            item_c.get_result(result_c),
-            item_d.get_result(result_d),
-        ]
-    )
-    assert aggregated_score == 0.0
+    instance_results.append(instance_result_d)
+    result = multi_criteria.get_result(instance_results)
+    assert result.aggregated_score == 0.0
 
-    assert item_a.get_score(result=result_a) == 1.0
-    result_b.score = 5.0
-    assert item_b.get_score(result=result_b) == 5.0
-    assert item_c.get_score(result=result_c) == 1.0
-    assert item_d.get_score(result=result_d) == 0.0
+    assert result.item_results[0].weighted_score == 0.4
+
+    instance_result_b.score = 5.0
+    assert item_b.get_score(result=instance_result_b, normalize_score=False) == 5.0
+
+    assert item_c.get_score(result=instance_result_c, normalize_score=False) == 1.0
+
+    assert item_d.get_score(result=instance_result_d, normalize_score=False) == 0.0
 
 
 def test_target_option():
@@ -332,7 +317,7 @@ def test_target_option():
         to_evaluate_field="response",
     )
 
-    result = DirectInstanceResult(
+    instance_result = DirectInstanceResult(
         criteria=criterion,
         selected_option="Good",
         score=1.0,
@@ -344,14 +329,9 @@ def test_target_option():
     multi_criteria = MultiCriteria(
         items=[MultiCriteriaItem(criterion=criterion, weight=1.0, target_option="Good")]
     )
-    multi_criteria_item = multi_criteria.items[0]
+    assert multi_criteria.get_result([instance_result]).aggregated_score == 1.0
 
-    aggregated_score = multi_criteria.get_aggregated_score(
-        [multi_criteria_item.get_result(result)]
-    )
-    assert aggregated_score == 1.0
-
-    result = DirectInstanceResult(
+    instance_result = DirectInstanceResult(
         criteria=criterion,
         selected_option="Bad",
         score=0.0,
@@ -360,10 +340,7 @@ def test_target_option():
         instance=dummy_direct_instance,
     )
 
-    aggregated_score = multi_criteria.get_aggregated_score(
-        [multi_criteria_item.get_result(result)]
-    )
-    assert aggregated_score == 0.0
+    assert multi_criteria.get_result([instance_result]).aggregated_score == 0.0
 
 
 def test_score_threshold():
@@ -377,7 +354,7 @@ def test_score_threshold():
         to_evaluate_field="response",
     )
 
-    result = DirectInstanceResult(
+    instance_result = DirectInstanceResult(
         criteria=criterion,
         selected_option="Good",
         score=1.0,
@@ -389,14 +366,10 @@ def test_score_threshold():
     multi_criteria = MultiCriteria(
         items=[MultiCriteriaItem(criterion=criterion, weight=1.0, score_threshold=0.5)]
     )
-    multi_criteria_item = multi_criteria.items[0]
 
-    aggregated_score = multi_criteria.get_aggregated_score(
-        [multi_criteria_item.get_result(result)]
-    )
-    assert aggregated_score == 1.0
+    assert multi_criteria.get_result([instance_result]).aggregated_score == 1.0
 
-    result = DirectInstanceResult(
+    instance_result = DirectInstanceResult(
         criteria=criterion,
         selected_option="Bad",
         score=0.0,
@@ -404,10 +377,8 @@ def test_score_threshold():
         feedback=None,
         instance=dummy_direct_instance,
     )
-    aggregated_score = multi_criteria.get_aggregated_score(
-        [multi_criteria_item.get_result(result)]
-    )
-    assert aggregated_score == 0.0
+
+    assert multi_criteria.get_result([instance_result]).aggregated_score == 0.0
 
 
 def test_duplicate_criteria_names():

@@ -68,7 +68,7 @@ class BaseJudge(
     ``Criteria`` and returns a result specific to the concrete implementation.
     """
 
-    self_consistency: int = False
+    self_consistency: int | bool = False
     check_positional_bias: bool = False
 
     def __init__(
@@ -419,7 +419,7 @@ class BasePairwiseJudge(BaseJudge[Instance, PairwiseInstanceResult], ABC):
             *args,
             **kwargs,
         )
-        if self.self_consistency:
+        if self.self_consistency is True or self.self_consistency > 1:
             raise ValueError(
                 "Self consistency is not supported on pairwise comparison judges yet."
             )

@@ -1,12 +1,9 @@
 import logging
 from typing import cast
 
-from evalassist.judges import CriteriaOption
-from evalassist.judges.unitxt_judges import UnitxtInferenceEngineMixin
-
-from ..base import BaseDirectJudge
+from ..base import BaseDirectJudge, UnitxtInferenceEngineMixin
 from ..direct_judge import DirectJudge
-from ..types import Criteria, DirectInstanceResult, Instance
+from ..types import Criteria, CriteriaOption, DirectInstanceResult, Instance
 
 logger = logging.getLogger(__name__)
 
@@ -66,9 +63,9 @@ class CriticizedDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             instances=[
                 Instance(
                     fields={
-                        "judge_prompt": result.metadata["prompt"],  # type: ignore
+                        "judge_prompt": str(result.metadata["prompt"]),
                         "explanation": result.explanation,
-                        "response": result.selected_option,  # type: ignore
+                        "selected_option": str(result.selected_option),
                     },
                 )
                 for result in results
@@ -84,52 +81,57 @@ class CriticizedDirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
         logger.info(
             f"Running the evaluation again taking the feedback into account for {len(to_revisit_results_index)} instances..."
         )
-
-        revisited_results = {
-            to_revisit_result_index: revisited_result
-            for to_revisit_result_index, revisited_result in zip(
-                to_revisit_results_index,
-                simple_judge(
-                    instances=[
-                        Instance(
-                            fields={
-                                **instances[to_revisit_result_index].fields,
-                                "Feedback from previous evaluation": f"The previous time you evaluated this instance, your evaluation was categorized as '{criticized_results[to_revisit_result_index].selected_option}'. In order to improve it, take the following feedback into account: {cast(str, criticized_results[to_revisit_result_index].feedback)}"
-                                if criticized_results[to_revisit_result_index].feedback
-                                != ""
-                                else "Nothing to improve",
-                            },
-                        )
-                        for to_revisit_result_index in to_revisit_results_index
-                    ],
-                    criteria=[
-                        Criteria(
-                            description=f"{criteria[to_revisit_result_index].description} Important: take the judge feedback into account to improve your judgement",
-                            name=criteria[to_revisit_result_index].name,
-                            options=criteria[to_revisit_result_index].options,
-                            context_fields=[
-                                *(
-                                    cast(
-                                        list,
-                                        criteria[
+        revisited_results = {}
+        if len(to_revisit_results_index) > 0:
+            revisited_results = {
+                to_revisit_result_index: revisited_result
+                for to_revisit_result_index, revisited_result in zip(
+                    to_revisit_results_index,
+                    simple_judge(
+                        instances=[
+                            Instance(
+                                fields={
+                                    **instances[to_revisit_result_index].fields,
+                                    "Feedback from previous evaluation": f"The previous time you evaluated this instance, your evaluation was categorized as '{criticized_results[to_revisit_result_index].selected_option}'. In order to improve it, take the following feedback into account: {cast(str, criticized_results[to_revisit_result_index].feedback)}"
+                                    if criticized_results[
+                                        to_revisit_result_index
+                                    ].feedback
+                                    != ""
+                                    else "Nothing to improve",
+                                },
+                            )
+                            for to_revisit_result_index in to_revisit_results_index
+                        ],
+                        criteria=[
+                            Criteria(
+                                description=f"{criteria[to_revisit_result_index].description} Important: take the judge feedback into account to improve your judgement",
+                                name=criteria[to_revisit_result_index].name,
+                                options=criteria[to_revisit_result_index].options,
+                                context_fields=[
+                                    *(
+                                        cast(
+                                            list,
+                                            criteria[
+                                                to_revisit_result_index
+                                            ].context_fields,
+                                        )
+                                        if criteria[
                                             to_revisit_result_index
-                                        ].context_fields,
-                                    )
-                                    if criteria[to_revisit_result_index].context_fields
-                                    is not None
-                                    else []
-                                ),
-                                "judge_feedback",
-                            ],
-                            to_evaluate_field=criteria[
-                                to_revisit_result_index
-                            ].to_evaluate_field,
-                        )
-                        for to_revisit_result_index in to_revisit_results_index
-                    ],
-                ),
-            )
-        }
+                                        ].context_fields
+                                        is not None
+                                        else []
+                                    ),
+                                    "judge_feedback",
+                                ],
+                                to_evaluate_field=criteria[
+                                    to_revisit_result_index
+                                ].to_evaluate_field,
+                            )
+                            for to_revisit_result_index in to_revisit_results_index
+                        ],
+                    ),
+                )
+            }
 
         for result in results:
             if result.metadata is None:

@@ -9,7 +9,7 @@ from .types import Criteria, DirectInstanceResult, Instance, PairwiseInstanceRes
 class MPrometheusJudge:
     m_prometheus_model_name: str
 
-    def __init__(self, m_prometheus_b_params: Literal[3, 7, 14], **kwargs):
+    def __init__(self, m_prometheus_b_params: Literal[3, 7, 14] = 3, **kwargs):
         super().__init__(**kwargs)
         self.m_prometheus_model_name = (
             f"Unbabel/M-Prometheus-{str(m_prometheus_b_params)}B"

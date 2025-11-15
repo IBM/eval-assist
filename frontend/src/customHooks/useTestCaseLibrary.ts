@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 
-import { TaskEnum } from '@constants'
+import { BASE_JUDGE_DEFAULT_PARAMS_MAP, DEFAULT_JUDGE, JUDGE_DEFAULT_PARAMS_MAP, TaskEnum } from '@constants'
 import { useCriteriasContext } from '@providers/CriteriaProvider'
 import { capitalizeFirstWord, generateId } from '@utils'
 
@@ -466,6 +466,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['direct'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Conciseness',
@@ -511,6 +518,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['direct'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Harmfulness',
@@ -552,6 +566,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['direct'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Insensitivity',
@@ -596,6 +617,13 @@ export const useTestCaseLibrary = () => {
           },
           criteria: getCriteria('insensitivity', EvaluationType.DIRECT) as CriteriaWithOptions,
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['direct'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           id: null,
@@ -667,6 +695,13 @@ export const useTestCaseLibrary = () => {
           },
           criteria: getCriteria('coherence', EvaluationType.DIRECT) as CriteriaWithOptions,
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['direct'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Summarization Preference',
@@ -725,6 +760,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['direct'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Reference Document Faithfulness',
@@ -815,6 +857,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['direct'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Fairness',
@@ -874,6 +923,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['direct'][DEFAULT_JUDGE],
+            },
+          },
         },
       ].map((testCase) => prettifyTestCaseFields(testCase)),
     [getCriteria],
@@ -915,6 +971,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['pairwise'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Consistency',
@@ -949,6 +1012,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['pairwise'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Inclusivity',
@@ -983,6 +1053,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['pairwise'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Reference Document Faithfulness',
@@ -1024,6 +1101,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['pairwise'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Summarization Preference',
@@ -1061,6 +1145,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['pairwise'][DEFAULT_JUDGE],
+            },
+          },
         },
         {
           name: 'Email Inclusivity',
@@ -1098,6 +1189,13 @@ export const useTestCaseLibrary = () => {
             borderlineCount: null,
           },
           examples: [],
+          judge: {
+            name: DEFAULT_JUDGE,
+            params: {
+              ...BASE_JUDGE_DEFAULT_PARAMS_MAP,
+              ...JUDGE_DEFAULT_PARAMS_MAP['pairwise'][DEFAULT_JUDGE],
+            },
+          },
         },
       ].map((testCase) => prettifyTestCaseFields(testCase)),
     [getCriteria],
