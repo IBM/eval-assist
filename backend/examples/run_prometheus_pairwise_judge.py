@@ -1,7 +1,7 @@
 from evalassist.judges import Criteria, Instance, MPrometheusPairwiseJudge
 
 if __name__ == "__main__":
-    judge = MPrometheusPairwiseJudge(m_prometheus_b_params=3)
+    judge = MPrometheusPairwiseJudge(billions_of_params=3)
 
     instances = [
         Instance(

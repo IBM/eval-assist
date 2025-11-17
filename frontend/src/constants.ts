@@ -152,7 +152,9 @@ export const JUDGE_PARAMS_MAP: Record<string, Record<string, any>> = {
       generate_feedback: 'boolean',
       on_generation_failure: ['raise', 'random'],
     },
-    m_prometheus: {},
+    m_prometheus: {
+      billions_of_params: ['3', '5', '7'],
+    },
     criticized: {},
     thesis_antithesis: {},
     unitxt: {},
@@ -160,7 +162,9 @@ export const JUDGE_PARAMS_MAP: Record<string, Record<string, any>> = {
   },
   pairwise: {
     eval_assist: {},
-    m_prometheus: {},
+    m_prometheus: {
+      billions_of_params: ['3', '5', '7'],
+    },
     unitxt: {},
   },
 }
@@ -172,7 +176,9 @@ export const JUDGE_DEFAULT_PARAMS_MAP: Record<string, Record<string, any>> = {
       generate_feedback: true,
       on_generation_failure: 'random',
     },
-    m_prometheus: {},
+    m_prometheus: {
+      billions_of_params: '3',
+    },
     criticized: {},
     thesis_antithesis: {},
     unitxt: {},
@@ -180,7 +186,9 @@ export const JUDGE_DEFAULT_PARAMS_MAP: Record<string, Record<string, any>> = {
   },
   pairwise: {
     eval_assist: {},
-    m_prometheus: {},
+    m_prometheus: {
+      billions_of_params: '3',
+    },
     unitxt: {},
   },
 }
