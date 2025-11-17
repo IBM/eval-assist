@@ -545,7 +545,10 @@ def download_notebook(params: NotebookParams, background_tasks: BackgroundTasks)
         "evaluator_type": params.evaluator_type,
         "model_name": model_name,
         "plain_python_script": params.plain_python_script,
+        "judge": params.judge,
+        "judge_params": params.judge_params,
     }
+
     if params.evaluator_type == EvaluatorTypeEnum.DIRECT:
         nb = DirectEvaluationNotebook(**p).generate_notebook()  # type: ignore
     else:
