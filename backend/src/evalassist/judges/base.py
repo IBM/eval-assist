@@ -505,7 +505,7 @@ class BasePairwiseJudge(BaseJudge[Instance, PairwiseInstanceResult], ABC):
                     result=positional_bias_instance_result,
                 )
 
-            return results
+            return results[:results_len]
         else:
             return self._run(instances=instances, criteria=criteria)
 
