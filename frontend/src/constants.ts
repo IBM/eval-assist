@@ -192,3 +192,19 @@ export const JUDGE_DEFAULT_PARAMS_MAP: Record<string, Record<string, any>> = {
     unitxt: {},
   },
 }
+
+export const JUDGE_REQUIRES_MODEL_SELECTION_MAP: Record<string, Record<string, any>> = {
+  direct: {
+    eval_assist: true,
+    m_prometheus: false,
+    criticized: true,
+    thesis_antithesis: true,
+    unitxt: true,
+    granite_guardian: true,
+  },
+  pairwise: {
+    eval_assist: true,
+    m_prometheus: false,
+    unitxt: true,
+  },
+}
