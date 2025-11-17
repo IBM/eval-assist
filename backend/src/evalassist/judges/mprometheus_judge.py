@@ -1,18 +1,19 @@
 from typing import Literal, cast
 
-from evalassist.judges.utils import get_to_evaluate_text
+from fastapi import HTTPException
 
 from .base import BaseDirectJudge, BasePairwiseJudge
 from .types import Criteria, DirectInstanceResult, Instance, PairwiseInstanceResult
+from .utils import get_to_evaluate_text
 
 
 class MPrometheusJudge:
     m_prometheus_model_name: str
 
-    def __init__(self, m_prometheus_b_params: Literal[3, 7, 14] = 3, **kwargs):
+    def __init__(self, billions_of_params: Literal[3, 7, 14] = 3, **kwargs):
         super().__init__(**kwargs)
         self.m_prometheus_model_name = (
-            f"Unbabel/M-Prometheus-{str(m_prometheus_b_params)}B"
+            f"Unbabel/M-Prometheus-{str(billions_of_params)}B"
         )
 
 
@@ -42,12 +43,18 @@ class MPrometheusDirectJudge(MPrometheusJudge, BaseDirectJudge):
         instances: list[Instance],
         criteria: list[Criteria],
     ) -> list[DirectInstanceResult]:
-        from prometheus_eval import PrometheusEval
-        from prometheus_eval.prompts import (
-            ABSOLUTE_PROMPT_WO_REF,
-            SCORE_RUBRIC_TEMPLATE,
-        )
-        from prometheus_eval.vllm import VLLM
+        try:
+            from prometheus_eval import PrometheusEval
+            from prometheus_eval.prompts import (
+                ABSOLUTE_PROMPT_WO_REF,
+                SCORE_RUBRIC_TEMPLATE,
+            )
+            from prometheus_eval.vllm import VLLM
+        except ModuleNotFoundError:
+            raise HTTPException(
+                status_code=404,
+                detail="Failed to import 'prometheus_eval' package. Make sure it is installed correctly.",
+            )
 
         self._validate_criteria(criteria)
         self._validate_instances(instances)
