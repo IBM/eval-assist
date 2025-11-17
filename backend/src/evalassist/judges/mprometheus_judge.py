@@ -10,7 +10,9 @@ from .utils import get_to_evaluate_text
 class MPrometheusJudge:
     m_prometheus_model_name: str
 
-    def __init__(self, billions_of_params: Literal[3, 7, 14] = 3, **kwargs):
+    def __init__(
+        self, billions_of_params: Literal[3, 7, 14, "3", "7", "14"] = 3, **kwargs
+    ):
         super().__init__(**kwargs)
         self.m_prometheus_model_name = (
             f"Unbabel/M-Prometheus-{str(billions_of_params)}B"

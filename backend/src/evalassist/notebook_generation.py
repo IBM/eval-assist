@@ -1,5 +1,4 @@
 import json
-import re
 from abc import ABC, abstractmethod
 from typing import Literal, cast
 
@@ -208,17 +207,26 @@ class DirectEvaluationNotebook(EvaluationNotebookGenerator):
         return "direct"
 
     def get_import_code(self):
-        return """\
-from unitxt.inference import CrossProviderInferenceEngine
-from evalassist.judges import DirectJudge, Instance,  Criteria, DirectInstanceResult, DirectInstanceResult
+        if self.judge_requires_model:
+            inference_engine_import = (
+                "from unitxt.inference import CrossProviderInferenceEngine\n"
+            )
+        else:
+            inference_engine_import = ""
+        return f"""\
+{inference_engine_import}from evalassist.judges import {self.judge_class.__name__}, Instance,  Criteria, DirectInstanceResult, DirectInstanceResult
 import nest_asyncio
 nest_asyncio.apply()\
 """
 
     def get_setup_and_run_eval_code(self):
         if self.judge_requires_model:
-            inference_engine_construct_str = generate_constructor_code(
-                "CrossProviderInferenceEngine", params=self.inference_engine_params
+            inference_engine_construct_str = (
+                "inference_engine = "
+                + generate_constructor_code(
+                    "CrossProviderInferenceEngine", params=self.inference_engine_params
+                )
+                + "\n"
             )  # type: ignore
         else:
             inference_engine_construct_str = ""
@@ -231,8 +239,7 @@ nest_asyncio.apply()\
         )
 
         return f"""\
-inference_engine = {inference_engine_construct_str}
-
+{inference_engine_construct_str}
 judge = {judge_construct_str}
 
 results: list[DirectInstanceResult] = judge(instances, criteria)
@@ -250,23 +257,35 @@ class PairwiseEvaluationNotebook(EvaluationNotebookGenerator):
         return "pairwise"
 
     def get_import_code(self):
-        return """\
+        return f"""\
 from unitxt.inference import CrossProviderInferenceEngine
-from evalassist.judges import PairwiseJudge, Instance, Criteria, PairwiseInstanceResult
+from evalassist.judges import {self.judge_class.__name__}, Instance, Criteria, PairwiseInstanceResult
 import nest_asyncio
 nest_asyncio.apply()\
 """
 
     def get_setup_and_run_eval_code(self):
-        params = re.sub(
-            r"\btrue\b", "True", json.dumps(self.inference_engine_params, indent=4)
-        )
-        return f"""\
-inference_engine = CrossProviderInferenceEngine(**{params})
+        if self.judge_requires_model:
+            inference_engine_construct_str = (
+                "inference_engine = "
+                + generate_constructor_code(
+                    "CrossProviderInferenceEngine", params=self.inference_engine_params
+                )
+                + "\n"
+            )  # type: ignore
+        else:
+            inference_engine_construct_str = ""
 
-judge = PairwiseJudge(
-    inference_engine=inference_engine,
-)
+        judge_params = self.judge_params
+        if self.judge_requires_model:
+            judge_params["inference_engine"] = VariableRef("inference_engine")
+        judge_construct_str = generate_constructor_code(
+            self.judge_class.__name__, params=judge_params
+        )
+
+        return f"""\
+{inference_engine_construct_str}
+judge = {judge_construct_str}
 
 results: list[PairwiseInstanceResult] = judge(instances, criteria)
 
