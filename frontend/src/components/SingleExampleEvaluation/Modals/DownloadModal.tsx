@@ -35,9 +35,11 @@ export const DownloadModal = ({ open, setOpen }: Props) => {
     if (['ipynb', 'py'].includes(selected)) {
       downloadUnitxtCode({ downloadAsScript: selected === 'py' })
     } else if (selected === 'test_case') {
+      downloadTestCase()
     } else {
+      downloadTestData()
     }
-  }, [setOpen, selected, downloadUnitxtCode])
+  }, [setOpen, selected, downloadUnitxtCode, downloadTestCase, downloadTestData])
 
   return (
     <Modal
