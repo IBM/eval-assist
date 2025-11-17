@@ -7,6 +7,7 @@ from typing import cast
 import nbformat as nbf
 import nest_asyncio
 import pandas as pd
+from evalassist.judges.base import UnitxtInferenceEngineMixin
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -311,16 +312,23 @@ async def evaluate(
         else:
             temperature = 0.0
 
-        inference_engine: InferenceEngine = get_inference_engine_from_judge_metadata(
-            evaluator_name=evaluator_name,
-            custom_model_name=custom_model_name,
-            provider=req.provider,
-            llm_provider_credentials=req.llm_provider_credentials,
-            custom_params={
-                **DEFAULT_JUDGE_INFERENCE_PARAMS,
-                "temperature": temperature,
-            },
-        )
+        judge_class = JUDGE_CLASS_MAP[req.type][req.judge]
+        judge_requires_model = issubclass(judge_class, UnitxtInferenceEngineMixin)
+
+        if judge_requires_model:
+            inference_engine: InferenceEngine = (
+                get_inference_engine_from_judge_metadata(
+                    evaluator_name=evaluator_name,
+                    custom_model_name=custom_model_name,
+                    provider=req.provider,
+                    llm_provider_credentials=req.llm_provider_credentials,
+                    custom_params={
+                        **DEFAULT_JUDGE_INFERENCE_PARAMS,
+                        "temperature": temperature,
+                    },
+                )
+            )
+
         if (
             req.criteria.to_evaluate_field is None
             or req.criteria.context_fields is None
@@ -337,14 +345,17 @@ async def evaluate(
             example.to_instance_result(req.criteria.to_evaluate_field)
             for example in req.examples
         ]
-        judge = JUDGE_CLASS_MAP[req.type][req.judge](
-            **{"inference_engine": inference_engine, **req.judge_params}
-        )  # type: ignore
+
+        params = req.judge_params
+        if judge_requires_model:
+            params["inference_engine"] = inference_engine  # type: ignore
+
+        judge = judge_class(**params)  # type: ignore
 
         if req.type == EvaluatorTypeEnum.DIRECT:
             criteria = req.criteria.to_criteria(examples=examples)
             if evaluator_name.name.startswith("GRANITE_GUARDIAN"):
-                judge = GraniteGuardianJudge(inference_engine=inference_engine)
+                judge = GraniteGuardianJudge(inference_engine=inference_engine)  # type: ignore
             per_instance_result = judge.evaluate(
                 instances=instances,
                 criteria=criteria,
