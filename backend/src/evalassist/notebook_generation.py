@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 from typing import Literal, cast
 
 import nbformat as nbf
-from evalassist.judges import Criteria, Instance
+from evalassist.judges import JUDGE_CLASS_MAP, Criteria, Instance
+from evalassist.judges.base import UnitxtInferenceEngineMixin
 
 from .api_types import (
     EvaluatorNameEnum,
@@ -14,6 +15,58 @@ from .api_types import (
 )
 from .judges.const import DEFAULT_JUDGE_INFERENCE_PARAMS
 from .utils import get_cross_inference_engine_params
+
+
+def format_value(value, indent=0):
+    """
+    Format values as valid Python code.
+    Supports nested dicts, literals, and variable references.
+    """
+    pad = " " * indent
+
+    # Variable reference
+    if isinstance(value, VariableRef):
+        return value.name
+
+    # Basic literals
+    if isinstance(value, (bool, int, float)):
+        return repr(value)
+
+    # Strings
+    if isinstance(value, str):
+        return repr(value)
+
+    # Nested dictionary
+    if isinstance(value, dict):
+        if not value:
+            return "{}"
+
+        inner_indent = indent + 4
+        inner_pad = " " * inner_indent
+
+        items = []
+        for k, v in value.items():
+            items.append(f"{inner_pad}{repr(k)}: {format_value(v, inner_indent)},")
+
+        return "{\n" + "\n".join(items) + f"\n{pad}}}"
+
+    raise ValueError(f"Unsupported param type: {type(value)}")
+
+
+def generate_constructor_code(class_name: str, params: dict) -> str:
+    lines = [f"{class_name}("]
+    for key, value in params.items():
+        formatted = format_value(value, indent=4)
+        lines.append(f"    {key}={formatted},")
+    lines.append(")")
+    return "\n".join(lines)
+
+
+class VariableRef:
+    """Wrapper representing a variable name in generated code."""
+
+    def __init__(self, name: str):
+        self.name = name
 
 
 class Cell:
@@ -37,6 +90,8 @@ class EvaluationNotebookGenerator(ABC):
         evaluator_type: EvaluatorTypeEnum,
         model_name: str,
         plain_python_script: bool,
+        judge: str,
+        judge_params: dict,
     ):
         self.instances = instances
         self.criteria = criteria
@@ -44,12 +99,25 @@ class EvaluationNotebookGenerator(ABC):
         self.evaluator_name = evaluator_name
         self.evaluator_type = evaluator_type
         self.plain_python_script = plain_python_script
-        self.inference_engine_params = get_cross_inference_engine_params(
-            credentials=credentials,
-            provider=provider,
-            model_name=model_name,
-            custom_params=DEFAULT_JUDGE_INFERENCE_PARAMS,
+        self.judge = judge
+        self.judge_params = judge_params
+
+        self.judge_class = JUDGE_CLASS_MAP[evaluator_type][judge]
+
+        self.judge_requires_model = issubclass(
+            self.judge_class, UnitxtInferenceEngineMixin
         )
+
+        if self.judge_requires_model:
+            self.inference_engine_params = get_cross_inference_engine_params(
+                credentials=credentials,
+                provider=provider,
+                model_name=model_name,
+                custom_params=DEFAULT_JUDGE_INFERENCE_PARAMS,
+            )
+        else:
+            self.inference_engine_params = None
+
         self.cells: list[Cell] = []
 
     def generate_notebook(self):
@@ -148,15 +216,24 @@ nest_asyncio.apply()\
 """
 
     def get_setup_and_run_eval_code(self):
-        params = re.sub(
-            r"\btrue\b", "True", json.dumps(self.inference_engine_params, indent=4)
-        )
-        return f"""\
-inference_engine = CrossProviderInferenceEngine(**{params})
+        if self.judge_requires_model:
+            inference_engine_construct_str = generate_constructor_code(
+                "CrossProviderInferenceEngine", params=self.inference_engine_params
+            )  # type: ignore
+        else:
+            inference_engine_construct_str = ""
 
-judge = DirectJudge(
-    inference_engine=inference_engine,
-)
+        judge_params = self.judge_params
+        if self.judge_requires_model:
+            judge_params["inference_engine"] = VariableRef("inference_engine")
+        judge_construct_str = generate_constructor_code(
+            self.judge_class.__name__, params=judge_params
+        )
+
+        return f"""\
+inference_engine = {inference_engine_construct_str}
+
+judge = {judge_construct_str}
 
 results: list[DirectInstanceResult] = judge(instances, criteria)
 

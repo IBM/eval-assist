@@ -211,6 +211,8 @@ class NotebookParams(BaseModel):
     instances: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
     examples: list[DirectInstanceDTO] | list[PairwiseInstanceDTO]
     criteria: CriteriaDTO | CriteriaWithOptionsDTO
+    judge: str
+    judge_params: dict
 
 
 # class DownloadTestCaseParams(BaseModel):

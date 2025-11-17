@@ -42,6 +42,8 @@ export const useUnitxtCodeGeneration = () => {
         evaluator_type: currentTestCase.type,
         test_case_name: currentTestCase.name || '',
         plain_python_script: downloadAsScript,
+        judge: currentTestCase.judge.name,
+        judge_params: currentTestCase.judge.params,
       })
 
       if (!response.ok) {

@@ -56,7 +56,7 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
                 "Either provide set generate_synthetic_persona to False or don't provide a judge_description_prompt."
             )
 
-        if self.self_consistency:
+        if self.self_consistency is True or self.self_consistency > 1:
             temp = getattr(self.inference_engine, "temperature", None)
             if temp is not None:
                 try:
