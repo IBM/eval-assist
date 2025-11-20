@@ -11,7 +11,6 @@ from evalassist.judges.utils import (
     get_to_evaluate_text,
     is_float,
 )
-from langchain_core.prompts.prompt import PromptTemplate
 from pydantic import BaseModel, Field
 from unitxt.inference import InferenceEngine
 
@@ -621,26 +620,21 @@ class DirectJudge(BaseDirectJudge, UnitxtInferenceEngineMixin):
             "structured_output_model", field_defs
         )
 
-        prompt_template = PromptTemplate(
-            input_variables=["judge_prompt"],
-            partial_variables={
-                "format_instructions": build_format_instructions(dynamic_model),
-            },
-            template=dedent(
-                text="""\
-                    {judge_prompt}
+        prompt_template = dedent(
+            text="""\
+                {judge_prompt}
 
-                    ### Output format
-                    {format_instructions}
+                ### Output format
+                {format_instructions}
 
-                    Only output the json instance, anything else will result in a failed generation.
-                """,
-            ),
+                Only output the json instance, anything else will result in a failed generation.
+            """,
         )
 
         prompts: list[str] = [
             prompt_template.format(
                 judge_prompt=judge_prompt,
+                format_instructions=build_format_instructions(dynamic_model),
             )
             for judge_prompt in judge_prompts
         ]
