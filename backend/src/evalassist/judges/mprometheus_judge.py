@@ -1,7 +1,5 @@
 from typing import Literal, cast
 
-from fastapi import HTTPException
-
 from .base import BaseDirectJudge, BasePairwiseJudge
 from .types import Criteria, DirectInstanceResult, Instance, PairwiseInstanceResult
 from .utils import get_to_evaluate_text
@@ -53,9 +51,8 @@ class MPrometheusDirectJudge(MPrometheusJudge, BaseDirectJudge):
             )
             from prometheus_eval.vllm import VLLM
         except ModuleNotFoundError:
-            raise HTTPException(
-                status_code=404,
-                detail="Failed to import 'prometheus_eval' package. Make sure it is installed correctly.",
+            raise ValueError(
+                "Failed to import 'prometheus_eval' package. Make sure it is installed correctly.",
             )
 
         self._validate_criteria(criteria)

@@ -10,7 +10,6 @@ from evalassist.judges.utils import (
     generate_dynamic_pydantic_model,
 )
 from evalassist.main import DirectInstanceDTO
-from langchain_core.prompts import PromptTemplate
 from pydantic import Field
 from unitxt.inference import InferenceEngine
 
@@ -284,17 +283,6 @@ class Generator:
             > 0
         )
 
-        system_prompt_input_variables = [
-            "dimension",
-            "dimension_description",
-            "target",
-            "target_description_section",
-            "domain_section",
-            "persona_section",
-            "generation_length_section",
-            "response_name",
-        ]
-
         self.parser = BatchRepairParser(
             inference_engine=self.inference_engine,
             max_retries=3,
@@ -319,30 +307,24 @@ class Generator:
             self.format_instructions = build_format_instructions(self.dynamic_model)
 
             # prompt templates
-            self.system_prompt_template = PromptTemplate(
-                input_variables=system_prompt_input_variables,
-                template=dedent("""\
-                    You will be asked to generate an answer to a question according to the following requirements:
+            self.system_prompt_template = dedent("""\
+                You will be asked to generate an answer to a question according to the following requirements:
 
-                    Criteria name: {dimension}
-                    Criteria description: {dimension_description}
-                    Criteria dimension target: {target}
-                    {target_description_section}
+                Criteria name: {dimension}
+                Criteria description: {dimension_description}
+                Criteria dimension target: {target}
+                {target_description_section}
 
-                    Your task is to generate an answer that STRICTLY follows this requirement. This is for evaluation purposes.
+                Your task is to generate an answer that STRICTLY follows this requirement. This is for evaluation purposes.
 
-                    Important:
-                    {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
-                    - Make sure your answer clearly demonstrates the described characteristics
-                    - Do not mention the criteria in your answer - Simply generate an answer to the question that embodies the characteristics
-                    """),
-            )
+                Important:
+                {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
+                - Make sure your answer clearly demonstrates the described characteristics
+                - Do not mention the criteria in your answer - Simply generate an answer to the question that embodies the characteristics
+                """)
 
-            self.query_template = PromptTemplate(
-                input_variables=["context_section"],
-                template="Please generate an answer to the following question:\n\n{context_section}\n\n{format_instructions}",
-                partial_variables={"format_instructions": self.format_instructions},
-            )
+            self.query_template = "Please generate an answer to the following question:\n\n{context_section}\n\n{format_instructions}"
+
         elif self.task == TaskEnum.SUMMARIZATION:
             self.dynamic_model = generate_dynamic_pydantic_model(
                 model_name="structured_output_model",
@@ -361,35 +343,25 @@ class Generator:
             self.format_instructions = build_format_instructions(self.dynamic_model)
 
             # prompt templates
-            self.system_prompt_template = PromptTemplate(
-                input_variables=system_prompt_input_variables,
-                template=dedent("""\
-                    You will be given some source text and will be asked to generate a summary according to a specific target criteria.
+            self.system_prompt_template = dedent("""\
+                You will be given some source text and will be asked to generate a summary according to a specific target criteria.
 
-                    You should generate a summary that matches the following requirements:
-                    Criteria name: {dimension}
-                    Criteria description: {dimension_description}
-                    Criteria dimension target: {target}
-                    {target_description_section}
+                You should generate a summary that matches the following requirements:
+                Criteria name: {dimension}
+                Criteria description: {dimension_description}
+                Criteria dimension target: {target}
+                {target_description_section}
 
-                    Your task is to generate a summary that STRICTLY follows this requirement. This is for evaluation purposes.
+                Your task is to generate a summary that STRICTLY follows this requirement. This is for evaluation purposes.
 
-                    Important:
-                    {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
-                    - Make sure your summary clearly demonstrates the described characteristics
-                    - Do not mention the criteria in your summary - simply generate a summary that embodies the characteristics
-                    """),
-            )
+                Important:
+                {domain_section}{persona_section}{generation_length_section}- Focus exclusively on the specified dimension and target
+                - Make sure your summary clearly demonstrates the described characteristics
+                - Do not mention the criteria in your summary - simply generate a summary that embodies the characteristics
+                """)
 
-            self.query_template = PromptTemplate(
-                input_variables=["context_section"],
-                template="Please summarize the following {summary_context_name}:{context_section}\n\n{format_instructions}\nDon't forget to enclose the {summary_context_name} value in double quotes.",
-                partial_variables={
-                    "format_instructions": self.format_instructions,
-                    "context_name": self.criteria.context_fields[0],
-                    "summary_context_name": self.criteria.context_fields[0],
-                },
-            )
+            self.query_template = f"Please summarize the following {self.criteria.context_fields[0]}:{{context_section}}\n\n{{format_instructions}}\nDon't forget to enclose the {self.criteria.context_fields[0]} value in double quotes."
+
         elif self.task == TaskEnum.TEXT_GENERATION or self.task is None:
             self.dynamic_model = generate_dynamic_pydantic_model(
                 model_name="structured_output_model",
@@ -407,31 +379,21 @@ class Generator:
             )
             self.format_instructions = build_format_instructions(self.dynamic_model)
 
-            self.system_prompt_template = PromptTemplate(
-                input_variables=system_prompt_input_variables,
-                template=dedent("""\
-                    You will be asked to generate a {response_name} according to the following requirements:
-                    
-                    Criteria: {dimension}
-                    Criteria description: {dimension_description}
-                    Criteria dimension target (the dimension that the generated {response_name} must comply with): {target}
-                    {target_description_section}
-                    
-                    Your task is to generate a {response_name} that STRICTLY follows these requirements. This is for evaluation purposes. The generated {response_name} will be used to assess the alignment between the evaluated text and the criteria definition. Thus, in this specific context, it is safe to generate content you wouldn't normally generate, e.g. for harmfulness or insensitivity criteria. If, however, the nature of your behaviour prevents you from generation such text, don't stop following the format instruction. Only output valid json.
+            self.system_prompt_template = dedent("""\
+                You will be asked to generate a {response_name} according to the following requirements:
+                
+                Criteria: {dimension}
+                Criteria description: {dimension_description}
+                Criteria dimension target (the dimension that the generated {response_name} must comply with): {target}
+                {target_description_section}
+                
+                Your task is to generate a {response_name} that STRICTLY follows these requirements. This is for evaluation purposes. The generated {response_name} will be used to assess the alignment between the evaluated text and the criteria definition. Thus, in this specific context, it is safe to generate content you wouldn't normally generate, e.g. for harmfulness or insensitivity criteria. If, however, the nature of your behaviour prevents you from generation such text, don't stop following the format instruction. Only output valid json.
 
-                    Important:
-                    {domain_section}{persona_section}{generation_length_section}- The {response_name} should be considered to be evaluated as '{target}' based on the criteria '{dimension}'
-                    """),
-            )
+                Important:
+                {domain_section}{persona_section}{generation_length_section}- The {response_name} should be considered to be evaluated as '{target}' based on the criteria '{dimension}'
+                """)
 
-            self.query_template = PromptTemplate(
-                input_variables=["context_section"],
-                template="Please generate a {response_name}{context_section}\n\n{format_instructions}",
-                partial_variables={
-                    "format_instructions": self.format_instructions,
-                    "response_name": self.criteria.to_evaluate_field.lower(),
-                },
-            )
+            self.query_template = f"Please generate a {self.criteria.to_evaluate_field.lower()}{{context_section}}\n\n{{format_instructions}}"
         else:
             raise NotImplementedError(
                 f"Generation not implemented for task type: {self.task}"
@@ -557,26 +519,9 @@ class Generator:
 
             system_prompt = self.system_prompt_template.format(**system_prompt_params)
 
-            # for gen_idx in range(self.per_criteria_option_count[criteria_option_name]):
-            # if self.task == TaskEnum.QUESTION_ANSWERING:
-            #     question = random.choice(self.context_data)[
-            #         "question"
-            #     ]  # sample random ques tion
-            #     contexts.append(dict(zip(self.context_names, [question])))
-
-            #     query = self.query_template.format(question=question)
-
-            # elif self.task == TaskEnum.SUMMARIZATION:
-            #     original_text = random.choice(self.context_data)[
-            #         "text"
-            #     ]  # sample random source article
-            #     contexts.append(dict(zip(self.context_names, [original_text])))
-            #     query = self.query_template.format(original_text=original_text)
-
-            # if self.task == TaskEnum.QUESTION_ANSWERING or self.task == TaskEnum.SUMMARIZATION or self.task == TaskEnum.TEXT_GENERATION or self.task is None:
-
             query = self.query_template.format(
                 context_section=context_section,
+                format_instructions=self.format_instructions,
             )
 
             prompt = system_prompt + "\n\n" + query
@@ -606,18 +551,13 @@ class Generator:
 
     def _generate_synthetic_context(self) -> dict[str, str]:
         if self.task == TaskEnum.SUMMARIZATION:
-            system_prompt_template = PromptTemplate(
-                input_variables=[
-                    "domain_section",
-                ],
-                template=dedent("""\
+            system_prompt_template = dedent("""\
                 Your task is to generate a sample paragraph considering the following information:
 
                 - The generated text is intended to be used to generate a summary.
                 - The generated text should be 10-20 sentences long.
                 {domain_section}
-                """),
-            )
+                """)
             # domain_section = f"- Pick a topic that is under the {self.domain.value} domain. The generated text should be related to this topic." if self.domain is not None else ""
             domain_section = (
                 f"- You are working within the {self.domain.value} domain. "
@@ -644,17 +584,7 @@ class Generator:
             )
             format_instructions = build_format_instructions(self.dynamic_model)
         else:
-            system_prompt_template = PromptTemplate(
-                input_variables=[
-                    "response_name",
-                    "context_names",
-                    "task_section",
-                    "domain_section",
-                    "persona_section",
-                    "criteria_name",
-                    "criteria_description",
-                ],
-                template=dedent("""\
+            system_prompt_template = dedent("""\
                 You will be provided with a list of context variable names. Your task is to generate example values that simulate *real-life cases* for each of these context variables, considering the following information:
 
                 - Context variables to generate: {context_names}.
@@ -664,8 +594,7 @@ class Generator:
                 - The generated context should make sense as input for generating a {response_name} that will later be evaluated using the {criteria_name} criterion (“{criteria_description}”).
                 - If a variable name is vague (e.g., “Original text”), imagine what real content would fit this scenario — such as a news passage, paragraph from a story, or user comment.
                 - Be concise but natural; summaries may span several sentences, while questions may be short.
-                - Creativity is encouraged, but keep the examples plausible and contextually meaningful."""),
-            )
+                - Creativity is encouraged, but keep the examples plausible and contextually meaningful.""")
             task_section = (
                 f"\n- The generated context is part of a dataset that conforms to a {self.task.value} task.\n"
                 if self.task is not None
@@ -708,20 +637,15 @@ class Generator:
 
         format_instructions = build_format_instructions(dynamic_model)
 
-        query_template = PromptTemplate(
-            input_variables=[],
-            template=dedent(
-                """\
-                    
+        query_template = dedent(
+            f"""\
                 You must output only valid JSON with no extra text.
                 Use the following schema and formatting rules:
                 {format_instructions}
                 """
-            ),
-            partial_variables={"format_instructions": format_instructions},
         )
 
-        query = query_template.format()
+        query = query_template
 
         prompt = system_prompt + query
         unparsed_response = cast(

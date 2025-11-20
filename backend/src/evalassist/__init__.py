@@ -1,10 +1,5 @@
 import logging
 
-import litellm
-
-litellm.drop_params = True
-litellm.disable_aiohttp_transport = True
-
 root_pkg_logger = logging.getLogger(__name__)
 root_pkg_logger.propagate = False
 
