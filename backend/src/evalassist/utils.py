@@ -18,7 +18,6 @@ from ibm_watsonx_ai.wml_client_error import (
     CannotSetProjectOrSpace,
     WMLClientError,
 )
-from langchain_core.exceptions import OutputParserException
 from openai import AuthenticationError, NotFoundError
 from unitxt.inference import (
     CrossProviderInferenceEngine,
@@ -434,12 +433,7 @@ def parse_exception_message(e: Exception) -> str:
 
 def handle_exception(e: Exception) -> None:
     error_message = parse_exception_message(e)
-    if isinstance(e, OutputParserException):
-        raise HTTPException(
-            status_code=400,
-            detail=error_message,
-        ) from e
-    elif isinstance(e, NotFoundError):
+    if isinstance(e, NotFoundError):
         raise HTTPException(status_code=400, detail=error_message)
     elif isinstance(e, ValueError):
         raise HTTPException(status_code=400, detail=error_message)
