@@ -62,6 +62,7 @@ EVAL_ASSIST_DIR = Path(__file__).parent
 STATIC_DIR = Path(os.getenv("STATIC_DIR", EVAL_ASSIST_DIR / "static"))
 DATA_DIR = Path(os.getenv("DATA_DIR", EVAL_ASSIST_DIR / "data")).expanduser()
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+LOG_DIR = Path(os.getenv("EVALASSIST_LOG_DIR", EVAL_ASSIST_DIR / "logs")).expanduser()
 DEFAULT_DATABASE_URL = f"sqlite:////{DATA_DIR / 'evalassist.db'}"
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
 TEMPORARY_FILES_FOLDER = EVAL_ASSIST_DIR / "temporary_files"
