@@ -8,6 +8,7 @@ import nbformat as nbf
 import nest_asyncio
 import pandas as pd
 from evalassist.judges.base import UnitxtInferenceEngineMixin
+from evalassist.logging_config import configure_logging
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -89,6 +90,7 @@ from .utils import (
 )
 
 nest_asyncio.apply()
+configure_logging()
 logger = logging.getLogger(__name__)
 app = FastAPI()
 app.add_middleware(
