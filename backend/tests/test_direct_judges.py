@@ -1,3 +1,4 @@
+import os
 from typing import cast
 from unittest.mock import patch
 
@@ -15,7 +16,19 @@ from unitxt.artifact import fetch_artifact
 from unitxt.inference import CrossProviderInferenceEngine, MockInferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions
 
+# Check if WatsonX credentials are available
+WATSONX_CREDENTIALS_AVAILABLE = all(
+    [
+        os.environ.get("WATSONX_API_KEY"),
+        os.environ.get("WATSONX_PROJECT_ID"),
+    ]
+)
 
+
+@pytest.mark.skipif(
+    not WATSONX_CREDENTIALS_AVAILABLE,
+    reason="Requires WatsonX credentials (WATSONX_API_KEY and WATSONX_PROJECT_ID environment variables)",
+)
 def test_main_judge():
     inference_engine = CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",
@@ -27,9 +40,7 @@ def test_main_judge():
         Criteria.from_unitxt_criteria(
             cast(
                 CriteriaWithOptions,
-                fetch_artifact("metrics.llm_as_judge.direct.criteria.answer_relevance")[
-                    0
-                ],
+                fetch_artifact("metrics.llm_as_judge.direct.criteria.answer_relevance")[0],
             )
         ),
         Criteria.from_unitxt_criteria("metrics.llm_as_judge.direct.criteria.coherence"),
@@ -56,17 +67,17 @@ def test_main_judge():
         ),
     ]
 
-    results: list[DirectInstanceResult] = judge.evaluate(
-        instances=instances, criteria=criteria
-    )
+    results: list[DirectInstanceResult] = judge.evaluate(instances=instances, criteria=criteria)
     assert results[0].selected_option == "Excellent"
     assert cast(float, results[1].score) >= 0.5
     assert cast(float, results[2].score) == 0.0
-    assert (
-        results[2].feedback is not None and len(results[2].feedback) > 0
-    )  # provided feedback
+    assert results[2].feedback is not None and len(results[2].feedback) > 0  # provided feedback
 
 
+@pytest.mark.skipif(
+    not WATSONX_CREDENTIALS_AVAILABLE,
+    reason="Requires WatsonX credentials (WATSONX_API_KEY and WATSONX_PROJECT_ID environment variables)",
+)
 def test_judges_str_params():
     inference_engine = CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",
@@ -136,15 +147,11 @@ def test_direct_judge_mocked_inference_failure(mock_infer):
 @patch(
     "unitxt.inference.MockInferenceEngine.infer",
     side_effect=[
-        [
-            'json```\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```'
-        ],
+        ['json```\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```'],
         [
             'json```\n{\n  "explanation": "explanation",\n  "selected_option": "Excellent",\n  "feedback": "feedback"\n}\n```'
         ],
-        [
-            'json```\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
-        ],
+        ['json```\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'],
     ],
 )
 def test_direct_judge_mocked_inference_almost_failure(mock_infer):
@@ -169,6 +176,10 @@ def test_direct_judge_mocked_inference_almost_failure(mock_infer):
     assert mock_infer.call_count == 3
 
 
+@pytest.mark.skipif(
+    not WATSONX_CREDENTIALS_AVAILABLE,
+    reason="Requires WatsonX credentials (WATSONX_API_KEY and WATSONX_PROJECT_ID environment variables)",
+)
 def test_direct_judge_mocked_inference_almost_failure_2():
     """In this test, the first call to inference engine is mocked and set to an invalid output generator, so the parser fails first time.
 
@@ -184,12 +195,8 @@ def test_direct_judge_mocked_inference_almost_failure_2():
         def side_effect(*args, **kwargs):
             if mock_infer.call_count < 3:
                 r = [
-                    [
-                        '```\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```'
-                    ],
-                    [
-                        '```\n{\n  "explanation": "explanation",\n "selected_option": "N"\n}\n```'
-                    ],
+                    ['```\n{\n  "explanation": "explanation",\n  "feedback": "feedback"\n}\n```'],
+                    ['```\n{\n  "explanation": "explanation",\n "selected_option": "N"\n}\n```'],
                 ][mock_infer.call_count - 1]
             else:
                 r = real_infer(inference_engine, *args, **kwargs)
@@ -229,12 +236,8 @@ def test_direct_judge_mocked_inference_almost_failure_2():
 @patch(
     "unitxt.inference.MockInferenceEngine.infer",
     side_effect=[
-        [
-            '```\n{\n  "persona_name": "persona_name",\n  "persona_description": "persona_description"\n}\n```'
-        ],
-        [
-            '```\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
-        ],
+        ['```\n{\n  "persona_name": "persona_name",\n  "persona_description": "persona_description"\n}\n```'],
+        ['```\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'],
     ],
 )
 def test_direct_judge_with_synthetic_persona_mocked_inference_success(mock_infer):
@@ -262,9 +265,7 @@ def test_direct_judge_with_synthetic_persona_mocked_inference_success(mock_infer
 @patch(
     "unitxt.inference.MockInferenceEngine.infer",
     side_effect=[
-        [
-            '```\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'
-        ],
+        ['```\n{\n  "explanation": "explanation",\n  "selected_option": "No",\n  "feedback": "feedback"\n}\n```'],
     ],
 )
 def test_direct_judge_with_ice_mocked_inference_success(mock_infer):

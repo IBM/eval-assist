@@ -1,5 +1,7 @@
+import os
 from typing import cast
 
+import pytest
 from evalassist.judges import (
     Criteria,
     Instance,
@@ -11,7 +13,19 @@ from unitxt.artifact import fetch_artifact
 from unitxt.inference import CrossProviderInferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions
 
+# Check if WatsonX credentials are available
+WATSONX_CREDENTIALS_AVAILABLE = all(
+    [
+        os.environ.get("WATSONX_API_KEY"),
+        os.environ.get("WATSONX_PROJECT_ID"),
+    ]
+)
 
+
+@pytest.mark.skipif(
+    not WATSONX_CREDENTIALS_AVAILABLE,
+    reason="Requires WatsonX credentials (WATSONX_API_KEY and WATSONX_PROJECT_ID environment variables)",
+)
 def test_main_judge():
     inference_engine = CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",
@@ -47,14 +61,16 @@ def test_main_judge():
         ),
     ]
 
-    results: list[PairwiseInstanceResult] = judge.evaluate(
-        instances=instances, criteria=criteria
-    )
+    results: list[PairwiseInstanceResult] = judge.evaluate(instances=instances, criteria=criteria)
 
     assert results[0].selected_option == 1
     assert results[1].selected_option == "tie"
 
 
+@pytest.mark.skipif(
+    not WATSONX_CREDENTIALS_AVAILABLE,
+    reason="Requires WatsonX credentials (WATSONX_API_KEY and WATSONX_PROJECT_ID environment variables)",
+)
 def test_judges_str_params():
     inference_engine = CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",

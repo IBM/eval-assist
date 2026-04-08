@@ -8,10 +8,10 @@ on:
 
 jobs:
   quality:
-    env:
-      WATSONX_API_KEY: ${{ secrets.WATSONX_API_KEY }}
-      WATSONX_PROJECT_ID: ${{ secrets.WATSONX_PROJECT_ID }}
-      WATSONX_URL: "https://us-south.ml.cloud.ibm.com"
+    # env:
+    #   WATSONX_API_KEY: ${{ secrets.WATSONX_API_KEY }}
+    #   WATSONX_PROJECT_ID: ${{ secrets.WATSONX_PROJECT_ID }}
+    #   WATSONX_URL: "https://us-south.ml.cloud.ibm.com"
     runs-on: ubuntu-latest
     strategy:
       matrix:
