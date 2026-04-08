@@ -61,7 +61,9 @@ def test_main_judge():
         ),
     ]
 
-    results: list[PairwiseInstanceResult] = judge.evaluate(instances=instances, criteria=criteria)
+    results: list[PairwiseInstanceResult] = judge.evaluate(
+        instances=instances, criteria=criteria
+    )
 
     assert results[0].selected_option == 1
     assert results[1].selected_option == "tie"
