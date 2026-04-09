@@ -4,7 +4,7 @@ name = "evalassist"
 dynamic = ["version"]
 description = "EvalAssist is an open-source project that simplifies using large language models as evaluators (LLM-as-a-Judge) of the output of other large language models by supporting users in iteratively refining evaluation criteria in a web-based user experience."
 license = "Apache-2.0" # set your license here
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.10,<3.13"
 authors = [
     { name = "Martín Santillán Cooper", email = "martinsantillancooper@gmail.com" },
 ]
@@ -41,7 +41,7 @@ classifiers = [
     "Framework :: Jupyter",
 ]
 
-dependencies = ["pydantic", "unitxt>=1.26.6"]
+dependencies = ["pydantic==2.11.7", "unitxt==1.26.6"]
 
 [tool.poetry]
 packages = [{ include = "evalassist", from = "src" }]
@@ -55,39 +55,39 @@ version = "0.0.0"
 
 [project.optional-dependencies]
 dev = [
-    "pre_commit",
-    "bandit[standard,toml]",
-    "flake8-pytest-style ",
-    "flake8 ",
-    "GitPython",
-    "pytest",
-    "httpx",
-    "tox",
-    "pytest-cov",
+    "pre_commit==4.2.0",
+    "bandit[standard,toml]==1.8.5",
+    "flake8-pytest-style==2.1.0",
+    "flake8==7.3.0",
+    "GitPython==3.1.44",
+    "pytest==8.4.1",
+    "httpx==0.28.1",
+    "tox==4.27.0",
+    "pytest-cov==6.2.1",
 ]
 webapp = [
-    "litellm",
-    "openai",
-    "ollama",
-    "ibm_watsonx_ai",
-    "fastapi",
-    "uvicorn",
-    "nest_asyncio",
-    "nbformat",
-    "tenacity",
-    "diskcache",
-    "pandas",
-    "nbconvert",
-    "boto3",
-    "click",
-    "setuptools",
-    "sqlmodel",
-    "alembic",
+    "litellm==1.73.0",
+    "openai==1.90.0",
+    "ollama==0.5.1",
+    "ibm_watsonx_ai==1.3.26",
+    "fastapi==0.115.13",
+    "uvicorn==0.34.3",
+    "nest_asyncio==1.6.0",
+    "nbformat==5.10.4",
+    "tenacity==9.1.2",
+    "diskcache==5.6.3",
+    "pandas==2.2.3",
+    "nbconvert==7.16.6",
+    "boto3==1.38.41",
+    "click==8.2.1",
+    "setuptools>=77.0.3,<80",
+    "sqlmodel==0.0.24",
+    "alembic==1.16.2",
 ]
-benchmarks = ["scikit-learn"]
-postgresql = ["psycopg2-binary"]
-local-inference = ["torch", "accelerate", "transformers"]
-prometheus = ["vllm", "prometheus-eval"]
+benchmarks = ["scikit-learn==1.7.0"]
+postgresql = ["psycopg2-binary==2.9.10"]
+local-inference = ["torch==2.7.1", "accelerate==1.8.1", "transformers==4.53.2"]
+prometheus = ["vllm==0.10.0", "prometheus-eval==0.1.20"]
 
 [tool.pytest.ini_options]
 addopts = "--cov=evalassist"

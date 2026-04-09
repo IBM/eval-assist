@@ -1,3 +1,4 @@
+import os
 from typing import cast
 from unittest.mock import patch
 
@@ -15,7 +16,19 @@ from unitxt.artifact import fetch_artifact
 from unitxt.inference import CrossProviderInferenceEngine, MockInferenceEngine
 from unitxt.llm_as_judge import CriteriaWithOptions
 
+# Check if WatsonX credentials are available
+WATSONX_CREDENTIALS_AVAILABLE = all(
+    [
+        os.environ.get("WATSONX_API_KEY"),
+        os.environ.get("WATSONX_PROJECT_ID"),
+    ]
+)
 
+
+@pytest.mark.skipif(
+    not WATSONX_CREDENTIALS_AVAILABLE,
+    reason="Requires WatsonX credentials (WATSONX_API_KEY and WATSONX_PROJECT_ID environment variables)",
+)
 def test_main_judge():
     inference_engine = CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",
@@ -67,6 +80,10 @@ def test_main_judge():
     )  # provided feedback
 
 
+@pytest.mark.skipif(
+    not WATSONX_CREDENTIALS_AVAILABLE,
+    reason="Requires WatsonX credentials (WATSONX_API_KEY and WATSONX_PROJECT_ID environment variables)",
+)
 def test_judges_str_params():
     inference_engine = CrossProviderInferenceEngine(
         model="llama-3-3-70b-instruct",
@@ -169,6 +186,10 @@ def test_direct_judge_mocked_inference_almost_failure(mock_infer):
     assert mock_infer.call_count == 3
 
 
+@pytest.mark.skipif(
+    not WATSONX_CREDENTIALS_AVAILABLE,
+    reason="Requires WatsonX credentials (WATSONX_API_KEY and WATSONX_PROJECT_ID environment variables)",
+)
 def test_direct_judge_mocked_inference_almost_failure_2():
     """In this test, the first call to inference engine is mocked and set to an invalid output generator, so the parser fails first time.
 
