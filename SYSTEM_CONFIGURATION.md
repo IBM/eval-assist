@@ -14,6 +14,8 @@ EvalAssist provides a set of environment variables and command parameter that al
 
 - **AUTHENTICATION_ENABLED**: Enables authentication. Currently, authentication is can be enabled only if backend and frontend are deployed separately, because the frontend uses dynamic route to implement auth. Defaults to `false`
 
+- **CORS_ALLOWED_ORIGINS**: Comma-separated browser origins allowed to call the API. Only needed if the frontend is deployed on a different origin than the backend. Defaults to `http://localhost:3000,http://127.0.0.1:3000`
+
 - **STORAGE_ENABLED**: Enables storing EvalAssist data. If disabled, any functionality that requires a database, like authentication and saving test cases won't be available. Defaults to `true`
 
 - **UVICORN_WORKERS**: The number of uvicorn workers to pass to `uvicorn.run`. Defaults to `1`
