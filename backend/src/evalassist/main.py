@@ -58,6 +58,7 @@ from .api_types import (
 from .benchmark import get_all_benchmarks
 from .const import (
     AUTHENTICATION_ENABLED,
+    CORS_ALLOWED_ORIGINS,
     DIRECT_ACTION_PARAMS,
     STATIC_DIR,
     STORAGE_ENABLED,
@@ -75,11 +76,11 @@ from .judges import (
 )
 from .model import AppUser, StoredTestCase
 from .notebook_generation import DirectEvaluationNotebook, PairwiseEvaluationNotebook
+from .server_credentials import get_public_default_credentials
 
 # Synthetic
 from .synthetic_example_generation.generate import DirectActionGenerator, Generator
 from .utils import (
-    clean_object,
     get_custom_models,
     get_evaluator_metadata_wrapper,
     get_inference_engine_from_judge_metadata,
@@ -95,8 +96,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=CORS_ALLOWED_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -187,43 +187,8 @@ def get_judges():
 
 @router.get("/default-credentials/", response_model=dict[str, dict[str, str]])
 def get_default_credentials():
-    openai_api_key = os.getenv("EVALASSIST_OPENAI_API_KEY", None)
-    azure_api_key = os.getenv("EVALASSIST_AZURE_API_KEY", None)
-    azure_api_base = os.getenv("EVALASSIST_AZURE_API_BASE", None)
-    rits_api_key = os.getenv("EVALASSIST_RITS_API_KEY", None)
-    watsonx_api_key = os.getenv("EVALASSIST_WATSONX_API_KEY", None)
-    watsonx_project_id = os.getenv("EVALASSIST_WATSONX_PROJECT_ID", None)
-    watsonx_api_base = os.getenv("EVALASSIST_WATSONX_API_BASE", None)
-    replicate_api_key = os.getenv("EVALASSIST_REPLICATE_API_KEY", None)
-    together_ai_api_key = os.getenv("EVALASSIST_TOGETHER_AI_API_KEY", None)
-    bedrock_ai_api_key = os.getenv("EVALASSIST_BEDROCK_AI_API_KEY", None)
-    open_ai_like_api_key = os.getenv("EVALASSIST_OPEN_AI_LIKE_API_KEY", None)
-    open_ai_like_api_base = os.getenv("EVALASSIST_OPEN_AI_LIKE_API_BASE", None)
-    ollama_api_key = os.getenv("EVALASSIST_OLLAMA_API_BASE", None)
-    vertex_ai_api_key = os.getenv("EVALASSIST_VERTEX_AI_API_KEY", None)
-
-    res = clean_object(
-        {
-            "rits": {"api_key": rits_api_key},
-            "watsonx": {
-                "api_key": watsonx_api_key,
-                "project_id": watsonx_project_id,
-                "api_base": watsonx_api_base,
-            },
-            "open-ai": {"api_key": openai_api_key},
-            "replicate": {"api_key": replicate_api_key},
-            "azure": {"api_key": azure_api_key, "api_base": azure_api_base},
-            "together-ai": {"api_key": together_ai_api_key},
-            "vertex-ai": {"api_key": vertex_ai_api_key},
-            "bedrock": {"api_key": bedrock_ai_api_key},
-            "open-ai-like": {
-                "api_key": open_ai_like_api_key,
-                "api_base": open_ai_like_api_base,
-            },
-            "ollama": {"api_base": ollama_api_key},
-        }
-    )
-    return res
+    # Secrets are masked; the server substitutes them when the placeholder is sent back.
+    return get_public_default_credentials()
 
 
 @router.get("/criteria/")
@@ -402,7 +367,11 @@ def log_user_action():
 def get_test_case(
     test_case_id: int, user: str, session: Session = Depends(get_session)
 ):
-    statement = select(StoredTestCase).where(StoredTestCase.id == test_case_id)
+    statement = (
+        select(StoredTestCase)
+        .join(AppUser)
+        .where(StoredTestCase.id == test_case_id, AppUser.email == user)
+    )
     test_case = session.exec(statement).first()
     if not test_case:
         raise HTTPException(status_code=404, detail="Test case not found")
@@ -466,13 +435,21 @@ def put_test_case(
 
 class DeleteTestCaseBody(BaseModel):
     test_case_id: int
+    user: str
 
 
 @router.delete("/test_case/")
 def delete_test_case(
     request_body: DeleteTestCaseBody, session: Session = Depends(get_session)
 ):
-    test_case = session.get(StoredTestCase, request_body.test_case_id)
+    test_case = session.exec(
+        select(StoredTestCase)
+        .join(AppUser)
+        .where(
+            StoredTestCase.id == request_body.test_case_id,
+            AppUser.email == request_body.user,
+        )
+    ).first()
     if not test_case:
         raise HTTPException(status_code=404, detail="Test case not found")
     session.delete(test_case)

@@ -38,6 +38,7 @@ from .extended_unitxt import (
     ExtendedModelProviderEnum,
 )
 from .judges import Instance
+from .server_credentials import resolve_server_default_credentials
 
 logger = logging.getLogger(__name__)
 
@@ -583,7 +584,9 @@ def get_inference_engine_from_judge_metadata(
         provider,
     )
     return get_inference_engine(
-        credentials=llm_provider_credentials,
+        credentials=resolve_server_default_credentials(
+            provider.value, llm_provider_credentials
+        ),
         provider=provider,
         model_name=model_name,
         custom_params=custom_params,

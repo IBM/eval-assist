@@ -398,7 +398,7 @@ export const TestCaseActionsProvider = ({ children }: { children: ReactNode }) =
   )
 
   const onDeleteTestCase = async () => {
-    await deleteCustom('test_case/', { test_case_id: currentTestCase.id })
+    await deleteCustom('test_case/', { test_case_id: currentTestCase.id, user: getUserName() })
 
     // notify the user
     addToast({

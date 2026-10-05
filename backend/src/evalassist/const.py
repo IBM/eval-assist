@@ -86,6 +86,16 @@ os.environ["STORAGE_ENABLED"] = str(STORAGE_ENABLED)
 
 AUTHENTICATION_ENABLED = os.getenv("AUTHENTICATION_ENABLED", "false").lower() == "true"
 
+# Origins allowed to call the API from a browser. Not needed when the frontend
+# is served by the backend (same origin); only set for separate deployments.
+CORS_ALLOWED_ORIGINS = [
+    o.strip()
+    for o in os.getenv(
+        "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+    ).split(",")
+    if o.strip()
+]
+
 UVICORN_WORKERS = os.getenv("UVICORN_WORKERS", "1")
 try:
     UVICORN_WORKERS = int(UVICORN_WORKERS)
